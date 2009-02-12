@@ -1,0 +1,66 @@
+<?php
+header('Content-Type: application/x-java-jnlp-file');
+header("Content-Disposition: attachment; filename=genomeview.jnlp");
+header('Pragma: no-cache');
+echo '<?xml version="1.0" encoding="utf-8"?>';
+
+
+$siteroot = 'http://' . $_SERVER["HTTP_HOST"] . str_replace(basename($_SERVER["PHP_SELF"]), "", $_SERVER["PHP_SELF"]);
+
+$param = $_SERVER["QUERY_STRING"];
+
+
+$jars[]="@jar@";
+/*
+ * Put all jars in an array for further use.
+ */
+$handle = opendir("lib/");
+while (($file = readdir($handle)) !== false) {
+	if ($file != "." && $file != ".." && ends_with($file,"jar"))
+		$jars[] = "lib/" . $file;
+}
+
+?>
+<jnlp spec="1.0+"
+  codebase="<?php echo $siteroot;?>"
+>
+
+<information>
+  <title>GenomeView: Genome Browser and Curator</title>
+  <vendor>VIB :: Plant Systems Biology :: Bioinformatics and Evolutionary Genomics</vendor>
+  <homepage href="http://bioinformatics.psb.ugent.be/" />
+  <description>GenomeView: Genome Browser and Curator</description>
+</information>
+<security>
+  <all-permissions />
+</security>
+<resources>
+  <j2se version="1.6+" java-vm-args="-ea" initial-heap-size="128M" max-heap-size="500M"/>
+  	 <?php
+
+
+foreach ($jars as $jar_file) {
+	echo "<jar href=\"" . $siteroot . "" . $jar_file . "\" />\n";
+}
+?>
+  
+</resources>
+<application-desc main-class="net.sf.genomeview.gui.GenomeView">
+<?php if (!empty($param)){ 
+	$params=explode("%20",$param);
+	foreach($params as $single){
+	echo "<argument>". $single."</argument>";
+	}
+} 
+?>
+</application-desc>
+
+
+</jnlp>
+
+<?php
+function ends_with( $str, $sub ) {
+   return ( substr( $str, strlen( $str ) - strlen( $sub ) ) == $sub );
+}
+
+?>

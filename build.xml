@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<project name="GenomeView" default="jar" basedir=".">
+
+
+	<property name="version" value="1.8" />
+	<property name="src" value="." />
+	<property name="build" value="build" />
+	<property name="lib" value="lib" />
+
+
+	<propertyfile file="genomeview.properties" comment="GenomeView properties">
+		<entry key="version" value="${version}" />
+	</propertyfile>
+
+	<property name="dist" value="genomeview-${version}" />
+	<property name="jar" value="genomeview-${version}.jar" />
+	<property name="srcjar" value="genomeview-${version}-src.jar" />
+
+
+	
+	<target name="init">
+		<delete failonerror="false" dir="${build}" />
+		<delete failonerror="false" dir="${dist}" />
+		<mkdir dir="${build}" />
+
+
+
+		<mkdir dir="${dist}" />
+		<mkdir dir="sourcebuild" />
+		<copy todir="sourcebuild">
+			<fileset dir="${src}">
+
+				<include name="**/*.java" />
+				<include name="**/*.conf" />
+				<include name="**/*.png" />
+			</fileset>
+		</copy>
+		<replaceregexp match="%HEADER%" replace="This file is part of GenomeView, a genome browser and annotation curator${line.separator}
+* ${line.separator}
+* Copyright (C) 2007-2009 Thomas Abeel and Thomas Van Parys${line.separator}
+* ${line.separator}
+* This program is free software: you can redistribute it and/or modify${line.separator}
+* it under the terms of the GNU General Public License as published by${line.separator}
+* the Free Software Foundation, either version 3 of the License, or${line.separator}
+* (at your option) any later version.${line.separator}
+*${line.separator}
+* This program is distributed in the hope that it will be useful,${line.separator}
+* but WITHOUT ANY WARRANTY; without even the implied warranty of${line.separator}
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the${line.separator}
+* GNU General Public License for more details.${line.separator}
+*${line.separator}
+* You should have received a copy of the GNU General Public License${line.separator}
+* along with this program.  If not, see http://www.gnu.org/licenses/.${line.separator}
+*${line.separator}
+* Project: http://genomeview.sourceforge.net/">
+			<fileset dir="sourcebuild">
+				<include name="**/*.java" />
+			</fileset>
+		</replaceregexp>
+
+		<jar destfile="${dist}/${srcjar}" basedir="sourcebuild">
+		</jar>
+		<delete failonerror="false" dir="sourcebuild" />
+
+		<copy todir="${dist}">
+			
+			<fileset dir="${src}">
+				<!-- <include name="**/*.conf" /> -->
+				<!-- <include name="**/*.txt" /> -->
+				<include name="*.txt" />
+			</fileset>
+		</copy>
+		<copy todir="${dist}/lib">
+			<fileset dir="${lib}" />
+
+		</copy>
+		<mkdir dir="${build}/images" />
+		<copy todir="${build}/images">
+			<fileset dir="images" />
+		</copy>
+		<copy todir="${build}">
+			<fileset dir="${src}">
+				<include name="**/*.conf" />
+
+			</fileset>
+		</copy>
+
+		<filter token="version" value="${version}" />
+		<filter token="jar" value="${jar}" />
+		<copy file="launch.jnlp" todir="${dist}" filtering="true">
+		</copy>
+
+		<copy file="genomeview.properties" todir="${build}" />
+		<copy file="plugin.xml" todir="${build}" />
+
+
+	</target>
+
+	<target name="compile" depends="init">
+		<javac source="1.6" target="1.6" debug="true" debuglevel="lines,vars,source" srcdir="${src}" destdir="${build}" excludes="junit/*.java">
+			<classpath>
+				<fileset dir="${lib}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+
+	<target name="jar" depends="compile">
+
+
+
+		<jar destfile="${dist}/${jar}" basedir="${build}" manifest="devtools/MANIFEST.MF">
+		</jar>
+
+
+		<!-- query for keystore information -->
+		<taskdef name="query" classname="com.jera.anttasks.Query" classpath="devtools/JeraAntTasks.jar" />
+		<query name="alias" password="false" />
+		<query name="storepass" password="true" />
+		<query name="aliaspass" password="true" />
+		<!-- sign everything -->
+		<!-- TODO: if jarsigner 1 returned, we should ask again for passwords -->
+		<!-- Jarsigning can't be lazy, it then complains about not the same certificate -->
+		<signjar lazy="false" alias="${alias}" keystore="devtools/key.store" storepass="${storepass}" keypass="${aliaspass}" jar="${dist}/${jar}" />
+		<signjar lazy="false" alias="${alias}" keystore="devtools/key.store" storepass="${storepass}" keypass="${aliaspass}">
+			<fileset dir="${dist}/lib/">
+				<include name="**/*.jar" />
+			</fileset>
+		</signjar>
+
+
+		<zip destfile="${dist}.zip" basedir="${dist}" />
+		<tar tarfile="${dist}.tar" basedir="${dist}" excludes="${dist}.zip" />
+		<gzip zipfile="${dist}.tar.gz" src="${dist}.tar" />
+		<delete failonerror="false" file="${dist}.tar" />
+		<delete failonerror="false" dir="${dist}" />
+
+		<delete failonerror="false" dir="${build}" />
+
+	</target>
+
+</project>
