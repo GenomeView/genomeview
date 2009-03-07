@@ -29,283 +29,296 @@ import be.abeel.util.LineIterator;
  * 
  */
 public class Configuration {
-    private static Logger logger = Logger.getLogger(Configuration.class.getCanonicalName());
 
-    /* Map with default genomeview configuration */
-    private static HashMap<String, String> defaultMap = new HashMap<String, String>();
+	private static File confDir;
 
-    /* Map with user configuration */
-    private static HashMap<String, String> localMap = new HashMap<String, String>();
+	static {
+		String s = System.getProperty("user.home");
+		confDir = new File(s + "/.genomeview");
+		System.out.println("User config: " + confDir);
 
-    /* Map with extra configuration */
-    private static HashMap<String, String> extraMap = new HashMap<String, String>();
+	}
 
-    private static Properties dbConnection = new Properties();
+	private static Logger logger = Logger.getLogger(Configuration.class
+			.getCanonicalName());
 
-    private static Properties gvProperties = new Properties();
-    static {
-        try {
-            load();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	/* Map with default genomeview configuration */
+	private static HashMap<String, String> defaultMap = new HashMap<String, String>();
 
-    public static String get(String key) {
-        if (extraMap.containsKey(key)) {
-            return extraMap.get(key);
-        } else if (localMap.containsKey(key)) {
-            return localMap.get(key);
+	/* Map with user configuration */
+	private static HashMap<String, String> localMap = new HashMap<String, String>();
 
-        } else if (defaultMap.containsKey(key)) {
-            localMap.put(key, defaultMap.get(key));
-            return defaultMap.get(key);
-        } else {
-            return null;
-        }
+	/* Map with extra configuration */
+	private static HashMap<String, String> extraMap = new HashMap<String, String>();
 
-    }
+	private static Properties dbConnection = new Properties();
 
-    private static File dbConnectionFile;
+	private static Properties gvProperties = new Properties();
+	static {
+		try {
+			load();
+			/*
+			 * Make sure personal conf is also available for next start. This is
+			 * mainly important for the first time you launch GV
+			 */
+			save();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-    private static File configFile;
+	public static String get(String key) {
+		if (extraMap.containsKey(key)) {
+			return extraMap.get(key);
+		} else if (localMap.containsKey(key)) {
+			return localMap.get(key);
 
-    private static File confDir;
+		} else if (defaultMap.containsKey(key)) {
+			localMap.put(key, defaultMap.get(key));
+			return defaultMap.get(key);
+		} else {
+			return null;
+		}
 
-    private static void load() throws IOException {
-        try {
-            gvProperties.load(Configuration.class.getResourceAsStream("/genomeview.properties"));
-        } catch (Exception e1) {
-            logger
-                    .warning("genomeview.properties file could not be loaded! GenomeView assumes your are a developer and know why you can ignore this.");
+	}
 
-        }
+	private static File dbConnectionFile;
 
-        String s = System.getProperty("user.home");
-        confDir = new File(s + "/.genomeview");
-        System.out.println("User config: "+confDir);
-        if (!confDir.exists()) {
-            confDir.mkdir();
+	private static File configFile;
 
-        }
-        /* loading default configuration from the jar */
+	private static void load() throws IOException {
+		try {
+			gvProperties.load(Configuration.class
+					.getResourceAsStream("/genomeview.properties"));
+		} catch (Exception e1) {
+			logger
+					.warning("genomeview.properties file could not be loaded! GenomeView assumes your are a developer and know why you can ignore this.");
 
-        logger.info("Loading default configuration...");
-        LineIterator it;
+		}
 
-        it = new LineIterator(Configuration.class.getResourceAsStream("/conf/default.conf"));
-        it.setSkipBlanks(true);
-        it.setSkipComments(true);
-        for (String line : it) {
-            String[] arr = line.split("=");
-            defaultMap.put(arr[0].trim(), arr[1].trim());
-        }
-        it.close();
+		/* loading default configuration from the jar */
 
-        /* look for local configuration and load it if present */
-        logger.info("Configuration directory: " + confDir);
+		logger.info("Loading default configuration...");
+		LineIterator it;
 
-        dbConnectionFile = new File(confDir, "dbconnection.properties");
-        if (!dbConnectionFile.exists()) {
-            createDbConnection();
-        }
-        dbConnection.load(new FileInputStream(dbConnectionFile));
+		it = new LineIterator(Configuration.class
+				.getResourceAsStream("/conf/default.conf"));
+		it.setSkipBlanks(true);
+		it.setSkipComments(true);
+		for (String line : it) {
+			String[] arr = line.split("=");
+			defaultMap.put(arr[0].trim(), arr[1].trim());
+		}
+		it.close();
 
-        configFile = new File(confDir, "personal.conf.gz");
-        if (!configFile.exists()) {
-            configFile.createNewFile();
-        } else {
-            it = new LineIterator(new GZIPInputStream(new FileInputStream(configFile)));
-            it.setSkipBlanks(true);
-            it.setSkipComments(true);
-            for (String line : it) {
-                String[] arr = line.split("=");
-                localMap.put(arr[0].trim(), arr[1].trim());
-            }
-            it.close();
-        }
+		/* look for local configuration and load it if present */
+		logger.info("Configuration directory: " + confDir);
 
-    }
+		dbConnectionFile = new File(confDir, "dbconnection.properties");
+		if (!dbConnectionFile.exists()) {
+			createDbConnection();
+		}
+		dbConnection.load(new FileInputStream(dbConnectionFile));
 
-    private static void createDbConnection() throws FileNotFoundException, IOException {
-        dbConnection.put("host", "jdbc:mysql://psbsql01:3306/db_thabe_genomeview");
-        dbConnection.put("user", "genomeview");
-        dbConnection.put("pass", "qjW23DPYDzMs3NYa");
-        dbConnection.store(new FileOutputStream(dbConnectionFile), "initial configuration");
-    }
+		configFile = new File(confDir, "personal.conf.gz");
+		if (!configFile.exists()) {
+			configFile.createNewFile();
+		} else {
+			it = new LineIterator(new GZIPInputStream(new FileInputStream(
+					configFile)));
+			it.setSkipBlanks(true);
+			it.setSkipComments(true);
+			for (String line : it) {
+				String[] arr = line.split("=");
+				localMap.put(arr[0].trim(), arr[1].trim());
+			}
+			it.close();
+		}
 
-    /**
-     * Save all configuration back to the respective files.
-     * 
-     * @throws IOException
-     */
-    public static void save() throws IOException {
-        logger.info("Saving config");
+	}
 
-        dbConnection.store(new FileOutputStream(dbConnectionFile), "");
+	private static void createDbConnection() throws FileNotFoundException,
+			IOException {
+		dbConnection.put("host",
+				"jdbc:mysql://psbsql01:3306/db_thabe_genomeview");
+		dbConnection.put("user", "genomeview");
+		dbConnection.put("pass", "qjW23DPYDzMs3NYa");
+		dbConnection.store(new FileOutputStream(dbConnectionFile),
+				"initial configuration");
+	}
 
-        GZIPPrintWriter out = new GZIPPrintWriter(configFile);
-        for (String s : localMap.keySet()) {
-            out.println(s + "=" + localMap.get(s));
-        }
-        out.close();
+	/**
+	 * Save all configuration back to the respective files.
+	 * 
+	 * @throws IOException
+	 */
+	public static void save() throws IOException {
+		logger.info("Saving config");
 
-    }
+		dbConnection.store(new FileOutputStream(dbConnectionFile), "");
 
-    public static File getDirectory() {
-        return confDir;
-    }
+		GZIPPrintWriter out = new GZIPPrintWriter(configFile);
+		for (String s : localMap.keySet()) {
+			out.println(s + "=" + localMap.get(s));
+		}
+		out.close();
 
-    /**
-     * Returns the directory where the modules reside.
-     * 
-     * @return
-     */
-    public static File getModuleDirectory() {
-        File modules = new File(confDir, "modules");
-        if (!modules.exists()) {
-            modules.mkdir();
+	}
 
-        }
+	public static File getDirectory() {
+		return confDir;
+	}
 
-        return modules;
+	/**
+	 * Returns the directory where the modules reside.
+	 * 
+	 * @return
+	 */
+	public static File getModuleDirectory() {
+		File modules = new File(confDir, "modules");
+		if (!modules.exists()) {
+			modules.mkdir();
 
-    }
+		}
 
-    public static String getDBHost() {
-        return dbConnection.getProperty("host");
-    }
+		return modules;
 
-    public static String getDBUser() {
-        return dbConnection.getProperty("user");
-    }
+	}
 
-    public static String getDBPass() {
-        return dbConnection.getProperty("pass");
-    }
+	public static String getDBHost() {
+		return dbConnection.getProperty("host");
+	}
 
-    public static Properties getDbConnection() {
-        return dbConnection;
-    }
+	public static String getDBUser() {
+		return dbConnection.getProperty("user");
+	}
 
-    public static Color getColor(Type t) {
-        return getColor("TYPE_" + t);
-    }
+	public static String getDBPass() {
+		return dbConnection.getProperty("pass");
+	}
 
-    public static Color getColor(String string) {
-        String tmp = get(string);
-        if (tmp == null)
-            tmp = "GRAY";
-        return ColorFactory.decodeColor(get(string));
-    }
+	public static Properties getDbConnection() {
+		return dbConnection;
+	}
 
-    public static int getInt(String string) {
-        return Integer.parseInt(get(string));
-    }
+	public static Color getColor(Type t) {
+		return getColor("TYPE_" + t);
+	}
 
-    public static boolean getBoolean(String string) {
-        return Boolean.parseBoolean(get(string));
-    }
+	public static Color getColor(String string) {
+		String tmp = get(string);
+		if (tmp == null)
+			tmp = "GRAY";
+		return ColorFactory.decodeColor(get(string));
+	}
 
-    public static Color getNucleotideColor(char nt) {
+	public static int getInt(String string) {
+		return Integer.parseInt(get(string));
+	}
 
-        return getColor("N_" + nt);
-    }
+	public static boolean getBoolean(String string) {
+		return Boolean.parseBoolean(get(string));
+	}
 
-    public static Color getAminoAcidColor(char aa) {
-        return getColor("AA_" + aa);
-    }
+	public static Color getNucleotideColor(char nt) {
 
-    public static void set(String string, boolean b) {
-        set(string, "" + b);
-    }
+		return getColor("N_" + nt);
+	}
 
-    public static void set(String key, File value) {
-        localMap.put(key, value.toString());
-    }
+	public static Color getAminoAcidColor(char aa) {
+		return getColor("AA_" + aa);
+	}
 
-    public static void set(String string, String value) {
-        localMap.put(string, value);
+	public static void set(String string, boolean b) {
+		set(string, "" + b);
+	}
 
-    }
+	public static void set(String key, File value) {
+		localMap.put(key, value.toString());
+	}
 
-    public static Set<String> getStringSet(String key) {
-        String tmp = get(key);
-        Set<String> out = new HashSet<String>();
-        for (String s : tmp.split(",")) {
-            out.add(s.trim());
-        }
-        return out;
-    }
+	public static void set(String string, String value) {
+		localMap.put(string, value);
 
-    public static Set<Type> getTypeSet(String string) {
-        String tmp = get(string);
-        Set<Type> out = new HashSet<Type>();
-        for (String s : tmp.split(",")) {
-            out.add(Type.valueOf(s.trim()));
-        }
-        return out;
-    }
+	}
 
-    public static String version() {
-        return gvProperties.getProperty("version", "developer version");
-    }
+	public static Set<String> getStringSet(String key) {
+		String tmp = get(key);
+		Set<String> out = new HashSet<String>();
+		for (String s : tmp.split(",")) {
+			out.add(s.trim());
+		}
+		return out;
+	}
 
-    public static void loadExtra(InputStream ios) throws IOException {
-        logger.info("Loading extra config...");
-        LineIterator it = new LineIterator(ios);
-        it.setSkipBlanks(true);
-        it.setSkipComments(true);
-        for (String line : it) {
-            String[] arr = line.split("=");
-            extraMap.put(arr[0].trim(), arr[1].trim());
-        }
-        it.close();
+	public static Set<Type> getTypeSet(String string) {
+		String tmp = get(string);
+		Set<Type> out = new HashSet<Type>();
+		for (String s : tmp.split(",")) {
+			out.add(Type.valueOf(s.trim()));
+		}
+		return out;
+	}
 
-    }
+	public static String version() {
+		return gvProperties.getProperty("version", "developer version");
+	}
 
-    public static File getPluginDirectory() {
-        File modules = new File(confDir, "plugin");
-        if (!modules.exists()) {
-            modules.mkdir();
+	public static void loadExtra(InputStream ios) throws IOException {
+		logger.info("Loading extra config...");
+		LineIterator it = new LineIterator(ios);
+		it.setSkipBlanks(true);
+		it.setSkipComments(true);
+		for (String line : it) {
+			String[] arr = line.split("=");
+			extraMap.put(arr[0].trim(), arr[1].trim());
+		}
+		it.close();
 
-        }
+	}
 
-        return modules;
-    }
+	public static File getPluginDirectory() {
+		File modules = new File(confDir, "plugin");
+		if (!modules.exists()) {
+			modules.mkdir();
 
-    public static void set(String key, int value) {
-        set(key, "" + value);
+		}
 
-    }
+		return modules;
+	}
 
-    public static void setColor(Type type, Color newColor) {
-        set("TYPE_" + type, ColorFactory.encode(newColor));
+	public static void set(String key, int value) {
+		set(key, "" + value);
 
-    }
+	}
 
-    public static void reset(Model model) {
-        if (!configFile.delete()) {
-            System.err.println("Could not reset configuration!");
-        }
-        localMap.clear();
-        extraMap.clear();
-        defaultMap.clear();
-        try {
-            load();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        model.refresh();
-    }
+	public static void setColor(Type type, Color newColor) {
+		set("TYPE_" + type, ColorFactory.encode(newColor));
 
-    public static File getFile(String key) {
-        String val = get(key);
-        if (val != null)
-            return new File(val);
-        else
-            return null;
-    }
+	}
+
+	public static void reset(Model model) {
+		if (!configFile.delete()) {
+			System.err.println("Could not reset configuration!");
+		}
+		localMap.clear();
+		extraMap.clear();
+		defaultMap.clear();
+		try {
+			load();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		model.refresh();
+	}
+
+	public static File getFile(String key) {
+		String val = get(key);
+		if (val != null)
+			return new File(val);
+		else
+			return null;
+	}
 }
