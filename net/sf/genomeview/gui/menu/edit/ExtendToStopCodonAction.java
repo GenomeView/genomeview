@@ -32,7 +32,7 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
     public void update(Observable o, Object obj) {
         if (model.getFeatureSelection().size() == 1 && model.getFeatureSelection().first().type() == Type.get("CDS")) {
             setEnabled(SequenceTools.hasMissingStopCodon(model.getSelectedEntry().sequence, model.getFeatureSelection()
-                    .first()));
+                    .first(),model.getAAMapping()));
         } else
             setEnabled(false);
 
@@ -46,10 +46,10 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
         Sequence seq = model.getSelectedEntry().sequence;
         String nt = SequenceTools.extractSequence(seq, rf);
         int rest = nt.length() % 3;
-        assert (SequenceTools.hasMissingStopCodon(model.getSelectedEntry().sequence, rf));
+        assert (SequenceTools.hasMissingStopCodon(model.getSelectedEntry().sequence, rf,model.getAAMapping()));
         if (rf.strand() == Strand.FORWARD) {
             int start = rf.end() - rest + 1;
-            while (model.getSelectedEntry().sequence.getAminoAcid(start) != '*') {
+            while (model.getSelectedEntry().sequence.getAminoAcid(start,model.getAAMapping()) != '*') {
                 start += 3;
             }
             start += 2;
@@ -58,7 +58,7 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
         } else if (rf.strand() == Strand.REVERSE) {
             int start = rf.start() + rest;
             System.out.println(start);
-            while (model.getSelectedEntry().sequence.getReverseAminoAcid(start) != '*') {
+            while (model.getSelectedEntry().sequence.getReverseAminoAcid(start,model.getAAMapping()) != '*') {
 
                 start -= 3;
             }

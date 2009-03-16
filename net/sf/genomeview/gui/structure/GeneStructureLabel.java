@@ -412,9 +412,9 @@ public class GeneStructureLabel extends AbstractGeneLabel implements MouseListen
 
             char aa;
             if (forward)
-                aa = model.getSelectedEntry().sequence.getAminoAcid(i);
+                aa = model.getSelectedEntry().sequence.getAminoAcid(i,model.getAAMapping());
             else
-                aa = model.getSelectedEntry().sequence.getReverseAminoAcid(i);
+                aa = model.getSelectedEntry().sequence.getReverseAminoAcid(i,model.getAAMapping());
             /* draw amino acid box */
             int x = (int) (((i - r.start()) * width));
             int y;

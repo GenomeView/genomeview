@@ -30,6 +30,7 @@ import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.annotation.AnnotationFrame;
 import net.sf.genomeview.gui.chromosome.ChromosomeFrame;
+import net.sf.genomeview.gui.components.AAMappingChooser;
 import net.sf.genomeview.gui.information.InformationFrame;
 import net.sf.genomeview.gui.menu.edit.RedoAction;
 import net.sf.genomeview.gui.menu.edit.UndoAction;
@@ -113,7 +114,7 @@ public class MainContent {
         bar.addSeparator();
         bar.add(new JLabel("Entry:"));
         bar.add(new JComboBox(new ChromosomeListModel(model)));
-
+        bar.add(new AAMappingChooser(model));
         String sponsor = Configuration.get("sponsor");
         if (sponsor.length() != 0) {
             URL url = Icons.class.getResource(sponsor);

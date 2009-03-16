@@ -99,7 +99,7 @@ public class SelectedSequenceDialog extends JDialog {
                     }
                 }
                 if (aa.isSelected()) {
-                    selectedSequence = SequenceTools.translate(tmp.toString());
+                    selectedSequence = SequenceTools.translate(tmp.toString(),model.getAAMapping());
                 } else
                     selectedSequence = tmp.toString();
                 setVisible(false);

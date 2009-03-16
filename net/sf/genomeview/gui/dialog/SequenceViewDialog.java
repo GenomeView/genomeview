@@ -230,7 +230,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
         Set<Feature> feats = model.getFeatureSelection();
         for (Feature feat : feats) {
             String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence, feat);
-            String prots = SequenceTools.translate(seq);
+            String prots = SequenceTools.translate(seq,model.getAAMapping());
 
             newList.put(feat, prots);
         }

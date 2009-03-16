@@ -47,7 +47,7 @@ public class CopySequenceAction extends AbstractModelAction {
             case 3:
             case 4:
                 for (int i = l.start(); i <= l.end(); i += 3)
-                    sb.append(seq.getAminoAcid(i));
+                    sb.append(seq.getAminoAcid(i,model.getAAMapping()));
                 break;
             case -1:
                 for (int i = l.end(); i >= l.start(); i--)
@@ -57,7 +57,7 @@ public class CopySequenceAction extends AbstractModelAction {
             case -3:
             case -4:
                 for (int i = l.end(); i >= l.start(); i -= 3)
-                    sb.append(seq.getReverseAminoAcid(i - 2));
+                    sb.append(seq.getReverseAminoAcid(i - 2,model.getAAMapping()));
                 break;
             }
 

@@ -90,19 +90,19 @@ public class CDSTrackListModel extends AbstractTableModel implements Observer {
         case 0:
             return f;
         case 1:
-            if (SequenceTools.hasMissingStartCodon(seq, f)) {
+            if (SequenceTools.hasMissingStartCodon(seq, f,model.getAAMapping())) {
                 return Icons.NO;
             } else {
                 return Icons.YES;
             }
         case 2:
-            if (SequenceTools.hasMissingStopCodon(seq, f)) {
+            if (SequenceTools.hasMissingStopCodon(seq, f,model.getAAMapping())) {
                 return Icons.NO;
             } else {
                 return Icons.YES;
             }
         case 3:
-            if (SequenceTools.hasInternalStopCodon(seq, f)) {
+            if (SequenceTools.hasInternalStopCodon(seq, f,model.getAAMapping())) {
                 return Icons.NO;
             } else {
                 return Icons.YES;

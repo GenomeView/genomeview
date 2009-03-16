@@ -24,6 +24,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.DisplayType;
 import net.sf.genomeview.plugin.GUIManager;
 import net.sf.genomeview.plugin.IValueFeature;
+import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.Annotation;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
@@ -626,6 +627,23 @@ public class Model extends Observable implements Observer, IModel {
 		System.out.println("Model.addEntries DONE!");
 		refresh();
 		return es;
+	}
+
+	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(
+			AminoAcidMapping.STANDARDCODE);
+
+	public AminoAcidMapping getAAMapping(Entry e) {
+		return aamapping.get(e);
+	}
+	public AminoAcidMapping getAAMapping(){
+		return aamapping.get(getSelectedEntry());
+	}
+
+	public void setAAMapping(Entry e, AminoAcidMapping aamapping) {
+		System.out.println("setting: "+aamapping);
+		this.aamapping.put(e, aamapping);
+		refresh();
+
 	}
 
 	/**

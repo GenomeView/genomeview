@@ -26,6 +26,7 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
@@ -215,7 +216,8 @@ public class SearchDialog extends JDialog {
                 private byte[] translate(byte[] seq, int offset) {
                     byte[] out = new byte[seq.length / 3];
                     for (int i = 0; i < out.length && 3 * i + offset + 2 < seq.length; i++) {
-                        out[i] = (byte) net.sf.jannot.AminoAcidMapping.get("" + (char) seq[3 * i + offset]
+                    	AminoAcidMapping aamap=model.getAAMapping(model.getSelectedEntry());
+                        out[i] = (byte) aamap.get("" + (char) seq[3 * i + offset]
                                 + (char) seq[3 * i + offset + 1] + (char) seq[3 * i + offset + 2]);
                         // System.out.println((char)out[i]);
                     }

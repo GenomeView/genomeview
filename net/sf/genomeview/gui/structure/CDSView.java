@@ -195,7 +195,7 @@ public class CDSView extends JLabel implements Observer {
             Rectangle r = new Rectangle(lmin + hGap, hor + vGap, lmax - lmin, lineHeight);
             /* Draw box */
             Color cdsColor = Configuration.getColor("TYPE_CDS");
-            if (SequenceTools.hasInternalStopCodon(entry.sequence, rf, l)) {
+            if (SequenceTools.hasInternalStopCodon(entry.sequence, rf, l,model.getAAMapping())) {
                 g.setColor(Color.RED);
             } else {
                 g.setColor(cdsColor);
