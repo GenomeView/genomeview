@@ -24,11 +24,9 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.source.MobySource;
 import net.sf.genomeview.gui.dialog.GVProgressBar;
@@ -38,7 +36,6 @@ import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.URLSource;
-import net.sf.jannot.source.DataSource.Sources;
 import be.abeel.util.AutoHelpCmdLineParser;
 
 /**
@@ -113,22 +110,22 @@ public class MainWindow implements WindowListener, Observer {
 		String cmdFile = (String) parser.getOptionValue(fileO);
 		final String cmdBogas = (String) parser.getOptionValue(bogasO);
 
-		/*
-		 * Select data source. If an URL or file are specified on the command
-		 * line, that is selected. In other cases a dialog pops-up to let the
-		 * user select.
-		 * 
-		 * If both file and url are specified, the URL is loaded.
-		 */
-		DataSource[] data = null;
-		if (cmdFile == null && cmdUrl == null && cmdBogas == null) {
-			logger.info("File, url and bogas options are null!");
-			Sources source = (Sources) JOptionPane.showInputDialog(window,
-					"Select main data source", "Data selection",
-					JOptionPane.INFORMATION_MESSAGE, null, Sources.values(),
-					Sources.values()[0]);
-			if (source != null)
-				data = DataSourceFactory.create(source, model);
+
+        /*
+         * Select data source. If an URL or file are specified on the command
+         * line, that is selected. In other cases a dialog pops-up to let the
+         * user select.
+         * 
+         * If both file and url are specified, the URL is loaded.
+         */
+        DataSource[] data = null;
+        if (cmdFile == null && cmdUrl == null && cmdBogas == null) {
+            logger.info("File, url and bogas options are null!");
+//            Sources source = (Sources) JOptionPane.showInputDialog(window, "Select main data source", "Data selection",
+//                    JOptionPane.INFORMATION_MESSAGE, null, Sources.values(), Sources.values()[0]);
+//            if(source!=null)
+//            data = DataSourceFactory.create(source, model);
+        	
 
 		} else if (cmdUrl != null) {
 			logger.info("URL commandline option is set: " + cmdUrl);
@@ -138,6 +135,7 @@ public class MainWindow implements WindowListener, Observer {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
 
 		} else if (cmdFile != null) {
 			logger.info("File commandline option is set: " + cmdFile);

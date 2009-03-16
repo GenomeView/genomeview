@@ -204,10 +204,10 @@ public class MobySource extends DataSource {
 
         entry.sequence.setSequence(dnaString, start);
 
-        entry.description.addAccessionNumber(acc);
-        entry.description.setTaxonomicDivision(Integer.toString(taxId));
-        entry.description.addDescriptionValue("Genotype", genoType);
-        entry.description.addDescriptionValue("Release", release);
+        entry.description.setID(acc);
+        entry.description.put("taxonomicDivision",Integer.toString(taxId));
+        entry.description.put("genotype", genoType);
+        entry.description.put("release", release);
 
         // iterate the containers and attach the features
         // TODO implement relationships!
@@ -318,15 +318,15 @@ public class MobySource extends DataSource {
         MobyDataComposite regionObj = new MobyDataComposite("Region", "region", registry);
         // return regionObj;
         MobyDataComposite sourceObj = new MobyDataComposite("Source", registry);
-        String accessions = new String();
-        for (String acc : entry.description.getAccessionNumbers()) {
-            accessions.concat(" " + acc);
-        }
+        String accessions = entry.description.getID();
+//        for (String acc : entry.description.getAccessionNumbers()) {
+//            accessions.concat(" " + acc);
+//        }
 
         sourceObj.put("accession", new MobyDataString(accessions, registry));
-        sourceObj.put("taxID", new MobyDataInt(Integer.parseInt(entry.description.getTaxonomicDivision()), registry));
-        sourceObj.put("genotype", new MobyDataString(entry.description.getDescriptionValue("Genotype"), registry));
-        sourceObj.put("release", new MobyDataString(entry.description.getDescriptionValue("Release"), registry));
+        sourceObj.put("taxID", new MobyDataInt(Integer.parseInt(entry.description.get("taxonomicDivision")), registry));
+        sourceObj.put("genotype", new MobyDataString(entry.description.get("genotype"), registry));
+        sourceObj.put("release", new MobyDataString(entry.description.get("release"), registry));
         regionObj.put("Source", sourceObj);
 
         MobyDataComposite dnaObj = new MobyDataComposite("DNASequence", registry);
