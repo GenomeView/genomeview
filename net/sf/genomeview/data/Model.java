@@ -667,6 +667,7 @@ public class Model extends Observable implements Observer, IModel {
 			/* Check if any existing entry has the same name */
 			for (Entry g : entries) {
 				if (g.description.getID().equals(e.description.getID())) {
+					System.out.println("adding to: "+g.getID());
 					addTo = g;
 				}
 			}

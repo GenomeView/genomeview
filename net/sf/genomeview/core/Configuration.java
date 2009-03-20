@@ -35,6 +35,10 @@ public class Configuration {
 	static {
 		String s = System.getProperty("user.home");
 		confDir = new File(s + "/.genomeview");
+		if (!confDir.exists()) {
+			confDir.mkdir();
+
+		}
 		System.out.println("User config: " + confDir);
 
 	}
@@ -54,6 +58,7 @@ public class Configuration {
 	private static Properties dbConnection = new Properties();
 
 	private static Properties gvProperties = new Properties();
+	
 	static {
 		try {
 			load();

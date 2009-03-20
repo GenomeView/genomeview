@@ -3,7 +3,6 @@
  */
 package net.sf.genomeview.gui;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Observable;
@@ -21,14 +20,12 @@ public class GenomeView {
 	private static Logger logger;
 
 	public static void main(String[] args) {
-		/* Make sure the configuration directory is present. */
-		String s = System.getProperty("user.home");
-		File confDir = new File(s + "/.genomeview");
-		if (!confDir.exists()) {
-			confDir.mkdir();
 
-		}
-
+		/*
+		 * The configuration class needs to be called at least once before we
+		 * can start the logger
+		 */
+		System.out.println("Starting GenomeView " + Configuration.version());
 		/* Configure loggin */
 		try {
 			LogManager.getLogManager().readConfiguration(

@@ -23,7 +23,8 @@ public class ReadEntriesWorker extends DataSourceWorker<Entry[]> {
     @Override
     protected Entry[] doInBackground() {
         try {
-            return model.addEntries(source);
+        	Entry[]out=model.addEntries(source);;
+        	return out; 
         } catch (Exception e) {
             e.printStackTrace();
             return null;

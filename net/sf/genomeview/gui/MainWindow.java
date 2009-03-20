@@ -110,22 +110,22 @@ public class MainWindow implements WindowListener, Observer {
 		String cmdFile = (String) parser.getOptionValue(fileO);
 		final String cmdBogas = (String) parser.getOptionValue(bogasO);
 
-
-        /*
-         * Select data source. If an URL or file are specified on the command
-         * line, that is selected. In other cases a dialog pops-up to let the
-         * user select.
-         * 
-         * If both file and url are specified, the URL is loaded.
-         */
-        DataSource[] data = null;
-        if (cmdFile == null && cmdUrl == null && cmdBogas == null) {
-            logger.info("File, url and bogas options are null!");
-//            Sources source = (Sources) JOptionPane.showInputDialog(window, "Select main data source", "Data selection",
-//                    JOptionPane.INFORMATION_MESSAGE, null, Sources.values(), Sources.values()[0]);
-//            if(source!=null)
-//            data = DataSourceFactory.create(source, model);
-        	
+		/*
+		 * Select data source. If an URL or file are specified on the command
+		 * line, that is selected. In other cases a dialog pops-up to let the
+		 * user select.
+		 * 
+		 * If both file and url are specified, the URL is loaded.
+		 */
+		DataSource[] data = null;
+		if (cmdFile == null && cmdUrl == null && cmdBogas == null) {
+			logger.info("File, url and bogas options are null!");
+			// Sources source = (Sources) JOptionPane.showInputDialog(window,
+			// "Select main data source", "Data selection",
+			// JOptionPane.INFORMATION_MESSAGE, null, Sources.values(),
+			// Sources.values()[0]);
+			// if(source!=null)
+			// data = DataSourceFactory.create(source, model);
 
 		} else if (cmdUrl != null) {
 			logger.info("URL commandline option is set: " + cmdUrl);
@@ -135,7 +135,6 @@ public class MainWindow implements WindowListener, Observer {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
 
 		} else if (cmdFile != null) {
 			logger.info("File commandline option is set: " + cmdFile);
@@ -156,21 +155,6 @@ public class MainWindow implements WindowListener, Observer {
 			}
 
 		}
-		/* Load the source, if one was constructed */
-		if (data != null) {
-
-			for (DataSource ds : data) {
-				final GVProgressBar pb = new GVProgressBar("Loading",
-						"Loading data", window);
-				ds.setProgressListener(pb);
-				final ReadEntriesWorker rw = new ReadEntriesWorker(ds, model);
-				rw.execute();
-			}
-			// rw.addPropertyChangeListener(pb);
-
-		} else {
-			// TODO do something
-		}
 
 		/* Which panels to hide */
 		Boolean hideChromView = (Boolean) parser.getOptionValue(hideChromViewO,
@@ -183,28 +167,6 @@ public class MainWindow implements WindowListener, Observer {
 		model.setChromosomeVisible(!hideChromView);
 		model.setStructureVisible(!hideStructureView);
 		model.setAnnotationVisible(!hideEvidenceView);
-
-		/* Load additional files */
-		String[] remArgs = parser.getRemainingArgs();
-		for (String s : remArgs) {
-			try {
-				if (!s.startsWith("http:") && !s.startsWith("ftp:")
-						&& !s.startsWith("https:")) {
-					model.addFeatures(new FileSource(new File(s)));
-				} else {
-					model.addFeatures(new URLSource(new URI(s).toURL()));
-				}
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 
 		/* Load the additional configuration */
 		String config = (String) parser.getOptionValue(configurationO);
@@ -256,9 +218,44 @@ public class MainWindow implements WindowListener, Observer {
 
 		model.addObserver(this);
 
-		model.refresh();
 		PluginLoader.load(model);
 
+		/* Load the source, if one was constructed */
+		if (data != null) {
+			assert (data.length == 1);
+			final GVProgressBar pb = new GVProgressBar("Loading",
+					"Loading data", window);
+			data[0].setProgressListener(pb);
+			final ReadEntriesWorker rw = new ReadEntriesWorker(data[0], model);
+			rw.execute();
+			rw.get();
+
+			/* Load additional files */
+			String[] remArgs = parser.getRemainingArgs();
+			for (String s : remArgs) {
+				logger.info("loading additional from commandline: " + s);
+				try {
+					if (!s.startsWith("http:") && !s.startsWith("ftp:")
+							&& !s.startsWith("https:")) {
+						model.addFeatures(new FileSource(new File(s)));
+					} else {
+						model.addFeatures(new URLSource(new URI(s).toURL()));
+					}
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		model.refresh();
 	}
 
 	private void parse(AutoHelpCmdLineParser parser, String[] args) {
