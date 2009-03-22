@@ -1,3 +1,6 @@
+/**
+ * %HEADER%
+ */
 package net.sf.genomeview.gui.components;
 
 import java.awt.event.ActionEvent;
@@ -5,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.Action;
 import javax.swing.JComboBox;
 
 import net.sf.genomeview.data.Model;
@@ -14,6 +16,8 @@ import net.sf.jannot.AminoAcidMapping;
 public class AAMappingChooser extends JComboBox implements ActionListener,
 		Observer {
 
+	
+	private static final long serialVersionUID = 8572963039431236614L;
 	private Model model;
 
 	public AAMappingChooser(Model model) {
