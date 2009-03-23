@@ -79,6 +79,17 @@ public class Model extends Observable implements Observer, IModel {
 
 	}
 
+	public void clearEntries() {
+		for (Entry e : entries) {
+			e.deleteObservers();
+		}
+		this.setAnnotationLocationVisible(new Location(1, 2));
+		this.setChromosomeLocationVisible(new Location(1, 2));
+		entries.clear();
+		selectedEntry = null;
+		refresh();
+	}
+
 	public List<Entry> entries() {
 		ArrayList<Entry> list = new ArrayList<Entry>();
 		for (Entry e : entries)
@@ -94,7 +105,19 @@ public class Model extends Observable implements Observer, IModel {
 			super(null);
 		}
 
+		@Override
+		public String getID() {
+			return null;
+		}
+
+		@Override
+		public String toString() {
+			return "Nothing loaded";
+		}
+
 	}
+
+	private Entry dummy = new DummyEntry();
 
 	/**
 	 * Gives the index of the selected entry
@@ -104,7 +127,7 @@ public class Model extends Observable implements Observer, IModel {
 
 	public Entry getSelectedEntry() {
 		if (selectedEntry == null)
-			return new DummyEntry();
+			return dummy;
 		return selectedEntry;
 	}
 
@@ -112,7 +135,6 @@ public class Model extends Observable implements Observer, IModel {
 		this.selectedEntry = entry;
 		selectedLocation.clear();
 		selectedRegion = null;
-
 		setChanged();
 		notifyObservers();
 
@@ -294,9 +316,7 @@ public class Model extends Observable implements Observer, IModel {
 	public void setAnnotationLocationVisible(Location r) {
 		int start = r.start();
 		int end = r.end();
-		if (start == end) {
-			setChanged();
-			notifyObservers();
+		if (start > end) {
 			return;
 		}
 
@@ -624,7 +644,7 @@ public class Model extends Observable implements Observer, IModel {
 			}
 
 		}
-		System.out.println("Model.addEntries DONE!");
+		logger.info("Model adding entries done!");
 		refresh();
 		return es;
 	}
@@ -635,12 +655,13 @@ public class Model extends Observable implements Observer, IModel {
 	public AminoAcidMapping getAAMapping(Entry e) {
 		return aamapping.get(e);
 	}
-	public AminoAcidMapping getAAMapping(){
+
+	public AminoAcidMapping getAAMapping() {
 		return aamapping.get(getSelectedEntry());
 	}
 
 	public void setAAMapping(Entry e, AminoAcidMapping aamapping) {
-		System.out.println("setting: "+aamapping);
+		logger.info("setting amino acid mapping: " + aamapping);
 		this.aamapping.put(e, aamapping);
 		refresh();
 
@@ -667,7 +688,7 @@ public class Model extends Observable implements Observer, IModel {
 			/* Check if any existing entry has the same name */
 			for (Entry g : entries) {
 				if (g.description.getID().equals(e.description.getID())) {
-					System.out.println("adding to: "+g.getID());
+					logger.info("adding to: " + g.getID());
 					addTo = g;
 				}
 			}
@@ -690,7 +711,6 @@ public class Model extends Observable implements Observer, IModel {
 	}
 
 	public final void setSelectedRegion(Location selectedRegion) {
-
 		this.selectedRegion = selectedRegion;
 		setChanged();
 		notifyObservers();

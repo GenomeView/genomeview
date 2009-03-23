@@ -18,6 +18,7 @@ import net.sf.genomeview.gui.menu.edit.MergeFeatureAction;
 import net.sf.genomeview.gui.menu.edit.RemoveAction;
 import net.sf.genomeview.gui.menu.edit.RemoveLocationAction;
 import net.sf.genomeview.gui.menu.edit.SplitFeatureAction;
+import net.sf.genomeview.gui.menu.file.ClearEntriesAction;
 import net.sf.genomeview.gui.menu.file.ExitAction;
 import net.sf.genomeview.gui.menu.file.LoadDirectoryAction;
 import net.sf.genomeview.gui.menu.file.LoadEntriesAction;
@@ -52,6 +53,7 @@ public class MainMenu extends JMenuBar {
 	public MainMenu(Model model, MainWindow mainWindow) {
 		JMenu file = new JMenu("File");
 		file.add(new NewInstanceAction(model));
+		file.add(new ClearEntriesAction(model));
 		file.addSeparator();
 		file.add(new LoadEntriesAction(model));
 		file.add(new LoadFeaturesAction(model));
