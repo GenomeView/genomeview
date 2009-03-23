@@ -74,8 +74,7 @@ public class Model extends Observable implements Observer, IModel {
 			undoStack.push((ChangeEvent) arg);
 			redoStack.clear();
 		}
-		setChanged();
-		notifyObservers(arg);
+		refresh();
 
 	}
 
@@ -135,8 +134,7 @@ public class Model extends Observable implements Observer, IModel {
 		this.selectedEntry = entry;
 		selectedLocation.clear();
 		selectedRegion = null;
-		setChanged();
-		notifyObservers();
+		refresh();
 
 	}
 
@@ -167,8 +165,7 @@ public class Model extends Observable implements Observer, IModel {
 	@Override
 	public void setDisplayType(Type type, DisplayType dt) {
 		displayTypeMapping.put(type, dt);
-		setChanged();
-		notifyObservers();
+		refresh();
 
 	}
 
@@ -202,14 +199,12 @@ public class Model extends Observable implements Observer, IModel {
 
 	public void setShowText(Type type, boolean b) {
 		showTextOnStructure.put(type, b);
-		setChanged();
-		notifyObservers();
+		refresh();
 	}
 
 	public void setShowChromText(Type type, boolean b) {
 		showChromText.put(type, b);
-		setChanged();
-		notifyObservers();
+		refresh();
 
 	}
 
@@ -223,8 +218,7 @@ public class Model extends Observable implements Observer, IModel {
 
 	public void setFeatureVisible(Feature rf, boolean b) {
 		featureVisible.put(rf, b);
-		setChanged();
-		notifyObservers(rf);
+		refresh();
 
 	}
 
@@ -234,9 +228,30 @@ public class Model extends Observable implements Observer, IModel {
 	private Map<Entry, List<IValueFeature>> valueFeatures = new DefaultHashMap<Entry, List<IValueFeature>>(
 			new ArrayList<IValueFeature>());
 
+	private boolean silent;
+
+	/**
+	 * Set the mode of the model. In silent mode, the model does not pass on
+	 * notifications from its observables to its observers.
+	 * 
+	 * This can be useful to limit the number of repaints in events that there
+	 * are a lot of changes in the data. For instance when loading new data.
+	 * 
+	 * @param silent
+	 */
+	public void setSilent(boolean silent) {
+		this.silent = silent;
+		refresh();
+	}
+
+	/**
+	 * Checked way to notify all model observers.
+	 */
 	public void refresh() {
-		setChanged();
-		notifyObservers();
+		if (!silent) {
+			setChanged();
+			notifyObservers();
+		}
 
 	}
 
@@ -244,8 +259,7 @@ public class Model extends Observable implements Observer, IModel {
 
 	public void exit() {
 		this.exitRequested = true;
-		setChanged();
-		notifyObservers();
+		refresh();
 
 	}
 
@@ -258,8 +272,7 @@ public class Model extends Observable implements Observer, IModel {
 
 	public void setValueFeatureVisible(IValueFeature type, boolean b) {
 		valueFeatureVisible.put(type, b);
-		setChanged();
-		notifyObservers();
+		refresh();
 
 	}
 
@@ -273,8 +286,7 @@ public class Model extends Observable implements Observer, IModel {
 
 	public void setValueFeatureDisplayType(IValueFeature name, DisplayType dt) {
 		valueFeatureDisplayMapping.put(name, dt);
-		setChanged();
-		notifyObservers();
+		refresh();
 
 	}
 
@@ -291,9 +303,7 @@ public class Model extends Observable implements Observer, IModel {
 
 		valueFeatures.get(e).add(vf);
 		valueFeatureDisplayMapping.put(vf, DisplayType.LineProfile);
-
-		setChanged();
-		notifyObservers();
+		refresh();
 
 	}
 
@@ -339,8 +349,7 @@ public class Model extends Observable implements Observer, IModel {
 		ZoomChange zc = new ZoomChange(new Location(annotationStart,
 				annotationEnd), newZoom);
 		zc.doChange();
-		setChanged();
-		notifyObservers(zc);
+		refresh();
 	}
 
 	/**
@@ -422,15 +431,13 @@ public class Model extends Observable implements Observer, IModel {
 
 	public void setVisibleOnAnnotation(Type type, boolean b) {
 		visibleOnAnnotation.put(type, b);
-		setChanged();
-		notifyObservers();
+		refresh();
 
 	}
 
 	public void setVisibleOnChromosome(Type type, boolean b) {
 		visibleOnChromosome.put(type, b);
-		setChanged();
-		notifyObservers();
+		refresh();
 
 	}
 
@@ -459,9 +466,7 @@ public class Model extends Observable implements Observer, IModel {
 	public void setChromosomeLocationVisible(Location r) {
 		int newStart = r.start();
 		int newEnd = r.end();
-		if (newStart == newEnd) {
-			setChanged();
-			notifyObservers();
+		if (newStart > newEnd) {
 			return;
 		}
 		if (newStart > 1) {
@@ -597,29 +602,24 @@ public class Model extends Observable implements Observer, IModel {
 
 	public void setStructureVisible(boolean b) {
 		this.structureVisible = b;
-		setChanged();
-		notifyObservers();
+		refresh();
 
 	}
 
 	public final void setAnnotationVisible(boolean annotationVisible) {
 		this.annotationVisible = annotationVisible;
-		setChanged();
-		notifyObservers();
+		refresh();
 	}
 
 	public final void setChromosomeVisible(boolean chromosomeVisible) {
 		this.chromosomeVisible = chromosomeVisible;
-		setChanged();
-		notifyObservers();
+		refresh();
 	}
 
 	public void removeLocationSelection(Location rl) {
 
 		selectedLocation.remove(rl);
-
-		setChanged();
-		notifyObservers();
+		refresh();
 
 	}
 
@@ -712,8 +712,7 @@ public class Model extends Observable implements Observer, IModel {
 
 	public final void setSelectedRegion(Location selectedRegion) {
 		this.selectedRegion = selectedRegion;
-		setChanged();
-		notifyObservers();
+		refresh();
 	}
 
 	public Set<Feature> getHighlightedFeatures() {
@@ -749,16 +748,14 @@ public class Model extends Observable implements Observer, IModel {
 		ChangeEvent e = undoStack.pop();
 		e.undoChange();
 		redoStack.push(e);
-		setChanged();
-		notifyObservers(e);
+		refresh();
 	}
 
 	public void redo() {
 		ChangeEvent e = redoStack.pop();
 		e.doChange();
 		undoStack.push(e);
-		setChanged();
-		notifyObservers(e);
+		refresh();
 	}
 
 	public String getUndoDescription() {
@@ -829,8 +826,7 @@ public class Model extends Observable implements Observer, IModel {
 	public void setHoveredChromFeature(Feature feat) {
 		if (feat != hoveredChromFeature) {
 			hoveredChromFeature = feat;
-			setChanged();
-			notifyObservers();
+			refresh();
 		}
 	}
 
@@ -843,8 +839,7 @@ public class Model extends Observable implements Observer, IModel {
 	public void setHoverChromEntry(Entry e) {
 		if (e != hoveredChromEntry) {
 			hoveredChromEntry = e;
-			setChanged();
-			notifyObservers();
+			refresh();
 		}
 	}
 
@@ -861,8 +856,7 @@ public class Model extends Observable implements Observer, IModel {
 
 	public void setVisibleOnStructure(Type type, boolean b) {
 		visibleOnStructure.put(type, b);
-		setChanged();
-		notifyObservers();
+		refresh();
 
 	}
 

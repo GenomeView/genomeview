@@ -7,6 +7,7 @@ import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 
+import java.awt.Component;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.WindowEvent;
@@ -104,7 +105,7 @@ public class MainWindow implements WindowListener, Observer {
 		window.addWindowListener(this);
 
 		model = new Model(window);
-
+		model.setSilent(true);
 		/* Data specified on command line */
 		String cmdUrl = (String) parser.getOptionValue(urlO);
 		String cmdFile = (String) parser.getOptionValue(fileO);
@@ -216,8 +217,6 @@ public class MainWindow implements WindowListener, Observer {
 			}
 		}
 
-		model.addObserver(this);
-
 		PluginLoader.load(model);
 
 		/* Load the source, if one was constructed */
@@ -255,9 +254,12 @@ public class MainWindow implements WindowListener, Observer {
 
 		}
 
-		model.refresh();
+		model.addObserver(this);
+		/* Start acting */
+		model.setSilent(false);
 	}
 
+	
 	private void parse(AutoHelpCmdLineParser parser, String[] args) {
 		try {
 			parser.parse(args);
@@ -337,4 +339,6 @@ public class MainWindow implements WindowListener, Observer {
 			dispose();
 		}
 	}
+
+	
 }
