@@ -172,9 +172,9 @@ public class ChromosomeFrame extends GridBagPanel implements Observer {
 						if(i>max)
 							max=i;
 //					System.out.println("Total: "+total);
-					System.out.println(e + "\t" + density.get(e).size());
+//					System.out.println(e + "\t" + density.get(e).size());
 					for(int i=0;i<precision;i++){
-						System.out.println(density.get(e).get(i));
+//						System.out.println(density.get(e).get(i));
 						int d=(int)(density.get(e).get(i)/max*255);
 						gg.setColor(new Color(255-d,255-d,255-d));
 						gg.fillRect((int)(i*windowWidth/precision), yOffset, (int)(windowWidth/precision)+1, 40);
