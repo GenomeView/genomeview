@@ -52,7 +52,7 @@ public class ChromosomeView implements Drawable {
 
     public static final int MARGIN = 10;
 
-	private static final int DRAWING_TRESHOLD = 300;
+	private static final int DRAWING_TRESHOLD = 150;
 
     private Model model;
 
@@ -117,7 +117,10 @@ public class ChromosomeView implements Drawable {
         }
         //don't bother iterating all features...
         if (totalSize>=DRAWING_TRESHOLD){
+        	
         	return -1;
+        }else{
+        	
         }
         
 
