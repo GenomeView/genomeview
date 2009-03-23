@@ -14,7 +14,7 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.source.MobySource;
 import net.sf.jannot.source.DataSource;
-import net.sf.jannot.source.DirectorySource;
+import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.URLSource;
 import net.sf.jannot.source.DataSource.Sources;
@@ -47,7 +47,7 @@ public class DataSourceFactory {
 					File file = chooser.getSelectedFile();
 
 					DataSource[] out = new DataSource[1];
-					out[0] = new DirectorySource(file);
+					out[0] = new MultiFileSource(file);
 					Configuration.set("lastDirectory", file.getParentFile());
 					return out;
 				} else {
