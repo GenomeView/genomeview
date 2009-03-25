@@ -74,7 +74,7 @@ public class Model extends Observable implements Observer, IModel {
 			undoStack.push((ChangeEvent) arg);
 			redoStack.clear();
 		}
-		refresh();
+		refresh(arg);
 
 	}
 
@@ -241,17 +241,21 @@ public class Model extends Observable implements Observer, IModel {
 	 */
 	public void setSilent(boolean silent) {
 		this.silent = silent;
-		refresh();
+		refresh(NotificationTypes.GENERAL);
+	}
+
+	public void refresh(Object arg) {
+		if (!silent) {
+			setChanged();
+			notifyObservers(arg);
+		}
 	}
 
 	/**
 	 * Checked way to notify all model observers.
 	 */
 	public void refresh() {
-		if (!silent) {
-			setChanged();
-			notifyObservers();
-		}
+		refresh(null);
 
 	}
 
@@ -663,7 +667,7 @@ public class Model extends Observable implements Observer, IModel {
 	public void setAAMapping(Entry e, AminoAcidMapping aamapping) {
 		logger.info("setting amino acid mapping: " + aamapping);
 		this.aamapping.put(e, aamapping);
-		refresh();
+		refresh(NotificationTypes.TRANSLATIONTABLECHANGE);
 
 	}
 
