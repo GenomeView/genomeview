@@ -4,6 +4,7 @@
 package net.sf.genomeview.gui.menu.file;
 
 import java.awt.event.ActionEvent;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 
@@ -15,6 +16,8 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSource.Sources;
 
 public class LoadDirectoryAction extends AbstractAction {
+
+	private Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
 	private static final long serialVersionUID = 4601582100774593419L;
 
@@ -31,8 +34,8 @@ public class LoadDirectoryAction extends AbstractAction {
 		net.sf.jannot.source.DataSource[] data = DataSourceFactory.create(
 				Sources.DIRECTORY, model);
 
-		System.out.println("Datasources="+data.length);
 		if (data != null) {
+			logger.info("Datasources=" + data.length);
 			for (DataSource ds : data) {
 				final GVProgressBar pb = new GVProgressBar("Loading",
 						"Loading data", model.getParent());
