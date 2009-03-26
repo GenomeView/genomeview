@@ -82,11 +82,13 @@ public class Model extends Observable implements Observer, IModel {
 		for (Entry e : entries) {
 			e.deleteObservers();
 		}
-		this.setAnnotationLocationVisible(new Location(1, 2));
-		this.setChromosomeLocationVisible(new Location(1, 2));
+		this.setAnnotationLocationVisible(new Location(1, 1));
+		this.setChromosomeLocationVisible(new Location(1, 1));
 		entries.clear();
 		selectedEntry = null;
-		refresh();
+		selectedLocation.clear();
+		selectedRegion=null;
+		refresh(NotificationTypes.GENERAL);
 	}
 
 	public List<Entry> entries() {
@@ -649,7 +651,7 @@ public class Model extends Observable implements Observer, IModel {
 
 		}
 		logger.info("Model adding entries done!");
-		refresh();
+		refresh(NotificationTypes.GENERAL);
 		return es;
 	}
 
