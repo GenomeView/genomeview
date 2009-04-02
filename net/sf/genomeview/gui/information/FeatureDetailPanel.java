@@ -20,6 +20,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -44,195 +45,177 @@ import be.abeel.gui.GridBagPanel;
  */
 public class FeatureDetailPanel extends GridBagPanel implements Observer {
 
-    /**
+	/**
      * 
      */
-    private static final long serialVersionUID = 1214531303733670258L;
+	private static final long serialVersionUID = 1214531303733670258L;
 
-    private JEditorPane name = new JEditorPane();
+	private JEditorPane name = new JEditorPane();
 
-    private Model model;
+	private Model model;
 
-    public FeatureDetailPanel(Model model) {
-        this.model = model;
-        name.setEditable(false);
-        name.addMouseListener(new MouseAdapter() {
+	public FeatureDetailPanel(Model model) {
+		this.model = model;
+		name.setEditable(false);
+		name.addMouseListener(new MouseAdapter() {
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    showPopUp(e);
-                }
-            }
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showPopUp(e);
+				}
+			}
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    showPopUp(e);
-                }
-            }
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showPopUp(e);
+				}
+			}
 
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    showPopUp(e);
-                }
-            }
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showPopUp(e);
+				}
+			}
 
-            private void showPopUp(MouseEvent e) {
-                JPopupMenu menu = new JPopupMenu();
-                JMenuItem ncbiQuery = new JMenuItem("Query at NCBI Entrez");
-                ncbiQuery.addActionListener(new ActionListener() {
+			/** 
+			 * Class representing a website query. 
+			 * @author Thomas
+			 *
+			 */
+			class Query extends AbstractAction {
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            String query = "http://www.ncbi.nlm.nih.gov/sites/gquery?term="
-                                    + URLEncoder.encode(name.getSelectedText(), "UTF-8");
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 5252902483799067615L;
+				private String queryURL;
+//				private String label;
 
-                            Desktop.getDesktop().browse(new URI(query));
-                        } catch (MalformedURLException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
-                        } catch (IOException f) {
-                            // TODO Auto-generated catch block
-                            f.printStackTrace();
-                        } catch (URISyntaxException g) {
-                            // TODO Auto-generated catch block
-                            g.printStackTrace();
-                        }
+				Query(String label, String queryURL) {
+					super(label);
+//					this.label = label;
+					this.queryURL = queryURL;
+				}
 
-                    }
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						String query =queryURL
+								+ URLEncoder.encode(name.getSelectedText(),
+										"UTF-8");
 
-                });
-                JMenuItem ensemblQuery = new JMenuItem("Query at Ensembl");
-                ensemblQuery.addActionListener(new ActionListener() {
+						Desktop.getDesktop().browse(new URI(query));
+					} catch (MalformedURLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException f) {
+						// TODO Auto-generated catch block
+						f.printStackTrace();
+					} catch (URISyntaxException g) {
+						// TODO Auto-generated catch block
+						g.printStackTrace();
+					}
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            URL query = new URL(
-                                    "http://www.ensembl.org/Homo_sapiens/Search/Summary?species=all;idx=;q="
-                                            + URLEncoder.encode(name.getSelectedText(), "UTF-8"));
-                            Desktop.getDesktop().browse(query.toURI());
-                        } catch (MalformedURLException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
-                        } catch (IOException f) {
-                            // TODO Auto-generated catch block
-                            f.printStackTrace();
-                        } catch (URISyntaxException g) {
-                            // TODO Auto-generated catch block
-                            g.printStackTrace();
-                        }
+				}
 
-                    }
+			}
 
-                });
-                JMenuItem ebi = new JMenuItem("Query at EMBL-EBI");
-                ebi.addActionListener(new ActionListener() {
+			private void showPopUp(MouseEvent e) {
+				JPopupMenu menu = new JPopupMenu();
+				JMenuItem ncbiQuery = new JMenuItem(new Query("Query at NCBI Entrez","http://www.ncbi.nlm.nih.gov/sites/gquery?term="));
+				JMenuItem ensemblQuery = new JMenuItem(new Query("Query at Ensembl","http://www.ensembl.org/Homo_sapiens/Search/Summary?species=all;idx=;q="));
+				JMenuItem ebi = new JMenuItem(new Query("Query at EMBL-EBI","http://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query="));
+				
+				JMenuItem google = new JMenuItem(new Query("Query at Google","http://www.google.com/search?q="));
+				
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            URL query = new URL(
-                                    "http://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query="
-                                            + URLEncoder.encode(name.getSelectedText(), "UTF-8"));
-                            Desktop.getDesktop().browse(query.toURI());
-                        } catch (MalformedURLException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
-                        } catch (IOException f) {
-                            // TODO Auto-generated catch block
-                            f.printStackTrace();
-                        } catch (URISyntaxException g) {
-                            // TODO Auto-generated catch block
-                            g.printStackTrace();
-                        }
+					
 
-                    }
+				menu.add(ncbiQuery);
+				menu.add(ensemblQuery);
+				menu.add(ebi);
+				menu.add(google);
+				menu.show(e.getComponent(), e.getX(), e.getY());
 
-                });
-                
-                menu.add(ncbiQuery);
-                menu.add(ensemblQuery);
-                menu.add(ebi);
-                menu.show(e.getComponent(), e.getX(), e.getY());
+			}
 
-            }
+		});
+		name.setEditorKit(new HTMLEditorKit());
+		name.setDocument(new HTMLDocument());
+		name.addHyperlinkListener(new HyperlinkListener() {
 
-        });
-        name.setEditorKit(new HTMLEditorKit());
-        name.setDocument(new HTMLDocument());
-        name.addHyperlinkListener(new HyperlinkListener() {
+			@Override
+			public void hyperlinkUpdate(HyperlinkEvent e) {
+				if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+					System.out.println(e.getDescription());
+					URL url = e.getURL();
+					System.out.println("Hyperlink: " + url);
+					// try {
+					// Desktop.getDesktop().browse(url.toURI());
+					// } catch (IOException e1) {
+					// // TODO Auto-generated catch block
+					// e1.printStackTrace();
+					// } catch (URISyntaxException e1) {
+					// // TODO Auto-generated catch block
+					// e1.printStackTrace();
+					// }
+					//                
+				}
+			}
 
-                    System.out.println(e.getDescription());
-                    URL url = e.getURL();
-                    System.out.println("Hyperlink: " + url);
-                    // try {
-                    // Desktop.getDesktop().browse(url.toURI());
-                    // } catch (IOException e1) {
-                    // // TODO Auto-generated catch block
-                    // e1.printStackTrace();
-                    // } catch (URISyntaxException e1) {
-                    // // TODO Auto-generated catch block
-                    // e1.printStackTrace();
-                    // }
-                    //                
-                }
-            }
+		});
+		;
 
-        });
-        ;
+		model.addObserver(this);
+		gc.fill = GridBagConstraints.BOTH;
+		gc.weightx = 1;
+		gc.weighty = 0;
+		add(name, gc);
+		gc.gridy++;
+		gc.weighty = 1;
+		add(new JLabel(), gc);
+	}
 
-        model.addObserver(this);
-        gc.fill = GridBagConstraints.BOTH;
-        gc.weightx = 1;
-        gc.weighty = 0;
-        add(name, gc);
-        gc.gridy++;
-        gc.weighty = 1;
-        add(new JLabel(), gc);
-    }
+	private int lastHash = 0;
 
-    private int lastHash = 0;
+	@Override
+	public void update(Observable o, Object arg) {
+		Set<Feature> set = model.getFeatureSelection();
+		String text = "";
 
-    @Override
-    public void update(Observable o, Object arg) {
-        Set<Feature> set = model.getFeatureSelection();
-        String text = "";
+		if (set != null && set.size() > 0) {
+			for (Feature rf : set) {
+				text += "Data origin: " + rf.getSource() + "<br/>";
+				text += "Location: "
+						+ StaticUtils.escapeHTML(rf.location().toString())
+						+ "<br/>";
+				text += "Strand: " + rf.strand() + "<br/>";
+				text += "Score: " + rf.getScore() + "<br/>";
+				Set<String> qks = rf.getQualifiersKeys();
+				for (String key : qks) {
+					for (Qualifier q : rf.qualifier(key)) {
+						text += q + "<br/>";
+					}
+				}
 
-        if (set != null && set.size() > 0) {
-            for (Feature rf : set) {
-                text += "Data origin: " + rf.getSource() + "<br/>";
-                text += "Location: " + StaticUtils.escapeHTML(rf.location().toString()) + "<br/>";
-                text += "Strand: " + rf.strand() + "<br/>";
-                text += "Score: " + rf.getScore() + "<br/>";
-                Set<String> qks = rf.getQualifiersKeys();
-                for (String key : qks) {
-                    for (Qualifier q : rf.qualifier(key)) {
-                        text += q + "<br/>";
-                    }
-                }
+			}
 
-            }
+			text += "---------------------------------------<br/>";
+			int hash = text.hashCode();
+			if (hash != lastHash) {
+				System.out.println("FDP: " + text + "\t" + name);
+				name.setText("<html>" + text + "</html>");
+				name.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
+				lastHash = hash;
+			}
 
-            text += "---------------------------------------<br/>";
-            int hash=text.hashCode();
-            if (hash != lastHash) {
-                System.out.println("FDP: " + text + "\t" + name);
-                name.setText("<html>" + text + "</html>");
-                name.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
-                lastHash=hash;
-            }
+		} else {
+			name.setText("");
+		}
 
-        } else {
-            name.setText("");
-        }
-
-    }
+	}
 }
