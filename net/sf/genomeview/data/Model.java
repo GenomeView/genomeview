@@ -685,9 +685,10 @@ public class Model extends Observable implements Observer, IModel {
 	 */
 	public Entry[] addFeatures(DataSource f) throws ReadFailedException {
 		logger.info("adding features: " + f);
-		loadedSources.add(f);
+		
 		Entry[] data = f.read();
 		logger.info("entries read: " + data.length);
+		
 		for (Entry e : data) {
 			Annotation a = e.annotation;
 			Entry addTo = getSelectedEntry();
@@ -698,8 +699,13 @@ public class Model extends Observable implements Observer, IModel {
 					addTo = g;
 				}
 			}
+			/* Add all features at once silently */
+			setSilent(true);
 			addTo.annotation.addAll(a);
+			setSilent(false);
 		}
+		loadedSources.add(f);
+		
 		return data;
 
 	}
