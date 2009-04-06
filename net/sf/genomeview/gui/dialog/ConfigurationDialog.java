@@ -4,17 +4,22 @@
 package net.sf.genomeview.gui.dialog;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -22,11 +27,12 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import net.sf.genomeview.core.ColorIcon;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
-
 import be.abeel.gui.GridBagPanel;
 import be.abeel.gui.JIntegerField;
+import be.abeel.gui.TitledComponent;
 
 public class ConfigurationDialog extends JDialog {
 
@@ -121,6 +127,59 @@ public class ConfigurationDialog extends JDialog {
 
 			});
 		}
+	}
+
+	class ColorLabel extends JLabel {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7614916778081300913L;
+
+		ColorLabel(final Model model, final String configKey) {
+			super(new ColorIcon(Configuration.getColor(configKey), 16));
+			this.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent e) {
+					Color newColor = JColorChooser.showDialog(
+							model.getParent(), "Choose track color",
+							Configuration.getColor(configKey));
+
+					if (newColor != null){
+						Configuration.setColor(configKey, newColor);
+						setIcon(new ColorIcon(Configuration.getColor(configKey), 16));
+					}
+				}
+			});
+
+		}
+	}
+
+	class AANucleotideColorsConfigPanel extends GridBagPanel {
+
+		private static final long serialVersionUID = -2574897453334264771L;
+
+		public AANucleotideColorsConfigPanel(Model model) {
+			setLayout(new BorderLayout());
+			Container aa = new Container();
+			aa.setLayout(new GridLayout(0, 8));
+			for (char c : Configuration.getAminoAcids()) {
+				aa.add(new JLabel("" + c));
+				aa.add(new ColorLabel(model,"AA_"+c));
+
+			}
+			Container nt = new Container();
+			nt.setLayout(new GridLayout(0, 8));
+			for (char c : Configuration.getNucleotides()) {
+				nt.add(new JLabel("" + c));
+				nt.add(new ColorLabel(model,"N_"+c));
+			}
+			this
+					.add(new TitledComponent("Amino acids", aa),
+							BorderLayout.NORTH);
+			this.add(new TitledComponent("Nucleotides", nt),
+					BorderLayout.CENTER);
+		}
+
 	}
 
 	/**
@@ -257,10 +316,12 @@ public class ConfigurationDialog extends JDialog {
 		// JPanel colorPanel = new ConfigureColorPanel();
 		JPanel structure = new StructureConfigPanel();
 		JPanel evidence = new AnnotationConfigPanel();
+		JPanel colors = new AANucleotideColorsConfigPanel(model);
 		JPanel miscPanel = new MiscellaneousPanel(model);
 
 		jtp.add("Structure view", structure);
 		jtp.add("Evidence view", evidence);
+		jtp.add("AA&nucleotide colors", colors);
 
 		jtp.add("Miscellaneous", miscPanel);
 
