@@ -305,8 +305,12 @@ public class Configuration {
 
 	}
 
+	public static void setColor(String key,Color newColor){
+		set(key, ColorFactory.encode(newColor));
+	}
+	
 	public static void setColor(Type type, Color newColor) {
-		set("TYPE_" + type, ColorFactory.encode(newColor));
+		setColor("TYPE_" + type, newColor);
 
 	}
 
