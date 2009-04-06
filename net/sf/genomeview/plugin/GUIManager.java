@@ -7,7 +7,6 @@ import java.awt.Component;
 
 import javax.swing.Action;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 
 /**
  * Manages GUI components that are accessible for plugins.
@@ -18,11 +17,17 @@ import javax.swing.JMenuItem;
 public class GUIManager {
 
     private JMenu pluginMenu;
+	private JMenu pluginDoc;
 
     public void registerPluginMenu(JMenu plugin) {
         this.pluginMenu=plugin;
         
     }
+    
+    public void registerPluginDocumentationMenu(JMenu pluginDoc){
+    	this.pluginDoc=pluginDoc;
+    }
+    
 
     public void addPluginAction(Action a,String pathMenu){
         getMenu(pluginMenu, pathMenu).add(a);
@@ -79,15 +84,8 @@ public class GUIManager {
 
     }
 
-//    private static boolean contains(JMenu subMenu, IModule module) {
-//        Component[] comps = subMenu.getComponents();
-//        for (Component c : comps) {
-//            if (c instanceof JMenuItem) {
-//                JMenuItem cItem = (JMenuItem) c;
-//                if (cItem.getText().equals(module.getName()))
-//                    return true;
-//            }
-//        }
-//        return false;
-//    }
+	public void addPluginDocumentation(Action a) {
+		pluginDoc.add(a);
+	}
+
 }
