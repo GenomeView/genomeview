@@ -119,22 +119,17 @@ public class MainMenu extends JMenuBar {
 		model.getGUIManager().registerPluginMenu(plugin);
 		add(plugin);
 
-		// Loader.loadAllModules(model, plugin);
-
 		JMenu help = new JMenu("Help");
 		help
 				.add(new OpenURLAction("User documentation",
 						"http://genomeview.sourceforge.net/content/user-documentation"));
 		help.add(new OpenURLAction("Post bug report or feature request",
 				"http://sourceforge.net/tracker/?group_id=208107"));
-		// help.add(new OpenURLAction("Open project website",
-		// "http://sf.net/projects/genomeview"));
+		
 		help.addSeparator();
 		help.add(new ShowInstalledModulesAction(model));
 		help.add(new OpenURLAction("Official list plugins",
-				"http://genomeview.sourceforge.net/category/post-type/module"));
-		// help.add(new OpenURLAction("Available modules",
-		// "http://www.psb.ugent.be/~thabe/gvmodules/"));
+				"http://genomeview.sourceforge.net/plugins"));
 		help.addSeparator();
 		help.add(new ShowAboutDialogAction(model));
 		add(help);
