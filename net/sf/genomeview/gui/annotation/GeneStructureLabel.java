@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.structure;
+package net.sf.genomeview.gui.annotation;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -426,15 +426,15 @@ public class GeneStructureLabel extends AbstractGeneLabel implements MouseListen
             int aa_width = (int) (width * 3);
             int aa_height = lineHeight - 2 * gap;
             /* Only color start and stop codons. */
-            if (Configuration.getBoolean("colorStopCodons") && aa == '*') {
+            if (Configuration.getBoolean("colorStopCodons") && model.getAAMapping().isStop(aa)) {
+            	g.setColor(Configuration.getAminoAcidColor(aa));
+            	g.fillRect(x, y, aa_width == 0 ? 1 : aa_width, aa_height);
+            }
+            if (Configuration.getBoolean("colorStartCodons") && model.getAAMapping().isStart(aa)) {
                 g.setColor(Configuration.getAminoAcidColor(aa));
                 g.fillRect(x, y, aa_width == 0 ? 1 : aa_width, aa_height);
             }
-            if (Configuration.getBoolean("colorStartCodons") && aa == 'M') {
-                g.setColor(Configuration.getAminoAcidColor(aa));
-                g.fillRect(x, y, aa_width == 0 ? 1 : aa_width, aa_height);
-
-            }
+            
             if (model.getAnnotationLocationVisible().length() < Configuration
                     .getInt("geneStructureAminoAcidWindowVerticalBars")) {
                 g.setColor(Color.black);

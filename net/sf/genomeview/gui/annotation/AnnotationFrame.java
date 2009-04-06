@@ -24,8 +24,6 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.navigation.AnnotationMoveRightAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationZoomInAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationZoomOutAction;
-import net.sf.genomeview.gui.structure.CDSView;
-import net.sf.genomeview.gui.structure.GeneStructureLabel;
 import net.sf.jannot.Location;
 import be.abeel.gui.GridBagPanel;
 
