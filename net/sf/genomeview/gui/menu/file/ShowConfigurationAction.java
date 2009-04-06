@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.menu.help;
+package net.sf.genomeview.gui.menu.file;
 
 import java.awt.event.ActionEvent;
 
