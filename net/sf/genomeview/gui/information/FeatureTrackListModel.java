@@ -3,15 +3,13 @@
  */
 package net.sf.genomeview.gui.information;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
 
+import net.sf.genomeview.core.ColorIcon;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.DisplayType;
 import net.sf.genomeview.core.Icons;
@@ -117,7 +115,7 @@ public class FeatureTrackListModel extends AbstractTableModel implements Observe
                 return Icons.NO;
             }
         case 4:
-            return new ColorIcon(Configuration.getColor("TYPE_" + ct));
+            return new ColorIcon(Configuration.getColor("TYPE_" + ct),16);
         case 5:
             if (model.isShowTextOnStructure(ct)) {
                 return Icons.YES;
@@ -148,31 +146,5 @@ public class FeatureTrackListModel extends AbstractTableModel implements Observe
 
     }
 
-    class ColorIcon extends ImageIcon {
-
-        private static final long serialVersionUID = 1L;
-
-        private Color c;
-
-        public ColorIcon(Color c) {
-            this.c = c;
-        }
-
-        @Override
-        public int getIconHeight() {
-            return 16;
-        }
-
-        @Override
-        public int getIconWidth() {
-            return 16;
-        }
-
-        @Override
-        public synchronized void paintIcon(Component comp, Graphics g, int x, int y) {
-            g.setColor(c);
-            g.fillRect(0, 0, 16, 16);
-        }
-
-    }
+    
 }
