@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
@@ -25,6 +26,7 @@ public class LoadDirectoryAction extends AbstractAction {
 
 	public LoadDirectoryAction(Model model) {
 		super("Load directory...");
+		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control D"));
 		this.model = model;
 
 	}
