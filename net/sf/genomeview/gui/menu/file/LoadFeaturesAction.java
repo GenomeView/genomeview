@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
@@ -23,6 +24,7 @@ public class LoadFeaturesAction extends AbstractAction {
 
     public LoadFeaturesAction(Model model) {
         super("Load features...");
+        super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control O"));
         this.model = model;
 
     }
