@@ -6,7 +6,7 @@ package net.sf.genomeview.gui.menu.file;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
@@ -23,27 +23,14 @@ public class LoadEntriesAction extends AbstractAction {
 
 	public LoadEntriesAction(Model model) {
 		super("Load entries...");
+		 super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control L"));
 		this.model = model;
 
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
-		// Sources source = (Sources)
-		// JOptionPane.showInputDialog(model.getParent(),
-		// "Select feature source",
-		// "Data selection", JOptionPane.INFORMATION_MESSAGE, null,
-		// Sources.values(), Sources.values()[0]);
-		// File
-		// if (source != null) {
-		net.sf.jannot.source.DataSource[] data = DataSourceFactory.create(
+		DataSource[] data = DataSourceFactory.create(
 				Sources.LOCALFILE, model);
-		// if (data != null){
-		// GVProgressBar pb = new GVProgressBar("Loading",
-		// "Loading additional entries", model.getParent());
-		// data.setProgressListener(pb);
-		// ReadEntriesWorker rw = new ReadEntriesWorker(data, model);
-		// rw.execute();
-		// }
 		if (data != null) {
 			for (DataSource ds : data) {
 				final GVProgressBar pb = new GVProgressBar("Loading",
@@ -53,7 +40,6 @@ public class LoadEntriesAction extends AbstractAction {
 				rw.execute();
 			}
 		}
-		// }
 	}
 
 }
