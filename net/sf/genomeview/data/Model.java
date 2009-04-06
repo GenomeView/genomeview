@@ -34,6 +34,7 @@ import net.sf.jannot.Type;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
+import net.sf.jannot.source.MultiFileSource;
 import be.abeel.util.DefaultHashMap;
 
 public class Model extends Observable implements Observer, IModel {
@@ -87,7 +88,7 @@ public class Model extends Observable implements Observer, IModel {
 		entries.clear();
 		selectedEntry = null;
 		selectedLocation.clear();
-		selectedRegion=null;
+		selectedRegion = null;
 		refresh(NotificationTypes.GENERAL);
 	}
 
@@ -637,7 +638,6 @@ public class Model extends Observable implements Observer, IModel {
 	 * @throws ReadFailedException
 	 */
 	public Entry[] addEntries(DataSource f) throws ReadFailedException {
-		loadedSources.add(f);
 		Entry[] es = f.read();
 		for (Entry e : es) {
 			entries.add(e);
@@ -651,6 +651,12 @@ public class Model extends Observable implements Observer, IModel {
 
 		}
 		logger.info("Model adding entries done!");
+		if (f instanceof MultiFileSource)
+			for (DataSource ds : ((MultiFileSource) f).getFileSources()) {
+				loadedSources.add(ds);
+			}
+		else
+			loadedSources.add(f);
 		refresh(NotificationTypes.GENERAL);
 		return es;
 	}
@@ -685,10 +691,10 @@ public class Model extends Observable implements Observer, IModel {
 	 */
 	public Entry[] addFeatures(DataSource f) throws ReadFailedException {
 		logger.info("adding features: " + f);
-		
+
 		Entry[] data = f.read();
 		logger.info("entries read: " + data.length);
-		
+
 		for (Entry e : data) {
 			Annotation a = e.annotation;
 			Entry addTo = getSelectedEntry();
@@ -705,7 +711,7 @@ public class Model extends Observable implements Observer, IModel {
 			setSilent(false);
 		}
 		loadedSources.add(f);
-		
+
 		return data;
 
 	}
