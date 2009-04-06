@@ -32,6 +32,13 @@ public class Configuration {
 
 	private static File confDir;
 
+	public static char[]getNucleotides(){
+		return new char[]{'a','t','g','c','A','T','G','C','n','N'};
+	}
+	public static char[]getAminoAcids(){
+		return new char[]{'M','*','X','Y','W','V','U','T','S','R','Q','P','N','L','K','I','H','G','F','E','D','C','A'};
+		
+	}
 	static {
 		String s = System.getProperty("user.home");
 		confDir = new File(s + "/.genomeview");
