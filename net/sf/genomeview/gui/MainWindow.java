@@ -212,8 +212,6 @@ public class MainWindow implements WindowListener, Observer {
 				helper.setContentPane(content[i]);
 				helper.setVisible(true);
 				helper.pack();
-				helper.setExtendedState(helper.getExtendedState()
-						+ JFrame.MAXIMIZED_BOTH);
 			}
 		}
 
