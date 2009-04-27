@@ -46,7 +46,7 @@ public abstract class AbstractGeneLabel extends JLabel implements Observer {
 
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				double rot = e.getWheelRotation() / 10.0;
+				double rot = e.getWheelRotation() / 5.0;
 				double center = translateScreenToGenome(e.getX(), model
 						.getAnnotationLocationVisible());
 				double start = model.getAnnotationLocationVisible().start();
