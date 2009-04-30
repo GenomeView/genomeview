@@ -12,6 +12,7 @@ public class Icons {
     public static final Icon YES = new ImageIcon(Icons.class.getResource("/images/yes.png"));
 
     public static final Icon NO = new ImageIcon(Icons.class.getResource("/images/no.png"));
+    public static final Icon BDASH = new ImageIcon(Icons.class.getResource("/images/bdash.png"));
 
     public static final Icon EDIT = new ImageIcon(Icons.class.getResource("/images/edit.png"));
 

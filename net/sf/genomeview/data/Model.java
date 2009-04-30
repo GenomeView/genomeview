@@ -22,12 +22,18 @@ import javax.swing.JFrame;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.DisplayType;
+import net.sf.genomeview.gui.annotation.track.FeatureTrack;
+import net.sf.genomeview.gui.annotation.track.StructureTrack;
+import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
+import net.sf.genomeview.gui.annotation.track.Track;
+import net.sf.genomeview.gui.annotation.track.WiggleTrack;
 import net.sf.genomeview.plugin.GUIManager;
 import net.sf.genomeview.plugin.IValueFeature;
 import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.Annotation;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Graph;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
@@ -44,21 +50,32 @@ public class Model extends Observable implements Observer, IModel {
 
 	public Model(JFrame parent) {
 		this.parent = parent;
+		this.trackList = new TrackList(this);
 		for (Entry e : entries) {
 			e.addObserver(this);
 		}
-		visibleOnChromosome.put(Type.get("gene"), true);
-		visibleOnChromosome.put(Type.get("CDS"), true);
+		// trackList.add(new FeatureTrack(this,Type.get("gene"),true));
+		// trackList.add(new FeatureTrack(this,Type.get("CDS"),true));
+
+		// visibleOnChromosome.put(Type.get("gene"), true);
+		// visibleOnChromosome.put(Type.get("CDS"), true);
 		// visibleOnChromosome.put(Type.get("CDS_before"), true);
 		// visibleOnChromosome.put(Type.get("CDS_after"), true);
 
+		StructureTrack strack = new StructureTrack(this);
+		trackList.add(strack);
+		TickmarkTrack ticks = new TickmarkTrack(this);
+		trackList.add(ticks);
+
 		Set<Type> tmp1 = Configuration.getTypeSet("visibleTypesStructure");
 		for (Type t : tmp1)
-			visibleOnStructure.put(t, true);
+			strack.setTypeVisible(t, true);
 
 		Set<Type> tmp = Configuration.getTypeSet("visibleTypes");
-		for (Type t : tmp)
-			visibleOnAnnotation.put(t, true);
+		updateTracklist();
+
+		// for (Type t : tmp)
+		// visibleOnAnnotation.put(t, true);
 
 	}
 
@@ -150,27 +167,28 @@ public class Model extends Observable implements Observer, IModel {
 		return parent;
 	}
 
-	private Map<Type, DisplayType> displayTypeMapping = new HashMap<Type, DisplayType>();
-
-	public DisplayType getDisplayType(Type type) {
-		if (displayTypeMapping.containsKey(type)) {
-			return displayTypeMapping.get(type);
-		} else {
-			String sdt = Configuration.get("DT_" + type);
-			if (sdt != null)
-				return DisplayType.valueOf(sdt);
-			else
-				return DisplayType.MultiLineBlocks;
-		}
-
-	}
-
-	@Override
-	public void setDisplayType(Type type, DisplayType dt) {
-		displayTypeMapping.put(type, dt);
-		refresh();
-
-	}
+	// private Map<Type, DisplayType> displayTypeMapping = new HashMap<Type,
+	// DisplayType>();
+	//
+	// public DisplayType getDisplayType(Type type) {
+	// if (displayTypeMapping.containsKey(type)) {
+	// return displayTypeMapping.get(type);
+	// } else {
+	// String sdt = Configuration.get("DT_" + type);
+	// if (sdt != null)
+	// return DisplayType.valueOf(sdt);
+	// else
+	// return DisplayType.MultiLineBlocks;
+	// }
+	//
+	// }
+	//
+	// @Override
+	// public void setDisplayType(Type type, DisplayType dt) {
+	// displayTypeMapping.put(type, dt);
+	// refresh();
+	//
+	// }
 
 	private Map<Type, Boolean> visibleOnChromosome = new DefaultHashMap<Type, Boolean>(
 			Boolean.FALSE);
@@ -179,12 +197,13 @@ public class Model extends Observable implements Observer, IModel {
 		return visibleOnChromosome.get(ct);
 	}
 
-	private Map<Type, Boolean> showTextOnStructure = new DefaultHashMap<Type, Boolean>(
-			Boolean.FALSE);
+	// private Map<Type, Boolean> showTextOnStructure = new DefaultHashMap<Type,
+	// Boolean>(
+	// Boolean.FALSE);
 
-	public boolean isShowText(Type ct) {
-		return showTextOnStructure.get(ct);
-	}
+	// public boolean isShowText(Type ct) {
+	// return showTextOnStructure.get(ct);
+	// }
 
 	private Map<Type, Boolean> showChromText = new DefaultHashMap<Type, Boolean>(
 			Boolean.FALSE);
@@ -193,18 +212,19 @@ public class Model extends Observable implements Observer, IModel {
 		return showChromText.get(ct);
 	}
 
-	private Map<Type, Boolean> visibleOnAnnotation = new DefaultHashMap<Type, Boolean>(
-			Boolean.FALSE);
+	// private Map<Type, Boolean> visibleOnAnnotation = new DefaultHashMap<Type,
+	// Boolean>(
+	// Boolean.FALSE);
 
-	public boolean isVisibleOnAnnotation(Type ct) {
-		return visibleOnAnnotation.get(ct);
-	}
-
-	public void setShowText(Type type, boolean b) {
-		showTextOnStructure.put(type, b);
-		refresh();
-	}
-
+	// public boolean isVisibleOnAnnotation(Type ct) {
+	// return visibleOnAnnotation.get(ct);
+	// }
+	//
+	// public void setShowText(Type type, boolean b) {
+	// showTextOnStructure.put(type, b);
+	// refresh();
+	// }
+	//
 	public void setShowChromText(Type type, boolean b) {
 		showChromText.put(type, b);
 		refresh();
@@ -225,11 +245,12 @@ public class Model extends Observable implements Observer, IModel {
 
 	}
 
-	/**
-	 * Provides a mapping between the Entry and the associated value features.
-	 */
-	private Map<Entry, List<IValueFeature>> valueFeatures = new DefaultHashMap<Entry, List<IValueFeature>>(
-			new ArrayList<IValueFeature>());
+	// /**
+	// * Provides a mapping between the Entry and the associated value features.
+	// */
+	// private Map<Entry, List<IValueFeature>> valueFeatures = new
+	// DefaultHashMap<Entry, List<IValueFeature>>(
+	// new ArrayList<IValueFeature>());
 
 	private boolean silent;
 
@@ -270,49 +291,53 @@ public class Model extends Observable implements Observer, IModel {
 
 	}
 
-	private Map<IValueFeature, Boolean> valueFeatureVisible = new DefaultHashMap<IValueFeature, Boolean>(
-			Boolean.TRUE);
+	// private Map<IValueFeature, Boolean> valueFeatureVisible = new
+	// DefaultHashMap<IValueFeature, Boolean>(
+	// Boolean.TRUE);
+	//
+	// public boolean isValueFeatureVisible(IValueFeature name) {
+	// return valueFeatureVisible.get(name);
+	// }
+	//
+	// public void setValueFeatureVisible(IValueFeature type, boolean b) {
+	// valueFeatureVisible.put(type, b);
+	// refresh();
+	//
+	// }
 
-	public boolean isValueFeatureVisible(IValueFeature name) {
-		return valueFeatureVisible.get(name);
-	}
+	// private Map<IValueFeature, DisplayType> valueFeatureDisplayMapping = new
+	// DefaultHashMap<IValueFeature, DisplayType>(
+	// DisplayType.OneLineBlocks);
+	//
+	// public DisplayType getValueFeatureDisplayType(IValueFeature type) {
+	// return valueFeatureDisplayMapping.get(type);
+	//
+	// }
 
-	public void setValueFeatureVisible(IValueFeature type, boolean b) {
-		valueFeatureVisible.put(type, b);
-		refresh();
+	// public void setValueFeatureDisplayType(IValueFeature name, DisplayType
+	// dt) {
+	// valueFeatureDisplayMapping.put(name, dt);
+	// refresh();
+	//
+	// }
+	// @Deprecated
+	// public List<IValueFeature> getValueFeatures(Entry entry) {
+	// return valueFeatures.get(entry);
+	// }
 
-	}
-
-	private Map<IValueFeature, DisplayType> valueFeatureDisplayMapping = new DefaultHashMap<IValueFeature, DisplayType>(
-			DisplayType.OneLineBlocks);
-
-	public DisplayType getValueFeatureDisplayType(IValueFeature type) {
-		return valueFeatureDisplayMapping.get(type);
-
-	}
-
-	public void setValueFeatureDisplayType(IValueFeature name, DisplayType dt) {
-		valueFeatureDisplayMapping.put(name, dt);
-		refresh();
-
-	}
-
-	public List<IValueFeature> getValueFeatures(Entry entry) {
-		return valueFeatures.get(entry);
-	}
-
-	@Override
-	public void addFeature(IValueFeature vf) {
-		Entry e = getSelectedEntry();
-		if (!valueFeatures.containsKey(e)) {
-			valueFeatures.put(e, new ArrayList<IValueFeature>());
-		}
-
-		valueFeatures.get(e).add(vf);
-		valueFeatureDisplayMapping.put(vf, DisplayType.LineProfile);
-		refresh();
-
-	}
+	// @Override
+	// @Deprecated
+	// public void addFeature(IValueFeature vf) {
+	// Entry e = getSelectedEntry();
+	// if (!valueFeatures.containsKey(e)) {
+	// valueFeatures.put(e, new ArrayList<IValueFeature>());
+	// }
+	//
+	// valueFeatures.get(e).add(vf);
+	// valueFeatureDisplayMapping.put(vf, DisplayType.LineProfile);
+	// refresh();
+	//
+	// }
 
 	public Location getAnnotationLocationVisible() {
 		return new Location(annotationStart, annotationEnd);
@@ -436,21 +461,22 @@ public class Model extends Observable implements Observer, IModel {
 		return exitRequested;
 	}
 
-	public void setVisibleOnAnnotation(Type type, boolean b) {
-		visibleOnAnnotation.put(type, b);
-		refresh();
-
-	}
-
+	// public void setVisibleOnAnnotation(Type type, boolean b) {
+	// visibleOnAnnotation.put(type, b);
+	// refresh();
+	//
+	// }
+	//
 	public void setVisibleOnChromosome(Type type, boolean b) {
 		visibleOnChromosome.put(type, b);
 		refresh();
 
 	}
 
-	public boolean isShowTextOnStructure(Type type) {
-		return showTextOnStructure.get(type);
-	}
+	//
+	// public boolean isShowTextOnStructure(Type type) {
+	// return showTextOnStructure.get(type);
+	// }
 
 	public int getLongestChromosomeLength() {
 		int longest = 0;
@@ -708,11 +734,91 @@ public class Model extends Observable implements Observer, IModel {
 			/* Add all features at once silently */
 			setSilent(true);
 			addTo.annotation.addAll(a);
+			addTo.graphs.addAll(e.graphs);
 			setSilent(false);
 		}
 		loadedSources.add(f);
 
+		updateTracklist();
 		return data;
+
+	}
+
+	public class TrackList extends ArrayList<Track> {
+
+		private Model model;
+
+		public TrackList(Model model) {
+			this.model = model;
+		}
+
+		private static final long serialVersionUID = 6716276343672660196L;
+
+		public boolean containsType(Type type) {
+			for (Track track : this) {
+				if (track instanceof FeatureTrack) {
+					if (((FeatureTrack) track).getType().equals(type))
+						return true;
+
+				}
+			}
+			return false;
+		}
+
+		public void down(int row) {
+			if (row < this.size() - 1) {
+				Track tmp = get(row);
+				set(row, get(row + 1));
+				set(row + 1, tmp);
+				model.refresh();
+
+			}
+
+		}
+
+		public void up(int row) {
+			if (row > 0) {
+				Track tmp = get(row);
+				set(row, get(row - 1));
+				set(row - 1, tmp);
+				model.refresh();
+			}
+
+		}
+
+		public boolean containsGraph(String name) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+	}
+
+	/**
+	 * Returns a list of all tracks
+	 * 
+	 * @return list of tracks
+	 */
+	public TrackList getTrackList() {
+		return trackList;
+	}
+
+	private TrackList trackList;
+
+	/*
+	 * Method keeps the track list up to date.
+	 * 
+	 * All types and graphs loaded should have a corresponding track.
+	 */
+	private void updateTracklist() {
+		for (Type t : Type.values()) {
+			if (!trackList.containsType(t))
+				trackList.add(new FeatureTrack(this, t, true));
+		}
+		for (Entry e : entries) {
+			for (Graph g : e.graphs.getGraphs()) {
+				if (!trackList.containsGraph(g.getName()))
+					trackList.add(new WiggleTrack(g.getName(),this, true));
+			}
+		}
 
 	}
 
@@ -863,19 +969,6 @@ public class Model extends Observable implements Observer, IModel {
 
 	public Entry getHoveredChromEntry() {
 		return hoveredChromEntry;
-	}
-
-	public boolean isVisibleOnStructure(Type type) {
-		return visibleOnStructure.get(type);
-	}
-
-	private DefaultHashMap<Type, Boolean> visibleOnStructure = new DefaultHashMap<Type, Boolean>(
-			Boolean.FALSE);
-
-	public void setVisibleOnStructure(Type type, boolean b) {
-		visibleOnStructure.put(type, b);
-		refresh();
-
 	}
 
 	private GUIManager guimanager = new GUIManager();

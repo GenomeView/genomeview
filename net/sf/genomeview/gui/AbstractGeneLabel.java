@@ -37,18 +37,18 @@ public abstract class AbstractGeneLabel extends JLabel implements Observer {
 	 * Map that contains all TrackKey,ItemName pairs and their corresponding
 	 * rectangle.
 	 */
-	protected CollisionMap collisionMap;
+//	protected CollisionMap collisionMap;
 
 	public AbstractGeneLabel(final Model model) {
 		this.model = model;
-		this.collisionMap = new CollisionMap(model);
+//		this.collisionMap = new CollisionMap(model);
 		this.addMouseWheelListener(new MouseWheelListener() {
 
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				double rot = e.getWheelRotation() / 5.0;
-				double center = translateScreenToGenome(e.getX(), model
-						.getAnnotationLocationVisible());
+				double center = Convert.translateScreenToGenome(e.getX(), model
+						.getAnnotationLocationVisible(),screenWidth);
 				double start = model.getAnnotationLocationVisible().start();
 				double end = model.getAnnotationLocationVisible().end();
 				double length = end - start + 1;
@@ -84,8 +84,8 @@ public abstract class AbstractGeneLabel extends JLabel implements Observer {
 
 		g.setColor(Color.RED);
 
-		int start = translateGenomeToScreen(frame.start(), real);
-		int end = translateGenomeToScreen(frame.end(), real);
+		int start = Convert.translateGenomeToScreen(frame.start(), real,screenWidth);
+		int end = Convert.translateGenomeToScreen(frame.end(), real,screenWidth);
 		g
 				.drawRect(start, 0, end - start, framePixelsUsed > g
 						.getClipBounds().height ? framePixelsUsed - 1 : g
@@ -93,62 +93,14 @@ public abstract class AbstractGeneLabel extends JLabel implements Observer {
 
 	}
 
-	protected boolean modifier(MouseEvent e) {
-		return e.isAltDown() || e.isShiftDown() || e.isControlDown();
-	}
-
-	protected boolean button1(MouseEvent e) {
-		return e.getButton() == MouseEvent.BUTTON1;
-	}
-
-	protected boolean button2(MouseEvent e) {
-		return e.getButton() == MouseEvent.BUTTON2;
-	}
-
-	protected boolean button3(MouseEvent e) {
-		return e.getButton() == MouseEvent.BUTTON3;
-	}
+	
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
 	}
 
-	/**
-	 * Translates a coordinate on the genome to a screen coordinate. This is
-	 * only needed for the X coordinate
-	 * 
-	 * @param g
-	 *            the graphics context for the visible Location
-	 * @param pos
-	 *            the position to translate, this may be outside the visible
-	 *            Location
-	 * @return
-	 */
-	protected int translateGenomeToScreen(int pos, Location r) {
-		int genomeWidth = r.length();
-		int relativePos = pos - r.start();
-		return (int) (screenWidth / genomeWidth * relativePos);
-
-	}
-
-	/**
-	 * Translates a coordinate on the screen to a genome coordinate. This is
-	 * only needed for the X coordinate
-	 * 
-	 * @param g
-	 *            the graphics context for the visible Location
-	 * @param pos
-	 *            the position to translate,
-	 * 
-	 * @return
-	 */
-	protected int translateScreenToGenome(int pos, Location r) {
-		// Location r = model.getAnnotationLocationVisible();
-		int genomeWidth = r.length();
-		return (int) (pos / screenWidth * genomeWidth) + r.start();
-
-	}
+	
 
 	protected double screenWidth = 0;
 

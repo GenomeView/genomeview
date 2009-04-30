@@ -27,12 +27,12 @@ public interface IModel {
      */
     public Entry getSelectedEntry();
 
-    /**
-     * Adds a value feature to the currently selected entry.
-     */
-    public void addFeature(IValueFeature vf);
+//    /**
+//     * Adds a value feature to the currently selected entry.
+//     */
+//    public void addFeature(IValueFeature vf);
 
-    public void setValueFeatureDisplayType(IValueFeature svf, DisplayType barchartProfile);
+//    public void setValueFeatureDisplayType(IValueFeature svf, DisplayType barchartProfile);
 
     /**
      * Returns the region that is currently selected.
@@ -43,9 +43,9 @@ public interface IModel {
 
     public JFrame getParent();
 
-    public void setDisplayType(Type type, DisplayType barchartProfile);
+//    public void setDisplayType(Type type, DisplayType barchartProfile);
 
-    public void setVisibleOnAnnotation(Type type, boolean b);
+//    public void setVisibleOnAnnotation(Type type, boolean b);
     public GUIManager getGUIManager();
 
 }

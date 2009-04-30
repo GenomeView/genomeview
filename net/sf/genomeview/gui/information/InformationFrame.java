@@ -49,7 +49,7 @@ public class InformationFrame extends GridBagPanel {
         add(new JScrollPane(sourceTrackList), gc);
         gc.gridy++;
 
-        final FeatureTrackTable featureTrackList = new FeatureTrackTable(model);
+        final TrackTable featureTrackList = new TrackTable(model);
 
         gc.gridy++;
         gc.weighty = 0;
@@ -68,48 +68,48 @@ public class InformationFrame extends GridBagPanel {
         add(new JScrollPane(annotationTrackList), gc);
         gc.gridy++;
 
-        final ValueTrackListModel valueTrackModel = new ValueTrackListModel(model);
-        final JTable valueTrackList = new JTable(valueTrackModel);
-
-        valueTrackList.setCellSelectionEnabled(false);
-        valueTrackList.setRowSelectionAllowed(true);
-        valueTrackList.setColumnSelectionAllowed(false);
-        System.out.println(Arrays.toString(valueTrackList.getMouseListeners()));
-        valueTrackList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        valueTrackList.addMouseListener(new MouseAdapter() {
-            public void mouseReleased(MouseEvent e) {
-
-                System.out.println("Selected: " + valueTrackList.getSelectedColumn() + "\t"
-                        + valueTrackList.getSelectedRow());
-                int column = valueTrackList.getSelectedColumn();
-                int row = valueTrackList.getSelectedRow();
-                // String name = (String) valueTrackList.getValueAt(row, 0);
-                IValueFeature vFeature = valueTrackModel.getValueFeature(row);
-
-                if (column == 1) {
-
-                    switch (model.getValueFeatureDisplayType(vFeature)) {
-                    case MultiLineBlocks:
-                        model.setValueFeatureDisplayType(vFeature, DisplayType.OneLineBlocks);
-                        break;
-                    case LineProfile:
-                        model.setValueFeatureDisplayType(vFeature, DisplayType.ColorCodingProfile);
-                        break;
-                    case OneLineBlocks:
-                        model.setValueFeatureDisplayType(vFeature, DisplayType.MultiLineBlocks);
-                        break;
-                    case ColorCodingProfile:
-                        model.setValueFeatureDisplayType(vFeature, DisplayType.LineProfile);
-                        break;
-                    }
-                }
-                if (column == 2) {
-                    model.setValueFeatureVisible(vFeature, !model.isValueFeatureVisible(vFeature));
-                }
-
-            }
-
-        });
+//        final ValueTrackListModel valueTrackModel = new ValueTrackListModel(model);
+//        final JTable valueTrackList = new JTable(valueTrackModel);
+//
+//        valueTrackList.setCellSelectionEnabled(false);
+//        valueTrackList.setRowSelectionAllowed(true);
+//        valueTrackList.setColumnSelectionAllowed(false);
+//        System.out.println(Arrays.toString(valueTrackList.getMouseListeners()));
+//        valueTrackList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//        valueTrackList.addMouseListener(new MouseAdapter() {
+//            public void mouseReleased(MouseEvent e) {
+//
+//                System.out.println("Selected: " + valueTrackList.getSelectedColumn() + "\t"
+//                        + valueTrackList.getSelectedRow());
+//                int column = valueTrackList.getSelectedColumn();
+//                int row = valueTrackList.getSelectedRow();
+//                // String name = (String) valueTrackList.getValueAt(row, 0);
+//                IValueFeature vFeature = valueTrackModel.getValueFeature(row);
+//
+//                if (column == 1) {
+//
+//                    switch (model.getValueFeatureDisplayType(vFeature)) {
+//                    case MultiLineBlocks:
+//                        model.setValueFeatureDisplayType(vFeature, DisplayType.OneLineBlocks);
+//                        break;
+//                    case LineProfile:
+//                        model.setValueFeatureDisplayType(vFeature, DisplayType.ColorCodingProfile);
+//                        break;
+//                    case OneLineBlocks:
+//                        model.setValueFeatureDisplayType(vFeature, DisplayType.MultiLineBlocks);
+//                        break;
+//                    case ColorCodingProfile:
+//                        model.setValueFeatureDisplayType(vFeature, DisplayType.LineProfile);
+//                        break;
+//                    }
+//                }
+//                if (column == 2) {
+//                    model.setValueFeatureVisible(vFeature, !model.isValueFeatureVisible(vFeature));
+//                }
+//
+//            }
+//
+//        });
 
         gc.weighty = 0;
         add(new JLabel("Details on selected items:"), gc);
@@ -119,11 +119,11 @@ public class InformationFrame extends GridBagPanel {
         add(new JScrollPane(detail), gc);
 
         gc.gridy++;
-        gc.weighty = 0;
-        add(new JLabel("Prediction features"), gc);
-        gc.gridy++;
         gc.weighty = 0.5;
-        add(new JScrollPane(valueTrackList), gc);
+//        add(new JLabel("Prediction features"), gc);
+//        gc.gridy++;
+//        gc.weighty = 0.5;
+//        add(new JScrollPane(valueTrackList), gc);
 
         setPreferredSize(new Dimension(250, this.getPreferredSize().height));
 

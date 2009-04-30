@@ -45,6 +45,7 @@ public class CDSView extends JLabel implements Observer {
     public CDSView(Model model) {
         this.model = model;
         collisionMap = new CollisionMap(model);
+     
         model.addObserver(this);
         this.setPreferredSize(new Dimension(200, 50));
         this.setBackground(Color.WHITE);

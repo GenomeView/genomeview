@@ -42,7 +42,7 @@ public class AnnotationFrame extends GridBagPanel implements Observer {
 
     private GeneEvidenceLabel evidenceLabel;
 
-    private GeneStructureLabel structureLabel;
+//    private GeneStructureLabel structureLabel;
 
     public AnnotationFrame(Model model) {
         this.model = model;
@@ -67,11 +67,11 @@ public class AnnotationFrame extends GridBagPanel implements Observer {
         gc.weighty = 10;
         gc.gridheight = 1;
         gc.gridy++;
-        structureLabel = new GeneStructureLabel(model);
+//        structureLabel = new GeneStructureLabel(model);
         evidenceLabel = new GeneEvidenceLabel(model);
         Container c = new Container();
         c.setLayout(new BorderLayout());
-        c.add(structureLabel, BorderLayout.NORTH);
+//        c.add(structureLabel, BorderLayout.NORTH);
         c.add(evidenceLabel, BorderLayout.CENTER);
         JScrollPane tmp = new JScrollPane(c);
         tmp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
