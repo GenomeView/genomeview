@@ -429,7 +429,7 @@ public class StructureTrack extends Track {
 					.getInt("geneStructureAminoAcidWindowVerticalBars")) {
 				g.setColor(Color.black);
 				g
-						.drawLine(x + aa_width - 1, y, x + aa_width - 1, y
+						.drawLine(x + aa_width - 1, y+yOffset, x + aa_width - 1, y+yOffset
 								+ aa_height);
 
 			}
@@ -446,7 +446,7 @@ public class StructureTrack extends Track {
 				/* draw amino acid letter */
 				x = (int) (((i - r.start()) * width - stringSize.getWidth() / 2) + (width * 3 / 2));
 				y += lineHeight - 2 * gap;
-				g.drawString("" + aa, x, y);
+				g.drawString("" + aa, x, y+yOffset);
 
 			}
 
