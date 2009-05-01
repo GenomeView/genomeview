@@ -3,47 +3,25 @@
  */
 package net.sf.genomeview.gui.annotation;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Observable;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeMap;
 
-import net.sf.genomeview.core.ColorFactory;
-import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.DisplayType;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.AbstractGeneLabel;
-import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
-import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
-import net.sf.genomeview.gui.components.CollisionMap;
-import net.sf.genomeview.plugin.IValue;
 import net.sf.genomeview.plugin.IValueFeature;
-import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
-import net.sf.jannot.Qualifier;
 import net.sf.jannot.Type;
 
 public class GeneEvidenceLabel extends AbstractGeneLabel implements
@@ -213,8 +191,6 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	}
 
-	// private Map<Rectangle, Track> trackMap = new HashMap<Rectangle, Track>();
-
 	private static final long serialVersionUID = 1L;
 
 	private int currentBackgroundIndex = 0;
@@ -223,38 +199,28 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 			new Color(255, 255, 204, 100) };
 
 	public void paintComponent(Graphics g) {
-
-		// super.collisionMap.clear();
 		displayValueToggle.clear();
 		displayTypeToggle.clear();
 		tracks.clear();
 		framePixelsUsed = 0;
 		screenWidth = this.getSize().width + 1;
 		super.paintComponent(g);
-
-		// paintTicks(g, model.getAnnotationLocationVisible());
-		// renderValueFeatures((Graphics2D) g);
-
 		currentBackgroundIndex = 0;
-		// for (Type key : Type.values()) {
-		// if (model.isVisibleOnAnnotation(key)) {
+		
 		for (Track track : model.getTrackList()) {
 			if (track.isVisible()) {
 				
 				int startY = framePixelsUsed;
 				framePixelsUsed += track.paint(g, model.getSelectedEntry(),
 						framePixelsUsed, screenWidth);
-				// DisplayType dt = model.getDisplayType(key);
-				// boolean collision = renderTerm(g, key, dt);
-				// if (collision)
-				// paintDisplayToggle(g, key);
+				
 				if (track instanceof FeatureTrack) {
 					framePixelsUsed += 5;
 					Rectangle r = new Rectangle(0, startY,
 							(int) screenWidth + 1, framePixelsUsed - startY);
 					tracks.put(framePixelsUsed, track);
 					g.setColor(background[currentBackgroundIndex]);
-					g.fillRect(r.x, r.y - 5, r.width, r.height + 5);
+					g.fillRect(r.x, r.y , r.width, r.height);
 
 					currentBackgroundIndex++;
 					currentBackgroundIndex %= background.length;
