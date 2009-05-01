@@ -54,14 +54,6 @@ public class Model extends Observable implements Observer, IModel {
 		for (Entry e : entries) {
 			e.addObserver(this);
 		}
-		// trackList.add(new FeatureTrack(this,Type.get("gene"),true));
-		// trackList.add(new FeatureTrack(this,Type.get("CDS"),true));
-
-		// visibleOnChromosome.put(Type.get("gene"), true);
-		// visibleOnChromosome.put(Type.get("CDS"), true);
-		// visibleOnChromosome.put(Type.get("CDS_before"), true);
-		// visibleOnChromosome.put(Type.get("CDS_after"), true);
-
 		StructureTrack strack = new StructureTrack(this);
 		trackList.add(strack);
 		TickmarkTrack ticks = new TickmarkTrack(this);
@@ -74,8 +66,7 @@ public class Model extends Observable implements Observer, IModel {
 		Set<Type> tmp = Configuration.getTypeSet("visibleTypes");
 		updateTracklist();
 
-		// for (Type t : tmp)
-		// visibleOnAnnotation.put(t, true);
+	
 
 	}
 
@@ -787,18 +778,31 @@ public class Model extends Observable implements Observer, IModel {
 		}
 
 		public boolean containsGraph(String name) {
-			// TODO Auto-generated method stub
+			for (Track track : this) {
+				if (track instanceof WiggleTrack) {
+					if (((WiggleTrack) track).displayName().equals(name))
+						return true;
+
+				}
+			}
 			return false;
+		}
+
+		public TrackList copy() {
+			TrackList out=new TrackList(model);
+			out.addAll(this);
+			return out;
 		}
 	}
 
 	/**
-	 * Returns a list of all tracks
+	 * Returns a list of all tracks. This method creates a copy to make it safe
+	 * to iterate the returned list.
 	 * 
 	 * @return list of tracks
 	 */
 	public TrackList getTrackList() {
-		return trackList;
+		return trackList.copy();
 	}
 
 	private TrackList trackList;
@@ -816,7 +820,7 @@ public class Model extends Observable implements Observer, IModel {
 		for (Entry e : entries) {
 			for (Graph g : e.graphs.getGraphs()) {
 				if (!trackList.containsGraph(g.getName()))
-					trackList.add(new WiggleTrack(g.getName(),this, true));
+					trackList.add(new WiggleTrack(g.getName(), this, true));
 			}
 		}
 
