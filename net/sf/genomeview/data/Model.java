@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
@@ -23,12 +24,14 @@ import javax.swing.JFrame;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.DisplayType;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
+import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack;
 import net.sf.genomeview.gui.annotation.track.StructureTrack;
 import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.gui.annotation.track.WiggleTrack;
 import net.sf.genomeview.plugin.GUIManager;
 import net.sf.genomeview.plugin.IValueFeature;
+import net.sf.jannot.Alignment;
 import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.Annotation;
 import net.sf.jannot.Entry;
@@ -706,10 +709,10 @@ public class Model extends Observable implements Observer, IModel {
 	 * 
 	 * @throws ReadFailedException
 	 */
-	public Entry[] addFeatures(DataSource f) throws ReadFailedException {
+	public void addFeatures(DataSource f,Entry[] data) throws ReadFailedException {
 		logger.info("adding features: " + f);
 
-		Entry[] data = f.read();
+	
 		logger.info("entries read: " + data.length);
 
 		for (Entry e : data) {
@@ -731,11 +734,20 @@ public class Model extends Observable implements Observer, IModel {
 		loadedSources.add(f);
 
 		updateTracklist();
-		return data;
+//		return data;
 
 	}
-
-	public class TrackList extends ArrayList<Track> {
+	public void addAlignment(DataSource source, Entry[] data) {
+		for(Entry e:data){
+			Alignment align=new Alignment(e.getID(),e.sequence);
+			getSelectedEntry().alignment.addAlignment(align);
+			System.out.println("adding alignment: "+align);
+		}
+		loadedSources.add(source);
+		updateTracklist();
+		
+	}
+	public class TrackList extends CopyOnWriteArrayList<Track> {
 
 		private Model model;
 
@@ -788,10 +800,17 @@ public class Model extends Observable implements Observer, IModel {
 			return false;
 		}
 
-		public TrackList copy() {
-			TrackList out=new TrackList(model);
-			out.addAll(this);
-			return out;
+	
+
+		public boolean containsAlignment(String name) {
+			for (Track track : this) {
+				if (track instanceof MultipleAlignmentTrack) {
+					if (((MultipleAlignmentTrack) track).displayName().equals(name))
+						return true;
+
+				}
+			}
+			return false;
 		}
 	}
 
@@ -802,7 +821,7 @@ public class Model extends Observable implements Observer, IModel {
 	 * @return list of tracks
 	 */
 	public TrackList getTrackList() {
-		return trackList.copy();
+		return trackList;
 	}
 
 	private TrackList trackList;
@@ -821,6 +840,10 @@ public class Model extends Observable implements Observer, IModel {
 			for (Graph g : e.graphs.getGraphs()) {
 				if (!trackList.containsGraph(g.getName()))
 					trackList.add(new WiggleTrack(g.getName(), this, true));
+			}
+			for (Alignment a : e.alignment.getAlignment()) {
+				if (!trackList.containsAlignment(a.name()))
+					trackList.add(new MultipleAlignmentTrack(a.name(), this, true));
 			}
 		}
 
@@ -980,5 +1003,7 @@ public class Model extends Observable implements Observer, IModel {
 	public GUIManager getGUIManager() {
 		return guimanager;
 	}
+
+	
 
 }

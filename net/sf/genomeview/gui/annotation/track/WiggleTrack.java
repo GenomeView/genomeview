@@ -51,9 +51,6 @@ public class WiggleTrack extends Track {
 
 			int lastX = -1;
 			int lastY = -1;
-			System.out.println("=================");
-			System.out.println("=================");
-			System.out.println("=================");
 			if (!isCollapsed()) {
 				GeneralPath gp = new GeneralPath();
 				/* Move to first point */
@@ -65,7 +62,7 @@ public class WiggleTrack extends Track {
 				gp.moveTo(x, y);
 				/* Add all intermediate points */
 				for (Location l : vf.keySet()) {
-					System.out.println(l + "\t" + vf.get(l));
+					
 					g.setColor(Color.BLACK);
 					val = (vf.get(l) - graph.min())
 							/ (graph.max() - graph.min());

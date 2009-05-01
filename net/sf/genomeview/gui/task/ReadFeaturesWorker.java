@@ -3,7 +3,12 @@
  */
 package net.sf.genomeview.gui.task;
 
+import java.util.HashSet;
+
+import javax.swing.JOptionPane;
+
 import net.sf.genomeview.data.Model;
+import net.sf.jannot.Alignment;
 import net.sf.jannot.Entry;
 import net.sf.jannot.source.DataSource;
 
@@ -16,45 +21,56 @@ import net.sf.jannot.source.DataSource;
  */
 public class ReadFeaturesWorker extends DataSourceWorker<Entry[]> {
 
-    public ReadFeaturesWorker(DataSource source, Model model) {
-        super(source, model);
-    }
+	public ReadFeaturesWorker(DataSource source, Model model) {
+		super(source, model);
+	}
 
-    Entry[] added;
+	Entry[] added;
 
-    @Override
-    protected Entry[] doInBackground()  {
-        try {
-            System.out.println("reading stuff in background");
-            Entry[] out = model.addFeatures(source);
-            System.out.println(out.length);
-            return out;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        
+	@Override
+	protected Entry[] doInBackground() {
+		try {
+			System.out.println("reading stuff in background");
+			Entry[] data = source.read();
+			if (likelyMultipleAlign(data)) {
+				int result=JOptionPane
+						.showConfirmDialog(
+								model.getParent(),
+								"The data looks like a multiple alignment, would you like to load it as such?\n\n"+source,
+								"Multiple alignment?",
+								JOptionPane.YES_NO_OPTION);
+				if(result==JOptionPane.OK_OPTION){
+					System.out.println("Adding multiple alignment: "+source);
+					model.addAlignment(source,data);
+					return data;
+				}
+			}
+			System.out.println("Adding features: "+source);
+			model.addFeatures(source, data);
+			System.out.println(data.length);
+			return data;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 
-    }
+	}
 
-    // @Override
-    // public void done(){
-    // if (added!=null){
-    // int count = 0;
-    // for (Entry e : added){
-    // if (e.sequence.size() != 0)
-    // count++;
-    // }
-    // if (count > 0) {
-    // setDoneMessage("There were "
-    // + count
-    // + " feature sets loaded with sequence.\n\n " +
-    // "GenomeView will be unable to save the sequence and it will " +
-    // "be lost if you save these files again!");
-    // setDoneType(JOptionPane.WARNING_MESSAGE);
-    // }
-    // }
-    // super.done();
-    // }
+	/*
+	 * Check if all sequences are the same size and if there is no other data
+	 * besides the sequences.
+	 */
+	private boolean likelyMultipleAlign(Entry[] data) {	
+		HashSet<Integer>lengths=new HashSet<Integer>();
+		lengths.add(0);
+		int annotation=0;
+		for (Entry e : data) {
+			lengths.add(e.sequence.size());
+			annotation+=e.annotation.getAllFeatures().size();
+			
+		}
+		return annotation==0&&lengths.size()==2;
+		
+	}
 
 }

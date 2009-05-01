@@ -35,6 +35,7 @@ import net.sf.genomeview.gui.AbstractGeneLabel;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.genomeview.gui.annotation.track.FeatureTrack;
 import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.gui.components.CollisionMap;
@@ -239,7 +240,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		// if (model.isVisibleOnAnnotation(key)) {
 		for (Track track : model.getTrackList()) {
 			if (track.isVisible()) {
-				framePixelsUsed += 5;
+				
 				int startY = framePixelsUsed;
 				framePixelsUsed += track.paint(g, model.getSelectedEntry(),
 						framePixelsUsed, screenWidth);
@@ -247,14 +248,17 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 				// boolean collision = renderTerm(g, key, dt);
 				// if (collision)
 				// paintDisplayToggle(g, key);
-				Rectangle r = new Rectangle(0, startY, (int) screenWidth + 1,
-						framePixelsUsed - startY);
-				tracks.put(framePixelsUsed, track);
-				g.setColor(background[currentBackgroundIndex]);
-				g.fillRect(r.x, r.y - 5, r.width, r.height + 5);
+				if (track instanceof FeatureTrack) {
+					framePixelsUsed += 5;
+					Rectangle r = new Rectangle(0, startY,
+							(int) screenWidth + 1, framePixelsUsed - startY);
+					tracks.put(framePixelsUsed, track);
+					g.setColor(background[currentBackgroundIndex]);
+					g.fillRect(r.x, r.y - 5, r.width, r.height + 5);
 
-				currentBackgroundIndex++;
-				currentBackgroundIndex %= background.length;
+					currentBackgroundIndex++;
+					currentBackgroundIndex %= background.length;
+				}
 			}
 			// }
 		}

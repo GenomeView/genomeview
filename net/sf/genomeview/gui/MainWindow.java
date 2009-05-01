@@ -33,6 +33,7 @@ import net.sf.genomeview.data.source.MobySource;
 import net.sf.genomeview.gui.dialog.GVProgressBar;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.gui.task.ReadEntriesWorker;
+import net.sf.genomeview.gui.task.ReadFeaturesWorker;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
@@ -220,8 +221,8 @@ public class MainWindow implements WindowListener, Observer {
 		/* Load the source, if one was constructed */
 		if (data != null) {
 			assert (data.length == 1);
-			final GVProgressBar pb = new GVProgressBar("Loading",
-					"Loading data", window);
+			GVProgressBar pb = new GVProgressBar("Loading", "Loading data",
+					window);
 			data[0].setProgressListener(pb);
 			final ReadEntriesWorker rw = new ReadEntriesWorker(data[0], model);
 			rw.execute();
@@ -234,9 +235,22 @@ public class MainWindow implements WindowListener, Observer {
 				try {
 					if (!s.startsWith("http:") && !s.startsWith("ftp:")
 							&& !s.startsWith("https:")) {
-						model.addFeatures(new FileSource(new File(s)));
+						DataSource ds = new FileSource(new File(s));
+						pb = new GVProgressBar("Loading", "Loading data", model
+								.getParent());
+						ds.setProgressListener(pb);
+						ReadFeaturesWorker rf = new ReadFeaturesWorker(ds,
+								model);
+						rf.execute();
+
 					} else {
-						model.addFeatures(new URLSource(new URI(s).toURL()));
+						DataSource ds = new URLSource(new URI(s).toURL());
+						pb = new GVProgressBar("Loading", "Loading data", model
+								.getParent());
+						ds.setProgressListener(pb);
+						ReadFeaturesWorker rf = new ReadFeaturesWorker(ds,
+								model);
+						rf.execute();
 					}
 				} catch (MalformedURLException e) {
 					// TODO Auto-generated catch block
@@ -257,7 +271,6 @@ public class MainWindow implements WindowListener, Observer {
 		model.setSilent(false);
 	}
 
-	
 	private void parse(AutoHelpCmdLineParser parser, String[] args) {
 		try {
 			parser.parse(args);
@@ -338,5 +351,4 @@ public class MainWindow implements WindowListener, Observer {
 		}
 	}
 
-	
 }
