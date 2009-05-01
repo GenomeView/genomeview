@@ -34,7 +34,8 @@ public class MultipleAlignmentTrack extends Track {
 		Alignment align = e.alignment.getAlignment(name);
 		if (align != null) {
 			if(r.length()>1500){
-				g.drawString("Too much data, zoom in to see details",
+				g.setColor(Color.BLACK);
+				g.drawString("Too much data in alignment, zoom in to see details",
 						5, yOffset+lineHeigh-2);
 				return lineHeigh;
 			}
