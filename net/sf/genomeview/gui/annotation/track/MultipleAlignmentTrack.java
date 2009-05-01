@@ -45,26 +45,34 @@ public class MultipleAlignmentTrack extends Track {
 
 				nt = align.sequence().getNucleotide(i);
 
-				// if (spliceSitePaint) {
-				// Color spliceSite = checkSpliceSite(i, model, forward);
+				double conservation=e.alignment.getConservation(i);
+				if(conservation==1){
+					g.setColor(Color.BLACK);	
+				}else if(conservation>0.75){
+					g.setColor(Color.DARK_GRAY);
+				}else if(conservation>0.5){
+					g.setColor(Color.LIGHT_GRAY);
+				}else
+					g.setColor(Color.WHITE);
+				if(nt=='-'){
+					g.setColor(Color.RED);
+				}
+				
+				g.fillRect((int) ((i - r.start()) * width), yOffset, (int) width + 1, lineHeigh);
 				//
-				// if (spliceSite != null) {
-				// g.setColor(spliceSite);
-				// g.fillRect((int) ((i - r.start()) * width), 3 * lineHeight
-				// + (forward ? 0 : tickHeight + lineHeight) + gap
-				// + yOffset, (int) (2 * width) + 1, lineHeight - 2
-				// * gap);
 				// }
-				// } else if (nucleotidePaint) {
-				 g.setColor(Configuration.getNucleotideColor(nt));
-				 g.fillRect((int) ((i - r.start()) * width), yOffset, (int) width + 1, lineHeigh);
-				//
-				// }
-
+				
 				if (model.getAnnotationLocationVisible().length() < 100) {
 					Rectangle2D stringSize = g.getFontMetrics()
 							.getStringBounds("" + nt, g);
-					g.setColor(Color.black);
+					if(conservation==1){
+						g.setColor(Color.WHITE);	
+					}else if(conservation>0.75){
+						g.setColor(Color.WHITE);
+					}else if(conservation>0.5){
+						g.setColor(Color.BLACK);
+					}else
+						g.setColor(Color.BLACK);
 					g.drawString("" + nt,
 							(int) (((i - r.start()) * width - stringSize
 									.getWidth() / 2) + (width / 2)), yOffset+lineHeigh-2);
