@@ -738,11 +738,13 @@ public class Model extends Observable implements Observer, IModel {
 
 	}
 	public void addAlignment(DataSource source, Entry[] data) {
+		List<Alignment>list=new ArrayList<Alignment>();
 		for(Entry e:data){
 			Alignment align=new Alignment(e.getID(),e.sequence);
-			getSelectedEntry().alignment.addAlignment(align);
+			list.add(align);
 			System.out.println("adding alignment: "+align);
 		}
+		getSelectedEntry().alignment.addAll(list);
 		loadedSources.add(source);
 		updateTracklist();
 		
