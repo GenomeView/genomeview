@@ -51,6 +51,12 @@ public class WiggleTrack extends Track {
 
 			int lastX = -1;
 			int lastY = -1;
+			if(vf.size()==0){
+				g.setColor(Color.black);
+				g.drawString("No datapoints in this interval", 10, yOffset + yUsed);
+			}
+				
+			
 			if (!isCollapsed()) {
 				GeneralPath gp = new GeneralPath();
 				/* Move to first point */
