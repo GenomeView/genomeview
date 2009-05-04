@@ -30,53 +30,59 @@ public class MultipleAlignmentTrack extends Track {
 	@Override
 	public int paint(Graphics g, Entry e, int yOffset, double screenWidth) {
 		Location r = model.getAnnotationLocationVisible();
-		int lineHeigh=15;
+		int lineHeigh = 15;
 		Alignment align = e.alignment.getAlignment(name);
 		if (align != null) {
-			if(r.length()>1500){
+			if (r.length() > 200000) {
 				g.setColor(Color.BLACK);
-				g.drawString("Too much data in alignment, zoom in to see details",
-						5, yOffset+lineHeigh-2);
+				g.drawString(
+						"Too much data in alignment, zoom in to see details",
+						5, yOffset + lineHeigh - 2);
 				return lineHeigh;
 			}
 			double width = screenWidth / (double) r.length();
-
-			for (int i = r.start(); i <= r.end(); i++) {
-				char nt;
-
-				nt = align.sequence().getNucleotide(i);
-
-				double conservation=e.alignment.getConservation(i);
-				if(conservation==1){
-					g.setColor(Color.BLACK);	
-				}else if(conservation>0.75){
+			int grouping = (int) Math.ceil(1.0 / width);
+			for (int i = r.start(); i <= r.end(); i += grouping) {
+				char nt=' ';
+				double conservation=0;
+				boolean dash=false;
+				for (int j = 0; j < grouping; j++) {
+					nt = align.sequence().getNucleotide(i+j);
+					conservation += e.alignment.getConservation(i+j);
+					if(nt=='-')
+						dash=true;
+					
+				}
+				conservation/=grouping;
+				if (conservation == 1) {
+					g.setColor(Color.BLACK);
+				} else if (conservation > 0.75) {
 					g.setColor(Color.DARK_GRAY);
-				}else if(conservation>0.5){
+				} else if (conservation > 0.5) {
 					g.setColor(Color.LIGHT_GRAY);
-				}else
+				} else
 					g.setColor(Color.WHITE);
-				if(nt=='-'){
+				if (dash) {
 					g.setColor(Color.RED);
 				}
-				
-				g.fillRect((int) ((i - r.start()) * width), yOffset, (int) width + 1, lineHeigh);
-				//
-				// }
-				
+
+				g.fillRect((int) ((i - r.start()) * width), yOffset,
+						(int) (width*grouping) + 1, lineHeigh);
 				if (model.getAnnotationLocationVisible().length() < 100) {
 					Rectangle2D stringSize = g.getFontMetrics()
 							.getStringBounds("" + nt, g);
-					if(conservation==1){
-						g.setColor(Color.WHITE);	
-					}else if(conservation>0.75){
+					if (conservation == 1) {
 						g.setColor(Color.WHITE);
-					}else if(conservation>0.5){
+					} else if (conservation > 0.75) {
+						g.setColor(Color.WHITE);
+					} else if (conservation > 0.5) {
 						g.setColor(Color.BLACK);
-					}else
+					} else
 						g.setColor(Color.BLACK);
 					g.drawString("" + nt,
 							(int) (((i - r.start()) * width - stringSize
-									.getWidth() / 2) + (width / 2)), yOffset+lineHeigh-2);
+									.getWidth() / 2) + (width / 2)), yOffset
+									+ lineHeigh - 2);
 				}
 			}
 
