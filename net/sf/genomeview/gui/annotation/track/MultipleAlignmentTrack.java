@@ -31,7 +31,9 @@ public class MultipleAlignmentTrack extends Track {
 	public int paint(Graphics g, Entry e, int yOffset, double screenWidth) {
 		Location r = model.getAnnotationLocationVisible();
 		int lineHeigh = 15;
+		Alignment ref=e.alignment.getReference();
 		Alignment align = e.alignment.getAlignment(name);
+		
 		if (align != null) {
 			if (r.length() > 200000) {
 				g.setColor(Color.BLACK);
@@ -47,8 +49,8 @@ public class MultipleAlignmentTrack extends Track {
 				double conservation=0;
 				boolean dash=false;
 				for (int j = 0; j < grouping; j++) {
-					nt = align.sequence().getNucleotide(i+j);
-					conservation += e.alignment.getConservation(i+j);
+					nt = align.sequence().getNucleotide(Alignment.ref2aln(ref,i+j));
+					conservation += e.alignment.getConservation(Alignment.ref2aln(ref,i+j));
 					if(nt=='-')
 						dash=true;
 					
