@@ -100,7 +100,20 @@ public class Model extends Observable implements Observer, IModel {
 		selectedEntry = null;
 		selectedLocation.clear();
 		selectedRegion = null;
+		clearTrackList(trackList);
 		refresh(NotificationTypes.GENERAL);
+	}
+
+	private void clearTrackList(TrackList tracklist) {
+		List<Track>remove=new ArrayList<Track>();
+		for(Track t:tracklist){
+			
+			if(!(t instanceof FeatureTrack ||t instanceof StructureTrack ||t instanceof TickmarkTrack))
+				remove.add(t);
+		}
+		tracklist.removeAll(remove);
+		refresh();
+		
 	}
 
 	public List<Entry> entries() {
