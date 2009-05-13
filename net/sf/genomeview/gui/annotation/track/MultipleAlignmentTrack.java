@@ -15,11 +15,13 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 
 public class MultipleAlignmentTrack extends Track {
+	private int index;
 	private String name;
 
-	public MultipleAlignmentTrack(String name, Model model, boolean b) {
+	public MultipleAlignmentTrack(String name,int index, Model model, boolean b) {
 		super(model, b);
-		this.name = name;
+		this.index=index;
+		this.name=name;
 	}
 
 	@Override
@@ -31,11 +33,11 @@ public class MultipleAlignmentTrack extends Track {
 	public int paint(Graphics g, Entry e, int yOffset, double screenWidth) {
 		Location r = model.getAnnotationLocationVisible();
 		int lineHeigh = 15;
-		Alignment ref=e.alignment.getReference();
-		Alignment align = e.alignment.getAlignment(name);
+		
+		Alignment align = e.alignment.getAlignment(index);
 		
 		if (align != null) {
-			if (r.length() > 200000) {
+			if (r.length() > 100000) {
 				g.setColor(Color.BLACK);
 				g.drawString(
 						"Too much data in alignment, zoom in to see details",
@@ -49,8 +51,8 @@ public class MultipleAlignmentTrack extends Track {
 				double conservation=0;
 				boolean dash=false;
 				for (int j = 0; j < grouping; j++) {
-					nt = align.sequence().getNucleotide(Alignment.ref2aln(ref,i+j));
-					conservation += e.alignment.getConservation(Alignment.ref2aln(ref,i+j));
+					nt = align.getNucleotide(i+j);
+					conservation += e.alignment.getConservation(i+j);
 					if(nt=='-')
 						dash=true;
 					
@@ -91,5 +93,9 @@ public class MultipleAlignmentTrack extends Track {
 			return lineHeigh;
 		}
 		return 0;
+	}
+
+	public int getIndex() {
+		return index;
 	}
 }

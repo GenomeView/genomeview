@@ -739,8 +739,9 @@ public class Model extends Observable implements Observer, IModel {
 	}
 	public void addAlignment(DataSource source, Entry[] data) {
 		List<Alignment>list=new ArrayList<Alignment>();
-		for(Entry e:data){
-			Alignment align=new Alignment(e.getID(),e.sequence);
+		
+		for(int i=0;i<data.length;i++){
+			Alignment align=new Alignment(data[i].getID(),data[i].sequence,data[0].sequence);
 			list.add(align);
 			System.out.println("adding alignment: "+align);
 		}
@@ -804,10 +805,10 @@ public class Model extends Observable implements Observer, IModel {
 
 	
 
-		public boolean containsAlignment(String name) {
+		public boolean containsAlignment(int index) {
 			for (Track track : this) {
 				if (track instanceof MultipleAlignmentTrack) {
-					if (((MultipleAlignmentTrack) track).displayName().equals(name))
+					if (((MultipleAlignmentTrack) track).getIndex()==index)
 						return true;
 
 				}
@@ -843,9 +844,9 @@ public class Model extends Observable implements Observer, IModel {
 				if (!trackList.containsGraph(g.getName()))
 					trackList.add(new WiggleTrack(g.getName(), this, true));
 			}
-			for (Alignment a : e.alignment.getAlignment()) {
-				if (!trackList.containsAlignment(a.name()))
-					trackList.add(new MultipleAlignmentTrack(a.name(), this, true));
+			for (int i=0;i< e.alignment.numAlignments();i++) {
+				if (!trackList.containsAlignment(i))
+					trackList.add(new MultipleAlignmentTrack(e.alignment.getAlignment(i).name(),i, this, true));
 			}
 		}
 
