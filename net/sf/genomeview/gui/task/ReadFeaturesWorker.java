@@ -69,7 +69,7 @@ public class ReadFeaturesWorker extends DataSourceWorker<Entry[]> {
 			annotation+=e.annotation.getAllFeatures().size();
 			
 		}
-		return annotation==0&&lengths.size()==2;
+		return annotation==0&&lengths.size()==2&&data.length>1;
 		
 	}
 
