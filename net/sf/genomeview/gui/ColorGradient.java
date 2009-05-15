@@ -126,7 +126,7 @@ public class ColorGradient {
 	 * @return the <code>Color</code> value in the gradient.
 	 */
 	public Color getColor(int i) {
-		return crGradient.get(i);
+		return i>crGradient.size()?crGradient.get(crGradient.size()-1):crGradient.get(i);
 	}
 
 	/**

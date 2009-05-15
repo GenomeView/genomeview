@@ -33,7 +33,12 @@ public class SyntenicTrack extends Track {
 		super(model, true);
 		this.ref = ref;
 		this.target = target;
-		this.gradient = ColorGradient.getSimple(Color.yellow, Color.blue);
+		this.gradient = new ColorGradient();
+		gradient.addPoint(Color.red);
+		gradient.addPoint(Color.yellow);
+		gradient.addPoint(Color.green);
+		gradient.addPoint(Color.blue);
+		gradient.createGradient(colors);
 
 	}
 
@@ -49,11 +54,30 @@ public class SyntenicTrack extends Track {
 			// Dont paint when reference does not match
 			return 0;
 		} else {
-
+			double colorBlockLength = (e.sequence.size() + 1) / colors;
 			if (target.equals(ref)) {
-
+				Color startColor = gradient
+						.getColor((int) (model.getAnnotationLocationVisible()
+								.start() / colorBlockLength));
+				Color endColor = gradient
+						.getColor((int) (model.getAnnotationLocationVisible()
+								.end() / colorBlockLength));
+				int screenStart = Convert.translateGenomeToScreen(model.getAnnotationLocationVisible()
+						.start(), model.getAnnotationLocationVisible(), width);
+				int screenEnd = Convert.translateGenomeToScreen(
+						model.getAnnotationLocationVisible().end(), model.getAnnotationLocationVisible(),
+						width);
+				for(int i=0;i<20;i++){
+					int length=screenEnd-screenStart;
+				}
+				GradientPaint gp = new GradientPaint(screenStart, 0,
+						startColor, screenEnd, 0, endColor);
+				g.setPaint(gp);
+				g
+						.fillRect(screenStart, offset, screenEnd - screenStart
+								+ 1, 10);
 			} else {
-				double colorBlockLength = (e.sequence.size() + 1) / colors;
+
 				List<SyntenicBlock> list = e.syntenic.get(model
 						.getAnnotationLocationVisible());
 				for (SyntenicBlock sb : list) {
@@ -97,8 +121,8 @@ public class SyntenicTrack extends Track {
 			}
 
 			g.setColor(Color.black);
-			g.drawString(displayName(), 10, offset +13);
-			return 15;
+			g.drawString(displayName(), 10, offset + 23);
+			return 25;
 
 		}
 	}
