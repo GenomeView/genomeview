@@ -38,7 +38,7 @@ import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.URLSource;
-import be.abeel.util.AutoHelpCmdLineParser;
+import be.abeel.jargs.AutoHelpCmdLineParser;
 
 /**
  * MainWindow is the container for a single GenomeView instance.

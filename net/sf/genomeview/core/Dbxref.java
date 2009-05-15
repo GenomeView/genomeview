@@ -6,7 +6,7 @@ package net.sf.genomeview.core;
 import java.util.HashMap;
 import java.util.Map;
 
-import be.abeel.util.LineIterator;
+import be.abeel.io.LineIterator;
 
 /**
  * Class to get the database information for a dbxref.

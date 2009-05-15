@@ -20,7 +20,7 @@ import java.util.TreeSet;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.jannot.Annotation;
+import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
@@ -339,7 +339,7 @@ public class MobySource extends DataSource {
         regionObj.put("start", new MobyDataInt(entry.sequence.getStartPos(), registry));
         regionObj.put("end", new MobyDataInt(entry.sequence.getEndPos(), registry));
 
-        Annotation a = entry.annotation;
+        FeatureAnnotation a = entry.annotation;
         // int counter = 0;
         for (Type type : Type.values()) {
             for (Feature feat : a.getByType(type)) {

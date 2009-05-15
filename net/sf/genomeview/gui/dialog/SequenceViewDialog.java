@@ -45,7 +45,7 @@ import net.sf.genomeview.gui.menu.selection.NCBIdnaBlastAction;
 import net.sf.genomeview.gui.menu.selection.NCBIproteinBlastAction;
 import net.sf.jannot.Feature;
 import net.sf.jannot.utils.SequenceTools;
-import be.abeel.util.ExtensionManager;
+import be.abeel.io.ExtensionManager;
 
 public class SequenceViewDialog extends JDialog implements Observer {
 

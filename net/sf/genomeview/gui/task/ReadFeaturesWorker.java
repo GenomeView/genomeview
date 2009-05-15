@@ -45,15 +45,25 @@ public class ReadFeaturesWorker extends DataSourceWorker<Entry[]> {
 					return data;
 				}
 			}
+			if(syntenic(data)){
+				model.addSyntenic(source,data);
+				return data;
+			}else{
 			System.out.println("Adding features: "+source);
 			model.addFeatures(source, data);
 			System.out.println(data.length);
 			return data;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 
+	}
+
+	private boolean syntenic(Entry[] data) {
+		return data[0].syntenic.getAll().size()>0;
+			
 	}
 
 	/*
@@ -66,7 +76,7 @@ public class ReadFeaturesWorker extends DataSourceWorker<Entry[]> {
 		int annotation=0;
 		for (Entry e : data) {
 			lengths.add(e.sequence.size());
-			annotation+=e.annotation.getAllFeatures().size();
+			annotation+=e.annotation.getAll().size();
 			
 		}
 		return annotation==0&&lengths.size()==2&&data.length>1;

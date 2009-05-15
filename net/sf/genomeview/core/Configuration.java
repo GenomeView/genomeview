@@ -19,8 +19,8 @@ import java.util.zip.GZIPInputStream;
 
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Type;
-import be.abeel.util.GZIPPrintWriter;
-import be.abeel.util.LineIterator;
+import be.abeel.io.GZIPPrintWriter;
+import be.abeel.io.LineIterator;
 
 /**
  * Low level access to the configuration.

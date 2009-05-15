@@ -22,23 +22,23 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.DisplayType;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
 import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack;
 import net.sf.genomeview.gui.annotation.track.StructureTrack;
+import net.sf.genomeview.gui.annotation.track.SyntenicTrack;
 import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.gui.annotation.track.WiggleTrack;
 import net.sf.genomeview.plugin.GUIManager;
-import net.sf.genomeview.plugin.IValueFeature;
 import net.sf.jannot.Alignment;
 import net.sf.jannot.AminoAcidMapping;
-import net.sf.jannot.Annotation;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
+import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Graph;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
+import net.sf.jannot.SyntenicAnnotation;
 import net.sf.jannot.Type;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
@@ -69,12 +69,23 @@ public class Model extends Observable implements Observer, IModel {
 		Set<Type> tmp = Configuration.getTypeSet("visibleTypes");
 		updateTracklist();
 
-	
-
 	}
 
 	public int noEntries() {
 		return entries.size();
+	}
+
+	/**
+	 * Get an entry by ID
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Entry entry(String id) {
+		for (Entry e : entries)
+			if (e.getID().equalsIgnoreCase(id))
+				return e;
+		return null;
 	}
 
 	public Entry entry(int index) {
@@ -105,15 +116,15 @@ public class Model extends Observable implements Observer, IModel {
 	}
 
 	private void clearTrackList(TrackList tracklist) {
-		List<Track>remove=new ArrayList<Track>();
-		for(Track t:tracklist){
-			
-			if(!(t instanceof FeatureTrack ||t instanceof StructureTrack ||t instanceof TickmarkTrack))
+		List<Track> remove = new ArrayList<Track>();
+		for (Track t : tracklist) {
+
+			if (!(t instanceof FeatureTrack || t instanceof StructureTrack || t instanceof TickmarkTrack))
 				remove.add(t);
 		}
 		tracklist.removeAll(remove);
 		refresh();
-		
+
 	}
 
 	public List<Entry> entries() {
@@ -712,6 +723,24 @@ public class Model extends Observable implements Observer, IModel {
 
 	}
 
+	public void addSyntenic(DataSource source, Entry[] data) {
+
+		for (int i = 0; i < data.length; i++) {
+			SyntenicAnnotation sa = data[i].syntenic;
+			System.out.println(data[i].getID());
+			System.out.println(entry(data[i].getID()));
+			Entry add=entry(data[i].getID());
+			if(add!=null)
+				add.syntenic.addAll(sa);
+			System.out.println("adding syntenic: " + sa);
+		}
+
+		loadedSources.add(source);
+		updateTracklist();
+	
+
+	}
+
 	/**
 	 * All data from the new stuff will be added to the existing annotation in
 	 * the selected entry.
@@ -722,14 +751,14 @@ public class Model extends Observable implements Observer, IModel {
 	 * 
 	 * @throws ReadFailedException
 	 */
-	public void addFeatures(DataSource f,Entry[] data) throws ReadFailedException {
+	public void addFeatures(DataSource f, Entry[] data)
+			throws ReadFailedException {
 		logger.info("adding features: " + f);
 
-	
 		logger.info("entries read: " + data.length);
 
 		for (Entry e : data) {
-			Annotation a = e.annotation;
+			FeatureAnnotation a = e.annotation;
 			Entry addTo = getSelectedEntry();
 			/* Check if any existing entry has the same name */
 			for (Entry g : entries) {
@@ -747,22 +776,25 @@ public class Model extends Observable implements Observer, IModel {
 		loadedSources.add(f);
 
 		updateTracklist();
-//		return data;
+		// return data;
 
 	}
+
 	public void addAlignment(DataSource source, Entry[] data) {
-		List<Alignment>list=new ArrayList<Alignment>();
-		
-		for(int i=0;i<data.length;i++){
-			Alignment align=new Alignment(data[i].getID(),data[i].sequence,data[0].sequence);
+		List<Alignment> list = new ArrayList<Alignment>();
+
+		for (int i = 0; i < data.length; i++) {
+			Alignment align = new Alignment(data[i].getID(), data[i].sequence,
+					data[0].sequence);
 			list.add(align);
-			System.out.println("adding alignment: "+align);
+			System.out.println("adding alignment: " + align);
 		}
 		getSelectedEntry().alignment.addAll(list);
 		loadedSources.add(source);
 		updateTracklist();
-		
+
 	}
+
 	public class TrackList extends CopyOnWriteArrayList<Track> {
 
 		private Model model;
@@ -816,12 +848,23 @@ public class Model extends Observable implements Observer, IModel {
 			return false;
 		}
 
-	
-
 		public boolean containsAlignment(int index) {
 			for (Track track : this) {
 				if (track instanceof MultipleAlignmentTrack) {
-					if (((MultipleAlignmentTrack) track).getIndex()==index)
+					if (((MultipleAlignmentTrack) track).getIndex() == index)
+						return true;
+
+				}
+			}
+			return false;
+		}
+
+		public boolean containsSyntenicTarget(Entry ref, Entry target) {
+			for (Track track : this) {
+				if (track instanceof SyntenicTrack) {
+					SyntenicTrack st = ((SyntenicTrack) track);
+					if (st.reference().equals(ref)
+							&& st.target().equals(target))
 						return true;
 
 				}
@@ -857,11 +900,22 @@ public class Model extends Observable implements Observer, IModel {
 				if (!trackList.containsGraph(g.getName()))
 					trackList.add(new WiggleTrack(g.getName(), this, true));
 			}
-			for (int i=0;i< e.alignment.numAlignments();i++) {
+			for (int i = 0; i < e.alignment.numAlignments(); i++) {
 				if (!trackList.containsAlignment(i))
-					trackList.add(new MultipleAlignmentTrack(e.alignment.getAlignment(i).name(),i, this, true));
+					trackList.add(new MultipleAlignmentTrack(e.alignment
+							.getAlignment(i).name(), i, this, true));
 			}
+			Set<Entry> targets = e.syntenic.getTargets();
+			if (!trackList.containsSyntenicTarget(e, e)) {
+				trackList.add(new SyntenicTrack(this, e, e));
+			}
+			for (Entry t : targets) {
+				if (!trackList.containsSyntenicTarget(e, t))
+					trackList.add(new SyntenicTrack(this, e, t));
+			}
+
 		}
+		refresh();
 
 	}
 
@@ -1019,7 +1073,5 @@ public class Model extends Observable implements Observer, IModel {
 	public GUIManager getGUIManager() {
 		return guimanager;
 	}
-
-	
 
 }

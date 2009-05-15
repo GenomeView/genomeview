@@ -27,7 +27,7 @@ public class TestGenbankParser {
 
             // System.out.println("ACC:" +
             // entries[0].description.getAccessionNumbers());
-            List<Feature> fs = entries[0].annotation.getAllFeatures();
+            List<Feature> fs = entries[0].annotation.getAll();
             for (Feature f : fs) {
                 // System.out.println(f.type());
                 // System.out.println(f.location());

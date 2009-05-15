@@ -16,7 +16,7 @@ import net.sf.genomeview.gui.chromosome.ChromosomeView;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
 import be.abeel.graphics.GraphicsFileExport;
-import be.abeel.util.ExtensionManager;
+import be.abeel.io.ExtensionManager;
 
 /**
  * Action to export a PDF image of the chromosome view.

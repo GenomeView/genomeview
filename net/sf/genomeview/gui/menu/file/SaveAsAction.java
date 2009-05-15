@@ -16,7 +16,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.jannot.Entry;
 import net.sf.jannot.parser.EMBLParser;
 import net.sf.jannot.parser.Parser;
-import be.abeel.util.ExtensionManager;
+import be.abeel.io.ExtensionManager;
 
 /**
  * Action to save the contents of a model to an url or a file.
