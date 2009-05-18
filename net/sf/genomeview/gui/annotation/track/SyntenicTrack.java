@@ -56,26 +56,30 @@ public class SyntenicTrack extends Track {
 		} else {
 			double colorBlockLength = (e.sequence.size() + 1) / colors;
 			if (target.equals(ref)) {
-				Color startColor = gradient
-						.getColor((int) (model.getAnnotationLocationVisible()
-								.start() / colorBlockLength));
-				Color endColor = gradient
-						.getColor((int) (model.getAnnotationLocationVisible()
-								.end() / colorBlockLength));
-				int screenStart = Convert.translateGenomeToScreen(model.getAnnotationLocationVisible()
-						.start(), model.getAnnotationLocationVisible(), width);
-				int screenEnd = Convert.translateGenomeToScreen(
-						model.getAnnotationLocationVisible().end(), model.getAnnotationLocationVisible(),
-						width);
-				for(int i=0;i<20;i++){
-					int length=screenEnd-screenStart;
+
+				for (int i = 0; i <= 20; i++) {
+					int length=model
+					.getAnnotationLocationVisible().end()-model
+					.getAnnotationLocationVisible().start()+1;
+					int start=(int)(length/20.0*i);
+					int end=(int)(length/20.0*(i+1));
+//					System.out.println(start+"\t"+end);
+					Color startColor = gradient
+							.getColor((int) ( start/ colorBlockLength));
+					Color endColor = gradient
+							.getColor((int) (end / colorBlockLength));
+					int screenStart = Convert.translateGenomeToScreen(start, model
+							.getAnnotationLocationVisible(), width);
+					int screenEnd = Convert.translateGenomeToScreen(end, model
+							.getAnnotationLocationVisible(), width);
+					GradientPaint gp = new GradientPaint(screenStart, 0,
+							startColor, screenEnd, 0, endColor);
+					g.setPaint(gp);
+					g.fillRect( screenStart, offset,
+							screenEnd-screenStart + 1, 10);
+
 				}
-				GradientPaint gp = new GradientPaint(screenStart, 0,
-						startColor, screenEnd, 0, endColor);
-				g.setPaint(gp);
-				g
-						.fillRect(screenStart, offset, screenEnd - screenStart
-								+ 1, 10);
+
 			} else {
 
 				List<SyntenicBlock> list = e.syntenic.get(model
@@ -112,8 +116,8 @@ public class SyntenicTrack extends Track {
 								g.fillRect(screenStart, offset, screenEnd
 										- screenStart + 1, 10);
 							} catch (Exception x) {
-								System.out.println(refLoc);
-								System.out.println(colorBlockLength);
+								System.err.println(refLoc);
+								System.err.println(colorBlockLength);
 							}
 						}
 					}
