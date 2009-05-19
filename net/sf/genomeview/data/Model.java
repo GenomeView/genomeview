@@ -24,6 +24,7 @@ import javax.swing.JFrame;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
 import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack;
+import net.sf.genomeview.gui.annotation.track.SequenceLogoTrack;
 import net.sf.genomeview.gui.annotation.track.StructureTrack;
 import net.sf.genomeview.gui.annotation.track.SyntenicTrack;
 import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
@@ -729,15 +730,14 @@ public class Model extends Observable implements Observer, IModel {
 			SyntenicAnnotation sa = data[i].syntenic;
 			System.out.println(data[i].getID());
 			System.out.println(entry(data[i].getID()));
-			Entry add=entry(data[i].getID());
-			if(add!=null)
+			Entry add = entry(data[i].getID());
+			if (add != null)
 				add.syntenic.addAll(sa);
 			System.out.println("adding syntenic: " + sa);
 		}
 
 		loadedSources.add(source);
 		updateTracklist();
-	
 
 	}
 
@@ -871,6 +871,17 @@ public class Model extends Observable implements Observer, IModel {
 			}
 			return false;
 		}
+
+		public boolean containsSequenceLogo() {
+			for (Track track : this) {
+				if (track instanceof SequenceLogoTrack) {
+
+					return true;
+
+				}
+			}
+			return false;
+		}
 	}
 
 	/**
@@ -896,17 +907,23 @@ public class Model extends Observable implements Observer, IModel {
 				trackList.add(new FeatureTrack(this, t, true));
 		}
 		for (Entry e : entries) {
+			/* Graph tracks */
 			for (Graph g : e.graphs.getGraphs()) {
 				if (!trackList.containsGraph(g.getName()))
 					trackList.add(new WiggleTrack(g.getName(), this, true));
 			}
+			/* Alignment and conservation tracks */
 			for (int i = 0; i < e.alignment.numAlignments(); i++) {
 				if (!trackList.containsAlignment(i))
 					trackList.add(new MultipleAlignmentTrack(e.alignment
 							.getAlignment(i).name(), i, this, true));
 			}
+			if (!trackList.containsSequenceLogo()
+					&& e.alignment.numAlignments() > 0)
+				trackList.add(new SequenceLogoTrack(this));
+			/* Syntenic tracks */
 			Set<Entry> targets = e.syntenic.getTargets();
-			if (!trackList.containsSyntenicTarget(e, e)) {
+			if (targets.size() > 0 && !trackList.containsSyntenicTarget(e, e)) {
 				trackList.add(new SyntenicTrack(this, e, e));
 			}
 			for (Entry t : targets) {
