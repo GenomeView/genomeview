@@ -8,15 +8,18 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.font.GlyphVector;
+import java.awt.font.LineMetrics;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.Collections;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import be.abeel.io.Serial;
+
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
-import net.sf.jannot.Alignment;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 
@@ -39,12 +42,53 @@ public class SequenceLogoTrack extends Track {
 		return "Multiple alignment sequence logo";
 	}
 
+	
+	public void draw(Map<Integer,String> map,Graphics2D g,int numAlign,int position,int lineHeight,Model m,double width,int yOffset){
+		
+		int left = lineHeight;
+		for (int key : map.keySet()) {
+			for (char c : map.get(key).toCharArray()) {
+				Color ntColor = Configuration.getNucleotideColor(c);
+				// System.out.println(c + "\t" + key);
+				double fraction = key
+						/ (double) numAlign;
+
+				Font font = new Font("Sans serif", 1, lineHeight);
+//				float f3 = 1.5F;
+//				System.out.println(position + "\t" + c + "\t" + lineHeight
+//						+ "\t" + fraction + "\t"
+//						+ (fraction * lineHeight));
+				Font font2 = font.deriveFont(AffineTransform
+						.getScaleInstance(width/lineHeight*1.2, fraction*1.4));
+
+				GlyphVector glyphvector = font2.createGlyphVector(g
+						.getFontRenderContext(), "" + c);
+//
+				Rectangle2D stringSize = font2.getStringBounds("" + c,
+						g.getFontRenderContext());
+				int x = (int) (((position - model.getAnnotationLocationVisible().start()) * width)+(width-stringSize.getWidth())/2);
+				int y = (int) (yOffset + left);
+//				System.out.println("\t"+x+"\t" + (y - yOffset));
+//				LineMetrics lm=font.getLineMetrics("" + c, g
+//						.getFontRenderContext());
+//				System.out.println("-"+lm.getDescent()+"\t"+lm.getLeading()+"\t"+lm.getAscent()+"\t"+lm.getHeight());
+				g.translate(x, y);
+				left -= fraction*lineHeight;
+				java.awt.Shape shape = glyphvector.getGlyphOutline(0);
+				g.setColor(ntColor);
+				g.fill(shape);
+				g.translate(-x, -y);
+
+			}
+		}
+	}
 	@Override
 	public int paint(Graphics g1, Entry e, int yOffset, double screenWidth) {
-		Graphics2D g=(Graphics2D)g1;
+		Graphics2D g = (Graphics2D) g1;
 		Location r = model.getAnnotationLocationVisible();
-		int lineHeigh = 25;
-
+		int lineHeigh = 40;
+		g.setColor(Color.LIGHT_GRAY);
+		g.fillRect(0, yOffset, (int) screenWidth, lineHeigh);
 		if (r.length() > 100000) {
 			g.setColor(Color.BLACK);
 			g.drawString("Too much data in alignment, zoom in to see details",
@@ -54,39 +98,13 @@ public class SequenceLogoTrack extends Track {
 		double width = screenWidth / (double) r.length();
 		int grouping = (int) Math.ceil(1.0 / width);
 		for (int i = r.start(); i <= r.end(); i += grouping) {
-			char nt = ' ';
-			double conservation = 0;
-			boolean dash = false;
-			// for (int j = 0; j < grouping; j++) {
-			// nt = align.getNucleotide(i + j);
-			// conservation += e.alignment.getConservation(i + j);
-			// if (nt == '-')
-			// dash = true;
-			//
-			// }
-			// conservation /= grouping;
-			// if (conservation == 1) {
-			// g.setColor(Color.BLACK);
-			// } else if (conservation > 0.75) {
-			// g.setColor(Color.DARK_GRAY);
-			// } else if (conservation > 0.5) {
-			// g.setColor(Color.LIGHT_GRAY);
-			// } else
-			// g.setColor(Color.WHITE);
-			// if (dash) {
-			// g.setColor(Color.RED);
-			// }
-			//
-			// g.fillRect((int) ((i - r.start()) * width), yOffset,
-			// (int) (width * grouping) + 1, lineHeigh);
 			// TODO do something with zoom-out
 			if (model.getAnnotationLocationVisible().length() < 100) {
-				Rectangle2D stringSize = g.getFontMetrics().getStringBounds(
-						"" + nt, g);
 				SortedMap<Integer, String> map = new TreeMap<Integer, String>(
 						Collections.reverseOrder());
 
 				map.put(e.alignment.getNucleotideCount('a', i), "A");
+
 				if (map.containsKey(e.alignment.getNucleotideCount('c', i))) {
 					map.put(e.alignment.getNucleotideCount('c', i), map
 							.get(e.alignment.getNucleotideCount('c', i))
@@ -108,44 +126,7 @@ public class SequenceLogoTrack extends Track {
 				} else {
 					map.put(e.alignment.getNucleotideCount('t', i), "T");
 				}
-				int left = 25;
-				for (int key : map.keySet()) {
-					for (char c : map.get(key).toCharArray()) {
-						Color ntColor = Configuration.getNucleotideColor(c);
-						System.out.println(c + "\t" + key);
-						int fraction = (int) (key
-								/ (double) e.alignment.numAlignments() * lineHeigh);
-
-						Font font = new Font("Sans serif", 1, lineHeigh);
-						float f3 = 1.5F;
-						if (c == 'W' || c == 'M')
-							f3 = 1.2F;
-//						float f4 = 0.0F;
-//						if (c == 'I')
-//							f4 = 4.5F;
-						Font font2 = font.deriveFont(AffineTransform
-								.getScaleInstance(f3, fraction));
-						GlyphVector glyphvector = font2.createGlyphVector(
-								g.getFontRenderContext(), String
-										.valueOf(c));
-//						g.translate((float) i + f4, i2);
-//						g.drawString("" + nt,
-//								(int) (((i - r.start()) * width - stringSize
-//										.getWidth() / 2) + (width / 2)), yOffset
-//										+ lineHeigh - 2);
-						int x=(int) (((i - r.start()) * width - stringSize
-								.getWidth() / 2) + (width / 2));
-						int y=yOffset
-						+ lineHeigh - left+fraction;
-						g.translate(x,y);
-						left-=fraction;
-						java.awt.Shape shape = glyphvector.getGlyphOutline(0);
-						g.setColor(ntColor);
-						g.fill(shape);
-						g.translate(-x, -y);
-
-					}
-				}
+				draw(map,g,e.alignment.numAlignments(), i, lineHeigh, model, width,  yOffset);
 
 			}
 		}
