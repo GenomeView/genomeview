@@ -198,6 +198,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 	private Color[] background = new Color[] { new Color(204, 238, 255, 100),
 			new Color(255, 255, 204, 100) };
 
+	@Override
 	public void paintComponent(Graphics g) {
 		displayValueToggle.clear();
 		displayTypeToggle.clear();
