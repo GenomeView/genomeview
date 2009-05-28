@@ -72,7 +72,7 @@ public class FeatureTrack extends Track {
 									+ ": Too many features to display, zoom in to see features",
 							10, yOffset + 10);
 			collapsible = false;
-			return 20;
+			return 20+5;
 		} else {
 			CollisionMap fullBlockMap = new CollisionMap(model);
 			
@@ -238,7 +238,7 @@ public class FeatureTrack extends Track {
 				g.setColor(Color.black);
 				g.drawString(type.toString(), 10, yOffset + lineThickness);
 			}
-			return (lines + 1) * lineThickness;
+			return (lines + 1) * lineThickness+5;
 
 		}
 	}

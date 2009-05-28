@@ -19,6 +19,7 @@ import net.sf.genomeview.gui.AbstractGeneLabel;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
+import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.plugin.IValueFeature;
 import net.sf.jannot.Location;
@@ -172,8 +173,8 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 				framePixelsUsed += track.paint(g, model.getSelectedEntry(),
 						framePixelsUsed, screenWidth);
 				
-				if (track instanceof FeatureTrack) {
-					framePixelsUsed += 5;
+				if (track instanceof FeatureTrack||track instanceof MultipleAlignmentTrack) {
+				
 					Rectangle r = new Rectangle(0, startY,
 							(int) screenWidth + 1, framePixelsUsed - startY);
 					tracks.put(framePixelsUsed, track);
@@ -559,6 +560,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	@Override
 	public void mouseDragged(MouseEvent arg) {
+		currentMouseX=arg.getX();
 		if (pressLoc != null) {
 
 			double move = (arg.getX() - pressX) / screenWidth;
