@@ -60,49 +60,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	}
 
-	// /**
-	// * Uses 32 pixels
-	// *
-	// * @param g
-	// * @param r
-	// */
-	// protected void paintTicks(Graphics g, Location r) {
-	// g.setColor(Color.BLACK);
-	// g.drawLine(0, framePixelsUsed + 15, g.getClipBounds().width,
-	// framePixelsUsed + 15);
-	//
-	// if (r.start() == r.end()) {
-	// return;
-	// }
-	// // determine the tickDistance, we aim for 10 ticks on screen.
-	// int length = r.length();
-	// int scale = (int) Math.log10(length / 10.0);
-	// int multiplier = (int) (length / Math.pow(10, scale + 1));
-	// int tickDistance = (int) (Math.pow(10, scale) * multiplier);
-	// if (tickDistance == 0)
-	// tickDistance = 1;
-	// // paint the ticks
-	// int currentTick = (r.start() - r.start() % tickDistance) + 1;
-	// boolean up = true;
-	// while (currentTick < r.end()) {
-	// int xpos = translateGenomeToScreen(currentTick, r,screenWidth);
-	// String s = "" + currentTick;
-	//
-	// if (up) {
-	// g.drawLine(xpos, framePixelsUsed + 2, xpos, framePixelsUsed + 28);
-	// g.drawString(s, xpos + 2, framePixelsUsed + 14);
-	// } else {
-	// g.drawLine(xpos, framePixelsUsed + 2, xpos, framePixelsUsed + 28);
-	// g.drawString(s, xpos + 2, framePixelsUsed + 26);
-	// }
-	// up = !up;
-	//
-	// currentTick += tickDistance;
-	//
-	// }
-	// framePixelsUsed += 32;
-	//
-	// }
+	
 	/* A mapping from position to track */
 	private TreeMap<Integer, Track> tracks = new TreeMap<Integer, Track>();
 
@@ -210,7 +168,6 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		
 		for (Track track : model.getTrackList()) {
 			if (track.isVisible()) {
-				
 				int startY = framePixelsUsed;
 				framePixelsUsed += track.paint(g, model.getSelectedEntry(),
 						framePixelsUsed, screenWidth);
@@ -229,7 +186,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 			}
 			// }
 		}
-		// paintSelectedLocation(g, model.getAnnotationLocationVisible());
+//		 paintSelectedLocation(g, model.getAnnotationLocationVisible());
 
 		if (this.getPreferredSize().height != framePixelsUsed) {
 			this.setPreferredSize(new Dimension(this.getPreferredSize().width,
@@ -239,6 +196,8 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 			revalidate();
 
 		}
+		g.setColor(new Color(120,120,120,120));
+		g.drawLine(currentMouseX, 0, currentMouseX, this.getPreferredSize().height);
 	}
 
 	// Collision map for the displayToggles
@@ -583,6 +542,8 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	private int pressX;
 
+	private int currentMouseX;
+
 	@Override
 	public void mousePressed(MouseEvent e) {
 		pressLoc = model.getAnnotationLocationVisible();
@@ -611,8 +572,8 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-
+		currentMouseX=arg0.getX();
+		repaint();
 	}
 
 }
