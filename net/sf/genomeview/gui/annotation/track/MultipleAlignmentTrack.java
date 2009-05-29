@@ -100,7 +100,7 @@ public class MultipleAlignmentTrack extends Track {
 
 				double width = screenWidth / (double) r.length() / 20.0;
 				int grouping = (int) Math.ceil(1.0 / width);
-				System.out.println("WG: " + width + "\t" + grouping);
+//				System.out.println("WG: " + width + "\t" + grouping);
 				GeneralPath conservationGP = new GeneralPath();
 //				GeneralPath footprintGP = new GeneralPath();
 				conservationGP.moveTo(0, yOffset);
