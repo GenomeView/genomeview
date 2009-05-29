@@ -106,7 +106,7 @@ public class MultipleAlignmentTrack extends Track {
 				conservationGP.moveTo(0, yOffset);
 				// footprintGP.moveTo(0,yOffset);
 				Alignment alg = e.alignment.getAlignment(index);
-				for (int i = r.start(); i <= r.end(); i += grouping) {
+				for (int i = r.start(); i <= r.end()+grouping; i += grouping) {
 
 					double conservation = 0;
 					double footprint = 0;
