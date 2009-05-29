@@ -30,6 +30,7 @@ import javax.swing.JTextField;
 import net.sf.genomeview.core.ColorIcon;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.jannot.Type;
 import be.abeel.gui.GridBagPanel;
 import be.abeel.gui.JIntegerField;
 import be.abeel.gui.TitledComponent;
@@ -144,9 +145,10 @@ public class ConfigurationDialog extends JDialog {
 							model.getParent(), "Choose track color",
 							Configuration.getColor(configKey));
 
-					if (newColor != null){
+					if (newColor != null) {
 						Configuration.setColor(configKey, newColor);
-						setIcon(new ColorIcon(Configuration.getColor(configKey), 16));
+						setIcon(new ColorIcon(
+								Configuration.getColor(configKey), 16));
 					}
 				}
 			});
@@ -164,14 +166,14 @@ public class ConfigurationDialog extends JDialog {
 			aa.setLayout(new GridLayout(0, 8));
 			for (char c : Configuration.getAminoAcids()) {
 				aa.add(new JLabel("" + c));
-				aa.add(new ColorLabel(model,"AA_"+c));
+				aa.add(new ColorLabel(model, "AA_" + c));
 
 			}
 			Container nt = new Container();
 			nt.setLayout(new GridLayout(0, 8));
 			for (char c : Configuration.getNucleotides()) {
 				nt.add(new JLabel("" + c));
-				nt.add(new ColorLabel(model,"N_"+c));
+				nt.add(new ColorLabel(model, "N_" + c));
 			}
 			this
 					.add(new TitledComponent("Amino acids", aa),
@@ -257,6 +259,30 @@ public class ConfigurationDialog extends JDialog {
 		}
 	}
 
+	class FeatureTrackConfigPanel extends GridBagPanel {
+		/**
+         * 
+         */
+		private static final long serialVersionUID = 7503579007314777946L;
+
+		public FeatureTrackConfigPanel(Model model) {
+			setLayout(new BorderLayout());
+			Container typeContainer = new Container();
+			typeContainer.setLayout(new GridLayout(0, 4));
+
+			for (Type type : Type.values()) {
+
+				typeContainer.add(new JLabel("" + type));
+				typeContainer.add(new ColorLabel(model, "TYPE_" + type));
+
+			}
+
+			this.add(new TitledComponent("Feature types", typeContainer),
+					BorderLayout.CENTER);
+
+		}
+	}
+
 	class MiscellaneousPanel extends GridBagPanel {
 
 		/**
@@ -322,7 +348,9 @@ public class ConfigurationDialog extends JDialog {
 		jtp.add("Structure view", structure);
 		jtp.add("Evidence view", evidence);
 		jtp.add("AA&nucleotide colors", colors);
+		jtp.add("Feature track", new FeatureTrackConfigPanel(model));
 
+		
 		jtp.add("Miscellaneous", miscPanel);
 
 		add(jtp, BorderLayout.CENTER);
