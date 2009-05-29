@@ -134,7 +134,7 @@ public class SequenceLogoTrack extends Track {
 						width, yOffset);
 			}
 		} else {
-			double width = screenWidth / (double) r.length() / 20.0;
+			double width = screenWidth / (double) r.length() / 10.0;
 			int grouping = (int) Math.ceil(1.0 / width);
 //			System.out.println("WG: " + width + "\t" + grouping);
 			GeneralPath conservationGP = new GeneralPath();
@@ -151,9 +151,9 @@ public class SequenceLogoTrack extends Track {
 				}
 				conservation /= grouping;
 				footprint /= grouping;
-				conservationGP.lineTo((int) ((i - r.start()) * width * 20),
+				conservationGP.lineTo((int) ((i - r.start()) * width * 10),
 						yOffset + (1 - conservation) * lineHeigh);
-				footprintGP.lineTo((int) ((i - r.start()) * width * 20),
+				footprintGP.lineTo((int) ((i - r.start()) * width * 10),
 						yOffset + (1 - footprint) *  lineHeigh);
 
 			}
