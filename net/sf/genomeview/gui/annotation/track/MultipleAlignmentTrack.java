@@ -98,7 +98,7 @@ public class MultipleAlignmentTrack extends Track {
 				return lineHeigh;
 			} else {
 
-				double width = screenWidth / (double) r.length() / 20.0;
+				double width = screenWidth / (double) r.length() / 5.0;
 				int grouping = (int) Math.ceil(1.0 / width);
 //				System.out.println("WG: " + width + "\t" + grouping);
 				GeneralPath conservationGP = new GeneralPath();
@@ -116,7 +116,7 @@ public class MultipleAlignmentTrack extends Track {
 					}
 					conservation /= grouping;
 					footprint /= grouping;
-					conservationGP.lineTo((int) ((i - r.start()) * width * 20)+width*10,
+					conservationGP.lineTo((int) ((i - r.start()) * width * 5)+width*2.5,
 							yOffset + (1 - conservation) *  (lineHeigh-4)+2);
 //					footprintGP.lineTo((int) ((i - r.start()) * width * 20),
 //							yOffset + (1 - footprint) * 3 * lineHeigh);
