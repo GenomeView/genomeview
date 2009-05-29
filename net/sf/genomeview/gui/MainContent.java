@@ -148,65 +148,53 @@ public class MainContent {
 		return bar;
 	}
 
-	// public AnnotationFrame getAnnotationFrame() {
-	// return af;
-	// }
-
 	public static JPanel[] createContent(Model model, int screens) {
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		screen.setSize(screen.getWidth() * 0.7, screen.getHeight() * 0.5);
-		// FIXME content[0].getAnnotationFrame().setPreferredSize(
-		// new Dimension((int) (screenX * 0.7),
-		// content.getAnnotationFrame().getPreferredSize().height));
-		JPanel[] out = null;
-		if (screens == 1) {
-			out = new JPanel[1];
-			out[0] = new JPanel();
-			registerKeyboard(out[0], model);
-			out[0].setLayout(new BorderLayout());
-			out[0].add(createToolBar(model), BorderLayout.PAGE_START);
 
-			JSplitPane leftRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-			Container leftContainer = new Container();
-
-			leftContainer.setLayout(new BorderLayout());
+		JPanel[] out = new JPanel[screens];
+		for (int i = 0; i < out.length - 1; i++) {
+			// out[0] = new JPanel();
+			out[i] = new JPanel();
+			registerKeyboard(out[i], model);
+			// out[0].setLayout(new BorderLayout());
+			out[i].setLayout(new BorderLayout());
+			out[i].add(createToolBar(model), BorderLayout.PAGE_START);
 
 			annotChrom = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
-			annotChrom.setTopComponent(new ChromosomeFrame(model));
-			AnnotationFrame af = new AnnotationFrame(model);
+			annotChrom.setTopComponent(new ChromosomeFrame(i,model));
+			AnnotationFrame af = new AnnotationFrame(i,model);
 			af.setPreferredSize(screen);
 			annotChrom.setBottomComponent(af);
 
-			leftContainer.add(annotChrom, BorderLayout.CENTER);
-
-			leftRight.setLeftComponent(leftContainer);
-			leftRight.setRightComponent(new InformationFrame(model));
-
-			out[0].add(leftRight);
-		} else {
-			out = new JPanel[2];
-			out[0] = new JPanel();
-			out[1] = new JPanel();
-			registerKeyboard(out[0], model);
-			out[0].setLayout(new BorderLayout());
-			out[1].setLayout(new BorderLayout());
-			out[0].add(createToolBar(model), BorderLayout.PAGE_START);
-
-			annotChrom = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-
-			annotChrom.setTopComponent(new ChromosomeFrame(model));
-			AnnotationFrame af = new AnnotationFrame(model);
-			af.setPreferredSize(screen);
-			annotChrom.setBottomComponent(af);
-
-			out[0].add(annotChrom, BorderLayout.CENTER);
-			out[1].add(new InformationFrame(model), BorderLayout.CENTER);
-
-			// leftRight.setRightComponent();
-
-			// out[0].add(leftRight);
+			out[i].add(annotChrom, BorderLayout.CENTER);
+			// out[1].add(new InformationFrame(model), BorderLayout.CENTER);
 		}
+		int last = out.length - 1;
+		out[last] = new JPanel();
+		registerKeyboard(out[last], model);
+		out[last].setLayout(new BorderLayout());
+		out[last].add(createToolBar(model), BorderLayout.PAGE_START);
+
+		JSplitPane leftRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		Container leftContainer = new Container();
+
+		leftContainer.setLayout(new BorderLayout());
+
+		annotChrom = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+
+		annotChrom.setTopComponent(new ChromosomeFrame(last,model));
+		AnnotationFrame af = new AnnotationFrame(last,model);
+		af.setPreferredSize(screen);
+		annotChrom.setBottomComponent(af);
+
+		leftContainer.add(annotChrom, BorderLayout.CENTER);
+
+		leftRight.setLeftComponent(leftContainer);
+		leftRight.setRightComponent(new InformationFrame(model));
+
+		out[last].add(leftRight);
 
 		model.addObserver(new Observer() {
 			public void update(Observable o, Object arg) {

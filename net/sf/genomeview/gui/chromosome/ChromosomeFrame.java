@@ -435,7 +435,7 @@ public class ChromosomeFrame extends GridBagPanel implements Observer {
 
 	}
 
-	public ChromosomeFrame(Model model) {
+	public ChromosomeFrame(int index, Model model) {
 		this.model = model;
 		model.addObserver(this);
 

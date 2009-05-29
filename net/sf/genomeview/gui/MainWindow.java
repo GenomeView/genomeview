@@ -66,9 +66,7 @@ public class MainWindow implements WindowListener, Observer {
 
 	public MainWindow(String args[]) throws InterruptedException,
 			ExecutionException {
-		GraphicsEnvironment ge = GraphicsEnvironment
-				.getLocalGraphicsEnvironment();
-		GraphicsDevice[] gs = ge.getScreenDevices();
+
 		/* Initialize the command line options */
 		AutoHelpCmdLineParser parser = new AutoHelpCmdLineParser();
 		Option urlO = parser.addHelp(parser.addStringOption("url"),
@@ -95,7 +93,9 @@ public class MainWindow implements WindowListener, Observer {
 		if (parser.checkHelp()) {
 			System.exit(0);
 		}
-
+		GraphicsEnvironment ge = GraphicsEnvironment
+				.getLocalGraphicsEnvironment();
+		GraphicsDevice[] gs = ge.getScreenDevices();
 		logger.info("Creating new window");
 		window = new JFrame("GenomeView :: " + Configuration.version(), gs[0]
 				.getDefaultConfiguration());

@@ -44,7 +44,8 @@ public class AnnotationFrame extends GridBagPanel implements Observer {
 
 //    private GeneStructureLabel structureLabel;
 
-    public AnnotationFrame(Model model) {
+    /* The supplied index is the index of the window that this panel is located. */
+    public AnnotationFrame(int index, Model model) {
         this.model = model;
 
         model.addObserver(this);
