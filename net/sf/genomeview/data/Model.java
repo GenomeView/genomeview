@@ -47,7 +47,7 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.MultiFileSource;
 import be.abeel.util.DefaultHashMap;
 
-public class Model extends Observable implements Observer, IModel {
+public class Model extends Observable implements IModel {
 	private Logger logger = Logger.getLogger(Model.class.getCanonicalName());
 
 	private ArrayList<Entry> entries = new ArrayList<Entry>();;
@@ -724,6 +724,10 @@ public class Model extends Observable implements Observer, IModel {
 
 	}
 
+	public void addTrack(Track track){
+		trackList.add(track);
+		refresh();
+	}
 	public void addSyntenic(DataSource source, Entry[] data) {
 
 		for (int i = 0; i < data.length; i++) {
