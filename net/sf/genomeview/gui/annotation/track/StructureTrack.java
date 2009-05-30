@@ -6,29 +6,25 @@ package net.sf.genomeview.gui.annotation.track;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
-import java.util.Observable;
-
-import be.abeel.util.DefaultHashMap;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Model.Highlight;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
-import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
+import be.abeel.util.DefaultHashMap;
 
 public class StructureTrack extends Track {
 	public StructureTrack(Model model) {
@@ -618,7 +614,7 @@ public class StructureTrack extends Track {
 	}
 
 	@Override
-	public void mouseClicked(int x, int y, MouseEvent e) {
+	public boolean mouseClicked(int x, int y, MouseEvent e) {
 		System.out.println("Clicked: "
 				+ Convert.translateScreenToGenome(e.getX(), model
 						.getAnnotationLocationVisible(), screenWidth));
@@ -653,14 +649,16 @@ public class StructureTrack extends Track {
 
 			}
 			model.setSelectedRegion(null);
-
+			return true;
 		}
+		return false;
 
 	}
 
 	@Override
-	public void mouseEntered(int x, int y, MouseEvent e) {
+	public boolean mouseEntered(int x, int y, MouseEvent e) {
 		outside = false;
+		return false;
 
 	}
 
@@ -670,7 +668,7 @@ public class StructureTrack extends Track {
 	private double screenWidth;
 
 	@Override
-	public void mouseExited(int x, int y, final MouseEvent e) {
+	public boolean mouseExited(int x, int y, final MouseEvent e) {
 		outside = true;
 		if (dragging) {
 			new Thread(new Runnable() {
@@ -702,11 +700,12 @@ public class StructureTrack extends Track {
 			}).start();
 
 		}
+		return false;
 
 	}
 
 	@Override
-	public void mousePressed(int x, int y, MouseEvent e) {
+	public boolean mousePressed(int x, int y, MouseEvent e) {
 		currentGenomeX = Convert.translateScreenToGenome(e.getX(), model
 				.getAnnotationLocationVisible(), screenWidth);
 		if (Mouse.button1(e) && !Mouse.modifier(e)) {
@@ -728,9 +727,10 @@ public class StructureTrack extends Track {
 			pressTrack = getTrack(e.getY());
 
 		}
+		
 		setChanged();
 		notifyObservers();
-
+		return false;
 	}
 
 	/**
@@ -769,7 +769,7 @@ public class StructureTrack extends Track {
 	}
 
 	@Override
-	public void mouseReleased(int x, int y, MouseEvent e) {
+	public boolean mouseReleased(int x, int y, MouseEvent e) {
 		currentGenomeX = Convert.translateScreenToGenome(e.getX(), model
 				.getAnnotationLocationVisible(), screenWidth);
 		if (Mouse.button1(e) && dragging) {
@@ -821,7 +821,7 @@ public class StructureTrack extends Track {
 		borderHit = null;
 		setChanged();
 		notifyObservers();
-
+		return false;
 	}
 
 	private void modifyCoordinate(Location y, int oldCoord, int newCoordinate) {
@@ -844,19 +844,20 @@ public class StructureTrack extends Track {
 	}
 
 	@Override
-	public void mouseDragged(int x, int y, MouseEvent e) {
+	public boolean mouseDragged(int x, int y, MouseEvent e) {
 		model.clearLocationSelection();
 		currentGenomeX = Convert.translateScreenToGenome(e.getX(), model
 				.getAnnotationLocationVisible(), screenWidth);
 		dragging = true;
 		setChanged();
 		notifyObservers();
+		return true;
 	}
 
 	@Override
-	public void mouseMoved(int x, int y, MouseEvent e) {
-
-		if (!collisionMap.nearBorder(e.getX(), e.getY()))
+	public boolean mouseMoved(int x, int y, MouseEvent e) {
+		System.out.println("moved: "+x+" "+y);
+		if (!collisionMap.nearBorder(x, y))
 			model.getParent().setCursor(
 					Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		else
@@ -864,6 +865,7 @@ public class StructureTrack extends Track {
 					Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 		setChanged();
 		notifyObservers();
+		return false;
 	}
 
 	@Override

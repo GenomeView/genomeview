@@ -251,7 +251,7 @@ public class FeatureTrack extends Track {
 	 * @param e
 	 *            the MouseEvent
 	 */
-	private void doubleClick(MouseEvent e) {
+	private boolean doubleClick(MouseEvent e) {
 		Location locationHit = hitmap.uniqueLocation(e.getX(), e.getY());
 		if (locationHit != null) {
 			Feature featHit = locationHit.getParent();
@@ -264,7 +264,9 @@ public class FeatureTrack extends Track {
 				int featCenter = featHit.start() + featHit.length() / 2;
 				model.centerChromView(featCenter);
 			}
+			return true;
 		}
+		return false;
 	}
 
 	private void drawRects(Graphics g, ArrayList<Rectangle> rectList,
@@ -293,7 +295,7 @@ public class FeatureTrack extends Track {
 	}
 
 	@Override
-	public void mouseClicked(int x, int y, MouseEvent e) {
+	public boolean mouseClicked(int x, int y, MouseEvent e) {
 //		System.out.println("feature track click: "+x+"\t"+y);
 		// catch double clicks
 		if (e.getClickCount() == 2) {
@@ -315,8 +317,9 @@ public class FeatureTrack extends Track {
 				model.setLocationSelection(locationHit);
 
 			}
-
+			return true;
 		}
+		return false;
 
 	}
 

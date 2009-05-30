@@ -25,7 +25,6 @@ import net.sf.jannot.Location;
 public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		MouseListener, MouseMotionListener {
 
-	
 	private static final long serialVersionUID = -8338383664013028337L;
 
 	public GeneEvidenceLabel(Model model) {
@@ -58,26 +57,24 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	}
 
-	
 	/* A mapping from position to track */
 	private TreeMap<Integer, Track> tracks = new TreeMap<Integer, Track>();
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
+	/**
+	 * Returns the track where the MouseEvent takes place
+	 * 
+	 * @param e
+	 *            MouseEvent
+	 * @return the track that overlaps with the coordinates of the event.
+	 */
+	private int getMouseOffset(MouseEvent e) {
 		int y = e.getY();
-		int min = Integer.MAX_VALUE;
+		int max = 0;
 		for (Integer i : tracks.keySet()) {
-			if (i > y && i < min)
-				min = i;
+			if (i < y && i > max)
+				max = i;
 		}
-		Track clickTrack = tracks.get(min);
-
-		if (clickTrack != null)
-			clickTrack.mouseClicked(e.getX(), y - min, e);
-
-		if (Mouse.button2(e) || Mouse.button3(e)) {
-			StaticUtils.popupMenu(model).show(this, e.getX(), e.getY());
-		}
+		return max;
 	}
 
 	private int currentBackgroundIndex = 0;
@@ -92,27 +89,31 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		screenWidth = this.getSize().width + 1;
 		super.paintComponent(g);
 		currentBackgroundIndex = 0;
-		
+
 		for (Track track : model.getTrackList()) {
 			if (track.isVisible()) {
-				int startY = framePixelsUsed;
-				framePixelsUsed += track.paint(g, model.getSelectedEntry(),
+				int height = track.paint(g, model.getSelectedEntry(),
 						framePixelsUsed, screenWidth);
-				
-				if (track instanceof FeatureTrack||track instanceof MultipleAlignmentTrack) {
-				
-					Rectangle r = new Rectangle(0, startY,
-							(int) screenWidth + 1, framePixelsUsed - startY);
-					tracks.put(framePixelsUsed, track);
+
+				if (track instanceof FeatureTrack
+						|| track instanceof MultipleAlignmentTrack) {
+
+					Rectangle r = new Rectangle(0, framePixelsUsed,
+							(int) screenWidth + 1, height);
+
 					g.setColor(background[currentBackgroundIndex]);
-					g.fillRect(r.x, r.y , r.width, r.height);
+					g.fillRect(r.x, r.y, r.width, r.height);
 
 					currentBackgroundIndex++;
 					currentBackgroundIndex %= background.length;
 				}
+				
+				if (height > 0)
+					tracks.put(framePixelsUsed, track);
+				framePixelsUsed += height;
 			}
 		}
-//	FIXME	 paintSelectedLocation(g, model.getAnnotationLocationVisible());
+		// FIXME paintSelectedLocation(g, model.getAnnotationLocationVisible());
 
 		if (this.getPreferredSize().height != framePixelsUsed) {
 			this.setPreferredSize(new Dimension(this.getPreferredSize().width,
@@ -122,20 +123,30 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 			revalidate();
 
 		}
-		g.setColor(new Color(120,120,120,120));
-		g.drawLine(currentMouseX, 0, currentMouseX, this.getPreferredSize().height);
+		g.setColor(new Color(120, 120, 120, 120));
+		g.drawLine(currentMouseX, 0, currentMouseX,
+				this.getPreferredSize().height);
 	}
-
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
+		/* Transfer MouseEvent to corresponding track */
+		int mouseOffset=getMouseOffset(e);
+		Track mouseTrack = tracks.get(mouseOffset);
+		if (mouseTrack != null)
+			mouseTrack.mouseEntered(e.getX(), e.getY() - mouseOffset, e);
+		/* Specific mouse code for this label */
 
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
+		/* Transfer MouseEvent to corresponding track */
+		int mouseOffset=getMouseOffset(e);
+		Track mouseTrack = tracks.get(mouseOffset);
+		if (mouseTrack != null)
+			mouseTrack.mouseExited(e.getX(), e.getY() - mouseOffset, e);
+		/* Specific mouse code for this label */
 
 	}
 
@@ -147,6 +158,15 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		/* Transfer MouseEvent to corresponding track */
+		int mouseOffset=getMouseOffset(e);
+		Track mouseTrack = tracks.get(mouseOffset);
+		boolean consumed=false;
+		if (mouseTrack != null)
+			consumed=mouseTrack.mousePressed(e.getX(), e.getY() - mouseOffset, e);
+		if(consumed)
+			return;
+		/* Specific mouse code for this label */
 		pressLoc = model.getAnnotationLocationVisible();
 		pressX = e.getX();
 
@@ -154,16 +174,35 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		/* Transfer MouseEvent to corresponding track */
+		int mouseOffset=getMouseOffset(e);
+		Track mouseTrack = tracks.get(mouseOffset);
+		boolean consumed=false;
+		if (mouseTrack != null)
+			consumed=mouseTrack.mouseReleased(e.getX(), e.getY() - mouseOffset, e);
+		if(consumed)
+			return;
+		/* Specific mouse code for this label */
 		pressLoc = null;
 
 	}
 
 	@Override
-	public void mouseDragged(MouseEvent arg) {
-		currentMouseX=arg.getX();
+	public void mouseDragged(MouseEvent e) {
+		/* Transfer MouseEvent to corresponding track */
+		int mouseOffset=getMouseOffset(e);
+		Track mouseTrack = tracks.get(mouseOffset);
+		boolean consumed=false;
+		if (mouseTrack != null)
+			consumed=mouseTrack.mouseDragged(e.getX(), e.getY() - mouseOffset, e);
+		if(consumed)
+			return;
+		/* Specific mouse code for this label */
+
+		currentMouseX = e.getX();
 		if (pressLoc != null) {
 
-			double move = (arg.getX() - pressX) / screenWidth;
+			double move = (e.getX() - pressX) / screenWidth;
 			int start = (int) (pressLoc.start() - pressLoc.length() * move);
 			int end = (int) (pressLoc.end() - pressLoc.length() * move);
 			model.setAnnotationLocationVisible(new Location(start, end));
@@ -173,9 +212,33 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent arg0) {
-		currentMouseX=arg0.getX();
+	public void mouseMoved(MouseEvent e) {
+		/* Transfer MouseEvent to corresponding track */
+		int mouseOffset=getMouseOffset(e);
+		Track mouseTrack = tracks.get(mouseOffset);
+		boolean consumed=false;
+		if (mouseTrack != null)
+			consumed=mouseTrack.mouseMoved(e.getX(), e.getY() - mouseOffset, e);
+		if(consumed)
+			return;
+		/* Specific mouse code for this label */
+		currentMouseX = e.getX();
 		repaint();
 	}
 
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		/* Transfer MouseEvent to corresponding track */
+		int mouseOffset=getMouseOffset(e);
+		Track mouseTrack = tracks.get(mouseOffset);
+		boolean consumed=false;
+		if (mouseTrack != null)
+			consumed=mouseTrack.mouseClicked(e.getX(), e.getY() - mouseOffset, e);
+		if(consumed)
+			return;
+		/* Specific mouse code for this label */
+		if (Mouse.button2(e) || Mouse.button3(e)) {
+			StaticUtils.popupMenu(model).show(this, e.getX(), e.getY());
+		}
+	}
 }
