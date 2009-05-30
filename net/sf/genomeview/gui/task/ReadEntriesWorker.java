@@ -16,20 +16,22 @@ import net.sf.jannot.source.DataSource;
  */
 public class ReadEntriesWorker extends DataSourceWorker<Entry[]> {
 
-    public ReadEntriesWorker(DataSource source, Model model) {
-        super(source, model);
-    }
+	public ReadEntriesWorker(DataSource source, Model model) {
+		super(source, model);
+	}
 
-    @Override
-    protected Entry[] doInBackground() {
-        try {
-        	Entry[]out=model.addEntries(source);;
-        	return out; 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+	@Override
+	protected Entry[] doInBackground() {
+		try {
+			Entry[] out = model.addEntries(source);
+			pb.done();
+			return out;
+		} catch (Exception e) {
+			e.printStackTrace();
+			pb.done();
+			return null;
+		}
 
-    }
+	}
 
 }

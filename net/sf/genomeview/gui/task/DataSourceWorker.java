@@ -6,6 +6,7 @@ package net.sf.genomeview.gui.task;
 import javax.swing.SwingWorker;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.dialog.GVProgressBar;
 import net.sf.jannot.source.DataSource;
 
 /**
@@ -26,9 +27,12 @@ public abstract class DataSourceWorker<T> extends SwingWorker<T, Void> {
 
     protected Model model;
 
+    protected GVProgressBar pb;
+
     public DataSourceWorker(DataSource source, Model model) {
         this.source = source;
         this.model = model;
+        this.pb= new GVProgressBar("Background task", "Doing background task", model.getParent());
     }
 
     @Override

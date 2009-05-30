@@ -8,7 +8,6 @@ import java.util.HashSet;
 import javax.swing.JOptionPane;
 
 import net.sf.genomeview.data.Model;
-import net.sf.jannot.Alignment;
 import net.sf.jannot.Entry;
 import net.sf.jannot.source.DataSource;
 
@@ -35,13 +34,14 @@ public class ReadFeaturesWorker extends DataSourceWorker<Entry[]> {
 			if (likelyMultipleAlign(data)) {
 				int result=JOptionPane
 						.showConfirmDialog(
-								model.getParent(),
+								pb,
 								"The data looks like a multiple alignment, would you like to load it as such?\n\n"+source,
 								"Multiple alignment?",
 								JOptionPane.YES_NO_OPTION);
 				if(result==JOptionPane.OK_OPTION){
 					System.out.println("Adding multiple alignment: "+source);
 					model.addAlignment(source,data);
+					 pb.done();
 					return data;
 				}
 			}
@@ -52,10 +52,12 @@ public class ReadFeaturesWorker extends DataSourceWorker<Entry[]> {
 			System.out.println("Adding features: "+source);
 			model.addFeatures(source, data);
 			System.out.println(data.length);
+			 pb.done();
 			return data;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			 pb.done();
 			return null;
 		}
 

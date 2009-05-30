@@ -7,7 +7,6 @@ import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 
-import java.awt.Component;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.WindowEvent;
@@ -30,7 +29,6 @@ import javax.swing.JPanel;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.source.MobySource;
-import net.sf.genomeview.gui.dialog.GVProgressBar;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.gui.task.ReadEntriesWorker;
 import net.sf.genomeview.gui.task.ReadFeaturesWorker;
@@ -223,9 +221,6 @@ public class MainWindow implements WindowListener, Observer {
 		/* Load the source, if one was constructed */
 		if (data != null) {
 			assert (data.length == 1);
-			GVProgressBar pb = new GVProgressBar("Loading", "Loading data",
-					window);
-			data[0].setProgressListener(pb);
 			final ReadEntriesWorker rw = new ReadEntriesWorker(data[0], model);
 			rw.execute();
 			rw.get();
@@ -238,18 +233,14 @@ public class MainWindow implements WindowListener, Observer {
 					if (!s.startsWith("http:") && !s.startsWith("ftp:")
 							&& !s.startsWith("https:")) {
 						DataSource ds = new FileSource(new File(s));
-						pb = new GVProgressBar("Loading", "Loading data", model
-								.getParent());
-						ds.setProgressListener(pb);
+						
 						ReadFeaturesWorker rf = new ReadFeaturesWorker(ds,
 								model);
 						rf.execute();
 
 					} else {
 						DataSource ds = new URLSource(new URI(s).toURL());
-						pb = new GVProgressBar("Loading", "Loading data", model
-								.getParent());
-						ds.setProgressListener(pb);
+						
 						ReadFeaturesWorker rf = new ReadFeaturesWorker(ds,
 								model);
 						rf.execute();

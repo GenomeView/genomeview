@@ -27,6 +27,7 @@ public class WriteEntriesWorker extends DataSourceWorker<Void> {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        pb.done();
         return null;
     }
 

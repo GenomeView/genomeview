@@ -101,9 +101,7 @@ public class SaveDialog extends JDialog {
                         }
                         setVisible(false);
                         if (continueSave) {
-                            GVProgressBar pb = new GVProgressBar("Saving", "Saving data", model.getParent());
-                            dsb.data.setProgressListener(pb);
-                            WriteEntriesWorker rw = new WriteEntriesWorker(dsb.data, model);
+                        	WriteEntriesWorker rw = new WriteEntriesWorker(dsb.data, model);
                             rw.execute();
                         } else {
                             JOptionPane.showMessageDialog(model.getParent(), "Save aborted!");

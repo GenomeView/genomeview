@@ -12,8 +12,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
-import net.sf.jannot.source.ProgressListener;
-
 /**
  * A popup dialog containing a progress bar and progress messages. It is
  * designed to be passed as a PropertyChangeListener to SwingWorkers.
@@ -21,83 +19,58 @@ import net.sf.jannot.source.ProgressListener;
  * @author thpar
  * @author Thomas Abeel
  */
-public class GVProgressBar implements ProgressListener {
+public class GVProgressBar extends JDialog {
 
-	private JFrame parent = null;
+	private static final long serialVersionUID = -84766714924209282L;
 
-	private GVProgressBarDialog dialog;
+	private JLabel commentLabel = new JLabel();
 
-	/**
-	 * Contructs a JDialog with given title and an initial message. And
-	 * positions it relative to the parent window.
-	 * 
-	 * @param title
-	 * @param initText
-	 */
+	private JProgressBar pb = new JProgressBar();
+
+	
 	public GVProgressBar(String title, String initText, JFrame parent) {
-		this.parent = parent;
-		dialog = new GVProgressBarDialog(title, initText);
+		super(parent, title);
+		setAlwaysOnTop(true);
+		requestFocus();
+		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		setLayout(new GridBagLayout());
+		setPreferredSize(new Dimension(280, 80));
+		pb.setIndeterminate(true);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridy = GridBagConstraints.RELATIVE;
+		commentLabel.setText(initText + "...");
+		add(commentLabel, gbc);
+		add(pb, gbc);
+		pack();
+		setLocationRelativeTo(parent);
+
+		setVisible(true);
 	}
 
-	private class GVProgressBarDialog extends JDialog {
+	
 
-		private static final long serialVersionUID = 1L;
+	public void done() {
 
-		private JLabel commentLabel = new JLabel();
-
-		private JProgressBar pb = new JProgressBar(0, 100);
-
-		public GVProgressBarDialog(String title, String initText) {
-			super(parent, title);
-			setAlwaysOnTop(true);
-			requestFocus();
-			setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-			setLayout(new GridBagLayout());
-			setPreferredSize(new Dimension(280, 80));
-			pb.setValue(0);
-			GridBagConstraints gbc = new GridBagConstraints();
-			gbc.fill = GridBagConstraints.NONE;
-			gbc.anchor = GridBagConstraints.CENTER;
-			gbc.gridx = 0;
-			gbc.gridy = 0;
-			gbc.gridy = GridBagConstraints.RELATIVE;
-			commentLabel.setText(initText + "...");
-			add(commentLabel, gbc);
-			add(pb, gbc);
-			pack();
-			setLocationRelativeTo(parent);
-
-			setVisible(true);
-
-		}
-
-		private void setComment(String comment) {
-			commentLabel.setText(comment + "...");
-			repaint();
-		}
-
-		public void setProgressValue(Integer newValue) {
-			pb.setValue(newValue);
-			repaint();
-		}
+		setVisible(false);
+		dispose();
 	}
 
-	@Override
-	public void setDone() {
-
-		dialog.setVisible(false);
-		dialog.dispose();
-	}
-
-	@Override
 	public void setComment(String comment) {
-		dialog.setComment(comment);
+		commentLabel.setText(comment);
 
 	}
 
-	@Override
+	
+	public void setMax(int max){
+		pb.setIndeterminate(false);
+		pb.setMaximum(max);
+	}
 	public void setProgress(int progress) {
-		dialog.setProgressValue(progress);
+		pb.setValue(progress);
 
 	}
 

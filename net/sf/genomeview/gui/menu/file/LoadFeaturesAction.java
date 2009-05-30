@@ -11,7 +11,6 @@ import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.dialog.GVProgressBar;
 import net.sf.genomeview.gui.task.ReadFeaturesWorker;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSource.Sources;
@@ -36,9 +35,7 @@ public class LoadFeaturesAction extends AbstractAction {
             DataSource[] data = DataSourceFactory.create(source, model);
             if (data != null) {
                 for (DataSource ds : data) {
-                    final GVProgressBar pb = new GVProgressBar("Loading", "Loading data", model.getParent());
-                    ds.setProgressListener(pb);
-                    final ReadFeaturesWorker rw = new ReadFeaturesWorker(ds, model);
+                	final ReadFeaturesWorker rw = new ReadFeaturesWorker(ds, model);
                     rw.execute();
                 }
 

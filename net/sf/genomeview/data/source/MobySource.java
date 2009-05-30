@@ -90,15 +90,8 @@ public class MobySource extends DataSource {
 
     @Override
     public Entry[] read() throws ReadFailedException {
-        setProgress(20);
-        setComment("Initializing the Moby request");
-        MobyRequest mr = initRequest();
-        setProgress(70);
-        setComment("Loading locus data from BOGAS");
-        MobyDataComposite region = loadRegion(mr);
-        setProgress(90);
-        setComment("Constructing GenomeView data");
-        setDone();
+    	MobyRequest mr = initRequest();
+    	MobyDataComposite region = loadRegion(mr);
         return construct(region);
     }
 
@@ -114,8 +107,7 @@ public class MobySource extends DataSource {
         MobyService templateService = new MobyService(bogasGetRegionService);
 
         try {
-            setProgress(30);
-            setComment("Searching for web service");
+          
             MobyService[] validServices = worker.findService(templateService);
             MobyRequest mr = new MobyRequest(worker);
             mr.setService(validServices[0]);
@@ -125,8 +117,7 @@ public class MobySource extends DataSource {
             MobyContentInstance content = new MobyContentInstance();
             MobyDataJob job = new MobyDataJob();
 
-            setProgress(40);
-            setComment("Fetching data types from Moby Central");
+        
             job.put("locus_id", new MobyDataString(locusId, registry));
             job.put("release", new MobyDataInt(release, registry));
             job.put("date", new MobyDataDateTime("date", date, registry));
@@ -247,8 +238,7 @@ public class MobySource extends DataSource {
 
     public void saveOwn(Entry[] entries) throws SaveFailedException {
 
-        setProgress(20);
-        setComment("Looking up the web service");
+       
         MobyService templateService = new MobyService(bogasSaveRegionService);
 
         try {
@@ -261,8 +251,7 @@ public class MobySource extends DataSource {
             MobyContentInstance content = new MobyContentInstance();
 
             // create moby jobs
-            setProgress(40);
-            setComment("Creating the Moby objects");
+           
             for (Entry entry : entries) {
                 MobyDataJob job = new MobyDataJob();
                 MobyDataObject region = createRegionObject(entry);
@@ -285,29 +274,28 @@ public class MobySource extends DataSource {
             mr.setSecondaryInput(params);
 
             // make call
-            setProgress(70);
-            setComment("Invoking web service");
+           
             MobyContentInstance answer = mr.invokeService();
             Iterator<MobyDataJob> i = answer.values().iterator();
             for (MobyDataJob job = i.next(); i.hasNext();) {
                 MobyDataInt answerStatus = (MobyDataInt) job.getPrimaryDataObjects()[0];
                 if (answerStatus.intValue() == 1){
-                    setDone();
+                   
                     throw new SaveFailedException("Bogas service returned save failed status.");
                 }
             }
 
         } catch (ParserConfigurationException e) {
             System.err.println(e);
-            setDone();
+          
             throw new SaveFailedException(e);
         } catch (NoSuccessException e) {
             System.err.println(e);
-            setDone();
+         
             throw new SaveFailedException(e);
         } catch (Exception e) {
             System.err.println(e);
-            setDone();
+          
             throw new SaveFailedException(e);
         }
         
