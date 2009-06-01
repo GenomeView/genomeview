@@ -56,7 +56,6 @@ public class SyntenicTrack extends Track {
 		} else {
 			double colorBlockLength = (e.sequence.size() + 1) / colors;
 			if (target.equals(ref)) {
-
 				for (int i = 0; i <= 20; i++) {
 					int length=model
 					.getAnnotationLocationVisible().end()-model
@@ -75,7 +74,7 @@ public class SyntenicTrack extends Track {
 					GradientPaint gp = new GradientPaint(screenStart, 0,
 							startColor, screenEnd, 0, endColor);
 					g.setPaint(gp);
-					g.fillRect( screenStart, offset,
+					g.fillRect( screenStart, offset+15,
 							screenEnd-screenStart + 1, 10);
 
 				}
@@ -113,7 +112,7 @@ public class SyntenicTrack extends Track {
 										screenStart, 0, startColor, screenEnd,
 										0, endColor);
 								g.setPaint(gp);
-								g.fillRect(screenStart, offset, screenEnd
+								g.fillRect(screenStart, offset+15, screenEnd
 										- screenStart + 1, 10);
 							} catch (Exception x) {
 								System.err.println(refLoc);
@@ -125,7 +124,7 @@ public class SyntenicTrack extends Track {
 			}
 
 			g.setColor(Color.black);
-			g.drawString(displayName(), 10, offset + 23);
+			g.drawString(displayName(), 10, offset + 13);
 			return 25;
 
 		}
