@@ -10,14 +10,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.NetworkInterface;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Enumeration;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -146,40 +143,14 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 							"Query at Google",
 							"http://www.google.com/search?q="));
 
-					/* Check whether in Broad domain */
-					boolean inBroadNetwork = false;
-					try {
-
-						Enumeration<NetworkInterface> eni = NetworkInterface
-								.getNetworkInterfaces();
-						while (eni.hasMoreElements()) {
-							NetworkInterface ni = eni.nextElement();
-							// System.out.println(ni.getInetAddresses());
-							Enumeration<InetAddress> eia = ni
-									.getInetAddresses();
-							while (eia.hasMoreElements()) {
-								InetAddress ia = eia.nextElement();
-								System.out.println("Host  : "
-										+ ia.getCanonicalHostName());
-								if (ia.getCanonicalHostName().contains(
-										"broad.mit.edu"))
-									inBroadNetwork = true;
-							}
-						}
-
-					} catch (Exception t) {
-						t.printStackTrace();
-					}
-					JMenuItem calhoun = new JMenuItem(
-							new Query("View feature in Calhoun",
-									"http://calhoun/calhoun/app?page=InspectFeature&service=external&sp=S"));
-
+					JMenuItem tbdb=new JMenuItem(new Query("Query in TBDB","http://genome.tbdb.org/annotation/genome/tbdb/GlobalSearch.html?q="));
+					
 					popupMenu.add(ncbiQuery);
 					popupMenu.add(ensemblQuery);
 					popupMenu.add(ebi);
 					popupMenu.add(google);
-					if (inBroadNetwork)
-						popupMenu.add(calhoun);
+					popupMenu.add(tbdb);
+					
 				}
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 
@@ -239,7 +210,9 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 				text += "Strand: " + rf.strand() + "<br/>";
 				text += "Score: " + rf.getScore() + "<br/>";
 				Set<String> qks = rf.getQualifiersKeys();
+				System.out.println(qks);
 				for (String key : qks) {
+					System.out.println(rf.qualifier(key));
 					for (Qualifier q : rf.qualifier(key)) {
 						text += q + "<br/>";
 					}
@@ -250,7 +223,6 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 			text += "---------------------------------------<br/>";
 			int hash = text.hashCode();
 			if (hash != lastHash) {
-				System.out.println("FDP: " + text + "\t" + name);
 				name.setText("<html>" + text + "</html>");
 				name.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
 				lastHash = hash;
