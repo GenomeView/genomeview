@@ -149,15 +149,17 @@ public class MainContent {
 	}
 
 	public static JPanel[] createContent(Model model, int screens) {
+		if(screens==1){
+			return createOne(model);
+		}
+		
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		screen.setSize(screen.getWidth() * 0.7, screen.getHeight() * 0.5);
 
 		JPanel[] out = new JPanel[screens];
 		for (int i = 0; i < out.length - 1; i++) {
-			// out[0] = new JPanel();
 			out[i] = new JPanel();
 			registerKeyboard(out[i], model);
-			// out[0].setLayout(new BorderLayout());
 			out[i].setLayout(new BorderLayout());
 			out[i].add(createToolBar(model), BorderLayout.PAGE_START);
 
@@ -169,8 +171,29 @@ public class MainContent {
 			annotChrom.setBottomComponent(af);
 
 			out[i].add(annotChrom, BorderLayout.CENTER);
-			// out[1].add(new InformationFrame(model), BorderLayout.CENTER);
 		}
+		int last = out.length - 1;
+		out[last] = new JPanel();
+		out[last].setLayout(new BorderLayout());
+		out[last].add(new InformationFrame(model));
+
+		model.addObserver(new Observer() {
+			public void update(Observable o, Object arg) {
+				Model model = (Model) o;
+				boolean tmp = model.isAnnotationVisible();
+				if (tmp && (annotVisible ^ tmp)) {
+					annotChrom.resetToPreferredSizes();
+				}
+				annotVisible = tmp;
+			}
+		});
+		return out;
+	}
+
+	private static JPanel[] createOne(Model model) {
+		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+		screen.setSize(screen.getWidth() * 0.7, screen.getHeight() * 0.5);
+		JPanel[]out=new JPanel[1];
 		int last = out.length - 1;
 		out[last] = new JPanel();
 		registerKeyboard(out[last], model);
@@ -193,19 +216,8 @@ public class MainContent {
 
 		leftRight.setLeftComponent(leftContainer);
 		leftRight.setRightComponent(new InformationFrame(model));
-
+//		out[last].add(new InformationFrame(model));
 		out[last].add(leftRight);
-
-		model.addObserver(new Observer() {
-			public void update(Observable o, Object arg) {
-				Model model = (Model) o;
-				boolean tmp = model.isAnnotationVisible();
-				if (tmp && (annotVisible ^ tmp)) {
-					annotChrom.resetToPreferredSizes();
-				}
-				annotVisible = tmp;
-			}
-		});
 		return out;
 	}
 
