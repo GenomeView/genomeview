@@ -8,7 +8,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.font.GlyphVector;
-import java.awt.font.LineMetrics;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
@@ -16,8 +15,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import be.abeel.io.Serial;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
@@ -34,10 +31,7 @@ public class SequenceLogoTrack extends Track {
 	public SequenceLogoTrack(Model model) {
 		super(model, true);
 	}
-
-	// private int index;
-	private String name;
-
+	
 	@Override
 	public String displayName() {
 		return "Multiple alignment sequence logo";
