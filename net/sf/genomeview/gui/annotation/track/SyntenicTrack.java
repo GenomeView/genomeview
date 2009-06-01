@@ -60,8 +60,10 @@ public class SyntenicTrack extends Track {
 					int length=model
 					.getAnnotationLocationVisible().end()-model
 					.getAnnotationLocationVisible().start()+1;
-					int start=(int)(length/20.0*i);
-					int end=(int)(length/20.0*(i+1));
+					int start=model
+					.getAnnotationLocationVisible().start()+(int)(length/20.0*i);
+					int end=model
+					.getAnnotationLocationVisible().start()+(int)(length/20.0*(i+1));
 //					System.out.println(start+"\t"+end);
 					Color startColor = gradient
 							.getColor((int) ( start/ colorBlockLength));
