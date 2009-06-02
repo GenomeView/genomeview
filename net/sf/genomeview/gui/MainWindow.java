@@ -91,6 +91,30 @@ public class MainWindow implements WindowListener, Observer {
 		if (parser.checkHelp()) {
 			System.exit(0);
 		}
+		
+		/* Load the additional configuration */
+		String config = (String) parser.getOptionValue(configurationO);
+		if (config != null) {
+			try {
+				if (config.startsWith("http") || config.startsWith("ftp")) {
+					Configuration.loadExtra(new URI(config).toURL()
+							.openStream());
+				} else {
+					Configuration.loadExtra(new FileInputStream(config));
+				}
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
 		GraphicsEnvironment ge = GraphicsEnvironment
 				.getLocalGraphicsEnvironment();
 		GraphicsDevice[] gs = ge.getScreenDevices();
@@ -168,27 +192,7 @@ public class MainWindow implements WindowListener, Observer {
 		model.setStructureVisible(!hideStructureView);
 		model.setAnnotationVisible(!hideEvidenceView);
 
-		/* Load the additional configuration */
-		String config = (String) parser.getOptionValue(configurationO);
-		if (config != null) {
-			try {
-				if (config.startsWith("http") || config.startsWith("ftp")) {
-					Configuration.loadExtra(new URI(config).toURL()
-							.openStream());
-				} else {
-					Configuration.loadExtra(new FileInputStream(config));
-				}
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		
 
 		JPanel[] content = MainContent.createContent(model, Configuration
 				.getBoolean("dualscreen") ? gs.length : 1);
