@@ -393,7 +393,7 @@ public class SearchDialog extends JDialog {
                 public void actionPerformed(ActionEvent e) {
 
                     srm
-                            .search(model, seq.getText(), mismatch.getSelectedIndex(), (SequenceType) type
+                            .search(model, seq.getText().trim(), mismatch.getSelectedIndex(), (SequenceType) type
                                     .getSelectedItem());
 
                 }
@@ -531,7 +531,7 @@ public class SearchDialog extends JDialog {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    srm.search(text.getText());
+                    srm.search(text.getText().trim());
 
                 }
 
