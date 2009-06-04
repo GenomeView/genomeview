@@ -52,10 +52,7 @@ public class SearchDialog extends JDialog {
     private SearchDialog(Model model) {
 
         super(model.getParent(), "Search");
-        setResizable(false);
-        setLayout(new BorderLayout());
-
-        add(new SearchDialogContent(model), BorderLayout.CENTER);
+        setContentPane(new SearchDialogContent(model));
         pack();
         StaticUtils.right(this, model.getParent());
 
@@ -80,6 +77,7 @@ public class SearchDialog extends JDialog {
         public SearchDialogContent(Model model) {
 
             JTabbedPane pane = new JTabbedPane();
+            setLayout(new BorderLayout());
             add(pane, BorderLayout.CENTER);
             pane.add("Sequence search", new SearchSequencePane(model));
             pane.add("Keyword search", new SearchKeywordPane(model));
