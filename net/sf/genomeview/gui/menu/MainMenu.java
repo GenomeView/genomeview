@@ -29,7 +29,7 @@ import net.sf.genomeview.gui.menu.file.SaveAsAction;
 import net.sf.genomeview.gui.menu.file.ShowConfigurationAction;
 import net.sf.genomeview.gui.menu.help.ShowAboutDialogAction;
 import net.sf.genomeview.gui.menu.help.ShowInstalledModulesAction;
-import net.sf.genomeview.gui.menu.navigation.CenterOnPositionAction;
+import net.sf.genomeview.gui.menu.navigation.GotoPosition;
 import net.sf.genomeview.gui.menu.navigation.SearchAction;
 import net.sf.genomeview.gui.menu.selection.ClearFeatureSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ClearRegionSelectionAction;
@@ -85,7 +85,7 @@ public class MainMenu extends JMenuBar {
 		add(edit);
 
 		JMenu navigation = new JMenu("Navigation");
-		navigation.add(new CenterOnPositionAction(model));
+		navigation.add(new GotoPosition(model));
 		navigation.add(new SearchAction(model));
 		add(navigation);
 
