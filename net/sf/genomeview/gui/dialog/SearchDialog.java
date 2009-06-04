@@ -473,6 +473,7 @@ public class SearchDialog extends JDialog {
         }
 
         public void search(String text) {
+        	String lowerCaseText=text.toLowerCase();
             clear();
             for (Entry e : model.entries()) {
                 for (Type t : Type.values()) {
@@ -480,8 +481,8 @@ public class SearchDialog extends JDialog {
                         if (!featuresSet.contains(f)) {
                             for (String key : f.getQualifiersKeys()) {
                                 for (Qualifier q : f.qualifier(key)) {
-                                    if (q.getKey().toLowerCase().contains(text.toLowerCase())
-                                            || q.getValue().toLowerCase().contains(text.toLowerCase())) {
+                                    if (q.getKey().toLowerCase().contains(lowerCaseText)
+                                            || q.getValue().toLowerCase().contains(lowerCaseText)) {
                                         features.add(f);
                                         featuresSet.add(f);
                                     }
