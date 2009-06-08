@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.annotation.track;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -45,14 +46,14 @@ public class FeatureTrack extends Track {
 	}
 
 	public FeatureTrack(Model model, Type type) {
-		this(model,type,true);
+		this(model, type, true);
 	}
 
 	public FeatureTrack(Model model, Type type, boolean visible) {
-		super(model,visible);
-		hitmap=new CollisionMap(model);
+		super(model, visible);
+		hitmap = new CollisionMap(model);
 		this.type = type;
-		collapsible=true;
+		collapsible = true;
 	}
 
 	@Override
@@ -61,26 +62,19 @@ public class FeatureTrack extends Track {
 		hitmap.clear();
 
 		Graphics2D g = (Graphics2D) gg;
-		List<Feature> types = entry.annotation.getByType(
-				type, model.getAnnotationLocationVisible());
-		if (types.size() > Configuration
-				.getInt("annotationview:maximumNoVisibleFeatures")) {
+		List<Feature> types = entry.annotation.getByType(type, model.getAnnotationLocationVisible());
+		if (types.size() > Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
 			g.setColor(Color.BLACK);
-			g
-					.drawString(
-							type
-									+ ": Too many features to display, zoom in to see features",
-							10, yOffset + 10);
+			g.drawString(type + ": Too many features to display, zoom in to see features", 10, yOffset + 10);
 			collapsible = false;
-			return 20+5;
+			return 20 + 5;
 		} else {
 			CollisionMap fullBlockMap = new CollisionMap(model);
-			
 
 			int lineThickness = Configuration.getInt("evidenceLineHeight");
-//			if (model.isShowTextOnStructure(type)) {
-//				lineThickness += 10;
-//			}
+			// if (model.isShowTextOnStructure(type)) {
+			// lineThickness += 10;
+			// }
 			int lines = 0;
 			for (Feature rf : types) {
 				if (!model.isSourceVisible(rf.getSource()))
@@ -94,43 +88,37 @@ public class FeatureTrack extends Track {
 					if (notes.size() > 0) {
 						String[] arr = notes.get(0).getValue().split(" ");
 						if (arr.length == 3)
-							c = new Color(Integer.parseInt(arr[0]), Integer
-									.parseInt(arr[1]), Integer.parseInt(arr[2]));
+							c = new Color(Integer.parseInt(arr[0]), Integer.parseInt(arr[1]), Integer.parseInt(arr[2]));
 
 					}
 				}
 				g.setColor(c);
-				int x1 = Convert.translateGenomeToScreen(rf.start(), model
-						.getAnnotationLocationVisible(), width);
-				int x2 = Convert.translateGenomeToScreen(rf.end() + 1, model
-						.getAnnotationLocationVisible(), width);
+				int x1 = Convert.translateGenomeToScreen(rf.start(), model.getAnnotationLocationVisible(), width);
+				int x2 = Convert.translateGenomeToScreen(rf.end() + 1, model.getAnnotationLocationVisible(), width);
 
 				// TODO is this not always the case?
 				if (x2 > 0) {
 
-					Qualifier name = rf.singleQualifier("gene");
+				
 
 					int maxX = x2;
 
-//					// modify collision box only when the names will be
-//					// displayed.
-//					if (model.isShowTextOnStructure(type) && name != null) {
-//
-//						Rectangle2D stringSize = g.getFontMetrics()
-//								.getStringBounds(name.getValue(), g);
-//						if (x1 + stringSize.getMaxX() > maxX)
-//							maxX = x1 + (int) stringSize.getMaxX() + 1;
-//
-//					}
+					// // modify collision box only when the names will be
+					// // displayed.
+					// if (model.isShowTextOnStructure(type) && name != null) {
+					//
+					// Rectangle2D stringSize = g.getFontMetrics()
+					// .getStringBounds(name.getValue(), g);
+					// if (x1 + stringSize.getMaxX() > maxX)
+					// maxX = x1 + (int) stringSize.getMaxX() + 1;
+					//
+					// }
 					/*
 					 * How close can items be together before they are
 					 * considered overlapping?
 					 */
-					int closenessOverlap = Configuration
-							.getInt("closenessOverlap");
-					Rectangle r = new Rectangle(x1 - closenessOverlap, thisLine
-							* lineThickness + yOffset, maxX - x1 + 2
-							* closenessOverlap, lineThickness);
+					int closenessOverlap = Configuration.getInt("closenessOverlap");
+					Rectangle r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness + yOffset, maxX - x1 + 2 * closenessOverlap, lineThickness);
 					// only when the blocks should be tiled, do we need to
 					// determine an empty place.
 					if (!collision)
@@ -142,9 +130,7 @@ public class FeatureTrack extends Track {
 
 							if (thisLine > lines)
 								lines = thisLine;
-							r = new Rectangle(x1 - closenessOverlap, thisLine
-									* lineThickness + yOffset, maxX - x1 + 2
-									* closenessOverlap, lineThickness);
+							r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness + yOffset, maxX - x1 + 2 * closenessOverlap, lineThickness);
 						}
 					}
 					fullBlockMap.addLocation(r, null);
@@ -154,31 +140,26 @@ public class FeatureTrack extends Track {
 					 * are ordered from left to right.
 					 */
 					SortedSet<Location> loc = rf.location();
+					
+
+					/* Draw rectangles that are the features */
 					ArrayList<Rectangle> rectList = new ArrayList<Rectangle>();
 					for (Location l : loc) {
 
-						int subX1 = Convert.translateGenomeToScreen(l.start(),
-								model.getAnnotationLocationVisible(), width);
-						int subX2 = Convert.translateGenomeToScreen(
-								l.end() + 1, model
-										.getAnnotationLocationVisible(), width);
-						Rectangle rec = new Rectangle(subX1, thisLine
-								* lineThickness + yOffset, subX2 - subX1,
-								lineThickness - 5);
+						int subX1 = Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), width);
+						int subX2 = Convert.translateGenomeToScreen(l.end() + 1, model.getAnnotationLocationVisible(), width);
+						Rectangle rec = new Rectangle(subX1, thisLine * lineThickness + yOffset, subX2 - subX1, lineThickness - 5);
 						/* Add this rectangle to the location hits */
 						hitmap.addLocation(rec, l);
 						rectList.add(rec);
 
 					}
 
-					if (model.getHighlightedFeatures() != null
-							&& model.getHighlightedFeatures().contains(rf)) {
+					if (model.getHighlightedFeatures() != null && model.getHighlightedFeatures().contains(rf)) {
 						Color backupColor = g.getColor();
 						Stroke backupStroke = g.getStroke();
 						float[] dashes = { 5f, 2f };
-						Stroke dashedStroke = new BasicStroke(2f,
-								BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
-								10f, dashes, 0f);
+						Stroke dashedStroke = new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10f, dashes, 0f);
 						// g.setStroke(new BasicStroke(2));
 						g.setStroke(dashedStroke);
 						g.setColor(Color.ORANGE);
@@ -187,6 +168,7 @@ public class FeatureTrack extends Track {
 						g.setStroke(backupStroke);
 
 					}
+					g.setColor(c);
 					if (!model.isFeatureVisible(rf))
 						g.setColor(Color.LIGHT_GRAY);
 					drawRects(g, rectList, FillMode.FILL);
@@ -198,29 +180,21 @@ public class FeatureTrack extends Track {
 					int trianglehalf = (lineThickness - 5) / 2;
 					switch (rf.strand()) {
 					case REVERSE:// reverse arrow
-						g.drawLine(x1, thisLine * lineThickness + yOffset, x1
-								- trianglehalf, thisLine * lineThickness
-								+ yOffset + trianglehalf);
-						g.drawLine(x1 - trianglehalf, thisLine * lineThickness
-								+ yOffset + trianglehalf, x1, thisLine
-								* lineThickness + yOffset + lineThickness - 5);
+						g.drawLine(x1, thisLine * lineThickness + yOffset, x1 - trianglehalf, thisLine * lineThickness + yOffset + trianglehalf);
+						g.drawLine(x1 - trianglehalf, thisLine * lineThickness + yOffset + trianglehalf, x1, thisLine * lineThickness + yOffset + lineThickness - 5);
 						break;
 					case FORWARD:// forward arrow
-						g.drawLine(x2, thisLine * lineThickness + yOffset, x2
-								+ trianglehalf, thisLine * lineThickness
-								+ yOffset + trianglehalf);
-						g.drawLine(x2 + trianglehalf, thisLine * lineThickness
-								+ yOffset + trianglehalf, x2, thisLine
-								* lineThickness + yOffset + lineThickness - 5);
+						g.drawLine(x2, thisLine * lineThickness + yOffset, x2 + trianglehalf, thisLine * lineThickness + yOffset + trianglehalf);
+						g.drawLine(x2 + trianglehalf, thisLine * lineThickness + yOffset + trianglehalf, x2, thisLine * lineThickness + yOffset + lineThickness - 5);
 						break;
 					default:// do nothing
 						break;
 
 					}
-//					if (model.isShowTextOnStructure(type) && name != null) {
-//						g.drawString(name.getValue(), x1, thisLine
-//								* lineThickness + yOffset + 20);
-//					}
+					// if (model.isShowTextOnStructure(type) && name != null) {
+					// g.drawString(name.getValue(), x1, thisLine
+					// * lineThickness + yOffset + 20);
+					// }
 					g.setColor(backColor);
 
 					// Set<Feature> selected = model.getFeatureSelection();
@@ -232,13 +206,29 @@ public class FeatureTrack extends Track {
 						drawRects(g, rectList, FillMode.DRAW);
 
 					}
+					
+					/*
+					 * If the first location takes more than 50 px, we draw name
+					 * of the feature in it
+					 */
+					if (types.size() < 20) {
+						int a = Convert.translateGenomeToScreen(loc.first().start(), model.getAnnotationLocationVisible(), width);
+						int b = Convert.translateGenomeToScreen(loc.first().end() + 1, model.getAnnotationLocationVisible(), width);
+						if (b - a > 100) {
+							g.setColor(c.darker().darker().darker());
+							g.setFont(new Font("SansSerif",Font.PLAIN,10));
+							g.drawString(rf.toString(), a+5, thisLine * lineThickness + yOffset+9);
+						}
+
+					}
+					
 				}
 			}
 			if (Configuration.getBoolean("showTrackName")) {
 				g.setColor(Color.black);
 				g.drawString(type.toString(), 10, yOffset + lineThickness);
 			}
-			return (lines + 1) * lineThickness+5;
+			return (lines + 1) * lineThickness + 5;
 
 		}
 	}
@@ -257,8 +247,7 @@ public class FeatureTrack extends Track {
 			Feature featHit = locationHit.getParent();
 			model.setLocationSelection(featHit);
 			int l = featHit.length();
-			model.setAnnotationLocationVisible(new Location(featHit.start()
-					- (l / 20), featHit.end() + (l / 20)));
+			model.setAnnotationLocationVisible(new Location(featHit.start() - (l / 20), featHit.end() + (l / 20)));
 
 			if (!featHit.overlaps(model.getChromosomeLocationVisible())) {
 				int featCenter = featHit.start() + featHit.length() / 2;
@@ -269,8 +258,7 @@ public class FeatureTrack extends Track {
 		return false;
 	}
 
-	private void drawRects(Graphics g, ArrayList<Rectangle> rectList,
-			FillMode fm) {
+	private void drawRects(Graphics g, ArrayList<Rectangle> rectList, FillMode fm) {
 		Point lastPoint = null;
 
 		for (Rectangle rect : rectList) {
@@ -286,8 +274,7 @@ public class FeatureTrack extends Track {
 				break;
 			}
 			if (lastPoint != null) {
-				g.drawLine(rect.x, rect.y + rect.height / 2, lastPoint.x,
-						lastPoint.y);
+				g.drawLine(rect.x, rect.y + rect.height / 2, lastPoint.x, lastPoint.y);
 			}
 			lastPoint = new Point(rect.x + rect.width, rect.y + rect.height / 2);
 		}
@@ -296,7 +283,7 @@ public class FeatureTrack extends Track {
 
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
-//		System.out.println("feature track click: "+x+"\t"+y);
+		// System.out.println("feature track click: "+x+"\t"+y);
 		// catch double clicks
 		if (e.getClickCount() == 2) {
 			doubleClick(e);
