@@ -124,8 +124,6 @@ public class MultipleAlignmentTrack extends Track {
 						cacheValues[i] = conservation;
 
 					}
-				}else{
-					System.out.println("using cached "+System.currentTimeMillis());
 				}
 				/* Plot whatever is in the cache */
 				for (int i = 0; i < cacheValues.length; i++) {
