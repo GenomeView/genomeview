@@ -29,6 +29,10 @@ public class MultipleAlignmentTrack extends Track {
 		return "MA: " + name;
 	}
 
+	private int  cacheStart= -1;
+	private int cacheEnd=-1;
+	private double[] cacheValues = null;
+
 	@Override
 	public int paint(Graphics g1, Entry e, int yOffset, double screenWidth) {
 		Graphics2D g = (Graphics2D) g1;
@@ -40,9 +44,7 @@ public class MultipleAlignmentTrack extends Track {
 		if (align != null) {
 			if (r.length() > 1000000) {
 				g.setColor(Color.BLACK);
-				g.drawString(
-						"Too much data in alignment, zoom in to see details",
-						5, yOffset + lineHeigh - 2);
+				g.drawString("Too much data in alignment, zoom in to see details", 5, yOffset + lineHeigh - 2);
 				return lineHeigh;
 			}
 			if (r.length() < 1000) {
@@ -72,11 +74,9 @@ public class MultipleAlignmentTrack extends Track {
 						g.setColor(Color.RED);
 					}
 
-					g.fillRect((int) ((i - r.start()) * width), yOffset,
-							(int) (width * grouping) + 1, lineHeigh);
+					g.fillRect((int) ((i - r.start()) * width), yOffset, (int) (width * grouping) + 1, lineHeigh);
 					if (model.getAnnotationLocationVisible().length() < 100) {
-						Rectangle2D stringSize = g.getFontMetrics()
-								.getStringBounds("" + nt, g);
+						Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
 						if (conservation == 1) {
 							g.setColor(Color.WHITE);
 						} else if (conservation > 0.75) {
@@ -85,49 +85,57 @@ public class MultipleAlignmentTrack extends Track {
 							g.setColor(Color.BLACK);
 						} else
 							g.setColor(Color.BLACK);
-						g.drawString("" + nt,
-								(int) (((i - r.start()) * width - stringSize
-										.getWidth() / 2) + (width / 2)),
-								yOffset + lineHeigh - 2);
+						g.drawString("" + nt, (int) (((i - r.start()) * width - stringSize.getWidth() / 2) + (width / 2)), yOffset + lineHeigh - 2);
 					}
 				}
 				g.setColor(Color.GREEN);
-				if(model.getAnnotationLocationVisible().length() >= 100)
-					g.drawString(this.displayName() , 10,
-							yOffset + lineHeigh - 2);
+				if (model.getAnnotationLocationVisible().length() >= 100)
+					g.drawString(this.displayName(), 10, yOffset + lineHeigh - 2);
 				return lineHeigh;
 			} else {
 
 				double width = screenWidth / (double) r.length() / 5.0;
 				int grouping = (int) Math.ceil(1.0 / width);
-//				System.out.println("WG: " + width + "\t" + grouping);
+				// System.out.println("WG: " + width + "\t" + grouping);
 				GeneralPath conservationGP = new GeneralPath();
-//				GeneralPath footprintGP = new GeneralPath();
+				// GeneralPath footprintGP = new GeneralPath();
 				conservationGP.moveTo(0, yOffset);
 				// footprintGP.moveTo(0,yOffset);
 				Alignment alg = e.alignment.getAlignment(index);
-				for (int i = r.start(); i <= r.end()+grouping; i += grouping) {
 
-					double conservation = 0;
-					double footprint = 0;
-					for (int j = 0; j < grouping; j++) {
-						if (alg.isAligned(i + j))
-							conservation++;
+				// for (int i = r.start(); i <= r.end()+grouping; i += grouping)
+				// {
+				if (r.start()!=cacheStart||r.end()!=cacheEnd) {
+					cacheEnd=r.end();
+					cacheStart=r.start();
+					cacheValues = new double[(r.end() + grouping - r.start()) / grouping];
+					for (int i = 0; i < cacheValues.length; i++) {
+						double conservation = 0;
+						double footprint = 0;
+						for (int j = 0; j < grouping; j++) {
+							if (alg.isAligned(r.start()+i * grouping + j))
+								conservation++;
+						}
+						conservation /= grouping;
+						footprint /= grouping;
+						// conservationGP.lineTo((int) ((i*grouping - r.start())
+						// * width * 5)+width*2.5,
+						// yOffset + (1 - conservation) * (lineHeigh-4)+2);
+						cacheValues[i] = conservation;
+
 					}
-					conservation /= grouping;
-					footprint /= grouping;
-					conservationGP.lineTo((int) ((i - r.start()) * width * 5)+width*2.5,
-							yOffset + (1 - conservation) *  (lineHeigh-4)+2);
-//					footprintGP.lineTo((int) ((i - r.start()) * width * 20),
-//							yOffset + (1 - footprint) * 3 * lineHeigh);
-
+				}else{
+					System.out.println("using cached "+System.currentTimeMillis());
+				}
+				/* Plot whatever is in the cache */
+				for (int i = 0; i < cacheValues.length; i++) {
+					conservationGP.lineTo((int) ((i * grouping) * width * 5) + width * 2.5, yOffset + (1 - cacheValues[i]) * (lineHeigh - 4) + 2);
 				}
 				g.setColor(Color.BLACK);
 				g.draw(conservationGP);
 				g.setColor(Color.BLUE);
-//				g.draw(footprintGP);
-				g.drawString(this.displayName() + " (" + grouping + ")", 10,
-						yOffset + lineHeigh - 2);
+				// g.draw(footprintGP);
+				g.drawString(this.displayName() + " (" + grouping + ")", 10, yOffset + lineHeigh - 2);
 				return lineHeigh;
 
 			}
