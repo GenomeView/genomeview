@@ -215,9 +215,11 @@ public class FeatureTrack extends Track {
 						int a = Convert.translateGenomeToScreen(loc.first().start(), model.getAnnotationLocationVisible(), width);
 						int b = Convert.translateGenomeToScreen(loc.first().end() + 1, model.getAnnotationLocationVisible(), width);
 						if (b - a > 100) {
+							Font resetFont=g.getFont();
 							g.setColor(c.darker().darker().darker());
 							g.setFont(new Font("SansSerif",Font.PLAIN,10));
 							g.drawString(rf.toString(), a+5, thisLine * lineThickness + yOffset+9);
+							g.setFont(resetFont);
 						}
 
 					}
