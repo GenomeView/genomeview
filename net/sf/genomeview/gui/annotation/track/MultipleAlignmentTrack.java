@@ -10,6 +10,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Alignment;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
@@ -29,9 +30,43 @@ public class MultipleAlignmentTrack extends Track {
 		return "MA: " + name;
 	}
 
-	private int  cacheStart= -1;
-	private int cacheEnd=-1;
-	private double[] cacheValues = null;
+	class Cache {
+		private int cacheStart = -1;
+		private int cacheEnd = -1;
+		private int cacheScale = 1;
+		private double[] cacheValues = null;
+
+		public boolean hasData(int scale, int start, int end) {
+			return scale == cacheScale && start >= cacheStart && end <= cacheEnd;
+		}
+
+		public void store(int scale, int start, int end, double[] cacheValues2) {
+			this.cacheScale = scale;
+			this.cacheStart = start;
+			this.cacheEnd = end;
+			this.cacheValues = cacheValues2;
+
+		}
+
+		public double[] get() {
+			return cacheValues;
+		}
+
+		public int start() {
+			return cacheStart;
+		}
+
+		public int end() {
+			return cacheEnd;
+		}
+
+		public int scale() {
+			return cacheScale;
+		}
+
+	}
+
+	private Cache cache = new Cache();
 
 	@Override
 	public int paint(Graphics g1, Entry e, int yOffset, double screenWidth) {
@@ -95,45 +130,42 @@ public class MultipleAlignmentTrack extends Track {
 			} else {
 
 				double width = screenWidth / (double) r.length() / 5.0;
-				int grouping = (int) Math.ceil(1.0 / width);
-				// System.out.println("WG: " + width + "\t" + grouping);
+
+				int scale = 1;
+				while (scale < (int) Math.ceil(1.0 / width))
+					scale *= 2;
+
 				GeneralPath conservationGP = new GeneralPath();
-				// GeneralPath footprintGP = new GeneralPath();
 				conservationGP.moveTo(0, yOffset);
-				// footprintGP.moveTo(0,yOffset);
 				Alignment alg = e.alignment.getAlignment(index);
 
-				// for (int i = r.start(); i <= r.end()+grouping; i += grouping)
-				// {
-				if (r.start()!=cacheStart||r.end()!=cacheEnd) {
-					cacheEnd=r.end();
-					cacheStart=r.start();
-					cacheValues = new double[(r.end() + grouping - r.start()) / grouping];
+				int start = r.start() / scale * scale;
+				int end = ((r.end() / scale) + 1) * scale;
+				if (!cache.hasData(scale, r.start(), r.end())) {
+					double[] cacheValues = new double[(end - start) / scale];
 					for (int i = 0; i < cacheValues.length; i++) {
 						double conservation = 0;
-						double footprint = 0;
-						for (int j = 0; j < grouping; j++) {
-							if (alg.isAligned(r.start()+i * grouping + j))
+						for (int j = 0; j < scale; j++) {
+							if (alg.isAligned(start + i * scale + j))
 								conservation++;
 						}
-						conservation /= grouping;
-						footprint /= grouping;
-						// conservationGP.lineTo((int) ((i*grouping - r.start())
-						// * width * 5)+width*2.5,
-						// yOffset + (1 - conservation) * (lineHeigh-4)+2);
+						conservation /= scale;
 						cacheValues[i] = conservation;
-
 					}
+					cache.store(scale, start, end, cacheValues);
 				}
 				/* Plot whatever is in the cache */
-				for (int i = 0; i < cacheValues.length; i++) {
-					conservationGP.lineTo((int) ((i * grouping) * width * 5) + width * 2.5, yOffset + (1 - cacheValues[i]) * (lineHeigh - 4) + 2);
+				double[] cValues = cache.get();
+				int cStart = cache.start();
+				int cScale = cache.scale();
+				for (int i = 0; i < cValues.length; i++) {
+					int x = Convert.translateGenomeToScreen(cStart + i * cScale, r, screenWidth) + 5;
+					conservationGP.lineTo(x, yOffset + (1 - cValues[i]) * (lineHeigh - 4) + 2);
 				}
 				g.setColor(Color.BLACK);
 				g.draw(conservationGP);
 				g.setColor(Color.BLUE);
-				// g.draw(footprintGP);
-				g.drawString(this.displayName() + " (" + grouping + ")", 10, yOffset + lineHeigh - 2);
+				g.drawString(this.displayName() + " (" + cScale + ")", 10, yOffset + lineHeigh - 2);
 				return lineHeigh;
 
 			}
