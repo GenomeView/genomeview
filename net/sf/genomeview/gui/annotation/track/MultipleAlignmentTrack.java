@@ -23,8 +23,8 @@ public class MultipleAlignmentTrack extends Track {
 	private int index;
 	private String name;
 	double LOG2 = Math.log(2);
-	int bareScale = 4;
-	int bareScaleIndex = 2;
+	int bareScale = 32;
+	int bareScaleIndex = 5;
 	private Map<Entry, Buffer> buffers = new HashMap<Entry, Buffer>();
 
 	class Buffer {
@@ -69,7 +69,7 @@ public class MultipleAlignmentTrack extends Track {
 
 		private float[] bare() {
 
-			float[] out = new float[a.refLength() / bareScale];
+			float[] out = new float[a.refLength() / bareScale+1];
 			for (int i = 0; i < a.refLength(); i += bareScale) {
 				float conservation = 0;
 				for (int j = 0; j < bareScale; j++) {
@@ -133,8 +133,7 @@ public class MultipleAlignmentTrack extends Track {
 
 	}
 
-	private Cache cache = new Cache();
-
+	
 	@Override
 	public int paint(Graphics g1, Entry e, int yOffset, double screenWidth) {
 		Graphics2D g = (Graphics2D) g1;
