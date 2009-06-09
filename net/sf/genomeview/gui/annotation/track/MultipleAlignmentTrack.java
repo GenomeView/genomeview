@@ -8,6 +8,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
@@ -18,11 +22,74 @@ import net.sf.jannot.Location;
 public class MultipleAlignmentTrack extends Track {
 	private int index;
 	private String name;
+	double LOG2 = Math.log(2);
+	int bareScale = 4;
+	int bareScaleIndex = 2;
+	private Map<Entry, Buffer> buffers = new HashMap<Entry, Buffer>();
+
+	class Buffer {
+		private Alignment a;
+
+		Buffer(Alignment a) {
+			this.a = a;
+		}
+
+		private List<float[]> buffer = new ArrayList<float[]>();
+
+		public double get(int start, int scale) {
+
+			if (scale < bareScale) {
+				double conservation = 0;
+				for (int j = 0; j < scale; j++) {
+					if (a.isAligned(start + j))
+						conservation++;
+				}
+				return conservation / scale;
+			}
+			if(buffer.size()==0)
+				buffer.add(bare());
+
+			int index = (int) (Math.log(scale) / LOG2) - bareScaleIndex;
+
+			while (buffer.size() <= index + 1) {
+				buffer.add(merge(buffer.get(buffer.size() - 1)));
+			}
+
+			return buffer.get(index)[start / scale];
+		}
+
+		private float[] merge(float[] ds) {
+			float[] out = new float[(ds.length + 1) / 2];
+			for (int i = 0; i < ds.length - 1; i += 2) {
+				out[i / 2] = (ds[i] + ds[i + 1]) / 2;
+			}
+			out[out.length - 1] = ds[ds.length - 1];
+			return out;
+		}
+
+		private float[] bare() {
+
+			float[] out = new float[a.refLength() / bareScale];
+			for (int i = 0; i < a.refLength(); i += bareScale) {
+				float conservation = 0;
+				for (int j = 0; j < bareScale; j++) {
+					if (a.isAligned(i + j))
+						conservation++;
+				}
+				conservation /= bareScale;
+				out[i / bareScale] = conservation;
+
+			}
+			return out;
+		}
+
+	}
 
 	public MultipleAlignmentTrack(String name, int index, Model model, boolean b) {
 		super(model, b);
 		this.index = index;
 		this.name = name;
+
 	}
 
 	@Override
@@ -137,35 +204,35 @@ public class MultipleAlignmentTrack extends Track {
 
 				GeneralPath conservationGP = new GeneralPath();
 				conservationGP.moveTo(0, yOffset);
-				Alignment alg = e.alignment.getAlignment(index);
 
 				int start = r.start() / scale * scale;
 				int end = ((r.end() / scale) + 1) * scale;
-				if (!cache.hasData(scale, r.start(), r.end())) {
-					double[] cacheValues = new double[(end - start) / scale];
-					for (int i = 0; i < cacheValues.length; i++) {
-						double conservation = 0;
-						for (int j = 0; j < scale; j++) {
-							if (alg.isAligned(start + i * scale + j))
-								conservation++;
-						}
-						conservation /= scale;
-						cacheValues[i] = conservation;
-					}
-					cache.store(scale, start, end, cacheValues);
-				}
-				/* Plot whatever is in the cache */
-				double[] cValues = cache.get();
-				int cStart = cache.start();
-				int cScale = cache.scale();
-				for (int i = 0; i < cValues.length; i++) {
-					int x = Convert.translateGenomeToScreen(cStart + i * cScale, r, screenWidth) + 5;
-					conservationGP.lineTo(x, yOffset + (1 - cValues[i]) * (lineHeigh - 4) + 2);
+//				if (!cache.hasData(scale, r.start(), r.end())) {
+//					double[] cacheValues = new double[(end - start) / scale];
+//					Buffer b=buffers.get(e);
+//					for (int i = 0; i < cacheValues.length; i++) {
+//						double conservation = 0;
+//						conservation = b.get(start + i * scale, scale);
+//						cacheValues[i] = conservation;
+//					}
+//					cache.store(scale, start, end, cacheValues);
+//				}
+//				/* Plot whatever is in the cache */
+				if(!buffers.containsKey(e))
+					buffers.put(e, new Buffer(e.alignment.getAlignment(index)));
+				Buffer b=buffers.get(e);
+//				double[] cValues = cache.get();
+//				int cStart = cache.start();
+//				int cScale = cache.scale();
+				for (int i = 0; i < (end - start) / scale; i++) {
+					int x = Convert.translateGenomeToScreen(start + i * scale, r, screenWidth) + 5;
+//					conservationGP.lineTo(x, yOffset + (1 - cValues[i]) * (lineHeigh - 4) + 2);
+					conservationGP.lineTo(x, yOffset + (1 - b.get(start + i * scale, scale)) * (lineHeigh - 4) + 2);
 				}
 				g.setColor(Color.BLACK);
 				g.draw(conservationGP);
 				g.setColor(Color.BLUE);
-				g.drawString(this.displayName() + " (" + cScale + ")", 10, yOffset + lineHeigh - 2);
+				g.drawString(this.displayName() + " (" + scale + ")", 10, yOffset + lineHeigh - 2);
 				return lineHeigh;
 
 			}
