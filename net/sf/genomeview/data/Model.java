@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.Stack;
@@ -31,7 +30,6 @@ import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.gui.annotation.track.WiggleTrack;
 import net.sf.genomeview.plugin.GUIManager;
-import net.sf.jannot.Alignment;
 import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
@@ -41,6 +39,8 @@ import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.SyntenicAnnotation;
 import net.sf.jannot.Type;
+import net.sf.jannot.alignment.Alignment;
+import net.sf.jannot.alignment.ReferenceSequence;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
@@ -209,8 +209,7 @@ public class Model extends Observable implements IModel {
 	//
 	// }
 
-	private Map<Type, Boolean> visibleOnChromosome = new DefaultHashMap<Type, Boolean>(
-			Boolean.FALSE);
+	private Map<Type, Boolean> visibleOnChromosome = new DefaultHashMap<Type, Boolean>(Boolean.FALSE);
 
 	public boolean isVisibleOnChromosome(Type ct) {
 		return visibleOnChromosome.get(ct);
@@ -224,8 +223,7 @@ public class Model extends Observable implements IModel {
 	// return showTextOnStructure.get(ct);
 	// }
 
-	private Map<Type, Boolean> showChromText = new DefaultHashMap<Type, Boolean>(
-			Boolean.FALSE);
+	private Map<Type, Boolean> showChromText = new DefaultHashMap<Type, Boolean>(Boolean.FALSE);
 
 	public boolean isShowChromText(Type ct) {
 		return showChromText.get(ct);
@@ -251,8 +249,7 @@ public class Model extends Observable implements IModel {
 	}
 
 	/* Keeps track of individually hidden features. */
-	private Map<Feature, Boolean> featureVisible = new DefaultHashMap<Feature, Boolean>(
-			Boolean.TRUE);
+	private Map<Feature, Boolean> featureVisible = new DefaultHashMap<Feature, Boolean>(Boolean.TRUE);
 
 	public boolean isFeatureVisible(Feature f) {
 		return featureVisible.get(f);
@@ -397,8 +394,7 @@ public class Model extends Observable implements IModel {
 		Location newZoom = new Location(modStart, modEnd);
 
 		// getAnnotationLocationVisible();
-		ZoomChange zc = new ZoomChange(new Location(annotationStart,
-				annotationEnd), newZoom);
+		ZoomChange zc = new ZoomChange(new Location(annotationStart, annotationEnd), newZoom);
 		zc.doChange();
 		refresh();
 	}
@@ -555,8 +551,7 @@ public class Model extends Observable implements IModel {
 	public List<Highlight> getHighlight(Location region) {
 		ArrayList<Highlight> out = new ArrayList<Highlight>();
 		for (Highlight f : highlights) {
-			if (f.location.end() > region.start()
-					&& f.location.start() < region.end())
+			if (f.location.end() > region.start() && f.location.start() < region.end())
 				out.add(f);
 		}
 		return Collections.unmodifiableList(out);
@@ -581,8 +576,7 @@ public class Model extends Observable implements IModel {
 	 */
 	public void center(int genomePosition) {
 		int length = (annotationEnd - annotationStart) / 2;
-		setAnnotationLocationVisible(new Location(genomePosition - length,
-				genomePosition + length));
+		setAnnotationLocationVisible(new Location(genomePosition - length, genomePosition + length));
 
 	}
 
@@ -690,8 +684,7 @@ public class Model extends Observable implements IModel {
 			if (selectedEntry == null) {
 				selectedEntry = e;
 				setAnnotationLocationVisible(new Location(1, 10000));
-				setChromosomeLocationVisible(new Location(1,
-						selectedEntry.sequence.size()));
+				setChromosomeLocationVisible(new Location(1, selectedEntry.sequence.size()));
 			}
 
 		}
@@ -706,8 +699,7 @@ public class Model extends Observable implements IModel {
 		return es;
 	}
 
-	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(
-			AminoAcidMapping.STANDARDCODE);
+	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(AminoAcidMapping.STANDARDCODE);
 
 	public AminoAcidMapping getAAMapping(Entry e) {
 		return aamapping.get(e);
@@ -724,10 +716,11 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	public void addTrack(Track track){
+	public void addTrack(Track track) {
 		trackList.add(track);
 		refresh();
 	}
+
 	public void addSyntenic(DataSource source, Entry[] data) {
 
 		for (int i = 0; i < data.length; i++) {
@@ -755,8 +748,7 @@ public class Model extends Observable implements IModel {
 	 * 
 	 * @throws ReadFailedException
 	 */
-	public void addFeatures(DataSource f, Entry[] data)
-			throws ReadFailedException {
+	public void addFeatures(DataSource f, Entry[] data) throws ReadFailedException {
 		logger.info("adding features: " + f);
 
 		logger.info("entries read: " + data.length);
@@ -786,10 +778,9 @@ public class Model extends Observable implements IModel {
 
 	public void addAlignment(DataSource source, Entry[] data) {
 		List<Alignment> list = new ArrayList<Alignment>();
-
+		ReferenceSequence rs = new ReferenceSequence(data[0].sequence);
 		for (int i = 0; i < data.length; i++) {
-			Alignment align = new Alignment(data[i].getID(), data[i].sequence,
-					data[0].sequence);
+			Alignment align = new Alignment(data[i].getID(), data[i].sequence, rs);
 			list.add(align);
 			System.out.println("adding alignment: " + align);
 		}
@@ -867,8 +858,7 @@ public class Model extends Observable implements IModel {
 			for (Track track : this) {
 				if (track instanceof SyntenicTrack) {
 					SyntenicTrack st = ((SyntenicTrack) track);
-					if (st.reference().equals(ref)
-							&& st.target().equals(target))
+					if (st.reference().equals(ref) && st.target().equals(target))
 						return true;
 
 				}
@@ -919,11 +909,9 @@ public class Model extends Observable implements IModel {
 			/* Alignment and conservation tracks */
 			for (int i = 0; i < e.alignment.numAlignments(); i++) {
 				if (!trackList.containsAlignment(i))
-					trackList.add(new MultipleAlignmentTrack(e.alignment
-							.getAlignment(i).name(), i, this, true));
+					trackList.add(new MultipleAlignmentTrack(e.alignment.getAlignment(i).name(), i, this, true));
 			}
-			if (!trackList.containsSequenceLogo()
-					&& e.alignment.numAlignments() > 0)
+			if (!trackList.containsSequenceLogo() && e.alignment.numAlignments() > 0)
 				trackList.add(new SequenceLogoTrack(this));
 			/* Syntenic tracks */
 			Set<Entry> targets = e.syntenic.getTargets();
@@ -1014,8 +1002,7 @@ public class Model extends Observable implements IModel {
 			return "";
 	}
 
-	private HashMap<DataSource, Boolean> sourceVisibility = new DefaultHashMap<DataSource, Boolean>(
-			Boolean.TRUE);
+	private HashMap<DataSource, Boolean> sourceVisibility = new DefaultHashMap<DataSource, Boolean>(Boolean.TRUE);
 
 	public boolean isSourceVisible(DataSource dataSource) {
 		return sourceVisibility.get(dataSource);

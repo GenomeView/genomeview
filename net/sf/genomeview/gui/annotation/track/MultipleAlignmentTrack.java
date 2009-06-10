@@ -15,9 +15,9 @@ import java.util.Map;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
-import net.sf.jannot.Alignment;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
+import net.sf.jannot.alignment.Alignment;
 
 public class MultipleAlignmentTrack extends Track {
 	private int index;
