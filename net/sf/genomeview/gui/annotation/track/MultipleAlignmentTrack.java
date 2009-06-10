@@ -142,7 +142,7 @@ public class MultipleAlignmentTrack extends Track {
 		Alignment align = e.alignment.getAlignment(index);
 
 		if (align != null) {
-			if (r.length() > 1000000) {
+			if (r.length() > 10000000) {
 				g.setColor(Color.BLACK);
 				g.drawString("Too much data in alignment, zoom in to see details", 5, yOffset + lineHeigh - 2);
 				return lineHeigh;
