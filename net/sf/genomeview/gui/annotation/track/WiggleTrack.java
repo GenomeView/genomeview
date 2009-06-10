@@ -43,70 +43,60 @@ public class WiggleTrack extends Track {
 		Graph graph = e.graphs.getGraph(name);
 		if (graph != null) {
 
-			SortedMap<Location, Double> vf = graph.get(model
-					.getAnnotationLocationVisible());
+			SortedMap<Location, Double> vf = graph.get(model.getAnnotationLocationVisible());
 
 			int lastX = -1;
 			int lastY = -1;
-			if(vf.size()==0){
+			if (vf.size() == 0) {
 				g.setColor(Color.black);
-				yUsed=20;
-				g.drawString("No datapoints in this interval", 10, yOffset + yUsed);
+				yUsed = 20;
+				g.drawString(graph.getName() + ": no datapoints in this interval", 10, yOffset + yUsed);
 				return yUsed;
 			}
-					
+
 			if (!isCollapsed()) {
 				GeneralPath gp = new GeneralPath();
 				/* Move to first point */
-				double val = (vf.get(vf.firstKey()) - graph.min())
-				/ (graph.max() - graph.min());
+				double val = (vf.get(vf.firstKey()) - graph.min()) / (graph.max() - graph.min());
 				int y = (int) ((-val * 50) + yOffset + 50);
-				int x = Convert.translateGenomeToScreen(vf.firstKey().start(),
-						model.getAnnotationLocationVisible(), screenWidth);
+				int x = Convert.translateGenomeToScreen(vf.firstKey().start(), model.getAnnotationLocationVisible(), screenWidth);
 				gp.moveTo(x, y);
 				/* Add all intermediate points */
 				for (Location l : vf.keySet()) {
-					
+
 					g.setColor(Color.BLACK);
-					val = (vf.get(l) - graph.min())
-							/ (graph.max() - graph.min());
+					val = (vf.get(l) - graph.min()) / (graph.max() - graph.min());
 					// require inverse of value because we paint
 					// top-down.
 					y = (int) ((-val * 50) + yOffset + 50);
-					x = Convert.translateGenomeToScreen(l.start() / 2 + l.end()
-							/ 2, model.getAnnotationLocationVisible(),
-							screenWidth);
+					x = Convert.translateGenomeToScreen(l.start() / 2 + l.end() / 2, model.getAnnotationLocationVisible(), screenWidth);
 
 					gp.lineTo(x, y);
 
 				}
 				/* Add last point */
-				val = (vf.get(vf.lastKey()) - graph.min())
-				/ (graph.max() - graph.min());
+				val = (vf.get(vf.lastKey()) - graph.min()) / (graph.max() - graph.min());
 				y = (int) ((-val * 50) + yOffset + 50);
-				x = Convert.translateGenomeToScreen(vf.lastKey().end(), model
-						.getAnnotationLocationVisible(), screenWidth);
+				x = Convert.translateGenomeToScreen(vf.lastKey().end(), model.getAnnotationLocationVisible(), screenWidth);
 				gp.lineTo(x, y);
 				g.draw(gp);
 				yUsed = 50;
 			} else { /* Color coding */
 
 				for (Location l : vf.keySet()) {
-					double val = (vf.get(l) - graph.min())
-							/ (graph.max() - graph.min());
+					double val = (vf.get(l) - graph.min()) / (graph.max() - graph.min());
 					g.setColor(ColorFactory.getColorCoding(val));
-					int x = Convert.translateGenomeToScreen(l.start()/2+l.end()/2, model
-							.getAnnotationLocationVisible(), screenWidth);
+					int x = Convert.translateGenomeToScreen(l.start() / 2 + l.end() / 2, model.getAnnotationLocationVisible(), screenWidth);
 					g.fillRect(lastX, yOffset, x - lastX, 10);
 					lastX = x;
 
 				}
 				yUsed = 10;
 			}
-			if (Configuration.getBoolean("showTrackName")) {
-				g.setColor(Color.black);
-				g.drawString(graph.getName(), 10, yOffset + yUsed);
-			}
+
+			g.setColor(Color.black);
+			g.drawString(graph.getName(), 10, yOffset + yUsed);
+
 		}
 		return yUsed;
 	}
