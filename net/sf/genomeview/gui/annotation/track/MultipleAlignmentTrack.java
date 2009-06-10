@@ -46,7 +46,7 @@ public class MultipleAlignmentTrack extends Track {
 				}
 				return conservation / scale;
 			}
-			if(buffer.size()==0)
+			if (buffer.size() == 0)
 				buffer.add(bare());
 
 			int index = (int) (Math.log(scale) / LOG2) - bareScaleIndex;
@@ -69,7 +69,7 @@ public class MultipleAlignmentTrack extends Track {
 
 		private float[] bare() {
 
-			float[] out = new float[a.refLength() / bareScale+1];
+			float[] out = new float[a.refLength() / bareScale + 1];
 			for (int i = 0; i < a.refLength(); i += bareScale) {
 				float conservation = 0;
 				for (int j = 0; j < bareScale; j++) {
@@ -133,7 +133,6 @@ public class MultipleAlignmentTrack extends Track {
 
 	}
 
-	
 	@Override
 	public int paint(Graphics g1, Entry e, int yOffset, double screenWidth) {
 		Graphics2D g = (Graphics2D) g1;
@@ -164,12 +163,19 @@ public class MultipleAlignmentTrack extends Track {
 					}
 					conservation /= grouping;
 					if (conservation == 1) {
+						// g.setColor(new Color(0x00,0x00,0x33));/*blue */
+						// g.setColor(new Color(0x00,0x33,0x00));/*green */
 						g.setColor(Color.BLACK);
 					} else if (conservation > 0.75) {
+						// g.setColor(new Color(0x00,0x66,0x00));/*green */
+						// g.setColor(new Color(0x00,0x00,0x66));/*blue*/
 						g.setColor(Color.DARK_GRAY);
 					} else if (conservation > 0.5) {
+						// g.setColor(new Color(0x00,0x00,0xff));/*blue*/
+						// g.setColor(new Color(0x00,0xff,0x00));/*green */
 						g.setColor(Color.LIGHT_GRAY);
 					} else
+						// g.setColor(new Color(0xcc,0xff,0x00));
 						g.setColor(Color.WHITE);
 					if (dash) {
 						g.setColor(Color.RED);
@@ -206,26 +212,27 @@ public class MultipleAlignmentTrack extends Track {
 
 				int start = r.start() / scale * scale;
 				int end = ((r.end() / scale) + 1) * scale;
-//				if (!cache.hasData(scale, r.start(), r.end())) {
-//					double[] cacheValues = new double[(end - start) / scale];
-//					Buffer b=buffers.get(e);
-//					for (int i = 0; i < cacheValues.length; i++) {
-//						double conservation = 0;
-//						conservation = b.get(start + i * scale, scale);
-//						cacheValues[i] = conservation;
-//					}
-//					cache.store(scale, start, end, cacheValues);
-//				}
-//				/* Plot whatever is in the cache */
-				if(!buffers.containsKey(e))
+				// if (!cache.hasData(scale, r.start(), r.end())) {
+				// double[] cacheValues = new double[(end - start) / scale];
+				// Buffer b=buffers.get(e);
+				// for (int i = 0; i < cacheValues.length; i++) {
+				// double conservation = 0;
+				// conservation = b.get(start + i * scale, scale);
+				// cacheValues[i] = conservation;
+				// }
+				// cache.store(scale, start, end, cacheValues);
+				// }
+				// /* Plot whatever is in the cache */
+				if (!buffers.containsKey(e))
 					buffers.put(e, new Buffer(e.alignment.getAlignment(index)));
-				Buffer b=buffers.get(e);
-//				double[] cValues = cache.get();
-//				int cStart = cache.start();
-//				int cScale = cache.scale();
+				Buffer b = buffers.get(e);
+				// double[] cValues = cache.get();
+				// int cStart = cache.start();
+				// int cScale = cache.scale();
 				for (int i = 0; i < (end - start) / scale; i++) {
 					int x = Convert.translateGenomeToScreen(start + i * scale, r, screenWidth) + 5;
-//					conservationGP.lineTo(x, yOffset + (1 - cValues[i]) * (lineHeigh - 4) + 2);
+					// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
+					// (lineHeigh - 4) + 2);
 					conservationGP.lineTo(x, yOffset + (1 - b.get(start + i * scale, scale)) * (lineHeigh - 4) + 2);
 				}
 				g.setColor(Color.BLACK);
