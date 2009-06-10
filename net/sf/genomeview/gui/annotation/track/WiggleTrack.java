@@ -7,15 +7,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
-import java.util.HashMap;
 import java.util.SortedMap;
 
 import net.sf.genomeview.core.ColorFactory;
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.DisplayType;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.plugin.IValue;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Graph;
 import net.sf.jannot.Location;
