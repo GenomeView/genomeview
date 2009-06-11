@@ -29,6 +29,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Feature;
@@ -104,9 +105,9 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-						String query = queryURL
-								+ URLEncoder.encode(name.getSelectedText(),
-										"UTF-8");
+						String query = queryURL.replaceAll("%query%",
+								URLEncoder.encode(name.getSelectedText().trim(),
+										"UTF-8"));
 
 						Desktop.getDesktop().browse(new URI(query));
 					} catch (MalformedURLException e1) {
@@ -129,28 +130,41 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 			private void showPopUp(MouseEvent e) {
 				if (popupMenu == null) {
 					popupMenu = new JPopupMenu();
-					JMenuItem ncbiQuery = new JMenuItem(new Query(
-							"Query at NCBI Entrez",
-							"http://www.ncbi.nlm.nih.gov/sites/gquery?term="));
+					JMenuItem ncbiQuery = new JMenuItem(
+							new Query("Query at NCBI Entrez",
+									"http://www.ncbi.nlm.nih.gov/sites/gquery?term=%query%"));
 					JMenuItem ensemblQuery = new JMenuItem(
 							new Query("Query at Ensembl",
-									"http://www.ensembl.org/Homo_sapiens/Search/Summary?species=all;idx=;q="));
+									"http://www.ensembl.org/Homo_sapiens/Search/Summary?species=all;idx=;q=%query%"));
 					JMenuItem ebi = new JMenuItem(
 							new Query("Query at EMBL-EBI",
-									"http://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query="));
+									"http://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query=%query%"));
 
 					JMenuItem google = new JMenuItem(new Query(
 							"Query at Google",
-							"http://www.google.com/search?q="));
+							"http://www.google.com/search?q=%query%"));
 
-					JMenuItem tbdb=new JMenuItem(new Query("Query in TBDB","http://genome.tbdb.org/annotation/genome/tbdb/GlobalSearch.html?q="));
-					
+					JMenuItem tbdb = new JMenuItem(
+							new Query("Query in TBDB",
+									"http://genome.tbdb.org/annotation/genome/tbdb/GlobalSearch.html?q=%query%"));
 					popupMenu.add(ncbiQuery);
 					popupMenu.add(ensemblQuery);
 					popupMenu.add(ebi);
 					popupMenu.add(google);
 					popupMenu.add(tbdb);
+					String extra = Configuration.get("extraqueries");
+					if (extra != null) {
+						popupMenu.addSeparator();
+						String[] arr = extra.split(";");
+						for (String s : arr) {
+							String[] tmp = s.split(",");
+							JMenuItem extramenu = new JMenuItem(new Query(
+									tmp[0], tmp[1]));
+							popupMenu.add(extramenu);
+						}
+					}
 					
+
 				}
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 
