@@ -182,6 +182,10 @@ public class MultipleAlignmentTrack extends Track {
 					}
 
 					g.fillRect((int) ((i - r.start()) * width), yOffset, (int) (width * grouping) + 1, lineHeigh);
+					if(align.sizeGapAfter(i)>0){
+						g.setColor(Color.ORANGE);
+						g.fillRect((int) ((i - r.start()) * width+width*3/4), yOffset, (int) (width * grouping)/2 + 1, lineHeigh);
+					}
 					if (model.getAnnotationLocationVisible().length() < 100) {
 						Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
 						if (conservation == 1) {
