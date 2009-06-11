@@ -895,7 +895,7 @@ public class Model extends Observable implements IModel {
 	 * 
 	 * All types and graphs loaded should have a corresponding track.
 	 */
-	private void updateTracklist() {
+	private synchronized void updateTracklist() {
 		for (Type t : Type.values()) {
 			if (!trackList.containsType(t))
 				trackList.add(new FeatureTrack(this, t, true));
