@@ -7,23 +7,18 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Logger;
 
-import javax.swing.ActionMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
-import javax.swing.InputMap;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
@@ -34,14 +29,6 @@ import net.sf.genomeview.gui.components.AAMappingChooser;
 import net.sf.genomeview.gui.information.InformationFrame;
 import net.sf.genomeview.gui.menu.edit.RedoAction;
 import net.sf.genomeview.gui.menu.edit.UndoAction;
-import net.sf.genomeview.gui.menu.navigation.AnnotationMoveLeftAction;
-import net.sf.genomeview.gui.menu.navigation.AnnotationMoveRightAction;
-import net.sf.genomeview.gui.menu.navigation.AnnotationZoomInAction;
-import net.sf.genomeview.gui.menu.navigation.AnnotationZoomOutAction;
-import net.sf.genomeview.gui.menu.selection.SelectFromSelectedBack;
-import net.sf.genomeview.gui.menu.selection.SelectFromSelectedFirst;
-import net.sf.genomeview.gui.menu.selection.SelectFromSelectedForward;
-import net.sf.genomeview.gui.menu.selection.SelectFromSelectedLast;
 import net.sf.jannot.Entry;
 
 public class MainContent {
@@ -60,65 +47,6 @@ public class MainContent {
 	//       
 	// }
 
-	/**
-	 * Register all custom keyboard actions.
-	 * 
-	 * @param model2
-	 * 
-	 * 
-	 */
-	private static void registerKeyboard(JComponent comp, Model model) {
-
-		InputMap inputs = comp
-				.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		System.out.println(inputs);
-		ActionMap actions = comp.getActionMap();
-		/* move left */
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD4, 0),
-				"customMoveLeft");
-		actions.put("customMoveLeft", new AnnotationMoveLeftAction(model));
-		/* move right */
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD6, 0),
-				"customMoveRight");
-		actions.put("customMoveRight", new AnnotationMoveRightAction(model));
-		/* zoom in */
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), "customZoomIn");
-		actions.put("customZoomIn", new AnnotationZoomInAction(model));
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0),
-				"customZoomOut");
-		actions.put("customZoomOut", new AnnotationZoomOutAction(model));
-
-		/* select first from selection */
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD7, 0),
-				"customSelectFirst");
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0),
-				"customSelectFirst");
-		actions.put("customSelectFirst", new SelectFromSelectedFirst(model));
-
-		/* select last from selection */
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD1, 0),
-				"customSelectLast");
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0),
-				"customSelectLast");
-		actions.put("customSelectLast", new SelectFromSelectedLast(model));
-
-		/* move selection one location forward */
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD9, 0),
-				"customSelectForward");
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0),
-				"customSelectForward");
-		actions
-				.put("customSelectForward",
-						new SelectFromSelectedForward(model));
-
-		/* move selection one location back */
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD3, 0),
-				"customSelectBack");
-		inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0),
-				"customSelectBack");
-		actions.put("customSelectBack", new SelectFromSelectedBack(model));
-
-	}
 
 	private static JToolBar createToolBar(Model model) {
 		JToolBar bar = new JToolBar();
@@ -159,7 +87,7 @@ public class MainContent {
 		JPanel[] out = new JPanel[screens];
 		for (int i = 0; i < out.length - 1; i++) {
 			out[i] = new JPanel();
-			registerKeyboard(out[i], model);
+//			registerKeyboard(out[i], model);
 			out[i].setLayout(new BorderLayout());
 			out[i].add(createToolBar(model), BorderLayout.PAGE_START);
 
@@ -196,7 +124,7 @@ public class MainContent {
 		JPanel[]out=new JPanel[1];
 		int last = out.length - 1;
 		out[last] = new JPanel();
-		registerKeyboard(out[last], model);
+//		registerKeyboard(out[last], model);
 		out[last].setLayout(new BorderLayout());
 		out[last].add(createToolBar(model), BorderLayout.PAGE_START);
 

@@ -9,6 +9,7 @@ import jargs.gnu.CmdLineParser.UnknownOptionException;
 
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -115,6 +116,7 @@ public class MainWindow implements WindowListener, Observer {
 		}
 		
 		
+		
 		GraphicsEnvironment ge = GraphicsEnvironment
 				.getLocalGraphicsEnvironment();
 		GraphicsDevice[] gs = ge.getScreenDevices();
@@ -129,6 +131,8 @@ public class MainWindow implements WindowListener, Observer {
 
 		model = new Model(window);
 		model.setSilent(true);
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new Hotkeys(model));
+		
 		/* Data specified on command line */
 		String cmdUrl = (String) parser.getOptionValue(urlO);
 		String cmdFile = (String) parser.getOptionValue(fileO);
