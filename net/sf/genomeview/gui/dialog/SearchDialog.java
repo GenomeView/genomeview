@@ -525,8 +525,10 @@ public class SearchDialog extends JDialog {
 							for (String key : f.getQualifiersKeys()) {
 								for (Qualifier q : f.qualifier(key)) {
 									if (q.getKey().toLowerCase().contains(lowerCaseText) || q.getValue().toLowerCase().contains(lowerCaseText)) {
-										features.add(f);
-										featuresSet.add(f);
+										if(!featuresSet.contains(f)){
+											features.add(f);
+											featuresSet.add(f);
+										}
 									}
 
 								}
