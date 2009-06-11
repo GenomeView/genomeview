@@ -119,8 +119,9 @@ public class Configuration {
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
 		for (String line : it) {
-			String[] arr = line.split("=");
-			defaultMap.put(arr[0].trim(), arr[1].trim());
+			String  key = line.substring(0,line.indexOf('='));
+			String  value = line.substring(line.indexOf('=')+1);
+			defaultMap.put(key.trim(), value.trim());
 		}
 		it.close();
 
@@ -142,8 +143,9 @@ public class Configuration {
 			it.setSkipBlanks(true);
 			it.setSkipComments(true);
 			for (String line : it) {
-				String[] arr = line.split("=");
-				localMap.put(arr[0].trim(), arr[1].trim());
+				String  key = line.substring(0,line.indexOf('='));
+				String  value = line.substring(line.indexOf('=')+1);
+				localMap.put(key.trim(), value.trim());
 			}
 			it.close();
 		}
