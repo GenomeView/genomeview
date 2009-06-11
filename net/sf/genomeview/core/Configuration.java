@@ -283,8 +283,9 @@ public class Configuration {
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
 		for (String line : it) {
-			String[] arr = line.split("=");
-			extraMap.put(arr[0].trim(), arr[1].trim());
+			String  key = line.substring(0,line.indexOf('='));
+			String  value = line.substring(line.indexOf('=')+1);
+			extraMap.put(key.trim(), value.trim());
 		}
 		it.close();
 
