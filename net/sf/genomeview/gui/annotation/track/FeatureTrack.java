@@ -50,10 +50,10 @@ public class FeatureTrack extends Track {
 	}
 
 	public FeatureTrack(Model model, Type type, boolean visible) {
-		super(model, visible);
+		super(model, visible,true);
 		hitmap = new CollisionMap(model);
 		this.type = type;
-		collapsible = true;
+		
 	}
 
 	@Override
@@ -66,7 +66,6 @@ public class FeatureTrack extends Track {
 		if (types.size() > Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
 			g.setColor(Color.BLACK);
 			g.drawString(type + ": Too many features to display, zoom in to see features", 10, yOffset + 10);
-			collapsible = false;
 			return 20 + 5;
 		} else {
 			CollisionMap fullBlockMap = new CollisionMap(model);

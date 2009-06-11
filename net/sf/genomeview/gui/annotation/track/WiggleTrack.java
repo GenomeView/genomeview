@@ -23,8 +23,7 @@ public class WiggleTrack extends Track {
 	private String name;
 
 	public WiggleTrack(String name, Model model, boolean b) {
-		super(model, b);
-		collapsible = true;
+		super(model, b,true);
 		this.name = name;
 	}
 

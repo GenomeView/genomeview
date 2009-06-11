@@ -15,7 +15,7 @@ import net.sf.jannot.Location;
 public class TickmarkTrack extends Track {
 
 	public TickmarkTrack(Model model) {
-		super(model,true);
+		super(model,true,false);
 	}
 
 	@Override

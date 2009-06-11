@@ -30,7 +30,7 @@ public class SyntenicTrack extends Track {
 	private int colors = 512;
 
 	public SyntenicTrack(Model model, Entry ref, Entry target) {
-		super(model, true);
+		super(model, true,false);
 		this.ref = ref;
 		this.target = target;
 		this.gradient = new ColorGradient();

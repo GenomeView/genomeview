@@ -17,9 +17,10 @@ public abstract class Track extends Observable {
 
 	protected Model model;
 
-	public Track(Model model, boolean visible) {
+	public Track(Model model, boolean visible, boolean collapsible) {
 		this.model = model;
 		this.visible = visible;
+		this.collapsible=collapsible;
 		this.addObserver(model);
 	}
 
@@ -87,10 +88,15 @@ public abstract class Track extends Observable {
 	public abstract int paint(Graphics g, Entry e, int yOffset, double width);
 
 	/* Keeps track of whether a track is collapsible */
-	protected boolean collapsible = false;
+	private boolean collapsible = false;
 	/* Keeps track of the actual collapse state of the track */
 	private boolean collapsed = false;
 
+	protected void setCollapsible(boolean collapsible){
+		this.collapsible=collapsible;
+		setChanged();
+		notifyObservers();
+	}
 	public void setCollapsed(boolean collapsed) {
 		this.collapsed = collapsed;
 		setChanged();

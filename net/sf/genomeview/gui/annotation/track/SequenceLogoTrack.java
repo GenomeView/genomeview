@@ -29,7 +29,7 @@ import net.sf.jannot.Location;
  */
 public class SequenceLogoTrack extends Track {
 	public SequenceLogoTrack(Model model) {
-		super(model, true);
+		super(model, true,false);
 	}
 	
 	@Override

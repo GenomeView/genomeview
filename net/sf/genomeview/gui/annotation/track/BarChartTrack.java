@@ -27,7 +27,7 @@ public class BarChartTrack extends Track {
 	private double max = Double.NEGATIVE_INFINITY;
 
 	public BarChartTrack(Model model, String name) {
-		super(model, true);
+		super(model, true,false);
 		this.name = name;
 
 	}

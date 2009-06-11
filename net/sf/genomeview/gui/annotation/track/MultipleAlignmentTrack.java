@@ -86,7 +86,7 @@ public class MultipleAlignmentTrack extends Track {
 	}
 
 	public MultipleAlignmentTrack(String name, int index, Model model, boolean b) {
-		super(model, b);
+		super(model, b,false);
 		this.index = index;
 		this.name = name;
 

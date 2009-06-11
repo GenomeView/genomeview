@@ -28,7 +28,7 @@ import be.abeel.util.DefaultHashMap;
 
 public class StructureTrack extends Track {
 	public StructureTrack(Model model) {
-		super(model, true);
+		super(model, true,false);
 		collisionMap = new CollisionMap(model);
 
 		// this.addMouseListener(this);
