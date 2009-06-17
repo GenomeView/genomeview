@@ -108,6 +108,10 @@ public class Model extends Observable implements IModel {
 		}
 		this.setAnnotationLocationVisible(new Location(1, 1));
 		this.setChromosomeLocationVisible(new Location(1, 1));
+		for(Entry e:entries){
+			e.deleteObservers();
+		}
+		loadedSources.clear();
 		entries.clear();
 		selectedEntry = null;
 		selectedLocation.clear();
@@ -1013,6 +1017,7 @@ public class Model extends Observable implements IModel {
 		refresh();
 	}
 
+	/* Cache of the sources that are currently loaded */
 	private Set<DataSource> loadedSources = new HashSet<DataSource>();
 
 	private int pressTrack;
