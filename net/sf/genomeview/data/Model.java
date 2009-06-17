@@ -38,6 +38,7 @@ import net.sf.jannot.Graph;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.SyntenicAnnotation;
+import net.sf.jannot.SyntenicBlock;
 import net.sf.jannot.Type;
 import net.sf.jannot.alignment.Alignment;
 import net.sf.jannot.alignment.ReferenceSequence;
@@ -732,8 +733,13 @@ public class Model extends Observable implements IModel {
 			System.out.println(data[i].getID());
 			System.out.println(entry(data[i].getID()));
 			Entry add = entry(data[i].getID());
-			if (add != null)
+			if (add != null){
+				for(SyntenicBlock sb:sa.getAll()){
+					
+				}
 				add.syntenic.addAll(sa);
+				
+			}
 			System.out.println("adding syntenic: " + sa);
 		}
 
@@ -782,7 +788,7 @@ public class Model extends Observable implements IModel {
 
 	public void addAlignment(DataSource source, Entry[] data) {
 
-		Entry ref = findEntry(data[0].getID());
+		Entry ref = entry(data[0].getID());
 		List<Alignment> list = new ArrayList<Alignment>();
 		ReferenceSequence rs = new ReferenceSequence(data[0].sequence);
 		for (int i = 0; i < data.length; i++) {
@@ -798,20 +804,20 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	/*
-	 * Looks in the list of loaded entries and returns the one with a matching
-	 * id. Null is returned when no entries match
-	 */
-	private Entry findEntry(String id) {
-		if (id == null)
-			return null;
-		for (Entry f : entries) {
-			if (id.equals(f.getID()))
-				return f;
-		}
-		return null;
-
-	}
+//	/*
+//	 * Looks in the list of loaded entries and returns the one with a matching
+//	 * id. Null is returned when no entries match
+//	 */
+//	private Entry findEntry(String id) {
+//		if (id == null)
+//			return null;
+//		for (Entry f : entries) {
+//			if (id.equals(f.getID()))
+//				return f;
+//		}
+//		return null;
+//
+//	}
 
 	public class TrackList extends CopyOnWriteArrayList<Track> {
 
@@ -877,7 +883,7 @@ public class Model extends Observable implements IModel {
 			return false;
 		}
 
-		public boolean containsSyntenicTarget(Entry ref, Entry target) {
+		public boolean containsSyntenicTarget(String ref, String target) {
 			for (Track track : this) {
 				if (track instanceof SyntenicTrack) {
 					SyntenicTrack st = ((SyntenicTrack) track);
@@ -937,13 +943,13 @@ public class Model extends Observable implements IModel {
 			if (!trackList.containsSequenceLogo() && e.alignment.numAlignments() > 0)
 				trackList.add(new SequenceLogoTrack(this));
 			/* Syntenic tracks */
-			Set<Entry> targets = e.syntenic.getTargets();
-			if (targets.size() > 0 && !trackList.containsSyntenicTarget(e, e)) {
-				trackList.add(new SyntenicTrack(this, e, e));
+			Set<String> targets = e.syntenic.getTargets();
+			if (targets.size() > 0 && !trackList.containsSyntenicTarget(e.getID(), e.getID())) {
+				trackList.add(new SyntenicTrack(this, e.getID(), e.getID()));
 			}
-			for (Entry t : targets) {
-				if (!trackList.containsSyntenicTarget(e, t))
-					trackList.add(new SyntenicTrack(this, e, t));
+			for (String t : targets) {
+				if (!trackList.containsSyntenicTarget(e.getID(), t))
+					trackList.add(new SyntenicTrack(this, e.getID(), t));
 			}
 
 		}
