@@ -32,7 +32,7 @@ public class LoadDirectoryAction extends AbstractAction {
 
 	public void actionPerformed(ActionEvent arg0) {
 		DataSource[] data = DataSourceFactory.create(
-				Sources.DIRECTORY, model);
+				Sources.DIRECTORY, model,null);
 
 		if (data != null) {
 			logger.info("Datasources=" + data.length);

@@ -6,6 +6,7 @@ package net.sf.genomeview.data;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -20,7 +21,7 @@ import net.sf.jannot.source.URLSource;
 import net.sf.jannot.source.DataSource.Sources;
 
 public class DataSourceFactory {
-	public static DataSource[] create(Sources source, Model model) {
+	public static DataSource[] create(Sources source, Model model, final String[] extensions) {
 		switch (source) {
 		case DIRECTORY:
 			try {
@@ -71,6 +72,49 @@ public class DataSourceFactory {
 			try {
 				JFileChooser chooser = new JFileChooser(Configuration
 						.getFile("lastDirectory"));
+				chooser.resetChoosableFileFilters();
+				if(extensions!=null){
+					
+					for(final String ext:extensions){
+						chooser.addChoosableFileFilter(new FileFilter(){
+
+							@Override
+							public boolean accept(File f) {
+								if(f.isDirectory())
+									return true;
+								return f.getName().endsWith(ext)||f.getName().endsWith(ext+".gz");
+							}
+
+							@Override
+							public String getDescription() {
+								return ext+" files";
+							}
+							
+						});
+					}
+					chooser.addChoosableFileFilter(new FileFilter(){
+
+						@Override
+						public boolean accept(File f) {
+							if(f.isDirectory())
+								return true;
+							for(String ext:extensions){
+								
+								if(f.getName().endsWith(ext)||f.getName().endsWith(ext+".gz")){
+									return true;
+								}
+							}
+							return false;
+						}
+
+						@Override
+						public String getDescription() {
+							return Arrays.toString(extensions);
+						}
+						
+					});
+				}
+				
 				chooser.setMultiSelectionEnabled(true);
 				int returnVal = chooser.showOpenDialog(model.getParent());
 				if (returnVal == JFileChooser.APPROVE_OPTION) {

@@ -29,7 +29,7 @@ public class LoadEntriesAction extends AbstractAction {
 
 	public void actionPerformed(ActionEvent arg0) {
 		DataSource[] data = DataSourceFactory.create(
-				Sources.LOCALFILE, model);
+				Sources.LOCALFILE, model,new String[]{"fasta","fa","fas","embl"});
 		if (data != null) {
 			for (DataSource ds : data) {
 				final ReadEntriesWorker rw = new ReadEntriesWorker(ds, model);
