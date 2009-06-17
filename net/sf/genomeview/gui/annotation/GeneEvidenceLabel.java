@@ -4,6 +4,7 @@
 package net.sf.genomeview.gui.annotation;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -19,6 +20,7 @@ import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
 import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack;
+import net.sf.genomeview.gui.annotation.track.StructureTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.jannot.Location;
 
@@ -217,8 +219,11 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		int mouseOffset=getMouseOffset(e);
 		Track mouseTrack = tracks.get(mouseOffset);
 		boolean consumed=false;
-		if (mouseTrack != null)
+		if (mouseTrack != null){
 			consumed=mouseTrack.mouseMoved(e.getX(), e.getY() - mouseOffset, e);
+			if(!(mouseTrack instanceof StructureTrack))
+				model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		}
 		if(consumed)
 			return;
 		/* Specific mouse code for this label */
