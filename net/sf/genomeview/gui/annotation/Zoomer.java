@@ -34,7 +34,6 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		System.out.println("rec:" + rec + "\t" + e.getX() + " " + e.getY());
 		if (e.getY() > rec.y && e.getY() < rec.y + rec.height) {
 			if (Math.abs(e.getX() - rec.x) < closeness) {
 				model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
