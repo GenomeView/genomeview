@@ -137,20 +137,6 @@ public class SyntenicTrack extends Track {
 								g.fill(r);
 								r.translate(0, -offset);
 								hitmap.put(r, sb);
-								/* Paint features */
-//								Entry targetEntry = model.entry(sb.target());
-//								if (targetEntry != null) {
-//									List<Feature> featureList = targetEntry.annotation.getByType(Type.get("CDS"), targetLoc);
-//									System.out.println(sb.target() + "\t" + featureList.size() + "\t" + targetLoc);
-//									if (featureList.size() < 100) {
-//										for (Feature f : featureList) {
-//											screenStart = Convert.translateGenomeToScreen(f.start(), model.getAnnotationLocationVisible(), width);
-//											screenEnd = Convert.translateGenomeToScreen(f.end(), model.getAnnotationLocationVisible(), width);
-//											g.setPaint(Configuration.getColor(Type.get("CDS")));
-//											g.fillRect(screenStart, offset + 2, screenEnd - screenStart + 1, 10);
-//										}
-//									}
-//								}
 							} catch (Exception x) {
 								System.err.println(refLoc);
 								System.err.println(colorBlockLength);
