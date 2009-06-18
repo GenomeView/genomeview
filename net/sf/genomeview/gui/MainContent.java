@@ -24,7 +24,6 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.annotation.AnnotationFrame;
-import net.sf.genomeview.gui.chromosome.ChromosomeFrame;
 import net.sf.genomeview.gui.components.AAMappingChooser;
 import net.sf.genomeview.gui.information.InformationFrame;
 import net.sf.genomeview.gui.menu.edit.RedoAction;
@@ -38,14 +37,7 @@ public class MainContent {
 
 	private static final long serialVersionUID = -2304899922750491897L;
 
-	// private AnnotationFrame af;
-	//
-	private static JSplitPane annotChrom;
-
-	//
-	// public MainContent(Model model) {
-	//       
-	// }
+	
 
 
 	private static JToolBar createToolBar(Model model) {
@@ -91,30 +83,20 @@ public class MainContent {
 			out[i].setLayout(new BorderLayout());
 			out[i].add(createToolBar(model), BorderLayout.PAGE_START);
 
-			annotChrom = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-
-			annotChrom.setTopComponent(new ChromosomeFrame(i,model));
+			
+			
 			AnnotationFrame af = new AnnotationFrame(i,model);
 			af.setPreferredSize(screen);
-			annotChrom.setBottomComponent(af);
+		
 
-			out[i].add(annotChrom, BorderLayout.CENTER);
+			out[i].add(af, BorderLayout.CENTER);
 		}
 		int last = out.length - 1;
 		out[last] = new JPanel();
 		out[last].setLayout(new BorderLayout());
 		out[last].add(new InformationFrame(model));
 
-		model.addObserver(new Observer() {
-			public void update(Observable o, Object arg) {
-				Model model = (Model) o;
-				boolean tmp = model.isAnnotationVisible();
-				if (tmp && (annotVisible ^ tmp)) {
-					annotChrom.resetToPreferredSizes();
-				}
-				annotVisible = tmp;
-			}
-		});
+		
 		return out;
 	}
 
@@ -133,14 +115,12 @@ public class MainContent {
 
 		leftContainer.setLayout(new BorderLayout());
 
-		annotChrom = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-
-		annotChrom.setTopComponent(new ChromosomeFrame(last,model));
+	
 		AnnotationFrame af = new AnnotationFrame(last,model);
 		af.setPreferredSize(screen);
-		annotChrom.setBottomComponent(af);
+		
 
-		leftContainer.add(annotChrom, BorderLayout.CENTER);
+		leftContainer.add(af, BorderLayout.CENTER);
 
 		leftRight.setLeftComponent(leftContainer);
 		leftRight.setRightComponent(new InformationFrame(model));
@@ -149,7 +129,7 @@ public class MainContent {
 		return out;
 	}
 
-	private static boolean annotVisible = false;
+	
 
 }
 

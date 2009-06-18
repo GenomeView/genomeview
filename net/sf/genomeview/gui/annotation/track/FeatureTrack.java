@@ -18,6 +18,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JWindow;
+import javax.swing.border.Border;
+
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
@@ -49,10 +54,10 @@ public class FeatureTrack extends Track {
 	}
 
 	public FeatureTrack(Model model, Type type, boolean visible) {
-		super(model, visible,true);
+		super(model, visible, true);
 		hitmap = new CollisionMap(model);
 		this.type = type;
-		
+
 	}
 
 	@Override
@@ -97,20 +102,9 @@ public class FeatureTrack extends Track {
 				// TODO is this not always the case?
 				if (x2 > 0) {
 
-				
-
 					int maxX = x2;
 
-					// // modify collision box only when the names will be
-					// // displayed.
-					// if (model.isShowTextOnStructure(type) && name != null) {
-					//
-					// Rectangle2D stringSize = g.getFontMetrics()
-					// .getStringBounds(name.getValue(), g);
-					// if (x1 + stringSize.getMaxX() > maxX)
-					// maxX = x1 + (int) stringSize.getMaxX() + 1;
-					//
-					// }
+					
 					/*
 					 * How close can items be together before they are
 					 * considered overlapping?
@@ -138,7 +132,6 @@ public class FeatureTrack extends Track {
 					 * are ordered from left to right.
 					 */
 					SortedSet<Location> loc = rf.location();
-					
 
 					/* Draw rectangles that are the features */
 					ArrayList<Rectangle> rectList = new ArrayList<Rectangle>();
@@ -204,7 +197,7 @@ public class FeatureTrack extends Track {
 						drawRects(g, rectList, FillMode.DRAW);
 
 					}
-					
+
 					/*
 					 * If the first location takes more than 50 px, we draw name
 					 * of the feature in it
@@ -213,15 +206,15 @@ public class FeatureTrack extends Track {
 						int a = Convert.translateGenomeToScreen(loc.first().start(), model.getAnnotationLocationVisible(), width);
 						int b = Convert.translateGenomeToScreen(loc.first().end() + 1, model.getAnnotationLocationVisible(), width);
 						if (b - a > 100) {
-							Font resetFont=g.getFont();
+							Font resetFont = g.getFont();
 							g.setColor(c.darker().darker().darker());
-							g.setFont(new Font("SansSerif",Font.PLAIN,10));
-							g.drawString(rf.toString(), a+5, thisLine * lineThickness + yOffset+9);
+							g.setFont(new Font("SansSerif", Font.PLAIN, 10));
+							g.drawString(rf.toString(), a + 5, thisLine * lineThickness + yOffset + 9);
 							g.setFont(resetFont);
 						}
 
 					}
-					
+
 				}
 			}
 			if (Configuration.getBoolean("showTrackName")) {
@@ -257,6 +250,12 @@ public class FeatureTrack extends Track {
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean mouseExited(int x,int y,MouseEvent e){
+		floatingWindow.set(null, e);
+		return false;
+	}
 
 	private void drawRects(Graphics g, ArrayList<Rectangle> rectList, FillMode fm) {
 		Point lastPoint = null;
@@ -279,6 +278,57 @@ public class FeatureTrack extends Track {
 			lastPoint = new Point(rect.x + rect.width, rect.y + rect.height / 2);
 		}
 
+	}
+
+	private FeatureInfoWindow floatingWindow=new FeatureInfoWindow();
+
+	private class FeatureInfoWindow extends JWindow {
+
+		private static final long serialVersionUID = -7416732151483650659L;
+
+		private JLabel floater = new JLabel();
+
+		public FeatureInfoWindow() {
+			floater.setBackground(Color.GRAY);
+			floater.setForeground(Color.BLACK);
+			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
+			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+			add(floater);
+			pack();
+		}
+
+		public void set(Set<Feature> features,MouseEvent e) {
+			if (features==null || features.size() == 0){
+				floater.setText("");
+				setVisible(false);
+			}else {
+				StringBuffer text = new StringBuffer();
+				text.append("<html>");
+				for (Feature f : features) {
+					text.append("Name : " + f.toString() + "<br />");
+					text.append("Start : " + f.start() + "<br />");
+					text.append("End : " + f.end() + "<br />");
+
+				}
+				text.append("</html>");
+				if (!text.toString().equals(floater.getText())) {
+					floater.setText(text.toString());
+					setLocation(e.getXOnScreen()+ 5, e
+							.getYOnScreen() + 5);
+					this.pack();
+					setVisible(true);
+				}
+			}
+		}
+
+	}
+
+	@Override
+	public boolean mouseMoved(int x, int y, MouseEvent e) {
+		Set<Feature> hits = hitmap.featureHits(x,e.getY());
+		floatingWindow.set(hits,e);
+		return false;
 	}
 
 	@Override

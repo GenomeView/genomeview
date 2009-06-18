@@ -792,7 +792,7 @@ public class StructureTrack extends Track {
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent e) {
-		if (!collisionMap.nearBorder(x, y))
+		if (!collisionMap.nearBorder(x, e.getY()))
 			model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		else
 			model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));

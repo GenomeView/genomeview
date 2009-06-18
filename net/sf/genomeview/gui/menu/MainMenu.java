@@ -42,9 +42,6 @@ import net.sf.genomeview.gui.menu.selection.ShowSequenceWindowAction;
 import net.sf.genomeview.gui.menu.selection.ZoomToSelectedFeaturesAction;
 import net.sf.genomeview.gui.menu.selection.ZoomToSelectedLocationAction;
 import net.sf.genomeview.gui.menu.selection.ZoomToSelectionAction;
-import net.sf.genomeview.gui.menu.view.ChromosomeToggle;
-import net.sf.genomeview.gui.menu.view.EvidenceToggle;
-import net.sf.genomeview.gui.menu.view.StructureToggle;
 
 public class MainMenu extends JMenuBar {
 
@@ -105,15 +102,6 @@ public class MainMenu extends JMenuBar {
 		select.add(new ZoomToSelectedLocationAction(model));
 		add(select);
 
-		// Toggle buttons to show or hide the separate frames.
-		JMenu view = new JMenu("View");
-
-		// view.addSeparator();
-		view.add(new ChromosomeToggle(model));
-		view.add(new StructureToggle(model));
-		view.add(new EvidenceToggle(model));
-		// view.add(nfBox);
-		add(view);
 
 		JMenu plugin = new JMenu("Plugins");
 		model.getGUIManager().registerPluginMenu(plugin);

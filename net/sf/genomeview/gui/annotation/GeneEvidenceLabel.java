@@ -213,6 +213,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	}
 
+	private Track last=null;
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		/* Transfer MouseEvent to corresponding track */
@@ -220,6 +221,12 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		Track mouseTrack = tracks.get(mouseOffset);
 		boolean consumed=false;
 		if (mouseTrack != null){
+			if(last!=mouseTrack){
+				if(last!=null)
+					last.mouseExited(e.getX(), e.getY() - mouseOffset, e);
+				last=mouseTrack;
+				mouseTrack.mouseEntered(e.getX(), e.getY() - mouseOffset, e);
+			}
 			consumed=mouseTrack.mouseMoved(e.getX(), e.getY() - mouseOffset, e);
 			if(!(mouseTrack instanceof StructureTrack))
 				model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));

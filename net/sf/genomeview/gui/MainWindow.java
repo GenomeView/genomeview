@@ -73,14 +73,6 @@ public class MainWindow implements WindowListener, Observer {
 		Option fileO = parser.addHelp(parser.addStringOption("file"),
 				"Start GenomeView with data loaded from a file.");
 		
-
-		Option hideChromViewO = parser.addHelp(parser
-				.addBooleanOption("hideCV"), "Hides the chromosome panel.");
-		Option hideStructureViewO = parser.addHelp(parser
-				.addBooleanOption("hideSV"), "Hides the structure panel.");
-		Option hideEvidenceViewO = parser.addHelp(parser
-				.addBooleanOption("hideEV"), "Hides the evidence panel.");
-
 		Option configurationO = parser.addHelp(
 				parser.addStringOption("config"),
 				"Provide additional configuration to load.");
@@ -172,18 +164,7 @@ public class MainWindow implements WindowListener, Observer {
 			}
 		} 
 
-		/* Which panels to hide */
-		Boolean hideChromView = (Boolean) parser.getOptionValue(hideChromViewO,
-				Boolean.FALSE);
-		Boolean hideStructureView = (Boolean) parser.getOptionValue(
-				hideStructureViewO, Boolean.FALSE);
-		Boolean hideEvidenceView = (Boolean) parser.getOptionValue(
-				hideEvidenceViewO, Boolean.FALSE);
-
-		model.setChromosomeVisible(!hideChromView);
-		model.setStructureVisible(!hideStructureView);
-		model.setAnnotationVisible(!hideEvidenceView);
-
+	
 		
 
 		JPanel[] content = MainContent.createContent(model, Configuration
