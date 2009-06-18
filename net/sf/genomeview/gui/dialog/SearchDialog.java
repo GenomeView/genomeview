@@ -485,6 +485,7 @@ public class SearchDialog extends JDialog {
 	class KeywordSearchResultModel extends AbstractTableModel {
 
 		private ArrayList<Feature> features = new ArrayList<Feature>();
+		private ArrayList<Entry> entries = new ArrayList<Entry>();
 
 		private Set<Feature> featuresSet = new HashSet<Feature>();
 
@@ -494,15 +495,17 @@ public class SearchDialog extends JDialog {
 			this.model = model;
 		}
 
+		private String[]columns=new String[]{"Entry","Feature"};
 		@Override
 		public String getColumnName(int col) {
-			return "Feature";
+			
+			return columns[col];
 
 		}
 
 		@Override
 		public int getColumnCount() {
-			return 1;
+			return 2;
 		}
 
 		@Override
@@ -512,7 +515,19 @@ public class SearchDialog extends JDialog {
 
 		@Override
 		public Object getValueAt(int row, int col) {
-			return features.get(row);
+			switch(col){
+			case 0:
+				return entries.get(row);
+			case 1:
+				return features.get(row);
+			}
+			return null;
+			
+		}
+		
+		public Entry getEntry(int row){
+			return entries.get(row);
+			
 		}
 
 		public void search(String text) {
@@ -527,6 +542,7 @@ public class SearchDialog extends JDialog {
 									if (q.getKey().toLowerCase().contains(lowerCaseText) || q.getValue().toLowerCase().contains(lowerCaseText)) {
 										if(!featuresSet.contains(f)){
 											features.add(f);
+											entries.add(e);
 											featuresSet.add(f);
 										}
 									}
@@ -648,6 +664,9 @@ public class SearchDialog extends JDialog {
 				public void mouseClicked(MouseEvent e) {
 					int row = resultTable.getSelectedRow();
 					Feature f = srm.getFeature(row);
+					Entry entry=srm.getEntry(row);
+					if(model.getSelectedEntry()!=entry)
+						model.setSelectedEntry(entry);
 					model.setLocationSelection(f);
 					double border = 0.05 * (f.end() - f.start());
 					model.setAnnotationLocationVisible(new Location((int) (f.start() - border), (int) (f.end() + border)));
