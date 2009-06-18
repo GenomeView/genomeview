@@ -553,6 +553,7 @@ public class SearchDialog extends JDialog {
 					}
 				}
 			}
+			
 			fireTableDataChanged();
 
 		}
@@ -563,6 +564,7 @@ public class SearchDialog extends JDialog {
 
 		public void clear() {
 			features.clear();
+			entries.clear();
 			featuresSet.clear();
 			fireTableDataChanged();
 		}
