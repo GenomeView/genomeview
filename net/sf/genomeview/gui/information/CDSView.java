@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.annotation;
+package net.sf.genomeview.gui.information;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

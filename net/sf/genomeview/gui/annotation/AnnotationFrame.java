@@ -21,6 +21,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.information.CDSView;
 import net.sf.genomeview.gui.menu.navigation.AnnotationMoveRightAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationZoomInAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationZoomOutAction;
@@ -99,8 +100,8 @@ public class AnnotationFrame extends GridBagPanel implements Observer {
             cgc.gridy = 0;
             cgc.gridheight = 2;
             cgc.weightx = 1;
-            cgc.weighty = 0;
-            add(new CDSView(model), cgc);
+            cgc.weighty = 1;
+            add(new Zoomer(model), cgc);
 
             cgc.gridheight = 1;
             cgc.gridx++;
