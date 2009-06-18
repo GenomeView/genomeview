@@ -733,12 +733,9 @@ public class Model extends Observable implements IModel {
 			System.out.println(data[i].getID());
 			System.out.println(entry(data[i].getID()));
 			Entry add = entry(data[i].getID());
-			if (add != null){
-				for(SyntenicBlock sb:sa.getAll()){
-					
-				}
+			if (add != null) {
 				add.syntenic.addAll(sa);
-				
+
 			}
 			System.out.println("adding syntenic: " + sa);
 		}
@@ -789,35 +786,37 @@ public class Model extends Observable implements IModel {
 	public void addAlignment(DataSource source, Entry[] data) {
 
 		Entry ref = entry(data[0].getID());
-		List<Alignment> list = new ArrayList<Alignment>();
-		ReferenceSequence rs = new ReferenceSequence(data[0].sequence);
-		for (int i = 0; i < data.length; i++) {
-			System.out.println(data[i].getID());
-			Alignment align = new Alignment(data[i].getID(), data[i].sequence, rs);
-			list.add(align);
-			System.out.println("adding alignment: " + align);
-		}
-		ref.alignment.addAll(list);
+		if (ref != null) {
+			List<Alignment> list = new ArrayList<Alignment>();
+			ReferenceSequence rs = new ReferenceSequence(data[0].sequence);
+			for (int i = 0; i < data.length; i++) {
+				System.out.println(data[i].getID());
+				Alignment align = new Alignment(data[i].getID(), data[i].sequence, rs);
+				list.add(align);
+				System.out.println("adding alignment: " + align);
+			}
+			ref.alignment.addAll(list);
 
-		loadedSources.add(source);
-		updateTracklist();
+			loadedSources.add(source);
+			updateTracklist();
+		}
 
 	}
 
-//	/*
-//	 * Looks in the list of loaded entries and returns the one with a matching
-//	 * id. Null is returned when no entries match
-//	 */
-//	private Entry findEntry(String id) {
-//		if (id == null)
-//			return null;
-//		for (Entry f : entries) {
-//			if (id.equals(f.getID()))
-//				return f;
-//		}
-//		return null;
-//
-//	}
+	// /*
+	// * Looks in the list of loaded entries and returns the one with a matching
+	// * id. Null is returned when no entries match
+	// */
+	// private Entry findEntry(String id) {
+	// if (id == null)
+	// return null;
+	// for (Entry f : entries) {
+	// if (id.equals(f.getID()))
+	// return f;
+	// }
+	// return null;
+	//
+	// }
 
 	public class TrackList extends CopyOnWriteArrayList<Track> {
 
