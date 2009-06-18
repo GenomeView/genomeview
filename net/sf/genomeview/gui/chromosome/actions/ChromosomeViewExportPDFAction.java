@@ -14,7 +14,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.chromosome.ChromosomeView;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
-
 import be.abeel.graphics.GraphicsFileExport;
 import be.abeel.io.ExtensionManager;
 

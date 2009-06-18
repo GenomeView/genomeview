@@ -29,7 +29,6 @@ import javax.swing.JPanel;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.data.source.MobySource;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.gui.task.ReadEntriesWorker;
 import net.sf.genomeview.gui.task.ReadFeaturesWorker;
@@ -73,8 +72,7 @@ public class MainWindow implements WindowListener, Observer {
 
 		Option fileO = parser.addHelp(parser.addStringOption("file"),
 				"Start GenomeView with data loaded from a file.");
-		Option bogasO = parser.addHelp(parser.addStringOption("bogas"),
-				"Start GenomeView with BOGAS data");
+		
 
 		Option hideChromViewO = parser.addHelp(parser
 				.addBooleanOption("hideCV"), "Hides the chromosome panel.");
@@ -136,7 +134,7 @@ public class MainWindow implements WindowListener, Observer {
 		/* Data specified on command line */
 		String cmdUrl = (String) parser.getOptionValue(urlO);
 		String cmdFile = (String) parser.getOptionValue(fileO);
-		final String cmdBogas = (String) parser.getOptionValue(bogasO);
+	
 
 		/*
 		 * Select data source. If an URL or file are specified on the command
@@ -146,7 +144,7 @@ public class MainWindow implements WindowListener, Observer {
 		 * If both file and url are specified, the URL is loaded.
 		 */
 		DataSource[] data = null;
-		if (cmdFile == null && cmdUrl == null && cmdBogas == null) {
+		if (cmdFile == null && cmdUrl == null) {
 			logger.info("File, url and bogas options are null!");
 			// Sources source = (Sources) JOptionPane.showInputDialog(window,
 			// "Select main data source", "Data selection",
@@ -172,17 +170,7 @@ public class MainWindow implements WindowListener, Observer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} else if (cmdBogas != null) {
-			logger.info("BOGAS commandline option is set: " + cmdBogas);
-			try {
-				data = new DataSource[] { new MobySource(new URI(cmdBogas)
-						.toURL()) };
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
+		} 
 
 		/* Which panels to hide */
 		Boolean hideChromView = (Boolean) parser.getOptionValue(hideChromViewO,

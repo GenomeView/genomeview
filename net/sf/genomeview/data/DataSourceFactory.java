@@ -13,10 +13,9 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.data.source.MobySource;
 import net.sf.jannot.source.DataSource;
-import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.source.FileSource;
+import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.source.URLSource;
 import net.sf.jannot.source.DataSource.Sources;
 
@@ -128,17 +127,6 @@ public class DataSourceFactory {
 				} else {
 					return null;
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			break;
-		// return new LocalFileSource(model);
-		case BIOMOBY:
-			try {
-				URL mobyurl = new URI(JOptionPane.showInputDialog(
-						model.getParent(), "Give the URL of the data").trim())
-						.toURL();
-				return new DataSource[] { new MobySource(mobyurl) };
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -38,7 +38,6 @@ import net.sf.jannot.Graph;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.SyntenicAnnotation;
-import net.sf.jannot.SyntenicBlock;
 import net.sf.jannot.Type;
 import net.sf.jannot.alignment.Alignment;
 import net.sf.jannot.alignment.ReferenceSequence;

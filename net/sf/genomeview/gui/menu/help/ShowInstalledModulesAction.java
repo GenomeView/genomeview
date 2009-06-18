@@ -12,7 +12,6 @@ import javax.swing.JOptionPane;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.plugin.PluginLoader;
 
-import org.java.plugin.PluginManager;
 import org.java.plugin.registry.PluginDescriptor;
 
 

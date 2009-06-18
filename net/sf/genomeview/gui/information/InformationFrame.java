@@ -5,20 +5,12 @@ package net.sf.genomeview.gui.information;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.Arrays;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 
-import net.sf.genomeview.core.DisplayType;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.plugin.IValueFeature;
-
 import be.abeel.gui.GridBagPanel;
 
 /**

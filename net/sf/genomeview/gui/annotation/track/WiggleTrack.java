@@ -10,7 +10,6 @@ import java.awt.geom.GeneralPath;
 import java.util.SortedMap;
 
 import net.sf.genomeview.core.ColorFactory;
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Entry;

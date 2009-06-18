@@ -3,17 +3,12 @@
  */
 package net.sf.genomeview.gui.information;
 
-import java.awt.Color;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.ImageIcon;
-import javax.swing.JColorChooser;
 import javax.swing.table.AbstractTableModel;
 
-import net.sf.genomeview.core.ColorIcon;
-import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.DisplayType;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;

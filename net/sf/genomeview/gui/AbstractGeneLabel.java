@@ -5,7 +5,6 @@ package net.sf.genomeview.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.Observable;
@@ -15,7 +14,6 @@ import javax.swing.JLabel;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.jannot.Location;
 
 /**

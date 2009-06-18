@@ -12,18 +12,12 @@ import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 
-import be.abeel.util.Config;
-
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.ColorGradient;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.jannot.Entry;
-import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.SyntenicBlock;
-import net.sf.jannot.Type;
 
 /**
  * Track to display syntenic information.

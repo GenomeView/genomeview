@@ -5,7 +5,6 @@ package net.sf.genomeview.gui.annotation.track;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;

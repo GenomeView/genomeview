@@ -3,22 +3,17 @@
  */
 package net.sf.genomeview.gui.information;
 
-import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
-import javax.swing.JColorChooser;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ToolTipManager;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.DisplayType;
 import net.sf.genomeview.data.Model;
-import net.sf.jannot.Type;
 
 public class TrackTable extends JTable {
 

@@ -1,14 +1,13 @@
 package junit.model;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Entry;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.source.DataSource;
-import net.sf.jannot.source.FileSource;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestClear {
 

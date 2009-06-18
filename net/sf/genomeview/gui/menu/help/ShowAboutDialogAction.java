@@ -4,10 +4,6 @@
 package net.sf.genomeview.gui.menu.help;
 
 import java.awt.event.ActionEvent;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Properties;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;

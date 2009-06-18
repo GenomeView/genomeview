@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.menu.edit;
 
 import java.awt.event.ActionEvent;
 import java.util.Observable;
+
 import javax.swing.ImageIcon;
 
 import net.sf.genomeview.data.Model;
