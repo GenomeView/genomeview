@@ -32,7 +32,7 @@ public class LoadFeaturesAction extends AbstractAction {
         Sources source = (Sources) JOptionPane.showInputDialog(model.getParent(), "Select feature source",
                 "Data selection", JOptionPane.INFORMATION_MESSAGE, null, Sources.values(), Sources.values()[0]);
         if (source != null) {
-            DataSource[] data = DataSourceFactory.create(source, model,new String[]{"gff","gff3","maln","syn","wig","mfa"});
+            DataSource[] data = DataSourceFactory.create(source, model,new String[]{"gff","gff3","maln","syn","wig","mfa","bed"});
             if (data != null) {
                 for (DataSource ds : data) {
                 	final ReadFeaturesWorker rw = new ReadFeaturesWorker(ds, model);
