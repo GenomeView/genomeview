@@ -6,11 +6,10 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.CubicCurve2D;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -21,6 +20,8 @@ import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Location;
 
 public class Zoomer extends JLabel implements Observer, MouseMotionListener, MouseListener {
+
+	private static final long serialVersionUID = -6554830611969076297L;
 
 	private Model model;
 
@@ -103,12 +104,25 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 		int start = Convert.translateGenomeToScreen(current.start(), full, dim.width);
 		int end = Convert.translateGenomeToScreen(current.end(), full, dim.width);
 		g.setColor(Color.BLACK);
-		g.drawLine(0, dim.height / 2, dim.width, dim.height / 2);
-		rec = new Rectangle(start, dim.height / 2 - 10, end - start + 1, 20);
+		g.drawLine(0, 10, dim.width, 10);
+		rec = new Rectangle(start, 0, end - start + 1, 20);
 		g.setColor(Color.BLUE);
 		g.fill(rec);
 		g.setColor(Color.blue.darker());
-		g.draw(rec);
+		g.draw(rec);		
+		CubicCurve2D.Double curveLeft=new CubicCurve2D.Double(
+				0,this.getSize().height-1,
+				rec.x/2.0,this.getSize().height-1,
+				rec.x,rec.y+rec.height+15,
+				rec.x,rec.y+rec.height);
+		g.draw(curveLeft);
+		
+		CubicCurve2D.Double curveRight=new CubicCurve2D.Double(
+				rec.x+rec.width,rec.y+rec.height,
+				rec.x+rec.width,rec.y+rec.height+15,
+				rec.x+rec.width+(this.getSize().width-rec.x-rec.width)/5.0,this.getSize().height-1,
+				this.getSize().width,this.getSize().height-1);
+		g.draw(curveRight);
 	}
 
 	@Override
