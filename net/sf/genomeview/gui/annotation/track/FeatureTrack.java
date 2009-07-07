@@ -241,11 +241,6 @@ public class FeatureTrack extends Track {
 			model.setLocationSelection(featHit);
 			int l = featHit.length();
 			model.setAnnotationLocationVisible(new Location(featHit.start() - (l / 20), featHit.end() + (l / 20)));
-
-			if (!featHit.overlaps(model.getChromosomeLocationVisible())) {
-				int featCenter = featHit.start() + featHit.length() / 2;
-				model.centerChromView(featCenter);
-			}
 			return true;
 		}
 		return false;

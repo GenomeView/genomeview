@@ -21,7 +21,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.information.CDSView;
 import net.sf.genomeview.gui.menu.navigation.AnnotationMoveRightAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationZoomInAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationZoomOutAction;
@@ -35,22 +34,14 @@ import be.abeel.gui.GridBagPanel;
  * @author Thomas Abeel
  * 
  */
-public class AnnotationFrame extends GridBagPanel implements Observer {
+public class AnnotationFrame extends GridBagPanel {
 
     private static final long serialVersionUID = 1L;
 
-    Model model;
-
     private GeneEvidenceLabel evidenceLabel;
-
-//    private GeneStructureLabel structureLabel;
 
     /* The supplied index is the index of the window that this panel is located. */
     public AnnotationFrame(int index, Model model) {
-        this.model = model;
-
-        model.addObserver(this);
-
         gc.fill = GridBagConstraints.BOTH;
         gc.weightx = 1;
         gc.weighty = 10;
@@ -178,14 +169,6 @@ public class AnnotationFrame extends GridBagPanel implements Observer {
 
     }
 
-    @Override
-    public void update(Observable arg0, Object arg1) {
-        if (!model.isAnnotationVisible() && !model.isStructureVisible()) {
-            this.setVisible(false);
-        } else {
-            this.setVisible(true);
-        }
-        this.repaint();
-    }
+
 
 }

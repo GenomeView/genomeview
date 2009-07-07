@@ -590,10 +590,6 @@ public class StructureTrack extends Track {
 					int st = f.start() - (l / 20);
 					int en = f.end() + (l / 20);
 					model.setAnnotationLocationVisible(new Location(st, en));
-					if (!f.overlaps(model.getChromosomeLocationVisible())) {
-						int featCenter = f.start() + f.length() / 2;
-						model.centerChromView(featCenter);
-					}
 				}
 
 			}

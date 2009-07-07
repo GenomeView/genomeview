@@ -67,7 +67,7 @@ public class Model extends Observable implements IModel {
 		for (Type t : tmp1)
 			strack.setTypeVisible(t, true);
 
-		Set<Type> tmp = Configuration.getTypeSet("visibleTypes");
+		Configuration.getTypeSet("visibleTypes");
 		updateTracklist();
 
 	}
@@ -107,7 +107,6 @@ public class Model extends Observable implements IModel {
 			e.deleteObservers();
 		}
 		this.setAnnotationLocationVisible(new Location(1, 1));
-		this.setChromosomeLocationVisible(new Location(1, 1));
 		for (Entry e : entries) {
 			e.deleteObservers();
 		}
@@ -190,68 +189,6 @@ public class Model extends Observable implements IModel {
 		return parent;
 	}
 
-	// private Map<Type, DisplayType> displayTypeMapping = new HashMap<Type,
-	// DisplayType>();
-	//
-	// public DisplayType getDisplayType(Type type) {
-	// if (displayTypeMapping.containsKey(type)) {
-	// return displayTypeMapping.get(type);
-	// } else {
-	// String sdt = Configuration.get("DT_" + type);
-	// if (sdt != null)
-	// return DisplayType.valueOf(sdt);
-	// else
-	// return DisplayType.MultiLineBlocks;
-	// }
-	//
-	// }
-	//
-	// @Override
-	// public void setDisplayType(Type type, DisplayType dt) {
-	// displayTypeMapping.put(type, dt);
-	// refresh();
-	//
-	// }
-
-	private Map<Type, Boolean> visibleOnChromosome = new DefaultHashMap<Type, Boolean>(Boolean.FALSE);
-
-	public boolean isVisibleOnChromosome(Type ct) {
-		return visibleOnChromosome.get(ct);
-	}
-
-	// private Map<Type, Boolean> showTextOnStructure = new DefaultHashMap<Type,
-	// Boolean>(
-	// Boolean.FALSE);
-
-	// public boolean isShowText(Type ct) {
-	// return showTextOnStructure.get(ct);
-	// }
-
-	private Map<Type, Boolean> showChromText = new DefaultHashMap<Type, Boolean>(Boolean.FALSE);
-
-	public boolean isShowChromText(Type ct) {
-		return showChromText.get(ct);
-	}
-
-	// private Map<Type, Boolean> visibleOnAnnotation = new DefaultHashMap<Type,
-	// Boolean>(
-	// Boolean.FALSE);
-
-	// public boolean isVisibleOnAnnotation(Type ct) {
-	// return visibleOnAnnotation.get(ct);
-	// }
-	//
-	// public void setShowText(Type type, boolean b) {
-	// showTextOnStructure.put(type, b);
-	// refresh();
-	// }
-	//
-	public void setShowChromText(Type type, boolean b) {
-		showChromText.put(type, b);
-		refresh();
-
-	}
-
 	/* Keeps track of individually hidden features. */
 	private Map<Feature, Boolean> featureVisible = new DefaultHashMap<Feature, Boolean>(Boolean.TRUE);
 
@@ -265,12 +202,6 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	// /**
-	// * Provides a mapping between the Entry and the associated value features.
-	// */
-	// private Map<Entry, List<IValueFeature>> valueFeatures = new
-	// DefaultHashMap<Entry, List<IValueFeature>>(
-	// new ArrayList<IValueFeature>());
 
 	private boolean silent;
 
@@ -439,102 +370,12 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	private boolean annotationAvailable = true;
-
-	private boolean annotationVisible = true;
-
-	public boolean isAnnotationAvailable() {
-		return annotationAvailable;
-	}
-
-	public boolean isAnnotationVisible() {
-		return annotationVisible && annotationAvailable;
-	}
-
-	private boolean structureAvailable = true;
-
-	private boolean structureVisible = true;
-
-	public boolean isStructureAvailable() {
-		return structureAvailable;
-	}
-
-	public boolean isStructureVisible() {
-		return structureVisible && structureAvailable;
-	}
-
-	public boolean isChromosomeAvailable() {
-		return chromosomeAvailable;
-	}
-
-	/* Flag to indicate whether the chromosome panel is visible */
-	private boolean chromosomeVisible = true;
-
-	private boolean chromosomeAvailable = true;
-
-	public boolean isChromosomeVisible() {
-		return chromosomeVisible && chromosomeAvailable;
-	}
 
 	public boolean isExitRequested() {
 		return exitRequested;
 	}
 
-	// public void setVisibleOnAnnotation(Type type, boolean b) {
-	// visibleOnAnnotation.put(type, b);
-	// refresh();
-	//
-	// }
-	//
-	public void setVisibleOnChromosome(Type type, boolean b) {
-		visibleOnChromosome.put(type, b);
-		refresh();
-
-	}
-
-	//
-	// public boolean isShowTextOnStructure(Type type) {
-	// return showTextOnStructure.get(type);
-	// }
-
-	public int getLongestChromosomeLength() {
-		int longest = 0;
-		for (Entry e : entries)
-			if (e.sequence.size() > longest)
-				longest = e.sequence.size();
-		return longest;
-		// return selectedGenomeCache.getLongestSequenceLength();
-	}
-
-	public Location getChromosomeLocationVisible() {
-		return new Location(chrStart, chrEnd);
-
-	}
-
-	private int chrStart;
-
-	private int chrEnd;
-
-	public void setChromosomeLocationVisible(Location r) {
-		int newStart = r.start();
-		int newEnd = r.end();
-		if (newStart > newEnd) {
-			return;
-		}
-		if (newStart > 1) {
-			this.chrStart = newStart;
-		} else {
-			this.chrStart = 1;
-		}
-
-		if (newEnd < getLongestChromosomeLength()) {
-			this.chrEnd = newEnd;
-		} else {
-			this.chrEnd = getLongestChromosomeLength();
-		}
-		refresh();
-	}
-
+	
 	private ArrayList<Highlight> highlights = new ArrayList<Highlight>();
 
 	public class Highlight {
@@ -584,25 +425,7 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	/**
-	 * Center the ChromosomeView on a certain position, while maintaining the
-	 * zoom level of the view.
-	 */
-	public void centerChromView(int genomePosition) {
-		int chromLengtVis = getChromosomeLocationVisible().length();
-		int viewStart = genomePosition - chromLengtVis / 2;
-		int viewEnd = viewStart + chromLengtVis - 1;
-		if (viewStart < 1) {
-			viewStart = 1;
-			viewEnd = chromLengtVis;
-		}
-		if (viewEnd > getLongestChromosomeLength()) {
-			viewEnd = getLongestChromosomeLength();
-			viewStart = viewEnd - chromLengtVis + 1;
-		}
-		setChromosomeLocationVisible(new Location(viewStart, viewEnd));
-	}
-
+	
 	/**
 	 * Contains all selected locations, these can be subcomponents of a Feature.
 	 */
@@ -610,26 +433,10 @@ public class Model extends Observable implements IModel {
 
 	public void addLocationSelection(Location rl) {
 		selectedLocation.add(rl);
-		checkChromosomeVisibility();
 		refresh();
 	}
 
-	private void checkChromosomeVisibility() {
-		if (this.getLocationSelection().size() > 0) {
-			boolean someThingVisible = false;
-			Location r = this.getChromosomeLocationVisible();
-			for (Location l : this.getLocationSelection()) {
-				if (r.overlaps(l)) {
-					someThingVisible = true;
-				}
-			}
-			if (!someThingVisible) {
-				Location l = this.getLocationSelection().first();
-				int center = (l.start() + l.end()) / 2;
-				this.centerChromView(center);
-			}
-		}
-	}
+	
 
 	public SortedSet<Location> getLocationSelection() {
 		return selectedLocation;
@@ -639,7 +446,6 @@ public class Model extends Observable implements IModel {
 		selectedLocation.clear();
 		for (Location l : rl.location())
 			selectedLocation.add(l);
-		checkChromosomeVisibility();
 		refresh();
 
 	}
@@ -650,22 +456,7 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	public void setStructureVisible(boolean b) {
-		this.structureVisible = b;
-		refresh();
-
-	}
-
-	public final void setAnnotationVisible(boolean annotationVisible) {
-		this.annotationVisible = annotationVisible;
-		refresh();
-	}
-
-	public final void setChromosomeVisible(boolean chromosomeVisible) {
-		this.chromosomeVisible = chromosomeVisible;
-		refresh();
-	}
-
+	
 	public void removeLocationSelection(Location rl) {
 
 		selectedLocation.remove(rl);
@@ -688,7 +479,6 @@ public class Model extends Observable implements IModel {
 			if (selectedEntry == null) {
 				selectedEntry = e;
 				setAnnotationLocationVisible(new Location(1, 10000));
-				setChromosomeLocationVisible(new Location(1, selectedEntry.sequence.size()));
 			}
 
 		}
@@ -1070,40 +860,9 @@ public class Model extends Observable implements IModel {
 	 * @param pressTrack
 	 */
 	public void setSelectedTrack(int pressTrack) {
-
 		this.pressTrack = pressTrack;
-
 	}
-
-	/**
-	 * The feature that is hovered over in the ChromosomeView
-	 */
-	private Feature hoveredChromFeature;
-
-	public void setHoveredChromFeature(Feature feat) {
-		if (feat != hoveredChromFeature) {
-			hoveredChromFeature = feat;
-			refresh();
-		}
-	}
-
-	public Feature getHoveredChromFeature() {
-		return hoveredChromFeature;
-	}
-
-	private Entry hoveredChromEntry;
-
-	public void setHoverChromEntry(Entry e) {
-		if (e != hoveredChromEntry) {
-			hoveredChromEntry = e;
-			refresh();
-		}
-	}
-
-	public Entry getHoveredChromEntry() {
-		return hoveredChromEntry;
-	}
-
+	
 	private GUIManager guimanager = new GUIManager();
 
 	public GUIManager getGUIManager() {

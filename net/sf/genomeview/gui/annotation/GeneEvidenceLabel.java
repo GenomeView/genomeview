@@ -24,8 +24,7 @@ import net.sf.genomeview.gui.annotation.track.StructureTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.jannot.Location;
 
-public class GeneEvidenceLabel extends AbstractGeneLabel implements
-		MouseListener, MouseMotionListener {
+public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListener, MouseMotionListener {
 
 	private static final long serialVersionUID = -8338383664013028337L;
 
@@ -38,9 +37,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		model.addObserver(this);
 		// TODO 200 pixels for evidence should be a portion of the screen
 		// instead of hard coded
-		this
-				.setPreferredSize(new Dimension(this.getPreferredSize().width,
-						200));
+		this.setPreferredSize(new Dimension(this.getPreferredSize().width, 200));
 
 	}
 
@@ -50,12 +47,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		this.setVisible(model.isAnnotationVisible());
-		if (this.isVisible()) {
-			revalidate();
-			repaint();
-		}
-		super.update(arg0, arg1);
+		repaint();
 
 	}
 
@@ -81,8 +73,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	private int currentBackgroundIndex = 0;
 
-	private Color[] background = new Color[] { new Color(204, 238, 255, 100),
-			new Color(255, 255, 204, 100) };
+	private Color[] background = new Color[] { new Color(204, 238, 255, 100), new Color(255, 255, 204, 100) };
 
 	@Override
 	public void paintComponent(Graphics g) {
@@ -94,14 +85,11 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 		for (Track track : model.getTrackList()) {
 			if (track.isVisible()) {
-				int height = track.paint(g, model.getSelectedEntry(),
-						framePixelsUsed, screenWidth);
+				int height = track.paint(g, model.getSelectedEntry(), framePixelsUsed, screenWidth);
 
-				if (track instanceof FeatureTrack
-						|| track instanceof MultipleAlignmentTrack) {
+				if (track instanceof FeatureTrack || track instanceof MultipleAlignmentTrack) {
 
-					Rectangle r = new Rectangle(0, framePixelsUsed,
-							(int) screenWidth + 1, height);
+					Rectangle r = new Rectangle(0, framePixelsUsed, (int) screenWidth + 1, height);
 
 					g.setColor(background[currentBackgroundIndex]);
 					g.fillRect(r.x, r.y, r.width, r.height);
@@ -109,7 +97,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 					currentBackgroundIndex++;
 					currentBackgroundIndex %= background.length;
 				}
-				
+
 				if (height > 0)
 					tracks.put(framePixelsUsed, track);
 				framePixelsUsed += height;
@@ -118,22 +106,20 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		// FIXME paintSelectedLocation(g, model.getAnnotationLocationVisible());
 
 		if (this.getPreferredSize().height != framePixelsUsed) {
-			this.setPreferredSize(new Dimension(this.getPreferredSize().width,
-					framePixelsUsed));
+			this.setPreferredSize(new Dimension(this.getPreferredSize().width, framePixelsUsed));
 			this.invalidate();
 			this.getParent().validate();
 			revalidate();
 
 		}
 		g.setColor(new Color(120, 120, 120, 120));
-		g.drawLine(currentMouseX, 0, currentMouseX,
-				this.getPreferredSize().height);
+		g.drawLine(currentMouseX, 0, currentMouseX, this.getPreferredSize().height);
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		/* Transfer MouseEvent to corresponding track */
-		int mouseOffset=getMouseOffset(e);
+		int mouseOffset = getMouseOffset(e);
 		Track mouseTrack = tracks.get(mouseOffset);
 		if (mouseTrack != null)
 			mouseTrack.mouseEntered(e.getX(), e.getY() - mouseOffset, e);
@@ -144,7 +130,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 	@Override
 	public void mouseExited(MouseEvent e) {
 		/* Transfer MouseEvent to corresponding track */
-		int mouseOffset=getMouseOffset(e);
+		int mouseOffset = getMouseOffset(e);
 		Track mouseTrack = tracks.get(mouseOffset);
 		if (mouseTrack != null)
 			mouseTrack.mouseExited(e.getX(), e.getY() - mouseOffset, e);
@@ -161,12 +147,12 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 	@Override
 	public void mousePressed(MouseEvent e) {
 		/* Transfer MouseEvent to corresponding track */
-		int mouseOffset=getMouseOffset(e);
+		int mouseOffset = getMouseOffset(e);
 		Track mouseTrack = tracks.get(mouseOffset);
-		boolean consumed=false;
+		boolean consumed = false;
 		if (mouseTrack != null)
-			consumed=mouseTrack.mousePressed(e.getX(), e.getY() - mouseOffset, e);
-		if(consumed)
+			consumed = mouseTrack.mousePressed(e.getX(), e.getY() - mouseOffset, e);
+		if (consumed)
 			return;
 		/* Specific mouse code for this label */
 		pressLoc = model.getAnnotationLocationVisible();
@@ -177,12 +163,12 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		/* Transfer MouseEvent to corresponding track */
-		int mouseOffset=getMouseOffset(e);
+		int mouseOffset = getMouseOffset(e);
 		Track mouseTrack = tracks.get(mouseOffset);
-		boolean consumed=false;
+		boolean consumed = false;
 		if (mouseTrack != null)
-			consumed=mouseTrack.mouseReleased(e.getX(), e.getY() - mouseOffset, e);
-		if(consumed)
+			consumed = mouseTrack.mouseReleased(e.getX(), e.getY() - mouseOffset, e);
+		if (consumed)
 			return;
 		/* Specific mouse code for this label */
 		pressLoc = null;
@@ -192,12 +178,12 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		/* Transfer MouseEvent to corresponding track */
-		int mouseOffset=getMouseOffset(e);
+		int mouseOffset = getMouseOffset(e);
 		Track mouseTrack = tracks.get(mouseOffset);
-		boolean consumed=false;
+		boolean consumed = false;
 		if (mouseTrack != null)
-			consumed=mouseTrack.mouseDragged(e.getX(), e.getY() - mouseOffset, e);
-		if(consumed)
+			consumed = mouseTrack.mouseDragged(e.getX(), e.getY() - mouseOffset, e);
+		if (consumed)
 			return;
 		/* Specific mouse code for this label */
 
@@ -213,25 +199,26 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	}
 
-	private Track last=null;
+	private Track last = null;
+
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		/* Transfer MouseEvent to corresponding track */
-		int mouseOffset=getMouseOffset(e);
+		int mouseOffset = getMouseOffset(e);
 		Track mouseTrack = tracks.get(mouseOffset);
-		boolean consumed=false;
-		if (mouseTrack != null){
-			if(last!=mouseTrack){
-				if(last!=null)
+		boolean consumed = false;
+		if (mouseTrack != null) {
+			if (last != mouseTrack) {
+				if (last != null)
 					last.mouseExited(e.getX(), e.getY() - mouseOffset, e);
-				last=mouseTrack;
+				last = mouseTrack;
 				mouseTrack.mouseEntered(e.getX(), e.getY() - mouseOffset, e);
 			}
-			consumed=mouseTrack.mouseMoved(e.getX(), e.getY() - mouseOffset, e);
-			if(!(mouseTrack instanceof StructureTrack))
+			consumed = mouseTrack.mouseMoved(e.getX(), e.getY() - mouseOffset, e);
+			if (!(mouseTrack instanceof StructureTrack))
 				model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
-		if(consumed)
+		if (consumed)
 			return;
 		/* Specific mouse code for this label */
 		currentMouseX = e.getX();
@@ -241,12 +228,12 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		/* Transfer MouseEvent to corresponding track */
-		int mouseOffset=getMouseOffset(e);
+		int mouseOffset = getMouseOffset(e);
 		Track mouseTrack = tracks.get(mouseOffset);
-		boolean consumed=false;
+		boolean consumed = false;
 		if (mouseTrack != null)
-			consumed=mouseTrack.mouseClicked(e.getX(), e.getY() - mouseOffset, e);
-		if(consumed)
+			consumed = mouseTrack.mouseClicked(e.getX(), e.getY() - mouseOffset, e);
+		if (consumed)
 			return;
 		/* Specific mouse code for this label */
 		if (Mouse.button2(e) || Mouse.button3(e)) {
