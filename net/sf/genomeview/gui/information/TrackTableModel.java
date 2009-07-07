@@ -27,30 +27,24 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 	@Override
 	public String getColumnName(int column) {
 		switch (column) {
+		
 		case 0:
-			return "Type";
-		case 3:
-			return "Annotation visibility";
-		case 1:
-			return "Chromosome visibility";
-		case 2:
 			return "Structure visibility";
-
-		case 4:
-			return "ChromText";
-		case 5:
+		case 1:
+			return "Annotation visibility";
+		case 2:
 			return "Collapsed";
-		case 6:
-			return "";
-		case 7:
-			return "";
+		case 3:
+			return "up";
+		case 4:
+			return "down";
 		default:
-			return "no name";
+			return "Track name";
 
 		}
 	}
 
-	private static final long serialVersionUID = 1999579168557221399L;
+	private static final long serialVersionUID = 19995791685221399L;
 
 	private Model model;
 
@@ -68,7 +62,7 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 
 	@Override
 	public int getColumnCount() {
-		return 8;
+		return 6;
 	}
 
 	@Override
@@ -79,7 +73,7 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 	@Override
 	public Class<?> getColumnClass(int arg0) {
 		switch (arg0) {
-		case 0:
+		case 5:
 			return Track.class;
 
 		default:
@@ -91,26 +85,10 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 	public Object getValueAt(int row, int col) {
 		Track track = model.getTrackList().get(row);
 		switch (col) {
+		
+		
+		
 		case 0:
-			return track.displayName();
-		case 3:
-			if (model.getTrackList().get(row).isVisible()) {
-				return Icons.YES;
-			} else {
-				return Icons.NO;
-			}
-		case 1:
-			if (track instanceof FeatureTrack) {
-				Type ct = ((FeatureTrack) track).getType();
-				if (model.isVisibleOnChromosome(ct)) {
-					return Icons.YES;
-				} else {
-					return Icons.NO;
-				}
-			} else {
-				return Icons.BDASH;
-			}
-		case 2:
 			if (track instanceof FeatureTrack) {
 				Type ct = ((FeatureTrack) track).getType();
 				if (getStructureTrack().isTypeVisible(ct)) {
@@ -121,20 +99,13 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 			} else {
 				return Icons.BDASH;
 			}
-
-		case 4:
-			if (track instanceof FeatureTrack) {
-				Type ct = ((FeatureTrack) track).getType();
-				if (model.isShowChromText(ct)) {
-					return Icons.YES;
-				} else {
-					return Icons.NO;
-				}
+		case 1:
+			if (model.getTrackList().get(row).isVisible()) {
+				return Icons.YES;
 			} else {
-				return Icons.BDASH;
+				return Icons.NO;
 			}
-
-		case 5:
+		case 2:
 			if (track.isCollapsible()) {
 				if (track.isCollapsed()) {
 					return Icons.YES;
@@ -145,12 +116,13 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 				return Icons.BDASH;
 			}
 
-		case 6:
+		case 3:
 			return Icons.UP_ARROW;
-		case 7:
+		case 4:
 			return Icons.DOWN_ARROW;
+		default: return track.displayName();
 		}
-		return null;
+		
 
 	}
 
@@ -164,19 +136,9 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 
 	public void mouse(int column, int row) {
 		Track track = model.getTrackList().get(row);
-		if (column == 3) {
-			model.getTrackList().get(row).setVisible(
-					!model.getTrackList().get(row).isVisible());
-
-		}
-		if (column == 1) {
-			if (track instanceof FeatureTrack) {
-				Type type = ((FeatureTrack) track).getType();
-				model.setVisibleOnChromosome(type, !model
-						.isVisibleOnChromosome(type));
-			}
-		}
-		if (column == 2) {
+		
+		
+		if (column == 0) {
 			StructureTrack strack = getStructureTrack();
 			if (track instanceof FeatureTrack) {
 				Type type = ((FeatureTrack) track).getType();
@@ -186,21 +148,21 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 
 		}
 
-		if (column == 4) {
-			if (track instanceof FeatureTrack) {
-				Type type = ((FeatureTrack) track).getType();
-				model.setShowChromText(type, !model.isShowChromText(type));
-			}
+		if (column == 1) {
+			model.getTrackList().get(row).setVisible(
+					!model.getTrackList().get(row).isVisible());
+
 		}
-		if (column == 5) {
+		
+		if (column == 2) {
 			if (track.isCollapsible()) {
 				track.setCollapsed(!track.isCollapsed());
 			}
 		}
-		if (column == 6) {
+		if (column == 3) {
 			model.getTrackList().up(row);
 		}
-		if (column == 7) {
+		if (column == 4) {
 			model.getTrackList().down(row);
 		}
 

@@ -26,7 +26,7 @@ public class TrackTable extends JTable {
         /* Set column widths */
 //        setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //        getColumnModel().getColumn(0).setPreferredWidth(150);
-        for (int i = 1; i < this.getColumnCount(); i++){
+        for (int i = 0; i < this.getColumnCount()-1; i++){
             getColumnModel().getColumn(i).setPreferredWidth(20);
             getColumnModel().getColumn(i).setMaxWidth(50);
         }

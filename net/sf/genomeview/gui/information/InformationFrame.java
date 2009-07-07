@@ -45,7 +45,7 @@ public class InformationFrame extends GridBagPanel {
 
         gc.gridy++;
         gc.weighty = 0;
-        add(new JLabel("Annotation features"), gc);
+        add(new JLabel("Track list"), gc);
         gc.gridy++;
         gc.weighty = 1;
         add(new JScrollPane(featureTrackList), gc);
