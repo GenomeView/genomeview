@@ -31,7 +31,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 	private boolean inside = false;
 
 	private Location pressLocation;
-	private int closeness = 5;
+	private int closeness = 2;
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
