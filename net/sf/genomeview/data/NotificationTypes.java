@@ -22,7 +22,17 @@ public enum NotificationTypes {
 	/**
 	 * Indicates the event where a user selects another translation table.
 	 */
-	TRANSLATIONTABLECHANGE
+	TRANSLATIONTABLECHANGE,
+	
+	/**
+	 * Indicates that updateTracks was called.
+	 */
+	UPDATETRACKS,
+	
+	/**
+	 * The entry selection changed
+	 */
+	ENTRYCHANGED
 	;
 
 }

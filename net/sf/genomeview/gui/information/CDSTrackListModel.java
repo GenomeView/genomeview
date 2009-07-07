@@ -47,7 +47,7 @@ public class CDSTrackListModel extends AbstractTableModel implements Observer {
 	}
 
 	public void update(Observable o, Object arg) {
-		if (arg == NotificationTypes.GENERAL||arg == NotificationTypes.TRANSLATIONTABLECHANGE){
+		if (arg == NotificationTypes.GENERAL||arg == NotificationTypes.TRANSLATIONTABLECHANGE||arg == NotificationTypes.ENTRYCHANGED){
 			fireTableDataChanged();
 		}
 

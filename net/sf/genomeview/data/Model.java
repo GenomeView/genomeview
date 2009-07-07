@@ -176,7 +176,7 @@ public class Model extends Observable implements IModel {
 		this.selectedEntry = entry;
 		selectedLocation.clear();
 		selectedRegion = null;
-		refresh();
+		refresh(NotificationTypes.ENTRYCHANGED);
 
 	}
 
@@ -741,7 +741,7 @@ public class Model extends Observable implements IModel {
 			}
 
 		}
-		refresh();
+		refresh(NotificationTypes.UPDATETRACKS);
 
 	}
 
