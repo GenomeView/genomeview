@@ -30,8 +30,7 @@ public class CDSTrackListModel extends AbstractTableModel implements Observer {
      */
 	private static final long serialVersionUID = 320228141380099074L;
 
-	private String[] columns = { "Name", "Start", "Stop", "Internal stop",
-			"Splice sites", "Visible" };
+	private String[] columns = { "Name", "Start", "Stop", "Internal stop", "Splice sites"};
 
 	@Override
 	public String getColumnName(int column) {
@@ -47,7 +46,7 @@ public class CDSTrackListModel extends AbstractTableModel implements Observer {
 	}
 
 	public void update(Observable o, Object arg) {
-		if (arg == NotificationTypes.GENERAL||arg == NotificationTypes.TRANSLATIONTABLECHANGE||arg == NotificationTypes.ENTRYCHANGED){
+		if (arg == NotificationTypes.GENERAL || arg == NotificationTypes.TRANSLATIONTABLECHANGE || arg == NotificationTypes.ENTRYCHANGED) {
 			fireTableDataChanged();
 		}
 
@@ -60,7 +59,7 @@ public class CDSTrackListModel extends AbstractTableModel implements Observer {
 
 	@Override
 	public int getRowCount() {
-		return model.getSelectedEntry().annotation.noFeatures(Type.get("CDS"));
+		return model.getSelectedEntry().annotation.noFeatures(type);
 	}
 
 	@Override
@@ -72,7 +71,6 @@ public class CDSTrackListModel extends AbstractTableModel implements Observer {
 		case 2:
 		case 3:
 		case 4:
-		case 5:
 			return Icon.class;
 		default:
 			return String.class;
@@ -82,7 +80,7 @@ public class CDSTrackListModel extends AbstractTableModel implements Observer {
 	}
 
 	public Feature getFeature(int row) {
-		return model.getSelectedEntry().annotation.get(Type.get("CDS"), row);
+		return model.getSelectedEntry().annotation.get(type, row);
 	}
 
 	@Override
@@ -93,8 +91,7 @@ public class CDSTrackListModel extends AbstractTableModel implements Observer {
 		case 0:
 			return f;
 		case 1:
-			if (SequenceTools
-					.hasMissingStartCodon(seq, f, model.getAAMapping())) {
+			if (SequenceTools.hasMissingStartCodon(seq, f, model.getAAMapping())) {
 				return Icons.NO;
 			} else {
 				return Icons.YES;
@@ -106,8 +103,7 @@ public class CDSTrackListModel extends AbstractTableModel implements Observer {
 				return Icons.YES;
 			}
 		case 3:
-			if (SequenceTools
-					.hasInternalStopCodon(seq, f, model.getAAMapping())) {
+			if (SequenceTools.hasInternalStopCodon(seq, f, model.getAAMapping())) {
 				return Icons.NO;
 			} else {
 				return Icons.YES;
@@ -118,20 +114,25 @@ public class CDSTrackListModel extends AbstractTableModel implements Observer {
 			} else {
 				return Icons.YES;
 			}
-
-		case 5:
-			if (model.isFeatureVisible(f)) {
-				return Icons.YES;
-			} else
-				return Icons.NO;
 		default:
 			return null;
 		}
 	}
 
-	public int getRow(Feature first, Type type) {
-		return model.getSelectedEntry().annotation.getByType(type).indexOf(
-				first);
+	public int getRow(Feature first) {
+		return model.getSelectedEntry().annotation.getByType(type).indexOf(first);
+
+	}
+
+	private Type type = Type.get("CDS");
+
+	public Type getType() {
+		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
+		model.refresh(NotificationTypes.GENERAL);
 
 	}
 

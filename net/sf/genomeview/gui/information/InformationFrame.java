@@ -11,6 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.components.TypeCombo;
+import net.sf.jannot.Type;
 import be.abeel.gui.GridBagPanel;
 
 /**
@@ -31,7 +33,8 @@ public class InformationFrame extends GridBagPanel {
         gc.fill = GridBagConstraints.BOTH;
         gc.weightx = 1;
         gc.weighty = 1;
-
+        gc.gridwidth=2;
+     
         final SourceTrackTable sourceTrackList = new SourceTrackTable(model);
         gc.gridy++;
         gc.weighty = 0;
@@ -54,7 +57,16 @@ public class InformationFrame extends GridBagPanel {
         CDSOverviewTable annotationTrackList = new CDSOverviewTable(model);
 
         gc.weighty = 0;
-        add(new JLabel("Gene structures"), gc);
+        gc.gridwidth=1;
+        add(new JLabel("Features"), gc);
+        TypeCombo type=new TypeCombo(model);
+        type.setSelectedItem(Type.get("CDS"));
+        type.addActionListener(annotationTrackList);
+        gc.gridx++;
+        add(type, gc);
+        
+        gc.gridwidth=2;
+        gc.gridx--;
         gc.gridy++;
         gc.weighty = 1;
         add(new JScrollPane(annotationTrackList), gc);

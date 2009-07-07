@@ -3,6 +3,10 @@
  */
 package net.sf.genomeview.gui.components;
 
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
 import net.sf.genomeview.data.Model;
@@ -16,16 +20,42 @@ import net.sf.jannot.Type;
  */
 public class TypeCombo extends JComboBox {
 
-    private static final long serialVersionUID = 3311298470708351886L;
+	private static final long serialVersionUID = 3311298470708351886L;
 
-    public TypeCombo(Model model) {
-        for (Type ct : Type.values()) {
-            this.addItem(ct);
-        }
-    }
+	public TypeCombo(Model model) {
+		super(new TypeModel(model));
 
-    public Type getTerm() {
-        return (Type) this.getSelectedItem();
-    }
+	}
+
+	public Type getTerm() {
+		return (Type) this.getSelectedItem();
+	}
+
+}
+
+class TypeModel extends DefaultComboBoxModel implements Observer {
+
+	private static final long serialVersionUID = -5021594934465844712L;
+
+	public TypeModel(Model model) {
+		model.addObserver(this);
+	}
+
+	@Override
+	public Object getElementAt(int index) {
+
+		return Type.values()[index];
+	}
+
+	@Override
+	public int getSize() {
+		return Type.values().length;
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		fireContentsChanged(o, 0, Type.values().length);
+
+	}
 
 }

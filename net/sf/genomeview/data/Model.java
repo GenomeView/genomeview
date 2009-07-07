@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Set;
 import java.util.SortedSet;
@@ -188,20 +187,6 @@ public class Model extends Observable implements IModel {
 	public JFrame getParent() {
 		return parent;
 	}
-
-	/* Keeps track of individually hidden features. */
-	private Map<Feature, Boolean> featureVisible = new DefaultHashMap<Feature, Boolean>(Boolean.TRUE);
-
-	public boolean isFeatureVisible(Feature f) {
-		return featureVisible.get(f);
-	}
-
-	public void setFeatureVisible(Feature rf, boolean b) {
-		featureVisible.put(rf, b);
-		refresh();
-
-	}
-
 
 	private boolean silent;
 
@@ -761,15 +746,6 @@ public class Model extends Observable implements IModel {
 		this.selectedRegion = selectedRegion;
 		refresh();
 	}
-
-	public Set<Feature> getHighlightedFeatures() {
-		return highlightedRich;
-	}
-
-	/**
-	 * selected features and children/parents of selected features
-	 */
-	private SortedSet<Feature> highlightedRich = null;
 
 	public SortedSet<Feature> getFeatureSelection() {
 		SortedSet<Feature> out = new TreeSet<Feature>();

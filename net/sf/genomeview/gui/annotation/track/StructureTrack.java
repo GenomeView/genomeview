@@ -28,7 +28,7 @@ import be.abeel.util.DefaultHashMap;
 
 public class StructureTrack extends Track {
 	public StructureTrack(Model model) {
-		super(model, true,false);
+		super(model, true, false);
 		collisionMap = new CollisionMap(model);
 
 		// this.addMouseListener(this);
@@ -341,7 +341,7 @@ public class StructureTrack extends Track {
 		return null;
 	}
 
-	private void paintAminoAcidReadingFrame(Graphics g, boolean forward,int yOffset) {
+	private void paintAminoAcidReadingFrame(Graphics g, boolean forward, int yOffset) {
 		Location r = model.getAnnotationLocationVisible();
 		/* The width of a single nucleotide */
 		double width = screenWidth / (double) r.length();
@@ -350,17 +350,12 @@ public class StructureTrack extends Track {
 
 			char aa;
 			String codon;
-			if (forward){
-				aa = model.getSelectedEntry().sequence.getAminoAcid(i, model
-						.getAAMapping());
-			codon = "" + model.getSelectedEntry().sequence.getNucleotide(i) + model.getSelectedEntry().sequence.getNucleotide(i + 1)
-				+ model.getSelectedEntry().sequence.getNucleotide(i + 2);
-			}
-			else{
-				aa = model.getSelectedEntry().sequence.getReverseAminoAcid(i,
-						model.getAAMapping());
-				 codon = "" + model.getSelectedEntry().sequence.getReverseNucleotide(i + 2)
-				+ model.getSelectedEntry().sequence.getReverseNucleotide(i + 1) + model.getSelectedEntry().sequence.getReverseNucleotide(i);
+			if (forward) {
+				aa = model.getSelectedEntry().sequence.getAminoAcid(i, model.getAAMapping());
+				codon = "" + model.getSelectedEntry().sequence.getNucleotide(i) + model.getSelectedEntry().sequence.getNucleotide(i + 1) + model.getSelectedEntry().sequence.getNucleotide(i + 2);
+			} else {
+				aa = model.getSelectedEntry().sequence.getReverseAminoAcid(i, model.getAAMapping());
+				codon = "" + model.getSelectedEntry().sequence.getReverseNucleotide(i + 2) + model.getSelectedEntry().sequence.getReverseNucleotide(i + 1) + model.getSelectedEntry().sequence.getReverseNucleotide(i);
 			}
 			/* draw amino acid box */
 			int x = (int) (((i - r.start()) * width));
@@ -368,30 +363,24 @@ public class StructureTrack extends Track {
 			if (forward) {
 				y = (2 - ((frame + 2) % 3)) * lineHeight + gap;
 			} else {
-				y = tickHeight + 5 * lineHeight + (frame + 2) % 3 * lineHeight
-						+ gap;
+				y = tickHeight + 5 * lineHeight + (frame + 2) % 3 * lineHeight + gap;
 			}
 			int aa_width = (int) (width * 3);
 			int aa_height = lineHeight - 2 * gap;
 			/* Only color start and stop codons. */
-			if (Configuration.getBoolean("colorStopCodons")
-					&& model.getAAMapping().isStop(aa)) {
+			if (Configuration.getBoolean("colorStopCodons") && model.getAAMapping().isStop(aa)) {
 				g.setColor(Configuration.getAminoAcidColor(aa));
-				g.fillRect(x, y+ yOffset, aa_width == 0 ? 1 : aa_width, aa_height);
-			}
-			
-			if (Configuration.getBoolean("colorStartCodons")
-					&& model.getAAMapping().isStart(codon)) {
-				g.setColor(Configuration.getAminoAcidColor(aa));
-				g.fillRect(x, y+ yOffset, aa_width == 0 ? 1 : aa_width, aa_height);
+				g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width, aa_height);
 			}
 
-			if (model.getAnnotationLocationVisible().length() < Configuration
-					.getInt("geneStructureAminoAcidWindowVerticalBars")) {
+			if (Configuration.getBoolean("colorStartCodons") && model.getAAMapping().isStart(codon)) {
+				g.setColor(Configuration.getAminoAcidColor(aa));
+				g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width, aa_height);
+			}
+
+			if (model.getAnnotationLocationVisible().length() < Configuration.getInt("geneStructureAminoAcidWindowVerticalBars")) {
 				g.setColor(Color.black);
-				g
-						.drawLine(x + aa_width - 1, y+yOffset, x + aa_width - 1, y+yOffset
-								+ aa_height);
+				g.drawLine(x + aa_width - 1, y + yOffset, x + aa_width - 1, y + yOffset + aa_height);
 
 			}
 
@@ -399,15 +388,13 @@ public class StructureTrack extends Track {
 			 * Only show the actual letters when there is less than x bp
 			 * visible.
 			 */
-			if (model.getAnnotationLocationVisible().length() < Configuration
-					.getInt("geneStructureAminoAcidWindowLetters")) {
-				Rectangle2D stringSize = g.getFontMetrics().getStringBounds(
-						"" + aa, g);
+			if (model.getAnnotationLocationVisible().length() < Configuration.getInt("geneStructureAminoAcidWindowLetters")) {
+				Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + aa, g);
 
 				/* draw amino acid letter */
 				x = (int) (((i - r.start()) * width - stringSize.getWidth() / 2) + (width * 3 / 2));
 				y += lineHeight - 2 * gap;
-				g.drawString("" + aa, x, y+yOffset);
+				g.drawString("" + aa, x, y + yOffset);
 
 			}
 
@@ -438,11 +425,9 @@ public class StructureTrack extends Track {
 					for (Feature rf : trackData) {
 						if (!model.isSourceVisible(rf.getSource()))
 							continue;
-						if (model.isFeatureVisible(rf)) {
-							g.setColor(Color.BLACK);
-							renderCDS(g, rf, yOffset);
 
-						}
+						g.setColor(Color.BLACK);
+						renderCDS(g, rf, yOffset);
 
 					}
 				} else {

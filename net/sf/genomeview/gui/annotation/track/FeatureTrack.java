@@ -3,14 +3,12 @@
  */
 package net.sf.genomeview.gui.annotation.track;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -146,22 +144,7 @@ public class FeatureTrack extends Track {
 
 					}
 
-					if (model.getHighlightedFeatures() != null && model.getHighlightedFeatures().contains(rf)) {
-						Color backupColor = g.getColor();
-						Stroke backupStroke = g.getStroke();
-						float[] dashes = { 5f, 2f };
-						Stroke dashedStroke = new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10f, dashes, 0f);
-						// g.setStroke(new BasicStroke(2));
-						g.setStroke(dashedStroke);
-						g.setColor(Color.ORANGE);
-						drawRects(g, rectList, FillMode.DRAW);
-						g.setColor(backupColor);
-						g.setStroke(backupStroke);
-
-					}
 					g.setColor(c);
-					if (!model.isFeatureVisible(rf))
-						g.setColor(Color.LIGHT_GRAY);
 					drawRects(g, rectList, FillMode.FILL);
 					Color backColor = g.getColor();
 					g.setColor(g.getColor().darker());
