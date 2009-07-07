@@ -86,6 +86,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	public Zoomer(final Model model) {
 		this.model = model;
+		this.setPreferredSize(new Dimension(250,40));
 		model.addObserver(this);
 		addMouseMotionListener(this);
 		addMouseListener(this);
@@ -104,23 +105,25 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 		int start = Convert.translateGenomeToScreen(current.start(), full, dim.width);
 		int end = Convert.translateGenomeToScreen(current.end(), full, dim.width);
 		g.setColor(Color.BLACK);
-		g.drawLine(0, 10, dim.width, 10);
-		rec = new Rectangle(start, 0, end - start + 1, 20);
+		g.drawLine(0, 7, dim.width, 7);
+		rec = new Rectangle(start, 0, end - start + 1, 14);
 		g.setColor(Color.BLUE);
 		g.fill(rec);
 		g.setColor(Color.blue.darker());
 		g.draw(rec);		
 		CubicCurve2D.Double curveLeft=new CubicCurve2D.Double(
 				0,this.getSize().height-1,
-				rec.x/2.0,this.getSize().height-1,
-				rec.x,rec.y+rec.height+15,
+//				rec.x/2.0,this.getSize().height-1,
+				0,this.getSize().height-10,
+				rec.x,rec.y+rec.height+10,
 				rec.x,rec.y+rec.height);
 		g.draw(curveLeft);
 		
 		CubicCurve2D.Double curveRight=new CubicCurve2D.Double(
 				rec.x+rec.width,rec.y+rec.height,
-				rec.x+rec.width,rec.y+rec.height+15,
-				rec.x+rec.width+(this.getSize().width-rec.x-rec.width)/5.0,this.getSize().height-1,
+				rec.x+rec.width,rec.y+rec.height+10,
+//				rec.x+rec.width+(this.getSize().width-rec.x-rec.width)/5.0,this.getSize().height-1,
+				this.getSize().width,this.getSize().height-10,
 				this.getSize().width,this.getSize().height-1);
 		g.draw(curveRight);
 	}
