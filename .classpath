@@ -7,6 +7,6 @@
 	<classpathentry kind="lib" path="lib/ajt-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/jpf.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
-	<classpathentry kind="lib" path="lib/jannot-1.7.jar" sourcepath="Z:/workspace/JAnnot"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JAnnot"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

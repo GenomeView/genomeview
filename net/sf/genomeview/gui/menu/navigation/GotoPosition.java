@@ -25,7 +25,7 @@ public class GotoPosition extends AbstractModelAction {
     public void actionPerformed(ActionEvent arg0) {
         String input = JOptionPane.showInputDialog("Provide a coordinate");
         if (input != null) {
-            int i = Integer.parseInt(input);
+            int i = Integer.parseInt(input.trim());
             super.model.center(i);
         }
 
