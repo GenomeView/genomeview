@@ -11,7 +11,7 @@ import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.task.ReadEntriesWorker;
+import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSource.Sources;
 
@@ -37,7 +37,7 @@ public class LoadDirectoryAction extends AbstractAction {
 		if (data != null) {
 			logger.info("Datasources=" + data.length);
 			for (DataSource ds : data) {
-				final ReadEntriesWorker rw = new ReadEntriesWorker(ds, model);
+				final ReadWorker rw = new ReadWorker(ds, model);
 				rw.execute();
 			}
 		}

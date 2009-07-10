@@ -21,7 +21,7 @@ import net.sf.jannot.source.DataSource;
  * @author Thomas Abeel
  * 
  */
-public abstract class DataSourceWorker<T> extends SwingWorker<T, Void> {
+public abstract class DataSourceWorker extends SwingWorker<Void, Void> {
 
     protected DataSource source;
 
@@ -36,6 +36,6 @@ public abstract class DataSourceWorker<T> extends SwingWorker<T, Void> {
     }
 
     @Override
-    protected abstract T doInBackground();
+    protected abstract Void doInBackground();
 
 }

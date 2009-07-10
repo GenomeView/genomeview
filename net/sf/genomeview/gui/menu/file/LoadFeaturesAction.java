@@ -11,7 +11,7 @@ import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.task.ReadFeaturesWorker;
+import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSource.Sources;
 
@@ -27,15 +27,15 @@ public class LoadFeaturesAction extends AbstractAction {
         this.model = model;
 
     }
-
+	
     public void actionPerformed(ActionEvent arg0) {
         Sources source = (Sources) JOptionPane.showInputDialog(model.getParent(), "Select feature source",
                 "Data selection", JOptionPane.INFORMATION_MESSAGE, null, Sources.values(), Sources.values()[0]);
         if (source != null) {
-            DataSource[] data = DataSourceFactory.create(source, model,new String[]{"gff","gff3","maln","syn","wig","mfa","bed"});
+            DataSource[] data = DataSourceFactory.create(source, model,new String[]{"fasta","fa","fas","embl","fna","gff","gff3","maln","syn","wig","mfa","bed"});
             if (data != null) {
                 for (DataSource ds : data) {
-                	final ReadFeaturesWorker rw = new ReadFeaturesWorker(ds, model);
+                	final ReadWorker rw = new ReadWorker(ds, model);
                     rw.execute();
                 }
 

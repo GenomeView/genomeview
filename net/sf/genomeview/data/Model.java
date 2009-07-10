@@ -31,15 +31,12 @@ import net.sf.genomeview.gui.annotation.track.WiggleTrack;
 import net.sf.genomeview.plugin.GUIManager;
 import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.Entry;
+import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
-import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Graph;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
-import net.sf.jannot.SyntenicAnnotation;
 import net.sf.jannot.Type;
-import net.sf.jannot.alignment.Alignment;
-import net.sf.jannot.alignment.ReferenceSequence;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
@@ -49,14 +46,12 @@ import be.abeel.util.DefaultHashMap;
 public class Model extends Observable implements IModel {
 	private Logger logger = Logger.getLogger(Model.class.getCanonicalName());
 
-	private ArrayList<Entry> entries = new ArrayList<Entry>();;
+	private EntrySet entries = new EntrySet(null);
 
 	public Model(JFrame parent) {
 		this.parent = parent;
 		this.trackList = new TrackList(this);
-		for (Entry e : entries) {
-			e.addObserver(this);
-		}
+		entries.addObserver(this);
 		StructureTrack strack = new StructureTrack(this);
 		trackList.add(strack);
 		TickmarkTrack ticks = new TickmarkTrack(this);
@@ -89,7 +84,8 @@ public class Model extends Observable implements IModel {
 	}
 
 	public Entry entry(int index) {
-		return entries.get(index);
+		//FIXME still needed?
+		return entries.getEntry(index);
 	}
 
 	public void update(Observable arg0, Object arg) {
@@ -102,16 +98,9 @@ public class Model extends Observable implements IModel {
 	}
 
 	public void clearEntries() {
-		for (Entry e : entries) {
-			e.deleteObservers();
-		}
 		this.setAnnotationLocationVisible(new Location(1, 1));
-		for (Entry e : entries) {
-			e.deleteObservers();
-		}
 		loadedSources.clear();
 		entries.clear();
-		selectedEntry = null;
 		selectedLocation.clear();
 		selectedRegion = null;
 		clearTrackList(trackList);
@@ -130,15 +119,12 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	public List<Entry> entries() {
-		ArrayList<Entry> list = new ArrayList<Entry>();
-		for (Entry e : entries)
-			list.add(e);
-		return Collections.unmodifiableList(list);
+	public EntrySet entries() {
+		return entries;
 
 	}
 
-	private Entry selectedEntry = null;
+	
 
 	class DummyEntry extends Entry {
 		public DummyEntry() {
@@ -166,13 +152,13 @@ public class Model extends Observable implements IModel {
 	 */
 
 	public Entry getSelectedEntry() {
-		if (selectedEntry == null)
+		if (entries.size()==0)
 			return dummy;
-		return selectedEntry;
+		return entries.getEntry();
 	}
 
 	public void setSelectedEntry(Entry entry) {
-		this.selectedEntry = entry;
+		entries.setDefault(entry);
 		selectedLocation.clear();
 		selectedRegion = null;
 		refresh(NotificationTypes.ENTRYCHANGED);
@@ -456,26 +442,24 @@ public class Model extends Observable implements IModel {
 	 *            data source to load data from
 	 * @throws ReadFailedException
 	 */
-	public Entry[] addEntries(DataSource f) throws ReadFailedException {
-		Entry[] es = f.read();
-		for (Entry e : es) {
-			entries.add(e);
-			e.addObserver(this);
-			if (selectedEntry == null) {
-				selectedEntry = e;
-				setAnnotationLocationVisible(new Location(1, 10000));
-			}
-
+	public void addData(DataSource f) throws ReadFailedException {
+		boolean firstEntry=entries.size()==0;
+		System.out.println("Reading source:"+f);
+		f.read(entries);
+		if(firstEntry){
+			entries.getEntry();//select a default
+			setAnnotationLocationVisible(new Location(1, 10000));
 		}
-		logger.info("Model adding entries done!");
+
+		logger.info("Model adding data done!");
 		if (f instanceof MultiFileSource)
 			for (DataSource ds : ((MultiFileSource) f).getFileSources()) {
 				loadedSources.add(ds);
 			}
 		else
 			loadedSources.add(f);
+		updateTracklist();
 		refresh(NotificationTypes.GENERAL);
-		return es;
 	}
 
 	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(AminoAcidMapping.STANDARDCODE);
@@ -500,82 +484,11 @@ public class Model extends Observable implements IModel {
 		refresh();
 	}
 
-	public void addSyntenic(DataSource source, Entry[] data) {
+	
 
-		for (int i = 0; i < data.length; i++) {
-			SyntenicAnnotation sa = data[i].syntenic;
-			System.out.println(data[i].getID());
-			System.out.println(entry(data[i].getID()));
-			Entry add = entry(data[i].getID());
-			if (add != null) {
-				add.syntenic.addAll(sa);
 
-			}
-			System.out.println("adding syntenic: " + sa);
-		}
 
-		loadedSources.add(source);
-		updateTracklist();
-
-	}
-
-	/**
-	 * All data from the new stuff will be added to the existing annotation in
-	 * the selected entry.
-	 * 
-	 * If there is a seqid set and there already exists an Entry with this ID,
-	 * the features will be added to that Entry instead.
-	 * 
-	 * 
-	 * @throws ReadFailedException
-	 */
-	public void addFeatures(DataSource f, Entry[] data) throws ReadFailedException {
-		logger.info("adding features: " + f);
-
-		logger.info("entries read: " + data.length);
-
-		for (Entry e : data) {
-			FeatureAnnotation a = e.annotation;
-			Entry addTo = getSelectedEntry();
-			/* Check if any existing entry has the same name */
-			for (Entry g : entries) {
-				if (g.description.getID().equals(e.description.getID())) {
-					logger.info("adding to: " + g.getID());
-					addTo = g;
-				}
-			}
-			/* Add all features at once silently */
-			setSilent(true);
-			addTo.annotation.addAll(a);
-			addTo.graphs.addAll(e.graphs);
-			setSilent(false);
-		}
-		loadedSources.add(f);
-
-		updateTracklist();
-		// return data;
-
-	}
-
-	public void addAlignment(DataSource source, Entry[] data) {
-
-		Entry ref = entry(data[0].getID());
-		if (ref != null) {
-			List<Alignment> list = new ArrayList<Alignment>();
-			ReferenceSequence rs = new ReferenceSequence(data[0].sequence);
-			for (int i = 0; i < data.length; i++) {
-				System.out.println(data[i].getID());
-				Alignment align = new Alignment(data[i].getID(), data[i].sequence, rs);
-				list.add(align);
-				System.out.println("adding alignment: " + align);
-			}
-			ref.alignment.addAll(list);
-
-			loadedSources.add(source);
-			updateTracklist();
-		}
-
-	}
+	
 
 	// /*
 	// * Looks in the list of loaded entries and returns the one with a matching

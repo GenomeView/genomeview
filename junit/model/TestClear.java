@@ -2,6 +2,7 @@ package junit.model;
 
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Entry;
+import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.source.DataSource;
@@ -15,7 +16,7 @@ public class TestClear {
 	public void testClearEntries() {
 		Model model = new Model(null);
 		try {
-			model.addEntries(new TestDataSource());
+			model.addData(new TestDataSource());
 		} catch (ReadFailedException e) {
 
 			e.printStackTrace();
@@ -35,18 +36,19 @@ public class TestClear {
 			return false;
 		}
 
+	
+
 		@Override
-		public Entry[] read() throws ReadFailedException {
-			Entry[] out = new Entry[5];
-			for (int i = 0; i < out.length; i++)
-				out[i] = new Entry(null);
-			return out;
+		public void saveOwn(EntrySet entries) throws SaveFailedException {
+			// TODO Auto-generated method stub
+
 		}
 
 		@Override
-		public void saveOwn(Entry[] entries) throws SaveFailedException {
-			// TODO Auto-generated method stub
-
+		public EntrySet read(EntrySet add) throws ReadFailedException {
+			for(int i=0;i<5;i++)
+				add.getOrCreateEntry("entry"+i, null);
+			return add;
 		}
 
 	}

@@ -13,7 +13,7 @@ import net.sf.jannot.source.DataSource;
  * @author thpar
  * @author thabe
  */
-public class WriteEntriesWorker extends DataSourceWorker<Void> {
+public class WriteEntriesWorker extends DataSourceWorker {
 
     public WriteEntriesWorker(DataSource source, Model model) {
         super(source, model);
@@ -22,7 +22,7 @@ public class WriteEntriesWorker extends DataSourceWorker<Void> {
     @Override
     protected Void doInBackground() {
         try {
-            source.saveOwn(model.entries().toArray(new Entry[0]));
+            source.saveOwn(model.entries());
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

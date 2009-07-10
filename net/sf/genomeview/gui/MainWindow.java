@@ -30,8 +30,7 @@ import javax.swing.JPanel;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
-import net.sf.genomeview.gui.task.ReadEntriesWorker;
-import net.sf.genomeview.gui.task.ReadFeaturesWorker;
+import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
@@ -198,7 +197,7 @@ public class MainWindow implements WindowListener, Observer {
 		/* Load the source, if one was constructed */
 		if (data != null) {
 			assert (data.length == 1);
-			final ReadEntriesWorker rw = new ReadEntriesWorker(data[0], model);
+			final ReadWorker rw = new ReadWorker(data[0], model);
 			rw.execute();
 			rw.get();
 
@@ -211,14 +210,14 @@ public class MainWindow implements WindowListener, Observer {
 							&& !s.startsWith("https:")) {
 						DataSource ds = new FileSource(new File(s));
 						
-						ReadFeaturesWorker rf = new ReadFeaturesWorker(ds,
+						ReadWorker rf = new ReadWorker(ds,
 								model);
 						rf.execute();
 
 					} else {
 						DataSource ds = new URLSource(new URI(s).toURL());
 						
-						ReadFeaturesWorker rf = new ReadFeaturesWorker(ds,
+						ReadWorker rf = new ReadWorker(ds,
 								model);
 						rf.execute();
 					}
