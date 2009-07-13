@@ -161,6 +161,8 @@ public class Model extends Observable implements IModel {
 		entries.setDefault(entry);
 		selectedLocation.clear();
 		selectedRegion = null;
+		setAnnotationLocationVisible(getAnnotationLocationVisible());
+			
 		refresh(NotificationTypes.ENTRYCHANGED);
 
 	}
