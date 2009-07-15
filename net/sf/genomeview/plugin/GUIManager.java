@@ -4,6 +4,8 @@
 package net.sf.genomeview.plugin;
 
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JMenu;
@@ -16,21 +18,23 @@ import javax.swing.JMenu;
  */
 public class GUIManager {
 
-    private JMenu pluginMenu;
-	private JMenu pluginDoc;
+	/* There can be multiple menus as ther wil be one for each screen */
+    private List<JMenu> pluginMenu=new ArrayList<JMenu>();
+	private List<JMenu> pluginDoc=new ArrayList<JMenu>();
 
     public void registerPluginMenu(JMenu plugin) {
-        this.pluginMenu=plugin;
+        this.pluginMenu.add(plugin);
         
     }
     
     public void registerPluginDocumentationMenu(JMenu pluginDoc){
-    	this.pluginDoc=pluginDoc;
+    	this.pluginDoc.add(pluginDoc);
     }
     
 
     public void addPluginAction(Action a,String pathMenu){
-        getMenu(pluginMenu, pathMenu).add(a);
+    	for(JMenu menu:pluginMenu)
+    		getMenu(menu, pathMenu).add(a);
     }
     
     /**
@@ -85,7 +89,9 @@ public class GUIManager {
     }
 
 	public void addPluginDocumentation(Action a) {
-		pluginDoc.add(a);
+		for(JMenu menu:pluginDoc)
+    		menu.add(a);
+		
 	}
 
 }
