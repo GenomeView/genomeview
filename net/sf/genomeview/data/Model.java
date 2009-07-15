@@ -62,7 +62,7 @@ public class Model extends Observable implements IModel {
 			strack.setTypeVisible(t, true);
 
 		Configuration.getTypeSet("visibleTypes");
-		updateTracklist();
+		updateTracks();
 
 	}
 
@@ -460,7 +460,7 @@ public class Model extends Observable implements IModel {
 			}
 		else
 			loadedSources.add(f);
-		updateTracklist();
+		updateTracks();
 		refresh(NotificationTypes.GENERAL);
 	}
 
@@ -607,12 +607,12 @@ public class Model extends Observable implements IModel {
 
 	private TrackList trackList;
 
-	/*
-	 * Method keeps the track list up to date.
+	/**
+	 * This method keeps the track list up to date when adding new data to the entry from outside the model.
 	 * 
 	 * All types and graphs loaded should have a corresponding track.
 	 */
-	private synchronized void updateTracklist() {
+	public synchronized void updateTracks() {
 		for (Type t : Type.values()) {
 			if (!trackList.containsType(t))
 				trackList.add(new FeatureTrack(this, t, true));
@@ -653,6 +653,7 @@ public class Model extends Observable implements IModel {
 
 	private Location selectedRegion = null;
 
+	@Override
 	public final Location getSelectedRegion() {
 		return selectedRegion;
 	}

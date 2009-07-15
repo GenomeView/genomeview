@@ -28,7 +28,7 @@ public interface IModel extends Observer {
     public Entry getSelectedEntry();
 
     /**
-     * Returns the region that is currently selected.
+     * Returns the region that is currently selected. If nothin is selected, this method will return null.
      * 
      * @return the region of the sequence that is currently selected.
      */
@@ -39,5 +39,9 @@ public interface IModel extends Observer {
     public GUIManager getGUIManager();
     
     public void addTrack(Track track);
+
+	public void updateTracks();
+
+	public void addObserver(Observer observer);
 
 }
