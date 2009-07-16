@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="1.99" />
+	<property name="version" value="1.991" />
 	<property name="src" value="." />
 	<property name="build" value="build" />
 	<property name="lib" value="lib" />
@@ -81,7 +81,8 @@
 		<copy todir="${build}">
 			<fileset dir="${src}">
 				<include name="**/*.conf" />
-
+				<include name="org/java/**/*.properties" />
+				<include name="org/java/**/*.dtd" />
 			</fileset>
 		</copy>
 

@@ -1,0 +1,30 @@
+<html><body>
+
+<p>This package contains framework runtime API.</p>
+<p>The JPF consists of three major parts:</p>
+<ul>
+	<li>{@link org.java.plugin.registry.PluginRegistry Plug-in registry}
+		- the storage for meta information about all discovered plug-ins</li>
+	<li>{@link org.java.plugin.PathResolver Path resolver}
+		- the component, which knows all about where things are physically located</li>
+	<li>{@link org.java.plugin.PluginManager Plug-in manager}
+		- the framework runtime that loads and activates plug-ins</li>
+</ul>
+<p>Plug-in registry is a set of interfaces that abstract whole meta information
+	about plug-ins and plug-in fragments. The framework provides
+	standard implementation for these interfaces that is based on concept of
+	plug-in manifest as a special XML syntax file, created according to
+	<a href="{@docRoot}/../plugin_1_0.dtd">plug-in DTD</a>. But in any case,
+	the general rule is that manifest should be registered with plug-in
+	registry for every plug-in and plug-in fragment.</p>
+<p>The framework also provides standard implementation of path resolver,
+	which just maps plug-in manifests to context ("home") folder of
+	corresponding plug-ins.</p>
+<p>To get instances of any base Framework classes, use special
+	{@link org.java.plugin.ObjectFactory factory class} that knows what
+	implementation classes to load for plug-in registry, manager and path
+	resolver. For example, you can get instance of plug-in manager just in one
+	{@link org.java.plugin.ObjectFactory#createManager() method call}.
+	This makes usage of JPF very simple in most situations.</p>
+
+</body></html>
