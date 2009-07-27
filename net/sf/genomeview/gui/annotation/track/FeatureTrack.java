@@ -86,11 +86,10 @@ public class FeatureTrack extends Track {
 				Color c = Configuration.getColor("TYPE_" + rf.type());
 				if (Configuration.getBoolean("useColorQualifierTag")) {
 					List<Qualifier> notes = rf.qualifier("colour");
+					notes.addAll(rf.qualifier("color"));
 					if (notes.size() > 0) {
-						String[] arr = notes.get(0).getValue().split(" ");
-						if (arr.length == 3)
-							c = new Color(Integer.parseInt(arr[0]), Integer.parseInt(arr[1]), Integer.parseInt(arr[2]));
-
+						String val=notes.get(0).getValue();
+						c=Color.decode(val);
 					}
 				}
 				g.setColor(c);
@@ -144,7 +143,6 @@ public class FeatureTrack extends Track {
 
 					}
 
-					g.setColor(c);
 					drawRects(g, rectList, FillMode.FILL);
 					Color backColor = g.getColor();
 					g.setColor(g.getColor().darker());
