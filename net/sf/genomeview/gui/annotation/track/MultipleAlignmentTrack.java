@@ -4,6 +4,7 @@
 package net.sf.genomeview.gui.annotation.track;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
@@ -86,7 +87,7 @@ public class MultipleAlignmentTrack extends Track {
 	}
 
 	public MultipleAlignmentTrack(String name, int index, Model model, boolean b) {
-		super(model, b,false);
+		super(model, b, false);
 		this.index = index;
 		this.name = name;
 
@@ -182,9 +183,9 @@ public class MultipleAlignmentTrack extends Track {
 					}
 
 					g.fillRect((int) ((i - r.start()) * width), yOffset, (int) (width * grouping) + 1, lineHeigh);
-					if(align.sizeGapAfter(i)>0){
+					if (align.sizeGapAfter(i) > 0) {
 						g.setColor(Color.ORANGE);
-						g.fillRect((int) ((i - r.start()) * width+width*3/4), yOffset, (int) (width * grouping)/2 + 1, lineHeigh);
+						g.fillRect((int) ((i - r.start()) * width + width * 3 / 4), yOffset, (int) (width * grouping) / 2 + 1, lineHeigh);
 					}
 					if (model.getAnnotationLocationVisible().length() < 100) {
 						Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
@@ -199,9 +200,17 @@ public class MultipleAlignmentTrack extends Track {
 						g.drawString("" + nt, (int) (((i - r.start()) * width - stringSize.getWidth() / 2) + (width / 2)), yOffset + lineHeigh - 2);
 					}
 				}
-				g.setColor(Color.GREEN);
-				if (model.getAnnotationLocationVisible().length() >= 100)
-					g.drawString(this.displayName(), 10, yOffset + lineHeigh - 2);
+			
+				FontMetrics metrics = g.getFontMetrics();
+				int hgt = metrics.getHeight();
+				int adv = metrics.stringWidth(this.displayName());
+				
+				g.setColor(Color.WHITE);
+				g.fillRect(10, yOffset + lineHeigh-hgt, adv+2, hgt+2);
+				
+				g.setColor(Color.BLUE);
+				// if (model.getAnnotationLocationVisible().length() >= 100)
+				g.drawString(this.displayName(), 10, yOffset + lineHeigh - 2);
 				return lineHeigh;
 			} else {
 
