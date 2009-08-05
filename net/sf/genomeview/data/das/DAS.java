@@ -1,3 +1,6 @@
+/**
+ * %HEADER%
+ */
 package net.sf.genomeview.data.das;
 
 import java.io.IOException;
