@@ -17,9 +17,23 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.source.URLSource;
-import net.sf.jannot.source.DataSource.Sources;
 
 public class DataSourceFactory {
+	public enum Sources {
+		LOCALFILE, URL, DIRECTORY;
+		@Override
+		public String toString() {
+			switch (this) {
+			case URL:
+				return "URL";
+			case LOCALFILE:
+				return "Local file";
+			case DIRECTORY:
+				return "Directory";
+			}
+			return null;
+		}
+	}
 	public static DataSource[] create(Sources source, Model model, final String[] extensions) {
 		switch (source) {
 		case DIRECTORY:

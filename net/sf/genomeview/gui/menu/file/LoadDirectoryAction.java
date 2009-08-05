@@ -11,9 +11,9 @@ import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.DataSourceFactory.Sources;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.source.DataSource;
-import net.sf.jannot.source.DataSource.Sources;
 
 public class LoadDirectoryAction extends AbstractAction {
 
