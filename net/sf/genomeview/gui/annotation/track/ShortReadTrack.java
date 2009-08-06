@@ -129,12 +129,7 @@ public class ShortReadTrack extends Track {
 			write(entry.shortReads.counts());
 		}
 		Buffer b = buffers.get(entry);
-		// double[] cValues = cache.get();
-		// int cStart = cache.start();
-		// int cScale = cache.scale();
-
-		// System.out.println("SRsteps= "+((end - start) / scale));
-		// double checkValue=-1;
+		
 		GeneralPath conservationGP = new GeneralPath();
 
 		for (int i = 0; i < (end - start) / scale; i++) {
@@ -172,14 +167,14 @@ public class ShortReadTrack extends Track {
 				g.drawString("Too many short reads to display, zoom in, " + reads.size() + " reads, limit=" + limit, 10, yOffset + 10);
 				yOffset += 20 + 5;
 			} else {
-//				System.out.println("Painting: " + reads.size() + " reads");
+				// System.out.println("Painting: " + reads.size() + " reads");
 				if (cachedLocation != null && r.start() == cachedLocation.start() && r.end() == cachedLocation.end()) {
 					// Same place, everything is cached
 				} else {
 					cachedLocation = r;
 					cachedColors.clear();
 					cachedRectangles.clear();
-					lines=0;
+					lines = 0;
 
 					BitSet[] tilingCounter = new BitSet[r.length()];
 					for (int i = 0; i < tilingCounter.length; i++) {
@@ -203,10 +198,13 @@ public class ShortReadTrack extends Track {
 							/* Find empty line */
 							boolean found = false;
 							int line = 0;
+							int pos = rf.start() - r.start();
+							if (pos >= 0 && pos < tilingCounter.length)
+								line = tilingCounter[rf.start() - r.start()].nextClearBit(line);
 							while (!found) {
 								boolean hit = false;
 								for (int i = rf.start(); i <= rf.end(); i++) {
-									int pos = i - r.start();
+									pos = i - r.start();
 									if (pos >= 0 && pos < tilingCounter.length && tilingCounter[pos].get(line)) {
 										hit = true;
 										break;
@@ -215,12 +213,15 @@ public class ShortReadTrack extends Track {
 								if (!hit) {
 									found = true;
 									for (int i = rf.start() - 1; i <= rf.end() + 1; i++) {
-										int pos = i - r.start();
+										pos = i - r.start();
 										if (pos >= 0 && pos < tilingCounter.length)
 											tilingCounter[pos].set(line);
 									}
 								} else {
 									line++;
+									pos = rf.start() - r.start();
+									if (pos >= 0 && pos < tilingCounter.length)
+										line = tilingCounter[rf.start() - r.start()].nextClearBit(line);
 								}
 							}
 							if (line > lines)
