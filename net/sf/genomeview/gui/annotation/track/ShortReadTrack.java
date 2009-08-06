@@ -129,7 +129,7 @@ public class ShortReadTrack extends Track {
 			write(entry.shortReads.counts());
 		}
 		Buffer b = buffers.get(entry);
-		
+
 		GeneralPath conservationGP = new GeneralPath();
 
 		for (int i = 0; i < (end - start) / scale; i++) {
@@ -175,7 +175,7 @@ public class ShortReadTrack extends Track {
 					cachedColors.clear();
 					cachedRectangles.clear();
 					lines = 0;
-
+					int readLength=entry.shortReads.readLength();
 					BitSet[] tilingCounter = new BitSet[r.length()];
 					for (int i = 0; i < tilingCounter.length; i++) {
 						tilingCounter[i] = new BitSet();
@@ -196,34 +196,17 @@ public class ShortReadTrack extends Track {
 						// TODO is this not always the case?
 						if (x2 > 0) {
 							/* Find empty line */
-							boolean found = false;
 							int line = 0;
 							int pos = rf.start() - r.start();
 							if (pos >= 0 && pos < tilingCounter.length)
 								line = tilingCounter[rf.start() - r.start()].nextClearBit(line);
-							while (!found) {
-								boolean hit = false;
-								for (int i = rf.start(); i <= rf.end(); i++) {
-									pos = i - r.start();
-									if (pos >= 0 && pos < tilingCounter.length && tilingCounter[pos].get(line)) {
-										hit = true;
-										break;
-									}
-								}
-								if (!hit) {
-									found = true;
-									for (int i = rf.start() - 1; i <= rf.end() + 1; i++) {
-										pos = i - r.start();
-										if (pos >= 0 && pos < tilingCounter.length)
-											tilingCounter[pos].set(line);
-									}
-								} else {
-									line++;
-									pos = rf.start() - r.start();
-									if (pos >= 0 && pos < tilingCounter.length)
-										line = tilingCounter[rf.start() - r.start()].nextClearBit(line);
-								}
+
+							for (int i = rf.start() - 1-readLength; i <= rf.end() + 1; i++) {
+								pos = i - r.start();
+								if (pos >= 0 && pos < tilingCounter.length)
+									tilingCounter[pos].set(line);
 							}
+
 							if (line > lines)
 								lines = line;
 
