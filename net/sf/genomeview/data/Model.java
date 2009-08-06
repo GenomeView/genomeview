@@ -23,6 +23,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
 import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack;
 import net.sf.genomeview.gui.annotation.track.SequenceLogoTrack;
+import net.sf.genomeview.gui.annotation.track.ShortReadTrack;
 import net.sf.genomeview.gui.annotation.track.StructureTrack;
 import net.sf.genomeview.gui.annotation.track.SyntenicTrack;
 import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
@@ -593,6 +594,17 @@ public class Model extends Observable implements IModel {
 			}
 			return false;
 		}
+
+		public boolean containShortReadTrack() {
+			for (Track track : this) {
+				if (track instanceof ShortReadTrack) {
+
+					return true;
+
+				}
+			}
+			return false;
+		}
 	}
 
 	/**
@@ -619,7 +631,7 @@ public class Model extends Observable implements IModel {
 		}
 		for (Entry e : entries) {
 			/* Graph tracks */
-			for (Graph g : e.graphs.getGraphs()) {
+			for (Graph g : e.graphs.getAll()) {
 				if (!trackList.containsGraph(g.getName()))
 					trackList.add(new WiggleTrack(g.getName(), this, true));
 			}
@@ -639,6 +651,11 @@ public class Model extends Observable implements IModel {
 				if (!trackList.containsSyntenicTarget(e.getID(), t))
 					trackList.add(new SyntenicTrack(this, e.getID(), t));
 			}
+			/* Short read tracks*/
+			if(e.shortReads.size()>0&&!trackList.containShortReadTrack()){
+				trackList.add(new ShortReadTrack(this));
+			}
+				
 
 		}
 		refresh(NotificationTypes.UPDATETRACKS);
