@@ -99,6 +99,10 @@ public class ShortReadTrack extends Track {
 	}
 
 	private Map<Entry, Buffer> buffers = new HashMap<Entry, Buffer>();
+	private Map<Entry, Buffer> buffersA = new HashMap<Entry, Buffer>();
+	private Map<Entry, Buffer> buffersC = new HashMap<Entry, Buffer>();
+	private Map<Entry, Buffer> buffersT = new HashMap<Entry, Buffer>();
+	private Map<Entry, Buffer> buffersG = new HashMap<Entry, Buffer>();
 
 	private Location cachedLocation = null;
 	private List<Rectangle> cachedRectangles = new ArrayList<Rectangle>();
@@ -121,7 +125,7 @@ public class ShortReadTrack extends Track {
 		}
 
 		/*
-		 * Draw line plot
+		 * Draw line plot of coverage
 		 */
 		double width = screenWidth / (double) r.length() / 2.0;
 
@@ -135,28 +139,85 @@ public class ShortReadTrack extends Track {
 		// /* Plot whatever is in the cache */
 		if (!buffers.containsKey(entry)) {
 			buffers.put(entry, new Buffer(entry.shortReads.counts(), entry.shortReads.maxCount()));
-			write(entry.shortReads.counts());
+			buffersA.put(entry, new Buffer(entry.shortReads.aCounts(), 10000));
+			buffersC.put(entry, new Buffer(entry.shortReads.cCounts(), 10000));
+			buffersG.put(entry, new Buffer(entry.shortReads.gCounts(), 10000));
+			buffersT.put(entry, new Buffer(entry.shortReads.tCounts(), 10000));
+			// write(entry.shortReads.counts());
 		}
 		Buffer b = buffers.get(entry);
 
 		GeneralPath conservationGP = new GeneralPath();
 
 		for (int i = 0; i < (end - start) / scale; i++) {
-			int x = Convert.translateGenomeToScreen(start + i * scale, r, screenWidth) + 5;
+			int x = Convert.translateGenomeToScreen(start + i * scale + 1, r, screenWidth) + 5;
 			// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
 			// (lineHeigh - 4) + 2);
 			double v = b.get(start + i * scale, scale);
+
 			// if(i==100)
 			// checkValue=v;
-			if (i == 0)
+			if (i == 0) {
 				conservationGP.moveTo(x - 1, yOffset + (1 - v) * (graphLineHeigh - 4) + 2);
+
+			}
 			conservationGP.lineTo(x, yOffset + (1 - v) * (graphLineHeigh - 4) + 2);
+
 		}
 		// System.out.println("CV="+checkValue);
 		g.setColor(Color.BLACK);
 		g.draw(conservationGP);
 		g.setColor(Color.BLUE);
 		g.drawString(this.displayName() + " (" + scale + ")", 10, yOffset + graphLineHeigh - 2);
+		yOffset += graphLineHeigh;
+
+		/*
+		 * Draw line plot of nucleotide frequencies
+		 */
+		Buffer bA = buffersA.get(entry);
+		Buffer bC = buffersC.get(entry);
+		Buffer bG = buffersG.get(entry);
+		Buffer bT = buffersT.get(entry);
+		GeneralPath conservationGPA = new GeneralPath();
+		GeneralPath conservationGPC = new GeneralPath();
+		GeneralPath conservationGPG = new GeneralPath();
+		GeneralPath conservationGPT = new GeneralPath();
+		for (int i = 0; i < (end - start) / scale; i++) {
+			int x = Convert.translateGenomeToScreen(start + i * scale + 1, r, screenWidth) + 5;
+			// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
+			// (lineHeigh - 4) + 2);
+
+			double vA = bA.get(start + i * scale, scale);
+			double vC = bC.get(start + i * scale, scale);
+			double vG = bG.get(start + i * scale, scale);
+			double vT = bT.get(start + i * scale, scale);
+			// if(i==100)
+			// checkValue=v;
+			if (i == 0) {
+
+				conservationGPA.moveTo(x - 1, yOffset + (1 - vA) * (graphLineHeigh - 4) + 2);
+				conservationGPC.moveTo(x - 1, yOffset + (1 - vC) * (graphLineHeigh - 4) + 2);
+				conservationGPG.moveTo(x - 1, yOffset + (1 - vG) * (graphLineHeigh - 4) + 2);
+				conservationGPT.moveTo(x - 1, yOffset + (1 - vT) * (graphLineHeigh - 4) + 2);
+
+			}
+
+			conservationGPA.lineTo(x, yOffset + (1 - vA) * (graphLineHeigh - 4) + 2);
+			conservationGPC.lineTo(x, yOffset + (1 - vC) * (graphLineHeigh - 4) + 2);
+			conservationGPG.lineTo(x, yOffset + (1 - vG) * (graphLineHeigh - 4) + 2);
+			conservationGPT.lineTo(x, yOffset + (1 - vT) * (graphLineHeigh - 4) + 2);
+		}
+		
+		g.setColor(Configuration.getNucleotideColor('a'));
+		g.draw(conservationGPA);
+		g.setColor(Configuration.getNucleotideColor('c'));
+		g.draw(conservationGPC);
+		g.setColor(Configuration.getNucleotideColor('g'));
+		g.draw(conservationGPG);
+		g.setColor(Configuration.getNucleotideColor('t'));
+		g.draw(conservationGPT);
+		g.setColor(Color.BLUE);
+		g.drawString("Nuc. freq. (" + scale + ")", 10, yOffset + graphLineHeigh - 2);
 		yOffset += graphLineHeigh;
 		/*
 		 * Draw individual reads when possible
@@ -258,14 +319,15 @@ public class ShortReadTrack extends Track {
 								if (model.getAnnotationLocationVisible().length() < 100) {
 									g.setColor(cachedColors.get(i));
 									Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
-//									g.setColor(Color.black);
-									g.drawString("" + readNt, (int) (x1 + ((x2 - x1)/2 - stringSize.getWidth() / 2)), rec.y + readLineHeight - 3);
-//									g.drawChars(new char[] { readNt }, 0, 1, x1, rec.y);
+									// g.setColor(Color.black);
+									g.drawString("" + readNt, (int) (x1 + ((x2 - x1) / 2 - stringSize.getWidth() / 2)), rec.y + readLineHeight - 3);
+									// g.drawChars(new char[] { readNt }, 0, 1,
+									// x1, rec.y);
 								}
 							}
-							
-//							g.setColor(Color.CYAN);
-//							g.drawRect(x1, rec.y, x2 - x1, rec.height);
+
+							// g.setColor(Color.CYAN);
+							// g.drawRect(x1, rec.y, x2 - x1, rec.height);
 
 						}
 					}
@@ -283,18 +345,7 @@ public class ShortReadTrack extends Track {
 		return yOffset - originalYOffset;
 	}
 
-	private void write(short[] counts) {
-		PrintWriter out;
-		try {
-			out = new PrintWriter("counts.log");
-			out.println(Arrays.toString(counts));
-			out.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+	
 
 	@Override
 	public String displayName() {
