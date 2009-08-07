@@ -44,7 +44,8 @@ public class ShortReadTrack extends Track {
 		private List<float[]> buffer = new ArrayList<float[]>();
 
 		public double get(int start, int scale) {
-
+			if(start+scale>counts.length)
+				return 0;
 			if (scale < bareScale) {
 				double conservation = 0;
 				for (int j = 0; j < scale; j++) {
@@ -255,7 +256,7 @@ public class ShortReadTrack extends Track {
 							c = Color.BLUE;
 						else
 							c = new Color(0x00, 0x99, 0x00);
-						cachedColors.add(c);
+						
 						// int x1 = Convert.translateGenomeToScreen(rf.start(),
 						// model.getAnnotationLocationVisible(), screenWidth);
 						int x2 = Convert.translateGenomeToScreen(rf.end() + 1, model.getAnnotationLocationVisible(), screenWidth);
@@ -283,6 +284,7 @@ public class ShortReadTrack extends Track {
 							Rectangle rec = new Rectangle(subX1, line * readLineHeight + yOffset, subX2 - subX1, readLineHeight - 1);
 							cachedRectangles.add(rec);
 							cachedIndices.add(readIndex);
+							cachedColors.add(c);
 
 						}
 					}
@@ -300,11 +302,7 @@ public class ShortReadTrack extends Track {
 						ShortRead rf = reads.get(cachedIndices.get(i));
 						for (int j = rf.start(); j <= rf.end(); j++) {
 							char readNt = rf.getNucleotide(j - rf.start() + 1);
-							char refNt;
-							if (rf.strand() == Strand.FORWARD) {
-								refNt = Character.toUpperCase(entry.sequence.getNucleotide(j));
-							} else
-								refNt = Character.toUpperCase(entry.sequence.getReverseNucleotide(j));
+							char refNt=Character.toUpperCase(entry.sequence.getNucleotide(j));
 							int x1 = Convert.translateGenomeToScreen(j, model.getAnnotationLocationVisible(), screenWidth);
 							int x2 = Convert.translateGenomeToScreen(j + 1, model.getAnnotationLocationVisible(), screenWidth);
 
@@ -328,9 +326,9 @@ public class ShortReadTrack extends Track {
 					}
 
 				}
-				if (r.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
-					System.out.println("Reads visible: " + reads.size());
-				}
+//				if (r.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+//					System.out.println("Reads visible: " + reads.size());
+//				}
 
 				yOffset += (lines + 1) * readLineHeight + 5;
 
