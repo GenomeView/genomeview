@@ -140,12 +140,10 @@ public class Configuration {
 			it.setSkipBlanks(true);
 			it.setSkipComments(true);
 			for (String line : it) {
-				//FIXME this should be fixed in AJT
-				if (line.length() > 0) {
-					String key = line.substring(0, line.indexOf('='));
-					String value = line.substring(line.indexOf('=') + 1);
-					localMap.put(key.trim(), value.trim());
-				}
+				String key = line.substring(0, line.indexOf('='));
+				String value = line.substring(line.indexOf('=') + 1);
+				localMap.put(key.trim(), value.trim());
+
 			}
 			it.close();
 		}
@@ -170,6 +168,7 @@ public class Configuration {
 		dbConnection.store(new FileOutputStream(dbConnectionFile), "");
 
 		GZIPPrintWriter out = new GZIPPrintWriter(configFile);
+		out.println("time=" + System.currentTimeMillis());
 		for (String s : localMap.keySet()) {
 			out.println(s + "=" + localMap.get(s));
 		}
