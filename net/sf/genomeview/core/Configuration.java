@@ -32,13 +32,15 @@ public class Configuration {
 
 	private static File confDir;
 
-	public static char[]getNucleotides(){
-		return new char[]{'a','t','g','c','A','T','G','C','n','N'};
+	public static char[] getNucleotides() {
+		return new char[] { 'a', 't', 'g', 'c', 'A', 'T', 'G', 'C', 'n', 'N' };
 	}
-	public static char[]getAminoAcids(){
-		return new char[]{'M','*','X','Y','W','V','U','T','S','R','Q','P','N','L','K','I','H','G','F','E','D','C','A'};
-		
+
+	public static char[] getAminoAcids() {
+		return new char[] { 'M', '*', 'X', 'Y', 'W', 'V', 'U', 'T', 'S', 'R', 'Q', 'P', 'N', 'L', 'K', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'A' };
+
 	}
+
 	static {
 		String s = System.getProperty("user.home");
 		confDir = new File(s + "/.genomeview");
@@ -50,8 +52,7 @@ public class Configuration {
 
 	}
 
-	private static Logger logger = Logger.getLogger(Configuration.class
-			.getCanonicalName());
+	private static Logger logger = Logger.getLogger(Configuration.class.getCanonicalName());
 
 	/* Map with default genomeview configuration */
 	private static HashMap<String, String> defaultMap = new HashMap<String, String>();
@@ -65,7 +66,7 @@ public class Configuration {
 	private static Properties dbConnection = new Properties();
 
 	private static Properties gvProperties = new Properties();
-	
+
 	static {
 		try {
 			load();
@@ -101,11 +102,9 @@ public class Configuration {
 
 	private static void load() throws IOException {
 		try {
-			gvProperties.load(Configuration.class
-					.getResourceAsStream("/genomeview.properties"));
+			gvProperties.load(Configuration.class.getResourceAsStream("/genomeview.properties"));
 		} catch (Exception e1) {
-			logger
-					.warning("genomeview.properties file could not be loaded! GenomeView assumes your are a developer and know why you can ignore this.");
+			logger.warning("genomeview.properties file could not be loaded! GenomeView assumes your are a developer and know why you can ignore this.");
 
 		}
 
@@ -114,13 +113,12 @@ public class Configuration {
 		logger.info("Loading default configuration...");
 		LineIterator it;
 
-		it = new LineIterator(Configuration.class
-				.getResourceAsStream("/conf/default.conf"));
+		it = new LineIterator(Configuration.class.getResourceAsStream("/conf/default.conf"));
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
 		for (String line : it) {
-			String  key = line.substring(0,line.indexOf('='));
-			String  value = line.substring(line.indexOf('=')+1);
+			String key = line.substring(0, line.indexOf('='));
+			String value = line.substring(line.indexOf('=') + 1);
 			defaultMap.put(key.trim(), value.trim());
 		}
 		it.close();
@@ -138,28 +136,27 @@ public class Configuration {
 		if (!configFile.exists()) {
 			configFile.createNewFile();
 		} else {
-			it = new LineIterator(new GZIPInputStream(new FileInputStream(
-					configFile)));
+			it = new LineIterator(new GZIPInputStream(new FileInputStream(configFile)));
 			it.setSkipBlanks(true);
 			it.setSkipComments(true);
 			for (String line : it) {
-				String  key = line.substring(0,line.indexOf('='));
-				String  value = line.substring(line.indexOf('=')+1);
-				localMap.put(key.trim(), value.trim());
+				//FIXME this should be fixed in AJT
+				if (line.length() > 0) {
+					String key = line.substring(0, line.indexOf('='));
+					String value = line.substring(line.indexOf('=') + 1);
+					localMap.put(key.trim(), value.trim());
+				}
 			}
 			it.close();
 		}
 
 	}
 
-	private static void createDbConnection() throws FileNotFoundException,
-			IOException {
-		dbConnection.put("host",
-				"jdbc:mysql://psbsql01:3306/db_thabe_genomeview");
+	private static void createDbConnection() throws FileNotFoundException, IOException {
+		dbConnection.put("host", "jdbc:mysql://psbsql01:3306/db_thabe_genomeview");
 		dbConnection.put("user", "genomeview");
 		dbConnection.put("pass", "qjW23DPYDzMs3NYa");
-		dbConnection.store(new FileOutputStream(dbConnectionFile),
-				"initial configuration");
+		dbConnection.store(new FileOutputStream(dbConnectionFile), "initial configuration");
 	}
 
 	/**
@@ -285,8 +282,8 @@ public class Configuration {
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
 		for (String line : it) {
-			String  key = line.substring(0,line.indexOf('='));
-			String  value = line.substring(line.indexOf('=')+1);
+			String key = line.substring(0, line.indexOf('='));
+			String value = line.substring(line.indexOf('=') + 1);
 			extraMap.put(key.trim(), value.trim());
 		}
 		it.close();
@@ -308,10 +305,10 @@ public class Configuration {
 
 	}
 
-	public static void setColor(String key,Color newColor){
+	public static void setColor(String key, Color newColor) {
 		set(key, ColorFactory.encode(newColor));
 	}
-	
+
 	public static void setColor(Type type, Color newColor) {
 		setColor("TYPE_" + type, newColor);
 
