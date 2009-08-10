@@ -32,6 +32,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.genomeview.plugin.PluginLoader;
+import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.URLSource;
@@ -76,6 +77,10 @@ public class MainWindow implements WindowListener, Observer {
 				parser.addStringOption("config"),
 				"Provide additional configuration to load.");
 
+		Option positionO = parser.addHelp(
+				parser.addStringOption("position"),
+				"Provide the initial region that should be visible.");
+		
 		parse(parser, args);
 
 		if (parser.checkHelp()) {
@@ -234,7 +239,12 @@ public class MainWindow implements WindowListener, Observer {
 			}
 
 		}
-
+		String initialLocation=(String)parser.getOptionValue(positionO);
+		if(initialLocation!=null){
+			String[]arr=initialLocation.split(":");
+			model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[0]),Integer.parseInt(arr[1])));
+			
+		}
 		model.addObserver(this);
 		/* Start acting */
 		model.setSilent(false);
