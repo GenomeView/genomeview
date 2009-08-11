@@ -44,7 +44,7 @@ public class ShortReadTrack extends Track {
 		private List<float[]> buffer = new ArrayList<float[]>();
 
 		public double get(int start, int scale) {
-			if(start+scale>counts.length)
+			if (start + scale > counts.length)
 				return 0;
 			if (scale < bareScale) {
 				double conservation = 0;
@@ -99,13 +99,6 @@ public class ShortReadTrack extends Track {
 	private Map<Entry, Buffer> buffersC = new HashMap<Entry, Buffer>();
 	private Map<Entry, Buffer> buffersT = new HashMap<Entry, Buffer>();
 	private Map<Entry, Buffer> buffersG = new HashMap<Entry, Buffer>();
-
-	private Location cachedLocation = null;
-	private List<Rectangle> cachedRectangles = new ArrayList<Rectangle>();
-	private List<Color> cachedColors = new ArrayList<Color>();
-
-	private List<Integer> cachedIndices = new ArrayList<Integer>();
-	private int lines = 0;
 
 	@Override
 	public int paint(Graphics gg, Entry entry, int yOffset, double screenWidth) {
@@ -203,7 +196,7 @@ public class ShortReadTrack extends Track {
 			conservationGPG.lineTo(x, yOffset + (1 - vG) * (graphLineHeigh - 4) + 2);
 			conservationGPT.lineTo(x, yOffset + (1 - vT) * (graphLineHeigh - 4) + 2);
 		}
-		
+
 		g.setColor(Configuration.getNucleotideColor('a'));
 		g.draw(conservationGPA);
 		g.setColor(Configuration.getNucleotideColor('c'));
@@ -224,8 +217,14 @@ public class ShortReadTrack extends Track {
 			g.drawString("Region too big, zoom in", 10, yOffset + 10);
 			yOffset += 20 + 5;
 		} else {
-			reads = entry.shortReads.get(model.getAnnotationLocationVisible());
+			reads = entry.shortReads.get(r);
 		}
+		Location cachedLocation = null;
+		List<Rectangle> cachedRectangles = new ArrayList<Rectangle>();
+		List<Color> cachedColors = new ArrayList<Color>();
+
+		List<Integer> cachedIndices = new ArrayList<Integer>();
+		int lines = 0;
 		if (reads != null) {
 			int limit = 100 * Configuration.getInt("annotationview:maximumNoVisibleFeatures");
 			if (reads.size() > limit) {
@@ -256,10 +255,10 @@ public class ShortReadTrack extends Track {
 							c = Color.BLUE;
 						else
 							c = new Color(0x00, 0x99, 0x00);
-						
+
 						// int x1 = Convert.translateGenomeToScreen(rf.start(),
 						// model.getAnnotationLocationVisible(), screenWidth);
-						int x2 = Convert.translateGenomeToScreen(rf.end() + 1, model.getAnnotationLocationVisible(), screenWidth);
+						int x2 = Convert.translateGenomeToScreen(rf.end() + 1, r, screenWidth);
 
 						// TODO is this not always the case?
 						if (x2 > 0) {
@@ -279,56 +278,105 @@ public class ShortReadTrack extends Track {
 							if (line > lines)
 								lines = line;
 
-							int subX1 = Convert.translateGenomeToScreen(rf.start(), model.getAnnotationLocationVisible(), screenWidth);
-							int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, model.getAnnotationLocationVisible(), screenWidth);
-							Rectangle rec = new Rectangle(subX1, line * readLineHeight + yOffset, subX2 - subX1, readLineHeight - 1);
-							cachedRectangles.add(rec);
-							cachedIndices.add(readIndex);
-							cachedColors.add(c);
+							int subX1 = Convert.translateGenomeToScreen(rf.start(), r, screenWidth);
+							int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, r, screenWidth);
+							if (subX2 < subX1) {
+								subX2 = subX1;
+							}
+							Rectangle rec = new Rectangle(subX1, line * readLineHeight + yOffset, subX2 - subX1 + 1, readLineHeight - 1);
+							// cachedRectangles.add(rec);
+							// cachedIndices.add(readIndex);
+							// cachedColors.add(c);
+							/* Actual painting */
+							// for (int i = 0; i < cachedRectangles.size(); i++)
+							// {
+							// g.setColor(cachedColors.get(i));
+							g.setColor(c);
+							// Rectangle rec = cachedRectangles.get(i);
+							g.fillRect(rec.x, rec.y, rec.width, rec.height);
 
-						}
-					}
+							/* Check mismatches */
+							if (r.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+								// ShortRead rf =
+								// reads.get(cachedIndices.get(i));
+								for (int j = rf.start(); j <= rf.end(); j++) {
+									char readNt = rf.getNucleotide(j - rf.start() + 1);
+									char refNt = Character.toUpperCase(entry.sequence.getNucleotide(j));
+									int tx1 = Convert.translateGenomeToScreen(j, r, screenWidth);
+									int tx2 = Convert.translateGenomeToScreen(j + 1, r, screenWidth);
 
-				}
+									if (readNt != refNt) {
+										g.setColor(Color.ORANGE);
+										g.fillRect(tx1, rec.y, tx2 - tx1, rec.height);
+										if (model.getAnnotationLocationVisible().length() < 100) {
+											// g.setColor(cachedColors.get(i));
+											g.setColor(c);
+											Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
+											// g.setColor(Color.black);
+											g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 - stringSize.getWidth() / 2)), rec.y + readLineHeight - 3);
+											// g.drawChars(new char[] { readNt
+											// }, 0, 1,
+											// x1, rec.y);
+										}
+									}
 
-				/* Actual painting */
-				for (int i = 0; i < cachedRectangles.size(); i++) {
-					g.setColor(cachedColors.get(i));
-					Rectangle rec = cachedRectangles.get(i);
-					g.fillRect(rec.x, rec.y, rec.width, rec.height);
+									// g.setColor(Color.CYAN);
+									// g.drawRect(x1, rec.y, x2 - x1,
+									// rec.height);
 
-					/* Check mismatches */
-					if (r.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
-						ShortRead rf = reads.get(cachedIndices.get(i));
-						for (int j = rf.start(); j <= rf.end(); j++) {
-							char readNt = rf.getNucleotide(j - rf.start() + 1);
-							char refNt=Character.toUpperCase(entry.sequence.getNucleotide(j));
-							int x1 = Convert.translateGenomeToScreen(j, model.getAnnotationLocationVisible(), screenWidth);
-							int x2 = Convert.translateGenomeToScreen(j + 1, model.getAnnotationLocationVisible(), screenWidth);
-
-							if (readNt != refNt) {
-								g.setColor(Color.ORANGE);
-								g.fillRect(x1, rec.y, x2 - x1, rec.height);
-								if (model.getAnnotationLocationVisible().length() < 100) {
-									g.setColor(cachedColors.get(i));
-									Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
-									// g.setColor(Color.black);
-									g.drawString("" + readNt, (int) (x1 + ((x2 - x1) / 2 - stringSize.getWidth() / 2)), rec.y + readLineHeight - 3);
-									// g.drawChars(new char[] { readNt }, 0, 1,
-									// x1, rec.y);
 								}
 							}
 
-							// g.setColor(Color.CYAN);
-							// g.drawRect(x1, rec.y, x2 - x1, rec.height);
-
+							// }
 						}
 					}
 
 				}
-//				if (r.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
-//					System.out.println("Reads visible: " + reads.size());
-//				}
+
+				// /* Actual painting */
+				// for (int i = 0; i < cachedRectangles.size(); i++) {
+				// g.setColor(cachedColors.get(i));
+				// Rectangle rec = cachedRectangles.get(i);
+				// g.fillRect(rec.x, rec.y, rec.width, rec.height);
+				//
+				// /* Check mismatches */
+				// if (r.length() <
+				// Configuration.getInt("geneStructureNucleotideWindow")) {
+				// ShortRead rf = reads.get(cachedIndices.get(i));
+				// for (int j = rf.start(); j <= rf.end(); j++) {
+				// char readNt = rf.getNucleotide(j - rf.start() + 1);
+				// char
+				// refNt=Character.toUpperCase(entry.sequence.getNucleotide(j));
+				// int x1 = Convert.translateGenomeToScreen(j, r, screenWidth);
+				// int x2 = Convert.translateGenomeToScreen(j + 1, r,
+				// screenWidth);
+				//
+				// if (readNt != refNt) {
+				// g.setColor(Color.ORANGE);
+				// g.fillRect(x1, rec.y, x2 - x1, rec.height);
+				// if (model.getAnnotationLocationVisible().length() < 100) {
+				// g.setColor(cachedColors.get(i));
+				// Rectangle2D stringSize =
+				// g.getFontMetrics().getStringBounds("" + readNt, g);
+				// // g.setColor(Color.black);
+				// g.drawString("" + readNt, (int) (x1 + ((x2 - x1) / 2 -
+				// stringSize.getWidth() / 2)), rec.y + readLineHeight - 3);
+				// // g.drawChars(new char[] { readNt }, 0, 1,
+				// // x1, rec.y);
+				// }
+				// }
+				//
+				// // g.setColor(Color.CYAN);
+				// // g.drawRect(x1, rec.y, x2 - x1, rec.height);
+				//
+				// }
+				// }
+				//
+				// }
+				// if (r.length() <
+				// Configuration.getInt("geneStructureNucleotideWindow")) {
+				// System.out.println("Reads visible: " + reads.size());
+				// }
 
 				yOffset += (lines + 1) * readLineHeight + 5;
 
@@ -337,8 +385,6 @@ public class ShortReadTrack extends Track {
 
 		return yOffset - originalYOffset;
 	}
-
-	
 
 	@Override
 	public String displayName() {
