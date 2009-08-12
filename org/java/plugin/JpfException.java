@@ -27,7 +27,9 @@ import org.java.plugin.util.ResourceManager;
  * @version $Id$
  */
 public abstract class JpfException extends Exception {
-    private final String packageName;
+    
+	private static final long serialVersionUID = 6424140808027101812L;
+	private final String packageName;
     private final String messageKey;
     private final Object data;
     

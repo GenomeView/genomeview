@@ -484,6 +484,8 @@ public class SearchDialog extends JDialog {
 
 	class KeywordSearchResultModel extends AbstractTableModel {
 
+		private static final long serialVersionUID = -6980331160054705283L;
+		
 		private ArrayList<Feature> features = new ArrayList<Feature>();
 		private ArrayList<Entry> entries = new ArrayList<Entry>();
 
@@ -572,6 +574,8 @@ public class SearchDialog extends JDialog {
 
 	class OverlapSearchResultModel extends AbstractTableModel {
 
+		private static final long serialVersionUID = 5850270831525342543L;
+
 		private ArrayList<Feature> features = new ArrayList<Feature>();
 
 		private Set<Feature> featuresSet = new HashSet<Feature>();
@@ -654,6 +658,8 @@ public class SearchDialog extends JDialog {
 	}
 
 	class SearchKeywordPane extends GridBagPanel {
+
+		private static final long serialVersionUID = -7531967816569386730L;
 
 		public SearchKeywordPane(final Model model) {
 			final JTextArea text = new JTextArea(5, 30);
