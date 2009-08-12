@@ -134,10 +134,10 @@ public class ShiftOrMismatches extends MismatchSearch {
   return new Object[] {
    t,
    type,
-   new Integer(i - 1),
-   new Integer(ovmask),
-   new Integer(b),
-   new Integer(lim)};
+   Integer.valueOf(i - 1),
+   Integer.valueOf(ovmask),
+   Integer.valueOf(b),
+   Integer.valueOf(lim)};
  }
 
  /**
@@ -193,10 +193,10 @@ public class ShiftOrMismatches extends MismatchSearch {
   return new Object[] {
    t,
    type,
-   new Integer(i - 1),
-   new Integer(ovmask),
-   new Integer(b),
-   new Integer(lim)};
+  Integer.valueOf(i - 1),
+  Integer.valueOf(ovmask),
+  Integer.valueOf(b),
+  Integer.valueOf(lim)};
 
  }
 
