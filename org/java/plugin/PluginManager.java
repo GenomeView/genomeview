@@ -93,7 +93,7 @@ public abstract class PluginManager {
         if (obj instanceof Plugin) {
             return ((Plugin) obj).getManager();
         } else if (obj instanceof Class) {
-            clsLoader = ((Class) obj).getClassLoader();
+            clsLoader = ((Class<?>) obj).getClassLoader();
         } else if (obj instanceof ClassLoader) {
             clsLoader = (ClassLoader) obj;
         } else {
