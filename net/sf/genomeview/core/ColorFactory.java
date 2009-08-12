@@ -84,13 +84,17 @@ public class ColorFactory {
                 Field colorField = Color.class.getDeclaredField(colorString);
                 color = (Color) colorField.get(Color.class);
             }
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             // the method can fail is the text representation has no matching
             // color constant of if the RGB value isn't hexa-decimal, decimal or
             // octal.
             // in that case: be gray.
             color = Color.GRAY;
-        }
+        } catch (NoSuchFieldException e) {
+        	color = Color.GRAY;
+		} catch (IllegalAccessException e) {
+			color = Color.GRAY;
+		}
         return color;
     }
 

@@ -5,7 +5,9 @@ package net.sf.genomeview.plugin;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -15,6 +17,7 @@ import javax.swing.JOptionPane;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.IModel;
 
+import org.java.plugin.JpfException;
 import org.java.plugin.ObjectFactory;
 import org.java.plugin.PluginLifecycleException;
 import org.java.plugin.PluginManager;
@@ -103,7 +106,14 @@ public class PluginLoader {
                         errorMessage.append("The " + name + " plugin can't be started.\n");
                     }
                     log.severe("Cannot load " + pd + " " + e.getMessage());
-                }
+                } catch (InstantiationException e) {
+					throw new RuntimeException(e);
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
             }
             if (errorMessage.length() > 0) {
@@ -111,9 +121,16 @@ public class PluginLoader {
                 JOptionPane.showMessageDialog(model.getParent(), errorMessage,"Plugin error!",JOptionPane.ERROR_MESSAGE);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        }
+        
+        } catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JpfException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }
