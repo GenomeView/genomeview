@@ -86,7 +86,7 @@ public class SyntenicTrack extends Track {
 			// Dont paint when reference does not match
 			return 0;
 		} else {
-			double colorBlockLength = (e.sequence.size() + 1) / colors;
+			double colorBlockLength = (e.sequence.size() + 1.0) / colors;
 			/* Reference color scheme in 20 steps */
 			if (target.equals(ref)) {
 				for (int i = 0; i <= 20; i++) {

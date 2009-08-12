@@ -302,12 +302,12 @@ public class ShortReadTrack extends Track {
 								for (int j = rf.start(); j <= rf.end(); j++) {
 									char readNt = rf.getNucleotide(j - rf.start() + 1);
 									char refNt = Character.toUpperCase(entry.sequence.getNucleotide(j));
-									int tx1 = Convert.translateGenomeToScreen(j, r, screenWidth);
-									int tx2 = Convert.translateGenomeToScreen(j + 1, r, screenWidth);
+									double tx1 = Convert.translateGenomeToScreen(j, r, screenWidth);
+									double tx2 = Convert.translateGenomeToScreen(j + 1, r, screenWidth);
 
 									if (readNt != refNt) {
 										g.setColor(Color.ORANGE);
-										g.fillRect(tx1, rec.y, tx2 - tx1, rec.height);
+										g.fillRect((int)tx1, rec.y,(int)( tx2 - tx1), rec.height);
 										if (model.getAnnotationLocationVisible().length() < 100) {
 											// g.setColor(cachedColors.get(i));
 											g.setColor(c);
