@@ -34,24 +34,11 @@ public class UniqueFeatureHitDialog extends JDialog {
         this.setLocationRelativeTo(model.getParent());
 
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        Location preferedSelection = null;
+       
         final JComboBox box = new JComboBox();
         for (Feature p : list) {
             box.addItem(p);
-
-            // TODO enable preference selection
-
-            // if (model.getFeatureSelection() != null &&
-            // model.getFeatureSelection().contains(p.x())) {
-            // preferedSelection = s;
-            // }
         }
-
-        // by default, select the CDS belonging to the selected feature (if any)
-        if (preferedSelection != null) {
-            box.setSelectedItem(preferedSelection);
-        }
-
         JButton ok = new JButton("OK");
         this.getRootPane().setDefaultButton(ok);
         ok.addActionListener(new ActionListener() {
