@@ -261,7 +261,7 @@ public final class StandardPluginManager extends PluginManager {
         }
         ClassLoader clsLoader;
         if (obj instanceof Class) {
-            clsLoader = ((Class) obj).getClassLoader();
+            clsLoader = ((Class<?>) obj).getClassLoader();
         } else if (obj instanceof ClassLoader) {
             clsLoader = (ClassLoader) obj;
         } else {
