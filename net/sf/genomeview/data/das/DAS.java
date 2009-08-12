@@ -10,12 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import javax.smartcardio.ATR;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sf.genomeview.data.das.DSN.DSNParser;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
@@ -81,7 +79,7 @@ public class DAS extends DataSource {
 
 	}
 
-	public class EntryPoint {
+	static public class EntryPoint {
 		String id;
 		int start, stop;
 
@@ -90,7 +88,7 @@ public class DAS extends DataSource {
 		}
 	}
 
-	private class SequenceParser extends DefaultHandler {
+	private static class SequenceParser extends DefaultHandler {
 		StringBuffer seq = null;
 
 		@Override
@@ -131,7 +129,7 @@ public class DAS extends DataSource {
 
 	}
 
-	private class FeatureParser extends DefaultHandler {
+	private static class FeatureParser extends DefaultHandler {
 		private Stack<String> parserStack = new Stack<String>();
 		private String featureID = null;
 		private String typeID = null;
