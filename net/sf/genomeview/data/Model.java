@@ -40,6 +40,7 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
+import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.MultiFileSource;
 import be.abeel.util.DefaultHashMap;
@@ -85,7 +86,7 @@ public class Model extends Observable implements IModel {
 	}
 
 	public Entry entry(int index) {
-		//FIXME still needed?
+		// FIXME still needed?
 		return entries.getEntry(index);
 	}
 
@@ -125,8 +126,6 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	
-
 	static class DummyEntry extends Entry {
 		public DummyEntry() {
 			super(null);
@@ -153,7 +152,7 @@ public class Model extends Observable implements IModel {
 	 */
 
 	public Entry getSelectedEntry() {
-		if (entries.size()==0)
+		if (entries.size() == 0)
 			return dummy;
 		return entries.getEntry();
 	}
@@ -163,7 +162,7 @@ public class Model extends Observable implements IModel {
 		selectedLocation.clear();
 		selectedRegion = null;
 		setAnnotationLocationVisible(getAnnotationLocationVisible());
-			
+
 		refresh(NotificationTypes.ENTRYCHANGED);
 
 	}
@@ -344,12 +343,10 @@ public class Model extends Observable implements IModel {
 
 	}
 
-
 	public boolean isExitRequested() {
 		return exitRequested;
 	}
 
-	
 	private ArrayList<Highlight> highlights = new ArrayList<Highlight>();
 
 	public class Highlight {
@@ -399,7 +396,6 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	
 	/**
 	 * Contains all selected locations, these can be subcomponents of a Feature.
 	 */
@@ -409,8 +405,6 @@ public class Model extends Observable implements IModel {
 		selectedLocation.add(rl);
 		refresh();
 	}
-
-	
 
 	public SortedSet<Location> getLocationSelection() {
 		return selectedLocation;
@@ -430,7 +424,6 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	
 	public void removeLocationSelection(Location rl) {
 
 		selectedLocation.remove(rl);
@@ -446,11 +439,11 @@ public class Model extends Observable implements IModel {
 	 * @throws ReadFailedException
 	 */
 	public void addData(DataSource f) throws ReadFailedException {
-		boolean firstEntry=entries.size()==0;
-		System.out.println("Reading source:"+f);
+		boolean firstEntry = entries.size() == 0;
+		System.out.println("Reading source:" + f);
 		f.read(entries);
-		if(firstEntry){
-			entries.getEntry();//select a default
+		if (firstEntry) {
+			entries.getEntry();// select a default
 			setAnnotationLocationVisible(new Location(1, 10000));
 		}
 
@@ -486,12 +479,6 @@ public class Model extends Observable implements IModel {
 		trackList.add(track);
 		refresh();
 	}
-
-	
-
-
-
-	
 
 	// /*
 	// * Looks in the list of loaded entries and returns the one with a matching
@@ -595,11 +582,12 @@ public class Model extends Observable implements IModel {
 			return false;
 		}
 
-		public boolean containShortReadTrack() {
+		public boolean containShortReadTrack(DataSource rg) {
 			for (Track track : this) {
 				if (track instanceof ShortReadTrack) {
-
-					return true;
+					ShortReadTrack srt=(ShortReadTrack)track;
+					if(srt.source().equals(rg))
+						return true;
 
 				}
 			}
@@ -620,7 +608,8 @@ public class Model extends Observable implements IModel {
 	private TrackList trackList;
 
 	/**
-	 * This method keeps the track list up to date when adding new data to the entry from outside the model.
+	 * This method keeps the track list up to date when adding new data to the
+	 * entry from outside the model.
 	 * 
 	 * All types and graphs loaded should have a corresponding track.
 	 */
@@ -651,11 +640,12 @@ public class Model extends Observable implements IModel {
 				if (!trackList.containsSyntenicTarget(e.getID(), t))
 					trackList.add(new SyntenicTrack(this, e.getID(), t));
 			}
-			/* Short read tracks*/
-			if(e.shortReads.size()>0&&!trackList.containShortReadTrack()){
-				trackList.add(new ShortReadTrack(this));
+			/* Short read tracks */
+			for (DataSource rg : e.shortReads.getSources()) {
+				if (!trackList.containShortReadTrack(rg)) {
+					trackList.add(new ShortReadTrack(this, rg));
+				}
 			}
-				
 
 		}
 		refresh(NotificationTypes.UPDATETRACKS);
@@ -771,7 +761,7 @@ public class Model extends Observable implements IModel {
 	public void setSelectedTrack(int pressTrack) {
 		this.pressTrack = pressTrack;
 	}
-	
+
 	private GUIManager guimanager = new GUIManager();
 
 	public GUIManager getGUIManager() {

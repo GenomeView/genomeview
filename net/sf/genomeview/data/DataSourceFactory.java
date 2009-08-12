@@ -22,6 +22,7 @@ import net.sf.genomeview.data.das.DAS.EntryPoint;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.MultiFileSource;
+import net.sf.jannot.source.SAMDataSource;
 import net.sf.jannot.source.URLSource;
 
 public class DataSourceFactory {
@@ -155,8 +156,14 @@ public class DataSourceFactory {
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					File[] files = chooser.getSelectedFiles();
 					DataSource[] out = new DataSource[files.length];
-					for (int i = 0; i < files.length; i++)
-						out[i] = new FileSource(files[i]);
+					for (int i = 0; i < files.length; i++){
+						if(files[i].getName().toLowerCase().endsWith("bai")){
+							String fileName=files[i].toString();
+							out[i]=new SAMDataSource(new File(fileName.substring(0,fileName.length()-4)));
+						}else
+							out[i] = new FileSource(files[i]);
+						
+					}
 					Configuration.set("lastDirectory", files[0].getParentFile());
 					return out;
 				} else {

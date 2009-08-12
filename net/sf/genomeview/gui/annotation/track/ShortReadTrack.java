@@ -4,9 +4,9 @@
 package net.sf.genomeview.gui.annotation.track;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -20,13 +20,18 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
-import net.sf.jannot.ShortRead;
 import net.sf.jannot.Strand;
+import net.sf.jannot.shortread.ReadGroup;
+import net.sf.jannot.shortread.ShortRead;
+import net.sf.jannot.source.DataSource;
 
 public class ShortReadTrack extends Track {
 
-	public ShortReadTrack(Model model) {
+	private DataSource source;
+
+	public ShortReadTrack(Model model, DataSource source) {
 		super(model, true, false);
+		this.source = source;
 	}
 
 	static class Buffer {
@@ -94,6 +99,7 @@ public class ShortReadTrack extends Track {
 
 	}
 
+	private int bufferCount = -1;
 	private Map<Entry, Buffer> buffers = new HashMap<Entry, Buffer>();
 	private Map<Entry, Buffer> buffersA = new HashMap<Entry, Buffer>();
 	private Map<Entry, Buffer> buffersC = new HashMap<Entry, Buffer>();
@@ -126,13 +132,22 @@ public class ShortReadTrack extends Track {
 		int end = ((r.end() / scale) + 1) * scale;
 
 		// /* Plot whatever is in the cache */
-		if (!buffers.containsKey(entry)) {
-			buffers.put(entry, new Buffer(entry.shortReads.counts(), entry.shortReads.maxCount()));
-			buffersA.put(entry, new Buffer(entry.shortReads.aCounts(), 10000));
-			buffersC.put(entry, new Buffer(entry.shortReads.cCounts(), 10000));
-			buffersG.put(entry, new Buffer(entry.shortReads.gCounts(), 10000));
-			buffersT.put(entry, new Buffer(entry.shortReads.tCounts(), 10000));
+
+		ReadGroup rg = entry.shortReads.getReadGroup(source);
+//		System.out.println(entry.shortReads+"\t"+rg+"\t"+source);
+		if (rg != null) {
+			int tmp=rg.size();
+			if (!buffers.containsKey(entry)||bufferCount!=tmp) {
+				bufferCount=tmp;
+				buffers.put(entry, new Buffer(entry.shortReads.getReadGroup(source).counts(), entry.shortReads.getReadGroup(source).maxCount()));
+				buffersA.put(entry, new Buffer(entry.shortReads.getReadGroup(source).aCounts(), 10000));
+				buffersC.put(entry, new Buffer(entry.shortReads.getReadGroup(source).cCounts(), 10000));
+				buffersG.put(entry, new Buffer(entry.shortReads.getReadGroup(source).gCounts(), 10000));
+				buffersT.put(entry, new Buffer(entry.shortReads.getReadGroup(source).tCounts(), 10000));
+			} 
 			// write(entry.shortReads.counts());
+		}else {
+			return 0; /* Not yet ready */
 		}
 		Buffer b = buffers.get(entry);
 
@@ -211,183 +226,138 @@ public class ShortReadTrack extends Track {
 		/*
 		 * Draw individual reads when possible
 		 */
-		List<ShortRead> reads = null;
+		Iterable<ShortRead> reads = null;
 		if (r.length() > 1000000) {
 			g.setColor(Color.BLACK);
 			g.drawString("Region too big, zoom in", 10, yOffset + 10);
 			yOffset += 20 + 5;
 		} else {
-			reads = entry.shortReads.get(r);
+			reads = entry.shortReads.getReadGroup(source).get(r);
 		}
-		Location cachedLocation = null;
-		List<Rectangle> cachedRectangles = new ArrayList<Rectangle>();
-		List<Color> cachedColors = new ArrayList<Color>();
-
-		List<Integer> cachedIndices = new ArrayList<Integer>();
+		// Location cachedLocation = null;
+		// List<Rectangle> cachedRectangles = new ArrayList<Rectangle>();
+		// List<Color> cachedColors = new ArrayList<Color>();
+		//
+		// List<Integer> cachedIndices = new ArrayList<Integer>();
 		int lines = 0;
 		if (reads != null) {
 			int limit = 100 * Configuration.getInt("annotationview:maximumNoVisibleFeatures");
-			if (reads.size() > limit) {
-				g.setColor(Color.BLACK);
-				g.drawString("Too many short reads to display, zoom in, " + reads.size() + " reads, limit=" + limit, 10, yOffset + 10);
-				yOffset += 20 + 5;
-			} else {
-				// System.out.println("Painting: " + reads.size() + " reads");
-				if (cachedLocation != null && r.start() == cachedLocation.start() && r.end() == cachedLocation.end()) {
-					// Same place, everything is cached
-				} else {
-					cachedLocation = r;
-					cachedColors.clear();
-					cachedRectangles.clear();
-					cachedIndices.clear();
-					lines = 0;
-					int readLength = entry.shortReads.readLength();
-					BitSet[] tilingCounter = new BitSet[r.length()];
-					for (int i = 0; i < tilingCounter.length; i++) {
-						tilingCounter[i] = new BitSet();
+			// if (reads.size() > limit) {
+			// g.setColor(Color.BLACK);
+			// g.drawString("Too many short reads to display, zoom in, " +
+			// reads.size() + " reads, limit=" + limit, 10, yOffset + 10);
+			// yOffset += 20 + 5;
+			// } else {
+			// System.out.println("Painting: " + reads.size() + " reads");
+			// if (cachedLocation != null && r.start() == cachedLocation.start()
+			// && r.end() == cachedLocation.end()) {
+			// // Same place, everything is cached
+			// } else {
+			// cachedLocation = r;
+			// cachedColors.clear();
+			// cachedRectangles.clear();
+			// cachedIndices.clear();
+			lines = 0;
+			int readLength = entry.shortReads.getReadGroup(source).readLength();
+			BitSet[] tilingCounter = new BitSet[r.length()];
+			for (int i = 0; i < tilingCounter.length; i++) {
+				tilingCounter[i] = new BitSet();
+			}
+			int readIndex = -1;
+			for (ShortRead rf : reads) {
+				readIndex++;
+				if (readIndex > limit) {
+
+					String msg = "Too many short reads to display, only first " + limit + " are displayed ";
+					FontMetrics metrics = g.getFontMetrics();
+					int hgt = metrics.getHeight();
+					int adv = metrics.stringWidth(msg);
+					g.setColor(Color.WHITE);
+					g.fillRect(10, yOffset + 20 - hgt, adv + 2, hgt + 2);
+					g.setColor(Color.RED);
+					g.drawString(msg, 10, yOffset + 10);
+					break;
+				}
+				Color c = Color.GRAY;
+
+				if (rf.strand() == Strand.FORWARD)
+					c = Color.BLUE;
+				else
+					c = new Color(0x00, 0x99, 0x00);
+
+				// int x1 = Convert.translateGenomeToScreen(rf.start(),
+				// model.getAnnotationLocationVisible(), screenWidth);
+				int x2 = Convert.translateGenomeToScreen(rf.end() + 1, r, screenWidth);
+
+				// TODO is this not always the case?
+				if (x2 > 0) {
+					/* Find empty line */
+					int line = 0;
+					int pos = rf.start() - r.start();
+					if (pos >= 0 && pos < tilingCounter.length)
+						line = tilingCounter[rf.start() - r.start()].nextClearBit(line);
+					else
+						line = tilingCounter[0].nextClearBit(line);
+					for (int i = rf.start() - 1 - readLength; i <= rf.end() + 1; i++) {
+						pos = i - r.start();
+						if (pos >= 0 && pos < tilingCounter.length)
+							tilingCounter[pos].set(line);
 					}
-					int readIndex = -1;
-					for (ShortRead rf : reads) {
-						readIndex++;
-						Color c = Color.GRAY;
 
-						if (rf.strand() == Strand.FORWARD)
-							c = Color.BLUE;
-						else
-							c = new Color(0x00, 0x99, 0x00);
+					if (line > lines)
+						lines = line;
 
-						// int x1 = Convert.translateGenomeToScreen(rf.start(),
-						// model.getAnnotationLocationVisible(), screenWidth);
-						int x2 = Convert.translateGenomeToScreen(rf.end() + 1, r, screenWidth);
+					int subX1 = Convert.translateGenomeToScreen(rf.start(), r, screenWidth);
+					int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, r, screenWidth);
+					if (subX2 < subX1) {
+						subX2 = subX1;
+					}
 
-						// TODO is this not always the case?
-						if (x2 > 0) {
-							/* Find empty line */
-							int line = 0;
-							int pos = rf.start() - r.start();
-							if (pos >= 0 && pos < tilingCounter.length)
-								line = tilingCounter[rf.start() - r.start()].nextClearBit(line);
-							else
-								line = tilingCounter[0].nextClearBit(line);
-							for (int i = rf.start() - 1 - readLength; i <= rf.end() + 1; i++) {
-								pos = i - r.start();
-								if (pos >= 0 && pos < tilingCounter.length)
-									tilingCounter[pos].set(line);
-							}
+					if (readIndex + 100 > limit)
+						g.setColor(Color.RED);
+					else
+						g.setColor(c);
 
-							if (line > lines)
-								lines = line;
+					int yRec = line * readLineHeight + yOffset;
+					g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
 
-							int subX1 = Convert.translateGenomeToScreen(rf.start(), r, screenWidth);
-							int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, r, screenWidth);
-							if (subX2 < subX1) {
-								subX2 = subX1;
-							}
-							Rectangle rec = new Rectangle(subX1, line * readLineHeight + yOffset, subX2 - subX1 + 1, readLineHeight - 1);
-							// cachedRectangles.add(rec);
-							// cachedIndices.add(readIndex);
-							// cachedColors.add(c);
-							/* Actual painting */
-							// for (int i = 0; i < cachedRectangles.size(); i++)
-							// {
-							// g.setColor(cachedColors.get(i));
-							g.setColor(c);
-							// Rectangle rec = cachedRectangles.get(i);
-							g.fillRect(rec.x, rec.y, rec.width, rec.height);
+					/* Check mismatches */
+					if (r.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+						// ShortRead rf =
+						// reads.get(cachedIndices.get(i));
+						for (int j = rf.start(); j <= rf.end(); j++) {
+							char readNt = rf.getNucleotide(j - rf.start() + 1);
+							char refNt = Character.toUpperCase(entry.sequence.getNucleotide(j));
+							double tx1 = Convert.translateGenomeToScreen(j, r, screenWidth);
+							double tx2 = Convert.translateGenomeToScreen(j + 1, r, screenWidth);
 
-							/* Check mismatches */
-							if (r.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
-								// ShortRead rf =
-								// reads.get(cachedIndices.get(i));
-								for (int j = rf.start(); j <= rf.end(); j++) {
-									char readNt = rf.getNucleotide(j - rf.start() + 1);
-									char refNt = Character.toUpperCase(entry.sequence.getNucleotide(j));
-									double tx1 = Convert.translateGenomeToScreen(j, r, screenWidth);
-									double tx2 = Convert.translateGenomeToScreen(j + 1, r, screenWidth);
-
-									if (readNt != refNt) {
-										g.setColor(Color.ORANGE);
-										g.fillRect((int)tx1, rec.y,(int)( tx2 - tx1), rec.height);
-										if (model.getAnnotationLocationVisible().length() < 100) {
-											// g.setColor(cachedColors.get(i));
-											g.setColor(c);
-											Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
-											// g.setColor(Color.black);
-											g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 - stringSize.getWidth() / 2)), rec.y + readLineHeight - 3);
-											// g.drawChars(new char[] { readNt
-											// }, 0, 1,
-											// x1, rec.y);
-										}
-									}
-
-									// g.setColor(Color.CYAN);
-									// g.drawRect(x1, rec.y, x2 - x1,
-									// rec.height);
+							if (readNt != refNt) {
+								g.setColor(Color.ORANGE);
+								g.fillRect((int) tx1, yRec, (int) (tx2 - tx1), readLineHeight - 1);
+								if (model.getAnnotationLocationVisible().length() < 100) {
+									g.setColor(c);
+									Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
+									g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 - stringSize.getWidth() / 2)), yRec + readLineHeight - 3);
 
 								}
 							}
-
-							// }
 						}
 					}
-
 				}
-
-				// /* Actual painting */
-				// for (int i = 0; i < cachedRectangles.size(); i++) {
-				// g.setColor(cachedColors.get(i));
-				// Rectangle rec = cachedRectangles.get(i);
-				// g.fillRect(rec.x, rec.y, rec.width, rec.height);
-				//
-				// /* Check mismatches */
-				// if (r.length() <
-				// Configuration.getInt("geneStructureNucleotideWindow")) {
-				// ShortRead rf = reads.get(cachedIndices.get(i));
-				// for (int j = rf.start(); j <= rf.end(); j++) {
-				// char readNt = rf.getNucleotide(j - rf.start() + 1);
-				// char
-				// refNt=Character.toUpperCase(entry.sequence.getNucleotide(j));
-				// int x1 = Convert.translateGenomeToScreen(j, r, screenWidth);
-				// int x2 = Convert.translateGenomeToScreen(j + 1, r,
-				// screenWidth);
-				//
-				// if (readNt != refNt) {
-				// g.setColor(Color.ORANGE);
-				// g.fillRect(x1, rec.y, x2 - x1, rec.height);
-				// if (model.getAnnotationLocationVisible().length() < 100) {
-				// g.setColor(cachedColors.get(i));
-				// Rectangle2D stringSize =
-				// g.getFontMetrics().getStringBounds("" + readNt, g);
-				// // g.setColor(Color.black);
-				// g.drawString("" + readNt, (int) (x1 + ((x2 - x1) / 2 -
-				// stringSize.getWidth() / 2)), rec.y + readLineHeight - 3);
-				// // g.drawChars(new char[] { readNt }, 0, 1,
-				// // x1, rec.y);
-				// }
-				// }
-				//
-				// // g.setColor(Color.CYAN);
-				// // g.drawRect(x1, rec.y, x2 - x1, rec.height);
-				//
-				// }
-				// }
-				//
-				// }
-				// if (r.length() <
-				// Configuration.getInt("geneStructureNucleotideWindow")) {
-				// System.out.println("Reads visible: " + reads.size());
-				// }
-
-				yOffset += (lines + 1) * readLineHeight + 5;
-
 			}
-		}
 
+			yOffset += (lines + 1) * readLineHeight + 5;
+
+		}
 		return yOffset - originalYOffset;
 	}
 
 	@Override
 	public String displayName() {
-		return "Short reads";
+		return "Short reads from " + source;
+	}
+
+	public DataSource source() {
+		return source;
 	}
 }
