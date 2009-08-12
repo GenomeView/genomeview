@@ -32,7 +32,7 @@ public class ClientHttpRequest {
 
     OutputStream os = null;
 
-    Map cookies = new HashMap();
+    Map<Object,Object> cookies = new HashMap<Object,Object>();
 
     protected void connect() throws IOException {
         if (os == null)
@@ -145,7 +145,7 @@ public class ClientHttpRequest {
      *            the cookie "name-to-value" map
      * @throws IOException
      */
-    public void setCookies(Map cookies) throws IOException {
+    public void setCookies(Map<Object,Object> cookies) throws IOException {
         if (cookies == null)
             return;
         this.cookies.putAll(cookies);
@@ -276,11 +276,11 @@ public class ClientHttpRequest {
      *            request
      * @throws IOException
      */
-    public void setParameters(Map parameters) throws IOException {
+    public void setParameters(Map<Object,Object> parameters) throws IOException {
         if (parameters == null)
             return;
-        for (Iterator i = parameters.entrySet().iterator(); i.hasNext();) {
-            Map.Entry entry = (Map.Entry) i.next();
+        for (Iterator<Map.Entry<Object,Object>> i = parameters.entrySet().iterator(); i.hasNext();) {
+            Map.Entry<Object,Object> entry = i.next();
             setParameter(entry.getKey().toString(), entry.getValue());
         }
     }
@@ -328,7 +328,7 @@ public class ClientHttpRequest {
      * @throws IOException
      * @see setParameters
      */
-    public InputStream post(Map parameters) throws IOException {
+    public InputStream post(Map<Object,Object> parameters) throws IOException {
         setParameters(parameters);
         return post();
     }
@@ -363,7 +363,7 @@ public class ClientHttpRequest {
      * @see setParameters
      * @see setCookies
      */
-    public InputStream post(Map cookies, Map parameters) throws IOException {
+    public InputStream post(Map<Object,Object> cookies, Map<Object,Object> parameters) throws IOException {
         setCookies(cookies);
         setParameters(parameters);
         return post();
@@ -489,7 +489,7 @@ public class ClientHttpRequest {
      * @throws IOException
      * @see setParameters
      */
-    public static InputStream post(URL url, Map parameters) throws IOException {
+    public static InputStream post(URL url, Map<Object,Object> parameters) throws IOException {
         return new ClientHttpRequest(url).post(parameters);
     }
 
@@ -520,7 +520,7 @@ public class ClientHttpRequest {
      * @see setCookies
      * @see setParameters
      */
-    public static InputStream post(URL url, Map cookies, Map parameters) throws IOException {
+    public static InputStream post(URL url, Map<Object,Object> cookies, Map<Object,Object> parameters) throws IOException {
         return new ClientHttpRequest(url).post(cookies, parameters);
     }
 
