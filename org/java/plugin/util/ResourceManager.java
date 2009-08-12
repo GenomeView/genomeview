@@ -124,7 +124,7 @@ public final class ResourceManager {
             }
         } else if (data instanceof Collection) {
             int i = 0;
-            for (Object object : (Collection) data) {
+            for (Object object : (Collection<?>) data) {
                 result = replaceAll(result, "{" + i++ + "}", "" + object); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
         } else {
