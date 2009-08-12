@@ -31,7 +31,6 @@ import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PrivilegedAction;
-import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Collections;
@@ -71,7 +70,7 @@ public class StandardPluginClassLoader extends PluginClassLoader {
 
 		try {
 			byte[] bytes = toByte(super.getResourceAsStream(name.replace('.', '/') + ".class"));
-			Class loaded = super.defineClass(name, bytes, 0, bytes.length, this.getClass().getProtectionDomain());
+			Class<?> loaded = super.defineClass(name, bytes, 0, bytes.length, this.getClass().getProtectionDomain());
 
 			return loaded;
 		} catch (Exception e) {
