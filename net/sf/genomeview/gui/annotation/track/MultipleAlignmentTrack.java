@@ -98,7 +98,7 @@ public class MultipleAlignmentTrack extends Track {
 		return "MA: " + name;
 	}
 
-	class Cache {
+	static class Cache {
 		private int cacheStart = -1;
 		private int cacheEnd = -1;
 		private int cacheScale = 1;
@@ -163,7 +163,7 @@ public class MultipleAlignmentTrack extends Track {
 
 					}
 					conservation /= grouping;
-					if (conservation == 1) {
+					if ((int)conservation == 1) {
 						// g.setColor(new Color(0x00,0x00,0x33));/*blue */
 						// g.setColor(new Color(0x00,0x33,0x00));/*green */
 						g.setColor(Color.BLACK);
@@ -189,12 +189,8 @@ public class MultipleAlignmentTrack extends Track {
 					}
 					if (model.getAnnotationLocationVisible().length() < 100) {
 						Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
-						if (conservation == 1) {
+						if (conservation > 0.75) {
 							g.setColor(Color.WHITE);
-						} else if (conservation > 0.75) {
-							g.setColor(Color.WHITE);
-						} else if (conservation > 0.5) {
-							g.setColor(Color.BLACK);
 						} else
 							g.setColor(Color.BLACK);
 						g.drawString("" + nt, (int) (((i - r.start()) * width - stringSize.getWidth() / 2) + (width / 2)), yOffset + lineHeigh - 2);
