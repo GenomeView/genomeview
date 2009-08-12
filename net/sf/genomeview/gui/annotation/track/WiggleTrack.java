@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
+import java.util.Map;
 import java.util.SortedMap;
 
 import net.sf.genomeview.core.ColorFactory;
@@ -44,7 +45,6 @@ public class WiggleTrack extends Track {
 			SortedMap<Location, Double> vf = graph.get(model.getAnnotationLocationVisible());
 
 			int lastX = -1;
-			int lastY = -1;
 			if (vf.size() == 0) {
 				g.setColor(Color.black);
 				yUsed = 20;
@@ -60,14 +60,14 @@ public class WiggleTrack extends Track {
 				int x = Convert.translateGenomeToScreen(vf.firstKey().start(), model.getAnnotationLocationVisible(), screenWidth);
 				gp.moveTo(x, y);
 				/* Add all intermediate points */
-				for (Location l : vf.keySet()) {
+				for(Map.Entry<Location,Double>eld:vf.entrySet()){
 
 					g.setColor(Color.BLACK);
-					val = (vf.get(l) - graph.min()) / (graph.max() - graph.min());
+					val = (eld.getValue() - graph.min()) / (graph.max() - graph.min());
 					// require inverse of value because we paint
 					// top-down.
 					y = (int) ((-val * 50) + yOffset + 50);
-					x = Convert.translateGenomeToScreen(l.start() / 2 + l.end() / 2, model.getAnnotationLocationVisible(), screenWidth);
+					x = Convert.translateGenomeToScreen(eld.getKey().start() / 2 + eld.getKey().end() / 2, model.getAnnotationLocationVisible(), screenWidth);
 
 					gp.lineTo(x, y);
 
@@ -81,10 +81,10 @@ public class WiggleTrack extends Track {
 				yUsed = 50;
 			} else { /* Color coding */
 
-				for (Location l : vf.keySet()) {
-					double val = (vf.get(l) - graph.min()) / (graph.max() - graph.min());
+				for(Map.Entry<Location,Double>eld:vf.entrySet()){
+					double val = (vf.get(eld.getValue()) - graph.min()) / (graph.max() - graph.min());
 					g.setColor(ColorFactory.getColorCoding(val));
-					int x = Convert.translateGenomeToScreen(l.start() / 2 + l.end() / 2, model.getAnnotationLocationVisible(), screenWidth);
+					int x = Convert.translateGenomeToScreen(eld.getKey().start() / 2 + eld.getKey().end() / 2, model.getAnnotationLocationVisible(), screenWidth);
 					g.fillRect(lastX, yOffset, x - lastX, 10);
 					lastX = x;
 
