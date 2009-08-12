@@ -6,8 +6,6 @@ package net.sf.genomeview.core;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -64,8 +62,6 @@ public class Configuration {
 
 	/* Map with extra configuration */
 	private static HashMap<String, String> extraMap = new HashMap<String, String>();
-
-	private static Properties dbConnection = new Properties();
 
 	private static Properties gvProperties = new Properties();
 
@@ -135,7 +131,9 @@ public class Configuration {
 
 		configFile = new File(confDir, "personal.conf.gz");
 		if (!configFile.exists()) {
-			configFile.createNewFile();
+			if(!configFile.createNewFile()){
+				logger.warning("Cannot create your personal configuration file sure GenomeView has write access to you home directory!");
+			}
 		} else {
 			it = new LineIterator(new GZIPInputStream(new FileInputStream(configFile)));
 			it.setSkipBlanks(true);
@@ -174,21 +172,6 @@ public class Configuration {
 		return confDir;
 	}
 
-	/**
-	 * Returns the directory where the modules reside.
-	 * 
-	 * @return
-	 */
-	public static File getModuleDirectory() {
-		File modules = new File(confDir, "modules");
-		if (!modules.exists()) {
-			modules.mkdir();
-
-		}
-
-		return modules;
-
-	}
 
 	public static Color getColor(Type t) {
 		return getColor("TYPE_" + t);
@@ -270,8 +253,8 @@ public class Configuration {
 	public static File getPluginDirectory() {
 		File modules = new File(confDir, "plugin");
 		if (!modules.exists()) {
-			modules.mkdir();
-
+			if(!modules.mkdir())
+				logger.warning("Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
 		}
 
 		return modules;
