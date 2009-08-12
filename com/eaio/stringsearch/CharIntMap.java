@@ -96,7 +96,9 @@ public class CharIntMap implements Externalizable, Cloneable {
   * 
   * @return an CharIntMap containing the same mappings
   */
- public Object clone() {
+ public Object clone() throws CloneNotSupportedException{
+	 super.clone();
+	 
   CharIntMap out = new CharIntMap();
   out.lowest = lowest;
   out.defaultValue = defaultValue;
