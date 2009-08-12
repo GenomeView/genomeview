@@ -372,7 +372,7 @@ public abstract class StringSearch {
             stringFields = shortString.getClass().getDeclaredFields();
         } catch (SecurityException ex) {
             try {
-                stringFields = (Field[]) AccessController.doPrivileged(new PrivilegedAction() {
+                stringFields = (Field[]) AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
                     public Object run() {
                         return shortString.getClass().getDeclaredFields();
@@ -386,7 +386,7 @@ public abstract class StringSearch {
 
         if (stringFields != null) {
 
-            Class charArray = new char[0].getClass();
+            Class<?> charArray = new char[0].getClass();
 
             for (int i = 0; i < stringFields.length; i++) {
                 if (stringFields[i].getType() == charArray) {
@@ -394,7 +394,7 @@ public abstract class StringSearch {
 
                     try {
 
-                        AccessController.doPrivileged(new PrivilegedAction() {
+                        AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
                             public Object run() {
                                 v.setAccessible(true);
@@ -410,7 +410,7 @@ public abstract class StringSearch {
 
                     try {
 
-                        AccessController.doPrivileged(new PrivilegedAction() {
+                        AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
                             public Object run() {
                                 o.setAccessible(true);
