@@ -45,10 +45,12 @@ public class Hotkeys implements KeyEventDispatcher {
 		case KeyEvent.VK_PLUS:
 		case KeyEvent.VK_EQUALS:
 			zoomin.actionPerformed(null);
+			return true;
 		case KeyEvent.VK_SUBTRACT:
 		case KeyEvent.VK_DOWN:
 		case KeyEvent.VK_MINUS:
 			zoomout.actionPerformed(null);
+			return false;
 			
 			
 		default:
