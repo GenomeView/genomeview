@@ -47,7 +47,7 @@ public class ConfigurationDialog extends JDialog {
 		dialog.setVisible(true);
 	}
 
-	class IntegerConfig extends Container {
+	static class IntegerConfig extends Container {
 
 		/**
          * 
@@ -79,7 +79,7 @@ public class ConfigurationDialog extends JDialog {
 
 	}
 
-	class StringConfig extends Container {
+	static class StringConfig extends Container {
 
 		/**
          * 
@@ -111,7 +111,7 @@ public class ConfigurationDialog extends JDialog {
 
 	}
 
-	class BooleanConfig extends JCheckBox {
+	static class BooleanConfig extends JCheckBox {
 
 		private static final long serialVersionUID = 9081788377933556296L;
 
@@ -130,7 +130,7 @@ public class ConfigurationDialog extends JDialog {
 		}
 	}
 
-	class ColorLabel extends JLabel {
+	static class ColorLabel extends JLabel {
 
 		/**
 		 * 
