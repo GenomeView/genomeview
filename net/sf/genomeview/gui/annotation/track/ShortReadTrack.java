@@ -29,7 +29,7 @@ public class ShortReadTrack extends Track {
 		super(model, true, false);
 	}
 
-	class Buffer {
+	static class Buffer {
 		double LOG2 = Math.log(2);
 		int bareScale = 32;
 		int bareScaleIndex = 5;
