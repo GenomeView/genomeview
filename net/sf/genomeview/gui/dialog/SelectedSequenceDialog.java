@@ -83,11 +83,12 @@ public class SelectedSequenceDialog extends JDialog {
                             for (int i = l.start(); i <= l.end(); i++) {
                                 tmp.append(seq.getNucleotide(i));
                             }
-
+                            break;
                         case REVERSE:
                             for (int i = l.end(); i >= l.start(); i--) {
                                 tmp.append(seq.getReverseNucleotide(i));
                             }
+                            break;
                         }
                     }
 
