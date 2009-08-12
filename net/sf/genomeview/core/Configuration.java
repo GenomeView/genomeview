@@ -40,19 +40,21 @@ public class Configuration {
 		return new char[] { 'M', '*', 'X', 'Y', 'W', 'V', 'U', 'T', 'S', 'R', 'Q', 'P', 'N', 'L', 'K', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'A' };
 
 	}
-
+	private static Logger logger = Logger.getLogger(Configuration.class.getCanonicalName());
+	
 	static {
 		String s = System.getProperty("user.home");
 		confDir = new File(s + "/.genomeview");
 		if (!confDir.exists()) {
-			confDir.mkdir();
+			if(!confDir.mkdir())
+				logger.warning("Could not create configuration directory: "+confDir);
 
 		}
-		System.out.println("User config: " + confDir);
+		logger.info("User config: " + confDir);
 
 	}
 
-	private static Logger logger = Logger.getLogger(Configuration.class.getCanonicalName());
+	
 
 	/* Map with default genomeview configuration */
 	private static HashMap<String, String> defaultMap = new HashMap<String, String>();
@@ -96,23 +98,26 @@ public class Configuration {
 
 	}
 
-	private static File dbConnectionFile;
-
 	private static File configFile;
 
 	private static void load() throws IOException {
+		InputStream is=null;
 		try {
-			gvProperties.load(Configuration.class.getResourceAsStream("/genomeview.properties"));
+			is=Configuration.class.getResourceAsStream("/genomeview.properties");
+			gvProperties.load(is);
 		} catch (Exception e1) {
 			logger.warning("genomeview.properties file could not be loaded! GenomeView assumes your are a developer and know why you can ignore this.");
 
+		}finally{
+			if(is!=null)
+				is.close();
 		}
 
 		/* loading default configuration from the jar */
 
 		logger.info("Loading default configuration...");
 		LineIterator it;
-
+		
 		it = new LineIterator(Configuration.class.getResourceAsStream("/conf/default.conf"));
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
@@ -126,11 +131,7 @@ public class Configuration {
 		/* look for local configuration and load it if present */
 		logger.info("Configuration directory: " + confDir);
 
-		dbConnectionFile = new File(confDir, "dbconnection.properties");
-		if (!dbConnectionFile.exists()) {
-			createDbConnection();
-		}
-		dbConnection.load(new FileInputStream(dbConnectionFile));
+		
 
 		configFile = new File(confDir, "personal.conf.gz");
 		if (!configFile.exists()) {
@@ -150,12 +151,7 @@ public class Configuration {
 
 	}
 
-	private static void createDbConnection() throws FileNotFoundException, IOException {
-		dbConnection.put("host", "jdbc:mysql://psbsql01:3306/db_thabe_genomeview");
-		dbConnection.put("user", "genomeview");
-		dbConnection.put("pass", "qjW23DPYDzMs3NYa");
-		dbConnection.store(new FileOutputStream(dbConnectionFile), "initial configuration");
-	}
+	
 
 	/**
 	 * Save all configuration back to the respective files.
@@ -164,8 +160,6 @@ public class Configuration {
 	 */
 	public static void save() throws IOException {
 		logger.info("Saving config");
-
-		dbConnection.store(new FileOutputStream(dbConnectionFile), "");
 
 		GZIPPrintWriter out = new GZIPPrintWriter(configFile);
 		out.println("time=" + System.currentTimeMillis());
@@ -194,22 +188,6 @@ public class Configuration {
 
 		return modules;
 
-	}
-
-	public static String getDBHost() {
-		return dbConnection.getProperty("host");
-	}
-
-	public static String getDBUser() {
-		return dbConnection.getProperty("user");
-	}
-
-	public static String getDBPass() {
-		return dbConnection.getProperty("pass");
-	}
-
-	public static Properties getDbConnection() {
-		return dbConnection;
 	}
 
 	public static Color getColor(Type t) {
