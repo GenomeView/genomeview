@@ -21,6 +21,7 @@ import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
+import net.sf.jannot.shortread.BAMreads;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortRead;
 import net.sf.jannot.source.DataSource;
@@ -30,7 +31,7 @@ public class ShortReadTrack extends Track {
 	private DataSource source;
 
 	public ShortReadTrack(Model model, DataSource source) {
-		super(model, true, false);
+		super(model, true, true);
 		this.source = source;
 	}
 
@@ -106,8 +107,9 @@ public class ShortReadTrack extends Track {
 	private Map<Entry, Buffer> buffersT = new HashMap<Entry, Buffer>();
 	private Map<Entry, Buffer> buffersG = new HashMap<Entry, Buffer>();
 
+	private boolean countRunning=false;
 	@Override
-	public int paint(Graphics gg, Entry entry, int yOffset, double screenWidth) {
+	public int paint(Graphics gg, final Entry entry, int yOffset, double screenWidth) {
 		Location r = model.getAnnotationLocationVisible();
 
 		int originalYOffset = yOffset;
@@ -134,46 +136,51 @@ public class ShortReadTrack extends Track {
 		// /* Plot whatever is in the cache */
 
 		ReadGroup rg = entry.shortReads.getReadGroup(source);
-//		System.out.println(entry.shortReads+"\t"+rg+"\t"+source);
+		// System.out.println(entry.shortReads+"\t"+rg+"\t"+source);
 		if (rg != null) {
-			int tmp=rg.size();
-			if (!buffers.containsKey(entry)||bufferCount!=tmp) {
-				bufferCount=tmp;
-				buffers.put(entry, new Buffer(entry.shortReads.getReadGroup(source).counts(), entry.shortReads.getReadGroup(source).maxCount()));
-				buffersA.put(entry, new Buffer(entry.shortReads.getReadGroup(source).aCounts(), 10000));
-				buffersC.put(entry, new Buffer(entry.shortReads.getReadGroup(source).cCounts(), 10000));
-				buffersG.put(entry, new Buffer(entry.shortReads.getReadGroup(source).gCounts(), 10000));
-				buffersT.put(entry, new Buffer(entry.shortReads.getReadGroup(source).tCounts(), 10000));
-			} 
+			int tmp = rg.size();
+			if (!countRunning&&(!buffers.containsKey(entry) || bufferCount != tmp)) {
+				bufferCount = tmp;
+				countRunning=true;
+				new Thread(new Runnable() {
+					public void run() {
+
+						buffers.put(entry, new Buffer(entry.shortReads.getReadGroup(source).counts(), entry.shortReads.getReadGroup(source).maxCount()));
+						buffersA.put(entry, new Buffer(entry.shortReads.getReadGroup(source).aCounts(), 10000));
+						buffersC.put(entry, new Buffer(entry.shortReads.getReadGroup(source).cCounts(), 10000));
+						buffersG.put(entry, new Buffer(entry.shortReads.getReadGroup(source).gCounts(), 10000));
+						buffersT.put(entry, new Buffer(entry.shortReads.getReadGroup(source).tCounts(), 10000));
+					}
+				}).start();
+			}
 			// write(entry.shortReads.counts());
-		}else {
+		} else {
 			return 0; /* Not yet ready */
 		}
 		Buffer b = buffers.get(entry);
+		if (b != null) {
+			GeneralPath conservationGP = new GeneralPath();
+			for (int i = 0; i < (end - start) / scale; i++) {
+				int x = Convert.translateGenomeToScreen(start + i * scale + 1, r, screenWidth) + 5;
+				// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
+				// (lineHeigh - 4) + 2);
+				double v = b.get(start + i * scale, scale);
 
-		GeneralPath conservationGP = new GeneralPath();
+				// if(i==100)
+				// checkValue=v;
+				if (i == 0) {
+					conservationGP.moveTo(x - 1, yOffset + (1 - v) * (graphLineHeigh - 4) + 2);
 
-		for (int i = 0; i < (end - start) / scale; i++) {
-			int x = Convert.translateGenomeToScreen(start + i * scale + 1, r, screenWidth) + 5;
-			// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
-			// (lineHeigh - 4) + 2);
-			double v = b.get(start + i * scale, scale);
-
-			// if(i==100)
-			// checkValue=v;
-			if (i == 0) {
-				conservationGP.moveTo(x - 1, yOffset + (1 - v) * (graphLineHeigh - 4) + 2);
+				}
+				conservationGP.lineTo(x, yOffset + (1 - v) * (graphLineHeigh - 4) + 2);
 
 			}
-			conservationGP.lineTo(x, yOffset + (1 - v) * (graphLineHeigh - 4) + 2);
-
+			g.setColor(Color.BLACK);
+			g.draw(conservationGP);
+			g.setColor(Color.BLUE);
+			g.drawString(this.displayName() + " (" + scale + ")", 10, yOffset + graphLineHeigh - 2);
+			yOffset += graphLineHeigh;
 		}
-		// System.out.println("CV="+checkValue);
-		g.setColor(Color.BLACK);
-		g.draw(conservationGP);
-		g.setColor(Color.BLUE);
-		g.drawString(this.displayName() + " (" + scale + ")", 10, yOffset + graphLineHeigh - 2);
-		yOffset += graphLineHeigh;
 
 		/*
 		 * Draw line plot of nucleotide frequencies
@@ -182,57 +189,59 @@ public class ShortReadTrack extends Track {
 		Buffer bC = buffersC.get(entry);
 		Buffer bG = buffersG.get(entry);
 		Buffer bT = buffersT.get(entry);
-		GeneralPath conservationGPA = new GeneralPath();
-		GeneralPath conservationGPC = new GeneralPath();
-		GeneralPath conservationGPG = new GeneralPath();
-		GeneralPath conservationGPT = new GeneralPath();
-		for (int i = 0; i < (end - start) / scale; i++) {
-			int x = Convert.translateGenomeToScreen(start + i * scale + 1, r, screenWidth) + 5;
-			// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
-			// (lineHeigh - 4) + 2);
+		if (bA != null && bC != null && bG != null && bT != null) {
+			GeneralPath conservationGPA = new GeneralPath();
+			GeneralPath conservationGPC = new GeneralPath();
+			GeneralPath conservationGPG = new GeneralPath();
+			GeneralPath conservationGPT = new GeneralPath();
+			for (int i = 0; i < (end - start) / scale; i++) {
+				int x = Convert.translateGenomeToScreen(start + i * scale + 1, r, screenWidth) + 5;
+				// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
+				// (lineHeigh - 4) + 2);
 
-			double vA = bA.get(start + i * scale, scale);
-			double vC = bC.get(start + i * scale, scale);
-			double vG = bG.get(start + i * scale, scale);
-			double vT = bT.get(start + i * scale, scale);
-			// if(i==100)
-			// checkValue=v;
-			if (i == 0) {
+				double vA = bA.get(start + i * scale, scale);
+				double vC = bC.get(start + i * scale, scale);
+				double vG = bG.get(start + i * scale, scale);
+				double vT = bT.get(start + i * scale, scale);
+				// if(i==100)
+				// checkValue=v;
+				if (i == 0) {
 
-				conservationGPA.moveTo(x - 1, yOffset + (1 - vA) * (graphLineHeigh - 4) + 2);
-				conservationGPC.moveTo(x - 1, yOffset + (1 - vC) * (graphLineHeigh - 4) + 2);
-				conservationGPG.moveTo(x - 1, yOffset + (1 - vG) * (graphLineHeigh - 4) + 2);
-				conservationGPT.moveTo(x - 1, yOffset + (1 - vT) * (graphLineHeigh - 4) + 2);
+					conservationGPA.moveTo(x - 1, yOffset + (1 - vA) * (graphLineHeigh - 4) + 2);
+					conservationGPC.moveTo(x - 1, yOffset + (1 - vC) * (graphLineHeigh - 4) + 2);
+					conservationGPG.moveTo(x - 1, yOffset + (1 - vG) * (graphLineHeigh - 4) + 2);
+					conservationGPT.moveTo(x - 1, yOffset + (1 - vT) * (graphLineHeigh - 4) + 2);
 
+				}
+
+				conservationGPA.lineTo(x, yOffset + (1 - vA) * (graphLineHeigh - 4) + 2);
+				conservationGPC.lineTo(x, yOffset + (1 - vC) * (graphLineHeigh - 4) + 2);
+				conservationGPG.lineTo(x, yOffset + (1 - vG) * (graphLineHeigh - 4) + 2);
+				conservationGPT.lineTo(x, yOffset + (1 - vT) * (graphLineHeigh - 4) + 2);
 			}
 
-			conservationGPA.lineTo(x, yOffset + (1 - vA) * (graphLineHeigh - 4) + 2);
-			conservationGPC.lineTo(x, yOffset + (1 - vC) * (graphLineHeigh - 4) + 2);
-			conservationGPG.lineTo(x, yOffset + (1 - vG) * (graphLineHeigh - 4) + 2);
-			conservationGPT.lineTo(x, yOffset + (1 - vT) * (graphLineHeigh - 4) + 2);
+			g.setColor(Configuration.getNucleotideColor('a'));
+			g.draw(conservationGPA);
+			g.setColor(Configuration.getNucleotideColor('c'));
+			g.draw(conservationGPC);
+			g.setColor(Configuration.getNucleotideColor('g'));
+			g.draw(conservationGPG);
+			g.setColor(Configuration.getNucleotideColor('t'));
+			g.draw(conservationGPT);
+			g.setColor(Color.BLUE);
+			g.drawString("Nuc. freq. (" + scale + ")", 10, yOffset + graphLineHeigh - 2);
+			yOffset += graphLineHeigh;
 		}
-
-		g.setColor(Configuration.getNucleotideColor('a'));
-		g.draw(conservationGPA);
-		g.setColor(Configuration.getNucleotideColor('c'));
-		g.draw(conservationGPC);
-		g.setColor(Configuration.getNucleotideColor('g'));
-		g.draw(conservationGPG);
-		g.setColor(Configuration.getNucleotideColor('t'));
-		g.draw(conservationGPT);
-		g.setColor(Color.BLUE);
-		g.drawString("Nuc. freq. (" + scale + ")", 10, yOffset + graphLineHeigh - 2);
-		yOffset += graphLineHeigh;
 		/*
 		 * Draw individual reads when possible
 		 */
 		Iterable<ShortRead> reads = null;
-		if (r.length() > 1000000) {
+		if (isCollapsed() || r.length() > 1000000 || (rg instanceof BAMreads && r.length() > 25000)) {
 			g.setColor(Color.BLACK);
 			g.drawString("Region too big, zoom in", 10, yOffset + 10);
 			yOffset += 20 + 5;
 		} else {
-			reads = entry.shortReads.getReadGroup(source).get(r);
+			reads = rg.get(r);
 		}
 		// Location cachedLocation = null;
 		// List<Rectangle> cachedRectangles = new ArrayList<Rectangle>();
