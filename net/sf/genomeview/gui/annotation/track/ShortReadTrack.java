@@ -11,6 +11,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class ShortReadTrack extends Track {
 		private List<float[]> buffer = new ArrayList<float[]>();
 
 		public synchronized double get(int start, int scale) {
-			if (start + scale > rg.getPileUp().size())
+			if (start + scale >= rg.getPileUp().size())
 				return 0;
 			if (scale < bareScale) {
 				double conservation = 0;
@@ -78,7 +79,10 @@ public class ShortReadTrack extends Track {
 				buffer.add(merge(buffer.get(buffer.size() - 1)));
 			}
 
-			return buffer.get(index)[start / scale];
+			if (start / scale < buffer.get(index).length)
+				return buffer.get(index)[start / scale];
+			else
+				return -1;
 		}
 
 		private float[] merge(float[] ds) {
@@ -174,7 +178,7 @@ public class ShortReadTrack extends Track {
 			g.setColor(Color.BLACK);
 			g.draw(conservationGP);
 			g.setColor(Color.BLUE);
-			g.drawString(this.displayName() + " (" + scale + ")", 10, yOffset + graphLineHeigh - 2);
+			g.drawString(this.displayName() + " (" + scale + ")", 10, yOffset + 12 - 2);
 			yOffset += graphLineHeigh;
 		}
 
@@ -242,11 +246,11 @@ public class ShortReadTrack extends Track {
 		 * Draw individual reads when possible
 		 */
 		Iterable<ShortRead> reads = null;
-		if (isCollapsed() || r.length() > 1000000 || (rg instanceof BAMreads && r.length() > 25000)) {
+		if (!isCollapsed()&&(r.length() > 1000000 || (rg instanceof BAMreads && r.length() > 25000))) {
 			g.setColor(Color.BLACK);
 			g.drawString("Region too big, zoom in", 10, yOffset + 10);
 			yOffset += 20 + 5;
-		} else {
+		} else if (!isCollapsed()) {
 			reads = rg.get(r);
 		}
 		// Location cachedLocation = null;
@@ -265,86 +269,90 @@ public class ShortReadTrack extends Track {
 				tilingCounter[i] = new BitSet();
 			}
 			int readIndex = -1;
-			for (ShortRead rf : reads) {
-				readIndex++;
-				if (readIndex > limit) {
+			try {
+				for (ShortRead rf : reads) {
+					readIndex++;
+					if (readIndex > limit) {
 
-					String msg = "Too many short reads to display, only first " + limit + " are displayed ";
-					FontMetrics metrics = g.getFontMetrics();
-					int hgt = metrics.getHeight();
-					int adv = metrics.stringWidth(msg);
-					g.setColor(Color.WHITE);
-					g.fillRect(10, yOffset + 20 - hgt, adv + 2, hgt + 2);
-					g.setColor(Color.RED);
-					g.drawString(msg, 10, yOffset + 10);
-					break;
-				}
-				Color c = Color.GRAY;
-
-				if (rf.strand() == Strand.FORWARD)
-					c = Color.BLUE;
-				else
-					c = new Color(0x00, 0x99, 0x00);
-
-				// int x1 = Convert.translateGenomeToScreen(rf.start(),
-				// model.getAnnotationLocationVisible(), screenWidth);
-				int x2 = Convert.translateGenomeToScreen(rf.end() + 1, r, screenWidth);
-
-				// TODO is this not always the case?
-				if (x2 > 0) {
-					/* Find empty line */
-					int line = 0;
-					int pos = rf.start() - r.start();
-					if (pos >= 0 && pos < tilingCounter.length)
-						line = tilingCounter[rf.start() - r.start()].nextClearBit(line);
-					else
-						line = tilingCounter[0].nextClearBit(line);
-					for (int i = rf.start() - 1 - readLength; i <= rf.end() + 1; i++) {
-						pos = i - r.start();
-						if (pos >= 0 && pos < tilingCounter.length)
-							tilingCounter[pos].set(line);
-					}
-
-					if (line > lines)
-						lines = line;
-
-					int subX1 = Convert.translateGenomeToScreen(rf.start(), r, screenWidth);
-					int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, r, screenWidth);
-					if (subX2 < subX1) {
-						subX2 = subX1;
-					}
-
-					if (readIndex + 100 > limit)
+						String msg = "Too many short reads to display, only first " + limit + " are displayed ";
+						FontMetrics metrics = g.getFontMetrics();
+						int hgt = metrics.getHeight();
+						int adv = metrics.stringWidth(msg);
+						g.setColor(Color.WHITE);
+						g.fillRect(10, yOffset + 20 - hgt, adv + 2, hgt + 2);
 						g.setColor(Color.RED);
+						g.drawString(msg, 10, yOffset + 18);
+						break;
+					}
+					Color c = Color.GRAY;
+
+					if (rf.strand() == Strand.FORWARD)
+						c = Color.BLUE;
 					else
-						g.setColor(c);
+						c = new Color(0x00, 0x99, 0x00);
 
-					int yRec = line * readLineHeight + yOffset;
-					g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
+					// int x1 = Convert.translateGenomeToScreen(rf.start(),
+					// model.getAnnotationLocationVisible(), screenWidth);
+					int x2 = Convert.translateGenomeToScreen(rf.end() + 1, r, screenWidth);
 
-					/* Check mismatches */
-					if (r.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
-						// ShortRead rf =
-						// reads.get(cachedIndices.get(i));
-						for (int j = rf.start(); j <= rf.end(); j++) {
-							char readNt = rf.getNucleotide(j - rf.start() + 1);
-							char refNt = Character.toUpperCase(entry.sequence.getNucleotide(j));
-							double tx1 = Convert.translateGenomeToScreen(j, r, screenWidth);
-							double tx2 = Convert.translateGenomeToScreen(j + 1, r, screenWidth);
+					// TODO is this not always the case?
+					if (x2 > 0) {
+						/* Find empty line */
+						int line = 0;
+						int pos = rf.start() - r.start();
+						if (pos >= 0 && pos < tilingCounter.length)
+							line = tilingCounter[rf.start() - r.start()].nextClearBit(line);
+						else
+							line = tilingCounter[0].nextClearBit(line);
+						for (int i = rf.start() - 1 - readLength; i <= rf.end() + 1; i++) {
+							pos = i - r.start();
+							if (pos >= 0 && pos < tilingCounter.length)
+								tilingCounter[pos].set(line);
+						}
 
-							if (readNt != refNt) {
-								g.setColor(Color.ORANGE);
-								g.fillRect((int) tx1, yRec, (int) (tx2 - tx1), readLineHeight - 1);
-								if (model.getAnnotationLocationVisible().length() < 100) {
-									g.setColor(c);
-									Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
-									g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 - stringSize.getWidth() / 2)), yRec + readLineHeight - 3);
+						if (line > lines)
+							lines = line;
 
+						int subX1 = Convert.translateGenomeToScreen(rf.start(), r, screenWidth);
+						int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, r, screenWidth);
+						if (subX2 < subX1) {
+							subX2 = subX1;
+						}
+
+						if (readIndex + 100 > limit)
+							g.setColor(Color.RED);
+						else
+							g.setColor(c);
+
+						int yRec = line * readLineHeight + yOffset;
+						g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
+
+						/* Check mismatches */
+						if (r.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+							// ShortRead rf =
+							// reads.get(cachedIndices.get(i));
+							for (int j = rf.start(); j <= rf.end(); j++) {
+								char readNt = rf.getNucleotide(j - rf.start() + 1);
+								char refNt = Character.toUpperCase(entry.sequence.getNucleotide(j));
+								double tx1 = Convert.translateGenomeToScreen(j, r, screenWidth);
+								double tx2 = Convert.translateGenomeToScreen(j + 1, r, screenWidth);
+
+								if (readNt != refNt) {
+									g.setColor(Color.ORANGE);
+									g.fillRect((int) tx1, yRec, (int) (tx2 - tx1), readLineHeight - 1);
+									if (model.getAnnotationLocationVisible().length() < 100) {
+										g.setColor(c);
+										Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
+										g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 - stringSize.getWidth() / 2)), yRec + readLineHeight - 3);
+
+									}
 								}
 							}
 						}
 					}
 				}
+			} catch (ConcurrentModificationException e) {
+				// Ignore
 			}
 
 			yOffset += (lines + 1) * readLineHeight + 5;
