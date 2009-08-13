@@ -14,6 +14,10 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+
+import cern.colt.list.ShortArrayList;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
@@ -35,32 +39,35 @@ public class ShortReadTrack extends Track {
 		this.source = source;
 	}
 
-	static class Buffer {
+	/**
+	 * Keeps an eye on a read group
+	 * 
+	 * @author tabeel
+	 * 
+	 */
+	static class Buffer implements Observer {
 		double LOG2 = Math.log(2);
 		int bareScale = 32;
 		int bareScaleIndex = 5;
-		private short[] counts;
-		private int maxCount;
 
-		public Buffer(short[] counts, int maxCount) {
-			this.counts = counts;
-			this.maxCount = maxCount;
+		private ReadGroup rg;
+
+		public Buffer(ReadGroup rg) {
+			rg.addObserver(this);
+			this.rg = rg;
 		}
 
 		private List<float[]> buffer = new ArrayList<float[]>();
 
-		public double get(int start, int scale) {
-			if (start + scale > counts.length)
+		public synchronized double get(int start, int scale) {
+			if (start + scale > rg.getPileUp().size())
 				return 0;
 			if (scale < bareScale) {
 				double conservation = 0;
 				for (int j = 0; j < scale; j++) {
-					// if (a.isAligned(start + j))
-					// FIXME out of bounds when scrolling completely to the
-					// right
-					conservation += counts[start + j];
+					conservation += rg.getPileUp().get(start + j);
 				}
-				return conservation / (scale * maxCount);
+				return conservation / (scale * rg.getMaxPile());
 			}
 			if (buffer.size() == 0)
 				buffer.add(bare());
@@ -84,30 +91,29 @@ public class ShortReadTrack extends Track {
 		}
 
 		private float[] bare() {
-
-			float[] out = new float[counts.length / bareScale + 1];
-			for (int i = 0; i < counts.length; i += bareScale) {
+			int size = rg.getPileUp().size();
+			float[] out = new float[size / bareScale + 1];
+			for (int i = 0; i < size; i += bareScale) {
 				float conservation = 0;
-				for (int j = 0; j < bareScale && i + j < counts.length; j++) {
-					conservation += counts[i + j];
+				for (int j = 0; j < bareScale && i + j < size; j++) {
+					conservation += rg.getPileUp().get(i + j);
 				}
-				conservation /= bareScale * maxCount;
+				conservation /= bareScale * rg.getMaxPile();
 				out[i / bareScale] = conservation;
 
 			}
 			return out;
 		}
 
+		@Override
+		public synchronized void update(Observable o, Object arg) {
+			buffer.clear();
+		}
+
 	}
 
-	private int bufferCount = -1;
 	private Map<Entry, Buffer> buffers = new HashMap<Entry, Buffer>();
-	private Map<Entry, Buffer> buffersA = new HashMap<Entry, Buffer>();
-	private Map<Entry, Buffer> buffersC = new HashMap<Entry, Buffer>();
-	private Map<Entry, Buffer> buffersT = new HashMap<Entry, Buffer>();
-	private Map<Entry, Buffer> buffersG = new HashMap<Entry, Buffer>();
 
-	private boolean countRunning=false;
 	@Override
 	public int paint(Graphics gg, final Entry entry, int yOffset, double screenWidth) {
 		Location r = model.getAnnotationLocationVisible();
@@ -138,20 +144,10 @@ public class ShortReadTrack extends Track {
 		ReadGroup rg = entry.shortReads.getReadGroup(source);
 		// System.out.println(entry.shortReads+"\t"+rg+"\t"+source);
 		if (rg != null) {
-			int tmp = rg.size();
-			if (!countRunning&&(!buffers.containsKey(entry) || bufferCount != tmp)) {
-				bufferCount = tmp;
-				countRunning=true;
-				new Thread(new Runnable() {
-					public void run() {
+			if (!buffers.containsKey(entry)) {
+				// System.out.println("Construction size: " + tmp);
+				buffers.put(entry, new Buffer(rg));
 
-						buffers.put(entry, new Buffer(entry.shortReads.getReadGroup(source).counts(), entry.shortReads.getReadGroup(source).maxCount()));
-						buffersA.put(entry, new Buffer(entry.shortReads.getReadGroup(source).aCounts(), 10000));
-						buffersC.put(entry, new Buffer(entry.shortReads.getReadGroup(source).cCounts(), 10000));
-						buffersG.put(entry, new Buffer(entry.shortReads.getReadGroup(source).gCounts(), 10000));
-						buffersT.put(entry, new Buffer(entry.shortReads.getReadGroup(source).tCounts(), 10000));
-					}
-				}).start();
 			}
 			// write(entry.shortReads.counts());
 		} else {
@@ -182,56 +178,66 @@ public class ShortReadTrack extends Track {
 			yOffset += graphLineHeigh;
 		}
 
-		/*
-		 * Draw line plot of nucleotide frequencies
-		 */
-		Buffer bA = buffersA.get(entry);
-		Buffer bC = buffersC.get(entry);
-		Buffer bG = buffersG.get(entry);
-		Buffer bT = buffersT.get(entry);
-		if (bA != null && bC != null && bG != null && bT != null) {
-			GeneralPath conservationGPA = new GeneralPath();
-			GeneralPath conservationGPC = new GeneralPath();
-			GeneralPath conservationGPG = new GeneralPath();
-			GeneralPath conservationGPT = new GeneralPath();
-			for (int i = 0; i < (end - start) / scale; i++) {
-				int x = Convert.translateGenomeToScreen(start + i * scale + 1, r, screenWidth) + 5;
-				// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
-				// (lineHeigh - 4) + 2);
-
-				double vA = bA.get(start + i * scale, scale);
-				double vC = bC.get(start + i * scale, scale);
-				double vG = bG.get(start + i * scale, scale);
-				double vT = bT.get(start + i * scale, scale);
-				// if(i==100)
-				// checkValue=v;
-				if (i == 0) {
-
-					conservationGPA.moveTo(x - 1, yOffset + (1 - vA) * (graphLineHeigh - 4) + 2);
-					conservationGPC.moveTo(x - 1, yOffset + (1 - vC) * (graphLineHeigh - 4) + 2);
-					conservationGPG.moveTo(x - 1, yOffset + (1 - vG) * (graphLineHeigh - 4) + 2);
-					conservationGPT.moveTo(x - 1, yOffset + (1 - vT) * (graphLineHeigh - 4) + 2);
-
-				}
-
-				conservationGPA.lineTo(x, yOffset + (1 - vA) * (graphLineHeigh - 4) + 2);
-				conservationGPC.lineTo(x, yOffset + (1 - vC) * (graphLineHeigh - 4) + 2);
-				conservationGPG.lineTo(x, yOffset + (1 - vG) * (graphLineHeigh - 4) + 2);
-				conservationGPT.lineTo(x, yOffset + (1 - vT) * (graphLineHeigh - 4) + 2);
-			}
-
-			g.setColor(Configuration.getNucleotideColor('a'));
-			g.draw(conservationGPA);
-			g.setColor(Configuration.getNucleotideColor('c'));
-			g.draw(conservationGPC);
-			g.setColor(Configuration.getNucleotideColor('g'));
-			g.draw(conservationGPG);
-			g.setColor(Configuration.getNucleotideColor('t'));
-			g.draw(conservationGPT);
-			g.setColor(Color.BLUE);
-			g.drawString("Nuc. freq. (" + scale + ")", 10, yOffset + graphLineHeigh - 2);
-			yOffset += graphLineHeigh;
-		}
+		// /*
+		// * Draw line plot of nucleotide frequencies
+		// */
+		// Buffer bA = buffersA.get(entry);
+		// Buffer bC = buffersC.get(entry);
+		// Buffer bG = buffersG.get(entry);
+		// Buffer bT = buffersT.get(entry);
+		// if (bA != null && bC != null && bG != null && bT != null) {
+		// GeneralPath conservationGPA = new GeneralPath();
+		// GeneralPath conservationGPC = new GeneralPath();
+		// GeneralPath conservationGPG = new GeneralPath();
+		// GeneralPath conservationGPT = new GeneralPath();
+		// for (int i = 0; i < (end - start) / scale; i++) {
+		// int x = Convert.translateGenomeToScreen(start + i * scale + 1, r,
+		// screenWidth) + 5;
+		// // conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
+		// // (lineHeigh - 4) + 2);
+		//
+		// double vA = bA.get(start + i * scale, scale);
+		// double vC = bC.get(start + i * scale, scale);
+		// double vG = bG.get(start + i * scale, scale);
+		// double vT = bT.get(start + i * scale, scale);
+		// // if(i==100)
+		// // checkValue=v;
+		// if (i == 0) {
+		//
+		// conservationGPA.moveTo(x - 1, yOffset + (1 - vA) * (graphLineHeigh -
+		// 4) + 2);
+		// conservationGPC.moveTo(x - 1, yOffset + (1 - vC) * (graphLineHeigh -
+		// 4) + 2);
+		// conservationGPG.moveTo(x - 1, yOffset + (1 - vG) * (graphLineHeigh -
+		// 4) + 2);
+		// conservationGPT.moveTo(x - 1, yOffset + (1 - vT) * (graphLineHeigh -
+		// 4) + 2);
+		//
+		// }
+		//
+		// conservationGPA.lineTo(x, yOffset + (1 - vA) * (graphLineHeigh - 4) +
+		// 2);
+		// conservationGPC.lineTo(x, yOffset + (1 - vC) * (graphLineHeigh - 4) +
+		// 2);
+		// conservationGPG.lineTo(x, yOffset + (1 - vG) * (graphLineHeigh - 4) +
+		// 2);
+		// conservationGPT.lineTo(x, yOffset + (1 - vT) * (graphLineHeigh - 4) +
+		// 2);
+		// }
+		//
+		// g.setColor(Configuration.getNucleotideColor('a'));
+		// g.draw(conservationGPA);
+		// g.setColor(Configuration.getNucleotideColor('c'));
+		// g.draw(conservationGPC);
+		// g.setColor(Configuration.getNucleotideColor('g'));
+		// g.draw(conservationGPG);
+		// g.setColor(Configuration.getNucleotideColor('t'));
+		// g.draw(conservationGPT);
+		// g.setColor(Color.BLUE);
+		// g.drawString("Nuc. freq. (" + scale + ")", 10, yOffset +
+		// graphLineHeigh - 2);
+		// yOffset += graphLineHeigh;
+		// }
 		/*
 		 * Draw individual reads when possible
 		 */
@@ -251,21 +257,7 @@ public class ShortReadTrack extends Track {
 		int lines = 0;
 		if (reads != null) {
 			int limit = 100 * Configuration.getInt("annotationview:maximumNoVisibleFeatures");
-			// if (reads.size() > limit) {
-			// g.setColor(Color.BLACK);
-			// g.drawString("Too many short reads to display, zoom in, " +
-			// reads.size() + " reads, limit=" + limit, 10, yOffset + 10);
-			// yOffset += 20 + 5;
-			// } else {
-			// System.out.println("Painting: " + reads.size() + " reads");
-			// if (cachedLocation != null && r.start() == cachedLocation.start()
-			// && r.end() == cachedLocation.end()) {
-			// // Same place, everything is cached
-			// } else {
-			// cachedLocation = r;
-			// cachedColors.clear();
-			// cachedRectangles.clear();
-			// cachedIndices.clear();
+
 			lines = 0;
 			int readLength = entry.shortReads.getReadGroup(source).readLength();
 			BitSet[] tilingCounter = new BitSet[r.length()];
