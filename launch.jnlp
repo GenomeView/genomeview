@@ -27,7 +27,7 @@ while (($file = readdir($handle)) !== false) {
 
 <information>
   <title>GenomeView: Genome Browser and Curator</title>
-  <vendor>VIB :: Plant Systems Biology :: Bioinformatics and Evolutionary Genomics</vendor>
+  <vendor>Thomas Abeel</vendor>
   <homepage href="http://bioinformatics.psb.ugent.be/" />
   <description>GenomeView: Genome Browser and Curator</description>
 </information>
