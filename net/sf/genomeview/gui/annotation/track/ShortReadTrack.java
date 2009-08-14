@@ -24,6 +24,8 @@ import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
+import net.sf.jannot.shortread.BAMreads;
+import net.sf.jannot.shortread.MemoryReadSet;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortRead;
 import net.sf.jannot.source.DataSource;
@@ -31,11 +33,64 @@ import net.sf.jannot.source.DataSource;
 public class ShortReadTrack extends Track {
 
 	private DataSource source;
-	
+	private ReadBuffer readBuffer;
 
 	public ShortReadTrack(Model model, DataSource source) {
 		super(model, true, true);
 		this.source = source;
+		this.readBuffer = new ReadBuffer(source);
+	}
+
+	static class ReadBuffer {
+
+		class Runner implements Runnable {
+
+			private Entry localEntry;
+
+			public Runner(Entry e) {
+				this.localEntry = e;
+			}
+
+			@Override
+			public void run() {
+				buffer.clear();
+				for (ShortRead sr : localEntry.shortReads.getReadGroup(source)) {
+					if (localEntry != entry) {
+						return;
+					}else{
+						buffer.add(sr);
+					}
+
+				}
+				System.out.println("Buffering done: "+localEntry);
+				ready = true;
+
+			}
+		}
+
+		private DataSource source;
+		private Entry entry = null;
+		private boolean ready = false;
+		private MemoryReadSet buffer = new MemoryReadSet();
+
+		public ReadBuffer(DataSource source) {
+			this.source = source;
+		}
+
+		public synchronized Iterable<ShortRead> get(Entry e, Location r) {
+			if(entry==e){
+				if(ready)
+					return buffer.get(r);
+				else
+					return e.shortReads.getReadGroup(source).get(r);
+			}else{
+				entry=e;
+				ready=false;
+				new Thread(new Runner(entry)).start();
+				return e.shortReads.getReadGroup(source).get(r);
+			}
+			
+		}
 	}
 
 	/**
@@ -118,12 +173,12 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public int paint(Graphics gg, final Entry entry, int yOffset, double screenWidth) {
-		
+
 		/* Configuration options */
 		int maxReads = Configuration.getInt("shortread:maxReads");
 		int maxRegion = Configuration.getInt("shortread:maxRegion");
 		int maxStack = Configuration.getInt("shortread:maxStack");
-		
+
 		Location r = model.getAnnotationLocationVisible();
 
 		int originalYOffset = yOffset;
@@ -146,8 +201,6 @@ public class ShortReadTrack extends Track {
 
 		int start = r.start() / scale * scale;
 		int end = ((r.end() / scale) + 1) * scale;
-
-		// /* Plot whatever is in the cache */
 
 		ReadGroup rg = entry.shortReads.getReadGroup(source);
 		// System.out.println(entry.shortReads+"\t"+rg+"\t"+source);
@@ -252,10 +305,15 @@ public class ShortReadTrack extends Track {
 		Iterable<ShortRead> reads = null;
 		if (!isCollapsed() && (r.length() > maxRegion)) {
 			g.setColor(Color.BLACK);
-			g.drawString("Region too big (max "+maxRegion+" nt), zoom in", 10, yOffset + 10);
+			g.drawString("Region too big (max " + maxRegion + " nt), zoom in", 10, yOffset + 10);
 			yOffset += 20 + 5;
 		} else if (!isCollapsed()) {
-			reads = rg.get(r);
+			/* Access to BAMread is through buffer for performance! */
+			if (rg instanceof BAMreads) {
+				reads = readBuffer.get(entry, r);
+			} else {
+				reads = rg.get(r);
+			}
 		}
 
 		int lines = 0;
@@ -269,7 +327,7 @@ public class ShortReadTrack extends Track {
 			int visibleReadCount = 0;
 			try {
 				for (ShortRead rf : reads) {
-					
+
 					if (visibleReadCount > maxReads) {
 
 						String msg = "Too many short reads to display, only first " + maxReads + " are displayed ";
