@@ -330,6 +330,7 @@ public class ShortReadTrack extends Track {
 		}
 
 		int lines = 0;
+		boolean stackExceeded=false;
 		if (reads != null) {
 			lines = 0;
 			int readLength = entry.shortReads.getReadGroup(source).readLength();
@@ -370,8 +371,6 @@ public class ShortReadTrack extends Track {
 						else
 							line = tilingCounter[0].nextClearBit(line);
 
-						/* Limit to 10k coverage */
-						// FIXME should be configuration option
 						if (line < maxStack) {
 							for (int i = rf.start() - 1 - readLength; i <= rf.end() + 1; i++) {
 								pos = i - r.start();
@@ -418,13 +417,21 @@ public class ShortReadTrack extends Track {
 									}
 								}
 							}
+						}else{
+							stackExceeded = true;
 						}
 					}
 				}
 			} catch (ConcurrentModificationException e) {
 				// Ignore
 			}
-
+			if(stackExceeded){
+				g.setColor(Color.RED);
+				g.drawString("Max stacking depth reached!", 5,lines*readLineHeight+ yOffset-2);
+				g.drawLine(0, lines*readLineHeight+ yOffset, (int)screenWidth, lines*readLineHeight+ yOffset);
+				lines++;
+				
+			}
 			yOffset += (lines + 1) * readLineHeight + 5;
 
 		}
