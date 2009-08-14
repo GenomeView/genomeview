@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.CubicCurve2D;
+import java.text.NumberFormat;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -92,6 +93,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 		model.addObserver(this);
 		addMouseMotionListener(this);
 		addMouseListener(this);
+	
 
 	}
 
@@ -134,6 +136,29 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 		// rec.x+rec.width+(this.getSize().width-rec.x-rec.width)/5.0,this.getSize().height-1,
 				this.getSize().width, this.getSize().height - 10, this.getSize().width, this.getSize().height - 1);
 		g.draw(curveRight);
+		
+		String size=format(current);
+		g.setColor(Color.BLACK);
+		g.drawString(size, this.getSize().width/2-50, this.getSize().height-1);
+	}
+	private NumberFormat nf=NumberFormat.getInstance();
+	private String format(Location current) {
+		double size=current.length();
+		if(size>1000000){
+			size/=1000000;
+			nf.setMaximumFractionDigits(1);
+			nf.setMinimumFractionDigits(1);
+			return nf.format(size)+" Mb";
+		}
+		if(size>1000){
+			size/=1000;
+			nf.setMaximumFractionDigits(1);
+			nf.setMinimumFractionDigits(1);
+			return nf.format(size)+" Kb";
+		}
+		nf.setMaximumFractionDigits(0);
+		nf.setMinimumFractionDigits(0);
+		return nf.format(size)+" b";
 	}
 
 	@Override
