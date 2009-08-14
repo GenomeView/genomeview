@@ -57,12 +57,12 @@ public class ShortReadTrack extends Track {
 				for (ShortRead sr : localEntry.shortReads.getReadGroup(source)) {
 					if (localEntry != entry) {
 						return;
-					}else{
+					} else {
 						buffer.add(sr);
 					}
 
 				}
-				System.out.println("Buffering done: "+localEntry);
+				System.out.println("Buffering done: " + localEntry);
 				ready = true;
 
 			}
@@ -78,18 +78,18 @@ public class ShortReadTrack extends Track {
 		}
 
 		public synchronized Iterable<ShortRead> get(Entry e, Location r) {
-			if(entry==e){
-				if(ready)
+			if (entry == e) {
+				if (ready)
 					return buffer.get(r);
 				else
 					return e.shortReads.getReadGroup(source).get(r);
-			}else{
-				entry=e;
-				ready=false;
+			} else {
+				entry = e;
+				ready = false;
 				new Thread(new Runner(entry)).start();
 				return e.shortReads.getReadGroup(source).get(r);
 			}
-			
+
 		}
 	}
 
@@ -100,6 +100,14 @@ public class ShortReadTrack extends Track {
 	 * 
 	 */
 	static class GraphBuffer implements Observer {
+
+		private double log(int val) {
+			if (val > 0)
+				return Math.log(val);
+			else
+				return 0;
+		}
+
 		double LOG2 = Math.log(2);
 		int bareScale = 32;
 		int bareScaleIndex = 5;
@@ -119,9 +127,9 @@ public class ShortReadTrack extends Track {
 			if (scale < bareScale) {
 				double conservation = 0;
 				for (int j = 0; j < scale; j++) {
-					conservation += rg.getPileUp().get(start + j);
+					conservation += log(rg.getPileUp().get(start + j));
 				}
-				return conservation / (scale * rg.getMaxPile());
+				return conservation / (scale * log(rg.getMaxPile()));
 			}
 			if (buffer.size() == 0)
 				buffer.add(bare());
@@ -140,15 +148,15 @@ public class ShortReadTrack extends Track {
 
 		private float[] merge(float[] ds) {
 			float[] out = new float[(ds.length + 1) / 2];
-			double max=0;
+			double max = 0;
 			for (int i = 0; i < ds.length - 1; i += 2) {
 				out[i / 2] = (ds[i] + ds[i + 1]) / 2;
-				if(out[i/2]>max)
-					max=out[i/2];
+				if (out[i / 2] > max)
+					max = out[i / 2];
 			}
 			out[out.length - 1] = ds[ds.length - 1];
-			for(int i=0;i<out.length;i++)
-				out[i]/=max;
+			for (int i = 0; i < out.length; i++)
+				out[i] /= max;
 			return out;
 		}
 
@@ -158,9 +166,9 @@ public class ShortReadTrack extends Track {
 			for (int i = 0; i < size; i += bareScale) {
 				float conservation = 0;
 				for (int j = 0; j < bareScale && i + j < size; j++) {
-					conservation += rg.getPileUp().get(i + j);
+					conservation += log(rg.getPileUp().get(i + j));
 				}
-				conservation /= bareScale * rg.getMaxPile();
+				conservation /= bareScale * log(rg.getMaxPile());
 				out[i / bareScale] = conservation;
 
 			}
