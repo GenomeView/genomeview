@@ -143,7 +143,7 @@ public class ShortReadTrack extends Track {
 			if (start / scale < buffer.get(index).length)
 				return buffer.get(index)[start / scale];
 			else
-				return -1;
+				return -0.02;
 		}
 
 		private float[] merge(float[] ds) {
@@ -248,7 +248,7 @@ public class ShortReadTrack extends Track {
 			g.setColor(Color.BLACK);
 			g.draw(conservationGP);
 			g.setColor(Color.BLUE);
-			g.drawString(this.displayName() + " (" + scale + ")", 10, yOffset + 12 - 2);
+			g.drawString(source.toString() + " (" + scale + ")", 10, yOffset + 12 - 2);
 			yOffset += graphLineHeigh;
 		}
 
@@ -440,7 +440,7 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public String displayName() {
-		return "Short reads from " + source;
+		return "Short reads: "+source.toString();
 	}
 
 	public DataSource source() {
