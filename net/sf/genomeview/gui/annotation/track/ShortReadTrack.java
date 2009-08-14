@@ -99,14 +99,14 @@ public class ShortReadTrack extends Track {
 	 * @author tabeel
 	 * 
 	 */
-	static class Buffer implements Observer {
+	static class GraphBuffer implements Observer {
 		double LOG2 = Math.log(2);
 		int bareScale = 32;
 		int bareScaleIndex = 5;
 
 		private ReadGroup rg;
 
-		public Buffer(ReadGroup rg) {
+		public GraphBuffer(ReadGroup rg) {
 			rg.addObserver(this);
 			this.rg = rg;
 		}
@@ -140,10 +140,15 @@ public class ShortReadTrack extends Track {
 
 		private float[] merge(float[] ds) {
 			float[] out = new float[(ds.length + 1) / 2];
+			double max=0;
 			for (int i = 0; i < ds.length - 1; i += 2) {
 				out[i / 2] = (ds[i] + ds[i + 1]) / 2;
+				if(out[i/2]>max)
+					max=out[i/2];
 			}
 			out[out.length - 1] = ds[ds.length - 1];
+			for(int i=0;i<out.length;i++)
+				out[i]/=max;
 			return out;
 		}
 
@@ -169,7 +174,7 @@ public class ShortReadTrack extends Track {
 
 	}
 
-	private Map<Entry, Buffer> buffers = new HashMap<Entry, Buffer>();
+	private Map<Entry, GraphBuffer> buffers = new HashMap<Entry, GraphBuffer>();
 
 	@Override
 	public int paint(Graphics gg, final Entry entry, int yOffset, double screenWidth) {
@@ -207,14 +212,14 @@ public class ShortReadTrack extends Track {
 		if (rg != null) {
 			if (!buffers.containsKey(entry)) {
 				// System.out.println("Construction size: " + tmp);
-				buffers.put(entry, new Buffer(rg));
+				buffers.put(entry, new GraphBuffer(rg));
 
 			}
 			// write(entry.shortReads.counts());
 		} else {
 			return 0; /* Not yet ready */
 		}
-		Buffer b = buffers.get(entry);
+		GraphBuffer b = buffers.get(entry);
 		if (b != null) {
 			GeneralPath conservationGP = new GeneralPath();
 			for (int i = 0; i < (end - start) / scale; i++) {
