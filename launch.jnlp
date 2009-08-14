@@ -28,7 +28,7 @@ while (($file = readdir($handle)) !== false) {
 <information>
   <title>GenomeView: Genome Browser and Curator</title>
   <vendor>Thomas Abeel</vendor>
-  <homepage href="http://bioinformatics.psb.ugent.be/" />
+  <homepage href="http://www.abeel.be/" />
   <description>GenomeView: Genome Browser and Curator</description>
 </information>
 <security>
