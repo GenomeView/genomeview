@@ -156,7 +156,7 @@ public class ConfigurationDialog extends JDialog {
 		}
 	}
 
-	class AANucleotideColorsConfigPanel extends GridBagPanel {
+	static class AANucleotideColorsConfigPanel extends GridBagPanel {
 
 		private static final long serialVersionUID = -2574897453334264771L;
 
@@ -183,14 +183,38 @@ public class ConfigurationDialog extends JDialog {
 		}
 
 	}
+	/**
+	 * Options for Short reads
+	 * 
+	 * @author Thomas Abeel
+	 * 
+	 */
+	static class ShortReadConfigPanel extends GridBagPanel {
 
+		/**
+         * 
+         */
+		private static final long serialVersionUID = -628553625113038258L;
+
+		public ShortReadConfigPanel() {
+			this.add(new IntegerConfig("shortread:maxReads",
+					"Maximum number of displayed reads"), gc);
+			gc.gridy++;
+			this.add(new IntegerConfig("shortread:maxRegion",
+					"Maximum range in nucleotides to display individual reads"), gc);
+			gc.gridy++;
+			this.add(new IntegerConfig("shortread:maxStack",
+					"Maximum display depth of stacked reads, deeper stacked reads will not be shown individually, but are included in the pile-up view"), gc);
+			
+		}
+	}
 	/**
 	 * Options for the AnnotationView
 	 * 
 	 * @author Thomas Abeel
 	 * 
 	 */
-	class AnnotationConfigPanel extends GridBagPanel {
+	static class AnnotationConfigPanel extends GridBagPanel {
 
 		/**
          * 
@@ -259,7 +283,7 @@ public class ConfigurationDialog extends JDialog {
 		}
 	}
 
-	class FeatureTrackConfigPanel extends GridBagPanel {
+	static class FeatureTrackConfigPanel extends GridBagPanel {
 		/**
          * 
          */
@@ -350,6 +374,7 @@ public class ConfigurationDialog extends JDialog {
 		jtp.add("AA&nucleotide colors", colors);
 		jtp.add("Feature track", new FeatureTrackConfigPanel(model));
 
+		jtp.add("Short reads",new ShortReadConfigPanel());
 		
 		jtp.add("Miscellaneous", miscPanel);
 
