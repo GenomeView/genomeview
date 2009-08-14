@@ -6,8 +6,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/ajt-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JAnnot"/>
 	<classpathentry kind="lib" path="lib/sam-1.03.jar"/>
 	<classpathentry kind="lib" path="lib/collections-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jannot-1.93.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

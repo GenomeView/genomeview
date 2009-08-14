@@ -293,7 +293,7 @@ public class Model extends Observable implements IModel {
 		} else {
 			modStart = 1;
 		}
-		int chromLength = getSelectedEntry().sequence.size();
+		int chromLength = getSelectedEntry().size();
 		if (end < chromLength || chromLength == 0) {
 			modEnd = end;
 		} else {
