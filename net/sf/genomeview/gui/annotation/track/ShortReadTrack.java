@@ -410,7 +410,7 @@ public class ShortReadTrack extends Track {
 
 									if (readNt != refNt) {
 										if (readNt == '-'){
-											System.out.println("RED");
+//											System.out.println("RED");
 											g.setColor(Color.RED);
 										}else
 											g.setColor(Color.ORANGE);
