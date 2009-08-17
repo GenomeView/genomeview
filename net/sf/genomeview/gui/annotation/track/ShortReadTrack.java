@@ -330,7 +330,7 @@ public class ShortReadTrack extends Track {
 		}
 
 		int lines = 0;
-		boolean stackExceeded=false;
+		boolean stackExceeded = false;
 		if (reads != null) {
 			lines = 0;
 			int readLength = entry.shortReads.getReadGroup(source).readLength();
@@ -371,6 +371,11 @@ public class ShortReadTrack extends Track {
 						else
 							line = tilingCounter[0].nextClearBit(line);
 
+						/*
+						 * FIXME add additional checks for Extended reads that
+						 * may cover other reads
+						 */
+
 						if (line < maxStack) {
 							for (int i = rf.start() - 1 - readLength; i <= rf.end() + 1; i++) {
 								pos = i - r.start();
@@ -397,8 +402,6 @@ public class ShortReadTrack extends Track {
 							visibleReadCount++;
 							/* Check mismatches */
 							if (r.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
-								// ShortRead rf =
-								// reads.get(cachedIndices.get(i));
 								for (int j = rf.start(); j <= rf.end(); j++) {
 									char readNt = rf.getNucleotide(j - rf.start() + 1);
 									char refNt = Character.toUpperCase(entry.sequence.getNucleotide(j));
@@ -406,7 +409,11 @@ public class ShortReadTrack extends Track {
 									double tx2 = Convert.translateGenomeToScreen(j + 1, r, screenWidth);
 
 									if (readNt != refNt) {
-										g.setColor(Color.ORANGE);
+										if (readNt == '-'){
+											System.out.println("RED");
+											g.setColor(Color.RED);
+										}else
+											g.setColor(Color.ORANGE);
 										g.fillRect((int) tx1, yRec, (int) (tx2 - tx1), readLineHeight - 1);
 										if (model.getAnnotationLocationVisible().length() < 100) {
 											g.setColor(c);
@@ -417,7 +424,7 @@ public class ShortReadTrack extends Track {
 									}
 								}
 							}
-						}else{
+						} else {
 							stackExceeded = true;
 						}
 					}
@@ -425,12 +432,12 @@ public class ShortReadTrack extends Track {
 			} catch (ConcurrentModificationException e) {
 				// Ignore
 			}
-			if(stackExceeded){
+			if (stackExceeded) {
 				g.setColor(Color.RED);
-				g.drawString("Max stacking depth reached!", 5,lines*readLineHeight+ yOffset-2);
-				g.drawLine(0, lines*readLineHeight+ yOffset, (int)screenWidth, lines*readLineHeight+ yOffset);
+				g.drawString("Max stacking depth reached!", 5, lines * readLineHeight + yOffset - 2);
+				g.drawLine(0, lines * readLineHeight + yOffset, (int) screenWidth, lines * readLineHeight + yOffset);
 				lines++;
-				
+
 			}
 			yOffset += (lines + 1) * readLineHeight + 5;
 
@@ -440,7 +447,7 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public String displayName() {
-		return "Short reads: "+source.toString();
+		return "Short reads: " + source.toString();
 	}
 
 	public DataSource source() {
