@@ -26,6 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.cache.CachedURLSource;
 import net.sf.genomeview.data.das.DAS;
 import net.sf.genomeview.data.das.DAS.EntryPoint;
 import net.sf.genomeview.gui.StaticUtils;
@@ -33,11 +34,10 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.source.SAMDataSource;
-import net.sf.jannot.source.URLSource;
 import be.abeel.gui.TitledComponent;
 
 public class DataSourceFactory {
-	static class MyAuthenticator extends Authenticator {
+	static private class MyAuthenticator extends Authenticator {
 
 		protected PasswordAuthentication getPasswordAuthentication() {
 			final JDialog jd = new JDialog();
@@ -142,7 +142,7 @@ public class DataSourceFactory {
 
 			try {
 				URL url = new URI(JOptionPane.showInputDialog(model.getParent(), "Give the URL of the data").trim()).toURL();
-				return new DataSource[] { new URLSource(url) };
+				return new DataSource[] { new CachedURLSource(url) };
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
