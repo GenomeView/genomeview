@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.JOptionPane;
+
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
@@ -41,7 +43,7 @@ public class ShortReadTrack extends Track {
 		this.readBuffer = new ReadBuffer(source);
 	}
 
-	static class ReadBuffer {
+	class ReadBuffer {
 
 		class Runner implements Runnable {
 
@@ -54,11 +56,18 @@ public class ShortReadTrack extends Track {
 			@Override
 			public void run() {
 				buffer.clear();
+				System.out.println("Start buffering: " + localEntry);
 				for (ShortRead sr : localEntry.shortReads.getReadGroup(source)) {
 					if (localEntry != entry) {
 						return;
 					} else {
 						buffer.add(sr);
+					}
+					if(buffer.size()>2000000){
+						buffer.clear();
+						System.out.println("Buffering is not working out, sorry!");
+						JOptionPane.showMessageDialog(null, "Buffering is not working out, too much data.","Warning!",JOptionPane.WARNING_MESSAGE);
+						return;
 					}
 
 				}
@@ -206,6 +215,8 @@ public class ShortReadTrack extends Track {
 		/*
 		 * Draw line plot of coverage
 		 */
+		g.setColor( new Color(204, 238, 255, 100));
+		g.fillRect(0, yOffset, (int)screenWidth, graphLineHeigh);
 		double width = screenWidth / (double) r.length() / 2.0;
 
 		int scale = 1;
