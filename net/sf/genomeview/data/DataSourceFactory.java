@@ -3,11 +3,8 @@
  */
 package net.sf.genomeview.data;
 
-import java.awt.Button;
-import java.awt.Color;
-import java.awt.GridLayout;
-import java.awt.Label;
-import java.awt.TextField;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -19,63 +16,68 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.das.DAS;
 import net.sf.genomeview.data.das.DAS.EntryPoint;
+import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.source.SAMDataSource;
 import net.sf.jannot.source.URLSource;
+import be.abeel.gui.TitledComponent;
 
 public class DataSourceFactory {
 	static class MyAuthenticator extends Authenticator {
-//		private String username = null, password = null;
-
-		public MyAuthenticator() {
-			// username = user;
-			// password = pass;
-		}
 
 		protected PasswordAuthentication getPasswordAuthentication() {
 			final JDialog jd = new JDialog();
 			jd.setTitle("Enter password");
 			jd.setModal(true);
-			jd.setLayout(new GridLayout(0, 1));
-			Label jl = new Label(getRequestingPrompt());
-			jd.add(jl);
-			TextField username = new TextField();
-			username.setBackground(Color.lightGray);
-			jd.add(username);
-			TextField password = new TextField();
-			password.setEchoChar('*');
-			password.setBackground(Color.lightGray);
-			jd.add(password);
-			Button jb = new Button("OK");
-			jd.add(jb);
+			jd.setLayout(new GridBagLayout());
+			GridBagConstraints gc=new GridBagConstraints();
+			gc.gridx=0;
+			gc.gridy=0;
+			gc.fill=GridBagConstraints.BOTH;
+			
+			JLabel jl = new JLabel("Please enter login details for: "+getRequestingPrompt() +" at "+getRequestingHost());
+			jd.add(jl,gc);
+			gc.gridy++;
+			JTextField username = new JTextField();
+			jd.add(new TitledComponent("User name",username),gc);
+			gc.gridy++;
+			JPasswordField password = new JPasswordField();
+
+			jd.add(new TitledComponent("Password",password),gc);
+			gc.gridy++;
+			JButton jb = new JButton("OK");
+			jd.add(jb,gc);
 			jb.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					jd.dispose();
 				}
 			});
+			jd.pack();
+			StaticUtils.center(jd);
+			jd.setVisible(true);
 			System.out.println("Requesting Host  : " + getRequestingHost());
 			System.out.println("Requesting Port  : " + getRequestingPort());
 			System.out.println("Requesting Prompt : " + getRequestingPrompt());
 			System.out.println("Requesting Protocol: " + getRequestingProtocol());
 			System.out.println("Requesting Scheme : " + getRequestingScheme());
 			System.out.println("Requesting Site  : " + getRequestingSite());
-			return new PasswordAuthentication(username.getText(), password.getText().toCharArray());
+			
+			return new PasswordAuthentication(username.getText(), password.getPassword());
 		}
-
-//		private void get() {
-//			// TODO Auto-generated method stub
-//
-//		}
 	}
 
 	static {
