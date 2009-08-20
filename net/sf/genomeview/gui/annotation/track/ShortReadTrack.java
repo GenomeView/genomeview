@@ -23,6 +23,8 @@ import javax.swing.JOptionPane;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.StaticUtils;
+import net.sf.genomeview.gui.dialog.GVProgressBar;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
@@ -55,23 +57,26 @@ public class ShortReadTrack extends Track {
 
 			@Override
 			public void run() {
-				buffer.clear();
-				System.out.println("Start buffering: " + localEntry);
-				for (ShortRead sr : localEntry.shortReads.getReadGroup(source)) {
+				buffer.clear();	
+				ReadGroup rg=localEntry.shortReads.getReadGroup(source);
+				GVProgressBar bar=new GVProgressBar("Buffering...","Buffering "+displayName(),model.getParent());
+				StaticUtils.upperRight(bar);
+				for (ShortRead sr : rg) {
 					if (localEntry != entry) {
 						return;
 					} else {
 						buffer.add(sr);
 					}
+					
 					if(buffer.size()>2000000){
 						buffer.clear();
-						System.out.println("Buffering is not working out, sorry!");
 						JOptionPane.showMessageDialog(null, "Buffering is not working out, too much data.","Warning!",JOptionPane.WARNING_MESSAGE);
+						bar.dispose();
 						return;
 					}
 
 				}
-				System.out.println("Buffering done: " + localEntry);
+				bar.dispose();
 				ready = true;
 
 			}
