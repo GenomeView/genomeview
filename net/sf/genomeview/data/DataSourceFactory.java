@@ -37,52 +37,7 @@ import net.sf.jannot.source.SAMDataSource;
 import be.abeel.gui.TitledComponent;
 
 public class DataSourceFactory {
-	static private class MyAuthenticator extends Authenticator {
-
-		protected PasswordAuthentication getPasswordAuthentication() {
-			final JDialog jd = new JDialog();
-			jd.setTitle("Enter password");
-			jd.setModal(true);
-			jd.setLayout(new GridBagLayout());
-			GridBagConstraints gc=new GridBagConstraints();
-			gc.gridx=0;
-			gc.gridy=0;
-			gc.fill=GridBagConstraints.BOTH;
-			
-			JLabel jl = new JLabel("Please enter login details for: "+getRequestingPrompt() +" at "+getRequestingHost());
-			jd.add(jl,gc);
-			gc.gridy++;
-			JTextField username = new JTextField();
-			jd.add(new TitledComponent("User name",username),gc);
-			gc.gridy++;
-			JPasswordField password = new JPasswordField();
-
-			jd.add(new TitledComponent("Password",password),gc);
-			gc.gridy++;
-			JButton jb = new JButton("OK");
-			jd.add(jb,gc);
-			jb.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					jd.dispose();
-				}
-			});
-			jd.pack();
-			StaticUtils.center(jd);
-			jd.setVisible(true);
-			System.out.println("Requesting Host  : " + getRequestingHost());
-			System.out.println("Requesting Port  : " + getRequestingPort());
-			System.out.println("Requesting Prompt : " + getRequestingPrompt());
-			System.out.println("Requesting Protocol: " + getRequestingProtocol());
-			System.out.println("Requesting Scheme : " + getRequestingScheme());
-			System.out.println("Requesting Site  : " + getRequestingSite());
-			
-			return new PasswordAuthentication(username.getText(), password.getPassword());
-		}
-	}
-
-	static {
-		Authenticator.setDefault(new MyAuthenticator());
-	}
+	
 
 	public enum Sources {
 		LOCALFILE, URL, DIRECTORY, DAS;

@@ -29,13 +29,13 @@ import javax.swing.JPanel;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.cache.CachedURLSource;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
-import net.sf.jannot.source.URLSource;
 import be.abeel.jargs.AutoHelpCmdLineParser;
 
 /**
@@ -152,7 +152,7 @@ public class MainWindow implements WindowListener, Observer {
 		} else if (cmdUrl != null) {
 			logger.info("URL commandline option is set: " + cmdUrl);
 			try {
-				data = new DataSource[] { new URLSource(new URI(cmdUrl).toURL()) };
+				data = new DataSource[] { new CachedURLSource(new URI(cmdUrl).toURL()) };
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -220,7 +220,7 @@ public class MainWindow implements WindowListener, Observer {
 						rf.execute();
 
 					} else {
-						DataSource ds = new URLSource(new URI(s).toURL());
+						DataSource ds = new CachedURLSource(new URI(s).toURL());
 						
 						ReadWorker rf = new ReadWorker(ds,
 								model);

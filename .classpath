@@ -8,6 +8,6 @@
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/sam-1.03.jar"/>
 	<classpathentry kind="lib" path="lib/collections-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/jannot-1.94.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JAnnot"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
