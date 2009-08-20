@@ -17,81 +17,84 @@ import net.sf.genomeview.gui.dialog.MergeFeatureDialog;
 import net.sf.genomeview.gui.dialog.SplitFeatureDialog;
 import net.sf.genomeview.gui.menu.PopUpMenu;
 
-
 public abstract class StaticUtils {
-    /*
-     * This class should never be instantiated, so we make the constructor
-     * private.
-     */
-    private StaticUtils() {
-    };
+	/*
+	 * This class should never be instantiated, so we make the constructor
+	 * private.
+	 */
+	private StaticUtils() {
+	};
 
-    private static EditFeatureWindow editStructure = null;
+	private static EditFeatureWindow editStructure = null;
 
-    public static EditFeatureWindow getEditStructure(Model model) {
-        // model.startGroupChange("Edit structure");
-        if (editStructure == null) {
-            editStructure = new EditFeatureWindow(model);
-        }
-        return editStructure;
-    }
+	public static EditFeatureWindow getEditStructure(Model model) {
+		// model.startGroupChange("Edit structure");
+		if (editStructure == null) {
+			editStructure = new EditFeatureWindow(model);
+		}
+		return editStructure;
+	}
 
-    private static PopUpMenu structurePopup = null;
+	private static PopUpMenu structurePopup = null;
 
-    private static MergeFeatureDialog mergeFeature = null;
+	private static MergeFeatureDialog mergeFeature = null;
 
-    private static SplitFeatureDialog splitFeature;
+	private static SplitFeatureDialog splitFeature;
 
-    public static JPopupMenu popupMenu(Model model) {
-        if (structurePopup == null)
-            structurePopup = new PopUpMenu(model);
+	public static JPopupMenu popupMenu(Model model) {
+		if (structurePopup == null)
+			structurePopup = new PopUpMenu(model);
 
-        return structurePopup;
-    }
+		return structurePopup;
+	}
 
-    /**
-     * Centers the window on the screen. This method should always be called
-     * after pack().
-     * 
-     * @param window
-     *            the window to center
-     */
-    public static void center(Window window) {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension windowSize = window.getPreferredSize();
-        window.setLocation(screenSize.width / 2 - (windowSize.width / 2), screenSize.height / 2
-                - (windowSize.height / 2));
+	/**
+	 * Centers the window on the screen. This method should always be called
+	 * after pack().
+	 * 
+	 * @param window
+	 *            the window to center
+	 */
+	public static void center(Window window) {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension windowSize = window.getPreferredSize();
+		window.setLocation(screenSize.width / 2 - (windowSize.width / 2), screenSize.height / 2 - (windowSize.height / 2));
 
-    }
+	}
 
-    public static MergeFeatureDialog getMergeFeature(Model model) {
-        if (mergeFeature == null)
-            mergeFeature = new MergeFeatureDialog(model);
-        return mergeFeature;
-    }
+	public static void upperRight(Window window) {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		window.setLocation(screenSize.width / 4 * 3,50);
+	}
 
-    public static SplitFeatureDialog splitFeature(Model model) {
-        if (splitFeature == null)
-            splitFeature = new SplitFeatureDialog(model);
-        return splitFeature;
-    }
+	public static MergeFeatureDialog getMergeFeature(Model model) {
+		if (mergeFeature == null)
+			mergeFeature = new MergeFeatureDialog(model);
+		return mergeFeature;
+	}
 
-    public static String escapeHTML(String in) {
-        in = in.replaceAll("<", "&lt;");
-        in = in.replaceAll(">", "&gt;");
+	public static SplitFeatureDialog splitFeature(Model model) {
+		if (splitFeature == null)
+			splitFeature = new SplitFeatureDialog(model);
+		return splitFeature;
+	}
 
-        return in;
+	public static String escapeHTML(String in) {
+		in = in.replaceAll("<", "&lt;");
+		in = in.replaceAll(">", "&gt;");
 
-    }
+		return in;
 
-    /**
-     * Put this component in the top-right corner of the supplied JFrame
-     * 
-     */
-    public static void right(Component comp, JFrame parent) {
-        int width = parent.getWidth();
-        comp.setLocation(width - comp.getWidth(), 0);
+	}
 
-    }
+	/**
+	 * Put this component in the top-right corner of the supplied JFrame
+	 * 
+	 */
+	public static void right(Component comp, JFrame parent) {
+		int width = parent.getWidth();
+		comp.setLocation(width - comp.getWidth(), 0);
+
+	}
 
 }
