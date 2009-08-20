@@ -12,6 +12,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
+import net.sf.genomeview.gui.StaticUtils;
+
 /**
  * A popup dialog containing a progress bar and progress messages. It is
  * designed to be passed as a PropertyChangeListener to SwingWorkers.
@@ -37,16 +39,16 @@ public class GVProgressBar extends JDialog {
 		setPreferredSize(new Dimension(280, 80));
 		pb.setIndeterminate(true);
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.NONE;
+		gbc.fill = GridBagConstraints.BOTH;
 		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridy = GridBagConstraints.RELATIVE;
-		commentLabel.setText(initText + "...");
+		commentLabel.setText(initText);
 		add(commentLabel, gbc);
 		add(pb, gbc);
 		pack();
-		setLocationRelativeTo(parent);
+		StaticUtils.upperRight(this);
 
 		setVisible(true);
 	}
@@ -73,5 +75,5 @@ public class GVProgressBar extends JDialog {
 		pb.setValue(progress);
 
 	}
-
+	
 }
