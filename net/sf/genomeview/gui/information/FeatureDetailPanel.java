@@ -144,14 +144,10 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 							"Query at Google",
 							"http://www.google.com/search?q=%query%"));
 
-					JMenuItem tbdb = new JMenuItem(
-							new Query("Query in TBDB",
-									"http://genome.tbdb.org/annotation/genome/tbdb/GlobalSearch.html?q=%query%"));
 					popupMenu.add(ncbiQuery);
 					popupMenu.add(ensemblQuery);
 					popupMenu.add(ebi);
 					popupMenu.add(google);
-					popupMenu.add(tbdb);
 					String extra = Configuration.get("extraqueries");
 					if (extra != null) {
 						popupMenu.addSeparator();
