@@ -134,14 +134,66 @@ public class ShortReadTrack extends Track {
 		}
 
 		private List<float[]> buffer = new ArrayList<float[]>();
-
-		public synchronized double get(int start, int scale) {
-			if (start + scale >= rg.getPileUp().size())
+		private List<float[]> bufferForward = new ArrayList<float[]>();
+		private List<float[]> bufferReverse = new ArrayList<float[]>();
+		
+		public synchronized double getReverse(int start, int scale) {
+			if (start + scale >= rg.getForwardPileUp().size())
 				return 0;
 			if (scale < bareScale) {
 				double conservation = 0;
 				for (int j = 0; j < scale; j++) {
-					conservation += log(rg.getPileUp().get(start + j));
+					conservation += log(rg.getReversePileUp().get(start + j));
+				}
+				return conservation / (scale * log(rg.getMaxPile()));
+			}
+			if (bufferReverse.size() == 0)
+				bufferReverse.add(bareReverse());
+
+			int index = (int) (Math.log(scale) / LOG2) - bareScaleIndex;
+
+			while (bufferReverse.size() <= index + 1) {
+				bufferReverse.add(merge(bufferReverse.get(bufferReverse.size() - 1)));
+			}
+
+			if (start / scale < bufferReverse.get(index).length)
+				return bufferReverse.get(index)[start / scale];
+			else
+				return -0.02;
+		}
+		public synchronized double getForward(int start, int scale) {
+			if (start + scale >= rg.getForwardPileUp().size())
+				return 0;
+			if (scale < bareScale) {
+				double conservation = 0;
+				for (int j = 0; j < scale; j++) {
+					conservation += log(rg.getForwardPileUp().get(start + j));
+					
+				}
+				return conservation / (scale * log(rg.getMaxPile()));
+			}
+			if (bufferForward.size() == 0)
+				bufferForward.add(bareForward());
+
+			int index = (int) (Math.log(scale) / LOG2) - bareScaleIndex;
+
+			while (bufferForward.size() <= index + 1) {
+				bufferForward.add(merge(bufferForward.get(bufferForward.size() - 1)));
+			}
+
+			if (start / scale < bufferForward.get(index).length)
+				return bufferForward.get(index)[start / scale];
+			else
+				return -0.02;
+		}
+		public synchronized double get(int start, int scale) {
+			if (start + scale >= rg.getForwardPileUp().size())
+				return 0;
+			if (scale < bareScale) {
+				double conservation = 0;
+				for (int j = 0; j < scale; j++) {
+					conservation += log(rg.getForwardPileUp().get(start + j));
+					conservation += log(rg.getReversePileUp().get(start + j));
 				}
 				return conservation / (scale * log(rg.getMaxPile()));
 			}
@@ -175,12 +227,13 @@ public class ShortReadTrack extends Track {
 		}
 
 		private float[] bare() {
-			int size = rg.getPileUp().size();
+			int size = rg.getForwardPileUp().size();
 			float[] out = new float[size / bareScale + 1];
 			for (int i = 0; i < size; i += bareScale) {
 				float conservation = 0;
 				for (int j = 0; j < bareScale && i + j < size; j++) {
-					conservation += log(rg.getPileUp().get(i + j));
+					conservation += log(rg.getForwardPileUp().get(i + j));
+					conservation += log(rg.getReversePileUp().get(i + j));
 				}
 				conservation /= bareScale * log(rg.getMaxPile());
 				out[i / bareScale] = conservation;
@@ -188,10 +241,39 @@ public class ShortReadTrack extends Track {
 			}
 			return out;
 		}
+		private float[] bareReverse() {
+			int size = rg.getForwardPileUp().size();
+			float[] out = new float[size / bareScale + 1];
+			for (int i = 0; i < size; i += bareScale) {
+				float conservation = 0;
+				for (int j = 0; j < bareScale && i + j < size; j++) {
+					conservation += log(rg.getReversePileUp().get(i + j));
+				}
+				conservation /= bareScale * log(rg.getMaxPile());
+				out[i / bareScale] = conservation;
 
+			}
+			return out;
+		}
+		private float[] bareForward() {
+			int size = rg.getForwardPileUp().size();
+			float[] out = new float[size / bareScale + 1];
+			for (int i = 0; i < size; i += bareScale) {
+				float conservation = 0;
+				for (int j = 0; j < bareScale && i + j < size; j++) {
+					conservation += log(rg.getForwardPileUp().get(i + j));
+				}
+				conservation /= bareScale * log(rg.getMaxPile());
+				out[i / bareScale] = conservation;
+
+			}
+			return out;
+		}
 		@Override
 		public synchronized void update(Observable o, Object arg) {
 			buffer.clear();
+			bufferForward.clear();
+			bufferReverse.clear();
 		}
 
 	}
@@ -246,23 +328,41 @@ public class ShortReadTrack extends Track {
 		GraphBuffer b = buffers.get(entry);
 		if (b != null) {
 			GeneralPath conservationGP = new GeneralPath();
+			GeneralPath conservationGPF = new GeneralPath();
+			GeneralPath conservationGPR = new GeneralPath();
 			for (int i = 0; i < (end - start) / scale; i++) {
 				int x = Convert.translateGenomeToScreen(start + i * scale + 1, r, screenWidth) + 5;
 				// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
 				// (lineHeigh - 4) + 2);
 				double v = b.get(start + i * scale, scale);
+				double vf = b.getForward(start + i * scale, scale);
+				double vr = b.getReverse(start + i * scale, scale);
 
 				// if(i==100)
 				// checkValue=v;
 				if (i == 0) {
 					conservationGP.moveTo(x - 1, yOffset + (1 - v) * (graphLineHeigh - 4) + 2);
+					conservationGPF.moveTo(x - 1, yOffset + (1 - vf) * (graphLineHeigh - 4) + 2);
+					conservationGPR.moveTo(x - 1, yOffset + (1 - vr) * (graphLineHeigh - 4) + 2);
 
 				}
 				conservationGP.lineTo(x, yOffset + (1 - v) * (graphLineHeigh - 4) + 2);
+				conservationGPF.lineTo(x, yOffset + (1 - vf) * (graphLineHeigh - 4) + 2);
+				conservationGPR.lineTo(x, yOffset + (1 - vr) * (graphLineHeigh - 4) + 2);
 
 			}
+			
+			/* Draw coverage lines */
+			g.setColor(Color.BLUE);
+			g.draw(conservationGPF);
+			
+			g.setColor(new Color(0x00, 0x99, 0x00));
+			g.draw(conservationGPR);
+			
 			g.setColor(Color.BLACK);
 			g.draw(conservationGP);
+			
+			
 			g.setColor(Color.BLUE);
 			g.drawString(source.toString() + " (" + scale + ")", 10, yOffset + 12 - 2);
 			yOffset += graphLineHeigh;
