@@ -29,10 +29,15 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.shortread.BAMreads;
+import net.sf.jannot.shortread.ExtendedShortRead;
 import net.sf.jannot.shortread.MemoryReadSet;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortRead;
 import net.sf.jannot.source.DataSource;
+import net.sf.jannot.source.SAMDataSource;
+import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMRecord;
+import net.sf.samtools.util.CloseableIterator;
 
 public class ShortReadTrack extends Track {
 
@@ -57,9 +62,9 @@ public class ShortReadTrack extends Track {
 
 			@Override
 			public void run() {
-				buffer.clear();	
-				ReadGroup rg=localEntry.shortReads.getReadGroup(source);
-				GVProgressBar bar=new GVProgressBar("Buffering...","Buffering "+displayName(),model.getParent());
+				buffer.clear();
+				ReadGroup rg = localEntry.shortReads.getReadGroup(source);
+				GVProgressBar bar = new GVProgressBar("Buffering...", "Buffering " + displayName(), model.getParent());
 				StaticUtils.upperRight(bar);
 				for (ShortRead sr : rg) {
 					if (localEntry != entry) {
@@ -67,10 +72,10 @@ public class ShortReadTrack extends Track {
 					} else {
 						buffer.add(sr);
 					}
-					
-					if(buffer.size()>2000000){
+
+					if (buffer.size() > 2000000) {
 						buffer.clear();
-						JOptionPane.showMessageDialog(null, "Buffering is not working out, too much data.","Warning!",JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(null, "Buffering is not working out, too much data.", "Warning!", JOptionPane.WARNING_MESSAGE);
 						bar.dispose();
 						return;
 					}
@@ -96,15 +101,81 @@ public class ShortReadTrack extends Track {
 				if (ready)
 					return buffer.get(r);
 				else
-					return e.shortReads.getReadGroup(source).get(r);
+					return qFast(e, r);
 			} else {
 				entry = e;
 				ready = false;
+				/* Try caching */
 				new Thread(new Runner(entry)).start();
-				return e.shortReads.getReadGroup(source).get(r);
+				/* But return something fast anyway */
+				return qFast(e, r);
 			}
 
 		}
+
+		/* qFast */
+		private List<ShortRead> qFastBuffer = new ArrayList<ShortRead>();
+		private Location qFastBufferLocation = new Location(-5, -5);
+		private byte qFastFail = 0;
+
+		private synchronized Iterable<ShortRead> qFast(Entry e, Location r) {
+			if(isQFastFail())
+				return null;
+			if (!(source instanceof SAMDataSource)) {
+				return e.shortReads.getReadGroup(source).get(r);
+			} else {
+				long time = System.currentTimeMillis();
+				if (r.start() != qFastBufferLocation.start() || r.end() != qFastBufferLocation.end()) {
+					qFastBuffer.clear();
+					BAMreads br = (BAMreads) (e.shortReads.getReadGroup(source));
+					SAMFileReader tmpReader = new SAMFileReader(((SAMDataSource) source).getFile());
+					CloseableIterator<SAMRecord> it = tmpReader.queryOverlapping(br.getKey(), r.start(), r.end());
+					while (it.hasNext()) {
+						try {
+							SAMRecord tmp = it.next();
+							byte[] seq = tmp.getReadBases();
+							if (complete(seq)) {
+								qFastBuffer.add(new ExtendedShortRead(seq, tmp.getAlignmentStart(), tmp.getAlignmentEnd(), !tmp.getReadNegativeStrandFlag(), tmp.getCigar()));
+
+							}
+						} catch (RuntimeException ex) {
+							System.err.println(e);
+
+						}
+						/* Check how long we have been busy */
+						if (System.currentTimeMillis() - time > 1000) {
+							/* last query failed, skip a few to catch up */
+							qFastFail=100;
+							qFastBuffer.clear();
+							qFastBufferLocation = new Location(-5, -5);
+							it.close();
+							tmpReader.close();
+							return null;
+						}
+					}
+					qFastBufferLocation = r;
+					it.close();
+					tmpReader.close();
+				}
+
+				return qFastBuffer;
+			}
+
+		}
+
+		public boolean isQFastFail() {
+			if(qFastFail>0)
+				qFastFail--;
+			return qFastFail>0;
+		}
+
+		private boolean complete(byte[] seq) {
+			for (int i = 0; i < seq.length; i++)
+				if (seq[i] == 'n' || seq[i] == 'N')
+					return false;
+			return true;
+		}
+
 	}
 
 	/**
@@ -136,7 +207,7 @@ public class ShortReadTrack extends Track {
 		private List<float[]> buffer = new ArrayList<float[]>();
 		private List<float[]> bufferForward = new ArrayList<float[]>();
 		private List<float[]> bufferReverse = new ArrayList<float[]>();
-		
+
 		public synchronized double getReverse(int start, int scale) {
 			if (start + scale >= rg.getForwardPileUp().size())
 				return 0;
@@ -161,6 +232,7 @@ public class ShortReadTrack extends Track {
 			else
 				return -0.02;
 		}
+
 		public synchronized double getForward(int start, int scale) {
 			if (start + scale >= rg.getForwardPileUp().size())
 				return 0;
@@ -168,7 +240,7 @@ public class ShortReadTrack extends Track {
 				double conservation = 0;
 				for (int j = 0; j < scale; j++) {
 					conservation += log(rg.getForwardPileUp().get(start + j));
-					
+
 				}
 				return conservation / (scale * log(rg.getMaxPile()));
 			}
@@ -186,6 +258,7 @@ public class ShortReadTrack extends Track {
 			else
 				return -0.02;
 		}
+
 		public synchronized double get(int start, int scale) {
 			if (start + scale >= rg.getForwardPileUp().size())
 				return 0;
@@ -241,6 +314,7 @@ public class ShortReadTrack extends Track {
 			}
 			return out;
 		}
+
 		private float[] bareReverse() {
 			int size = rg.getForwardPileUp().size();
 			float[] out = new float[size / bareScale + 1];
@@ -255,6 +329,7 @@ public class ShortReadTrack extends Track {
 			}
 			return out;
 		}
+
 		private float[] bareForward() {
 			int size = rg.getForwardPileUp().size();
 			float[] out = new float[size / bareScale + 1];
@@ -269,6 +344,7 @@ public class ShortReadTrack extends Track {
 			}
 			return out;
 		}
+
 		@Override
 		public synchronized void update(Observable o, Object arg) {
 			buffer.clear();
@@ -302,8 +378,8 @@ public class ShortReadTrack extends Track {
 		/*
 		 * Draw line plot of coverage
 		 */
-		g.setColor( new Color(204, 238, 255, 100));
-		g.fillRect(0, yOffset, (int)screenWidth, graphLineHeigh);
+		g.setColor(new Color(204, 238, 255, 100));
+		g.fillRect(0, yOffset, (int) screenWidth, graphLineHeigh);
 		double width = screenWidth / (double) r.length() / 2.0;
 
 		int scale = 1;
@@ -351,18 +427,17 @@ public class ShortReadTrack extends Track {
 				conservationGPR.lineTo(x, yOffset + (1 - vr) * (graphLineHeigh - 4) + 2);
 
 			}
-			
+
 			/* Draw coverage lines */
 			g.setColor(Color.BLUE);
 			g.draw(conservationGPF);
-			
+
 			g.setColor(new Color(0x00, 0x99, 0x00));
 			g.draw(conservationGPR);
-			
+
 			g.setColor(Color.BLACK);
 			g.draw(conservationGP);
-			
-			
+
 			g.setColor(Color.BLUE);
 			g.drawString(source.toString() + " (" + scale + ")", 10, yOffset + 12 - 2);
 			yOffset += graphLineHeigh;
@@ -432,6 +507,7 @@ public class ShortReadTrack extends Track {
 		 * Draw individual reads when possible
 		 */
 		Iterable<ShortRead> reads = null;
+		boolean timeout=false;
 		if (!isCollapsed() && (r.length() > maxRegion)) {
 			g.setColor(Color.BLACK);
 			g.drawString("Region too big (max " + maxRegion + " nt), zoom in", 10, yOffset + 10);
@@ -440,6 +516,17 @@ public class ShortReadTrack extends Track {
 			/* Access to BAMread is through buffer for performance! */
 			if (rg instanceof BAMreads) {
 				reads = readBuffer.get(entry, r);
+				timeout=readBuffer.isQFastFail();
+				if (timeout) {
+					String msg = "Query time-out, too much data in this area, you may want to collapse this track or zoom in";
+					FontMetrics metrics = g.getFontMetrics();
+					int hgt = metrics.getHeight();
+					int adv = metrics.stringWidth(msg);
+					g.setColor(Color.WHITE);
+					g.fillRect(10, yOffset + 20 - hgt, adv + 2, hgt + 2);
+					g.setColor(Color.RED);
+					g.drawString(msg, 10, yOffset + 18);
+				}
 			} else {
 				reads = rg.get(r);
 			}
@@ -470,6 +557,7 @@ public class ShortReadTrack extends Track {
 						g.drawString(msg, 10, yOffset + 18);
 						break;
 					}
+					
 					Color c = Color.GRAY;
 
 					if (rf.strand() == Strand.FORWARD)
@@ -525,10 +613,10 @@ public class ShortReadTrack extends Track {
 									double tx2 = Convert.translateGenomeToScreen(j + 1, r, screenWidth);
 
 									if (readNt != refNt) {
-										if (readNt == '-'){
-//											System.out.println("RED");
+										if (readNt == '-') {
+											// System.out.println("RED");
 											g.setColor(Color.RED);
-										}else
+										} else
 											g.setColor(Color.ORANGE);
 										g.fillRect((int) tx1, yRec, (int) (tx2 - tx1), readLineHeight - 1);
 										if (model.getAnnotationLocationVisible().length() < 100) {
