@@ -22,9 +22,11 @@ import net.sf.genomeview.gui.menu.file.ClearEntriesAction;
 import net.sf.genomeview.gui.menu.file.ExitAction;
 import net.sf.genomeview.gui.menu.file.LoadDirectoryAction;
 import net.sf.genomeview.gui.menu.file.LoadFeaturesAction;
+import net.sf.genomeview.gui.menu.file.LoadSessionAction;
 import net.sf.genomeview.gui.menu.file.NewInstanceAction;
 import net.sf.genomeview.gui.menu.file.SaveAction;
 import net.sf.genomeview.gui.menu.file.SaveAsAction;
+import net.sf.genomeview.gui.menu.file.SaveSessionAction;
 import net.sf.genomeview.gui.menu.file.ShowConfigurationAction;
 import net.sf.genomeview.gui.menu.help.ShowAboutDialogAction;
 import net.sf.genomeview.gui.menu.help.ShowInstalledModulesAction;
@@ -48,9 +50,11 @@ public class MainMenu extends JMenuBar {
 		JMenu file = new JMenu("File");
 		file.add(new NewInstanceAction(model));
 		file.add(new ClearEntriesAction(model));
+		file.add(new SaveSessionAction(model));
+		file.add(new LoadSessionAction(model));
 		file.addSeparator();
 		file.add(new LoadFeaturesAction(model));
-		file.add(new LoadDirectoryAction(model));
+//		file.add(new LoadDirectoryAction(model));
 
 		file.addSeparator();
 		file.add(new SaveAction(model));
