@@ -54,7 +54,7 @@ public class LoadSessionAction extends AbstractAction {
 
 		});
 
-		int result = chooser.showSaveDialog(model.getParent());
+		int result = chooser.showOpenDialog(model.getParent());
 
 		if (result == JFileChooser.APPROVE_OPTION) {
 			if (model.loadedSources().size() != 0) {
