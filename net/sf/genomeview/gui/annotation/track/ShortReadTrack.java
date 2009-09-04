@@ -255,9 +255,9 @@ public class ShortReadTrack extends Track {
 				return 0;
 		}
 
-		double LOG2 = Math.log(2);
-		int bareScale = 32;
-		int bareScaleIndex = 5;
+		private double LOG2 = Math.log(2);
+		private int bareScale = 32;
+		private int bareScaleIndex = 5;
 
 		private ReadGroup rg;
 
@@ -271,12 +271,13 @@ public class ShortReadTrack extends Track {
 		private List<float[]> bufferReverse = new ArrayList<float[]>();
 
 		public synchronized double getReverse(int start, int scale) {
-			if (start + scale >= rg.getForwardPileUp().size())
+			if (start + scale >= rg.getReversePileUp().size())
 				return 0;
 			if (scale < bareScale) {
 				double conservation = 0;
 				for (int j = 0; j < scale; j++) {
 					conservation += log(rg.getReversePileUp().get(start + j));
+
 				}
 				return conservation / (scale * log(rg.getMaxPile()));
 			}
@@ -342,8 +343,8 @@ public class ShortReadTrack extends Track {
 			if (scale < bareScale) {
 				double conservation = 0;
 				for (int j = 0; j < scale; j++) {
-					conservation += log(rg.getForwardPileUp().get(start + j));
-					conservation += log(rg.getReversePileUp().get(start + j));
+					conservation += log(rg.getForwardPileUp().get(start + j)+rg.getReversePileUp().get(start + j));
+					
 				}
 				return conservation / (scale * log(rg.getMaxPile()));
 			}
@@ -382,8 +383,8 @@ public class ShortReadTrack extends Track {
 			for (int i = 0; i < size; i += bareScale) {
 				float conservation = 0;
 				for (int j = 0; j < bareScale && i + j < size; j++) {
-					conservation += log(rg.getForwardPileUp().get(i + j));
-					conservation += log(rg.getReversePileUp().get(i + j));
+					conservation += log(rg.getForwardPileUp().get(i + j)+rg.getReversePileUp().get(i + j));
+					
 				}
 				conservation /= bareScale * log(rg.getMaxPile());
 				out[i / bareScale] = conservation;
@@ -396,12 +397,12 @@ public class ShortReadTrack extends Track {
 			int size = rg.getForwardPileUp().size();
 			float[] out = new float[size / bareScale + 1];
 			for (int i = 0; i < size; i += bareScale) {
-				float conservation = 0;
+				double conservation = 0;
 				for (int j = 0; j < bareScale && i + j < size; j++) {
 					conservation += log(rg.getReversePileUp().get(i + j));
 				}
 				conservation /= bareScale * log(rg.getMaxPile());
-				out[i / bareScale] = conservation;
+				out[i / bareScale] = (float)conservation;
 
 			}
 			return out;
@@ -411,12 +412,12 @@ public class ShortReadTrack extends Track {
 			int size = rg.getForwardPileUp().size();
 			float[] out = new float[size / bareScale + 1];
 			for (int i = 0; i < size; i += bareScale) {
-				float conservation = 0;
+				double conservation = 0;
 				for (int j = 0; j < bareScale && i + j < size; j++) {
 					conservation += log(rg.getForwardPileUp().get(i + j));
 				}
 				conservation /= bareScale * log(rg.getMaxPile());
-				out[i / bareScale] = conservation;
+				out[i / bareScale] =(float) conservation;
 
 			}
 			return out;
