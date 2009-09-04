@@ -44,7 +44,7 @@ public class LoadSessionAction extends AbstractAction {
 
 			@Override
 			public boolean accept(File f) {
-				return f.getName().endsWith(".gvs");
+				return f.getName().endsWith(".gvs")||f.isDirectory();
 			}
 
 			@Override
