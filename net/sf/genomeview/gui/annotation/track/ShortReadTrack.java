@@ -7,6 +7,8 @@ import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -17,8 +19,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JWindow;
+import javax.swing.border.Border;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
@@ -26,6 +33,7 @@ import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.dialog.GVProgressBar;
 import net.sf.jannot.Entry;
+import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.shortread.BAMreads;
@@ -40,6 +48,60 @@ import net.sf.samtools.SAMRecord;
 import net.sf.samtools.util.CloseableIterator;
 
 public class ShortReadTrack extends Track {
+
+	private final int graphLineHeigh = 50;
+
+	private Tooltip tooltip = new Tooltip();
+
+	private class Tooltip extends JWindow {
+
+		private static final long serialVersionUID = -7416732151483650659L;
+
+		private JLabel floater = new JLabel();
+
+		public Tooltip() {
+			floater.setBackground(Color.GRAY);
+			floater.setForeground(Color.BLACK);
+			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
+			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+			add(floater);
+			pack();
+		}
+
+		public void set(int forward, int reverse, int d,MouseEvent e) {
+			StringBuffer text = new StringBuffer();
+			text.append("<html>");
+			text.append("Forward coverage : " + forward + "<br />");
+			text.append("Reverse coverage: " +reverse + "<br />");
+			text.append("Total coverage : " + d + "<br />");
+			text.append("</html>");
+			if (!text.toString().equals(floater.getText())) {
+				floater.setText(text.toString());
+				setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
+				this.pack();
+				setVisible(true);
+			}
+			
+		}
+
+	}
+
+	@Override
+	public boolean mouseMoved(int x, int y, MouseEvent source) {
+		if (y > 5 && y < graphLineHeigh - 5&&scale<=256) {
+			if (!tooltip.isVisible())
+				tooltip.setVisible(true);
+			GraphBuffer currentBuffer=buffers.get(currentEntry);
+			int start=Convert.translateScreenToGenome(x,currentVisible, currentScreen);
+			
+			tooltip.set(currentBuffer.getRawForward(start),currentBuffer.getRawReverse(start),currentBuffer.getRaw(start),source);
+		} else {
+			if (tooltip.isVisible())
+				tooltip.setVisible(false);
+		}
+		return false;
+	}
 
 	private DataSource source;
 	private ReadBuffer readBuffer;
@@ -119,7 +181,7 @@ public class ShortReadTrack extends Track {
 		private byte qFastFail = 0;
 
 		private synchronized Iterable<ShortRead> qFast(Entry e, Location r) {
-			if(isQFastFail())
+			if (isQFastFail())
 				return null;
 			if (!(source instanceof SAMDataSource)) {
 				return e.shortReads.getReadGroup(source).get(r);
@@ -145,7 +207,7 @@ public class ShortReadTrack extends Track {
 						/* Check how long we have been busy */
 						if (System.currentTimeMillis() - time > 1000) {
 							/* last query failed, skip a few to catch up */
-							qFastFail=100;
+							qFastFail = 100;
 							qFastBuffer.clear();
 							qFastBufferLocation = new Location(-5, -5);
 							it.close();
@@ -164,9 +226,9 @@ public class ShortReadTrack extends Track {
 		}
 
 		public boolean isQFastFail() {
-			if(qFastFail>0)
+			if (qFastFail > 0)
 				qFastFail--;
-			return qFastFail>0;
+			return qFastFail > 0;
 		}
 
 		private boolean complete(byte[] seq) {
@@ -186,7 +248,7 @@ public class ShortReadTrack extends Track {
 	 */
 	static class GraphBuffer implements Observer {
 
-		private double log(int val) {
+		private double log(double val) {
 			if (val > 0)
 				return Math.log(val);
 			else
@@ -259,6 +321,21 @@ public class ShortReadTrack extends Track {
 				return -0.02;
 		}
 
+		public synchronized int getRaw(int start){
+			if (start>= rg.getForwardPileUp().size())
+				return 0;
+			return rg.getForwardPileUp().get(start)+rg.getReversePileUp().get(start);
+		}
+		public synchronized int getRawForward(int start){
+			if (start>= rg.getForwardPileUp().size())
+				return 0;
+			return rg.getForwardPileUp().get(start);
+		}
+		public synchronized int getRawReverse(int start){
+			if (start >= rg.getReversePileUp().size())
+				return 0;
+			return rg.getReversePileUp().get(start);
+		}
 		public synchronized double get(int start, int scale) {
 			if (start + scale >= rg.getForwardPileUp().size())
 				return 0;
@@ -356,22 +433,29 @@ public class ShortReadTrack extends Track {
 
 	private Map<Entry, GraphBuffer> buffers = new HashMap<Entry, GraphBuffer>();
 
+	private int  scale=1;
+
+	private Entry currentEntry;
+
+	private Location currentVisible;
+
+	private double currentScreen;
 	@Override
 	public int paint(Graphics gg, final Entry entry, int yOffset, double screenWidth) {
-
+		currentEntry=entry;
+		currentScreen=screenWidth;
 		/* Configuration options */
 		int maxReads = Configuration.getInt("shortread:maxReads");
 		int maxRegion = Configuration.getInt("shortread:maxRegion");
 		int maxStack = Configuration.getInt("shortread:maxStack");
 
-		Location r = model.getAnnotationLocationVisible();
+		currentVisible = model.getAnnotationLocationVisible();
 
 		int originalYOffset = yOffset;
 		Graphics2D g = (Graphics2D) gg;
 
-		int graphLineHeigh = 50;
 		int readLineHeight = 3;
-		if (r.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			readLineHeight = 14;
 		}
 
@@ -380,14 +464,14 @@ public class ShortReadTrack extends Track {
 		 */
 		g.setColor(new Color(204, 238, 255, 100));
 		g.fillRect(0, yOffset, (int) screenWidth, graphLineHeigh);
-		double width = screenWidth / (double) r.length() / 2.0;
+		double width = screenWidth / (double) currentVisible.length() / 2.0;
 
-		int scale = 1;
+		scale = 1;
 		while (scale < (int) Math.ceil(1.0 / width))
 			scale *= 2;
 
-		int start = r.start() / scale * scale;
-		int end = ((r.end() / scale) + 1) * scale;
+		int start = currentVisible.start() / scale * scale;
+		int end = ((currentVisible.end() / scale) + 1) * scale;
 
 		ReadGroup rg = entry.shortReads.getReadGroup(source);
 		// System.out.println(entry.shortReads+"\t"+rg+"\t"+source);
@@ -407,7 +491,7 @@ public class ShortReadTrack extends Track {
 			GeneralPath conservationGPF = new GeneralPath();
 			GeneralPath conservationGPR = new GeneralPath();
 			for (int i = 0; i < (end - start) / scale; i++) {
-				int x = Convert.translateGenomeToScreen(start + i * scale + 1, r, screenWidth) + 5;
+				int x = Convert.translateGenomeToScreen(start + i * scale + 1, currentVisible, screenWidth) + 5;
 				// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
 				// (lineHeigh - 4) + 2);
 				double v = b.get(start + i * scale, scale);
@@ -447,16 +531,16 @@ public class ShortReadTrack extends Track {
 		 * Draw individual reads when possible
 		 */
 		Iterable<ShortRead> reads = null;
-		boolean timeout=false;
-		if (!isCollapsed() && (r.length() > maxRegion)) {
+		boolean timeout = false;
+		if (!isCollapsed() && (currentVisible.length() > maxRegion)) {
 			g.setColor(Color.BLACK);
 			g.drawString("Region too big (max " + maxRegion + " nt), zoom in", 10, yOffset + 10);
 			yOffset += 20 + 5;
 		} else if (!isCollapsed()) {
 			/* Access to BAMread is through buffer for performance! */
 			if (rg instanceof BAMreads) {
-				reads = readBuffer.get(entry, r);
-				timeout=readBuffer.isQFastFail();
+				reads = readBuffer.get(entry, currentVisible);
+				timeout = readBuffer.isQFastFail();
 				if (timeout) {
 					String msg = "Query time-out, too much data in this area, you may want to collapse this track or zoom in";
 					FontMetrics metrics = g.getFontMetrics();
@@ -469,7 +553,7 @@ public class ShortReadTrack extends Track {
 					yOffset += 20 + 5;
 				}
 			} else {
-				reads = rg.get(r);
+				reads = rg.get(currentVisible);
 			}
 		}
 
@@ -478,7 +562,7 @@ public class ShortReadTrack extends Track {
 		if (reads != null) {
 			lines = 0;
 			int readLength = entry.shortReads.getReadGroup(source).readLength();
-			BitSet[] tilingCounter = new BitSet[r.length()];
+			BitSet[] tilingCounter = new BitSet[currentVisible.length()];
 			for (int i = 0; i < tilingCounter.length; i++) {
 				tilingCounter[i] = new BitSet();
 			}
@@ -498,7 +582,7 @@ public class ShortReadTrack extends Track {
 						g.drawString(msg, 10, yOffset + 18);
 						break;
 					}
-					
+
 					Color c = Color.GRAY;
 
 					if (rf.strand() == Strand.FORWARD)
@@ -506,13 +590,13 @@ public class ShortReadTrack extends Track {
 					else
 						c = new Color(0x00, 0x99, 0x00);
 
-					int x2 = Convert.translateGenomeToScreen(rf.end() + 1, r, screenWidth);
+					int x2 = Convert.translateGenomeToScreen(rf.end() + 1, currentVisible, screenWidth);
 					if (x2 > 0) {
 						/* Find empty line */
 						int line = 0;
-						int pos = rf.start() - r.start();
+						int pos = rf.start() - currentVisible.start();
 						if (pos >= 0 && pos < tilingCounter.length)
-							line = tilingCounter[rf.start() - r.start()].nextClearBit(line);
+							line = tilingCounter[rf.start() - currentVisible.start()].nextClearBit(line);
 						else
 							line = tilingCounter[0].nextClearBit(line);
 
@@ -523,7 +607,7 @@ public class ShortReadTrack extends Track {
 
 						if (line < maxStack) {
 							for (int i = rf.start() - 1 - readLength; i <= rf.end() + 1; i++) {
-								pos = i - r.start();
+								pos = i - currentVisible.start();
 								if (pos >= 0 && pos < tilingCounter.length)
 									tilingCounter[pos].set(line);
 							}
@@ -531,8 +615,8 @@ public class ShortReadTrack extends Track {
 							if (line > lines)
 								lines = line;
 
-							int subX1 = Convert.translateGenomeToScreen(rf.start(), r, screenWidth);
-							int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, r, screenWidth);
+							int subX1 = Convert.translateGenomeToScreen(rf.start(), currentVisible, screenWidth);
+							int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, currentVisible, screenWidth);
 							if (subX2 < subX1) {
 								subX2 = subX1;
 							}
@@ -546,12 +630,12 @@ public class ShortReadTrack extends Track {
 							g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
 							visibleReadCount++;
 							/* Check mismatches */
-							if (r.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+							if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 								for (int j = rf.start(); j <= rf.end(); j++) {
 									char readNt = rf.getNucleotide(j - rf.start() + 1);
 									char refNt = Character.toUpperCase(entry.sequence.getNucleotide(j));
-									double tx1 = Convert.translateGenomeToScreen(j, r, screenWidth);
-									double tx2 = Convert.translateGenomeToScreen(j + 1, r, screenWidth);
+									double tx1 = Convert.translateGenomeToScreen(j, currentVisible, screenWidth);
+									double tx2 = Convert.translateGenomeToScreen(j + 1, currentVisible, screenWidth);
 
 									if (readNt != refNt) {
 										if (readNt == '-') {
