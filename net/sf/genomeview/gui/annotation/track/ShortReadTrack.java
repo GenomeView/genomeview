@@ -268,7 +268,7 @@ public class ShortReadTrack extends Track {
 		private List<float[]> bufferReverse = new ArrayList<float[]>();
 
 		public synchronized double getReverse(int start, int scale) {
-			if (start + scale >= rg.getReversePileUp().size())
+			if (start<0||start + scale >= rg.getReversePileUp().size())
 				return 0;
 			if (scale < bareScale) {
 				double conservation = 0;
@@ -294,7 +294,7 @@ public class ShortReadTrack extends Track {
 		}
 
 		public synchronized double getForward(int start, int scale) {
-			if (start + scale >= rg.getForwardPileUp().size())
+			if (start<0||start + scale >= rg.getForwardPileUp().size())
 				return 0;
 			if (scale < bareScale) {
 				double conservation = 0;
@@ -335,7 +335,7 @@ public class ShortReadTrack extends Track {
 			return rg.getReversePileUp().get(start);
 		}
 		public synchronized double get(int start, int scale) {
-			if (start + scale >= rg.getForwardPileUp().size())
+			if (start<0||start + scale >= rg.getForwardPileUp().size())
 				return 0;
 			if (scale < bareScale) {
 				double conservation = 0;
@@ -597,11 +597,6 @@ public class ShortReadTrack extends Track {
 							line = tilingCounter[rf.start() - currentVisible.start()].nextClearBit(line);
 						else
 							line = tilingCounter[0].nextClearBit(line);
-
-						/*
-						 * FIXME add additional checks for Extended reads that
-						 * may cover other reads
-						 */
 
 						if (line < maxStack) {
 							for (int i = rf.start() - 1 - readLength; i <= rf.end() + 1; i++) {
