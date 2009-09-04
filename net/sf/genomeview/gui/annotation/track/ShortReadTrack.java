@@ -443,66 +443,6 @@ public class ShortReadTrack extends Track {
 			yOffset += graphLineHeigh;
 		}
 
-		// /*
-		// * Draw line plot of nucleotide frequencies
-		// */
-		// Buffer bA = buffersA.get(entry);
-		// Buffer bC = buffersC.get(entry);
-		// Buffer bG = buffersG.get(entry);
-		// Buffer bT = buffersT.get(entry);
-		// if (bA != null && bC != null && bG != null && bT != null) {
-		// GeneralPath conservationGPA = new GeneralPath();
-		// GeneralPath conservationGPC = new GeneralPath();
-		// GeneralPath conservationGPG = new GeneralPath();
-		// GeneralPath conservationGPT = new GeneralPath();
-		// for (int i = 0; i < (end - start) / scale; i++) {
-		// int x = Convert.translateGenomeToScreen(start + i * scale + 1, r,
-		// screenWidth) + 5;
-		// // conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
-		// // (lineHeigh - 4) + 2);
-		//
-		// double vA = bA.get(start + i * scale, scale);
-		// double vC = bC.get(start + i * scale, scale);
-		// double vG = bG.get(start + i * scale, scale);
-		// double vT = bT.get(start + i * scale, scale);
-		// // if(i==100)
-		// // checkValue=v;
-		// if (i == 0) {
-		//
-		// conservationGPA.moveTo(x - 1, yOffset + (1 - vA) * (graphLineHeigh -
-		// 4) + 2);
-		// conservationGPC.moveTo(x - 1, yOffset + (1 - vC) * (graphLineHeigh -
-		// 4) + 2);
-		// conservationGPG.moveTo(x - 1, yOffset + (1 - vG) * (graphLineHeigh -
-		// 4) + 2);
-		// conservationGPT.moveTo(x - 1, yOffset + (1 - vT) * (graphLineHeigh -
-		// 4) + 2);
-		//
-		// }
-		//
-		// conservationGPA.lineTo(x, yOffset + (1 - vA) * (graphLineHeigh - 4) +
-		// 2);
-		// conservationGPC.lineTo(x, yOffset + (1 - vC) * (graphLineHeigh - 4) +
-		// 2);
-		// conservationGPG.lineTo(x, yOffset + (1 - vG) * (graphLineHeigh - 4) +
-		// 2);
-		// conservationGPT.lineTo(x, yOffset + (1 - vT) * (graphLineHeigh - 4) +
-		// 2);
-		// }
-		//
-		// g.setColor(Configuration.getNucleotideColor('a'));
-		// g.draw(conservationGPA);
-		// g.setColor(Configuration.getNucleotideColor('c'));
-		// g.draw(conservationGPC);
-		// g.setColor(Configuration.getNucleotideColor('g'));
-		// g.draw(conservationGPG);
-		// g.setColor(Configuration.getNucleotideColor('t'));
-		// g.draw(conservationGPT);
-		// g.setColor(Color.BLUE);
-		// g.drawString("Nuc. freq. (" + scale + ")", 10, yOffset +
-		// graphLineHeigh - 2);
-		// yOffset += graphLineHeigh;
-		// }
 		/*
 		 * Draw individual reads when possible
 		 */
@@ -526,6 +466,7 @@ public class ShortReadTrack extends Track {
 					g.fillRect(10, yOffset + 20 - hgt, adv + 2, hgt + 2);
 					g.setColor(Color.RED);
 					g.drawString(msg, 10, yOffset + 18);
+					yOffset += 20 + 5;
 				}
 			} else {
 				reads = rg.get(r);
