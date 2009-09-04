@@ -18,47 +18,51 @@ import net.sf.genomeview.gui.menu.navigation.AnnotationZoomOutAction;
 public class Hotkeys implements KeyEventDispatcher {
 
 	private Model model;
+
 	public Hotkeys(Model model) {
-		this.left=new AnnotationMoveLeftAction(model);
-		this.right=new AnnotationMoveRightAction(model);
-		this.zoomin=new AnnotationZoomInAction(model);
-		this.zoomout=new AnnotationZoomOutAction(model);
-		this.model=model;
+		this.left = new AnnotationMoveLeftAction(model);
+		this.right = new AnnotationMoveRightAction(model);
+		this.zoomin = new AnnotationZoomInAction(model);
+		this.zoomout = new AnnotationZoomOutAction(model);
+		this.model = model;
 	}
 
-	private Action left,right,zoomin,zoomout;
+	private Action left, right, zoomin, zoomout;
+
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
-		if(!FocusManager.getCurrentManager().getActiveWindow().equals(model.getParent()))
+		
+		if (!FocusManager.getCurrentManager().getActiveWindow().equals(model.getParent()))
 			return false;
-		switch (e.getKeyCode()) {
-		case KeyEvent.VK_LEFT:
-		case KeyEvent.VK_NUMPAD4:
-			left.actionPerformed(null);
-			return true;
-		case KeyEvent.VK_RIGHT:
-		case KeyEvent.VK_NUMPAD6:
-			right.actionPerformed(null);
-			return true;
-		case KeyEvent.VK_ADD:
-		case KeyEvent.VK_UP:
-		case KeyEvent.VK_PLUS:
-		case KeyEvent.VK_EQUALS:
-			zoomin.actionPerformed(null);
-			return true;
-		case KeyEvent.VK_SUBTRACT:
-		case KeyEvent.VK_DOWN:
-		case KeyEvent.VK_MINUS:
-			zoomout.actionPerformed(null);
-			return false;
-			
-			
-		default:
-			return false;
-			// do nothing
-		}
+		if (e.getID() == KeyEvent.KEY_PRESSED) {
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_LEFT:
+			case KeyEvent.VK_NUMPAD4:
+				left.actionPerformed(null);
+				return true;
+			case KeyEvent.VK_RIGHT:
+			case KeyEvent.VK_NUMPAD6:
+				right.actionPerformed(null);
+				return true;
+			case KeyEvent.VK_ADD:
+			case KeyEvent.VK_UP:
+			case KeyEvent.VK_PLUS:
+			case KeyEvent.VK_EQUALS:
+				zoomin.actionPerformed(null);
+				return true;
+			case KeyEvent.VK_SUBTRACT:
+			case KeyEvent.VK_DOWN:
+			case KeyEvent.VK_MINUS:
+				zoomout.actionPerformed(null);
+				return false;
 
-	
+			default:
+				return false;
+				// do nothing
+			}
+		}
+		return false;
+
 		// /* zoom in */
 		// inputs.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0),
 		// "customZoomIn");
