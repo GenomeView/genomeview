@@ -11,6 +11,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
+
+import be.abeel.util.CountMap;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
@@ -32,6 +35,8 @@ import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.Qualifier;
 import net.sf.jannot.Type;
+import net.sf.jannot.shortread.ReadGroup;
+import net.sf.jannot.source.DataSource;
 
 public class FeatureTrack extends Track {
 	/* Type that is represented by this track */
@@ -88,8 +93,8 @@ public class FeatureTrack extends Track {
 					List<Qualifier> notes = rf.qualifier("colour");
 					notes.addAll(rf.qualifier("color"));
 					if (notes.size() > 0) {
-						String val=notes.get(0).getValue();
-						c=Color.decode(val);
+						String val = notes.get(0).getValue();
+						c = Color.decode(val);
 					}
 				}
 				g.setColor(c);
@@ -101,7 +106,6 @@ public class FeatureTrack extends Track {
 
 					int maxX = x2;
 
-					
 					/*
 					 * How close can items be together before they are
 					 * considered overlapping?
@@ -226,9 +230,9 @@ public class FeatureTrack extends Track {
 		}
 		return false;
 	}
-	
+
 	@Override
-	public boolean mouseExited(int x,int y,MouseEvent e){
+	public boolean mouseExited(int x, int y, MouseEvent e) {
 		floatingWindow.set(null, e);
 		return false;
 	}
@@ -256,7 +260,7 @@ public class FeatureTrack extends Track {
 
 	}
 
-	private FeatureInfoWindow floatingWindow=new FeatureInfoWindow();
+	private FeatureInfoWindow floatingWindow = new FeatureInfoWindow();
 
 	private class FeatureInfoWindow extends JWindow {
 
@@ -274,36 +278,60 @@ public class FeatureTrack extends Track {
 			pack();
 		}
 
-		public void set(Set<Feature> features,MouseEvent e) {
-			if (features==null || features.size() == 0){
+		public void set(Set<Feature> features, MouseEvent e) {
+			if (features == null || features.size() == 0) {
 				floater.setText("");
 				setVisible(false);
-			}else {
+			} else {
 				StringBuffer text = new StringBuffer();
 				text.append("<html>");
 				for (Feature f : features) {
 					text.append("Name : " + f.toString() + "<br />");
 					text.append("Start : " + f.start() + "<br />");
 					text.append("End : " + f.end() + "<br />");
+					Collection<DataSource> sources = model.getSelectedEntry().shortReads.getSources();
+
+					CountMap<Integer> cm = new CountMap<Integer>();
+					for (DataSource source : sources) {
+						ReadGroup rg = model.getSelectedEntry().shortReads.getReadGroup(source);
+						
+						for (Location l : f.location()) {
+							for (int i = l.start(); i <= l.end(); i++) {
+								cm.count(rg.getForwardPileUp().get(i) + rg.getReversePileUp().get(i));
+							}
+						}
+						text.append("Mean short read coverage (" + source + "): " + median(cm));
+
+					}
 
 				}
 				text.append("</html>");
 				if (!text.toString().equals(floater.getText())) {
 					floater.setText(text.toString());
-					setLocation(e.getXOnScreen()+ 5, e
-							.getYOnScreen() + 5);
+					setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
 					this.pack();
 					setVisible(true);
 				}
 			}
 		}
 
+		private int median(CountMap<Integer> cm) {
+			int total = cm.totalCount();
+			int sum = 0;
+			for (java.util.Map.Entry<Integer, Integer> e : cm.entrySet()) {
+				sum += e.getValue();
+				if (sum > total / 2)
+					return e.getKey();
+			}
+			throw new RuntimeException("This should not happen while calculating the median.");
+		}
+
 	}
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent e) {
-		Set<Feature> hits = hitmap.featureHits(x,e.getY());
-		floatingWindow.set(hits,e);
+		Set<Feature> hits = hitmap.featureHits(x, e.getY());
+		floatingWindow.set(hits, e);
 		return false;
 	}
 
