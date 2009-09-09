@@ -94,6 +94,8 @@ public class Model extends Observable implements IModel {
 		if (arg instanceof ChangeEvent) {
 			undoStack.push((ChangeEvent) arg);
 			redoStack.clear();
+			while(undoStack.size()>100)
+				undoStack.remove(0);
 		}
 		refresh(arg);
 
