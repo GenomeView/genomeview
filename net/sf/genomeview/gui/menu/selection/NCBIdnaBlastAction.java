@@ -36,7 +36,7 @@ public class NCBIdnaBlastAction extends AbstractModelAction {
 
         Feature rf = model.getLocationSelection().iterator().next().getParent();
         String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence, rf);
-        Blast.nucleotideBlast(""+rf.toString(),seq);
+        Blast.nucleotideBlast(""+rf.toString().hashCode(),seq);
 
     }
 

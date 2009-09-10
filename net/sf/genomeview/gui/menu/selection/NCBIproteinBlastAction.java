@@ -38,7 +38,7 @@ public class NCBIproteinBlastAction extends AbstractModelAction {
         String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence, rf);
 
         String protein = SequenceTools.translate(seq,model.getAAMapping());
-        Blast.proteinBlast(""+rf.toString(),protein);
+        Blast.proteinBlast(""+rf.toString().hashCode(),protein);
 
     }
 
