@@ -53,8 +53,6 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	private int currentBackgroundIndex = 0;
 
-	private Color[] background = new Color[] { new Color(204, 238, 255, 100), new Color(255, 255, 204, 100) };
-
 	@Override
 	public void paintComponent(Graphics g) {
 		tracks.clear();
@@ -63,20 +61,10 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		super.paintComponent(g);
 		currentBackgroundIndex = 0;
 
+		int index=0;
 		for (Track track : model.getTrackList()) {
 			if (track.isVisible()) {
-				int height = track.paint(g, model.getSelectedEntry(), framePixelsUsed, screenWidth);
-
-				if (track instanceof FeatureTrack || track instanceof MultipleAlignmentTrack) {
-
-					Rectangle r = new Rectangle(0, framePixelsUsed, (int) screenWidth + 1, height);
-
-					g.setColor(background[currentBackgroundIndex]);
-					g.fillRect(r.x, r.y, r.width, r.height);
-
-					currentBackgroundIndex++;
-					currentBackgroundIndex %= background.length;
-				}
+				int height = track.paint(g, model.getSelectedEntry(), framePixelsUsed, screenWidth,index++);
 
 				if (height > 0)
 					tracks.put(framePixelsUsed, track);
@@ -246,7 +234,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		int y=e.getY();
+		int y = e.getY();
 		/* Transfer MouseEvent to corresponding track */
 
 		Track mouseTrack = tracks.get(e);

@@ -35,8 +35,8 @@ public class WiggleTrack extends Track {
 	// private HashMap<Entry, Graph> graphs = new HashMap<Entry, Graph>();
 
 	@Override
-	public int paint(Graphics g1, Entry e, int yOffset, double screenWidth) {
-		Graphics2D g = (Graphics2D) g1;
+	public int paintTrack(Graphics2D g, Entry e, int yOffset, double screenWidth) {
+		
 		/* keeps track of the space used during painting */
 		int yUsed = 0;
 		Graph graph = e.graphs.getGraph(name);
@@ -96,6 +96,7 @@ public class WiggleTrack extends Track {
 			g.drawString(graph.getName(), 10, yOffset + yUsed);
 
 		}
+		
 		return yUsed;
 	}
 }

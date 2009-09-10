@@ -32,7 +32,7 @@ public class SyntenicTrack extends Track {
 	private ColorGradient gradient;
 	private int colors = 512;
 
-	private Rectangle hit(int x,int y){
+	private Rectangle hit(int x, int y) {
 		for (Rectangle r : hitmap.keySet()) {
 			if (r.contains(x, y)) {
 				return r;
@@ -40,22 +40,27 @@ public class SyntenicTrack extends Track {
 		}
 		return null;
 	}
+
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent source) {
-		Rectangle r=hit(x,y);
-		System.out.println("clickclick: "+r);
-		if(r!=null&&source.getClickCount()>1){
-			SyntenicBlock sb=hitmap.get(r);
-			Entry e=model.entry(sb.target());
-			if(e!=null){
-				model.setSelectedEntry(e);
-				model.setAnnotationLocationVisible(sb.targetLocation());
-				return true;
+		super.mouseClicked(x, y, source);
+		if (!source.isConsumed()) {
+			Rectangle r = hit(x, y);
+			System.out.println("clickclick: " + r);
+			if (r != null && source.getClickCount() > 1) {
+				SyntenicBlock sb = hitmap.get(r);
+				Entry e = model.entry(sb.target());
+				if (e != null) {
+					model.setSelectedEntry(e);
+					model.setAnnotationLocationVisible(sb.targetLocation());
+					return true;
+				}
+
 			}
-			
+
 		}
-		return false;
-		
+		return true;
+
 	}
 
 	public SyntenicTrack(Model model, String ref, String target) {
@@ -76,12 +81,12 @@ public class SyntenicTrack extends Track {
 		return "Syntheny " + ref + " - " + target;
 	}
 
-	private HashMap<Rectangle,SyntenicBlock> hitmap=new HashMap<Rectangle, SyntenicBlock>();
-	
+	private HashMap<Rectangle, SyntenicBlock> hitmap = new HashMap<Rectangle, SyntenicBlock>();
+
 	@Override
-	public int paint(Graphics g1, Entry e, int offset, double width) {
+	public int paintTrack(Graphics2D g, Entry e, int yOffset, double width) {
 		hitmap.clear();
-		Graphics2D g = (Graphics2D) g1;
+
 		if (!e.getID().equals(ref)) {
 			// Dont paint when reference does not match
 			return 0;
@@ -99,7 +104,7 @@ public class SyntenicTrack extends Track {
 					int screenEnd = Convert.translateGenomeToScreen(end, model.getAnnotationLocationVisible(), width);
 					GradientPaint gp = new GradientPaint(screenStart, 0, startColor, screenEnd, 0, endColor);
 					g.setPaint(gp);
-					g.fillRect(screenStart, offset + 15, screenEnd - screenStart + 1, 10);
+					g.fillRect(screenStart, yOffset + 15, screenEnd - screenStart + 1, 10);
 
 				}
 
@@ -112,14 +117,19 @@ public class SyntenicTrack extends Track {
 						Location targetLoc = sb.targetLocation();
 						Location refLoc = sb.refLocation();
 						if (refLoc.overlaps(model.getAnnotationLocationVisible())) {
-						
-							
+
 							try {
-//								Color startColor = gradient.getColor((int) (refLoc.start() / colorBlockLength));
-//								Color endColor = gradient.getColor((int) (refLoc.end() / colorBlockLength));
-//
-//								int screenStart = Convert.translateGenomeToScreen(targetLoc.start(), model.getAnnotationLocationVisible(), width);
-//								int screenEnd = Convert.translateGenomeToScreen(targetLoc.end(), model.getAnnotationLocationVisible(), width);
+								// Color startColor = gradient.getColor((int)
+								// (refLoc.start() / colorBlockLength));
+								// Color endColor = gradient.getColor((int)
+								// (refLoc.end() / colorBlockLength));
+								//
+								// int screenStart =
+								// Convert.translateGenomeToScreen(targetLoc.start(),
+								// model.getAnnotationLocationVisible(), width);
+								// int screenEnd =
+								// Convert.translateGenomeToScreen(targetLoc.end(),
+								// model.getAnnotationLocationVisible(), width);
 								Color startColor = gradient.getColor((int) (targetLoc.start() / colorBlockLength));
 								Color endColor = gradient.getColor((int) (targetLoc.end() / colorBlockLength));
 
@@ -127,9 +137,9 @@ public class SyntenicTrack extends Track {
 								int screenEnd = Convert.translateGenomeToScreen(refLoc.end(), model.getAnnotationLocationVisible(), width);
 								GradientPaint gp = new GradientPaint(screenStart, 0, startColor, screenEnd, 0, endColor);
 								g.setPaint(gp);
-								Rectangle r=new Rectangle(screenStart, offset + 15, screenEnd - screenStart + 1, 10);
+								Rectangle r = new Rectangle(screenStart, yOffset + 15, screenEnd - screenStart + 1, 10);
 								g.fill(r);
-								r.translate(0, -offset);
+								r.translate(0, -yOffset);
 								hitmap.put(r, sb);
 							} catch (Exception x) {
 								System.err.println(refLoc);
@@ -141,7 +151,7 @@ public class SyntenicTrack extends Track {
 			}
 
 			g.setColor(Color.black);
-			g.drawString(displayName(), 10, offset + 13);
+			g.drawString(displayName(), 10, yOffset + 13);
 			return 25;
 
 		}

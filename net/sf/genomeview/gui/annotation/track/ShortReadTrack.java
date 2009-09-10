@@ -507,7 +507,7 @@ public class ShortReadTrack extends Track {
 	private double currentScreen;
 
 	@Override
-	public int paint(Graphics gg, final Entry entry, int yOffset, double screenWidth) {
+	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
 		currentEntry = entry;
 		currentScreen = screenWidth;
 		/* Configuration options */
@@ -518,7 +518,7 @@ public class ShortReadTrack extends Track {
 		currentVisible = model.getAnnotationLocationVisible();
 
 		int originalYOffset = yOffset;
-		Graphics2D g = (Graphics2D) gg;
+		
 
 		int readLineHeight = 3;
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
@@ -528,8 +528,7 @@ public class ShortReadTrack extends Track {
 		/*
 		 * Draw line plot of coverage
 		 */
-		g.setColor(new Color(204, 238, 255, 100));
-		g.fillRect(0, yOffset, (int) screenWidth, graphLineHeigh);
+		
 		double width = screenWidth / (double) currentVisible.length() / 2.0;
 
 		scale = 1;

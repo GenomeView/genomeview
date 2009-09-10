@@ -80,8 +80,8 @@ public class SequenceLogoTrack extends Track {
 	}
 
 	@Override
-	public int paint(Graphics g1, Entry e, int yOffset, double screenWidth) {
-		Graphics2D g = (Graphics2D) g1;
+	public int paintTrack(Graphics2D g, Entry e, int yOffset, double screenWidth) {
+		
 		Location r = model.getAnnotationLocationVisible();
 		int lineHeigh = 40;
 		g.setColor(Color.LIGHT_GRAY);

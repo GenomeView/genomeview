@@ -64,19 +64,17 @@ public class FeatureTrack extends Track {
 	}
 
 	@Override
-	public int paint(Graphics gg, Entry entry, int yOffset, double width) {
+	public int paintTrack(Graphics2D g, Entry entry, int yOffset, double width) {
 		boolean collision = false;
 		hitmap.clear();
-		
 
-		Graphics2D g = (Graphics2D) gg;
 		List<Feature> types = entry.annotation.getByType(type, model.getAnnotationLocationVisible());
 		if (types.size() > Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
 			g.setColor(Color.BLACK);
 			g.drawString(type + ": Too many features to display, zoom in to see features", 10, yOffset + 10);
 			return 20 + 5;
 		} else {
-			gg.translate(0, yOffset);
+			g.translate(0, yOffset);
 			CollisionMap fullBlockMap = new CollisionMap(model);
 
 			int lineThickness = Configuration.getInt("evidenceLineHeight");
@@ -125,7 +123,7 @@ public class FeatureTrack extends Track {
 
 							if (thisLine > lines)
 								lines = thisLine;
-							r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness , maxX - x1 + 2 * closenessOverlap, lineThickness);
+							r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness, maxX - x1 + 2 * closenessOverlap, lineThickness);
 						}
 					}
 					fullBlockMap.addLocation(r, null);
@@ -142,7 +140,7 @@ public class FeatureTrack extends Track {
 
 						int subX1 = Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), width);
 						int subX2 = Convert.translateGenomeToScreen(l.end() + 1, model.getAnnotationLocationVisible(), width);
-						Rectangle rec = new Rectangle(subX1, thisLine * lineThickness , subX2 - subX1, lineThickness - 5);
+						Rectangle rec = new Rectangle(subX1, thisLine * lineThickness, subX2 - subX1, lineThickness - 5);
 						/* Add this rectangle to the location hits */
 						hitmap.addLocation(rec, l);
 						rectList.add(rec);
@@ -158,12 +156,12 @@ public class FeatureTrack extends Track {
 					int trianglehalf = (lineThickness - 5) / 2;
 					switch (rf.strand()) {
 					case REVERSE:// reverse arrow
-						g.drawLine(x1, thisLine * lineThickness , x1 - trianglehalf, thisLine * lineThickness +  trianglehalf);
-						g.drawLine(x1 - trianglehalf, thisLine * lineThickness +  trianglehalf, x1, thisLine * lineThickness +  lineThickness - 5);
+						g.drawLine(x1, thisLine * lineThickness, x1 - trianglehalf, thisLine * lineThickness + trianglehalf);
+						g.drawLine(x1 - trianglehalf, thisLine * lineThickness + trianglehalf, x1, thisLine * lineThickness + lineThickness - 5);
 						break;
 					case FORWARD:// forward arrow
-						g.drawLine(x2, thisLine * lineThickness , x2 + trianglehalf, thisLine * lineThickness  + trianglehalf);
-						g.drawLine(x2 + trianglehalf, thisLine * lineThickness  + trianglehalf, x2, thisLine * lineThickness  + lineThickness - 5);
+						g.drawLine(x2, thisLine * lineThickness, x2 + trianglehalf, thisLine * lineThickness + trianglehalf);
+						g.drawLine(x2 + trianglehalf, thisLine * lineThickness + trianglehalf, x2, thisLine * lineThickness + lineThickness - 5);
 						break;
 					default:// do nothing
 						break;
@@ -196,7 +194,7 @@ public class FeatureTrack extends Track {
 							Font resetFont = g.getFont();
 							g.setColor(c.darker().darker().darker());
 							g.setFont(new Font("SansSerif", Font.PLAIN, 10));
-							g.drawString(rf.toString(), a + 5, thisLine * lineThickness  + 9);
+							g.drawString(rf.toString(), a + 5, thisLine * lineThickness + 9);
 							g.setFont(resetFont);
 						}
 
@@ -206,13 +204,13 @@ public class FeatureTrack extends Track {
 			}
 			if (Configuration.getBoolean("showTrackName")) {
 				g.setColor(Color.black);
-				g.drawString(type.toString(), 10,  lineThickness);
+				g.drawString(type.toString(), 10, lineThickness);
 			}
-			gg.translate(0, -yOffset);
+			g.translate(0, -yOffset);
 			return (lines + 1) * lineThickness + 5;
 
 		}
-		
+
 	}
 
 	/**
@@ -343,30 +341,33 @@ public class FeatureTrack extends Track {
 
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
-		// System.out.println("feature track click: "+x+"\t"+y);
-		// catch double clicks
-		if (e.getClickCount() == 2) {
-			doubleClick(e);
-		}
-
-		/* try selecting something */
-		Location locationHit = hitmap.uniqueLocation(e.getX(), e.getY());
-		if (Mouse.button1(e)) {
-			if (locationHit == null && !Mouse.modifier(e)) {
-				model.clearLocationSelection();
-			} else if (locationHit != null && e.isShiftDown()) {
-				if (model.getLocationSelection().contains(locationHit)) {
-					model.removeLocationSelection(locationHit);
-				} else {
-					model.addLocationSelection(locationHit);
-				}
-			} else if (locationHit != null && !Mouse.modifier(e)) {
-				model.setLocationSelection(locationHit);
-
+		super.mouseClicked(x, y, e);
+		if (!e.isConsumed()) {
+			// catch double clicks
+			if (e.getClickCount() == 2) {
+				doubleClick(e);
 			}
-			return true;
+
+			/* try selecting something */
+			Location locationHit = hitmap.uniqueLocation(e.getX(), e.getY());
+			if (Mouse.button1(e)) {
+				if (locationHit == null && !Mouse.modifier(e)) {
+					model.clearLocationSelection();
+				} else if (locationHit != null && e.isShiftDown()) {
+					if (model.getLocationSelection().contains(locationHit)) {
+						model.removeLocationSelection(locationHit);
+					} else {
+						model.addLocationSelection(locationHit);
+					}
+				} else if (locationHit != null && !Mouse.modifier(e)) {
+					model.setLocationSelection(locationHit);
+
+				}
+				return true;
+			}
+			return false;
 		}
-		return false;
+		return true;
 
 	}
 

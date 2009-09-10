@@ -551,37 +551,41 @@ public class StructureTrack extends Track {
 
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
-		System.out.println("Clicked: " + Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth));
-		Location rf = collisionMap.uniqueLocation(e.getX(), e.getY());
+		super.mouseClicked(x, y, e);
+		if (!e.isConsumed()) {
+			System.out.println("Clicked: " + Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth));
+			Location rf = collisionMap.uniqueLocation(e.getX(), e.getY());
 
-		if (Mouse.button1(e)) {
-			if (rf == null && (!Mouse.modifier(e) || e.isShiftDown())) {
-				// model.clearFeatureSelection();
-				model.clearLocationSelection();
-			} else if (rf != null && e.isShiftDown()) {
-				// boolean rfs = model.getFeatureSelection().contains(rf);
-				boolean rls = model.getLocationSelection().contains(rf);
-				if (rls) {
-					// model.removeFeatureSelection(rf);
-					model.removeLocationSelection(rf);
-				} else
-					model.addLocationSelection(rf);
+			if (Mouse.button1(e)) {
+				if (rf == null && (!Mouse.modifier(e) || e.isShiftDown())) {
+					// model.clearFeatureSelection();
+					model.clearLocationSelection();
+				} else if (rf != null && e.isShiftDown()) {
+					// boolean rfs = model.getFeatureSelection().contains(rf);
+					boolean rls = model.getLocationSelection().contains(rf);
+					if (rls) {
+						// model.removeFeatureSelection(rf);
+						model.removeLocationSelection(rf);
+					} else
+						model.addLocationSelection(rf);
 
-			} else if (rf != null && !Mouse.modifier(e)) {
-				model.setLocationSelection(rf);
-				if (e.getClickCount() > 1) {
-					Feature f = rf.getParent();
-					int l = f.length();
-					int st = f.start() - (l / 20);
-					int en = f.end() + (l / 20);
-					model.setAnnotationLocationVisible(new Location(st, en));
+				} else if (rf != null && !Mouse.modifier(e)) {
+					model.setLocationSelection(rf);
+					if (e.getClickCount() > 1) {
+						Feature f = rf.getParent();
+						int l = f.length();
+						int st = f.start() - (l / 20);
+						int en = f.end() + (l / 20);
+						model.setAnnotationLocationVisible(new Location(st, en));
+					}
+
 				}
-
+				model.setSelectedRegion(null);
+				return true;
 			}
-			model.setSelectedRegion(null);
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 
 	}
 
@@ -783,11 +787,10 @@ public class StructureTrack extends Track {
 	}
 
 	@Override
-	public int paint(Graphics g1, Entry e, int yOffset, double width) {
+	public int paintTrack(Graphics2D g, Entry e, int yOffset, double width) {
 		this.screenWidth = width;
 		// super.paintComponent(g1);
 		collisionMap.clear();
-		Graphics2D g = (Graphics2D) g1;
 
 		// screenWidth = g.getClipBounds().width;
 		// screenWidth = this.getSize().width + 1;
