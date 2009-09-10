@@ -121,6 +121,9 @@ public abstract class Track extends Observable {
 		notifyObservers();
 	}
 
+	public void mouseNotHere(){
+		//Do nothing
+	}
 	public abstract String displayName();
 
 }

@@ -69,14 +69,17 @@ public class ShortReadTrack extends Track {
 		public void set(int forward, int reverse, int d, MouseEvent e) {
 			StringBuffer text = new StringBuffer();
 			text.append("<html>");
-			text.append("Forward coverage : " +( forward<0?"In progress...":forward )+ "<br />");
-			text.append("Reverse coverage: " + ( reverse<0?"In progress...":reverse ) + "<br />");
-			text.append("Total coverage : " + ( d<0?"In progress...":d ) + "<br />");
+			text.append("Forward coverage : " + (forward < 0 ? "In progress..." : forward) + "<br />");
+			text.append("Reverse coverage: " + (reverse < 0 ? "In progress..." : reverse) + "<br />");
+			text.append("Total coverage : " + (d < 0 ? "In progress..." : d) + "<br />");
 			text.append("</html>");
 			if (!text.toString().equals(floater.getText())) {
 				floater.setText(text.toString());
-				setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
-				this.pack();
+				this.pack();				
+			}
+			setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
+			
+			if(!isVisible()){
 				setVisible(true);
 			}
 
@@ -85,8 +88,15 @@ public class ShortReadTrack extends Track {
 	}
 
 	@Override
+	public boolean mouseExited(int x, int y, MouseEvent source) {
+
+		tooltip.setVisible(false);
+		return false;
+	}
+
+	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
-		if (y > 5 && y < graphLineHeigh - 5 && scale <= 256) {
+		if (scale <= 256) {
 			if (!tooltip.isVisible())
 				tooltip.setVisible(true);
 			GraphBuffer currentBuffer = buffers.get(currentEntry);
@@ -621,7 +631,7 @@ public class ShortReadTrack extends Track {
 			readLength = maxPairingDistance;
 		int lines = 0;
 		boolean stackExceeded = false;
-		boolean enablePairing=Configuration.getBoolean("shortread:enablepairing");
+		boolean enablePairing = Configuration.getBoolean("shortread:enablepairing");
 		if (reads != null) {
 			lines = 0;
 
@@ -634,7 +644,7 @@ public class ShortReadTrack extends Track {
 
 				for (ShortRead one : reads) {
 
-					if (enablePairing&&!one.isPaired() && one.isSecondInPair())
+					if (enablePairing && !one.isPaired() && one.isSecondInPair())
 						continue;
 
 					if (visibleReadCount > maxReads) {
@@ -654,16 +664,16 @@ public class ShortReadTrack extends Track {
 						/* Find empty line */
 						int pos = one.start() - currentVisible.start();
 						int line = line(one, pos, tilingCounter);
-						if (line > maxStack){
-							stackExceeded=true;
+						if (line > maxStack) {
+							stackExceeded = true;
 							continue;
-							
+
 						}
 						int clearStart = one.start();
 						int clearEnd = one.end();
 						ExtendedShortRead two = null;
 						/* Modify empty space finder for paired reads */
-						if (enablePairing&& one instanceof ExtendedShortRead) {
+						if (enablePairing && one instanceof ExtendedShortRead) {
 							ExtendedShortRead esr = (ExtendedShortRead) one;
 							if (esr.isPaired() && esr.isFirstInPair()) {
 								two = readBuffer.getSecondRead(esr);
