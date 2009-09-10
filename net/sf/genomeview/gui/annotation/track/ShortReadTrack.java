@@ -69,9 +69,9 @@ public class ShortReadTrack extends Track {
 		public void set(int forward, int reverse, int d, MouseEvent e) {
 			StringBuffer text = new StringBuffer();
 			text.append("<html>");
-			text.append("Forward coverage : " + forward + "<br />");
-			text.append("Reverse coverage: " + reverse + "<br />");
-			text.append("Total coverage : " + d + "<br />");
+			text.append("Forward coverage : " +( forward<0?"In progress...":forward )+ "<br />");
+			text.append("Reverse coverage: " + ( reverse<0?"In progress...":reverse ) + "<br />");
+			text.append("Total coverage : " + ( d<0?"In progress...":d ) + "<br />");
 			text.append("</html>");
 			if (!text.toString().equals(floater.getText())) {
 				floater.setText(text.toString());
@@ -323,7 +323,7 @@ public class ShortReadTrack extends Track {
 
 		public synchronized double getReverse(int start, int scale) {
 			if (start < 0 || start + scale >= rg.getReversePileUp().size())
-				return 0;
+				return Double.NaN;
 			if (scale < bareScale) {
 				double conservation = 0;
 				for (int j = 0; j < scale; j++) {
@@ -344,12 +344,12 @@ public class ShortReadTrack extends Track {
 			if (start / scale < bufferReverse.get(index).length)
 				return bufferReverse.get(index)[start / scale];
 			else
-				return -0.02;
+				return Double.NaN;
 		}
 
 		public synchronized double getForward(int start, int scale) {
 			if (start < 0 || start + scale >= rg.getForwardPileUp().size())
-				return 0;
+				return Double.NaN;
 			if (scale < bareScale) {
 				double conservation = 0;
 				for (int j = 0; j < scale; j++) {
@@ -370,30 +370,30 @@ public class ShortReadTrack extends Track {
 			if (start / scale < bufferForward.get(index).length)
 				return bufferForward.get(index)[start / scale];
 			else
-				return -0.02;
+				return Double.NaN;
 		}
 
 		public synchronized int getRaw(int start) {
 			if (start >= rg.getForwardPileUp().size())
-				return 0;
+				return -1;
 			return rg.getForwardPileUp().get(start) + rg.getReversePileUp().get(start);
 		}
 
 		public synchronized int getRawForward(int start) {
 			if (start >= rg.getForwardPileUp().size())
-				return 0;
+				return -1;
 			return rg.getForwardPileUp().get(start);
 		}
 
 		public synchronized int getRawReverse(int start) {
 			if (start >= rg.getReversePileUp().size())
-				return 0;
+				return -1;
 			return rg.getReversePileUp().get(start);
 		}
 
 		public synchronized double get(int start, int scale) {
 			if (start < 0 || start + scale >= rg.getForwardPileUp().size())
-				return 0;
+				return Double.NaN;
 			if (scale < bareScale) {
 				double conservation = 0;
 				for (int j = 0; j < scale; j++) {
@@ -414,7 +414,7 @@ public class ShortReadTrack extends Track {
 			if (start / scale < buffer.get(index).length)
 				return buffer.get(index)[start / scale];
 			else
-				return -0.02;
+				return Double.NaN;
 		}
 
 		private float[] merge(float[] ds) {
