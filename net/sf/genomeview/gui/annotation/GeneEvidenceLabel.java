@@ -246,6 +246,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		int y=e.getY();
 		/* Transfer MouseEvent to corresponding track */
 
 		Track mouseTrack = tracks.get(e);
@@ -256,7 +257,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			return;
 		/* Specific mouse code for this label */
 		if (Mouse.button2(e) || Mouse.button3(e)) {
-			StaticUtils.popupMenu(model).show(this, e.getX(), e.getY());
+			StaticUtils.popupMenu(model).show(this, e.getX(), y);
 		}
 	}
 }
