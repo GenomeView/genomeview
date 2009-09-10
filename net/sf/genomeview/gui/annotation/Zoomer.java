@@ -181,7 +181,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
+		model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 	}
 
