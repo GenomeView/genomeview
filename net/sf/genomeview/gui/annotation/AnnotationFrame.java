@@ -12,7 +12,7 @@ import javax.swing.ScrollPaneConstants;
 import net.sf.genomeview.data.Model;
 
 /**
- * Frame for annotation. This contains the gene structure panel and the evidence
+ * Frame for annotation. This contains the navigatoin panel and the annotation
  * panel.
  * 
  * @author Thomas Abeel
