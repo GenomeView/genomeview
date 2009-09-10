@@ -66,11 +66,11 @@ public class ShortReadTrack extends Track {
 			pack();
 		}
 
-		public void set(int forward, int reverse, int d,MouseEvent e) {
+		public void set(int forward, int reverse, int d, MouseEvent e) {
 			StringBuffer text = new StringBuffer();
 			text.append("<html>");
 			text.append("Forward coverage : " + forward + "<br />");
-			text.append("Reverse coverage: " +reverse + "<br />");
+			text.append("Reverse coverage: " + reverse + "<br />");
 			text.append("Total coverage : " + d + "<br />");
 			text.append("</html>");
 			if (!text.toString().equals(floater.getText())) {
@@ -79,20 +79,20 @@ public class ShortReadTrack extends Track {
 				this.pack();
 				setVisible(true);
 			}
-			
+
 		}
 
 	}
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
-		if (y > 5 && y < graphLineHeigh - 5&&scale<=256) {
+		if (y > 5 && y < graphLineHeigh - 5 && scale <= 256) {
 			if (!tooltip.isVisible())
 				tooltip.setVisible(true);
-			GraphBuffer currentBuffer=buffers.get(currentEntry);
-			int start=Convert.translateScreenToGenome(x,currentVisible, currentScreen);
-			
-			tooltip.set(currentBuffer.getRawForward(start),currentBuffer.getRawReverse(start),currentBuffer.getRaw(start),source);
+			GraphBuffer currentBuffer = buffers.get(currentEntry);
+			int start = Convert.translateScreenToGenome(x, currentVisible, currentScreen);
+
+			tooltip.set(currentBuffer.getRawForward(start), currentBuffer.getRawReverse(start), currentBuffer.getRaw(start), source);
 		} else {
 			if (tooltip.isVisible())
 				tooltip.setVisible(false);
@@ -109,6 +109,9 @@ public class ShortReadTrack extends Track {
 		this.readBuffer = new ReadBuffer(source);
 	}
 
+	/*
+	 * Buffering class for access to SAM and BAM based data
+	 */
 	class ReadBuffer {
 
 		class Runner implements Runnable {
@@ -122,6 +125,7 @@ public class ShortReadTrack extends Track {
 			@Override
 			public void run() {
 				buffer.clear();
+				int maxCache = Configuration.getInt("shortread:maximumCache");
 				ReadGroup rg = localEntry.shortReads.getReadGroup(source);
 				GVProgressBar bar = new GVProgressBar("Buffering...", "Buffering " + displayName(), model.getParent());
 				StaticUtils.upperRight(bar);
@@ -132,7 +136,7 @@ public class ShortReadTrack extends Track {
 						buffer.add(sr);
 					}
 
-					if (buffer.size() > 2000000) {
+					if (buffer.size() > maxCache) {
 						buffer.clear();
 						JOptionPane.showMessageDialog(null, "Buffering is not working out, too much data.", "Warning!", JOptionPane.WARNING_MESSAGE);
 						bar.dispose();
@@ -172,10 +176,29 @@ public class ShortReadTrack extends Track {
 
 		}
 
+		public ExtendedShortRead getFirstRead(ExtendedShortRead sr) {
+			if (ready) {
+				return buffer.getFirst(sr);
+
+			} else
+				return qFastFirst.get(sr.record().getReadName());
+		}
+
+		public ExtendedShortRead getSecondRead(ExtendedShortRead sr) {
+			if (ready) {
+				return buffer.getSecond(sr);
+
+			} else
+				return qFastSecond.get(sr.record().getReadName());
+		}
+
 		/* qFast */
 		private List<ShortRead> qFastBuffer = new ArrayList<ShortRead>();
 		private Location qFastBufferLocation = new Location(-5, -5);
 		private byte qFastFail = 0;
+		private HashMap<String, ExtendedShortRead> qFastFirst = new HashMap<String, ExtendedShortRead>();
+		private HashMap<String, ExtendedShortRead> qFastSecond = new HashMap<String, ExtendedShortRead>();
+		private int qFastMaxPairedLenght;
 
 		private synchronized Iterable<ShortRead> qFast(Entry e, Location r) {
 			if (isQFastFail())
@@ -186,6 +209,8 @@ public class ShortReadTrack extends Track {
 				long time = System.currentTimeMillis();
 				if (r.start() != qFastBufferLocation.start() || r.end() != qFastBufferLocation.end()) {
 					qFastBuffer.clear();
+					qFastFirst.clear();
+					qFastSecond.clear();
 					BAMreads br = (BAMreads) (e.shortReads.getReadGroup(source));
 					SAMFileReader tmpReader = new SAMFileReader(((SAMDataSource) source).getFile());
 					CloseableIterator<SAMRecord> it = tmpReader.queryOverlapping(br.getKey(), r.start(), r.end());
@@ -194,7 +219,25 @@ public class ShortReadTrack extends Track {
 							SAMRecord tmp = it.next();
 							byte[] seq = tmp.getReadBases();
 							if (complete(seq)) {
-								qFastBuffer.add(new ExtendedShortRead(seq, tmp.getAlignmentStart(), tmp.getAlignmentEnd(), !tmp.getReadNegativeStrandFlag(), tmp.getCigar()));
+								ExtendedShortRead esr = new ExtendedShortRead(tmp);
+								qFastBuffer.add(esr);
+								String name = tmp.getReadName();
+								if (esr.isPaired() && esr.isFirstInPair()) {
+									qFastFirst.put(name, esr);
+									if (qFastSecond.containsKey(name)) {
+										int len = Math.max(qFastFirst.get(name).end() - qFastSecond.get(name).start() + 1, qFastSecond.get(name).end() - qFastFirst.get(name).start() + 1);
+										if (len > qFastMaxPairedLenght)
+											qFastMaxPairedLenght = len;
+									}
+								}
+								if (esr.isPaired() && esr.isSecondInPair()) {
+									qFastSecond.put(tmp.getReadName(), esr);
+									if (qFastFirst.containsKey(name)) {
+										int len = Math.max(qFastFirst.get(name).end() - qFastSecond.get(name).start() + 1, qFastSecond.get(name).end() - qFastFirst.get(name).start() + 1);
+										if (len > qFastMaxPairedLenght)
+											qFastMaxPairedLenght = len;
+									}
+								}
 
 							}
 						} catch (RuntimeException ex) {
@@ -206,6 +249,8 @@ public class ShortReadTrack extends Track {
 							/* last query failed, skip a few to catch up */
 							qFastFail = 100;
 							qFastBuffer.clear();
+							qFastFirst.clear();
+							qFastSecond.clear();
 							qFastBufferLocation = new Location(-5, -5);
 							it.close();
 							tmpReader.close();
@@ -233,6 +278,15 @@ public class ShortReadTrack extends Track {
 				if (seq[i] == 'n' || seq[i] == 'N')
 					return false;
 			return true;
+		}
+
+		public int getPairLength() {
+			if (ready) {
+				return buffer.getPairLength();
+
+			} else {
+				return qFastMaxPairedLenght;
+			}
 		}
 
 	}
@@ -268,7 +322,7 @@ public class ShortReadTrack extends Track {
 		private List<float[]> bufferReverse = new ArrayList<float[]>();
 
 		public synchronized double getReverse(int start, int scale) {
-			if (start<0||start + scale >= rg.getReversePileUp().size())
+			if (start < 0 || start + scale >= rg.getReversePileUp().size())
 				return 0;
 			if (scale < bareScale) {
 				double conservation = 0;
@@ -294,7 +348,7 @@ public class ShortReadTrack extends Track {
 		}
 
 		public synchronized double getForward(int start, int scale) {
-			if (start<0||start + scale >= rg.getForwardPileUp().size())
+			if (start < 0 || start + scale >= rg.getForwardPileUp().size())
 				return 0;
 			if (scale < bareScale) {
 				double conservation = 0;
@@ -319,29 +373,32 @@ public class ShortReadTrack extends Track {
 				return -0.02;
 		}
 
-		public synchronized int getRaw(int start){
-			if (start>= rg.getForwardPileUp().size())
+		public synchronized int getRaw(int start) {
+			if (start >= rg.getForwardPileUp().size())
 				return 0;
-			return rg.getForwardPileUp().get(start)+rg.getReversePileUp().get(start);
+			return rg.getForwardPileUp().get(start) + rg.getReversePileUp().get(start);
 		}
-		public synchronized int getRawForward(int start){
-			if (start>= rg.getForwardPileUp().size())
+
+		public synchronized int getRawForward(int start) {
+			if (start >= rg.getForwardPileUp().size())
 				return 0;
 			return rg.getForwardPileUp().get(start);
 		}
-		public synchronized int getRawReverse(int start){
+
+		public synchronized int getRawReverse(int start) {
 			if (start >= rg.getReversePileUp().size())
 				return 0;
 			return rg.getReversePileUp().get(start);
 		}
+
 		public synchronized double get(int start, int scale) {
-			if (start<0||start + scale >= rg.getForwardPileUp().size())
+			if (start < 0 || start + scale >= rg.getForwardPileUp().size())
 				return 0;
 			if (scale < bareScale) {
 				double conservation = 0;
 				for (int j = 0; j < scale; j++) {
-					conservation += log(rg.getForwardPileUp().get(start + j)+rg.getReversePileUp().get(start + j));
-					
+					conservation += log(rg.getForwardPileUp().get(start + j) + rg.getReversePileUp().get(start + j));
+
 				}
 				return conservation / (scale * log(rg.getMaxPile()));
 			}
@@ -380,8 +437,8 @@ public class ShortReadTrack extends Track {
 			for (int i = 0; i < size; i += bareScale) {
 				float conservation = 0;
 				for (int j = 0; j < bareScale && i + j < size; j++) {
-					conservation += log(rg.getForwardPileUp().get(i + j)+rg.getReversePileUp().get(i + j));
-					
+					conservation += log(rg.getForwardPileUp().get(i + j) + rg.getReversePileUp().get(i + j));
+
 				}
 				conservation /= bareScale * log(rg.getMaxPile());
 				out[i / bareScale] = conservation;
@@ -399,7 +456,7 @@ public class ShortReadTrack extends Track {
 					conservation += log(rg.getReversePileUp().get(i + j));
 				}
 				conservation /= bareScale * log(rg.getMaxPile());
-				out[i / bareScale] = (float)conservation;
+				out[i / bareScale] = (float) conservation;
 
 			}
 			return out;
@@ -414,7 +471,7 @@ public class ShortReadTrack extends Track {
 					conservation += log(rg.getForwardPileUp().get(i + j));
 				}
 				conservation /= bareScale * log(rg.getMaxPile());
-				out[i / bareScale] =(float) conservation;
+				out[i / bareScale] = (float) conservation;
 
 			}
 			return out;
@@ -431,17 +488,18 @@ public class ShortReadTrack extends Track {
 
 	private Map<Entry, GraphBuffer> buffers = new HashMap<Entry, GraphBuffer>();
 
-	private int  scale=1;
+	private int scale = 1;
 
 	private Entry currentEntry;
 
 	private Location currentVisible;
 
 	private double currentScreen;
+
 	@Override
 	public int paint(Graphics gg, final Entry entry, int yOffset, double screenWidth) {
-		currentEntry=entry;
-		currentScreen=screenWidth;
+		currentEntry = entry;
+		currentScreen = screenWidth;
 		/* Configuration options */
 		int maxReads = Configuration.getInt("shortread:maxReads");
 		int maxRegion = Configuration.getInt("shortread:maxRegion");
@@ -530,6 +588,7 @@ public class ShortReadTrack extends Track {
 		 */
 		Iterable<ShortRead> reads = null;
 		boolean timeout = false;
+		int readLength = entry.shortReads.getReadGroup(source).readLength();
 		if (!isCollapsed() && (currentVisible.length() > maxRegion)) {
 			g.setColor(Color.BLACK);
 			g.drawString("Region too big (max " + maxRegion + " nt), zoom in", 10, yOffset + 10);
@@ -550,26 +609,35 @@ public class ShortReadTrack extends Track {
 					g.drawString(msg, 10, yOffset + 18);
 					yOffset += 20 + 5;
 				}
+				/* Update readLength for paired reads */
+				readLength = readBuffer.getPairLength();
+
 			} else {
 				reads = rg.get(currentVisible);
 			}
 		}
-
+		int maxPairingDistance = Configuration.getInt("shortread:maximumPairing");
+		if (readLength > maxPairingDistance)
+			readLength = maxPairingDistance;
 		int lines = 0;
 		boolean stackExceeded = false;
+		boolean enablePairing=Configuration.getBoolean("shortread:enablepairing");
 		if (reads != null) {
 			lines = 0;
-			int readLength = entry.shortReads.getReadGroup(source).readLength();
+
 			BitSet[] tilingCounter = new BitSet[currentVisible.length()];
 			for (int i = 0; i < tilingCounter.length; i++) {
 				tilingCounter[i] = new BitSet();
 			}
 			int visibleReadCount = 0;
 			try {
-				for (ShortRead rf : reads) {
+
+				for (ShortRead one : reads) {
+
+					if (enablePairing&&!one.isPaired() && one.isSecondInPair())
+						continue;
 
 					if (visibleReadCount > maxReads) {
-
 						String msg = "Too many short reads to display, only first " + maxReads + " are displayed ";
 						FontMetrics metrics = g.getFontMetrics();
 						int hgt = metrics.getHeight();
@@ -581,70 +649,75 @@ public class ShortReadTrack extends Track {
 						break;
 					}
 
-					Color c = Color.GRAY;
-
-					if (rf.strand() == Strand.FORWARD)
-						c = Color.BLUE;
-					else
-						c = new Color(0x00, 0x99, 0x00);
-
-					int x2 = Convert.translateGenomeToScreen(rf.end() + 1, currentVisible, screenWidth);
+					int x2 = Convert.translateGenomeToScreen(one.end() + 1, currentVisible, screenWidth);
 					if (x2 > 0) {
 						/* Find empty line */
-						int line = 0;
-						int pos = rf.start() - currentVisible.start();
-						if (pos >= 0 && pos < tilingCounter.length)
-							line = tilingCounter[rf.start() - currentVisible.start()].nextClearBit(line);
-						else
-							line = tilingCounter[0].nextClearBit(line);
+						int pos = one.start() - currentVisible.start();
+						int line = line(one, pos, tilingCounter);
+						if (line > maxStack){
+							stackExceeded=true;
+							continue;
+							
+						}
+						int clearStart = one.start();
+						int clearEnd = one.end();
+						ExtendedShortRead two = null;
+						/* Modify empty space finder for paired reads */
+						if (enablePairing&& one instanceof ExtendedShortRead) {
+							ExtendedShortRead esr = (ExtendedShortRead) one;
+							if (esr.isPaired() && esr.isFirstInPair()) {
+								two = readBuffer.getSecondRead(esr);
+							}
+							if (two != null) {
+								if (two.start() < one.start()) {
 
-						if (line < maxStack) {
-							for (int i = rf.start() - 1 - readLength; i <= rf.end() + 1; i++) {
-								pos = i - currentVisible.start();
-								if (pos >= 0 && pos < tilingCounter.length)
-									tilingCounter[pos].set(line);
+									pos = two.start() - currentVisible.start();
+									line = line(two, pos, tilingCounter);
+									clearStart = two.start();
+								} else {
+									clearEnd = two.end();
+								}
 							}
 
+						}
+						/* Carve space out of hitmap */
+						for (int i = clearStart - readLength; i <= clearEnd + 3; i++) {
+							pos = i - currentVisible.start();
+							if (pos >= 0 && pos < tilingCounter.length)
+								tilingCounter[pos].set(line);
+						}
+
+						int yRec = line * readLineHeight + yOffset;
+
+						/* Paint read or read pair */
+						if (line < maxStack) {
+							/* paired read - calculate connection coordinates */
+							if (two != null) {
+
+								int subX1, subX2;
+								if (one.start() < two.start()) {
+
+									subX1 = Convert.translateGenomeToScreen(one.end(), currentVisible, screenWidth);
+									subX2 = Convert.translateGenomeToScreen(two.start(), currentVisible, screenWidth);
+
+								} else {
+
+									subX1 = Convert.translateGenomeToScreen(one.start(), currentVisible, screenWidth);
+									subX2 = Convert.translateGenomeToScreen(two.end(), currentVisible, screenWidth);
+
+								}
+
+								g.setColor(Color.PINK);
+								g.drawLine(subX1, yRec + readLineHeight / 2, subX2, yRec + readLineHeight / 2);
+							}
 							if (line > lines)
 								lines = line;
 
-							int subX1 = Convert.translateGenomeToScreen(rf.start(), currentVisible, screenWidth);
-							int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, currentVisible, screenWidth);
-							if (subX2 < subX1) {
-								subX2 = subX1;
-							}
-
-							if (visibleReadCount + 100 > maxReads)
-								g.setColor(Color.RED);
-							else
-								g.setColor(c);
-
-							int yRec = line * readLineHeight + yOffset;
-							g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
+							paintRead(g, one, yRec, screenWidth, readLineHeight, entry);
 							visibleReadCount++;
-							/* Check mismatches */
-							if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
-								for (int j = rf.start(); j <= rf.end(); j++) {
-									char readNt = rf.getNucleotide(j - rf.start() + 1);
-									char refNt = Character.toUpperCase(entry.sequence.getNucleotide(j));
-									double tx1 = Convert.translateGenomeToScreen(j, currentVisible, screenWidth);
-									double tx2 = Convert.translateGenomeToScreen(j + 1, currentVisible, screenWidth);
-
-									if (readNt != refNt) {
-										if (readNt == '-') {
-											// System.out.println("RED");
-											g.setColor(Color.RED);
-										} else
-											g.setColor(Color.ORANGE);
-										g.fillRect((int) tx1, yRec, (int) (tx2 - tx1), readLineHeight - 1);
-										if (model.getAnnotationLocationVisible().length() < 100) {
-											g.setColor(c);
-											Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
-											g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 - stringSize.getWidth() / 2)), yRec + readLineHeight - 3);
-
-										}
-									}
-								}
+							if (two != null) {
+								paintRead(g, two, yRec, screenWidth, readLineHeight, entry);
+								visibleReadCount++;
 							}
 						} else {
 							stackExceeded = true;
@@ -665,6 +738,84 @@ public class ShortReadTrack extends Track {
 
 		}
 		return yOffset - originalYOffset;
+	}
+
+	private int line(ShortRead one, int pos, BitSet[] tilingCounter) {
+		if (pos >= 0 && pos < tilingCounter.length)
+			return tilingCounter[one.start() - currentVisible.start()].nextClearBit(0);
+		else
+			return tilingCounter[0].nextClearBit(0);
+
+	}
+
+	// private void drawReads(Graphics2D g, ShortRead rf, BitSet[]
+	// tilingCounter, int pos, int line, double screenWidth, int readLineHeight,
+	// Entry entry, int yOffset, ReadGroup rg) {
+
+	// if (rf instanceof ExtendedShortRead && ((ExtendedShortRead)
+	// rf).isPaired() && ((ExtendedShortRead) rf).isFirstInPair()) {
+	// ExtendedShortRead sr = ((ExtendedShortRead) rf);
+
+	// // FIXME The commented approach is too slow
+	// ExtendedShortRead second = null;
+	// if (currentVisible.length() < 200) {
+	// second = rg.getSecond(sr);
+	// }
+	// /* Faster, assumption based method */
+	// sr.record().getMateAlignmentStart();
+	//			
+	/* Carve space out of hitmap */
+	// for (int i = rf.start(); i <= rf.end() + 1; i++) {
+	// pos = i - currentVisible.start();
+	// if (pos >= 0 && pos < tilingCounter.length)
+	// tilingCounter[pos].set(line);
+	// }
+	// }
+	// }
+	//
+	private void paintRead(Graphics2D g, ShortRead rf, int yRec, double screenWidth, int readLineHeight, Entry entry) {
+		Color c = Color.GRAY;
+
+		if (rf.strand() == Strand.FORWARD)
+			c = Color.BLUE;
+		else
+			c = new Color(0x00, 0x99, 0x00);
+		g.setColor(c);
+		int subX1 = Convert.translateGenomeToScreen(rf.start(), currentVisible, screenWidth);
+		int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, currentVisible, screenWidth);
+		if (subX2 < subX1) {
+			subX2 = subX1;
+			// FIXME does this ever happen?
+		}
+		g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
+
+		// System.out.println(subX1);
+
+		/* Check mismatches */
+		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+			for (int j = rf.start(); j <= rf.end(); j++) {
+				char readNt = rf.getNucleotide(j - rf.start() + 1);
+				char refNt = Character.toUpperCase(entry.sequence.getNucleotide(j));
+				double tx1 = Convert.translateGenomeToScreen(j, currentVisible, screenWidth);
+				double tx2 = Convert.translateGenomeToScreen(j + 1, currentVisible, screenWidth);
+
+				if (readNt != refNt) {
+					if (readNt == '-') {
+						// System.out.println("RED");
+						g.setColor(Color.RED);
+					} else
+						g.setColor(Color.ORANGE);
+					g.fillRect((int) tx1, yRec, (int) (tx2 - tx1), readLineHeight - 1);
+					if (model.getAnnotationLocationVisible().length() < 100) {
+						g.setColor(c);
+						Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
+						g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 - stringSize.getWidth() / 2)), yRec + readLineHeight - 3);
+
+					}
+				}
+			}
+		}
+
 	}
 
 	@Override

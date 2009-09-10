@@ -204,8 +204,11 @@ public class ConfigurationDialog extends JDialog {
 					"Maximum range in nucleotides to display individual reads"), gc);
 			gc.gridy++;
 			this.add(new IntegerConfig("shortread:maxStack",
-					"Maximum display depth of stacked reads, deeper stacked reads will not be shown individually, but are included in the pile-up view"), gc);
-			
+					"<html>Maximum display depth of stacked reads, <br/>deeper stacked reads will not be shown individually, <br/>but are included in the pile-up view</html>"), gc);
+			gc.gridy++;
+			this.add(new BooleanConfig("shortread:enablepairing",
+			"Draw a connection between paired reads"), gc);
+	
 		}
 	}
 	/**
