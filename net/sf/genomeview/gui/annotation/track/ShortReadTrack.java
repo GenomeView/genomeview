@@ -506,6 +506,12 @@ public class ShortReadTrack extends Track {
 
 	private double currentScreen;
 
+	private Color pairingColor;
+
+	private Color reverseColor;
+
+	private Color forwardColor;
+
 	@Override
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
 		currentEntry = entry;
@@ -514,6 +520,9 @@ public class ShortReadTrack extends Track {
 		int maxReads = Configuration.getInt("shortread:maxReads");
 		int maxRegion = Configuration.getInt("shortread:maxRegion");
 		int maxStack = Configuration.getInt("shortread:maxStack");
+		 forwardColor=Configuration.getColor("shortread:forwardColor");
+		 reverseColor=Configuration.getColor("shortread:reverseColor");
+		 pairingColor=Configuration.getColor("shortread:pairingColor");
 
 		currentVisible = model.getAnnotationLocationVisible();
 
@@ -578,10 +587,10 @@ public class ShortReadTrack extends Track {
 			}
 
 			/* Draw coverage lines */
-			g.setColor(Color.BLUE);
+			g.setColor(forwardColor);
 			g.draw(conservationGPF);
 
-			g.setColor(new Color(0x00, 0x99, 0x00));
+			g.setColor(reverseColor);
 			g.draw(conservationGPR);
 
 			g.setColor(Color.BLACK);
@@ -716,7 +725,7 @@ public class ShortReadTrack extends Track {
 
 								}
 
-								g.setColor(Color.PINK);
+								g.setColor(pairingColor);
 								g.drawLine(subX1, yRec + readLineHeight / 2, subX2, yRec + readLineHeight / 2);
 							}
 							if (line > lines)
@@ -786,15 +795,16 @@ public class ShortReadTrack extends Track {
 		Color c = Color.GRAY;
 
 		if (rf.strand() == Strand.FORWARD)
-			c = Color.BLUE;
+			g.setColor(forwardColor);
 		else
-			c = new Color(0x00, 0x99, 0x00);
-		g.setColor(c);
+			g.setColor(reverseColor);
+		
 		int subX1 = Convert.translateGenomeToScreen(rf.start(), currentVisible, screenWidth);
 		int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, currentVisible, screenWidth);
 		if (subX2 < subX1) {
 			subX2 = subX1;
 			// FIXME does this ever happen?
+			System.err.println("This happens!");
 		}
 		g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
 

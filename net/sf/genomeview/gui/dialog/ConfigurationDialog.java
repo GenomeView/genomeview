@@ -130,30 +130,40 @@ public class ConfigurationDialog extends JDialog {
 		}
 	}
 
-	static class ColorLabel extends JLabel {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -7614916778081300913L;
-
-		ColorLabel(final Model model, final String configKey) {
-			super(new ColorIcon(Configuration.getColor(configKey), 16));
-			this.addMouseListener(new MouseAdapter() {
-				public void mouseClicked(MouseEvent e) {
-					Color newColor = JColorChooser.showDialog(
-							model.getParent(), "Choose track color",
-							Configuration.getColor(configKey));
-
-					if (newColor != null) {
-						Configuration.setColor(configKey, newColor);
-						setIcon(new ColorIcon(
-								Configuration.getColor(configKey), 16));
-					}
-				}
-			});
-
+	static class ColorConfig extends JPanel {
+		
+	
+		private static final long serialVersionUID = -2242613993844951737L;
+		public ColorConfig(Model model, String key, String msg) {
+			setLayout(new BorderLayout());
+			add(new JLabel(msg),BorderLayout.CENTER);
+			add(new ColorLabel(model, key),BorderLayout.EAST);
 		}
+		private class ColorLabel extends JLabel{
+			
+			private static final long serialVersionUID = -290128964356729238L;
+
+			private ColorLabel(final Model model, final String configKey) {
+				super(new ColorIcon(Configuration.getColor(configKey), 16));
+				this.addMouseListener(new MouseAdapter() {
+					public void mouseClicked(MouseEvent e) {
+						Color newColor = JColorChooser.showDialog(
+								model.getParent(), "Choose color",
+								Configuration.getColor(configKey));
+
+						if (newColor != null) {
+							Configuration.setColor(configKey, newColor);
+							setIcon(new ColorIcon(
+									Configuration.getColor(configKey), 16));
+						}
+					}
+				});
+
+			}
+		}
+		
+
+		
 	}
 
 	static class AANucleotideColorsConfigPanel extends GridBagPanel {
@@ -166,14 +176,14 @@ public class ConfigurationDialog extends JDialog {
 			aa.setLayout(new GridLayout(0, 8));
 			for (char c : Configuration.getAminoAcids()) {
 				aa.add(new JLabel("" + c));
-				aa.add(new ColorLabel(model, "AA_" + c));
+				aa.add(new ColorConfig(model, "AA_" + c,""+c));
 
 			}
 			Container nt = new Container();
 			nt.setLayout(new GridLayout(0, 8));
 			for (char c : Configuration.getNucleotides()) {
 				nt.add(new JLabel("" + c));
-				nt.add(new ColorLabel(model, "N_" + c));
+				nt.add(new ColorConfig(model, "N_" + c,""+c));
 			}
 			this
 					.add(new TitledComponent("Amino acids", aa),
@@ -196,7 +206,7 @@ public class ConfigurationDialog extends JDialog {
          */
 		private static final long serialVersionUID = -628553625113038258L;
 
-		public ShortReadConfigPanel() {
+		public ShortReadConfigPanel(Model model) {
 			this.add(new IntegerConfig("shortread:maxReads",
 					"Maximum number of displayed reads"), gc);
 			gc.gridy++;
@@ -208,6 +218,24 @@ public class ConfigurationDialog extends JDialog {
 			gc.gridy++;
 			this.add(new BooleanConfig("shortread:enablepairing",
 			"Draw a connection between paired reads"), gc);
+			gc.gridy++;
+			this.add(new IntegerConfig("shortread:maximumCache",
+			"Maximum number of reads to cache"), gc);
+			gc.gridy++;
+			this.add(new IntegerConfig("shortread:maximumPairing",
+			"Maximum distance between paired reads"), gc);
+			gc.gridy++;
+			this.add(new IntegerConfig("shortread:maximumPairing",
+			"Maximum distance between paired reads"), gc);
+			gc.gridy++;
+			this.add(new ColorConfig(model,"shortread:forwardColor",
+			"Color of the forward reads"), gc);
+			gc.gridy++;
+			this.add(new ColorConfig(model,"shortread:reverseColor",
+			"Color of the reverse reads"), gc);
+			gc.gridy++;
+			this.add(new ColorConfig(model,"shortread:pairingColor",
+			"Color of the line between paired reads"), gc);
 	
 		}
 	}
@@ -300,7 +328,7 @@ public class ConfigurationDialog extends JDialog {
 			for (Type type : Type.values()) {
 
 				typeContainer.add(new JLabel("" + type));
-				typeContainer.add(new ColorLabel(model, "TYPE_" + type));
+				typeContainer.add(new ColorConfig(model, "TYPE_" + type,type.toString()));
 
 			}
 
@@ -377,7 +405,7 @@ public class ConfigurationDialog extends JDialog {
 		jtp.add("AA&nucleotide colors", colors);
 		jtp.add("Feature track", new FeatureTrackConfigPanel(model));
 
-		jtp.add("Short reads",new ShortReadConfigPanel());
+		jtp.add("Short reads",new ShortReadConfigPanel(model));
 		
 		jtp.add("Miscellaneous", miscPanel);
 
