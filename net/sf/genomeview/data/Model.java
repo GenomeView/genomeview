@@ -107,6 +107,8 @@ public class Model extends Observable implements IModel {
 		entries.clear();
 		selectedLocation.clear();
 		selectedRegion = null;
+		undoStack.clear();
+		redoStack.clear();
 		clearTrackList(trackList);
 		refresh(NotificationTypes.GENERAL);
 	}
