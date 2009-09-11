@@ -20,7 +20,6 @@ import net.sf.genomeview.gui.menu.edit.RemoveLocationAction;
 import net.sf.genomeview.gui.menu.edit.SplitFeatureAction;
 import net.sf.genomeview.gui.menu.file.ClearEntriesAction;
 import net.sf.genomeview.gui.menu.file.ExitAction;
-import net.sf.genomeview.gui.menu.file.LoadDirectoryAction;
 import net.sf.genomeview.gui.menu.file.LoadFeaturesAction;
 import net.sf.genomeview.gui.menu.file.LoadSessionAction;
 import net.sf.genomeview.gui.menu.file.NewInstanceAction;
@@ -50,6 +49,7 @@ public class MainMenu extends JMenuBar {
 		JMenu file = new JMenu("File");
 		file.add(new NewInstanceAction(model));
 		file.add(new ClearEntriesAction(model));
+		file.addSeparator();
 		file.add(new SaveSessionAction(model));
 		file.add(new LoadSessionAction(model));
 		file.addSeparator();
