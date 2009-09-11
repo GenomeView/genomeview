@@ -795,10 +795,10 @@ public class ShortReadTrack extends Track {
 		Color c = Color.GRAY;
 
 		if (rf.strand() == Strand.FORWARD)
-			g.setColor(forwardColor);
+			c=forwardColor;
 		else
-			g.setColor(reverseColor);
-		
+			c=reverseColor;
+		g.setColor(c);
 		int subX1 = Convert.translateGenomeToScreen(rf.start(), currentVisible, screenWidth);
 		int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, currentVisible, screenWidth);
 		if (subX2 < subX1) {
