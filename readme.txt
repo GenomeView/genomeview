@@ -1,7 +1,7 @@
 GenomeView readme
 
-Documentation: http://genomeview.sourceforge.net/content/user-documentation
+Documentation: http://genomeview.sourceforge.net/
 
 Download: http://downloads.sourceforge.net/genomeview/
 
-Webstart: http://bioinformatics.psb.ugent.be/webtools/genomeview/launch.jnlp
+Webstart: http://genomeview.sourceforge.net/start.jnlp.php
