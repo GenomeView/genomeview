@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="1.9993" />
+	<property name="version" value="1.9994" />
 	<property name="src" value="." />
 	<property name="build" value="build" />
 	<property name="lib" value="lib" />
@@ -86,10 +86,7 @@
 			</fileset>
 		</copy>
 
-		<filter token="version" value="${version}" />
-		<filter token="jar" value="${jar}" />
-		<copy file="launch.jnlp" todir="${dist}" filtering="true">
-		</copy>
+		
 
 		<copy file="genomeview.properties" todir="${build}" />
 		<copy file="plugin.xml" todir="${build}" />
