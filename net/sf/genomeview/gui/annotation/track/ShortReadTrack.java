@@ -649,10 +649,9 @@ public class ShortReadTrack extends Track {
 			}
 			int visibleReadCount = 0;
 			try {
-
 				for (ShortRead one : reads) {
-
-					if (enablePairing && !one.isPaired() && one.isSecondInPair())
+					
+					if (enablePairing && one.isPaired() && one.isSecondInPair())
 						continue;
 
 					if (visibleReadCount > maxReads) {
@@ -734,6 +733,7 @@ public class ShortReadTrack extends Track {
 							paintRead(g, one, yRec, screenWidth, readLineHeight, entry);
 							visibleReadCount++;
 							if (two != null) {
+								
 								paintRead(g, two, yRec, screenWidth, readLineHeight, entry);
 								visibleReadCount++;
 							}
@@ -766,34 +766,8 @@ public class ShortReadTrack extends Track {
 
 	}
 
-	// private void drawReads(Graphics2D g, ShortRead rf, BitSet[]
-	// tilingCounter, int pos, int line, double screenWidth, int readLineHeight,
-	// Entry entry, int yOffset, ReadGroup rg) {
-
-	// if (rf instanceof ExtendedShortRead && ((ExtendedShortRead)
-	// rf).isPaired() && ((ExtendedShortRead) rf).isFirstInPair()) {
-	// ExtendedShortRead sr = ((ExtendedShortRead) rf);
-
-	// // FIXME The commented approach is too slow
-	// ExtendedShortRead second = null;
-	// if (currentVisible.length() < 200) {
-	// second = rg.getSecond(sr);
-	// }
-	// /* Faster, assumption based method */
-	// sr.record().getMateAlignmentStart();
-	//			
-	/* Carve space out of hitmap */
-	// for (int i = rf.start(); i <= rf.end() + 1; i++) {
-	// pos = i - currentVisible.start();
-	// if (pos >= 0 && pos < tilingCounter.length)
-	// tilingCounter[pos].set(line);
-	// }
-	// }
-	// }
-	//
 	private void paintRead(Graphics2D g, ShortRead rf, int yRec, double screenWidth, int readLineHeight, Entry entry) {
 		Color c = Color.GRAY;
-
 		if (rf.strand() == Strand.FORWARD)
 			c=forwardColor;
 		else
@@ -808,8 +782,6 @@ public class ShortReadTrack extends Track {
 		}
 		g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
 
-		// System.out.println(subX1);
-
 		/* Check mismatches */
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			for (int j = rf.start(); j <= rf.end(); j++) {
@@ -820,7 +792,6 @@ public class ShortReadTrack extends Track {
 
 				if (readNt != refNt) {
 					if (readNt == '-') {
-						// System.out.println("RED");
 						g.setColor(Color.RED);
 					} else
 						g.setColor(Color.ORANGE);
