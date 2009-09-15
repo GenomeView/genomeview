@@ -3,41 +3,35 @@
  */
 package net.sf.genomeview.data;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.cache.CachedURLSource;
+import net.sf.genomeview.data.cache.SAMCache;
 import net.sf.genomeview.data.das.DAS;
 import net.sf.genomeview.data.das.DAS.EntryPoint;
-import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.source.SAMDataSource;
-import be.abeel.gui.TitledComponent;
+import net.sf.jannot.source.SSL;
 
 public class DataSourceFactory {
-	
 
 	public enum Sources {
 		LOCALFILE, URL, DIRECTORY, DAS;
@@ -54,6 +48,26 @@ public class DataSourceFactory {
 				return "DAS server";
 			}
 			return null;
+		}
+	}
+
+	public static SAMDataSource constructSAMFromURL(URL url) throws IOException {
+		SSL.certify(url);
+		return SAMCache.getSAM(url);
+		
+
+	}
+
+	
+	
+	public static DataSource createURL(URL url) throws IOException {
+		String urlString = url.toString();
+		System.out.println("URL:" + urlString);
+		if (urlString.endsWith(".bai")) {
+			url = new URL(urlString.substring(0, urlString.length() - 4));
+			return constructSAMFromURL(url);
+		} else {
+			return new CachedURLSource(url);
 		}
 	}
 
@@ -97,15 +111,8 @@ public class DataSourceFactory {
 
 			try {
 				URL url = new URI(JOptionPane.showInputDialog(model.getParent(), "Give the URL of the data").trim()).toURL();
-				String urlString=url.toString();
-				System.out.println("URL:"+urlString);
-				if(urlString.endsWith(".bai")){
-					url=new URL(urlString.substring(0,urlString.length()-4));
-					return new DataSource[] { SAMDataSource.constructFromURL(url) };
-				}else{
-					return new DataSource[] { new CachedURLSource(url) };
-				}
-				
+				return new DataSource[] { createURL(url) };
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

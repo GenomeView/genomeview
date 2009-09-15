@@ -29,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.cache.CachedURLSource;
 import net.sf.genomeview.gui.menu.MainMenu;
@@ -197,17 +198,10 @@ public class MainWindow implements WindowListener, Observer {
 					rf.execute();
 
 				} else {
-					if(s.endsWith(".bai")){
-						URL url=new URL(s.substring(0,s.length()-4));
-						DataSource ds = SAMDataSource.constructFromURL(url);
-						ReadWorker rf = new ReadWorker(ds, model);
-						rf.execute();
-					}else{
-						URL url=new URL(s);
-						DataSource ds = new CachedURLSource(url) ;
-						ReadWorker rf = new ReadWorker(ds, model);
-						rf.execute();
-					}
+					DataSource ds = DataSourceFactory.createURL(new URL(s));
+					ReadWorker rf = new ReadWorker(ds, model);
+					rf.execute();
+
 				}
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
