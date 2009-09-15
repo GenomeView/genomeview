@@ -304,7 +304,7 @@ public class FeatureTrack extends Track {
 									cm.count(rg.getForwardPileUp().get(i) + rg.getReversePileUp().get(i));
 								}
 							}
-							text.append("Mean short read coverage (" + source + "): " + median(cm));
+							text.append("Mean short read coverage (" + source + "): " + median(cm)+ "<br />");
 						}
 					}
 
