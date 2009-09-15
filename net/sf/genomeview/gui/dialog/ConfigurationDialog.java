@@ -15,6 +15,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JButton;
@@ -23,6 +24,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -365,8 +367,26 @@ public class ConfigurationDialog extends JDialog {
 				}
 
 			});
-			// gc.gridy++;
+			
 			this.add(resetButton, gc);
+			JButton resetCache = new JButton("Empty cache");
+			resetCache.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					File dir=new File(Configuration.getDirectory(), "cache");;
+					for(File f:dir.listFiles()){
+						System.out.println("Marking for deletion:" +f);
+						f.deleteOnExit();
+					}
+					JOptionPane.showMessageDialog(model.getParent(), "<html>Cached files have been marked for deletion, they will be removed when you close GenomeView</html>","Cache cleared!", JOptionPane.INFORMATION_MESSAGE);
+
+				}
+
+			});
+			 gc.gridy++;
+			// gc.gridy++;
+			this.add(resetCache, gc);
 
 		}
 	}
