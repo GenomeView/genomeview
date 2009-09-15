@@ -97,7 +97,15 @@ public class DataSourceFactory {
 
 			try {
 				URL url = new URI(JOptionPane.showInputDialog(model.getParent(), "Give the URL of the data").trim()).toURL();
-				return new DataSource[] { new CachedURLSource(url) };
+				String urlString=url.toString();
+				System.out.println("URL:"+urlString);
+				if(urlString.endsWith(".bai")){
+					url=new URL(urlString.substring(0,urlString.length()-4));
+					return new DataSource[] { SAMDataSource.constructFromURL(url) };
+				}else{
+					return new DataSource[] { new CachedURLSource(url) };
+				}
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

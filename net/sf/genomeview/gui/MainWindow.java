@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutionException;
@@ -36,6 +37,7 @@ import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
+import net.sf.jannot.source.SAMDataSource;
 import be.abeel.jargs.AutoHelpCmdLineParser;
 
 /**
@@ -195,10 +197,17 @@ public class MainWindow implements WindowListener, Observer {
 					rf.execute();
 
 				} else {
-					DataSource ds = new CachedURLSource(new URI(s).toURL());
-
-					ReadWorker rf = new ReadWorker(ds, model);
-					rf.execute();
+					if(s.endsWith(".bai")){
+						URL url=new URL(s.substring(0,s.length()-4));
+						DataSource ds = SAMDataSource.constructFromURL(url);
+						ReadWorker rf = new ReadWorker(ds, model);
+						rf.execute();
+					}else{
+						URL url=new URL(s);
+						DataSource ds = new CachedURLSource(url) ;
+						ReadWorker rf = new ReadWorker(ds, model);
+						rf.execute();
+					}
 				}
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block

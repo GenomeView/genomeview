@@ -13,6 +13,7 @@ import java.net.URL;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.parser.Parser;
+import net.sf.jannot.source.SSL;
 import net.sf.jannot.source.URLSource;
 
 public class CachedURLSource extends URLSource {
@@ -25,7 +26,7 @@ public class CachedURLSource extends URLSource {
 	@Override
 	public EntrySet read(EntrySet set) throws ReadFailedException {
 		if (!SourceCache.contains(url)) {
-			certify();
+			SSL.certify(url);
 			try {
 				super.setParser(Parser.detectParser(url.openStream()));
 				final PipedInputStream in = new PipedInputStream();
