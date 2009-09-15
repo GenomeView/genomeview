@@ -5,7 +5,6 @@ package net.sf.genomeview.gui.menu.file;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.PrintWriter;
 import java.net.URL;
 
 import javax.swing.AbstractAction;
@@ -13,14 +12,14 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import be.abeel.io.LineIterator;
-
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.SAMDataSource;
 import net.sf.jannot.source.URLSource;
+import be.abeel.io.LineIterator;
 
 public class LoadSessionAction extends AbstractAction {
 
@@ -69,18 +68,21 @@ public class LoadSessionAction extends AbstractAction {
 				for (String line : it) {
 					char c=line.charAt(0);
 					line=line.substring(2);
+					DataSource ds=null;
 					switch(c){
 					case 'U':
-						model.addData(new URLSource(new URL(line)));
+						ds=new URLSource(new URL(line));						
 						break;
 					case 'F':
-						model.addData(new FileSource(new File(line)));
+						ds=new FileSource(new File(line));
 						break;
 					case 'S':
-						model.addData(new SAMDataSource(new File(line)));
+						ds=new SAMDataSource(new File(line));
 						break;
 						
 					}
+					final ReadWorker rw = new ReadWorker(ds, model);
+                    rw.execute();
 				}
 			} catch (Exception ex) {
 				// TODO fix
