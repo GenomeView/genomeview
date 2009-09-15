@@ -124,41 +124,41 @@ public class ShortReadTrack extends Track {
 	 */
 	class ReadBuffer {
 
-		class Runner implements Runnable {
-
-			private Entry localEntry;
-
-			public Runner(Entry e) {
-				this.localEntry = e;
-			}
-
-			@Override
-			public void run() {
-				buffer.clear();
-				int maxCache = Configuration.getInt("shortread:maximumCache");
-				ReadGroup rg = localEntry.shortReads.getReadGroup(source);
-				GVProgressBar bar = new GVProgressBar("Buffering...", "Buffering " + displayName(), model.getParent());
-				StaticUtils.upperRight(bar);
-				for (ShortRead sr : rg) {
-					if (localEntry != entry) {
-						return;
-					} else {
-						buffer.add(sr);
-					}
-
-					if (buffer.size() > maxCache) {
-						buffer.clear();
-						JOptionPane.showMessageDialog(null, "Buffering is not working out, too much data.", "Warning!", JOptionPane.WARNING_MESSAGE);
-						bar.dispose();
-						return;
-					}
-
-				}
-				bar.dispose();
-				ready = true;
-
-			}
-		}
+//		class Runner implements Runnable {
+//
+//			private Entry localEntry;
+//
+//			public Runner(Entry e) {
+//				this.localEntry = e;
+//			}
+//
+//			@Override
+//			public void run() {
+//				buffer.clear();
+//				int maxCache = Configuration.getInt("shortread:maximumCache");
+//				ReadGroup rg = localEntry.shortReads.getReadGroup(source);
+//				GVProgressBar bar = new GVProgressBar("Buffering...", "Buffering " + displayName(), model.getParent());
+//				StaticUtils.upperRight(bar);
+//				for (ShortRead sr : rg) {
+//					if (localEntry != entry) {
+//						return;
+//					} else {
+//						buffer.add(sr);
+//					}
+//
+//					if (buffer.size() > maxCache) {
+//						buffer.clear();
+//						JOptionPane.showMessageDialog(null, "Buffering is not working out, too much data.", "Warning!", JOptionPane.WARNING_MESSAGE);
+//						bar.dispose();
+//						return;
+//					}
+//
+//				}
+//				bar.dispose();
+//				ready = true;
+//
+//			}
+//		}
 
 		private DataSource source;
 		private Entry entry = null;
@@ -170,19 +170,20 @@ public class ShortReadTrack extends Track {
 		}
 
 		public synchronized Iterable<ShortRead> get(Entry e, Location r) {
-			if (entry == e) {
-				if (ready)
-					return buffer.get(r);
-				else
-					return qFast(e, r);
-			} else {
-				entry = e;
-				ready = false;
-				/* Try caching */
-				new Thread(new Runner(entry)).start();
-				/* But return something fast anyway */
-				return qFast(e, r);
-			}
+			return qFast(e, r);
+//			if (entry == e) {
+//				if (ready)
+//					return buffer.get(r);
+//				else
+//					return qFast(e, r);
+//			} else {
+//				entry = e;
+//				ready = false;
+//				/* Try caching */
+//				new Thread(new Runner(entry)).start();
+//				/* But return something fast anyway */
+//				return qFast(e, r);
+//			}
 
 		}
 
