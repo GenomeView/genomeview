@@ -30,6 +30,7 @@ import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.source.SAMDataSource;
 import net.sf.jannot.source.SSL;
+import net.sf.jannot.source.URLSource;
 
 public class DataSourceFactory {
 
@@ -67,7 +68,12 @@ public class DataSourceFactory {
 			url = new URL(urlString.substring(0, urlString.length() - 4));
 			return constructSAMFromURL(url);
 		} else {
-			return new CachedURLSource(url);
+			if(Configuration.getBoolean("general:disableURLCaching")){
+				return new URLSource(url);	
+			}else{
+				return new CachedURLSource(url);
+			}
+			
 		}
 	}
 

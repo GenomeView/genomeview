@@ -133,39 +133,35 @@ public class ConfigurationDialog extends JDialog {
 	}
 
 	static class ColorConfig extends JPanel {
-		
-	
+
 		private static final long serialVersionUID = -2242613993844951737L;
+
 		public ColorConfig(Model model, String key, String msg) {
 			setLayout(new BorderLayout());
-			add(new JLabel(msg),BorderLayout.CENTER);
-			add(new ColorLabel(model, key),BorderLayout.EAST);
+			add(new JLabel(msg), BorderLayout.CENTER);
+			add(new ColorLabel(model, key), BorderLayout.EAST);
 		}
-		private class ColorLabel extends JLabel{
-			
+
+		private class ColorLabel extends JLabel {
+
 			private static final long serialVersionUID = -290128964356729238L;
 
 			private ColorLabel(final Model model, final String configKey) {
 				super(new ColorIcon(Configuration.getColor(configKey), 16));
 				this.addMouseListener(new MouseAdapter() {
 					public void mouseClicked(MouseEvent e) {
-						Color newColor = JColorChooser.showDialog(
-								model.getParent(), "Choose color",
-								Configuration.getColor(configKey));
+						Color newColor = JColorChooser.showDialog(model.getParent(), "Choose color", Configuration.getColor(configKey));
 
 						if (newColor != null) {
 							Configuration.setColor(configKey, newColor);
-							setIcon(new ColorIcon(
-									Configuration.getColor(configKey), 16));
+							setIcon(new ColorIcon(Configuration.getColor(configKey), 16));
 						}
 					}
 				});
 
 			}
 		}
-		
 
-		
 	}
 
 	static class AANucleotideColorsConfigPanel extends GridBagPanel {
@@ -178,23 +174,21 @@ public class ConfigurationDialog extends JDialog {
 			aa.setLayout(new GridLayout(0, 8));
 			for (char c : Configuration.getAminoAcids()) {
 				aa.add(new JLabel("" + c));
-				aa.add(new ColorConfig(model, "AA_" + c,""+c));
+				aa.add(new ColorConfig(model, "AA_" + c, "" + c));
 
 			}
 			Container nt = new Container();
 			nt.setLayout(new GridLayout(0, 8));
 			for (char c : Configuration.getNucleotides()) {
 				nt.add(new JLabel("" + c));
-				nt.add(new ColorConfig(model, "N_" + c,""+c));
+				nt.add(new ColorConfig(model, "N_" + c, "" + c));
 			}
-			this
-					.add(new TitledComponent("Amino acids", aa),
-							BorderLayout.NORTH);
-			this.add(new TitledComponent("Nucleotides", nt),
-					BorderLayout.CENTER);
+			this.add(new TitledComponent("Amino acids", aa), BorderLayout.NORTH);
+			this.add(new TitledComponent("Nucleotides", nt), BorderLayout.CENTER);
 		}
 
 	}
+
 	/**
 	 * Options for Short reads
 	 * 
@@ -209,38 +203,29 @@ public class ConfigurationDialog extends JDialog {
 		private static final long serialVersionUID = -628553625113038258L;
 
 		public ShortReadConfigPanel(Model model) {
-			this.add(new IntegerConfig("shortread:maxReads",
-					"Maximum number of displayed reads"), gc);
+			this.add(new IntegerConfig("shortread:maxReads", "Maximum number of displayed reads"), gc);
 			gc.gridy++;
-			this.add(new IntegerConfig("shortread:maxRegion",
-					"Maximum range in nucleotides to display individual reads"), gc);
+			this.add(new IntegerConfig("shortread:maxRegion", "Maximum range in nucleotides to display individual reads"), gc);
 			gc.gridy++;
-			this.add(new IntegerConfig("shortread:maxStack",
-					"<html>Maximum display depth of stacked reads, <br/>deeper stacked reads will not be shown individually, <br/>but are included in the pile-up view</html>"), gc);
+			this.add(new IntegerConfig("shortread:maxStack", "<html>Maximum display depth of stacked reads, <br/>deeper stacked reads will not be shown individually, <br/>but are included in the pile-up view</html>"), gc);
 			gc.gridy++;
-			this.add(new BooleanConfig("shortread:enablepairing",
-			"Draw a connection between paired reads"), gc);
+			this.add(new BooleanConfig("shortread:enablepairing", "Draw a connection between paired reads"), gc);
 			gc.gridy++;
-			this.add(new IntegerConfig("shortread:maximumCache",
-			"Maximum number of reads to cache"), gc);
+			this.add(new IntegerConfig("shortread:maximumCache", "Maximum number of reads to cache"), gc);
 			gc.gridy++;
-			this.add(new IntegerConfig("shortread:maximumPairing",
-			"Maximum distance between paired reads"), gc);
+			this.add(new IntegerConfig("shortread:maximumPairing", "Maximum distance between paired reads"), gc);
 			gc.gridy++;
-			this.add(new IntegerConfig("shortread:maximumPairing",
-			"Maximum distance between paired reads"), gc);
+			this.add(new IntegerConfig("shortread:maximumPairing", "Maximum distance between paired reads"), gc);
 			gc.gridy++;
-			this.add(new ColorConfig(model,"shortread:forwardColor",
-			"Color of the forward reads"), gc);
+			this.add(new ColorConfig(model, "shortread:forwardColor", "Color of the forward reads"), gc);
 			gc.gridy++;
-			this.add(new ColorConfig(model,"shortread:reverseColor",
-			"Color of the reverse reads"), gc);
+			this.add(new ColorConfig(model, "shortread:reverseColor", "Color of the reverse reads"), gc);
 			gc.gridy++;
-			this.add(new ColorConfig(model,"shortread:pairingColor",
-			"Color of the line between paired reads"), gc);
-	
+			this.add(new ColorConfig(model, "shortread:pairingColor", "Color of the line between paired reads"), gc);
+
 		}
 	}
+
 	/**
 	 * Options for the AnnotationView
 	 * 
@@ -255,24 +240,15 @@ public class ConfigurationDialog extends JDialog {
 		private static final long serialVersionUID = -628553625113038258L;
 
 		public AnnotationConfigPanel() {
-			this.add(new IntegerConfig("evidenceLineHeight",
-					"Height of a track in pixels"), gc);
+			this.add(new IntegerConfig("evidenceLineHeight", "Height of a track in pixels"), gc);
 			gc.gridy++;
-			this.add(new BooleanConfig("showTrackName",
-					"Show evidence track names"), gc);
+			this.add(new BooleanConfig("showTrackName", "Show evidence track names"), gc);
 			gc.gridy++;
-			this.add(new BooleanConfig("useColorQualifierTag",
-					"Use the /color qualifier tag"), gc);
+			this.add(new BooleanConfig("useColorQualifierTag", "Use the /color qualifier tag"), gc);
 			gc.gridy++;
-			this.add(new StringConfig("visibleTypes",
-					"Visible types on start-up"), gc);
+			this.add(new StringConfig("visibleTypes", "Visible types on start-up"), gc);
 			gc.gridy++;
-			this
-					.add(
-							new IntegerConfig(
-									"annotationview:maximumNoVisibleFeatures",
-									"Maximum number of features of each type to display on the AnnotationView"),
-							gc);
+			this.add(new IntegerConfig("annotationview:maximumNoVisibleFeatures", "Maximum number of features of each type to display on the AnnotationView"), gc);
 		}
 	}
 
@@ -283,35 +259,22 @@ public class ConfigurationDialog extends JDialog {
 		private static final long serialVersionUID = 7503579007314777946L;
 
 		public StructureConfigPanel() {
-			this.add(new IntegerConfig("geneStructureLineHeight",
-					"Height of a track in pixels"), gc);
+			this.add(new IntegerConfig("geneStructureLineHeight", "Height of a track in pixels"), gc);
 			gc.gridy++;
-			this
-					.add(new BooleanConfig("colorStartCodons",
-							"Color start codons"), gc);
+			this.add(new BooleanConfig("colorStartCodons", "Color start codons"), gc);
 			gc.gridy++;
-			this.add(new BooleanConfig("colorStopCodons", "Color stop codons"),
-					gc);
+			this.add(new BooleanConfig("colorStopCodons", "Color stop codons"), gc);
 			gc.gridy++;
-			this.add(new BooleanConfig("showNucleotideColor",
-					"Color nucleotides"), gc);
+			this.add(new BooleanConfig("showNucleotideColor", "Color nucleotides"), gc);
 			gc.gridy++;
-			this.add(new BooleanConfig("showSpliceSiteColor",
-					"Color splice sites (overrides nucleotide coloring)"), gc);
+			this.add(new BooleanConfig("showSpliceSiteColor", "Color splice sites (overrides nucleotide coloring)"), gc);
 			gc.gridy++;
 
-			this.add(new StringConfig("visibleTypesStructure",
-					"Visible types on start-up"), gc);
+			this.add(new StringConfig("visibleTypesStructure", "Visible types on start-up"), gc);
 			gc.gridy++;
-			this.add(new StringConfig("geneStructures",
-					"Types to be considered gene models"), gc);
+			this.add(new StringConfig("geneStructures", "Types to be considered gene models"), gc);
 			gc.gridy++;
-			this
-					.add(
-							new IntegerConfig(
-									"structureview:maximumNoVisibleFeatures",
-									"Maximum number of features to display on the structure view"),
-							gc);
+			this.add(new IntegerConfig("structureview:maximumNoVisibleFeatures", "Maximum number of features to display on the structure view"), gc);
 
 		}
 	}
@@ -330,12 +293,11 @@ public class ConfigurationDialog extends JDialog {
 			for (Type type : Type.values()) {
 
 				typeContainer.add(new JLabel("" + type));
-				typeContainer.add(new ColorConfig(model, "TYPE_" + type,type.toString()));
+				typeContainer.add(new ColorConfig(model, "TYPE_" + type, type.toString()));
 
 			}
 
-			this.add(new TitledComponent("Feature types", typeContainer),
-					BorderLayout.CENTER);
+			this.add(new TitledComponent("Feature types", typeContainer), BorderLayout.CENTER);
 
 		}
 	}
@@ -348,12 +310,22 @@ public class ConfigurationDialog extends JDialog {
 		private static final long serialVersionUID = 511805592898297604L;
 
 		public MiscellaneousPanel(final Model model) {
-
-			this.add(new BooleanConfig("dualscreen",
-					"Enable dual-screen mode? (Requires restart)"), gc);
+			gc.gridwidth = 2;
+			gc.weightx=1;
+			this.add(new BooleanConfig("dualscreen", "Enable dual-screen mode? (Requires restart)"), gc);
 			gc.gridy++;
-			this.add(new BooleanConfig("geneticCodeSelection",
-					"Enable genetic code selection? (Requires restart"), gc);
+			this.add(new BooleanConfig("geneticCodeSelection", "Enable genetic code selection? (Requires restart)"), gc);
+			
+			gc.gridy++;
+			gc.gridwidth = 1;
+		
+			this.add(new BooleanConfig("general:disableURLCaching", "Disable URL caching?"), gc);
+			gc.weightx=0;
+			gc.gridx++;
+			this.add(new HelpDialog(model.getParent(), "URL caching needs to be disabled to be able to save to URLs."),gc);
+			gc.gridwidth = 2;
+			gc.weightx=1;
+			gc.gridx=0;
 			gc.gridy++;
 			// this.add(new BooleanConfig("logToFile",
 			// "Log console output to a file (Requires restart)"), gc);
@@ -367,24 +339,25 @@ public class ConfigurationDialog extends JDialog {
 				}
 
 			});
-			
+
 			this.add(resetButton, gc);
 			JButton resetCache = new JButton("Empty cache");
 			resetCache.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					File dir=new File(Configuration.getDirectory(), "cache");;
-					for(File f:dir.listFiles()){
-						System.out.println("Marking for deletion:" +f);
+					File dir = new File(Configuration.getDirectory(), "cache");
+					;
+					for (File f : dir.listFiles()) {
+						System.out.println("Marking for deletion:" + f);
 						f.deleteOnExit();
 					}
-					JOptionPane.showMessageDialog(model.getParent(), "<html>Cached files have been marked for deletion, they will be removed when you close GenomeView</html>","Cache cleared!", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(model.getParent(), "<html>Cached files have been marked for deletion, they will be removed when you close GenomeView</html>", "Cache cleared!", JOptionPane.INFORMATION_MESSAGE);
 
 				}
 
 			});
-			 gc.gridy++;
+			gc.gridy++;
 			// gc.gridy++;
 			this.add(resetCache, gc);
 
@@ -425,8 +398,8 @@ public class ConfigurationDialog extends JDialog {
 		jtp.add("AA&nucleotide colors", colors);
 		jtp.add("Feature track", new FeatureTrackConfigPanel(model));
 
-		jtp.add("Short reads",new ShortReadConfigPanel(model));
-		
+		jtp.add("Short reads", new ShortReadConfigPanel(model));
+
 		jtp.add("Miscellaneous", miscPanel);
 
 		add(jtp, BorderLayout.CENTER);
