@@ -12,6 +12,7 @@ import java.net.URL;
 
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
+import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.parser.Parser;
 import net.sf.jannot.source.SSL;
 import net.sf.jannot.source.URLSource;
@@ -21,6 +22,11 @@ public class CachedURLSource extends URLSource {
 	public CachedURLSource(URL url) throws IOException {
 		super(url, null);
 
+	}
+
+	@Override
+	public void saveOwn(EntrySet arg0) throws SaveFailedException {
+		throw new SaveFailedException("Cannot save cached URL data. To save data from a URL, you need to disable URL caching in the Misc. section of the configuration panel.");
 	}
 
 	@Override
