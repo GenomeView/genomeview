@@ -3,299 +3,229 @@
  */
 package net.sf.genomeview.gui.dialog;
 
-import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.JTextArea;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.components.StrandCombo;
+import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
-import net.sf.jannot.Strand;
+import net.sf.jannot.Qualifier;
 import be.abeel.gui.GridBagPanel;
+import be.abeel.gui.TitledComponent;
+import be.abeel.io.LineIterator;
 
 /**
- * JFrame that allows to edit a CDS using a table view.
+ * JFrame that allows to edit a feature
  * 
  * @author Thomas Abeel
  * 
  */
-public class EditFeatureWindow extends JDialog implements Observer {
-
-    private static final long serialVersionUID = -8014200598699402818L;
-
-    private final Model model;
-
-    private final JDialog _self;
-
-    class TableModel extends AbstractTableModel {
-        private static final long serialVersionUID = -6417322941515446991L;
-
-        private JComboBox strandSelection;
-
-        public TableModel(JComboBox strandSelection) {
-            this.strandSelection = strandSelection;
-        }
-
-        private List<Location> location = new ArrayList<Location>();
-
-        public void removeRow(int i) {
-            location.remove(i);
-            fireTableDataChanged();
-        }
-
-        public int getColumnCount() {
-            return 2;
-        }
-
-        /*
-         * Don't need to implement this method unless your table's editable.
-         */
-        public boolean isCellEditable(int row, int col) {
-            return true;
-        }
-
-        public void setValueAt(Object value, int row, int col) {
-            if (col == 0)
-                location.get(row).setStart(Integer.parseInt(value.toString()));
-            else
-                location.get(row).setEnd(Integer.parseInt(value.toString()));
-        }
-
-        public int getRowCount() {
-            return location.size();
-
-        }
-
-        /**
-         * Will refresh the table model with the newly selected Feature.
-         */
-        private void refresh(Feature rf) {
-            location.clear();
-            if (rf != null) {
-                for (Location l : rf.location()) {
-                    location.add(l.copy());
-                }
-                Strand s = rf.strand();
-                if (s == Strand.FORWARD) {
-                    strandSelection.setSelectedItem("forward");
-                } else
-                    strandSelection.setSelectedItem("reverse");
-            }
-
-            fireTableDataChanged();
-
-        }
-
-        public Object getValueAt(int row, int column) {
-
-            if (column == 0)
-                return location.get(row).start();
-            else
-                return location.get(row).end();
-
-        }
-
-        public void addRow(int i) {
-            if (i < 0)
-                i = 0;
-            location.add(i, new Location(0, 0));
-
-            fireTableDataChanged();
-
-        }
-
-        public void removeRows(int[] selectedRows) {
-            System.out.println("SelectedRows=" + selectedRows.length);
-            Arrays.sort(selectedRows);
-            for (int i = selectedRows.length - 1; i >= 0; i--) {
-                location.remove(selectedRows[i]);
-
-            }
-            fireTableDataChanged();
-
-        }
-
-    }
-
-    class EditStructureContent extends GridBagPanel {
-        void refresh() {
-            tm.refresh(model.getFeatureSelection().iterator().next());
-        }
-
-        private TableModel tm;
-
-        private static final long serialVersionUID = -6910194246570017601L;
-
-        public EditStructureContent(final Model model) {
-
-            add(new JLabel("Strand: "), gc);
-            gc.gridx++;
-            final StrandCombo strandSelection = new StrandCombo();
-            strandSelection.setSelectedItem(model.getFeatureSelection().first().strand());
-            add(strandSelection, gc);
-            gc.gridx = 0;
-            gc.gridy++;
-
-            gc.gridwidth = 4;
-            // field = new JTextField("test");
-
-            tm = new TableModel(strandSelection);
-            final JTable jt = new JTable(tm);
-            jt.setPreferredSize(new Dimension(400, 400));
-            add(new JScrollPane(jt), gc);
-
-            JButton addTop = new JButton("Insert top");
-            addTop.addActionListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent e) {
-                    tm.addRow(0);
-
-                }
-
-            });
-
-            JButton addSelection = new JButton("Insert selection");
-            addSelection.addActionListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent e) {
-                    tm.addRow(jt.getSelectedRow());
-
-                }
-
-            });
-
-            JButton addBottom = new JButton("Insert bottom");
-            addBottom.addActionListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent e) {
-                    tm.addRow(jt.getRowCount());
-
-                }
-
-            });
-
-            JButton removeButton = new JButton("Remove selected");
-            removeButton.addActionListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent e) {
-                    if (jt.getSelectedRow() >= 0) {
-                        tm.removeRows(jt.getSelectedRows());
-                    }
-
-                }
-
-            });
-
-            // JButton addSelection=new JButton("Start");
-
-            JButton ok = new JButton("Save & Close");
-            ok.addActionListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent arg0) {
-
-                    SortedSet<Location> loc = new TreeSet<Location>();
-                    loc.addAll(tm.location);
-
-                    assert (model.getFeatureSelection().size() == 1);
-                    Feature f = model.getFeatureSelection().first();
-                    System.out.println("Selected feature: " + f);
-                    _self.setVisible(false);
-                    f.setLocation(loc);
-                    f.setStrand(strandSelection.getStrand());
-
-                 
-                }
-
-            });
-
-            JButton cancel = new JButton("Close");
-            cancel.addActionListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent arg0) {
-                    _self.setVisible(false);
-
-                }
-
-            });
-            gc.gridwidth = 1;
-            gc.gridy++;
-            add(addTop, gc);
-            gc.gridx++;
-            add(addSelection, gc);
-            gc.gridx++;
-            add(addBottom, gc);
-            gc.gridx++;
-            add(removeButton, gc);
-
-            gc.gridx = 0;
-            gc.gridwidth = 2;
-            gc.gridy++;
-            add(ok, gc);
-            gc.gridx += 2;
-            // gc.gridwidth = 1;
-            add(cancel, gc);
-
-        }
-
-    }
-
-    EditStructureContent ec;
-
-    EditFeatureContent etc;
-
-    public EditFeatureWindow(Model model) {
-        super((JFrame) model.getParent(), "Edit structure");
-        _self = this;
-        setModal(true);
-        this.model = model;
-        JTabbedPane pane = new JTabbedPane();
-        ec = new EditStructureContent(model);
-        etc = new EditFeatureContent(model, this);
-        pane.add("Information", etc);
-        pane.add("Structure", ec);
-        this.setContentPane(pane);
-        this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-
-        pack();
-
-    }
-
-    public void setVisible(boolean b) {
-        if (b) {
-            // this.selectedFeature = model.getSelectedFeature();
-            model.addObserver(this);
-            ec.refresh();
-            etc.refresh();
-
-        } else {
-            model.deleteObserver(this);
-        }
-
-        super.setVisible(b);
-    }
-
-    public void update(Observable arg0, Object arg1) {
-        // this.selectedFeature = ;
-        ec.refresh();
-        etc.refresh();
-    }
+public class EditFeatureWindow extends JDialog {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -790390435947336529L;
+
+	private final Model model;
+
+	private Feature feature;
+
+	private EditFeatureWindow _self;
+	private JTextArea notes, location;
+	private StrandCombo strandSelection;
+	private TypeCombo typeSelection;
+
+	private class EditFeatureWindowContent extends GridBagPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3211302042434915395L;
+
+		public EditFeatureWindowContent() {
+			gc.gridwidth = 3;
+			gc.fill = GridBagConstraints.BOTH;
+			gc.weightx = 1;
+			gc.weighty = 0;
+			notes = new JTextArea(10, 50);
+			location = new JTextArea(10, 50);
+			location.setWrapStyleWord(true);
+			location.setLineWrap(true);
+			strandSelection = new StrandCombo();
+			typeSelection = new TypeCombo(model);
+			this.add(new TitledComponent("Type", typeSelection), gc);
+			gc.gridy++;
+			this.add(new TitledComponent("Strand", strandSelection), gc);
+
+			/* Notes legend */
+			gc.gridy++;
+			gc.gridwidth = 1;
+			this.add(new JLabel("Notes"), gc);
+			gc.gridx++;
+			this.add(new HelpDialog(_self, "One qualifier per line, key=value"), gc);
+
+			/* Notes text area */
+			gc.gridy++;
+			gc.gridx = 0;
+			;
+			gc.weighty = 1;
+			gc.gridwidth = 3;
+			this.add(new JScrollPane(notes), gc);
+
+			/* Location legend */
+			gc.weighty = 0;
+			gc.gridy++;
+			gc.gridwidth = 1;
+			this.add(new JLabel("Location"), gc);
+			gc.gridx++;
+			this.add(new HelpDialog(_self, "Locations separated with a comma, start and stop coordinate separated with two dots. White space and new lines are ignored."), gc);
+
+			/* Location text area */
+			gc.gridy++;
+			gc.gridx = 0;
+			;
+			gc.weighty = 1;
+			gc.gridwidth = 3;
+			this.add(new JScrollPane(location), gc);
+
+			gc.gridy++;
+			gc.weighty = 0;
+			JButton ok = new JButton("Save & Close");
+			ok.addActionListener(new ActionListener() {
+
+				public void actionPerformed(ActionEvent arg0) {
+					boolean warning = false;
+					try {
+						SortedSet<Location> loc = new TreeSet<Location>();
+						StringBuffer text = new StringBuffer();
+						for (String line : new LineIterator(new StringReader(location.getText()))) {
+							text.append(line.trim());
+						}
+						String[] arr = text.toString().split(",");
+						for (String s : arr) {
+							String[] as = s.split("\\.\\.");
+							int start = Integer.parseInt(as[0].trim());
+							int end = Integer.parseInt(as[1].trim());
+							loc.add(new Location(start, end));
+						}
+						feature.setLocation(loc);
+					} catch (Exception e) {
+						e.printStackTrace();
+						JOptionPane.showMessageDialog(_self, "Could not parse the location, please double check!", "Location failed", JOptionPane.WARNING_MESSAGE);
+						warning = true;
+					}
+					feature.setStrand(strandSelection.getStrand());
+					feature.setType(typeSelection.getTerm());
+
+					try {
+						feature.setMute(true);
+						/* Construct new qualifiers */
+						List<Qualifier> list = new ArrayList<Qualifier>();
+						for (String line : new LineIterator(new StringReader(notes.getText()))) {
+							if (line.trim().length() > 0) {
+								String[] arr = line.split("=");
+								list.add(new Qualifier(arr[0].trim(), arr[1].trim()));
+							}
+						}
+						/* Remove all qualifiers */
+						List<Qualifier> remove = new ArrayList<Qualifier>();
+						for (String key : feature.getQualifiersKeys()) {
+							List<Qualifier> qs = feature.qualifier(key);
+							for (Qualifier q : qs) {
+								remove.add(q);
+							}
+						}
+						for (Qualifier q : remove) {
+							feature.removeQualifier(q);
+						}
+						for (Qualifier q : list) {
+							feature.addQualifier(q);
+						}
+						feature.setMute(false);
+					} catch (Exception e) {
+						e.printStackTrace();
+						JOptionPane.showMessageDialog(_self, "Failed to parse the notes, please double check!", "Notes failed", JOptionPane.WARNING_MESSAGE);
+						warning = true;
+					}
+					if (!warning)
+						_self.setVisible(false);
+
+				}
+
+			});
+			JButton cancel = new JButton("Close");
+			cancel.addActionListener(new ActionListener() {
+
+				public void actionPerformed(ActionEvent arg0) {
+					_self.setVisible(false);
+
+				}
+
+			});
+
+			gc.gridwidth = 1;
+			gc.gridy++;
+			add(ok, gc);
+			gc.gridx++;
+
+			add(cancel, gc);
+		}
+	}
+
+	public EditFeatureWindow(Model model) {
+		super((JFrame) model.getParent(), "Edit structure");
+		_self = this;
+		setModal(true);
+		this.model = model;
+		this.setContentPane(new EditFeatureWindowContent());
+
+		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+
+		pack();
+
+	}
+
+	public void setVisible(boolean b) {
+		if (b) {
+			this.feature = model.getFeatureSelection().first();
+			/* Fill notes text area */
+			StringBuffer text = new StringBuffer();
+			for (String key : feature.getQualifiersKeys()) {
+				List<Qualifier> qs = feature.qualifier(key);
+				for (Qualifier q : qs) {
+					text.append(q.getKey() + "=" + q.getValue() + "\n");
+				}
+				notes.setText(text.toString());
+			}
+			/* Fill in combo boxes */
+			strandSelection.setSelectedItem(feature.strand());
+			typeSelection.setSelectedItem(feature.type());
+			location.setText(format(feature.location()));
+
+		}
+
+		super.setVisible(b);
+	}
+
+	private String format(SortedSet<Location> loc) {
+		StringBuffer tmp = new StringBuffer(loc.toString());
+		return tmp.substring(1, tmp.length() - 1);
+	}
 
 }
