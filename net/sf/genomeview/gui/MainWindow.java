@@ -140,7 +140,7 @@ public class MainWindow implements WindowListener, Observer {
 		} else if (cmdUrl != null) {
 			logger.info("URL commandline option is set: " + cmdUrl);
 			try {
-				data = new DataSource[] { new CachedURLSource(new URI(cmdUrl).toURL()) };
+				data = new DataSource[]{DataSourceFactory.createURL(new URI(cmdUrl).toURL())};
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
