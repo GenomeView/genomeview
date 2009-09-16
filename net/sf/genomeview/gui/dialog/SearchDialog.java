@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -345,6 +346,9 @@ public class SearchDialog extends JDialog {
 
 	class FeatureOverlapSearchPane extends GridBagPanel {
 		public FeatureOverlapSearchPane(final Model model) {
+			gc.weightx=1;
+			gc.weighty=0;
+			gc.fill=GridBagConstraints.BOTH;
 			final JTextArea seq = new JTextArea(7, 30);
 			focusField = seq;
 			final TypeCombo sourceType = new TypeCombo(model);
@@ -395,7 +399,7 @@ public class SearchDialog extends JDialog {
 			gc.gridwidth = 2;
 
 			gc.gridy++;
-
+			gc.weighty=1;
 			add(new JScrollPane(results), gc);
 
 		}
@@ -409,6 +413,7 @@ public class SearchDialog extends JDialog {
 		private static final long serialVersionUID = -3270709193426284702L;
 
 		public SearchSequencePane(final Model model) {
+			gc.fill=GridBagConstraints.BOTH;
 			final JTextArea seq = new JTextArea(7, 30);
 			focusField = seq;
 			final JComboBox mismatch = new JComboBox();
@@ -454,7 +459,7 @@ public class SearchDialog extends JDialog {
 
 			});
 			/* Query sequence box */
-			gc.weightx = 0;
+			gc.weightx = 1;
 			gc.gridwidth = 4;
 			gc.weighty = 0;
 			add(new TitledComponent("Query sequence", new JScrollPane(seq)), gc);
@@ -476,6 +481,7 @@ public class SearchDialog extends JDialog {
 			gc.gridwidth = 4;
 			gc.gridy++;
 			gc.weighty = 1;
+			gc.weightx = 1;
 			add(new TitledComponent("Result locations", new JScrollPane(results)), gc);
 
 		}
@@ -662,6 +668,9 @@ public class SearchDialog extends JDialog {
 		private static final long serialVersionUID = -7531967816569386730L;
 
 		public SearchKeywordPane(final Model model) {
+			gc.weightx=1;
+			gc.weighty=0;
+			gc.fill=GridBagConstraints.BOTH;
 			final JTextArea text = new JTextArea(5, 30);
 			JButton searchButton = new JButton("Search");
 			JButton clearButton = new JButton("Clear result");
@@ -711,7 +720,7 @@ public class SearchDialog extends JDialog {
 			gc.gridwidth = 2;
 
 			gc.gridy++;
-
+			gc.weighty=1;
 			add(new JScrollPane(resultTable), gc);
 
 		}
