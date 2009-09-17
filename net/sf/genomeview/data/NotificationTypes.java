@@ -32,7 +32,13 @@ public enum NotificationTypes {
 	/**
 	 * The entry selection changed
 	 */
-	ENTRYCHANGED
+	ENTRYCHANGED,
+	
+	/**
+	 * Indicates that a feature was edited, added or removed
+	 * 
+	 */
+	JANNOTCHANGE
 	;
 
 }

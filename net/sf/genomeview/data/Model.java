@@ -40,7 +40,6 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
-import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.MultiFileSource;
 import be.abeel.util.DefaultHashMap;
@@ -96,8 +95,10 @@ public class Model extends Observable implements IModel {
 			redoStack.clear();
 			while(undoStack.size()>100)
 				undoStack.remove(0);
+			refresh(NotificationTypes.JANNOTCHANGE);
+		}else{
+			refresh(arg);
 		}
-		refresh(arg);
 
 	}
 
@@ -199,15 +200,16 @@ public class Model extends Observable implements IModel {
 	public void refresh(Object arg) {
 		if (!silent) {
 			setChanged();
-			notifyObservers(arg);
+			notifyObservers(arg==null?NotificationTypes.GENERAL:arg);
 		}
 	}
 
 	/**
 	 * Checked way to notify all model observers.
 	 */
+	@Deprecated
 	public void refresh() {
-		refresh(null);
+		refresh(NotificationTypes.GENERAL);
 
 	}
 
@@ -218,54 +220,6 @@ public class Model extends Observable implements IModel {
 		refresh();
 
 	}
-
-	// private Map<IValueFeature, Boolean> valueFeatureVisible = new
-	// DefaultHashMap<IValueFeature, Boolean>(
-	// Boolean.TRUE);
-	//
-	// public boolean isValueFeatureVisible(IValueFeature name) {
-	// return valueFeatureVisible.get(name);
-	// }
-	//
-	// public void setValueFeatureVisible(IValueFeature type, boolean b) {
-	// valueFeatureVisible.put(type, b);
-	// refresh();
-	//
-	// }
-
-	// private Map<IValueFeature, DisplayType> valueFeatureDisplayMapping = new
-	// DefaultHashMap<IValueFeature, DisplayType>(
-	// DisplayType.OneLineBlocks);
-	//
-	// public DisplayType getValueFeatureDisplayType(IValueFeature type) {
-	// return valueFeatureDisplayMapping.get(type);
-	//
-	// }
-
-	// public void setValueFeatureDisplayType(IValueFeature name, DisplayType
-	// dt) {
-	// valueFeatureDisplayMapping.put(name, dt);
-	// refresh();
-	//
-	// }
-	// @Deprecated
-	// public List<IValueFeature> getValueFeatures(Entry entry) {
-	// return valueFeatures.get(entry);
-	// }
-
-	// @Override
-	// @Deprecated
-	// public void addFeature(IValueFeature vf) {
-	// Entry e = getSelectedEntry();
-	// if (!valueFeatures.containsKey(e)) {
-	// valueFeatures.put(e, new ArrayList<IValueFeature>());
-	// }
-	//
-	// valueFeatures.get(e).add(vf);
-	// valueFeatureDisplayMapping.put(vf, DisplayType.LineProfile);
-	// refresh();
-	//
-	// }
 
 	public Location getAnnotationLocationVisible() {
 		return new Location(annotationStart, annotationEnd);
