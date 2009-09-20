@@ -55,7 +55,8 @@ public class WiggleTrack extends Track {
 			if (!isCollapsed()) {
 				GeneralPath gp = new GeneralPath();
 				/* Move to first point */
-				double val = (vf.get(vf.firstKey()) - graph.min()) / (graph.max() - graph.min());
+				
+				double val = ( vf.get(vf.firstKey())- graph.min()) / (graph.max() - graph.min());
 				int y = (int) ((-val * 50) + yOffset + 50);
 				int x = Convert.translateGenomeToScreen(vf.firstKey().start(), model.getAnnotationLocationVisible(), screenWidth);
 				gp.moveTo(x, y);
@@ -82,7 +83,7 @@ public class WiggleTrack extends Track {
 			} else { /* Color coding */
 
 				for(Map.Entry<Location,Double>eld:vf.entrySet()){
-					double val = (vf.get(eld.getValue()) - graph.min()) / (graph.max() - graph.min());
+					double val = (vf.get(eld.getKey()) - graph.min()) / (graph.max() - graph.min());
 					g.setColor(ColorFactory.getColorCoding(val));
 					int x = Convert.translateGenomeToScreen(eld.getKey().start() / 2 + eld.getKey().end() / 2, model.getAnnotationLocationVisible(), screenWidth);
 					g.fillRect(lastX, yOffset, x - lastX, 10);
