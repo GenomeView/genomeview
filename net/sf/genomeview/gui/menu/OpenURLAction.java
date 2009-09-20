@@ -11,6 +11,8 @@ import java.net.URISyntaxException;
 
 import javax.swing.AbstractAction;
 
+import net.sf.genomeview.gui.StaticUtils;
+
 /**
  * Opens a URL in a browser window.
  * 
@@ -32,15 +34,13 @@ public class OpenURLAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        try {
-            Desktop.getDesktop().browse(new URI(url));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    	try {
+			StaticUtils.browse(new URI(url));
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
 
     }
 

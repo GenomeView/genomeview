@@ -3,14 +3,12 @@
  */
 package net.sf.genomeview.gui.information;
 
-import java.awt.Desktop;
 import java.awt.GridBagConstraints;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -109,10 +107,7 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 								URLEncoder.encode(name.getSelectedText().trim(),
 										"UTF-8"));
 
-						Desktop.getDesktop().browse(new URI(query));
-					} catch (MalformedURLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						StaticUtils.browse(new URI(query));
 					} catch (IOException f) {
 						// TODO Auto-generated catch block
 						f.printStackTrace();

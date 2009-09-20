@@ -4,11 +4,15 @@
 package net.sf.genomeview.gui;
 
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.io.IOException;
+import java.net.URI;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import net.sf.genomeview.data.Model;
@@ -58,13 +62,14 @@ public abstract class StaticUtils {
 	public static void center(Window window) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension windowSize = window.getPreferredSize();
-		window.setLocation(screenSize.width / 2 - (windowSize.width / 2), screenSize.height / 2 - (windowSize.height / 2));
+		window.setLocation(screenSize.width / 2 - (windowSize.width / 2),
+				screenSize.height / 2 - (windowSize.height / 2));
 
 	}
 
 	public static void upperRight(Window window) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		window.setLocation(screenSize.width / 4 * 3,50);
+		window.setLocation(screenSize.width / 4 * 3, 50);
 	}
 
 	public static MergeFeatureDialog getMergeFeature(Model model) {
@@ -94,6 +99,20 @@ public abstract class StaticUtils {
 	public static void right(Component comp, JFrame parent) {
 		int width = parent.getWidth();
 		comp.setLocation(width - comp.getWidth(), 0);
+
+	}
+
+	public static void browse(URI uri) {
+		try {
+			Desktop.getDesktop().browse(uri);
+		} catch (IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Could not open the specified url: "+uri, "URL open failed", JOptionPane.ERROR_MESSAGE);
+		}catch (UnsupportedOperationException e){
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Could not open the specified url: "+uri, "URL open failed", JOptionPane.ERROR_MESSAGE);
+			
+		}
 
 	}
 
