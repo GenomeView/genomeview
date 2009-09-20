@@ -133,14 +133,16 @@ public class ConfigurationDialog extends JDialog {
 		}
 	}
 
-	static class ColorConfig extends JPanel {
+	static class ColorConfig extends GridBagPanel {
 
 		private static final long serialVersionUID = -2242613993844951737L;
 
 		public ColorConfig(Model model, String key, String msg) {
-			setLayout(new BorderLayout());
-			add(new JLabel(msg), BorderLayout.CENTER);
-			add(new ColorLabel(model, key), BorderLayout.EAST);
+			gc.weightx=0;
+			gc.weighty=0;
+			add(new JLabel(msg), gc);
+			gc.gridx++;
+			add(new ColorLabel(model, key), gc);
 		}
 
 		private class ColorLabel extends JLabel {
@@ -174,14 +176,12 @@ public class ConfigurationDialog extends JDialog {
 			Container aa = new Container();
 			aa.setLayout(new GridLayout(0, 8));
 			for (char c : Configuration.getAminoAcids()) {
-				aa.add(new JLabel("" + c));
 				aa.add(new ColorConfig(model, "AA_" + c, "" + c));
 
 			}
 			Container nt = new Container();
 			nt.setLayout(new GridLayout(0, 8));
 			for (char c : Configuration.getNucleotides()) {
-				nt.add(new JLabel("" + c));
 				nt.add(new ColorConfig(model, "N_" + c, "" + c));
 			}
 			this.add(new TitledComponent("Amino acids", aa), BorderLayout.NORTH);
@@ -292,8 +292,6 @@ public class ConfigurationDialog extends JDialog {
 			typeContainer.setLayout(new GridLayout(0, 4));
 
 			for (Type type : Type.values()) {
-
-				typeContainer.add(new JLabel("" + type));
 				typeContainer.add(new ColorConfig(model, "TYPE_" + type, type.toString()));
 
 			}
