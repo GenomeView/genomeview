@@ -32,6 +32,7 @@ import javax.swing.JTextField;
 import net.sf.genomeview.core.ColorIcon;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Type;
 import be.abeel.gui.GridBagPanel;
 import be.abeel.gui.JIntegerField;
@@ -385,7 +386,6 @@ public class ConfigurationDialog extends JDialog {
 
 		});
 		setLayout(new BorderLayout());
-		setLocationRelativeTo(model.getParent());
 		JTabbedPane jtp = new JTabbedPane();
 		// JPanel colorPanel = new ConfigureColorPanel();
 		JPanel structure = new StructureConfigPanel();
@@ -422,6 +422,7 @@ public class ConfigurationDialog extends JDialog {
 		});
 		add(ok, BorderLayout.SOUTH);
 		pack();
+		StaticUtils.center(this);
 
 	}
 }
