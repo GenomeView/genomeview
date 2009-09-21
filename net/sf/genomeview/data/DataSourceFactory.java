@@ -4,14 +4,9 @@
 package net.sf.genomeview.data;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +17,6 @@ import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.cache.CachedURLSource;
-import net.sf.genomeview.data.cache.SAMCache;
 import net.sf.genomeview.data.das.DAS;
 import net.sf.genomeview.data.das.DAS.EntryPoint;
 import net.sf.jannot.source.DataSource;
@@ -52,13 +46,15 @@ public class DataSourceFactory {
 		}
 	}
 
-	public static SAMDataSource constructSAMFromURL(URL url) throws IOException {
+	public static SAMDataSource constructSAM(URL url) throws IOException {
 		SSL.certify(url);
-		return SAMCache.getSAM(url);
-		
+		return new SAMDataSource(url);
 
 	}
+	public static SAMDataSource constructSAM(File file) throws IOException {
+		return new SAMDataSource(file);
 
+	}
 	
 	
 	public static DataSource createURL(URL url) throws IOException {
@@ -66,7 +62,7 @@ public class DataSourceFactory {
 		System.out.println("URL:" + urlString);
 		if (urlString.endsWith(".bai")) {
 			url = new URL(urlString.substring(0, urlString.length() - 4));
-			return constructSAMFromURL(url);
+			return constructSAM(url);
 		} else {
 			if(Configuration.getBoolean("general:disableURLCaching")){
 				return new URLSource(url);	

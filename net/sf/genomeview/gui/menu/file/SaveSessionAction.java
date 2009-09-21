@@ -72,7 +72,7 @@ public class SaveSessionAction extends AbstractAction {
 						out.println("U:"+((URLSource) ds).getURL().toString());
 					}
 					if (ds instanceof SAMDataSource) {
-						out.println("S:"+((SAMDataSource) ds).getFile().toString());
+						out.println("S:"+ ds.toString());
 					}
 				}
 				Configuration.set("lastDirectory", f.getParentFile());
