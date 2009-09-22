@@ -16,6 +16,7 @@ import java.util.TreeMap;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.AbstractGeneLabel;
+import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
@@ -80,6 +81,17 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			revalidate();
 
 		}
+		
+		g.setColor(new Color(180, 180, 180, 120));
+		for(Location l:model.getLocationSelection()){
+			int x1=Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), screenWidth);
+			int x2=Convert.translateGenomeToScreen(l.end()+1, model.getAnnotationLocationVisible(), screenWidth);
+			g.drawLine(x1, 0, x1, this.getPreferredSize().height);
+			g.drawLine(x2, 0, x2, this.getPreferredSize().height);
+			g.setColor(new Color(180, 180, 255, 50));
+			g.fillRect(x1, 0, x2-x1, this.getPreferredSize().height);
+		}
+		
 		g.setColor(new Color(120, 120, 120, 120));
 		g.drawLine(currentMouseX, 0, currentMouseX, this.getPreferredSize().height);
 	}
