@@ -53,7 +53,8 @@ public class SourceTrackListModel extends AbstractTableModel implements Observer
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
         case 0:
-            return sources.get(rowIndex);
+        	String source=sources.get(rowIndex).toString();
+            return source.substring(source.lastIndexOf('/'));
         case 1:
             if (model.isSourceVisible(sources.get(rowIndex)))
                 return Icons.YES;
@@ -76,6 +77,10 @@ public class SourceTrackListModel extends AbstractTableModel implements Observer
 
     private ArrayList<DataSource> sources = new ArrayList<DataSource>();
 
+    
+    ArrayList<DataSource> sources(){
+    	return sources;
+    }
     @Override
     public void update(Observable o, Object arg) {
         ArrayList<DataSource> newSources = new ArrayList<DataSource>();
@@ -84,4 +89,6 @@ public class SourceTrackListModel extends AbstractTableModel implements Observer
 
         fireTableDataChanged();
     }
+   
+
 }
