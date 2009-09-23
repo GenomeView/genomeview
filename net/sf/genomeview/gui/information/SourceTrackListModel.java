@@ -54,7 +54,10 @@ public class SourceTrackListModel extends AbstractTableModel implements Observer
         switch (columnIndex) {
         case 0:
         	String source=sources.get(rowIndex).toString();
-            return source.substring(source.lastIndexOf('/'));
+        	if(source.indexOf('/')>=0)
+        		return source.substring(source.lastIndexOf('/'));
+        	else
+        		return source;
         case 1:
             if (model.isSourceVisible(sources.get(rowIndex)))
                 return Icons.YES;

@@ -296,16 +296,16 @@ public class FeatureTrack extends Track {
 					CountMap<Integer> cm = new CountMap<Integer>();
 					for (DataSource source : sources) {
 						ReadGroup rg = model.getSelectedEntry().shortReads.getReadGroup(source);
-						if (f.end() >= rg.getForwardPileUp().size())
-							text.append("Still calculating mean short read coverage...");
-						else {
-							for (Location l : f.location()) {
-								for (int i = l.start(); i <= l.end(); i++) {
-									cm.count(rg.getForwardPileUp().get(i) + rg.getReversePileUp().get(i));
-								}
-							}
-							text.append("Mean short read coverage (" + source + "): " + median(cm)+ "<br />");
-						}
+//						if (f.end() >= rg.getForwardPileUp().size())
+//							text.append("Still calculating mean short read coverage...");
+//						else {
+//							for (Location l : f.location()) {
+//								for (int i = l.start(); i <= l.end(); i++) {
+//									cm.count(rg.getForwardPileUp().get(i) + rg.getReversePileUp().get(i));
+//								}
+//							}
+//							text.append("Mean short read coverage (" + source + "): " + median(cm)+ "<br />");
+//						}
 					}
 
 				}

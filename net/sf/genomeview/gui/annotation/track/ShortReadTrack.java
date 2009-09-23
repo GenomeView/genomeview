@@ -35,6 +35,8 @@ import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortRead;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.SAMDataSource;
+import net.sf.jannot.wiggle.Graph;
+import net.sf.jannot.wiggle.ShortReadCoverage;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.util.CloseableIterator;
@@ -91,17 +93,20 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
-		if (scale <= 256) {
-			if (!tooltip.isVisible())
-				tooltip.setVisible(true);
-			GraphBuffer currentBuffer = buffers.get(currentEntry);
-			int start = Convert.translateScreenToGenome(x, currentVisible, currentScreen);
-
-			tooltip.set(currentBuffer.getRawForward(start), currentBuffer.getRawReverse(start), currentBuffer.getRaw(start), source);
-		} else {
-			if (tooltip.isVisible())
-				tooltip.setVisible(false);
-		}
+		// if (scale <= 256) {
+		// if (!tooltip.isVisible())
+		// tooltip.setVisible(true);
+		// GraphBuffer currentBuffer = buffers.get(currentEntry);
+		// int start = Convert.translateScreenToGenome(x, currentVisible,
+		// currentScreen);
+		//
+		// tooltip.set(currentBuffer.getRawForward(start),
+		// currentBuffer.getRawReverse(start), currentBuffer.getRaw(start),
+		// source);
+		// } else {
+		// if (tooltip.isVisible())
+		// tooltip.setVisible(false);
+		// }
 		return false;
 	}
 
@@ -159,9 +164,10 @@ public class ShortReadTrack extends Track {
 		// }
 
 		private DataSource source;
-//		private Entry entry = null;
-//		private boolean ready = false;
-//		private MemoryReadSet buffer = new MemoryReadSet();
+
+		// private Entry entry = null;
+		// private boolean ready = false;
+		// private MemoryReadSet buffer = new MemoryReadSet();
 
 		public ReadBuffer(DataSource source) {
 			this.source = source;
@@ -186,19 +192,19 @@ public class ShortReadTrack extends Track {
 		}
 
 		public ExtendedShortRead getFirstRead(ExtendedShortRead sr) {
-//			if (ready) {
-//				return buffer.getFirst(sr);
-//
-//			} else
-				return qFastFirst.get(sr.record().getReadName());
+			// if (ready) {
+			// return buffer.getFirst(sr);
+			//
+			// } else
+			return qFastFirst.get(sr.record().getReadName());
 		}
 
 		public ExtendedShortRead getSecondRead(ExtendedShortRead sr) {
-//			if (ready) {
-//				return buffer.getSecond(sr);
-//
-//			} else
-				return qFastSecond.get(sr.record().getReadName());
+			// if (ready) {
+			// return buffer.getSecond(sr);
+			//
+			// } else
+			return qFastSecond.get(sr.record().getReadName());
 		}
 
 		/* qFast */
@@ -210,8 +216,8 @@ public class ShortReadTrack extends Track {
 		private int qFastMaxPairedLenght;
 
 		private synchronized Iterable<ShortRead> qFast(Entry e, Location r) {
-//			if (isQFastFail())
-//				return null;
+			// if (isQFastFail())
+			// return null;
 			if (!(source instanceof SAMDataSource)) {
 				return e.shortReads.getReadGroup(source).get(r);
 			} else {
@@ -221,13 +227,13 @@ public class ShortReadTrack extends Track {
 					qFastFirst.clear();
 					qFastSecond.clear();
 					BAMreads br = (BAMreads) (e.shortReads.getReadGroup(source));
-					SAMFileReader tmpReader = ((SAMDataSource)source).getReader();
-					CloseableIterator<SAMRecord> it = tmpReader.queryOverlapping(br.getKey(), r.start()-500, r.end()+500);
+					SAMFileReader tmpReader = ((SAMDataSource) source).getReader();
+					CloseableIterator<SAMRecord> it = tmpReader.queryOverlapping(br.getKey(), r.start() - 500, r.end() + 500);
 					while (it.hasNext()) {
 						try {
 							SAMRecord tmp = it.next();
-							
-							if(tmp.getAlignmentStart()==0||tmp.getAlignmentEnd()==0)
+
+							if (tmp.getAlignmentStart() == 0 || tmp.getAlignmentEnd() == 0)
 								continue;
 							byte[] seq = tmp.getReadBases();
 							if (complete(seq)) {
@@ -256,18 +262,18 @@ public class ShortReadTrack extends Track {
 							System.err.println(e);
 
 						}
-//						/* Check how long we have been busy */
-//						if (System.currentTimeMillis() - time > 1000) {
-//							/* last query failed, skip a few to catch up */
-//							qFastFail = 2;
-//							qFastBuffer.clear();
-//							qFastFirst.clear();
-//							qFastSecond.clear();
-//							qFastBufferLocation = new Location(-5, -5);
-//							it.close();
-//							tmpReader.close();
-//							return null;
-//						}
+						// /* Check how long we have been busy */
+						// if (System.currentTimeMillis() - time > 1000) {
+						// /* last query failed, skip a few to catch up */
+						// qFastFail = 2;
+						// qFastBuffer.clear();
+						// qFastFirst.clear();
+						// qFastSecond.clear();
+						// qFastBufferLocation = new Location(-5, -5);
+						// it.close();
+						// tmpReader.close();
+						// return null;
+						// }
 					}
 					qFastBufferLocation = r;
 					it.close();
@@ -279,11 +285,11 @@ public class ShortReadTrack extends Track {
 
 		}
 
-//		public boolean isQFastFail() {
-//			if (qFastFail > 0)
-//				qFastFail--;
-//			return qFastFail > 0;
-//		}
+		// public boolean isQFastFail() {
+		// if (qFastFail > 0)
+		// qFastFail--;
+		// return qFastFail > 0;
+		// }
 
 		private boolean complete(byte[] seq) {
 			for (int i = 0; i < seq.length; i++)
@@ -293,215 +299,218 @@ public class ShortReadTrack extends Track {
 		}
 
 		public int getPairLength() {
-//			if (ready) {
-//				return buffer.getPairLength();
-//
-//			} else {
-				return qFastMaxPairedLenght;
-//			}
+			// if (ready) {
+			// return buffer.getPairLength();
+			//
+			// } else {
+			return qFastMaxPairedLenght;
+			// }
 		}
 
 	}
 
-	/**
-	 * Keeps an eye on a read group
-	 * 
-	 * @author tabeel
-	 * 
-	 */
-	static class GraphBuffer implements Observer {
+	// /**
+	// * Keeps an eye on a read group
+	// *
+	// * @author tabeel
+	// *
+	// */
+	// static class GraphBuffer implements Observer {
+	//
+	// private double log(double val) {
+	// if (val > 0)
+	// return Math.log(val);
+	// else
+	// return 0;
+	// }
+	//
+	// private double LOG2 = Math.log(2);
+	// private int bareScale = 32;
+	// private int bareScaleIndex = 5;
+	//
+	// private ReadGroup rg;
+	//
+	// public GraphBuffer(ReadGroup rg) {
+	// rg.addObserver(this);
+	// this.rg = rg;
+	// }
+	//
+	// private List<float[]> buffer = new ArrayList<float[]>();
+	// private List<float[]> bufferForward = new ArrayList<float[]>();
+	// private List<float[]> bufferReverse = new ArrayList<float[]>();
+	//
+	// public synchronized double getReverse(int start, int scale) {
+	// if (start < 0 || start + scale >= rg.getReversePileUp().size())
+	// return Double.NaN;
+	// if (scale < bareScale) {
+	// double conservation = 0;
+	// for (int j = 0; j < scale; j++) {
+	// conservation += log(rg.getReversePileUp().get(start + j));
+	//
+	// }
+	// return conservation / (scale * log(rg.getMaxPile()));
+	// }
+	// if (bufferReverse.size() == 0)
+	// bufferReverse.add(bareReverse());
+	//
+	// int index = (int) (Math.log(scale) / LOG2) - bareScaleIndex;
+	//
+	// while (bufferReverse.size() <= index + 1) {
+	// bufferReverse.add(merge(bufferReverse.get(bufferReverse.size() - 1)));
+	// }
+	//
+	// if (start / scale < bufferReverse.get(index).length)
+	// return bufferReverse.get(index)[start / scale];
+	// else
+	// return Double.NaN;
+	// }
+	//
+	// public synchronized double getForward(int start, int scale) {
+	// if (start < 0 || start + scale >= rg.getForwardPileUp().size())
+	// return Double.NaN;
+	// if (scale < bareScale) {
+	// double conservation = 0;
+	// for (int j = 0; j < scale; j++) {
+	// conservation += log(rg.getForwardPileUp().get(start + j));
+	//
+	// }
+	// return conservation / (scale * log(rg.getMaxPile()));
+	// }
+	// if (bufferForward.size() == 0)
+	// bufferForward.add(bareForward());
+	//
+	// int index = (int) (Math.log(scale) / LOG2) - bareScaleIndex;
+	//
+	// while (bufferForward.size() <= index + 1) {
+	// bufferForward.add(merge(bufferForward.get(bufferForward.size() - 1)));
+	// }
+	//
+	// if (start / scale < bufferForward.get(index).length)
+	// return bufferForward.get(index)[start / scale];
+	// else
+	// return Double.NaN;
+	// }
+	//
+	// public synchronized int getRaw(int start) {
+	// if (start >= rg.getForwardPileUp().size())
+	// return -1;
+	// return rg.getForwardPileUp().get(start) +
+	// rg.getReversePileUp().get(start);
+	// }
+	//
+	// public synchronized int getRawForward(int start) {
+	// if (start >= rg.getForwardPileUp().size())
+	// return -1;
+	// return rg.getForwardPileUp().get(start);
+	// }
+	//
+	// public synchronized int getRawReverse(int start) {
+	// if (start >= rg.getReversePileUp().size())
+	// return -1;
+	// return rg.getReversePileUp().get(start);
+	// }
+	//
+	// public synchronized double get(int start, int scale) {
+	// if (start < 0 || start + scale >= rg.getForwardPileUp().size())
+	// return Double.NaN;
+	// if (scale < bareScale) {
+	// double conservation = 0;
+	// for (int j = 0; j < scale; j++) {
+	// conservation += log(rg.getForwardPileUp().get(start + j) +
+	// rg.getReversePileUp().get(start + j));
+	//
+	// }
+	// return conservation / (scale * log(rg.getMaxPile()));
+	// }
+	// if (buffer.size() == 0)
+	// buffer.add(bare());
+	//
+	// int index = (int) (Math.log(scale) / LOG2) - bareScaleIndex;
+	//
+	// while (buffer.size() <= index + 1) {
+	// buffer.add(merge(buffer.get(buffer.size() - 1)));
+	// }
+	//
+	// if (start / scale < buffer.get(index).length)
+	// return buffer.get(index)[start / scale];
+	// else
+	// return Double.NaN;
+	// }
+	//
+	// private float[] merge(float[] ds) {
+	// float[] out = new float[(ds.length + 1) / 2];
+	// double max = 0;
+	// for (int i = 0; i < ds.length - 1; i += 2) {
+	// out[i / 2] = (ds[i] + ds[i + 1]) / 2;
+	// if (out[i / 2] > max)
+	// max = out[i / 2];
+	// }
+	// out[out.length - 1] = ds[ds.length - 1];
+	// for (int i = 0; i < out.length; i++)
+	// out[i] /= max;
+	// return out;
+	// }
+	//
+	// private float[] bare() {
+	// int size = rg.getForwardPileUp().size();
+	// float[] out = new float[size / bareScale + 1];
+	// for (int i = 0; i < size; i += bareScale) {
+	// float conservation = 0;
+	// for (int j = 0; j < bareScale && i + j < size; j++) {
+	// conservation += log(rg.getForwardPileUp().get(i + j) +
+	// rg.getReversePileUp().get(i + j));
+	//
+	// }
+	// conservation /= bareScale * log(rg.getMaxPile());
+	// out[i / bareScale] = conservation;
+	//
+	// }
+	// return out;
+	// }
+	//
+	// private float[] bareReverse() {
+	// int size = rg.getForwardPileUp().size();
+	// float[] out = new float[size / bareScale + 1];
+	// for (int i = 0; i < size; i += bareScale) {
+	// double conservation = 0;
+	// for (int j = 0; j < bareScale && i + j < size; j++) {
+	// conservation += log(rg.getReversePileUp().get(i + j));
+	// }
+	// conservation /= bareScale * log(rg.getMaxPile());
+	// out[i / bareScale] = (float) conservation;
+	//
+	// }
+	// return out;
+	// }
+	//
+	// private float[] bareForward() {
+	// int size = rg.getForwardPileUp().size();
+	// float[] out = new float[size / bareScale + 1];
+	// for (int i = 0; i < size; i += bareScale) {
+	// double conservation = 0;
+	// for (int j = 0; j < bareScale && i + j < size; j++) {
+	// conservation += log(rg.getForwardPileUp().get(i + j));
+	// }
+	// conservation /= bareScale * log(rg.getMaxPile());
+	// out[i / bareScale] = (float) conservation;
+	//
+	// }
+	// return out;
+	// }
+	//
+	// @Override
+	// public synchronized void update(Observable o, Object arg) {
+	// buffer.clear();
+	// bufferForward.clear();
+	// bufferReverse.clear();
+	// }
+	//
+	// }
 
-		private double log(double val) {
-			if (val > 0)
-				return Math.log(val);
-			else
-				return 0;
-		}
-
-		private double LOG2 = Math.log(2);
-		private int bareScale = 32;
-		private int bareScaleIndex = 5;
-
-		private ReadGroup rg;
-
-		public GraphBuffer(ReadGroup rg) {
-			rg.addObserver(this);
-			this.rg = rg;
-		}
-
-		private List<float[]> buffer = new ArrayList<float[]>();
-		private List<float[]> bufferForward = new ArrayList<float[]>();
-		private List<float[]> bufferReverse = new ArrayList<float[]>();
-
-		public synchronized double getReverse(int start, int scale) {
-			if (start < 0 || start + scale >= rg.getReversePileUp().size())
-				return Double.NaN;
-			if (scale < bareScale) {
-				double conservation = 0;
-				for (int j = 0; j < scale; j++) {
-					conservation += log(rg.getReversePileUp().get(start + j));
-
-				}
-				return conservation / (scale * log(rg.getMaxPile()));
-			}
-			if (bufferReverse.size() == 0)
-				bufferReverse.add(bareReverse());
-
-			int index = (int) (Math.log(scale) / LOG2) - bareScaleIndex;
-
-			while (bufferReverse.size() <= index + 1) {
-				bufferReverse.add(merge(bufferReverse.get(bufferReverse.size() - 1)));
-			}
-
-			if (start / scale < bufferReverse.get(index).length)
-				return bufferReverse.get(index)[start / scale];
-			else
-				return Double.NaN;
-		}
-
-		public synchronized double getForward(int start, int scale) {
-			if (start < 0 || start + scale >= rg.getForwardPileUp().size())
-				return Double.NaN;
-			if (scale < bareScale) {
-				double conservation = 0;
-				for (int j = 0; j < scale; j++) {
-					conservation += log(rg.getForwardPileUp().get(start + j));
-
-				}
-				return conservation / (scale * log(rg.getMaxPile()));
-			}
-			if (bufferForward.size() == 0)
-				bufferForward.add(bareForward());
-
-			int index = (int) (Math.log(scale) / LOG2) - bareScaleIndex;
-
-			while (bufferForward.size() <= index + 1) {
-				bufferForward.add(merge(bufferForward.get(bufferForward.size() - 1)));
-			}
-
-			if (start / scale < bufferForward.get(index).length)
-				return bufferForward.get(index)[start / scale];
-			else
-				return Double.NaN;
-		}
-
-		public synchronized int getRaw(int start) {
-			if (start >= rg.getForwardPileUp().size())
-				return -1;
-			return rg.getForwardPileUp().get(start) + rg.getReversePileUp().get(start);
-		}
-
-		public synchronized int getRawForward(int start) {
-			if (start >= rg.getForwardPileUp().size())
-				return -1;
-			return rg.getForwardPileUp().get(start);
-		}
-
-		public synchronized int getRawReverse(int start) {
-			if (start >= rg.getReversePileUp().size())
-				return -1;
-			return rg.getReversePileUp().get(start);
-		}
-
-		public synchronized double get(int start, int scale) {
-			if (start < 0 || start + scale >= rg.getForwardPileUp().size())
-				return Double.NaN;
-			if (scale < bareScale) {
-				double conservation = 0;
-				for (int j = 0; j < scale; j++) {
-					conservation += log(rg.getForwardPileUp().get(start + j) + rg.getReversePileUp().get(start + j));
-
-				}
-				return conservation / (scale * log(rg.getMaxPile()));
-			}
-			if (buffer.size() == 0)
-				buffer.add(bare());
-
-			int index = (int) (Math.log(scale) / LOG2) - bareScaleIndex;
-
-			while (buffer.size() <= index + 1) {
-				buffer.add(merge(buffer.get(buffer.size() - 1)));
-			}
-
-			if (start / scale < buffer.get(index).length)
-				return buffer.get(index)[start / scale];
-			else
-				return Double.NaN;
-		}
-
-		private float[] merge(float[] ds) {
-			float[] out = new float[(ds.length + 1) / 2];
-			double max = 0;
-			for (int i = 0; i < ds.length - 1; i += 2) {
-				out[i / 2] = (ds[i] + ds[i + 1]) / 2;
-				if (out[i / 2] > max)
-					max = out[i / 2];
-			}
-			out[out.length - 1] = ds[ds.length - 1];
-			for (int i = 0; i < out.length; i++)
-				out[i] /= max;
-			return out;
-		}
-
-		private float[] bare() {
-			int size = rg.getForwardPileUp().size();
-			float[] out = new float[size / bareScale + 1];
-			for (int i = 0; i < size; i += bareScale) {
-				float conservation = 0;
-				for (int j = 0; j < bareScale && i + j < size; j++) {
-					conservation += log(rg.getForwardPileUp().get(i + j) + rg.getReversePileUp().get(i + j));
-
-				}
-				conservation /= bareScale * log(rg.getMaxPile());
-				out[i / bareScale] = conservation;
-
-			}
-			return out;
-		}
-
-		private float[] bareReverse() {
-			int size = rg.getForwardPileUp().size();
-			float[] out = new float[size / bareScale + 1];
-			for (int i = 0; i < size; i += bareScale) {
-				double conservation = 0;
-				for (int j = 0; j < bareScale && i + j < size; j++) {
-					conservation += log(rg.getReversePileUp().get(i + j));
-				}
-				conservation /= bareScale * log(rg.getMaxPile());
-				out[i / bareScale] = (float) conservation;
-
-			}
-			return out;
-		}
-
-		private float[] bareForward() {
-			int size = rg.getForwardPileUp().size();
-			float[] out = new float[size / bareScale + 1];
-			for (int i = 0; i < size; i += bareScale) {
-				double conservation = 0;
-				for (int j = 0; j < bareScale && i + j < size; j++) {
-					conservation += log(rg.getForwardPileUp().get(i + j));
-				}
-				conservation /= bareScale * log(rg.getMaxPile());
-				out[i / bareScale] = (float) conservation;
-
-			}
-			return out;
-		}
-
-		@Override
-		public synchronized void update(Observable o, Object arg) {
-			buffer.clear();
-			bufferForward.clear();
-			bufferReverse.clear();
-		}
-
-	}
-
-	private Map<Entry, GraphBuffer> buffers = new HashMap<Entry, GraphBuffer>();
+	private Map<ReadGroup, ShortReadCoverage> buffers = new HashMap<ReadGroup, ShortReadCoverage>();
 
 	private int scale = 1;
-
+	private int scaleIndex = 0;
 	private Entry currentEntry;
 
 	private Location currentVisible;
@@ -514,6 +523,11 @@ public class ShortReadTrack extends Track {
 
 	private Color forwardColor;
 
+	private static final double LOG2=Math.log(2);
+	
+	private double log2(double d){
+		return Math.log(d)/LOG2;
+	}
 	@Override
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
 		currentEntry = entry;
@@ -542,65 +556,88 @@ public class ShortReadTrack extends Track {
 		double width = screenWidth / (double) currentVisible.length() / 2.0;
 
 		scale = 1;
-		while (scale < (int) Math.ceil(1.0 / width))
+		scaleIndex = 0;
+		while (scale < (int) Math.ceil(1.0 / width)) {
 			scale *= 2;
+			scaleIndex++;
+		}
 
 		int start = currentVisible.start() / scale * scale;
 		int end = ((currentVisible.end() / scale) + 1) * scale;
 
 		ReadGroup rg = entry.shortReads.getReadGroup(source);
+		if (!buffers.containsKey(rg))
+			buffers.put(rg, new ShortReadCoverage(rg,entry.size()));
+		Graph graph = buffers.get(rg);
+
 		// System.out.println(entry.shortReads+"\t"+rg+"\t"+source);
-		if (rg != null) {
-			if (!buffers.containsKey(entry)) {
-				// System.out.println("Construction size: " + tmp);
-				buffers.put(entry, new GraphBuffer(rg));
+		// if (rg != null) {
+		// if (!buffers.containsKey(entry)) {
+		// // System.out.println("Construction size: " + tmp);
+		// buffers.put(entry, new GraphBuffer(rg));
+		//
+		// }
+		// // write(entry.shortReads.counts());
+		// } else {
+		// return 0; /* Not yet ready */
+		// }
+		// GraphBuffer b = buffers.get(entry);
+		// if (b != null) {
 
-			}
-			// write(entry.shortReads.counts());
-		} else {
-			return 0; /* Not yet ready */
+		GeneralPath conservationGP = new GeneralPath();
+//		GeneralPath conservationGPF = new GeneralPath();
+//		GeneralPath conservationGPR = new GeneralPath();
+		// for (int i = 0; i < (end - start) / scale; i++) {
+
+		// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
+		// (lineHeigh - 4) + 2);
+		float[] v = graph.get(start, end, scaleIndex);
+		// double vf = b.getForward(start + i * scale, scale);
+		// double vr = b.getReverse(start + i * scale, scale);
+
+		// if(i==100)
+		// checkValue=v;
+
+		for (int i = 0; i < v.length; i++) {
+			int x = Convert.translateGenomeToScreen(start + i * scale + 1, currentVisible, screenWidth) + 5;
+			double val=v[i];
+			/* Cap value */
+			if(val>graph.max())
+				val=graph.max();
+			val=log2(val);
+			val/=log2(graph.max());
+			if (i == 0)
+				conservationGP.moveTo(x - 1, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
+			// conservationGPF.moveTo(x - 1, yOffset + (1 - vf) *
+			// (graphLineHeigh -
+			// 4) + 2);
+			// conservationGPR.moveTo(x - 1, yOffset + (1 - vr) *
+			// (graphLineHeigh -
+			// 4) + 2);
+
+			conservationGP.lineTo(x, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
+			// conservationGPF.lineTo(x, yOffset + (1 - vf) * (graphLineHeigh -
+			// 4) +
+			// 2);
+			// conservationGPR.lineTo(x, yOffset + (1 - vr) * (graphLineHeigh -
+			// 4) +
+			// 2);
+
 		}
-		GraphBuffer b = buffers.get(entry);
-		if (b != null) {
-			GeneralPath conservationGP = new GeneralPath();
-			GeneralPath conservationGPF = new GeneralPath();
-			GeneralPath conservationGPR = new GeneralPath();
-			for (int i = 0; i < (end - start) / scale; i++) {
-				int x = Convert.translateGenomeToScreen(start + i * scale + 1, currentVisible, screenWidth) + 5;
-				// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
-				// (lineHeigh - 4) + 2);
-				double v = b.get(start + i * scale, scale);
-				double vf = b.getForward(start + i * scale, scale);
-				double vr = b.getReverse(start + i * scale, scale);
 
-				// if(i==100)
-				// checkValue=v;
-				if (i == 0) {
-					conservationGP.moveTo(x - 1, yOffset + (1 - v) * (graphLineHeigh - 4) + 2);
-					conservationGPF.moveTo(x - 1, yOffset + (1 - vf) * (graphLineHeigh - 4) + 2);
-					conservationGPR.moveTo(x - 1, yOffset + (1 - vr) * (graphLineHeigh - 4) + 2);
+		/* Draw coverage lines */
+		// g.setColor(forwardColor);
+		// g.draw(conservationGPF);
+		//		
+		// g.setColor(reverseColor);
+		// g.draw(conservationGPR);
+		g.setColor(Color.BLACK);
+		g.draw(conservationGP);
 
-				}
-				conservationGP.lineTo(x, yOffset + (1 - v) * (graphLineHeigh - 4) + 2);
-				conservationGPF.lineTo(x, yOffset + (1 - vf) * (graphLineHeigh - 4) + 2);
-				conservationGPR.lineTo(x, yOffset + (1 - vr) * (graphLineHeigh - 4) + 2);
-
-			}
-
-			/* Draw coverage lines */
-			g.setColor(forwardColor);
-			g.draw(conservationGPF);
-
-			g.setColor(reverseColor);
-			g.draw(conservationGPR);
-
-			g.setColor(Color.BLACK);
-			g.draw(conservationGP);
-
-			g.setColor(Color.BLUE);
-			g.drawString(source.toString() + " (" + scale + ")", 10, yOffset + 12 - 2);
-			yOffset += graphLineHeigh;
-		}
+		g.setColor(Color.BLUE);
+		g.drawString(source.toString() + " (" + scale + ")", 10, yOffset + 12 - 2);
+		yOffset += graphLineHeigh;
+		// }
 
 		/*
 		 * Draw individual reads when possible
@@ -616,18 +653,19 @@ public class ShortReadTrack extends Track {
 			/* Access to BAMread is through buffer for performance! */
 			if (rg instanceof BAMreads) {
 				reads = readBuffer.get(entry, currentVisible);
-//				timeout = readBuffer.isQFastFail();
-//				if (timeout) {
-//					String msg = "Query time-out, too much data in this area, you may want to collapse this track or zoom in";
-//					FontMetrics metrics = g.getFontMetrics();
-//					int hgt = metrics.getHeight();
-//					int adv = metrics.stringWidth(msg);
-//					g.setColor(Color.WHITE);
-//					g.fillRect(10, yOffset + 20 - hgt, adv + 2, hgt + 2);
-//					g.setColor(Color.RED);
-//					g.drawString(msg, 10, yOffset + 18);
-//					yOffset += 20 + 5;
-//				}
+				// timeout = readBuffer.isQFastFail();
+				// if (timeout) {
+				// String msg =
+				// "Query time-out, too much data in this area, you may want to collapse this track or zoom in";
+				// FontMetrics metrics = g.getFontMetrics();
+				// int hgt = metrics.getHeight();
+				// int adv = metrics.stringWidth(msg);
+				// g.setColor(Color.WHITE);
+				// g.fillRect(10, yOffset + 20 - hgt, adv + 2, hgt + 2);
+				// g.setColor(Color.RED);
+				// g.drawString(msg, 10, yOffset + 18);
+				// yOffset += 20 + 5;
+				// }
 				/* Update readLength for paired reads */
 				readLength = readBuffer.getPairLength();
 
@@ -668,80 +706,80 @@ public class ShortReadTrack extends Track {
 					}
 
 					int x2 = Convert.translateGenomeToScreen(one.end() + 1, currentVisible, screenWidth);
-//					if (x2 > 0) {
-						/* Find empty line */
-						int pos = one.start() - currentVisible.start();
-						int line = line(one, pos, tilingCounter);
-						if (line > maxStack) {
-							stackExceeded = true;
-							continue;
+					// if (x2 > 0) {
+					/* Find empty line */
+					int pos = one.start() - currentVisible.start();
+					int line = line(one, pos, tilingCounter);
+					if (line > maxStack) {
+						stackExceeded = true;
+						continue;
 
+					}
+					int clearStart = one.start();
+					int clearEnd = one.end();
+					ExtendedShortRead two = null;
+					/* Modify empty space finder for paired reads */
+					if (enablePairing && one instanceof ExtendedShortRead) {
+						ExtendedShortRead esr = (ExtendedShortRead) one;
+						if (esr.isPaired() && esr.isFirstInPair()) {
+							two = readBuffer.getSecondRead(esr);
 						}
-						int clearStart = one.start();
-						int clearEnd = one.end();
-						ExtendedShortRead two = null;
-						/* Modify empty space finder for paired reads */
-						if (enablePairing && one instanceof ExtendedShortRead) {
-							ExtendedShortRead esr = (ExtendedShortRead) one;
-							if (esr.isPaired() && esr.isFirstInPair()) {
-								two = readBuffer.getSecondRead(esr);
-							}
-							if (two != null) {
-								if (two.start() < one.start()) {
+						if (two != null) {
+							if (two.start() < one.start()) {
 
-									pos = two.start() - currentVisible.start();
-									line = line(two, pos, tilingCounter);
-									clearStart = two.start();
-								} else {
-									clearEnd = two.end();
-								}
+								pos = two.start() - currentVisible.start();
+								line = line(two, pos, tilingCounter);
+								clearStart = two.start();
+							} else {
+								clearEnd = two.end();
 							}
-
-						}
-						/* Carve space out of hitmap */
-						for (int i = clearStart - readLength; i <= clearEnd + 3; i++) {
-							pos = i - currentVisible.start();
-							if (pos >= 0 && pos < tilingCounter.length)
-								tilingCounter[pos].set(line);
 						}
 
-						int yRec = line * readLineHeight + yOffset;
+					}
+					/* Carve space out of hitmap */
+					for (int i = clearStart - readLength; i <= clearEnd + 3; i++) {
+						pos = i - currentVisible.start();
+						if (pos >= 0 && pos < tilingCounter.length)
+							tilingCounter[pos].set(line);
+					}
 
-						/* Paint read or read pair */
-						if (line < maxStack) {
-							/* paired read - calculate connection coordinates */
-							if (two != null) {
+					int yRec = line * readLineHeight + yOffset;
 
-								int subX1, subX2;
-								if (one.start() < two.start()) {
+					/* Paint read or read pair */
+					if (line < maxStack) {
+						/* paired read - calculate connection coordinates */
+						if (two != null) {
 
-									subX1 = Convert.translateGenomeToScreen(one.end(), currentVisible, screenWidth);
-									subX2 = Convert.translateGenomeToScreen(two.start(), currentVisible, screenWidth);
+							int subX1, subX2;
+							if (one.start() < two.start()) {
 
-								} else {
+								subX1 = Convert.translateGenomeToScreen(one.end(), currentVisible, screenWidth);
+								subX2 = Convert.translateGenomeToScreen(two.start(), currentVisible, screenWidth);
 
-									subX1 = Convert.translateGenomeToScreen(one.start(), currentVisible, screenWidth);
-									subX2 = Convert.translateGenomeToScreen(two.end(), currentVisible, screenWidth);
+							} else {
 
-								}
+								subX1 = Convert.translateGenomeToScreen(one.start(), currentVisible, screenWidth);
+								subX2 = Convert.translateGenomeToScreen(two.end(), currentVisible, screenWidth);
 
-								g.setColor(pairingColor);
-								g.drawLine(subX1, yRec + readLineHeight / 2, subX2, yRec + readLineHeight / 2);
 							}
-							if (line > lines)
-								lines = line;
 
-							paintRead(g, one, yRec, screenWidth, readLineHeight, entry);
+							g.setColor(pairingColor);
+							g.drawLine(subX1, yRec + readLineHeight / 2, subX2, yRec + readLineHeight / 2);
+						}
+						if (line > lines)
+							lines = line;
+
+						paintRead(g, one, yRec, screenWidth, readLineHeight, entry);
+						visibleReadCount++;
+						if (two != null) {
+
+							paintRead(g, two, yRec, screenWidth, readLineHeight, entry);
 							visibleReadCount++;
-							if (two != null) {
-
-								paintRead(g, two, yRec, screenWidth, readLineHeight, entry);
-								visibleReadCount++;
-							}
-						} else {
-							stackExceeded = true;
 						}
-//					}
+					} else {
+						stackExceeded = true;
+					}
+					// }
 				}
 			} catch (ConcurrentModificationException e) {
 				// Ignore

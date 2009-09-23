@@ -34,7 +34,6 @@ import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
-import net.sf.jannot.Graph;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
@@ -42,6 +41,7 @@ import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.MultiFileSource;
+import net.sf.jannot.wiggle.Graph;
 import be.abeel.util.DefaultHashMap;
 
 public class Model extends Observable implements IModel {
