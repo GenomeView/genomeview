@@ -82,17 +82,24 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		g.setColor(new Color(180, 180, 180, 120));
 		for(Feature f:model.getFeatureSelection()){
 			for(Location l:f.location()){
-				int x1=Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), screenWidth);
-				int x2=Convert.translateGenomeToScreen(l.end()+1, model.getAnnotationLocationVisible(), screenWidth);
-				g.drawLine(x1, 0, x1, this.getPreferredSize().height);
-				g.drawLine(x2, 0, x2, this.getPreferredSize().height);
-				g.setColor(new Color(180, 180, 255, 50));
-				g.fillRect(x1, 0, x2-x1, this.getPreferredSize().height);
+				highlight(l,g);
 			}
 		}
+		if(model.getSelectedRegion()!=null)
+			highlight(model.getSelectedRegion(),g);
 		
 		g.setColor(new Color(120, 120, 120, 120));
 		g.drawLine(currentMouseX, 0, currentMouseX, this.getPreferredSize().height);
+	}
+
+	private void highlight(Location l,Graphics g) {
+		int x1=Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), screenWidth);
+		int x2=Convert.translateGenomeToScreen(l.end()+1, model.getAnnotationLocationVisible(), screenWidth);
+		g.drawLine(x1, 0, x1, this.getPreferredSize().height);
+		g.drawLine(x2, 0, x2, this.getPreferredSize().height);
+		g.setColor(new Color(180, 180, 255, 50));
+		g.fillRect(x1, 0, x2-x1, this.getPreferredSize().height);
+		
 	}
 
 	@Override
