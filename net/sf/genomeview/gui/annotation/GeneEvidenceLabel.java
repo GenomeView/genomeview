@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -19,10 +18,9 @@ import net.sf.genomeview.gui.AbstractGeneLabel;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.StaticUtils;
-import net.sf.genomeview.gui.annotation.track.FeatureTrack;
-import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack;
 import net.sf.genomeview.gui.annotation.track.StructureTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
+import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 
 public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListener, MouseMotionListener {
@@ -52,15 +50,13 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	}
 
-	private int currentBackgroundIndex = 0;
-
 	@Override
 	public void paintComponent(Graphics g) {
 		tracks.clear();
 		framePixelsUsed = 0;
 		screenWidth = this.getSize().width + 1;
 		super.paintComponent(g);
-		currentBackgroundIndex = 0;
+		
 
 		int index=0;
 		for (Track track : model.getTrackList()) {
@@ -82,14 +78,17 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 		}
 		
+		/* Highlight current selection */
 		g.setColor(new Color(180, 180, 180, 120));
-		for(Location l:model.getLocationSelection()){
-			int x1=Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), screenWidth);
-			int x2=Convert.translateGenomeToScreen(l.end()+1, model.getAnnotationLocationVisible(), screenWidth);
-			g.drawLine(x1, 0, x1, this.getPreferredSize().height);
-			g.drawLine(x2, 0, x2, this.getPreferredSize().height);
-			g.setColor(new Color(180, 180, 255, 50));
-			g.fillRect(x1, 0, x2-x1, this.getPreferredSize().height);
+		for(Feature f:model.getFeatureSelection()){
+			for(Location l:f.location()){
+				int x1=Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), screenWidth);
+				int x2=Convert.translateGenomeToScreen(l.end()+1, model.getAnnotationLocationVisible(), screenWidth);
+				g.drawLine(x1, 0, x1, this.getPreferredSize().height);
+				g.drawLine(x2, 0, x2, this.getPreferredSize().height);
+				g.setColor(new Color(180, 180, 255, 50));
+				g.fillRect(x1, 0, x2-x1, this.getPreferredSize().height);
+			}
 		}
 		
 		g.setColor(new Color(120, 120, 120, 120));
