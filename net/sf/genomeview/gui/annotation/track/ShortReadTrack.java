@@ -210,8 +210,8 @@ public class ShortReadTrack extends Track {
 		private int qFastMaxPairedLenght;
 
 		private synchronized Iterable<ShortRead> qFast(Entry e, Location r) {
-			if (isQFastFail())
-				return null;
+//			if (isQFastFail())
+//				return null;
 			if (!(source instanceof SAMDataSource)) {
 				return e.shortReads.getReadGroup(source).get(r);
 			} else {
@@ -256,18 +256,18 @@ public class ShortReadTrack extends Track {
 							System.err.println(e);
 
 						}
-						/* Check how long we have been busy */
-						if (System.currentTimeMillis() - time > 1000) {
-							/* last query failed, skip a few to catch up */
-							qFastFail = 100;
-							qFastBuffer.clear();
-							qFastFirst.clear();
-							qFastSecond.clear();
-							qFastBufferLocation = new Location(-5, -5);
-							it.close();
-							tmpReader.close();
-							return null;
-						}
+//						/* Check how long we have been busy */
+//						if (System.currentTimeMillis() - time > 1000) {
+//							/* last query failed, skip a few to catch up */
+//							qFastFail = 2;
+//							qFastBuffer.clear();
+//							qFastFirst.clear();
+//							qFastSecond.clear();
+//							qFastBufferLocation = new Location(-5, -5);
+//							it.close();
+//							tmpReader.close();
+//							return null;
+//						}
 					}
 					qFastBufferLocation = r;
 					it.close();
@@ -279,11 +279,11 @@ public class ShortReadTrack extends Track {
 
 		}
 
-		public boolean isQFastFail() {
-			if (qFastFail > 0)
-				qFastFail--;
-			return qFastFail > 0;
-		}
+//		public boolean isQFastFail() {
+//			if (qFastFail > 0)
+//				qFastFail--;
+//			return qFastFail > 0;
+//		}
 
 		private boolean complete(byte[] seq) {
 			for (int i = 0; i < seq.length; i++)
@@ -616,18 +616,18 @@ public class ShortReadTrack extends Track {
 			/* Access to BAMread is through buffer for performance! */
 			if (rg instanceof BAMreads) {
 				reads = readBuffer.get(entry, currentVisible);
-				timeout = readBuffer.isQFastFail();
-				if (timeout) {
-					String msg = "Query time-out, too much data in this area, you may want to collapse this track or zoom in";
-					FontMetrics metrics = g.getFontMetrics();
-					int hgt = metrics.getHeight();
-					int adv = metrics.stringWidth(msg);
-					g.setColor(Color.WHITE);
-					g.fillRect(10, yOffset + 20 - hgt, adv + 2, hgt + 2);
-					g.setColor(Color.RED);
-					g.drawString(msg, 10, yOffset + 18);
-					yOffset += 20 + 5;
-				}
+//				timeout = readBuffer.isQFastFail();
+//				if (timeout) {
+//					String msg = "Query time-out, too much data in this area, you may want to collapse this track or zoom in";
+//					FontMetrics metrics = g.getFontMetrics();
+//					int hgt = metrics.getHeight();
+//					int adv = metrics.stringWidth(msg);
+//					g.setColor(Color.WHITE);
+//					g.fillRect(10, yOffset + 20 - hgt, adv + 2, hgt + 2);
+//					g.setColor(Color.RED);
+//					g.drawString(msg, 10, yOffset + 18);
+//					yOffset += 20 + 5;
+//				}
 				/* Update readLength for paired reads */
 				readLength = readBuffer.getPairLength();
 
