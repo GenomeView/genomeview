@@ -51,5 +51,13 @@ public class TestClear {
 			return add;
 		}
 
+
+
+		@Override
+		public void finalize() {
+			// TODO Auto-generated method stub
+			
+		}
+
 	}
 }

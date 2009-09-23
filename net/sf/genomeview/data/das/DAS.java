@@ -290,4 +290,10 @@ public class DAS extends DataSource {
 		return dsn.getReferences();
 	}
 
+	@Override
+	public void finalize() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

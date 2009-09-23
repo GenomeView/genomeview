@@ -217,6 +217,10 @@ public class Model extends Observable implements IModel {
 
 	public void exit() {
 		this.exitRequested = true;
+		for(DataSource ds:loadedSources){
+			ds.finalize();
+		}
+		loadedSources.clear();
 		refresh();
 
 	}
