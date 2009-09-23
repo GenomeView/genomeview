@@ -222,7 +222,7 @@ public class ShortReadTrack extends Track {
 					qFastSecond.clear();
 					BAMreads br = (BAMreads) (e.shortReads.getReadGroup(source));
 					SAMFileReader tmpReader = ((SAMDataSource)source).getReader();
-					CloseableIterator<SAMRecord> it = tmpReader.queryOverlapping(br.getKey(), r.start(), r.end());
+					CloseableIterator<SAMRecord> it = tmpReader.queryOverlapping(br.getKey(), r.start()-500, r.end()+500);
 					while (it.hasNext()) {
 						try {
 							SAMRecord tmp = it.next();
@@ -668,7 +668,7 @@ public class ShortReadTrack extends Track {
 					}
 
 					int x2 = Convert.translateGenomeToScreen(one.end() + 1, currentVisible, screenWidth);
-					if (x2 > 0) {
+//					if (x2 > 0) {
 						/* Find empty line */
 						int pos = one.start() - currentVisible.start();
 						int line = line(one, pos, tilingCounter);
@@ -741,7 +741,7 @@ public class ShortReadTrack extends Track {
 						} else {
 							stackExceeded = true;
 						}
-					}
+//					}
 				}
 			} catch (ConcurrentModificationException e) {
 				// Ignore
