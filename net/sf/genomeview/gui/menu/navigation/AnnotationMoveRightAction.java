@@ -39,7 +39,8 @@ public class AnnotationMoveRightAction extends AbstractModelAction {
     public void actionPerformed(ActionEvent arg0) {
         Location r = model.getAnnotationLocationVisible();
         int halve = r.length() / 4;
-        model.setAnnotationLocationVisible(new Location(r.start() + halve, r.end() + halve));
+        if(enabled)
+        	model.setAnnotationLocationVisible(new Location(r.start() + halve, r.end() + halve));
 
     }
 

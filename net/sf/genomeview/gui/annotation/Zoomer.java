@@ -50,6 +50,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 			}
 		}
+		
 
 		if (!(left || right) && dragRec.contains(e.getX(), e.getY())) {
 			inside = true;
@@ -71,17 +72,24 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 		if (left) {
 			int mouseX = Convert.translateScreenToGenome(e.getX(), full, this.getWidth());
 			int diff = mouseX - pressedX;
-			model.setAnnotationLocationVisible(new Location(pressLocation.start() + diff, pressLocation.end()));
+			if(pressLocation.start()+diff>0)
+				model.setAnnotationLocationVisible(new Location(pressLocation.start() + diff, pressLocation.end()));
 		}
 		if (right) {
 			int mouseX = Convert.translateScreenToGenome(e.getX(), full, this.getWidth());
 			int diff = mouseX - pressedX;
-			model.setAnnotationLocationVisible(new Location(pressLocation.start(), pressLocation.end() + diff));
+			if(pressLocation.end()+diff<=full.end())
+				model.setAnnotationLocationVisible(new Location(pressLocation.start(), pressLocation.end() + diff));
 		}
 		if (inside) {
 			int mouseX = Convert.translateScreenToGenome(e.getX(), full, this.getWidth());
 			int diff = mouseX - pressedX;
-			model.setAnnotationLocationVisible(new Location(pressLocation.start() + diff, pressLocation.end() + diff));
+			if(pressLocation.start()+diff>0&&pressLocation.end()+diff<=full.end())
+				model.setAnnotationLocationVisible(new Location(pressLocation.start() + diff, pressLocation.end() + diff));
+			else if(pressLocation.start()+diff<=0){
+				model.setAnnotationLocationVisible(new Location(1, model.getAnnotationLocationVisible().length()));
+			}else if(pressLocation.end()+diff>full.end())
+				model.setAnnotationLocationVisible(new Location(full.end()- model.getAnnotationLocationVisible().length()-1,full.end()));
 		}
 	}
 
@@ -104,13 +112,47 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 	public void paintComponent(Graphics g1) {
 		super.paintComponent(g1);
 		Graphics2D g = (Graphics2D) g1;
+		/* Paint tick marks */
+		Location r = new Location(1, model.getSelectedEntry().size());
+		g.setColor(Color.BLACK);
+        g.drawLine(0,15, g.getClipBounds().width, 15);
+
+       
+        // determine the tickDistance, we aim for 10 ticks on screen.
+        int length = r.length();
+        int scale = (int) Math.log10(length / 10.0);
+        int multiplier = (int) (length / Math.pow(10, scale + 1));
+        int tickDistance = (int) (Math.pow(10, scale) * multiplier);
+        if (tickDistance == 0)
+            tickDistance = 1;
+        // paint the ticks
+        int currentTick = (r.start() - r.start() % tickDistance) + 1;
+        boolean up = true;
+        while (currentTick < r.end()) {
+            int xpos = Convert.translateGenomeToScreen(currentTick, r,this.getWidth());
+            String s = "" + currentTick;
+
+//            if (up) {
+//                g.drawLine(xpos,  2, xpos,  28);
+//                g.drawString(s, xpos + 2,  14);
+//            } else {
+                g.drawLine(xpos,  2, xpos,  28);
+                g.drawString(s, xpos + 2,  26);
+//            }
+//            up = !up;
+
+            currentTick += tickDistance;
+
+        }
+		
+		
 		Dimension dim = this.getSize();
 		Location full = new Location(1, model.getSelectedEntry().size());
 		Location current = model.getAnnotationLocationVisible();
 		int start = Convert.translateGenomeToScreen(current.start(), full, dim.width);
 		int end = Convert.translateGenomeToScreen(current.end(), full, dim.width);
 		g.setColor(Color.BLACK);
-		g.drawLine(0, 7, dim.width, 7);
+//		g.drawLine(0, 7, dim.width, 7);
 		visibleRec = new Rectangle(start, 0, end - start + 1, 14);
 		dragRec = new Rectangle(start-15, 0, end - start + 31, 14);
 
@@ -169,7 +211,9 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
+		Location full = new Location(1, model.getSelectedEntry().size());
+		int x=Convert.translateScreenToGenome(pressed.getX(), full, this.getWidth());
+		model.center(x);
 
 	}
 

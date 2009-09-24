@@ -244,6 +244,7 @@ public class Model extends Observable implements IModel {
 	public void setAnnotationLocationVisible(Location r) {
 		int start = r.start();
 		int end = r.end();
+		int len=end-start+1;
 		if (start > end) {
 			return;
 		}
@@ -254,12 +255,16 @@ public class Model extends Observable implements IModel {
 			modStart = start;
 		} else {
 			modStart = 1;
+			modEnd=len;
 		}
 		int chromLength = getSelectedEntry().size();
 		if (end < chromLength || chromLength == 0) {
 			modEnd = end;
 		} else {
 			modEnd = chromLength;
+			modStart=modEnd-len;
+			if(modStart<1)
+				modStart=1;
 		}
 		Location newZoom = new Location(modStart, modEnd);
 

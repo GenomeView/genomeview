@@ -27,7 +27,8 @@ public class AnnotationZoomOutAction extends AbstractModelAction {
         double center = end - (end - start) / 2;
         int newStart = (int) (center - (end - start) * 0.75);
         int newEnd = (int) (center + (end - start) * 0.75);
-        model.setAnnotationLocationVisible(new Location(newStart, newEnd));
+        if(enabled)
+        	model.setAnnotationLocationVisible(new Location(newStart, newEnd));
 
     }
 
