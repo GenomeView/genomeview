@@ -34,9 +34,11 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.Qualifier;
+import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.source.DataSource;
+import net.sf.jannot.wiggle.ShortReadCoverage;
 
 public class FeatureTrack extends Track {
 	/* Type that is represented by this track */
@@ -296,17 +298,15 @@ public class FeatureTrack extends Track {
 					CountMap<Integer> cm = new CountMap<Integer>();
 					for (DataSource source : sources) {
 						ReadGroup rg = model.getSelectedEntry().shortReads.getReadGroup(source);
-//						if (f.end() >= rg.getForwardPileUp().size())
-//							text.append("Still calculating mean short read coverage...");
-//						else {
-//							for (Location l : f.location()) {
-//								for (int i = l.start(); i <= l.end(); i++) {
-//									cm.count(rg.getForwardPileUp().get(i) + rg.getReversePileUp().get(i));
-//								}
-//							}
-//							text.append("Mean short read coverage (" + source + "): " + median(cm)+ "<br />");
-//						}
+						ShortReadCoverage src = rg.getCoverage();
+						for (Location l : f.location()) {
+							for (int i = l.start(); i <= l.end(); i++) {
+								cm.count((int)(src.get(Strand.FORWARD, i-1)+src.get(Strand.REVERSE, i-1)));
+							}
+						}
+						text.append("Mean short read coverage (" + source + "): " + median(cm) + "<br />");
 					}
+					// }
 
 				}
 				text.append("</html>");

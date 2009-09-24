@@ -87,10 +87,10 @@ public class ShortReadTrack extends Track {
 			if (!tooltip.isVisible())
 				tooltip.setVisible(true);
 			ReadGroup rg = currentEntry.shortReads.getReadGroup(this.source);
-			ShortReadCoverage currentBuffer = buffers.get(rg);
+			ShortReadCoverage currentBuffer = rg.getCoverage();
 			int start = Convert.translateScreenToGenome(x, currentVisible, currentScreenWidth);
-			int f=(int)currentBuffer.get(Strand.FORWARD,start);
-			int r=(int)currentBuffer.get(Strand.REVERSE,start);
+			int f=(int)currentBuffer.get(Strand.FORWARD,start-1);
+			int r=(int)currentBuffer.get(Strand.REVERSE,start-1);
 			tooltip.set(f, r, f+r, source);
 		} else {
 			if (tooltip.isVisible())
@@ -106,7 +106,7 @@ public class ShortReadTrack extends Track {
 		this.source = source;
 	}
 
-	private Map<ReadGroup, ShortReadCoverage> buffers = new HashMap<ReadGroup, ShortReadCoverage>();
+	
 
 	private int scale = 1;
 	private int scaleIndex = 0;
@@ -168,20 +168,18 @@ public class ShortReadTrack extends Track {
 		int end = ((currentVisible.end() / scale) + 1) * scale;
 
 		ReadGroup rg = entry.shortReads.getReadGroup(source);
-		if (!buffers.containsKey(rg))
-			buffers.put(rg, new ShortReadCoverage(rg, entry.size()));
-		ShortReadCoverage graph = buffers.get(rg);
+		ShortReadCoverage graph = rg.getCoverage();//.get(rg);
 
 	
 		GeneralPath conservationGP = new GeneralPath();
 		GeneralPath conservationGPF = new GeneralPath();
 		GeneralPath conservationGPR = new GeneralPath();
 	
-		float[] f = graph.get(Strand.FORWARD, start, end, scaleIndex);
-		float[] r = graph.get(Strand.REVERSE, start, end, scaleIndex);
+		float[] f = graph.get(Strand.FORWARD, start-1, end, scaleIndex);
+		float[] r = graph.get(Strand.REVERSE, start-1, end, scaleIndex);
 		
 		for (int i = 0; i < f.length; i++) {
-			int x = Convert.translateGenomeToScreen(start + i * scale + 1, currentVisible, screenWidth) + 5;
+			int x = Convert.translateGenomeToScreen(start + i * scale, currentVisible, screenWidth);
 			double valF = f[i];
 			double valR = r[i];
 			double val = f[i] + r[i];
