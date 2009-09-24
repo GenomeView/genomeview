@@ -164,8 +164,8 @@ public class ShortReadTrack extends Track {
 			scaleIndex++;
 		}
 
-		int start = currentVisible.start() / scale * scale;
-		int end = ((currentVisible.end() / scale) + 1) * scale;
+		int start = currentVisible.start / scale * scale;
+		int end = ((currentVisible.end / scale) + 1) * scale;
 
 		ReadGroup rg = entry.shortReads.getReadGroup(source);
 		ShortReadCoverage graph = rg.getCoverage();//.get(rg);
@@ -242,8 +242,6 @@ public class ShortReadTrack extends Track {
 				/* Update readLength for paired reads */
 				readLength = ((BAMreads) rg).getPairLength();
 
-			} else {
-				reads = rg.get(currentVisible);
 			}
 		}
 		int maxPairingDistance = Configuration.getInt("shortread:maximumPairing");
@@ -278,10 +276,10 @@ public class ShortReadTrack extends Track {
 						break;
 					}
 
-					int x2 = Convert.translateGenomeToScreen(one.end() + 1, currentVisible, screenWidth);
+//					int x2 = Convert.translateGenomeToScreen(one.end() + 1, currentVisible, screenWidth);
 					// if (x2 > 0) {
 					/* Find empty line */
-					int pos = one.start() - currentVisible.start();
+					int pos = one.start() - currentVisible.start;
 					int line = line(one, pos, tilingCounter);
 					if (line > maxStack) {
 						stackExceeded = true;
@@ -300,7 +298,7 @@ public class ShortReadTrack extends Track {
 						if (two != null) {
 							if (two.start() < one.start()) {
 
-								pos = two.start() - currentVisible.start();
+								pos = two.start() - currentVisible.start;
 								line = line(two, pos, tilingCounter);
 								clearStart = two.start();
 							} else {
@@ -311,9 +309,10 @@ public class ShortReadTrack extends Track {
 					}
 					/* Carve space out of hitmap */
 					for (int i = clearStart - readLength; i <= clearEnd + 3; i++) {
-						pos = i - currentVisible.start();
+						pos = i - currentVisible.start;
 						if (pos >= 0 && pos < tilingCounter.length)
 							tilingCounter[pos].set(line);
+						
 					}
 
 					int yRec = line * readLineHeight + yOffset;
@@ -372,7 +371,7 @@ public class ShortReadTrack extends Track {
 
 	private int line(ShortRead one, int pos, BitSet[] tilingCounter) {
 		if (pos >= 0 && pos < tilingCounter.length)
-			return tilingCounter[one.start() - currentVisible.start()].nextClearBit(0);
+			return tilingCounter[one.start() - currentVisible.start].nextClearBit(0);
 		else
 			return tilingCounter[0].nextClearBit(0);
 
