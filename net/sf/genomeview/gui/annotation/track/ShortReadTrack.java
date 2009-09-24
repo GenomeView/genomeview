@@ -29,8 +29,8 @@ import net.sf.jannot.shortread.BAMreads;
 import net.sf.jannot.shortread.ExtendedShortRead;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortRead;
+import net.sf.jannot.shortread.ShortReadCoverage;
 import net.sf.jannot.source.DataSource;
-import net.sf.jannot.wiggle.ShortReadCoverage;
 
 public class ShortReadTrack extends Track {
 
@@ -255,7 +255,7 @@ public class ShortReadTrack extends Track {
 
 			BitSet[] tilingCounter = new BitSet[currentVisible.length()];
 			for (int i = 0; i < tilingCounter.length; i++) {
-				tilingCounter[i] = new BitSet();
+				tilingCounter[i] = new BitSet(maxStack);
 			}
 			int visibleReadCount = 0;
 			try {

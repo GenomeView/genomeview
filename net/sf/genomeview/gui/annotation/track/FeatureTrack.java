@@ -37,8 +37,8 @@ import net.sf.jannot.Qualifier;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.shortread.ReadGroup;
+import net.sf.jannot.shortread.ShortReadCoverage;
 import net.sf.jannot.source.DataSource;
-import net.sf.jannot.wiggle.ShortReadCoverage;
 
 public class FeatureTrack extends Track {
 	/* Type that is represented by this track */
