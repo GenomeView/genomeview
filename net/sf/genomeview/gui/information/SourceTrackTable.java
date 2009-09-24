@@ -23,7 +23,7 @@ public class SourceTrackTable extends JTable {
 	public SourceTrackTable(final Model model) {
 		super(new SourceTrackListModel(model));
 	
-		SourceTrackListModel listModel = (SourceTrackListModel) this.getModel();
+		final SourceTrackListModel listModel = (SourceTrackListModel) this.getModel();
 		getTableHeader().addMouseMotionListener(new ColumnHeaderToolTips(listModel));
 		/* Set column widths */
 		setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
@@ -41,7 +41,7 @@ public class SourceTrackTable extends JTable {
 			public void mouseReleased(MouseEvent e) {
 				int column = getSelectedColumn();
 				int row = getSelectedRow();
-				DataSource type = (DataSource) getValueAt(row, 0);
+				DataSource type = listModel.sources().get(row);
 				if (column == 1) {
 					System.out.println("Setting visibility " + type + " " + !model.isSourceVisible(type));
 					model.setSourceVisibility(type, !model.isSourceVisible(type));

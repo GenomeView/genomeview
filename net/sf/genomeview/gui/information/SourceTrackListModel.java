@@ -49,6 +49,7 @@ public class SourceTrackListModel extends AbstractTableModel implements Observer
         return sources.size();
     }
 
+    
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
@@ -71,7 +72,7 @@ public class SourceTrackListModel extends AbstractTableModel implements Observer
     public Class<?> getColumnClass(int arg0) {
         switch (arg0) {
         case 0:
-            return DataSource.class;
+            return String.class;
 
         default:
             return ImageIcon.class;
