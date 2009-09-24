@@ -523,11 +523,12 @@ public class ShortReadTrack extends Track {
 
 	private Color forwardColor;
 
-	private static final double LOG2=Math.log(2);
-	
-	private double log2(double d){
-		return Math.log(d)/LOG2;
+	private static final double LOG2 = Math.log(2);
+
+	private double log2(double d) {
+		return Math.log(d) / LOG2;
 	}
+
 	@Override
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
 		currentEntry = entry;
@@ -567,8 +568,8 @@ public class ShortReadTrack extends Track {
 
 		ReadGroup rg = entry.shortReads.getReadGroup(source);
 		if (!buffers.containsKey(rg))
-			buffers.put(rg, new ShortReadCoverage(rg,entry.size()));
-		Graph graph = buffers.get(rg);
+			buffers.put(rg, new ShortReadCoverage(rg, entry.size()));
+		ShortReadCoverage graph = buffers.get(rg);
 
 		// System.out.println(entry.shortReads+"\t"+rg+"\t"+source);
 		// if (rg != null) {
@@ -585,52 +586,59 @@ public class ShortReadTrack extends Track {
 		// if (b != null) {
 
 		GeneralPath conservationGP = new GeneralPath();
-//		GeneralPath conservationGPF = new GeneralPath();
-//		GeneralPath conservationGPR = new GeneralPath();
+		GeneralPath conservationGPF = new GeneralPath();
+		GeneralPath conservationGPR = new GeneralPath();
 		// for (int i = 0; i < (end - start) / scale; i++) {
 
 		// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
 		// (lineHeigh - 4) + 2);
-		float[] v = graph.get(start, end, scaleIndex);
+		float[] f = graph.get(Strand.FORWARD, start, end, scaleIndex);
+		float[] r = graph.get(Strand.REVERSE, start, end, scaleIndex);
 		// double vf = b.getForward(start + i * scale, scale);
 		// double vr = b.getReverse(start + i * scale, scale);
 
 		// if(i==100)
 		// checkValue=v;
 
-		for (int i = 0; i < v.length; i++) {
+		for (int i = 0; i < f.length; i++) {
 			int x = Convert.translateGenomeToScreen(start + i * scale + 1, currentVisible, screenWidth) + 5;
-			double val=v[i];
+			double valF = f[i];
+			double valR = r[i];
+			double val = f[i] + r[i];
 			/* Cap value */
-			if(val>graph.max())
-				val=graph.max();
-			val=log2(val);
-			val/=log2(graph.max());
-			if (i == 0)
+			if (valF > graph.max())
+				valF = graph.max();
+			if (valR > graph.max())
+				valR = graph.max();
+			if (val > graph.max())
+				val = graph.max();
+			/* Logaritmic scaling */
+			valF = log2(valF);
+			valF /= log2(graph.max());
+			valR = log2(valR);
+			valR /= log2(graph.max());
+			val = log2(val);
+			val /= log2(graph.max());
+
+			/* Draw lines */
+			if (i == 0) {
 				conservationGP.moveTo(x - 1, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
-			// conservationGPF.moveTo(x - 1, yOffset + (1 - vf) *
-			// (graphLineHeigh -
-			// 4) + 2);
-			// conservationGPR.moveTo(x - 1, yOffset + (1 - vr) *
-			// (graphLineHeigh -
-			// 4) + 2);
+				conservationGPF.moveTo(x - 1, yOffset + (1 - valF) * (graphLineHeigh - 4) + 2);
+				conservationGPR.moveTo(x - 1, yOffset + (1 - valR) * (graphLineHeigh - 4) + 2);
+			}
 
 			conservationGP.lineTo(x, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
-			// conservationGPF.lineTo(x, yOffset + (1 - vf) * (graphLineHeigh -
-			// 4) +
-			// 2);
-			// conservationGPR.lineTo(x, yOffset + (1 - vr) * (graphLineHeigh -
-			// 4) +
-			// 2);
+			conservationGPF.lineTo(x, yOffset + (1 - valF) * (graphLineHeigh - 4) + 2);
+			conservationGPR.lineTo(x, yOffset + (1 - valR) * (graphLineHeigh - 4) + 2);
 
 		}
 
 		/* Draw coverage lines */
-		// g.setColor(forwardColor);
-		// g.draw(conservationGPF);
-		//		
-		// g.setColor(reverseColor);
-		// g.draw(conservationGPR);
+		g.setColor(forwardColor);
+		g.draw(conservationGPF);
+
+		g.setColor(reverseColor);
+		g.draw(conservationGPR);
 		g.setColor(Color.BLACK);
 		g.draw(conservationGP);
 
