@@ -22,6 +22,7 @@ import javax.swing.border.Border;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
@@ -221,7 +222,7 @@ public class ShortReadTrack extends Track {
 		g.draw(conservationGP);
 
 		g.setColor(Color.BLUE);
-		g.drawString(source.toString() + " (" + scale + ")", 10, yOffset + 12 - 2);
+		g.drawString(StaticUtils.shortify(source.toString()) + " (" + scale + ")", 10, yOffset + 12 - 2);
 		yOffset += graphLineHeigh;
 		// }
 

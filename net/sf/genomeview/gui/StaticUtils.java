@@ -62,8 +62,7 @@ public abstract class StaticUtils {
 	public static void center(Window window) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension windowSize = window.getPreferredSize();
-		window.setLocation(screenSize.width / 2 - (windowSize.width / 2),
-				screenSize.height / 2 - (windowSize.height / 2));
+		window.setLocation(screenSize.width / 2 - (windowSize.width / 2), screenSize.height / 2 - (windowSize.height / 2));
 
 	}
 
@@ -82,6 +81,11 @@ public abstract class StaticUtils {
 		if (splitFeature == null)
 			splitFeature = new SplitFeatureDialog(model);
 		return splitFeature;
+	}
+
+	public static String shortify(String in) {
+		String s = in.replace('\\', '/');
+		return s.substring(s.lastIndexOf('/'));
 	}
 
 	public static String escapeHTML(String in) {
@@ -107,11 +111,11 @@ public abstract class StaticUtils {
 			Desktop.getDesktop().browse(uri);
 		} catch (IOException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Could not open the specified url: "+uri, "URL open failed", JOptionPane.ERROR_MESSAGE);
-		}catch (UnsupportedOperationException e){
+			JOptionPane.showMessageDialog(null, "Could not open the specified url: " + uri, "URL open failed", JOptionPane.ERROR_MESSAGE);
+		} catch (UnsupportedOperationException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Could not open the specified url: "+uri, "URL open failed", JOptionPane.ERROR_MESSAGE);
-			
+			JOptionPane.showMessageDialog(null, "Could not open the specified url: " + uri, "URL open failed", JOptionPane.ERROR_MESSAGE);
+
 		}
 
 	}

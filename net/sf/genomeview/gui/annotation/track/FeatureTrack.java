@@ -22,12 +22,11 @@ import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
-import be.abeel.util.CountMap;
-
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
+import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.annotation.GeneEvidenceLabel.FillMode;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.jannot.Entry;
@@ -39,6 +38,7 @@ import net.sf.jannot.Type;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortReadCoverage;
 import net.sf.jannot.source.DataSource;
+import be.abeel.util.CountMap;
 
 public class FeatureTrack extends Track {
 	/* Type that is represented by this track */
@@ -297,6 +297,7 @@ public class FeatureTrack extends Track {
 
 					CountMap<Integer> cm = new CountMap<Integer>();
 					for (DataSource source : sources) {
+						cm.clear();
 						ReadGroup rg = model.getSelectedEntry().shortReads.getReadGroup(source);
 						ShortReadCoverage src = rg.getCoverage();
 						for (Location l : f.location()) {
@@ -304,7 +305,9 @@ public class FeatureTrack extends Track {
 								cm.count((int)(src.get(Strand.FORWARD, i-1)+src.get(Strand.REVERSE, i-1)));
 							}
 						}
-						text.append("Mean short read coverage (" + source + "): " + median(cm) + "<br />");
+						
+						
+						text.append("Mean short read coverage (" + StaticUtils.shortify(source.toString()) + "): " + median(cm) + "<br />");
 					}
 					// }
 

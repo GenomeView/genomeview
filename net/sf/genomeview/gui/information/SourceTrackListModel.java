@@ -12,6 +12,7 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.source.DataSource;
 
 public class SourceTrackListModel extends AbstractTableModel implements Observer {
@@ -55,10 +56,7 @@ public class SourceTrackListModel extends AbstractTableModel implements Observer
         switch (columnIndex) {
         case 0:
         	String source=sources.get(rowIndex).toString();
-        	if(source.indexOf('/')>=0)
-        		return source.substring(source.lastIndexOf('/'));
-        	else
-        		return source;
+        	return StaticUtils.shortify(source);
         case 1:
             if (model.isSourceVisible(sources.get(rowIndex)))
                 return Icons.YES;
