@@ -7,7 +7,7 @@
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/collections-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/ajt-2.2.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/picardfix"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JAnnot"/>
+	<classpathentry kind="lib" path="lib/jannot-1.996.jar"/>
+	<classpathentry kind="lib" path="lib/sam-819.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
