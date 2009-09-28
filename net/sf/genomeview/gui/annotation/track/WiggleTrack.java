@@ -10,12 +10,8 @@ import java.awt.geom.GeneralPath;
 import net.sf.genomeview.core.ColorFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
-import net.sf.jannot.Strand;
-import net.sf.jannot.shortread.ReadGroup;
-import net.sf.jannot.shortread.ShortReadCoverage;
 import net.sf.jannot.wiggle.Graph;
 
 // A SINGLE WIGGLE TRACK CAN CONTAIN MULTIPLE GRAPHS
