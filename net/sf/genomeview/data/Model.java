@@ -242,6 +242,9 @@ public class Model extends Observable implements IModel {
 	 */
 
 	public void setAnnotationLocationVisible(Location r) {
+		if(this.entries.getEntry().size()>5&&r.length()<25){
+			r=new Location(r.start()-50,r.end()+50);
+		}
 		int start = r.start();
 		int end = r.end();
 		int len=end-start+1;
