@@ -5,20 +5,68 @@ package net.sf.genomeview.gui.annotation.track;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
+
+import javax.swing.AbstractAction;
+import javax.swing.JPopupMenu;
 
 import net.sf.genomeview.core.ColorFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.Mouse;
+import net.sf.genomeview.gui.menu.PopUpMenu;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.wiggle.Graph;
 
 // A SINGLE WIGGLE TRACK CAN CONTAIN MULTIPLE GRAPHS
 public class WiggleTrack extends Track {
+	private boolean logScaled = false;
+
+	class WigglePopup extends JPopupMenu {
+		public WigglePopup() {
+			if(!logScaled)
+				add(new AbstractAction("Use log scaling"){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						logScaled=true;
+						model.refresh();
+						
+					}
+					
+				});
+			else{
+				add(new AbstractAction("Use normal scaling"){
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						logScaled=false;
+						model.refresh();
+						
+					}
+					
+				});
+			}
+		}
+	}
+
+	@Override
+	public boolean mouseClicked(int x, int y, MouseEvent e) {
+		/* Specific mouse code for this label */
+		if (Mouse.button2(e) || Mouse.button3(e)) {
+			new WigglePopup().show(e.getComponent(), e.getX(), currentYOffset+e.getY());
+			return true;
+		}
+		return false;
+
+	}
 
 	private String name;
 	private Location currentVisible;
+	private int currentYOffset;
 
 	public WiggleTrack(String name, Model model, boolean b) {
 		super(model, b, true);
@@ -31,10 +79,15 @@ public class WiggleTrack extends Track {
 	}
 
 	// private HashMap<Entry, Graph> graphs = new HashMap<Entry, Graph>();
+	private static final double LOG2 = Math.log(2);
 
+	private double log2(double d) {
+		return Math.log(d) / LOG2;
+	}
 	@Override
 	public int paintTrack(Graphics2D g, Entry e, int yOffset, double screenWidth) {
 		currentVisible = model.getAnnotationLocationVisible();
+		currentYOffset=yOffset;
 		int graphLineHeigh = 50;
 		/* keeps track of the space used during painting */
 		int yUsed = 0;
@@ -65,7 +118,17 @@ public class WiggleTrack extends Track {
 					val = graph.max();
 
 				val -= graph.min();
-				val /= graph.max() - graph.min();
+				double range= graph.max() - graph.min();
+				if(logScaled){
+					val+=1;
+					val = log2(val);
+					val /= log2(range);
+				}
+				else{
+					val /=range;
+				}
+				
+				
 				if (!isCollapsed()) {
 					/* Draw lines */
 					if (i == 0) {
@@ -88,8 +151,8 @@ public class WiggleTrack extends Track {
 
 			g.setColor(Color.black);
 			g.drawString(graph.getName(), 10, yOffset + yUsed + 15);
-			if(isCollapsed())
-				yUsed+=10;
+			if (isCollapsed())
+				yUsed += 10;
 			else
 				yUsed += graphLineHeigh;
 		}
