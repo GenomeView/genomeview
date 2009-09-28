@@ -20,7 +20,7 @@ public class RemoveAction extends AbstractModelAction implements Observer {
 	public RemoveAction(Model model) {
 		super("Remove selected feature", model);
 		model.addObserver(this);
-		setEnabled(model.getFeatureSelection() != null);
+		setEnabled(model.getFeatureSelection() != null&&model.getFeatureSelection().size()>0);
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
@@ -33,7 +33,7 @@ public class RemoveAction extends AbstractModelAction implements Observer {
 	}
 
 	public void update(Observable o, Object arg) {
-		setEnabled(model.getFeatureSelection() != null);
+		setEnabled(model.getFeatureSelection() != null&&model.getFeatureSelection().size()>0);
 
 	}
 

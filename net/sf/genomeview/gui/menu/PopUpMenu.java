@@ -3,10 +3,12 @@
  */
 package net.sf.genomeview.gui.menu;
 
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPopupMenu;
 
@@ -20,9 +22,6 @@ import net.sf.genomeview.gui.menu.edit.SplitFeatureAction;
 import net.sf.genomeview.gui.menu.selection.ClearFeatureSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ClearRegionSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ShowSequenceWindowAction;
-import net.sf.genomeview.gui.menu.selection.ZoomToSelectedFeaturesAction;
-import net.sf.genomeview.gui.menu.selection.ZoomToSelectedLocationAction;
-import net.sf.genomeview.gui.menu.selection.ZoomToSelectionAction;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Qualifier;
 
@@ -31,6 +30,7 @@ public class PopUpMenu extends JPopupMenu {
 
     private static final long serialVersionUID = 2573433669184123608L;
 
+    private int count=0;
     public PopUpMenu(Model model) {
         addC(new RemoveAction(model));
         addC(new EditStructureAction(model));
@@ -59,13 +59,33 @@ public class PopUpMenu extends JPopupMenu {
         	addSeparator();
         for(Action a:actions)
         	add(a);
+        count+=actions.size();
+        if(count==0){
+        	add(new AbstractAction("No actions available"){
+
+        	
+				
+				@Override
+				public boolean isEnabled() {
+					return false;
+				}
+
+				public void actionPerformed(ActionEvent e) {
+									
+				}
+        	
+        	
+        	});
+        }
         
 
     }
 
 	private void addC(Action a) {
-		if(a.isEnabled())
+		if(a.isEnabled()){
+			count++;
 			add(a);
+		}
 		
 	}
 
