@@ -16,7 +16,7 @@ public class ClearRegionSelectionAction extends AbstractModelAction implements O
     private static final long serialVersionUID = 3091007204195190317L;
 
     public ClearRegionSelectionAction(Model model) {
-        super("Clear Location selection", model);
+        super("Clear region selection", model);
         model.addObserver(this);
         setEnabled(model.getSelectedRegion()!=null);
     }

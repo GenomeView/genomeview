@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.PopupMenu;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -20,6 +21,7 @@ import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.annotation.track.StructureTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
+import net.sf.genomeview.gui.menu.PopUpMenu;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 
@@ -264,7 +266,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			return;
 		/* Specific mouse code for this label */
 		if (Mouse.button2(e) || Mouse.button3(e)) {
-			StaticUtils.popupMenu(model).show(this, e.getX(), y);
+			new PopUpMenu(model).show(this, e.getX(), y);
 		}
 	}
 }

@@ -224,12 +224,12 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 			}
 
 			text += "---------------------------------------<br/>";
-			int hash = text.hashCode();
-			if (hash != lastHash) {
+//			int hash = text.hashCode();
+//			if (hash != lastHash) {
 				name.setText("<html>" + text + "</html>");
 				name.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
-				lastHash = hash;
-			}
+//				lastHash = hash;
+//			}
 
 		} else {
 			name.setText("");

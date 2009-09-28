@@ -39,18 +39,10 @@ public abstract class StaticUtils {
 		return editStructure;
 	}
 
-	private static PopUpMenu structurePopup = null;
-
 	private static MergeFeatureDialog mergeFeature = null;
 
 	private static SplitFeatureDialog splitFeature;
 
-	public static JPopupMenu popupMenu(Model model) {
-		if (structurePopup == null)
-			structurePopup = new PopUpMenu(model);
-
-		return structurePopup;
-	}
 
 	/**
 	 * Centers the window on the screen. This method should always be called
