@@ -260,6 +260,8 @@ public class ConfigurationDialog extends JDialog {
 		private static final long serialVersionUID = 7503579007314777946L;
 
 		public StructureConfigPanel() {
+			this.add(new BooleanConfig("track:showStructure", "Show structure track on start-up"), gc);
+			gc.gridy++;
 			this.add(new IntegerConfig("geneStructureLineHeight", "Height of a track in pixels"), gc);
 			gc.gridy++;
 			this.add(new BooleanConfig("colorStartCodons", "Color start codons"), gc);
