@@ -140,9 +140,30 @@ class ChromosomeListModel extends DefaultComboBoxModel implements Observer {
 
 	private static final long serialVersionUID = -3028394066023453566L;
 
+	static class DummyEntry extends Entry {
+		public DummyEntry() {
+			super(null);
+		}
+
+		@Override
+		public String getID() {
+			return null;
+		}
+
+		@Override
+		public String toString() {
+			return "Nothing loaded";
+		}
+
+	}
+
+	private Entry dummy = new DummyEntry();
 	@Override
-	public Object getElementAt(int arg0) {
-		return model.entry(arg0);
+	public Object getElementAt(int i) {
+		if(model.entries().size()>0)
+			return model.entries().getEntry(i);
+		else 
+			return dummy;
 	}
 
 	@Override

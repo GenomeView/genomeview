@@ -85,10 +85,10 @@ public class Model extends Observable implements IModel {
 		return null;
 	}
 
-	public Entry entry(int index) {
-		// FIXME still needed?
-		return entries.getEntry(index);
-	}
+//	public Entry entry(int index) {
+//		// FIXME still needed?
+//		return entries.getEntry(index);
+//	}
 
 	public void update(Observable arg0, Object arg) {
 		if (arg instanceof ChangeEvent) {
@@ -132,6 +132,13 @@ public class Model extends Observable implements IModel {
 
 	}
 
+
+	/**
+	 * Gives the index of the selected entry
+	 * 
+	 * @return
+	 */
+
 	static class DummyEntry extends Entry {
 		public DummyEntry() {
 			super(null);
@@ -150,13 +157,6 @@ public class Model extends Observable implements IModel {
 	}
 
 	private Entry dummy = new DummyEntry();
-
-	/**
-	 * Gives the index of the selected entry
-	 * 
-	 * @return
-	 */
-
 	public Entry getSelectedEntry() {
 		if (entries.size() == 0)
 			return dummy;
@@ -248,7 +248,7 @@ public class Model extends Observable implements IModel {
 	 */
 
 	public void setAnnotationLocationVisible(Location r) {
-		if(this.entries.getEntry().size()>5&&r.length()<25){
+		if(this.getSelectedEntry().size()>5&&r.length()<25){
 			r=new Location(r.start()-50,r.end()+50);
 		}
 		int start = r.start();

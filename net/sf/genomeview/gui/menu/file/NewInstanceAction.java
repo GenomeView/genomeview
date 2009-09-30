@@ -21,7 +21,7 @@ public class NewInstanceAction extends AbstractModelAction {
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        GenomeView.createNewInstance();
+      GenomeView.single.newActivation(new String[0]);
     }
 
 }

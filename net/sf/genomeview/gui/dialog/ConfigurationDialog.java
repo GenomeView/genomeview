@@ -315,6 +315,8 @@ public class ConfigurationDialog extends JDialog {
 			gc.weightx=1;
 			this.add(new BooleanConfig("dualscreen", "Enable dual-screen mode? (Requires restart)"), gc);
 			gc.gridy++;
+			this.add(new BooleanConfig("general:singleInstance", "Allow only one instance of GenomeView"), gc);
+			gc.gridy++;
 			this.add(new BooleanConfig("geneticCodeSelection", "Enable genetic code selection? (Requires restart)"), gc);
 			
 			gc.gridy++;
