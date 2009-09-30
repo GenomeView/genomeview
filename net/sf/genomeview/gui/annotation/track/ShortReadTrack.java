@@ -132,9 +132,11 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
+		
 		/* Store information to be used in other methods */
 		currentEntry = entry;
 		currentScreenWidth = screenWidth;
+		seqBuffer=null;
 		/* Configuration options */
 		int maxReads = Configuration.getInt("shortread:maxReads");
 		int maxRegion = Configuration.getInt("shortread:maxRegion");
@@ -378,6 +380,7 @@ public class ShortReadTrack extends Track {
 
 	}
 
+	private char[]seqBuffer=null;
 	private void paintRead(Graphics2D g, ShortRead rf, int yRec, double screenWidth, int readLineHeight, Entry entry) {
 		Color c = Color.GRAY;
 		if (rf.strand() == Strand.FORWARD)
@@ -398,9 +401,15 @@ public class ShortReadTrack extends Track {
 
 		/* Check mismatches */
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+			if(seqBuffer==null)
+				seqBuffer=entry.sequence.getSubSequence(currentVisible.start, currentVisible.end+1).toCharArray();
 			for (int j = rf.start(); j <= rf.end(); j++) {
+				if(j>currentVisible.end||j<=currentVisible.start)
+					continue;
 				char readNt = rf.getNucleotide(j - rf.start() + 1);
-				char refNt = entry.sequence.getNucleotide(j);
+//				char refNt = entry.sequence.getNucleotide(j);
+				
+				char refNt=seqBuffer[j-currentVisible.start];
 				double tx1 = Convert.translateGenomeToScreen(j, currentVisible, screenWidth);
 				double tx2 = Convert.translateGenomeToScreen(j + 1, currentVisible, screenWidth);
 
