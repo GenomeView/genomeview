@@ -400,7 +400,7 @@ public class ShortReadTrack extends Track {
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			for (int j = rf.start(); j <= rf.end(); j++) {
 				char readNt = rf.getNucleotide(j - rf.start() + 1);
-				char refNt = Character.toUpperCase(entry.sequence.getNucleotide(j));
+				char refNt = entry.sequence.getNucleotide(j);
 				double tx1 = Convert.translateGenomeToScreen(j, currentVisible, screenWidth);
 				double tx2 = Convert.translateGenomeToScreen(j + 1, currentVisible, screenWidth);
 

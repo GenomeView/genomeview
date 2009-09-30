@@ -7,13 +7,13 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
@@ -39,6 +39,7 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
+import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.wiggle.Graph;
@@ -163,9 +164,14 @@ public class Model extends Observable implements IModel {
 	}
 
 	public void setSelectedEntry(Entry entry) {
+		for(Entry e:entries)
+			for(ReadGroup rg:e.shortReads.getReadGroups()){
+				rg.release();
+			}
 		entries.setDefault(entry);
 		selectedLocation.clear();
 		selectedRegion = null;
+		
 		setAnnotationLocationVisible(getAnnotationLocationVisible());
 
 		refresh(NotificationTypes.ENTRYCHANGED);
@@ -700,7 +706,7 @@ public class Model extends Observable implements IModel {
 	}
 
 	/* Cache of the sources that are currently loaded */
-	private Set<DataSource> loadedSources = new HashSet<DataSource>();
+	private ConcurrentSkipListSet<DataSource> loadedSources = new ConcurrentSkipListSet<DataSource>();
 
 	private int pressTrack;
 
