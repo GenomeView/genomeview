@@ -315,7 +315,14 @@ public class MainWindow implements WindowListener, Observer {
 		String initialLocation = (String) parser.getOptionValue(positionO);
 		if (initialLocation != null) {
 			String[] arr = initialLocation.split(":");
-			model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[0]), Integer.parseInt(arr[1])));
+			assert arr.length==2||arr.length==3;
+			if(arr.length==3){
+				model.setSelectedEntry(model.entry(arr[0]));
+				model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[1]), Integer.parseInt(arr[2])));
+			}else if(arr.length==2){
+				model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[0]), Integer.parseInt(arr[1])));	
+			}
+			
 
 		}
 		
