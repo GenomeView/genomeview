@@ -85,10 +85,6 @@ public class Model extends Observable implements IModel {
 		return null;
 	}
 
-//	public Entry entry(int index) {
-//		// FIXME still needed?
-//		return entries.getEntry(index);
-//	}
 
 	public void update(Observable arg0, Object arg) {
 		if (arg instanceof ChangeEvent) {
