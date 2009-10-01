@@ -8,7 +8,7 @@
 	<classpathentry kind="lib" path="lib/collections-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/ajt-2.2.jar"/>
 	<classpathentry kind="lib" path="lib/sam-819.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JAnnot"/>
 	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.6.0_13/jre/lib/javaws.jar"/>
+	<classpathentry kind="lib" path="lib/jannot-664.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
