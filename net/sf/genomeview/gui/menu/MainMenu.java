@@ -22,7 +22,6 @@ import net.sf.genomeview.gui.menu.file.ClearEntriesAction;
 import net.sf.genomeview.gui.menu.file.ExitAction;
 import net.sf.genomeview.gui.menu.file.LoadFeaturesAction;
 import net.sf.genomeview.gui.menu.file.LoadSessionAction;
-import net.sf.genomeview.gui.menu.file.NewInstanceAction;
 import net.sf.genomeview.gui.menu.file.SaveAction;
 import net.sf.genomeview.gui.menu.file.SaveAsAction;
 import net.sf.genomeview.gui.menu.file.SaveSessionAction;
@@ -47,7 +46,6 @@ public class MainMenu extends JMenuBar {
 
 	public MainMenu(Model model, MainWindow mainWindow) {
 		JMenu file = new JMenu("File");
-		file.add(new NewInstanceAction(model));
 		file.add(new ClearEntriesAction(model));
 		file.addSeparator();
 		file.add(new SaveSessionAction(model));

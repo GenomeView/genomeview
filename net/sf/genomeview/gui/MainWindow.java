@@ -146,6 +146,13 @@ public class MainWindow implements WindowListener, Observer {
 		if (model.isExitRequested()) {
 			System.out.println("Disposing the window here.");
 			dispose();
+			try {
+				Configuration.save();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.exit(0);
 		}
 	}
 
