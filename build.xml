@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="651" />
+	<property name="version" value="669" />
 	<property name="src" value="." />
 	<property name="build" value="build" />
 	<property name="lib" value="lib" />
@@ -100,6 +100,7 @@
 				<fileset dir="${lib}">
 					<include name="**/*.jar" />
 				</fileset>
+				 <pathelement location="${java.home}/lib/javaws.jar" />
 			</classpath>
 		</javac>
 	</target>
