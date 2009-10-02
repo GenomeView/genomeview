@@ -81,6 +81,7 @@ public class GenomeView implements SingleInstanceListener  {
 
 	private MainWindow mw;
 	public GenomeView(String[] args) {
+		jnlprewrite(args);
 		Authenticator.setDefault(new MyAuthenticator());
 		/*
 		 * The configuration class needs to be called at least once before we
@@ -123,7 +124,16 @@ public class GenomeView implements SingleInstanceListener  {
 		splash.dispose();
 	}
 
-	
+/*
+ * Rewrite args if started from file association	
+ */
+	private void jnlprewrite(String[] args) {
+		if(args.length>0&&args[0].equals("-open"))
+			args[0]="--file";
+		
+	}
+
+
 	public static void main(String[] args) {
 		new GenomeView(args);
 	}
