@@ -187,11 +187,7 @@ public class DataSourceFactory {
 					File[] files = chooser.getSelectedFiles();
 					DataSource[] out = new DataSource[files.length];
 					for (int i = 0; i < files.length; i++) {
-						if (files[i].getName().toLowerCase().endsWith("bai")) {
-							String fileName = files[i].toString();
-							out[i] = new SAMDataSource(new File(fileName.substring(0, fileName.length() - 4)));
-						} else
-							out[i] = new FileSource(files[i]);
+						out[i]=createFile(files[i]);
 
 					}
 					Configuration.set("lastDirectory", files[0].getParentFile());
@@ -205,5 +201,12 @@ public class DataSourceFactory {
 			break;
 		}
 		return null;
+	}
+	public static DataSource createFile(File file) throws IOException {
+		if (file.getName().toLowerCase().endsWith("bai")) {
+			String fileName = file.toString();
+			return  new SAMDataSource(new File(fileName.substring(0, fileName.length() - 4)));
+		} else
+			return new FileSource(file);
 	}
 }

@@ -114,6 +114,7 @@ public class GenomeView implements SingleInstanceListener  {
 		
         try {
 			mw = new MainWindow(args);
+			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

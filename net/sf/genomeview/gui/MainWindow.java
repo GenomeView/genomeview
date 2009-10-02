@@ -205,11 +205,12 @@ public class MainWindow implements WindowListener, Observer {
 			window.setIconImage(new ImageIcon(this.getClass().getResource("/images/gv2.png")).getImage());
 			window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			window.addWindowListener(this);
-
+			
 
 		}
 		if (model == null){
 			model = new Model(window);
+			window.getRootPane().setTransferHandler(new DropTransferHandler(model));
 			model.addObserver(this);
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new Hotkeys(model));
 		}
