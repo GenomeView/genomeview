@@ -65,7 +65,8 @@ public class MainWindow implements WindowListener, Observer {
 	}
 
 	public MainWindow(String args[]) throws InterruptedException, ExecutionException {
-
+		running++;
+		System.out.println("Start running: "+running);
 		init(args);
 	}
 
@@ -135,6 +136,7 @@ public class MainWindow implements WindowListener, Observer {
 
 	}
 
+	private static int running=0;
 	/**
 	 * Keeps an eye on the model (used to detect exitRequested)
 	 * 
@@ -143,7 +145,9 @@ public class MainWindow implements WindowListener, Observer {
 	 */
 	@Override
 	public void update(Observable o, Object arg) {
+		
 		if (model.isExitRequested()) {
+			model.deleteObserver(this);
 			System.out.println("Disposing the window here.");
 			dispose();
 			try {
@@ -152,7 +156,10 @@ public class MainWindow implements WindowListener, Observer {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.exit(0);
+			running--;
+			System.out.println("Exit running: "+running);
+			if(running<1)
+				System.exit(0);
 		}
 	}
 
