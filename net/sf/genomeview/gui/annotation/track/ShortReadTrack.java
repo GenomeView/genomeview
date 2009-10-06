@@ -171,6 +171,8 @@ public class ShortReadTrack extends Track {
 		int end = ((currentVisible.end / scale) + 1) * scale;
 
 		ReadGroup rg = entry.shortReads.getReadGroup(source);
+		if(rg==null)
+			return 0;
 		ShortReadCoverage graph = rg.getCoverage();//.get(rg);
 
 	
@@ -400,6 +402,8 @@ public class ShortReadTrack extends Track {
 		g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
 
 		/* Check mismatches */
+		if(entry.sequence.size()==0)
+			return;
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			if(seqBuffer==null)
 				seqBuffer=entry.sequence.getSubSequence(currentVisible.start, currentVisible.end+1).toCharArray();
