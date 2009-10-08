@@ -405,7 +405,7 @@ public class ShortReadTrack extends Track {
 		if(entry.sequence.size()==0)
 			return;
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
-			if(seqBuffer==null)
+			if(seqBuffer==null&&entry.sequence.size()>0)
 				seqBuffer=entry.sequence.getSubSequence(currentVisible.start, currentVisible.end+1).toCharArray();
 			for (int j = rf.start(); j <= rf.end(); j++) {
 				if(j>currentVisible.end||j<=currentVisible.start)
