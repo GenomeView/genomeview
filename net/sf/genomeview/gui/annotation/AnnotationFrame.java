@@ -33,6 +33,7 @@ public class AnnotationFrame extends JPanel {
     	evidenceLabel = new GeneEvidenceLabel(model);
         JScrollPane tmp = new JScrollPane(evidenceLabel);
         tmp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        tmp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         add(tmp, BorderLayout.CENTER);
     }
 }
