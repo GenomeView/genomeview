@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.PopupMenu;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -18,7 +17,6 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.AbstractGeneLabel;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
-import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.annotation.track.StructureTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.gui.menu.PopUpMenu;
@@ -36,8 +34,6 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 		model.addObserver(this);
-		// TODO 200 pixels for evidence should be a portion of the screen
-		// instead of hard coded
 		this.setPreferredSize(new Dimension(this.getPreferredSize().width, 200));
 
 	}
@@ -74,8 +70,6 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 		if (this.getPreferredSize().height != framePixelsUsed) {
 			this.setPreferredSize(new Dimension(this.getPreferredSize().width, framePixelsUsed));
-			this.invalidate();
-			this.getParent().validate();
 			revalidate();
 
 		}
