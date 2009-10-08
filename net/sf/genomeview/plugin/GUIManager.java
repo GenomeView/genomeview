@@ -10,6 +10,8 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.JMenu;
 
+import net.sf.genomeview.gui.annotation.GeneEvidenceLabel;
+
 /**
  * Manages GUI components that are accessible for plugins.
  * 
@@ -92,6 +94,15 @@ public class GUIManager {
 		for(JMenu menu:pluginDoc)
     		menu.add(a);
 		
+	}
+
+	private GeneEvidenceLabel gel=null;
+	
+	public void registerEvidenceLabel(GeneEvidenceLabel gel){
+		this.gel=gel;
+	}
+	public GeneEvidenceLabel getEvidenceLabel() {
+		return gel;
 	}
 
 }

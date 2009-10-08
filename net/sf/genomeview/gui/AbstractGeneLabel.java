@@ -93,10 +93,10 @@ public abstract class AbstractGeneLabel extends JLabel implements Observer {
 
 	
 
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-
-	}
+//	public void paintComponent(Graphics g) {
+//		super.paintComponent(g);
+//
+//	}
 
 	
 

@@ -22,7 +22,7 @@ public class TickmarkTrack extends Track {
 	public int paintTrack(Graphics2D g, Entry e, int yOffset, double screenWidth) {
 		Location r=model.getAnnotationLocationVisible();
 		g.setColor(Color.BLACK);
-        g.drawLine(0, yOffset + 15, g.getClipBounds().width, yOffset + 15);
+        g.drawLine(0, yOffset + 15, (int)screenWidth+1, yOffset + 15);
 
         if (r.start() == r.end()) {
             return 32;

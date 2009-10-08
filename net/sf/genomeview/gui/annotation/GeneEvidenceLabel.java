@@ -34,6 +34,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 		model.addObserver(this);
+		model.getGUIManager().registerEvidenceLabel(this);
 		this.setPreferredSize(new Dimension(this.getPreferredSize().width, 200));
 
 	}
@@ -48,24 +49,30 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	}
 
-	@Override
-	public void paintComponent(Graphics g) {
+	public void actualPaint(Graphics g) {
 		tracks.clear();
 		framePixelsUsed = 0;
 		screenWidth = this.getSize().width + 1;
 		super.paintComponent(g);
-		
-
-		int index=0;
+		int index = 0;
 		for (Track track : model.getTrackList()) {
 			if (track.isVisible()) {
-				int height = track.paint(g, model.getSelectedEntry(), framePixelsUsed, screenWidth,index++);
+				int height = track.paint(g, model.getSelectedEntry(), framePixelsUsed, screenWidth, index++);
 
 				if (height > 0)
 					tracks.put(framePixelsUsed, track);
 				framePixelsUsed += height;
 			}
 		}
+	}
+
+	@Override
+	public void paintComponent(Graphics g) {
+	
+		
+
+		actualPaint(g);
+
 		// FIXME paintSelectedLocation(g, model.getAnnotationLocationVisible());
 
 		if (this.getPreferredSize().height != framePixelsUsed) {
@@ -73,29 +80,29 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			revalidate();
 
 		}
-		
+
 		/* Highlight current selection */
 		g.setColor(new Color(180, 180, 180, 120));
-		for(Feature f:model.getFeatureSelection()){
-			for(Location l:f.location()){
-				highlight(l,g);
+		for (Feature f : model.getFeatureSelection()) {
+			for (Location l : f.location()) {
+				highlight(l, g);
 			}
 		}
-		if(model.getSelectedRegion()!=null)
-			highlight(model.getSelectedRegion(),g);
-		
+		if (model.getSelectedRegion() != null)
+			highlight(model.getSelectedRegion(), g);
+
 		g.setColor(new Color(120, 120, 120, 120));
 		g.drawLine(currentMouseX, 0, currentMouseX, this.getPreferredSize().height);
 	}
 
-	private void highlight(Location l,Graphics g) {
-		int x1=Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), screenWidth);
-		int x2=Convert.translateGenomeToScreen(l.end()+1, model.getAnnotationLocationVisible(), screenWidth);
+	private void highlight(Location l, Graphics g) {
+		int x1 = Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), screenWidth);
+		int x2 = Convert.translateGenomeToScreen(l.end() + 1, model.getAnnotationLocationVisible(), screenWidth);
 		g.drawLine(x1, 0, x1, this.getPreferredSize().height);
 		g.drawLine(x2, 0, x2, this.getPreferredSize().height);
 		g.setColor(new Color(180, 180, 255, 50));
-		g.fillRect(x1, 0, x2-x1, this.getPreferredSize().height);
-		
+		g.fillRect(x1, 0, x2 - x1, this.getPreferredSize().height);
+
 	}
 
 	@Override
@@ -214,7 +221,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			double move = (e.getX() - pressX) / screenWidth;
 			int start = (int) (pressLoc.start() - pressLoc.length() * move);
 			int end = (int) (pressLoc.end() - pressLoc.length() * move);
-			if(end-start>50)
+			if (end - start > 50)
 				model.setAnnotationLocationVisible(new Location(start, end));
 
 		}

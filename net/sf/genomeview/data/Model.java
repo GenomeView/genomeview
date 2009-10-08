@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.gui.MainWindow;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
 import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack;
 import net.sf.genomeview.gui.annotation.track.SequenceLogoTrack;
