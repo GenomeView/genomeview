@@ -112,8 +112,12 @@ public class DataSourceFactory {
 		case URL:
 
 			try {
-				URL url = new URI(JOptionPane.showInputDialog(model.getParent(), "Give the URL of the data").trim()).toURL();
-				return new DataSource[] { createURL(url) };
+				String input=JOptionPane.showInputDialog(model.getParent(), "Give the URL of the data");
+				if(input!=null&&input.trim().length()>0){
+					URL url = new URI(input.trim()).toURL();
+					return new DataSource[] { createURL(url) };
+				}else
+					return null;
 
 			} catch (Exception e) {
 				e.printStackTrace();
