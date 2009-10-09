@@ -7,7 +7,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.net.URL;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Logger;
@@ -58,15 +57,15 @@ public class MainContent {
 			bar.add(new JLabel("Code:"));
 			bar.add(new AAMappingChooser(model));
 		}
-		String sponsor = Configuration.get("sponsor");
-		if (sponsor.length() != 0) {
-			URL url = Icons.class.getResource(sponsor);
-			logger.info("Sponser logo url: " + url);
-			if (url != null) {
-				ImageIcon sponsorLogo = new ImageIcon(url);
-				bar.add(new JLabel(sponsorLogo));
-			}
-		}
+//		String sponsor = Configuration.get("sponsor");
+//		if (sponsor.length() != 0) {
+//			URL url = Icons.class.getResource(sponsor);
+//			logger.info("Sponser logo url: " + url);
+//			if (url != null) {
+//				ImageIcon sponsorLogo = new ImageIcon(url);
+//				bar.add(new JLabel(sponsorLogo));
+//			}
+//		}
 
 		bar.add(new JLabel(new ImageIcon(Icons.class.getResource("/images/vib.png"))));
 		return bar;
