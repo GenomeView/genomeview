@@ -26,7 +26,7 @@ public class WriteEntriesWorker extends DataSourceWorker {
     protected Void doInBackground() {
         try {
             source.saveOwn(model.entries());
-        } catch (SaveFailedException e) {
+        } catch (Throwable e) {
         	  pb.done();
         	JOptionPane.showMessageDialog(model.getParent(), "<html>"+e.getMessage()+"<br/></html>", "Error!",JOptionPane.ERROR_MESSAGE);
         	e.printStackTrace();

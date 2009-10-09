@@ -24,7 +24,7 @@ public class ReadWorker extends DataSourceWorker {
 			model.addData(source);
 			pb.done();
 			
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			pb.done();
 			
