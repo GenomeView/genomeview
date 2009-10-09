@@ -31,14 +31,12 @@ import javax.swing.JPanel;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.data.cache.CachedURLSource;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
-import net.sf.jannot.source.SAMDataSource;
 import be.abeel.jargs.AutoHelpCmdLineParser;
 
 /**
@@ -293,7 +291,9 @@ public class MainWindow implements WindowListener, Observer {
 
 		/* Load the source, if one was constructed */
 		if (data != null) {
+			
 			assert (data.length == 1);
+			logger.info("Loading with priority: "+data[0]);
 			final ReadWorker rw = new ReadWorker(data[0], model);
 			rw.execute();
 			rw.get();
