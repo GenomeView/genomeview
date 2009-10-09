@@ -110,7 +110,7 @@ public class SyntenicTrack extends Track {
 
 			} else {
 
-				List<SyntenicBlock> list = e.syntenic.get(model.getAnnotationLocationVisible());
+				List<SyntenicBlock> list = model.entries().syntenic.get(e,model.getAnnotationLocationVisible());
 				for (SyntenicBlock sb : list) {
 					if (sb.target().equals(target)) {
 

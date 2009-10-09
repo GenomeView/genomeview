@@ -23,6 +23,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.MainWindow;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
 import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack;
+import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack2;
 import net.sf.genomeview.gui.annotation.track.SequenceLogoTrack;
 import net.sf.genomeview.gui.annotation.track.ShortReadTrack;
 import net.sf.genomeview.gui.annotation.track.StructureTrack;
@@ -38,6 +39,7 @@ import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
+import net.sf.jannot.alignment.MultipleAlignment;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.shortread.ReadGroup;
@@ -86,15 +88,14 @@ public class Model extends Observable implements IModel {
 		return null;
 	}
 
-
 	public void update(Observable arg0, Object arg) {
 		if (arg instanceof ChangeEvent) {
 			undoStack.push((ChangeEvent) arg);
 			redoStack.clear();
-			while(undoStack.size()>100)
+			while (undoStack.size() > 100)
 				undoStack.remove(0);
 			refresh(NotificationTypes.JANNOTCHANGE);
-		}else{
+		} else {
 			refresh(arg);
 		}
 
@@ -129,7 +130,6 @@ public class Model extends Observable implements IModel {
 
 	}
 
-
 	/**
 	 * Gives the index of the selected entry
 	 * 
@@ -154,6 +154,7 @@ public class Model extends Observable implements IModel {
 	}
 
 	private Entry dummy = new DummyEntry();
+
 	public Entry getSelectedEntry() {
 		if (entries.size() == 0)
 			return dummy;
@@ -161,14 +162,14 @@ public class Model extends Observable implements IModel {
 	}
 
 	public void setSelectedEntry(Entry entry) {
-		for(Entry e:entries)
-			for(ReadGroup rg:e.shortReads.getReadGroups()){
+		for (Entry e : entries)
+			for (ReadGroup rg : e.shortReads.getReadGroups()) {
 				rg.release();
 			}
 		entries.setDefault(entry);
 		selectedLocation.clear();
 		selectedRegion = null;
-		
+
 		setAnnotationLocationVisible(getAnnotationLocationVisible());
 
 		refresh(NotificationTypes.ENTRYCHANGED);
@@ -203,7 +204,7 @@ public class Model extends Observable implements IModel {
 	public void refresh(Object arg) {
 		if (!silent) {
 			setChanged();
-			notifyObservers(arg==null?NotificationTypes.GENERAL:arg);
+			notifyObservers(arg == null ? NotificationTypes.GENERAL : arg);
 		}
 	}
 
@@ -220,7 +221,7 @@ public class Model extends Observable implements IModel {
 
 	public void exit() {
 		this.exitRequested = true;
-		for(DataSource ds:loadedSources){
+		for (DataSource ds : loadedSources) {
 			ds.finalize();
 		}
 		loadedSources.clear();
@@ -245,12 +246,12 @@ public class Model extends Observable implements IModel {
 	 */
 
 	public void setAnnotationLocationVisible(Location r) {
-		if(this.getSelectedEntry().size()>5&&r.length()<25){
-			r=new Location(r.start()-50,r.end()+50);
+		if (this.getSelectedEntry().size() > 5 && r.length() < 25) {
+			r = new Location(r.start() - 50, r.end() + 50);
 		}
 		int start = r.start();
 		int end = r.end();
-		int len=end-start+1;
+		int len = end - start + 1;
 		if (start > end) {
 			return;
 		}
@@ -261,16 +262,16 @@ public class Model extends Observable implements IModel {
 			modStart = start;
 		} else {
 			modStart = 1;
-			modEnd=len;
+			modEnd = len;
 		}
 		int chromLength = getSelectedEntry().size();
 		if (end < chromLength || chromLength == 0) {
 			modEnd = end;
 		} else {
 			modEnd = chromLength;
-			modStart=modEnd-len;
-			if(modStart<1)
-				modStart=1;
+			modStart = modEnd - len;
+			if (modStart < 1)
+				modStart = 1;
 		}
 		Location newZoom = new Location(modStart, modEnd);
 
@@ -558,12 +559,17 @@ public class Model extends Observable implements IModel {
 		public boolean containShortReadTrack(DataSource rg) {
 			for (Track track : this) {
 				if (track instanceof ShortReadTrack) {
-					ShortReadTrack srt=(ShortReadTrack)track;
-					if(srt.source().equals(rg))
+					ShortReadTrack srt = (ShortReadTrack) track;
+					if (srt.source().equals(rg))
 						return true;
 
 				}
 			}
+			return false;
+		}
+
+		public boolean containsMultipleAlignment(MultipleAlignment ma) {
+			// TODO Auto-generated method stub
 			return false;
 		}
 	}
@@ -604,15 +610,7 @@ public class Model extends Observable implements IModel {
 			}
 			if (!trackList.containsSequenceLogo() && e.alignment.numAlignments() > 0)
 				trackList.add(new SequenceLogoTrack(this));
-			/* Syntenic tracks */
-			Set<String> targets = e.syntenic.getTargets();
-			if (targets.size() > 0 && !trackList.containsSyntenicTarget(e.getID(), e.getID())) {
-				trackList.add(new SyntenicTrack(this, e.getID(), e.getID()));
-			}
-			for (String t : targets) {
-				if (!trackList.containsSyntenicTarget(e.getID(), t))
-					trackList.add(new SyntenicTrack(this, e.getID(), t));
-			}
+
 			/* Short read tracks */
 			for (DataSource rg : e.shortReads.getSources()) {
 				if (!trackList.containShortReadTrack(rg)) {
@@ -620,6 +618,26 @@ public class Model extends Observable implements IModel {
 				}
 			}
 
+		}
+		/* Syntenic tracks */
+		Set<String> targets = entries.syntenic.getTargets();
+		for (String s : targets) {
+			for (String t : targets) {
+				if (!trackList.containsSyntenicTarget(s, t))
+					trackList.add(new SyntenicTrack(this, s, t));
+			}
+		}
+		
+		/* Multiple alignments tracks */
+		for(MultipleAlignment ma:entries().multiplealignment){
+			if (!trackList.containsMultipleAlignment(ma))
+				trackList.add(new MultipleAlignmentTrack2(this,ma));
+		}
+		for (String s : targets) {
+			for (String t : targets) {
+				if (!trackList.containsSyntenicTarget(s, t))
+					trackList.add(new SyntenicTrack(this, s, t));
+			}
 		}
 		refresh(NotificationTypes.UPDATETRACKS);
 
