@@ -26,6 +26,8 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
+import net.sf.jannot.alignment.AlignmentBlock;
+import net.sf.jannot.alignment.AlignmentSequence;
 import net.sf.jannot.alignment.MultipleAlignment;
 import net.sf.jannot.shortread.BAMreads;
 import net.sf.jannot.shortread.ExtendedShortRead;
@@ -135,7 +137,25 @@ private MultipleAlignment ma;
 
 	@Override
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
-		
+		Iterable<AlignmentBlock>abs=ma.get(entry, model.getAnnotationLocationVisible());
+		int count=model.entries().size();
+		for(AlignmentBlock ab:abs){
+			System.out.println("--block");
+			int start=-1;
+			int end=-1;
+			for(AlignmentSequence as:ab){
+				System.out.println(as);
+				int index=model.entries().indexOf(as.entry());
+				if(as.entry()==entry){
+					start=as.start();
+					end=as.end();
+				}
+			}
+			int x1=Convert.translateGenomeToScreen(start, model.getAnnotationLocationVisible(), screenWidth);
+			int x2=Convert.translateGenomeToScreen(end+1, model.getAnnotationLocationVisible(), screenWidth);
+			g.drawRect(x1, yOffset, x2-x1, count*10);
+		}
+		return count*10;
 //		/* Store information to be used in other methods */
 //		currentEntry = entry;
 //		currentScreenWidth = screenWidth;
@@ -375,7 +395,7 @@ private MultipleAlignment ma;
 //
 //		}
 //		return yOffset - originalYOffset;
-		return 20;
+//		return 20;
 	}
 
 //	private int line(ShortRead one, int pos, BitSet[] tilingCounter) {
