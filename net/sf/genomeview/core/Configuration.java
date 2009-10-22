@@ -139,9 +139,13 @@ public class Configuration {
 			it.setSkipBlanks(true);
 			it.setSkipComments(true);
 			for (String line : it) {
-				String key = line.substring(0, line.indexOf('='));
-				String value = line.substring(line.indexOf('=') + 1);
-				localMap.put(key.trim(), value.trim());
+			    if(line.indexOf('=')>0){
+			        String key = line.substring(0, line.indexOf('='));
+				    String value = line.substring(line.indexOf('=') + 1);
+				    localMap.put(key.trim(), value.trim());
+			    }else{
+			        logger.warning("Invalid line in configuration file! '"+line+"'");
+			    }
 
 			}
 			it.close();
