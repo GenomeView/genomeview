@@ -246,35 +246,27 @@ public class Model extends Observable implements IModel {
 	 */
 
 	public void setAnnotationLocationVisible(Location r) {
-		if (this.getSelectedEntry().size() > 5 && r.length() < 25) {
-			r = new Location(r.start() - 50, r.end() + 50);
-		}
-		int start = r.start();
-		int end = r.end();
-		int len = end - start + 1;
-		if (start > end) {
-			return;
-		}
 
 		int modStart = -1;
 		int modEnd = -1;
-		if (start > 1) {
-			modStart = start;
+		if (r.start > 1) {
+			modStart = r.start;
 		} else {
 			modStart = 1;
-			modEnd = len;
+			modEnd = r.length();
 		}
 		int chromLength = getSelectedEntry().size();
-		if (end < chromLength || chromLength == 0) {
-			modEnd = end;
+		if (r.end < chromLength || chromLength == 0) {
+			modEnd = r.end;
 		} else {
 			modEnd = chromLength;
-			modStart = modEnd - len;
+			modStart = modEnd - r.length();
 			if (modStart < 1)
 				modStart = 1;
 		}
 		Location newZoom = new Location(modStart, modEnd);
-
+		if (newZoom.length() != annotationEnd - annotationStart + 1 && newZoom.length() < 50)
+			return;
 		// getAnnotationLocationVisible();
 		ZoomChange zc = new ZoomChange(new Location(annotationStart, annotationEnd), newZoom);
 		zc.doChange();
@@ -627,11 +619,11 @@ public class Model extends Observable implements IModel {
 					trackList.add(new SyntenicTrack(this, s, t));
 			}
 		}
-		
+
 		/* Multiple alignments tracks */
-		for(MultipleAlignment ma:entries().multiplealignment){
+		for (MultipleAlignment ma : entries().multiplealignment) {
 			if (!trackList.containsMultipleAlignment(ma))
-				trackList.add(new MultipleAlignmentTrack2(this,ma));
+				trackList.add(new MultipleAlignmentTrack2(this, ma));
 		}
 		for (String s : targets) {
 			for (String t : targets) {
