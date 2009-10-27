@@ -267,7 +267,9 @@ public class Model extends Observable implements IModel {
 		Location newZoom = new Location(modStart, modEnd);
 		if (newZoom.length() != annotationEnd - annotationStart + 1 && newZoom.length() < 50)
 			return;
-		// getAnnotationLocationVisible();
+		if(newZoom.start<1||newZoom.end<1)
+			return;
+		
 		ZoomChange zc = new ZoomChange(new Location(annotationStart, annotationEnd), newZoom);
 		zc.doChange();
 		refresh();
