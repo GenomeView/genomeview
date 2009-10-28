@@ -25,6 +25,8 @@ public class SourceTrackTable extends JTable {
 	
 		final SourceTrackListModel listModel = (SourceTrackListModel) this.getModel();
 		getTableHeader().addMouseMotionListener(new ColumnHeaderToolTips(listModel));
+		getTableHeader().setReorderingAllowed(false);
+
 		/* Set column widths */
 		setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 		// getColumnModel().getColumn(0).setPreferredWidth(150);
@@ -39,12 +41,14 @@ public class SourceTrackTable extends JTable {
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		addMouseListener(new MouseAdapter() {
 			public void mouseReleased(MouseEvent e) {
-				int column = getSelectedColumn();
-				int row = getSelectedRow();
-				DataSource type = listModel.sources().get(row);
-				if (column == 1) {
-					System.out.println("Setting visibility " + type + " " + !model.isSourceVisible(type));
+				if(e.getButton()==1){
+					int column = getSelectedColumn();
+					int row = getSelectedRow();
+					DataSource type = listModel.sources().get(row);
+					if (column == 1) {
+						System.out.println("Setting visibility " + type + " " + !model.isSourceVisible(type));
 					model.setSourceVisibility(type, !model.isSourceVisible(type));
+					}
 				}
 
 			}
