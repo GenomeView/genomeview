@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.gui.MainWindow;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
 import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack;
 import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack2;
@@ -408,7 +407,7 @@ public class Model extends Observable implements IModel {
 	 */
 	public void addData(DataSource f) throws ReadFailedException {
 		boolean firstEntry = entries.size() == 0;
-		System.out.println("Reading source:" + f);
+		logger.info("Reading source:" + f);
 		f.read(entries);
 		if (firstEntry) {
 			entries.getEntry();// select a default
