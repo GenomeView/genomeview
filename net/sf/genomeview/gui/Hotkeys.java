@@ -10,14 +10,17 @@ import javax.swing.Action;
 import javax.swing.FocusManager;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.menu.navigation.AnnotationEndAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationMoveLeftAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationMoveRightAction;
+import net.sf.genomeview.gui.menu.navigation.AnnotationStartAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationZoomInAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationZoomOutAction;
 
 public class Hotkeys implements KeyEventDispatcher {
 
 	private Model model;
+	
 
 	public Hotkeys(Model model) {
 		this.left = new AnnotationMoveLeftAction(model);
@@ -25,9 +28,11 @@ public class Hotkeys implements KeyEventDispatcher {
 		this.zoomin = new AnnotationZoomInAction(model);
 		this.zoomout = new AnnotationZoomOutAction(model);
 		this.model = model;
+		this.start=new AnnotationStartAction(model);
+		this.end=new AnnotationEndAction(model);
 	}
 
-	private Action left, right, zoomin, zoomout;
+	private Action left, right, zoomin, zoomout,start,end;
 
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
@@ -36,6 +41,12 @@ public class Hotkeys implements KeyEventDispatcher {
 			return false;
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
 			switch (e.getKeyCode()) {
+			case KeyEvent.VK_HOME:
+				start.actionPerformed(null);
+				return true;
+			case KeyEvent.VK_END:
+				end.actionPerformed(null);
+				return true;				
 			case KeyEvent.VK_LEFT:
 			case KeyEvent.VK_NUMPAD4:
 				left.actionPerformed(null);
@@ -54,7 +65,7 @@ public class Hotkeys implements KeyEventDispatcher {
 			case KeyEvent.VK_DOWN:
 			case KeyEvent.VK_MINUS:
 				zoomout.actionPerformed(null);
-				return false;
+				return true;
 
 			default:
 				return false;
