@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -27,7 +28,8 @@ import net.sf.jannot.source.SSL;
 import net.sf.jannot.source.URLSource;
 
 public class DataSourceFactory {
-
+	private static Logger log = Logger.getLogger(DataSourceFactory.class.getCanonicalName());
+	
 	public enum Sources {
 		LOCALFILE, URL, DIRECTORY, DAS;
 		@Override
@@ -59,7 +61,7 @@ public class DataSourceFactory {
 	
 	public static DataSource createURL(URL url) throws IOException {
 		String urlString = url.toString();
-		System.out.println("URL:" + urlString);
+		log.info("creating URL:" + urlString);
 		if (urlString.endsWith(".bai")) {
 			url = new URL(urlString.substring(0, urlString.length() - 4));
 			return constructSAM(url);
