@@ -104,7 +104,6 @@ public class MainWindow implements WindowListener, Observer {
 	 */
 	@Override
 	public void windowClosing(WindowEvent e) {
-		System.out.println("Closing this window by x-button");
 		this.model.exit();
 	}
 
