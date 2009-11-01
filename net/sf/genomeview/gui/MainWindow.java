@@ -64,7 +64,7 @@ public class MainWindow implements WindowListener, Observer {
 
 	public MainWindow(String args[]) throws InterruptedException, ExecutionException {
 		running++;
-		System.out.println("Start running: "+running);
+		logger.info("Started running instance" +running);
 		init(args);
 	}
 
@@ -72,11 +72,9 @@ public class MainWindow implements WindowListener, Observer {
 		try {
 			parser.parse(args);
 		} catch (IllegalOptionValueException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.throwing(this.getClass().getCanonicalName(), "parse", e);
 		} catch (UnknownOptionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.throwing(this.getClass().getCanonicalName(), "parse", e);
 		}
 
 	}
@@ -146,18 +144,19 @@ public class MainWindow implements WindowListener, Observer {
 		
 		if (model.isExitRequested()) {
 			model.deleteObserver(this);
-			System.out.println("Disposing the window here.");
+			logger.info("Disposing the window in MainWindow.update()");
 			dispose();
 			try {
 				Configuration.save();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.throwing(this.getClass().getCanonicalName(), "update", e);
 			}
 			running--;
-			System.out.println("Exit running: "+running);
-			if(running<1)
+			logger.info("Instances still running: "+running);
+			if(running<1){
+				logger.info("No instances left, exiting VM");
 				System.exit(0);
+			}
 		}
 	}
 
@@ -188,14 +187,11 @@ public class MainWindow implements WindowListener, Observer {
 					Configuration.loadExtra(new FileInputStream(config));
 				}
 			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.throwing(this.getClass().getCanonicalName(), "init", e);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.throwing(this.getClass().getCanonicalName(), "init", e);
 			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.throwing(this.getClass().getCanonicalName(), "init", e);
 			}
 		}
 

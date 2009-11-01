@@ -67,12 +67,12 @@ public class GenomeView implements SingleInstanceListener  {
 			jd.pack();
 			StaticUtils.center(jd);
 			jd.setVisible(true);
-			System.out.println("Requesting Host  : " + getRequestingHost());
-			System.out.println("Requesting Port  : " + getRequestingPort());
-			System.out.println("Requesting Prompt : " + getRequestingPrompt());
-			System.out.println("Requesting Protocol: " + getRequestingProtocol());
-			System.out.println("Requesting Scheme : " + getRequestingScheme());
-			System.out.println("Requesting Site  : " + getRequestingSite());
+			logger.info("Requesting Host  : " + getRequestingHost());
+			logger.info("Requesting Port  : " + getRequestingPort());
+			logger.info("Requesting Prompt : " + getRequestingPrompt());
+			logger.info("Requesting Protocol: " + getRequestingProtocol());
+			logger.info("Requesting Scheme : " + getRequestingScheme());
+			logger.info("Requesting Site  : " + getRequestingSite());
 			this.user = username.getText();
 			this.pass = password.getPassword();
 			return new PasswordAuthentication(this.user, this.pass);
@@ -88,15 +88,18 @@ public class GenomeView implements SingleInstanceListener  {
 		 * can start the logger
 		 */
 		System.out.println("Starting GenomeView " + Configuration.version());
-		/* Configure loggin */
+		/* Configure logging */
 		try {
 			LogManager.getLogManager().readConfiguration(GenomeView.class.getResourceAsStream("/conf/logging.conf"));
 			logger = Logger.getLogger(GenomeView.class.getCanonicalName());
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
+			logger.throwing(this.getClass().getCanonicalName(), "constructor", e);
+			/* These exceptions likely indicate that the log could not be initialized, print also to console */
 			e.printStackTrace();
+			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			logger.throwing(this.getClass().getCanonicalName(), "constructor", e);
+			/* These exceptions likely indicate that the log could not be initialized, print also to console */
 			e.printStackTrace();
 		}
 
@@ -116,11 +119,9 @@ public class GenomeView implements SingleInstanceListener  {
 			mw = new MainWindow(args);
 			
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.throwing(this.getClass().getCanonicalName(), "constructor", e);
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.throwing(this.getClass().getCanonicalName(), "constructor", e);
 		}
 		splash.dispose();
 	}
