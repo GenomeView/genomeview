@@ -16,7 +16,12 @@ import net.sf.genomeview.gui.dialog.SelectedSequenceDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Location;
 import net.sf.jannot.Sequence;
-
+/**
+ * Copies the selected sequence to the system clip board.
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class CopySequenceAction extends AbstractModelAction {
 
     public CopySequenceAction(Model model) {
@@ -24,9 +29,6 @@ public class CopySequenceAction extends AbstractModelAction {
         super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control C"));
     }
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -4864220753372131046L;
 
     @Override
@@ -50,7 +52,7 @@ public class CopySequenceAction extends AbstractModelAction {
                     sb.append(seq.getAminoAcid(i,model.getAAMapping()));
                 break;
             case -1:
-                for (int i = l.end(); i >= l.start(); i--)
+            	 for (int i = l.start(); i <= l.end(); i++)
                     sb.append(seq.getReverseNucleotide(i));
                 break;
             case -2:
