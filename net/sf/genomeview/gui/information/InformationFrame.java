@@ -35,7 +35,7 @@ public class InformationFrame extends GridBagPanel {
         gc.weighty = 1;
         gc.gridwidth=2;
      
-        final SourceTrackTable sourceTrackList = new SourceTrackTable(model);
+        final SourceTable sourceTrackList = new SourceTable(model);
         gc.gridy++;
         gc.weighty = 0;
         add(new JLabel("Data sources"), gc);
@@ -54,7 +54,7 @@ public class InformationFrame extends GridBagPanel {
         add(new JScrollPane(featureTrackList), gc);
         gc.gridy++;
 
-        CDSOverviewTable annotationTrackList = new CDSOverviewTable(model);
+        FeatureTable annotationTrackList = new FeatureTable(model);
 
         gc.weighty = 0;
         gc.gridwidth=1;
@@ -80,7 +80,7 @@ public class InformationFrame extends GridBagPanel {
 
         gc.gridy++;
         gc.weighty = 0.3;
-        add(new CDSView(model), gc);
+        add(new GeneStructureView(model), gc);
 
         setPreferredSize(new Dimension(250, this.getPreferredSize().height));
 

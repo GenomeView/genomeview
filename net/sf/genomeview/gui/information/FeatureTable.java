@@ -30,19 +30,19 @@ import net.sf.jannot.Location;
  * @author Thomas Abeel
  * 
  */
-public class CDSOverviewTable extends JTable implements Observer, ActionListener {
+public class FeatureTable extends JTable implements Observer, ActionListener {
 
 	private static final long serialVersionUID = 8956245030328303086L;
 
-	final CDSTrackListModel listModel;
+	final FeatureTableModel listModel;
 
 	private Model model;
 
-	public CDSOverviewTable(final Model model) {
-		super(new CDSTrackListModel(model));
+	public FeatureTable(final Model model) {
+		super(new FeatureTableModel(model));
 		model.addObserver(this);
 		this.model = model;
-		listModel = (CDSTrackListModel) this.getModel();
+		listModel = (FeatureTableModel) this.getModel();
 
 		// setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		// getColumnModel().getColumn(0).setPreferredWidth(200);
@@ -82,9 +82,9 @@ public class CDSOverviewTable extends JTable implements Observer, ActionListener
 	class ColumnHeaderToolTips extends MouseMotionAdapter {
 		private int index = -1;
 
-		private CDSTrackListModel listModel;
+		private FeatureTableModel listModel;
 
-		public ColumnHeaderToolTips(CDSTrackListModel listModel) {
+		public ColumnHeaderToolTips(FeatureTableModel listModel) {
 			this.listModel = listModel;
 
 		}

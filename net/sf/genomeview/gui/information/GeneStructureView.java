@@ -32,7 +32,7 @@ import net.sf.jannot.utils.SequenceTools;
  * @author Thomas Abeel
  * 
  */
-public class CDSView extends JLabel implements Observer {
+public class GeneStructureView extends JLabel implements Observer {
 
     private Model model;
 
@@ -42,7 +42,7 @@ public class CDSView extends JLabel implements Observer {
 
     private CollisionMap collisionMap;
 
-    public CDSView(Model model) {
+    public GeneStructureView(Model model) {
         this.model = model;
         collisionMap = new CollisionMap(model);
      
@@ -50,7 +50,7 @@ public class CDSView extends JLabel implements Observer {
         this.setPreferredSize(new Dimension(200, 50));
         this.setBackground(Color.WHITE);
         this.setOpaque(true);
-        final CDSView _self = this;
+        final GeneStructureView _self = this;
 
         this.addMouseListener(new MouseAdapter() {
 

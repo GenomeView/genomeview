@@ -16,14 +16,14 @@ import javax.swing.table.TableColumnModel;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.source.DataSource;
 
-public class SourceTrackTable extends JTable {
+public class SourceTable extends JTable {
 	private static final long serialVersionUID = 2680194422003453639L;
 
 
-	public SourceTrackTable(final Model model) {
-		super(new SourceTrackListModel(model));
+	public SourceTable(final Model model) {
+		super(new SourceTableModel(model));
 	
-		final SourceTrackListModel listModel = (SourceTrackListModel) this.getModel();
+		final SourceTableModel listModel = (SourceTableModel) this.getModel();
 		getTableHeader().addMouseMotionListener(new ColumnHeaderToolTips(listModel));
 		getTableHeader().setReorderingAllowed(false);
 
@@ -63,7 +63,7 @@ public class SourceTrackTable extends JTable {
 		int realColumnIndex = convertColumnIndexToModel(colIndex);
 
 		if (realColumnIndex == 0) { // Sport column
-			SourceTrackListModel model = (SourceTrackListModel) this.getModel();
+			SourceTableModel model = (SourceTableModel) this.getModel();
 			String source = model.sources().get(rowIndex).toString();
 
 			return source;
@@ -77,9 +77,9 @@ public class SourceTrackTable extends JTable {
 	class ColumnHeaderToolTips extends MouseMotionAdapter {
 		private int index = -1;
 
-		private SourceTrackListModel listModel;
+		private SourceTableModel listModel;
 
-		public ColumnHeaderToolTips(SourceTrackListModel listModel) {
+		public ColumnHeaderToolTips(SourceTableModel listModel) {
 			this.listModel = listModel;
 
 		}

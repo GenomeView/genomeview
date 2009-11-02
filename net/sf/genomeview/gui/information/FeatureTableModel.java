@@ -23,7 +23,7 @@ import net.sf.jannot.utils.SequenceTools;
  * @author Thomas Abeel
  * 
  */
-public class CDSTrackListModel extends AbstractTableModel implements Observer {
+public class FeatureTableModel extends AbstractTableModel implements Observer {
 
 	/**
      * 
@@ -39,7 +39,7 @@ public class CDSTrackListModel extends AbstractTableModel implements Observer {
 
 	private Model model;
 
-	public CDSTrackListModel(Model model) {
+	public FeatureTableModel(Model model) {
 		this.model = model;
 		model.addObserver(this);
 

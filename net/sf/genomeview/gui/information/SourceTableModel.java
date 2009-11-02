@@ -15,7 +15,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.source.DataSource;
 
-public class SourceTrackListModel extends AbstractTableModel implements Observer {
+public class SourceTableModel extends AbstractTableModel implements Observer {
 
     @Override
     public String getColumnName(int column) {
@@ -34,7 +34,7 @@ public class SourceTrackListModel extends AbstractTableModel implements Observer
 
     private Model model;
 
-    public SourceTrackListModel(Model model) {
+    public SourceTableModel(Model model) {
         model.addObserver(this);
         this.model = model;
         update(null, null);
