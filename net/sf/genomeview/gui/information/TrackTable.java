@@ -23,6 +23,7 @@ public class TrackTable extends JTable {
         super(new TrackTableModel(model));
         final TrackTableModel listModel = (TrackTableModel) this.getModel();
         getTableHeader().addMouseMotionListener(new ColumnHeaderToolTips(listModel));
+        getTableHeader().setReorderingAllowed(false);
         /* Set column widths */
 //        setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //        getColumnModel().getColumn(0).setPreferredWidth(150);

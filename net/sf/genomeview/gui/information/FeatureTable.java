@@ -51,6 +51,8 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 			getColumnModel().getColumn(i).setMaxWidth(50);
 		}
 		getTableHeader().addMouseMotionListener(new ColumnHeaderToolTips(listModel));
+		getTableHeader().setReorderingAllowed(false);
+		
 		ToolTipManager.sharedInstance().setInitialDelay(0);
 
 		
