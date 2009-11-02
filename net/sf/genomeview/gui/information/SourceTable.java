@@ -6,6 +6,7 @@ package net.sf.genomeview.gui.information;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.logging.Logger;
 
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -17,6 +18,9 @@ import net.sf.genomeview.data.Model;
 import net.sf.jannot.source.DataSource;
 
 public class SourceTable extends JTable {
+	
+	private static Logger logger = Logger.getLogger(SourceTable.class.getCanonicalName());
+	
 	private static final long serialVersionUID = 2680194422003453639L;
 
 
@@ -46,8 +50,8 @@ public class SourceTable extends JTable {
 					int row = getSelectedRow();
 					DataSource type = listModel.sources().get(row);
 					if (column == 1) {
-						System.out.println("Setting visibility " + type + " " + !model.isSourceVisible(type));
-					model.setSourceVisibility(type, !model.isSourceVisible(type));
+						logger.info("Setting visibility " + type + " " + !model.isSourceVisible(type));
+						model.setSourceVisibility(type, !model.isSourceVisible(type));
 					}
 				}
 
