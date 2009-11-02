@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -72,9 +73,9 @@ public class MainWindow implements WindowListener, Observer {
 		try {
 			parser.parse(args);
 		} catch (IllegalOptionValueException e) {
-			logger.throwing(this.getClass().getCanonicalName(), "parse", e);
+			logger.log(Level.SEVERE,"parsing command line options", e);
 		} catch (UnknownOptionException e) {
-			logger.throwing(this.getClass().getCanonicalName(), "parse", e);
+			logger.log(Level.SEVERE,"", e);
 		}
 
 	}
@@ -148,7 +149,7 @@ public class MainWindow implements WindowListener, Observer {
 			try {
 				Configuration.save();
 			} catch (IOException e) {
-				logger.throwing(this.getClass().getCanonicalName(), "update", e);
+				logger.log(Level.SEVERE,"saving configuration", e);
 			}
 			running--;
 			logger.info("Instances still running: "+running);
@@ -186,11 +187,11 @@ public class MainWindow implements WindowListener, Observer {
 					Configuration.loadExtra(new FileInputStream(config));
 				}
 			} catch (MalformedURLException e) {
-				logger.throwing(this.getClass().getCanonicalName(), "init", e);
+				logger.log(Level.SEVERE,"loading extra configuration", e);
 			} catch (IOException e) {
-				logger.throwing(this.getClass().getCanonicalName(), "init", e);
+				logger.log(Level.SEVERE,"loading extra configuration", e);
 			} catch (URISyntaxException e) {
-				logger.throwing(this.getClass().getCanonicalName(), "init", e);
+				logger.log(Level.SEVERE,"loading extra configuration", e);
 			}
 		}
 

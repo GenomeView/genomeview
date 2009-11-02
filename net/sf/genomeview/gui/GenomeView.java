@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -93,12 +94,12 @@ public class GenomeView implements SingleInstanceListener  {
 			LogManager.getLogManager().readConfiguration(GenomeView.class.getResourceAsStream("/conf/logging.conf"));
 			logger = Logger.getLogger(GenomeView.class.getCanonicalName());
 		} catch (SecurityException e) {
-			logger.throwing(this.getClass().getCanonicalName(), "constructor", e);
+			logger.log(Level.SEVERE,"log initialization", e);
 			/* These exceptions likely indicate that the log could not be initialized, print also to console */
 			e.printStackTrace();
 			
 		} catch (IOException e) {
-			logger.throwing(this.getClass().getCanonicalName(), "constructor", e);
+			logger.log(Level.SEVERE,"log initialization", e);
 			/* These exceptions likely indicate that the log could not be initialized, print also to console */
 			e.printStackTrace();
 		}
@@ -119,9 +120,9 @@ public class GenomeView implements SingleInstanceListener  {
 			mw = new MainWindow(args);
 			
 		} catch (InterruptedException e) {
-			logger.throwing(this.getClass().getCanonicalName(), "constructor", e);
+			logger.log(Level.SEVERE,"main window initialization", e);
 		} catch (ExecutionException e) {
-			logger.throwing(this.getClass().getCanonicalName(), "constructor", e);
+			logger.log(Level.SEVERE,"main window initialization", e);
 		}
 		splash.dispose();
 	}
