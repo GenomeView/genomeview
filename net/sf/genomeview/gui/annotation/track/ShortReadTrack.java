@@ -426,13 +426,18 @@ public class ShortReadTrack extends Track {
 						g.setColor(Color.RED);
 						break;
 					case '_':
-						g.setColor(pairingColor);
+						g.setColor(Color.WHITE);
 						break;
 					default:
 						g.setColor(Color.ORANGE);
 						break;
 					}
 					g.fillRect((int) tx1, yRec, (int) (tx2 - tx1), readLineHeight - 1);
+					/* For spliced alignments, the connection is blanked with a white box, put some color back */
+					if(readNt=='_'){
+						g.setColor(pairingColor);
+						g.fillRect((int) tx1, yRec+4, (int) (tx2 - tx1), readLineHeight-8 - 1);
+					}
 					if (readNt!='_' && model.getAnnotationLocationVisible().length() < 100) {
 						g.setColor(c);
 						Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
