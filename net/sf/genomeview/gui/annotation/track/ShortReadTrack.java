@@ -410,7 +410,7 @@ public class ShortReadTrack extends Track {
 			if (seqBuffer == null)
 				seqBuffer = entry.sequence.getSubSequence(currentVisible.start, currentVisible.end + 1).toCharArray();
 			for (int j = rf.start(); j <= rf.end(); j++) {
-				if (j > currentVisible.end || j <= currentVisible.start)
+				if (j > currentVisible.end || j < currentVisible.start)
 					continue;
 				char readNt = rf.getNucleotide(j - rf.start() + 1);
 				// char refNt = entry.sequence.getNucleotide(j);
