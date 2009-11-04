@@ -313,6 +313,8 @@ public class ConfigurationDialog extends JDialog {
 		public MiscellaneousPanel(final Model model) {
 			gc.gridwidth = 2;
 			gc.weightx=1;
+			this.add(new IntegerConfig("general:zoomout", "Maximum zoom-out size"), gc);
+			gc.gridy++;
 			this.add(new BooleanConfig("dualscreen", "Enable dual-screen mode? (Requires restart)"), gc);
 			gc.gridy++;
 			this.add(new BooleanConfig("general:singleInstance", "Allow only one instance of GenomeView"), gc);
