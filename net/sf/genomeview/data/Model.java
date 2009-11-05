@@ -564,7 +564,15 @@ public class Model extends Observable implements IModel {
 		}
 
 		public boolean containsMultipleAlignment(MultipleAlignment ma) {
-			// TODO Auto-generated method stub
+			for (Track track : this) {
+				if (track instanceof MultipleAlignmentTrack2) {
+					MultipleAlignmentTrack2 srt = (MultipleAlignmentTrack2) track;
+					
+					if (srt.getMA().equals(ma))
+						return true;
+
+				}
+			}
 			return false;
 		}
 	}
