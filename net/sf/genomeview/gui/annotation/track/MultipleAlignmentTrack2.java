@@ -6,6 +6,7 @@ package net.sf.genomeview.gui.annotation.track;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
@@ -23,6 +24,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
@@ -35,7 +37,11 @@ import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortRead;
 import net.sf.jannot.shortread.ShortReadCoverage;
 import net.sf.jannot.source.DataSource;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class MultipleAlignmentTrack2 extends Track {
 
 private MultipleAlignment ma;
@@ -107,6 +113,9 @@ private MultipleAlignment ma;
 
 //	private DataSource source;
 
+	public MultipleAlignment getMA(){
+		return ma;
+	}
 	public MultipleAlignmentTrack2(Model model, MultipleAlignment ma) {
 		super(model, true, true);
 		this.ma=ma;
@@ -135,27 +144,54 @@ private MultipleAlignment ma;
 //		return Math.log(d) / LOG2;
 //	}
 
+	private int lineHeight=10;
 	@Override
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
-		Iterable<AlignmentBlock>abs=ma.get(entry, model.getAnnotationLocationVisible());
-		int count=model.entries().size();
+		Location visible=model.getAnnotationLocationVisible();
+		Iterable<AlignmentBlock>abs=ma.get(entry, visible);
+		int yMax=0;
+		CollisionMap hitmap = new CollisionMap(model);
 		for(AlignmentBlock ab:abs){
-			System.out.println("--block");
+			int abCount=0;
+			
 			int start=-1;
 			int end=-1;
 			for(AlignmentSequence as:ab){
-				System.out.println(as);
+				abCount++;
+//				System.out.println(as);
 				int index=model.entries().indexOf(as.entry());
 				if(as.entry()==entry){
 					start=as.start();
 					end=as.end();
+					
 				}
 			}
+			
 			int x1=Convert.translateGenomeToScreen(start, model.getAnnotationLocationVisible(), screenWidth);
-			int x2=Convert.translateGenomeToScreen(end+1, model.getAnnotationLocationVisible(), screenWidth);
-			g.drawRect(x1, yOffset, x2-x1, count*10);
+			int x2=Convert.translateGenomeToScreen(end, model.getAnnotationLocationVisible(), screenWidth);
+		
+			Rectangle rec=new Rectangle(start,yOffset, end-start-1, abCount*lineHeight);
+			while(hitmap.collision(rec)){
+				rec.y+=lineHeight;
+			}
+			if(rec.y+rec.height>yMax)
+				yMax=rec.y+rec.height;
+			hitmap.addLocation(rec, null);
+//			rec.x=x1;
+//			rec.width=x2-x1;
+			g.drawRect(x1,rec.y,x2-x1,rec.height);
+			if(visible.length()<100){
+				System.out.println("--block ");
+				int line=0;
+				for(AlignmentSequence as:ab){
+					System.out.println("\t"+start+"\t"+end+"\t"+as.strand());
+					g.drawString(as.seq().toString(), x1, rec.y+line*lineHeight);
+					line++;
+				}
+			}
+			
 		}
-		return count*10;
+		return yMax-yOffset;
 //		/* Store information to be used in other methods */
 //		currentEntry = entry;
 //		currentScreenWidth = screenWidth;
