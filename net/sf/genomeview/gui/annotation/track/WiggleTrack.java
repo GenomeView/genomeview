@@ -110,6 +110,7 @@ public class WiggleTrack extends Track {
 			float[] f = graph.get(start - 1, end, scaleIndex);
 
 			int lastX = 0;
+			
 			for (int i = 0; i < f.length; i++) {
 				int x = Convert.translateGenomeToScreen(start + i * scale, currentVisible, screenWidth);
 				double val = f[i];
@@ -117,14 +118,17 @@ public class WiggleTrack extends Track {
 				if (val > graph.max())
 					val = graph.max();
 
-				val -= graph.min();
-				double range= graph.max() - graph.min();
+				
+				
 				if(logScaled){
-					val+=1;
-					val = log2(val);
-					val /= log2(range);
+					double logrange=log2(graph.max()+1) - log2(graph.min()+1);
+					val-=log2(graph.min()+1);
+					val = log2(val+1);
+					val /= logrange;
 				}
 				else{
+					double range= graph.max() - graph.min();
+					val -= graph.min();
 					val /=range;
 				}
 				
