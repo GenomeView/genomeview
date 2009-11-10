@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -124,20 +125,8 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
-		// System.out.println(x + "\t" + y);
-		// if (!tooltip.isVisible())
-		// // tooltip.setVisible(true);
-		// // ReadGroup rg = currentEntry.shortReads.getReadGroup(this.source);
-		// // ShortReadCoverage currentBuffer = rg.getCoverage();
-		// // int start = Convert.translateScreenToGenome(x, currentVisible,
-		// // currentScreenWidth);
-		// // int f=(int)currentBuffer.get(Strand.FORWARD,start-1);
-		// // int r=(int)currentBuffer.get(Strand.REVERSE,start-1);
-		// tooltip.set(ab, source);
-		// // } else {
-		// // if (tooltip.isVisible())
-		// // tooltip.setVisible(false);
-		// // }
+		if (paintedBlocks.size() == 0)
+			tooltip.setVisible(false);
 		for (Map.Entry<Rectangle, AlignmentBlock> e : paintedBlocks.entrySet()) {
 			if (e.getKey().contains(x, y)) {
 				if (!tooltip.isVisible())
@@ -164,68 +153,93 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	private Map<Rectangle, AlignmentBlock> paintedBlocks = new HashMap<Rectangle, AlignmentBlock>();
 
+	private int queriedBlocks = 0;
+
 	@Override
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
 
 		paintedBlocks.clear();
 		Location visible = model.getAnnotationLocationVisible();
-		Iterable<AlignmentBlock> abs = ma.get(entry, visible);
-		int yMax = 0;
-		CollisionMap hitmap = new CollisionMap(model);
-		for (AlignmentBlock ab : abs) {
-			int abCount = 0;
+		List<AlignmentBlock> abs = ma.get(entry, visible);
+		queriedBlocks = abs.size();
+		if (queriedBlocks < 500) {
+			int yMax = 0;
+			CollisionMap hitmap = new CollisionMap(model);
+			for (AlignmentBlock ab : abs) {
+				int abCount = 0;
 
-			int start = -1;
-			int end = -1;
-			for (AlignmentSequence as : ab) {
-				abCount++;
-				// System.out.println(as);
-				int index = model.entries().indexOf(as.entry());
-				if (as.entry() == entry) {
-					start = as.start();
-					end = as.end();
-
-				}
-			}
-
-			int x1 = Convert.translateGenomeToScreen(start, model.getAnnotationLocationVisible(), screenWidth);
-			int x2 = Convert.translateGenomeToScreen(end, model.getAnnotationLocationVisible(), screenWidth);
-
-			Rectangle rec = new Rectangle(start, yOffset, end - start - 1, abCount * lineHeight);
-			while (hitmap.collision(rec)) {
-				rec.y += lineHeight;
-			}
-			if (rec.y + rec.height > yMax)
-				yMax = rec.y + rec.height;
-			hitmap.addLocation(rec, null);
-			paintedBlocks.put(new Rectangle(x1, rec.y - yOffset, x2 - x1, rec.height), ab);
-			// rec.x=x1;
-			// rec.width=x2-x1;
-			g.drawRect(x1, rec.y, x2 - x1, rec.height);
-			if (visible.length() < 100) {
-				// System.out.println("--block ");
-				int line = 1;
+				int start = -1;
+				int end = -1;
 				for (AlignmentSequence as : ab) {
-					// System.out.println("\t" + start + "\t" + end + "\t" +
-					// as.strand());
-					// g.drawString(as.seq().toString(), x1,
-					// rec.y+line*lineHeight);
-					for (int i = visible.start; i <= visible.end; i++) {
-						if (i >= start && i < end) {
-							double width = screenWidth / (double) visible.length();
-							char nt = as.seq().getNucleotide(ab.translate(entry, i - start + 1));
-							Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
-							g.setColor(Color.BLACK);
-							g.drawString("" + nt, (int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)), rec.y + line * lineHeight - 2);
+					abCount++;
+					// System.out.println(as);
+					int index = model.entries().indexOf(as.entry());
+					if (as.entry() == entry) {
+						start = as.start();
+						end = as.end();
 
-						}
 					}
-					line++;
+				}
+
+				int x1 = Convert.translateGenomeToScreen(start, model.getAnnotationLocationVisible(), screenWidth);
+				int x2 = Convert.translateGenomeToScreen(end, model.getAnnotationLocationVisible(), screenWidth);
+
+				Rectangle rec = new Rectangle(start, yOffset, end - start - 1, abCount * lineHeight);
+				while (hitmap.collision(rec)) {
+					rec.y += lineHeight;
+				}
+				if (rec.y + rec.height > yMax)
+					yMax = rec.y + rec.height;
+				hitmap.addLocation(rec, null);
+				paintedBlocks.put(new Rectangle(x1, rec.y - yOffset, x2 - x1, rec.height), ab);
+				// rec.x=x1;
+				// rec.width=x2-x1;
+				g.drawRect(x1, rec.y, x2 - x1, rec.height);
+				if (visible.length() < 100) {
+					// System.out.println("--block ");
+					int line = 1;
+					for (AlignmentSequence as : ab) {
+						// System.out.println("\t" + start + "\t" + end + "\t" +
+						// as.strand());
+						// g.drawString(as.seq().toString(), x1,
+						// rec.y+line*lineHeight);
+						for (int i = visible.start; i <= visible.end; i++) {
+							if (i >= start && i < end) {
+								double width = screenWidth / (double) visible.length();
+								char nt = as.seq().getNucleotide(ab.translate(entry, i - start + 1));
+								Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
+								g.setColor(Color.BLACK);
+								g.drawString("" + nt, (int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)), rec.y + line * lineHeight - 2);
+
+							}
+						}
+						line++;
+					}
+				}
+
+			}
+			return yMax - yOffset;
+		} else {/* More than 500 blocks on screen */
+			int[] counts = new int[(int) Math.ceil(screenWidth)];
+			for (AlignmentBlock ab : abs) {
+				AlignmentSequence as = ab.getAlignmentSequence(entry);
+				int start = Convert.translateGenomeToScreen(as.start(), visible, screenWidth);
+				int end = Convert.translateGenomeToScreen(as.end(), visible, screenWidth);
+				for (int i = start; i <end; i++) {
+					if(i>=0&&i<counts.length)
+						counts[i] += ab.size();
 				}
 			}
+			int yMax = 0;
+			for (int i = 0; i < counts.length; i++) {
+				if (counts[i] > yMax)
+					yMax = counts[i];
+				g.drawLine(i, yOffset, i,yOffset+ counts[i] * lineHeight);
 
+			}
+
+			return yMax * lineHeight;
 		}
-		return yMax - yOffset;
 		// /* Store information to be used in other methods */
 		// currentEntry = entry;
 		// currentScreenWidth = screenWidth;
