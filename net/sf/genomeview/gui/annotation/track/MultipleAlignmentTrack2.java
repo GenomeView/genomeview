@@ -4,14 +4,10 @@
 package net.sf.genomeview.gui.annotation.track;
 
 import java.awt.Color;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
-import java.util.BitSet;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,23 +16,14 @@ import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
-import net.sf.jannot.Strand;
 import net.sf.jannot.alignment.AlignmentBlock;
 import net.sf.jannot.alignment.AlignmentSequence;
 import net.sf.jannot.alignment.MultipleAlignment;
-import net.sf.jannot.shortread.BAMreads;
-import net.sf.jannot.shortread.ExtendedShortRead;
-import net.sf.jannot.shortread.ReadGroup;
-import net.sf.jannot.shortread.ShortRead;
-import net.sf.jannot.shortread.ShortReadCoverage;
-import net.sf.jannot.source.DataSource;
 
 /**
  * 
@@ -45,11 +32,48 @@ import net.sf.jannot.source.DataSource;
  */
 public class MultipleAlignmentTrack2 extends Track {
 
+	private class Tooltip extends JWindow {
+
+		private JLabel floater = new JLabel();
+
+		public Tooltip() {
+			floater.setBackground(Color.GRAY);
+			floater.setForeground(Color.BLACK);
+			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
+			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+			add(floater);
+			pack();
+		}
+
+		public void set(AlignmentBlock ab, MouseEvent e) {
+			StringBuffer text = new StringBuffer();
+			text.append("<html>");
+			for (AlignmentSequence as : ab) {
+				text.append(as.entry() + " " + as.start() + " " + (as.end() - 1) + " " + as.strand() + "<br/>");
+			}
+
+			text.append("</html>");
+			if (!text.toString().equals(floater.getText())) {
+				floater.setText(text.toString());
+				this.pack();
+			}
+			setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
+
+			if (!isVisible()) {
+				setVisible(true);
+			}
+
+		}
+
+	}
+
 	private MultipleAlignment ma;
 
 	// private final int graphLineHeigh = 50;
 	//
-	// private Tooltip tooltip = new Tooltip();
+	private Tooltip tooltip = new Tooltip();
+
 	//
 	// private class Tooltip extends JWindow {
 	//
@@ -94,26 +118,34 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	@Override
 	public boolean mouseExited(int x, int y, MouseEvent source) {
-		// tooltip.setVisible(false);
+		tooltip.setVisible(false);
 		return false;
 	}
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
-		// if (scale <= 256) {
+		// System.out.println(x + "\t" + y);
 		// if (!tooltip.isVisible())
-		// tooltip.setVisible(true);
-		// ReadGroup rg = currentEntry.shortReads.getReadGroup(this.source);
-		// ShortReadCoverage currentBuffer = rg.getCoverage();
-		// int start = Convert.translateScreenToGenome(x, currentVisible,
-		// currentScreenWidth);
-		// int f=(int)currentBuffer.get(Strand.FORWARD,start-1);
-		// int r=(int)currentBuffer.get(Strand.REVERSE,start-1);
-		// tooltip.set(f, r, f+r, source);
-		// } else {
-		// if (tooltip.isVisible())
-		// tooltip.setVisible(false);
-		// }
+		// // tooltip.setVisible(true);
+		// // ReadGroup rg = currentEntry.shortReads.getReadGroup(this.source);
+		// // ShortReadCoverage currentBuffer = rg.getCoverage();
+		// // int start = Convert.translateScreenToGenome(x, currentVisible,
+		// // currentScreenWidth);
+		// // int f=(int)currentBuffer.get(Strand.FORWARD,start-1);
+		// // int r=(int)currentBuffer.get(Strand.REVERSE,start-1);
+		// tooltip.set(ab, source);
+		// // } else {
+		// // if (tooltip.isVisible())
+		// // tooltip.setVisible(false);
+		// // }
+		for (Map.Entry<Rectangle, AlignmentBlock> e : paintedBlocks.entrySet()) {
+			if (e.getKey().contains(x, y)) {
+				if (!tooltip.isVisible())
+					tooltip.setVisible(true);
+				tooltip.set(e.getValue(), source);
+				return false;
+			}
+		}
 		return false;
 	}
 
@@ -128,31 +160,14 @@ public class MultipleAlignmentTrack2 extends Track {
 		this.ma = ma;
 	}
 
-	// private int scale = 1;
-	// private int scaleIndex = 0;
-	//
-	// private Location currentVisible;
-	//
-	// private Color pairingColor;
-	//
-	// private Color reverseColor;
-	//
-	// private Color forwardColor;
-	//
-	// private Entry currentEntry;
-	//
-	// private double currentScreenWidth;
-
-	// private static final double LOG2 = Math.log(2);
-
-	// private double log2(double d) {
-	// return Math.log(d) / LOG2;
-	// }
-
 	private int lineHeight = 15;
+
+	private Map<Rectangle, AlignmentBlock> paintedBlocks = new HashMap<Rectangle, AlignmentBlock>();
 
 	@Override
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
+
+		paintedBlocks.clear();
 		Location visible = model.getAnnotationLocationVisible();
 		Iterable<AlignmentBlock> abs = ma.get(entry, visible);
 		int yMax = 0;
@@ -183,20 +198,22 @@ public class MultipleAlignmentTrack2 extends Track {
 			if (rec.y + rec.height > yMax)
 				yMax = rec.y + rec.height;
 			hitmap.addLocation(rec, null);
+			paintedBlocks.put(new Rectangle(x1, rec.y - yOffset, x2 - x1, rec.height), ab);
 			// rec.x=x1;
 			// rec.width=x2-x1;
 			g.drawRect(x1, rec.y, x2 - x1, rec.height);
 			if (visible.length() < 100) {
-				System.out.println("--block ");
+				// System.out.println("--block ");
 				int line = 1;
 				for (AlignmentSequence as : ab) {
-					System.out.println("\t" + start + "\t" + end + "\t" + as.strand());
+					// System.out.println("\t" + start + "\t" + end + "\t" +
+					// as.strand());
 					// g.drawString(as.seq().toString(), x1,
 					// rec.y+line*lineHeight);
 					for (int i = visible.start; i <= visible.end; i++) {
 						if (i >= start && i < end) {
 							double width = screenWidth / (double) visible.length();
-							char nt = as.seq().getNucleotide(ab.translate(entry, i - start+1));
+							char nt = as.seq().getNucleotide(ab.translate(entry, i - start + 1));
 							Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
 							g.setColor(Color.BLACK);
 							g.drawString("" + nt, (int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)), rec.y + line * lineHeight - 2);
