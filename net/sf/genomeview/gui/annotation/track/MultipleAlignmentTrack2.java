@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.components.CollisionMap;
@@ -194,8 +195,11 @@ public class MultipleAlignmentTrack2 extends Track {
 				paintedBlocks.put(new Rectangle(x1, rec.y - yOffset, x2 - x1, rec.height), ab);
 				// rec.x=x1;
 				// rec.width=x2-x1;
+				g.setColor(Color.BLACK);
 				g.drawRect(x1, rec.y, x2 - x1, rec.height);
-				if (visible.length() < 100) {
+
+				if (visible.length() < 1000) {
+					char[] ref = entry.sequence.getSubSequence(visible.start, visible.end + 1).toCharArray();
 					// System.out.println("--block ");
 					int line = 1;
 					for (AlignmentSequence as : ab) {
@@ -207,10 +211,23 @@ public class MultipleAlignmentTrack2 extends Track {
 							if (i >= start && i < end) {
 								double width = screenWidth / (double) visible.length();
 								char nt = as.seq().getNucleotide(ab.translate(entry, i - start + 1));
-								Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
-								g.setColor(Color.BLACK);
-								g.drawString("" + nt, (int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)), rec.y + line * lineHeight - 2);
-
+								// System.out.println(nt + "\t" + ref[i -
+								// visible.start]);
+								if (ref[i - visible.start] != nt) {
+									if (nt == '-')
+										g.setColor(Color.RED);
+									else
+										g.setColor(Color.lightGray);
+									g.fillRect((int) ((i - visible.start) * width), rec.y + (line - 1) * lineHeight, (int) Math.ceil(width), lineHeight);
+									if (visible.length() < 100) {
+										Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
+										if (nt == '-')
+											g.setColor(Color.BLACK);
+										else
+											g.setColor(Configuration.getNucleotideColor(nt));
+										g.drawString("" + nt, (int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)), rec.y + line * lineHeight - 2);
+									}
+								}
 							}
 						}
 						line++;
@@ -225,8 +242,8 @@ public class MultipleAlignmentTrack2 extends Track {
 				AlignmentSequence as = ab.getAlignmentSequence(entry);
 				int start = Convert.translateGenomeToScreen(as.start(), visible, screenWidth);
 				int end = Convert.translateGenomeToScreen(as.end(), visible, screenWidth);
-				for (int i = start; i <end; i++) {
-					if(i>=0&&i<counts.length)
+				for (int i = start; i < end; i++) {
+					if (i >= 0 && i < counts.length)
 						counts[i] += ab.size();
 				}
 			}
@@ -234,7 +251,7 @@ public class MultipleAlignmentTrack2 extends Track {
 			for (int i = 0; i < counts.length; i++) {
 				if (counts[i] > yMax)
 					yMax = counts[i];
-				g.drawLine(i, yOffset, i,yOffset+ counts[i] * lineHeight);
+				g.drawLine(i, yOffset, i, yOffset + counts[i] * lineHeight);
 
 			}
 
