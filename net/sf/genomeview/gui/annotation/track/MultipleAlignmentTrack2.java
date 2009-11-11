@@ -23,6 +23,7 @@ import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
+import net.sf.jannot.Strand;
 import net.sf.jannot.alignment.AlignmentBlock;
 import net.sf.jannot.alignment.AlignmentSequence;
 import net.sf.jannot.alignment.MultipleAlignment;
@@ -43,7 +44,8 @@ public class MultipleAlignmentTrack2 extends Track {
 			floater.setForeground(Color.BLACK);
 			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
-			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder,
+					emptyBorder));
 			add(floater);
 			pack();
 		}
@@ -52,7 +54,8 @@ public class MultipleAlignmentTrack2 extends Track {
 			StringBuffer text = new StringBuffer();
 			text.append("<html>");
 			for (AlignmentSequence as : ab) {
-				text.append(as.entry() + " " + as.start() + " " + (as.end() - 1) + " " + as.strand() + "<br/>");
+				text.append(as.entry() + " " + as.start() + " "
+						+ (as.end() - 1) + " " + as.strand() + "<br/>");
 			}
 
 			text.append("</html>");
@@ -157,7 +160,8 @@ public class MultipleAlignmentTrack2 extends Track {
 	private int queriedBlocks = 0;
 
 	@Override
-	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
+	public int paintTrack(Graphics2D g, final Entry entry, int yOffset,
+			double screenWidth) {
 
 		paintedBlocks.clear();
 		Location visible = model.getAnnotationLocationVisible();
@@ -182,24 +186,29 @@ public class MultipleAlignmentTrack2 extends Track {
 					}
 				}
 
-				int x1 = Convert.translateGenomeToScreen(start, model.getAnnotationLocationVisible(), screenWidth);
-				int x2 = Convert.translateGenomeToScreen(end, model.getAnnotationLocationVisible(), screenWidth);
+				int x1 = Convert.translateGenomeToScreen(start, model
+						.getAnnotationLocationVisible(), screenWidth);
+				int x2 = Convert.translateGenomeToScreen(end, model
+						.getAnnotationLocationVisible(), screenWidth);
 
-				Rectangle rec = new Rectangle(start, yOffset, end - start - 1, abCount * lineHeight);
+				Rectangle rec = new Rectangle(start, yOffset, end - start - 1,
+						abCount * lineHeight);
 				while (hitmap.collision(rec)) {
 					rec.y += lineHeight;
 				}
 				if (rec.y + rec.height > yMax)
 					yMax = rec.y + rec.height;
 				hitmap.addLocation(rec, null);
-				paintedBlocks.put(new Rectangle(x1, rec.y - yOffset, x2 - x1, rec.height), ab);
+				paintedBlocks.put(new Rectangle(x1, rec.y - yOffset, x2 - x1,
+						rec.height), ab);
 				// rec.x=x1;
 				// rec.width=x2-x1;
 				g.setColor(Color.BLACK);
 				g.drawRect(x1, rec.y, x2 - x1, rec.height);
 
 				if (visible.length() < 1000) {
-					char[] ref = entry.sequence.getSubSequence(visible.start, visible.end + 1).toCharArray();
+					char[] ref = entry.sequence.getSubSequence(visible.start,
+							visible.end + 1).toCharArray();
 					// System.out.println("--block ");
 					int line = 1;
 					for (AlignmentSequence as : ab) {
@@ -209,23 +218,48 @@ public class MultipleAlignmentTrack2 extends Track {
 						// rec.y+line*lineHeight);
 						for (int i = visible.start; i <= visible.end; i++) {
 							if (i >= start && i < end) {
-								double width = screenWidth / (double) visible.length();
-								char nt = as.seq().getNucleotide(ab.translate(entry, i - start + 1));
+								double width = screenWidth
+										/ (double) visible.length();
+								int translated = ab.translate(entry, i - start
+										);
+								char nt;
+								if (as.strand() == Strand.FORWARD)
+									nt = as.seq().getNucleotide(translated+1);
+								else
+									nt = as.seq().getReverseNucleotide(
+											as.seq().size() - translated);
 								// System.out.println(nt + "\t" + ref[i -
 								// visible.start]);
 								if (ref[i - visible.start] != nt) {
 									if (nt == '-')
 										g.setColor(Color.RED);
 									else
-										g.setColor(Color.lightGray);
-									g.fillRect((int) ((i - visible.start) * width), rec.y + (line - 1) * lineHeight, (int) Math.ceil(width), lineHeight);
+										g.setColor(Color.DARK_GRAY);
+									g
+											.fillRect(
+													(int) ((i - visible.start) * width),
+													rec.y + (line - 1)
+															* lineHeight,
+													(int) Math.ceil(width),
+													lineHeight);
 									if (visible.length() < 100) {
-										Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
+										Rectangle2D stringSize = g
+												.getFontMetrics()
+												.getStringBounds("" + nt, g);
 										if (nt == '-')
 											g.setColor(Color.BLACK);
 										else
-											g.setColor(Configuration.getNucleotideColor(nt));
-										g.drawString("" + nt, (int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)), rec.y + line * lineHeight - 2);
+											g.setColor(Configuration
+													.getNucleotideColor(nt).brighter());
+										g
+												.drawString(
+														"" + nt,
+														(int) (((i - visible.start)
+																* width - stringSize
+																.getWidth() / 2) + (width / 2)),
+														rec.y + line
+																* lineHeight
+																- 2);
 									}
 								}
 							}
@@ -240,8 +274,10 @@ public class MultipleAlignmentTrack2 extends Track {
 			int[] counts = new int[(int) Math.ceil(screenWidth)];
 			for (AlignmentBlock ab : abs) {
 				AlignmentSequence as = ab.getAlignmentSequence(entry);
-				int start = Convert.translateGenomeToScreen(as.start(), visible, screenWidth);
-				int end = Convert.translateGenomeToScreen(as.end(), visible, screenWidth);
+				int start = Convert.translateGenomeToScreen(as.start(),
+						visible, screenWidth);
+				int end = Convert.translateGenomeToScreen(as.end(), visible,
+						screenWidth);
 				for (int i = start; i < end; i++) {
 					if (i >= 0 && i < counts.length)
 						counts[i] += ab.size();
