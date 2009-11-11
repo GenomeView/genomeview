@@ -159,9 +159,8 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 	@Override
 	public void mouseExited(MouseEvent e) {
 		/* Transfer MouseEvent to corresponding track */
-		Track mouseTrack = tracks.get(e);
-		if (mouseTrack != null)
-			mouseTrack.mouseExited(e.getX(), e.getY(), e);
+		if (last != null)
+			last.mouseExited(e.getX(), e.getY(), e);
 		/* Specific mouse code for this label */
 
 	}
@@ -228,12 +227,13 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 	}
 
 	private Track last = null;
-
+	
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		/* Transfer MouseEvent to corresponding track */
 
 		Track mouseTrack = tracks.get(e);
+	
 		boolean consumed = false;
 		if (mouseTrack != null) {
 			if (last != mouseTrack) {
