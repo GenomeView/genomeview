@@ -14,7 +14,11 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.genomeview.data.Model;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class TrackTable extends JTable {
 
     private static final long serialVersionUID = 2680194422003453639L;
@@ -24,6 +28,7 @@ public class TrackTable extends JTable {
         final TrackTableModel listModel = (TrackTableModel) this.getModel();
         getTableHeader().addMouseMotionListener(new ColumnHeaderToolTips(listModel));
         getTableHeader().setReorderingAllowed(false);
+        setUI(new DragDropRowTableUI(model));
         /* Set column widths */
 //        setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //        getColumnModel().getColumn(0).setPreferredWidth(150);
