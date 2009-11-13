@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
@@ -20,12 +21,16 @@ import net.sf.genomeview.gui.menu.PopUpMenu;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.wiggle.Graph;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 // A SINGLE WIGGLE TRACK CAN CONTAIN MULTIPLE GRAPHS
 public class WiggleTrack extends Track {
 	private boolean logScaled = false;
 
-	class WigglePopup extends JPopupMenu {
+	private class WigglePopup extends JPopupMenu {
 		public WigglePopup() {
 			if(!logScaled)
 				add(new AbstractAction("Use log scaling"){
@@ -52,11 +57,12 @@ public class WiggleTrack extends Track {
 			}
 		}
 	}
-
+	private static final Logger log=Logger.getLogger(WiggleTrack.class.getCanonicalName());
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
 		/* Specific mouse code for this label */
 		if (Mouse.button2(e) || Mouse.button3(e)) {
+			log.finest("Wiggle track consumes button2||button3");
 			new WigglePopup().show(e.getComponent(), e.getX(), currentYOffset+e.getY());
 			return true;
 		}
