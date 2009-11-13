@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.Observable;
+import java.util.logging.Logger;
 
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Entry;
@@ -28,12 +29,14 @@ public abstract class Track extends Observable {
 	}
 
 	private boolean visible;
+	private static final Logger log=Logger.getLogger(Track.class.getCanonicalName());
 
 	/**
 	 * To pass along mouse clicks from the original panel.
 	 */
 	public boolean mouseClicked(int x, int y, MouseEvent source) {
 		if (collapse != null && collapse.contains(x, y)) {
+			log.finest("Track consumes click");
 			this.setCollapsed(!this.isCollapsed());
 			source.consume();
 			return true;

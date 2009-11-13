@@ -257,15 +257,11 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 	public void mouseClicked(MouseEvent e) {
 		int y = e.getY();
 		/* Transfer MouseEvent to corresponding track */
-
 		Track mouseTrack = tracks.get(e);
-		boolean consumed = false;
 		if (mouseTrack != null)
-			consumed = mouseTrack.mouseClicked(e.getX(), e.getY(), e);
-		if (consumed)
-			return;
+			mouseTrack.mouseClicked(e.getX(), e.getY(), e);
 		/* Specific mouse code for this label */
-		if (Mouse.button2(e) || Mouse.button3(e)) {
+		if (!e.isConsumed()&&(Mouse.button2(e) || Mouse.button3(e))) {
 			new PopUpMenu(model).show(this, e.getX(), y);
 		}
 	}

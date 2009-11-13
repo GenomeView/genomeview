@@ -60,10 +60,12 @@ public class WiggleTrack extends Track {
 	private static final Logger log=Logger.getLogger(WiggleTrack.class.getCanonicalName());
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
+		super.mouseClicked(x, y, e);
 		/* Specific mouse code for this label */
-		if (Mouse.button2(e) || Mouse.button3(e)) {
+		if (!e.isConsumed()&&(Mouse.button2(e) || Mouse.button3(e))) {
 			log.finest("Wiggle track consumes button2||button3");
 			new WigglePopup().show(e.getComponent(), e.getX(), currentYOffset+e.getY());
+			e.consume();
 			return true;
 		}
 		return false;
