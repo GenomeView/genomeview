@@ -129,34 +129,9 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	/**
-	 * Gives the index of the selected entry
-	 * 
-	 * @return
-	 */
-
-	static class DummyEntry extends Entry {
-		public DummyEntry() {
-			super(null,null);
-		}
-
-		@Override
-		public String getID() {
-			return null;
-		}
-
-		@Override
-		public String toString() {
-			return "Nothing loaded";
-		}
-
-	}
-
-	private Entry dummy = new DummyEntry();
-
-	public Entry getSelectedEntry() {
+		public Entry getSelectedEntry() {
 		if (entries.size() == 0)
-			return dummy;
+			return DummyEntry.dummy;
 		return entries.getEntry();
 	}
 
@@ -633,8 +608,10 @@ public class Model extends Observable implements IModel {
 
 		/* Multiple alignments tracks */
 		for (MultipleAlignment ma : entries().multiplealignment) {
-			if (!trackList.containsMultipleAlignment(ma))
+			if (!trackList.containsMultipleAlignment(ma)){
 				trackList.add(new MultipleAlignmentTrack2(this, ma));
+				logger.info("Added multiple alignment track "+ma);
+			}
 		}
 		for (String s : targets) {
 			for (String t : targets) {

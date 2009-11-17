@@ -8,6 +8,7 @@ import java.util.Observer;
 
 import javax.swing.DefaultComboBoxModel;
 
+import net.sf.genomeview.data.DummyEntry;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
@@ -28,25 +29,6 @@ final class EntryListModel extends DefaultComboBoxModel implements Observer {
 
 	private static final long serialVersionUID = -3028394066023453566L;
 
-	static class DummyEntry extends Entry {
-		public DummyEntry() {
-			super(null,null);
-		}
-
-		@Override
-		public String getID() {
-			return null;
-		}
-
-		@Override
-		public String toString() {
-			return "Nothing loaded";
-		}
-
-	}
-
-	private Entry dummy = new DummyEntry();
-
 	@Override
 	public Object getElementAt(int i) {
 		int count=0;
@@ -55,7 +37,7 @@ final class EntryListModel extends DefaultComboBoxModel implements Observer {
 				return e;
 			count++;
 		}
-		return dummy;
+		return DummyEntry.dummy;
 	}
 
 	@Override
