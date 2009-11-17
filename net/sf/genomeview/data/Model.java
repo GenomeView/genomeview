@@ -84,6 +84,7 @@ public class Model extends Observable implements IModel {
 		for (Entry e : entries)
 			if (e.getID().equalsIgnoreCase(id))
 				return e;
+		logger.warning("Entry not found: "+id);
 		return null;
 	}
 
@@ -129,7 +130,7 @@ public class Model extends Observable implements IModel {
 
 	}
 
-		public Entry getSelectedEntry() {
+	public Entry getSelectedEntry() {
 		if (entries.size() == 0)
 			return DummyEntry.dummy;
 		return entries.getEntry();
@@ -571,6 +572,7 @@ public class Model extends Observable implements IModel {
 	 * All types and graphs loaded should have a corresponding track.
 	 */
 	public synchronized void updateTracks() {
+		int startSize=trackList.size();
 		for (Type t : Type.values()) {
 			if (!trackList.containsType(t))
 				trackList.add(new FeatureTrack(this, t, true));
@@ -619,7 +621,8 @@ public class Model extends Observable implements IModel {
 					trackList.add(new SyntenicTrack(this, s, t));
 			}
 		}
-		refresh(NotificationTypes.UPDATETRACKS);
+		if(trackList.size()!=startSize)
+			refresh(NotificationTypes.UPDATETRACKS);
 
 	}
 

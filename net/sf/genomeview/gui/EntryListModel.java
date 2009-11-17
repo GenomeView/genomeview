@@ -3,10 +3,16 @@
  */
 package net.sf.genomeview.gui;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
 import net.sf.genomeview.data.DummyEntry;
 import net.sf.genomeview.data.Model;
@@ -18,7 +24,7 @@ import net.sf.jannot.EntrySet;
  * @author Thomas Abeel
  * 
  */
-final class EntryListModel extends DefaultComboBoxModel implements Observer {
+final class EntryListModel implements Observer, ComboBoxModel {
 
 	private Model model;
 
@@ -29,20 +35,19 @@ final class EntryListModel extends DefaultComboBoxModel implements Observer {
 
 	private static final long serialVersionUID = -3028394066023453566L;
 
+	private int lastSize = 0;
+
 	@Override
 	public Object getElementAt(int i) {
-		int count=0;
-		for(Entry e:model.entries()){
-			if(count==i)
-				return e;
-			count++;
-		}
-		return DummyEntry.dummy;
+		if(tmpList.size()==0)
+			return DummyEntry.dummy;
+		else
+			return tmpList.get(i);
 	}
 
 	@Override
 	public int getSize() {
-		return model.noEntries();
+		return tmpList.size();
 	}
 
 	@Override
@@ -55,10 +60,40 @@ final class EntryListModel extends DefaultComboBoxModel implements Observer {
 		model.setSelectedEntry((Entry) anItem);
 
 	}
+	private ArrayList<Entry>tmpList=new ArrayList<Entry>();
 
 	@Override
-	public void update(Observable arg0, Object arg1) {
-		fireContentsChanged(arg0, 0, model.noEntries());
+	public synchronized void update(Observable arg0, Object arg1) {
+		// System.out.println("loop");
+		int size = model.noEntries();
+		// for (int i = 0; i < size; i++)
+		// System.out.println("\t" + getElementAt(i));
+		// System.out.println("fire: " + model.noEntries());
+		if (size != lastSize) {
+			tmpList.clear();
+			for(Entry e:model.entries()){
+				tmpList.add(e);
+			}
+			ListDataEvent le = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, model.noEntries());
+			for (ListDataListener l : listeners) {
+				l.contentsChanged(le);
+			}
+			lastSize = tmpList.size();
+		}
+
+	}
+
+	private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
+
+	@Override
+	public void addListDataListener(ListDataListener l) {
+		listeners.add(l);
+
+	}
+
+	@Override
+	public void removeListDataListener(ListDataListener l) {
+		listeners.remove(l);
 
 	}
 
