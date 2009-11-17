@@ -111,8 +111,8 @@ public class DAS extends DataSource {
 
 	private Entry getEntry(String ref, EntryPoint ep) throws MalformedURLException, ParserConfigurationException, SAXException, IOException {
 		StringBuffer seq = this.getSequence(ref, ep);
-		Entry out = new Entry(null);
-		out.setID(ref + ":" + ep);
+		Entry out = new Entry(ref + ":" + ep,null);
+//		out.setID();
 		out.sequence.setSequence(seq);
 		// System.out.println("Ref: " + ref);
 		// if (ref.contains("Homo")) {

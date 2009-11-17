@@ -137,7 +137,7 @@ public class Model extends Observable implements IModel {
 
 	static class DummyEntry extends Entry {
 		public DummyEntry() {
-			super(null);
+			super(null,null);
 		}
 
 		@Override

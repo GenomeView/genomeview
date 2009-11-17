@@ -178,7 +178,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				for (AlignmentSequence as : ab) {
 					abCount++;
 					// System.out.println(as);
-					int index = model.entries().indexOf(as.entry());
+//					int index = model.entries().indexOf(as.entry());
 					if (as.entry() == entry) {
 						start = as.start();
 						end = as.end();

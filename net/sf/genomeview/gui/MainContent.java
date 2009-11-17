@@ -52,7 +52,7 @@ public class MainContent {
 		bar.add(new AnnotationMoveRightAction(model));
 		bar.addSeparator();
 		bar.add(new JLabel("Entry:"));
-		bar.add(new JComboBox(new ChromosomeListModel(model)));
+		bar.add(new JComboBox(new EntryListModel(model)));
 		if (Configuration.getBoolean("geneticCodeSelection")) {
 			bar.add(new JLabel("Code:"));
 			bar.add(new AAMappingChooser(model));
@@ -128,63 +128,4 @@ public class MainContent {
 
 }
 
-class ChromosomeListModel extends DefaultComboBoxModel implements Observer {
 
-	private Model model;
-
-	public ChromosomeListModel(Model model) {
-		model.addObserver(this);
-		this.model = model;
-	}
-
-	private static final long serialVersionUID = -3028394066023453566L;
-
-	static class DummyEntry extends Entry {
-		public DummyEntry() {
-			super(null);
-		}
-
-		@Override
-		public String getID() {
-			return null;
-		}
-
-		@Override
-		public String toString() {
-			return "Nothing loaded";
-		}
-
-	}
-
-	private Entry dummy = new DummyEntry();
-	@Override
-	public Object getElementAt(int i) {
-		if(model.entries().size()>0)
-			return model.entries().getEntry(i);
-		else 
-			return dummy;
-	}
-
-	@Override
-	public int getSize() {
-		return model.noEntries();
-	}
-
-	@Override
-	public Object getSelectedItem() {
-		return model.getSelectedEntry();
-	}
-
-	@Override
-	public void setSelectedItem(Object anItem) {
-		model.setSelectedEntry((Entry) anItem);
-
-	}
-
-	@Override
-	public void update(Observable arg0, Object arg1) {
-		fireContentsChanged(arg0, 0, model.noEntries());
-
-	}
-
-}
