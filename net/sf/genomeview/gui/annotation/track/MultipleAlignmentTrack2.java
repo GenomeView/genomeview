@@ -11,6 +11,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -165,7 +166,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 		paintedBlocks.clear();
 		Location visible = model.getAnnotationLocationVisible();
-		List<AlignmentBlock> abs = ma.get(entry, visible);
+		TreeSet<AlignmentBlock> abs = ma.get(entry, visible);
 		queriedBlocks = abs.size();
 		if (queriedBlocks < 500) {
 			int yMax = 0;
