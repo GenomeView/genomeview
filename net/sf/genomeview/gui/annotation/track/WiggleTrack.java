@@ -11,13 +11,16 @@ import java.awt.geom.GeneralPath;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
+import javax.swing.JWindow;
+import javax.swing.border.Border;
 
 import net.sf.genomeview.core.ColorFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
-import net.sf.genomeview.gui.menu.PopUpMenu;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.wiggle.Graph;
@@ -30,6 +33,41 @@ import net.sf.jannot.wiggle.Graph;
 // A SINGLE WIGGLE TRACK CAN CONTAIN MULTIPLE GRAPHS
 public class WiggleTrack extends Track {
 	private boolean logScaled = false;
+
+	private Tooltip tooltip = new Tooltip();
+
+	private class Tooltip extends JWindow {
+
+		private static final long serialVersionUID = -7416732151483650659L;
+
+		private JLabel floater = new JLabel();
+
+		private Tooltip() {
+			floater.setBackground(Color.GRAY);
+			floater.setForeground(Color.BLACK);
+			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
+			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+			add(floater);
+			pack();
+		}
+
+		public void set(float value, MouseEvent e) {
+			StringBuffer text = new StringBuffer();
+			text.append(value);
+			if (!text.toString().equals(floater.getText())) {
+				floater.setText(text.toString());
+				this.pack();
+			}
+			setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
+
+			if (!isVisible()) {
+				setVisible(true);
+			}
+
+		}
+
+	}
 
 	private class WigglePopup extends JPopupMenu {
 		public WigglePopup() {
@@ -85,6 +123,28 @@ public class WiggleTrack extends Track {
 
 	}
 
+	@Override
+	public boolean mouseExited(int x, int y, MouseEvent e) {
+		tooltip.setVisible(false);
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int x, int y, MouseEvent e) {
+		super.mouseMoved(x, y, e);
+		
+		if (!e.isConsumed()) {
+			Graph g=entry.graphs.getGraph(name);
+			if(g!=null){
+				int pos=Convert.translateScreenToGenome(e.getX(), currentVisible, screenWidth);
+				tooltip.set(g.value(pos), e);
+				
+			}
+		}
+		return false;
+
+	}
+
 	private String name;
 	private Location currentVisible;
 	private int currentYOffset;
@@ -107,11 +167,17 @@ public class WiggleTrack extends Track {
 	}
 
 	private int plotType = 0;
+	private double screenWidth;
+
+	/* Last painted entry */
+	private Entry entry;
 
 	@Override
 	public int paintTrack(Graphics2D g, Entry e, int yOffset, double screenWidth) {
-		currentVisible = model.getAnnotationLocationVisible();
-		currentYOffset = yOffset;
+		this.currentVisible = model.getAnnotationLocationVisible();
+		this.currentYOffset = yOffset;
+		this.screenWidth = screenWidth;
+		this.entry = e;
 		int graphLineHeigh = 50;
 		/* keeps track of the space used during painting */
 		int yUsed = 0;
@@ -160,13 +226,13 @@ public class WiggleTrack extends Track {
 
 						conservationGP.lineTo(x, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
 					} else {
-						int top=(int)( yOffset + (1 - val) * graphLineHeigh);
-						g.fillRect(x,top, x-lastX+1,graphLineHeigh-top+yOffset);
+						int top = (int) (yOffset + (1 - val) * graphLineHeigh);
+						g.fillRect(x, top, x - lastX + 1, graphLineHeigh - top + yOffset);
 					}
 				} else {
 					g.setColor(ColorFactory.getColorCoding(val));
 					g.fillRect(lastX, yOffset, x - lastX, 10);
-					
+
 				}
 				lastX = x;
 
