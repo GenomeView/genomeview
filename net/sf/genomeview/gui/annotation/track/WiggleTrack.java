@@ -179,6 +179,7 @@ public class WiggleTrack extends Track {
 		this.screenWidth = screenWidth;
 		this.entry = e;
 		int graphLineHeigh = 50;
+		g.setColor(Color.BLACK);
 		/* keeps track of the space used during painting */
 		int yUsed = 0;
 		Graph graph = e.graphs.getGraph(name);

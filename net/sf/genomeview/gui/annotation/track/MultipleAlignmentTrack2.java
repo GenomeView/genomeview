@@ -187,6 +187,7 @@ public class MultipleAlignmentTrack2 extends Track {
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
 		// this.yOffset = yOffset;
 		paintedBlocks.clear();
+		g.setColor(Color.BLACK);
 		Location visible = model.getAnnotationLocationVisible();
 		TreeSet<AlignmentBlock> abs = ma.get(entry, visible);
 		queriedBlocks = abs.size();
