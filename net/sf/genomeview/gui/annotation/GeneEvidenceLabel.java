@@ -148,6 +148,8 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		}
 
 		public Track get(MouseEvent e) {
+			if(e.getY()>framePixelsUsed)
+				return null;
 			int mouseOffset = getMouseOffset(e);
 			e.translatePoint(0, -mouseOffset);
 			return tracks.get(mouseOffset);
@@ -234,12 +236,16 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 		Track mouseTrack = tracks.get(e);
 	
+		if (last != mouseTrack) {
+			if (last != null)
+				last.mouseExited(e.getX(), e.getY(), e);
+			last = mouseTrack;
+		}
+		
+		
 		boolean consumed = false;
 		if (mouseTrack != null) {
 			if (last != mouseTrack) {
-				if (last != null)
-					last.mouseExited(e.getX(), e.getY(), e);
-				last = mouseTrack;
 				mouseTrack.mouseEntered(e.getX(), e.getY(), e);
 			}
 			consumed = mouseTrack.mouseMoved(e.getX(), e.getY(), e);
