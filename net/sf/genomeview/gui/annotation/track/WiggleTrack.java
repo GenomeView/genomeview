@@ -228,13 +228,14 @@ public class WiggleTrack extends Track {
 						conservationGP.lineTo(x, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
 					} else {
 						int top = (int) (yOffset + (1 - val) * graphLineHeigh);
-						g.fillRect(x, top, x - lastX + 1, graphLineHeigh - top + yOffset);
+						g.fillRect(x, top,(int)Math.ceil(2*width*scale), graphLineHeigh - top + yOffset);
 					}
 				} else {
 					g.setColor(ColorFactory.getColorCoding(val));
 					g.fillRect(lastX, yOffset, x - lastX, 10);
 
 				}
+				
 				lastX = x;
 
 			}
