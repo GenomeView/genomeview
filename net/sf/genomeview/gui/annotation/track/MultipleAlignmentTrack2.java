@@ -146,11 +146,13 @@ public class MultipleAlignmentTrack2 extends Track {
 		lastMouse = source;
 		return false;
 	}
+
 	@Override
 	public boolean mouseDragged(int x, int y, MouseEvent source) {
 		lastMouse = source;
 		return false;
 	}
+
 	// // if (paintedBlocks.size() == 0)
 	// // tooltip.setVisible(false);
 	// // for (Map.Entry<Rectangle, AlignmentBlock> e :
@@ -183,15 +185,20 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	private int queriedBlocks = 0;
 
+	class MouseHit {
+		AlignmentBlock ab;
+		Rectangle rec;
+		public int x1;
+	}
+
 	@Override
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
 		// this.yOffset = yOffset;
 		paintedBlocks.clear();
 		g.setColor(Color.BLACK);
 		Location visible = model.getAnnotationLocationVisible();
-		
-		
-		if(ma.getEstimateCount(visible)>10000){
+
+		if (ma.getEstimateCount(visible) > 10000) {
 			g.drawString("Too many alignment blocks, zoom in to see multiple alignments", 10, yOffset + 10);
 			return 20 + 5;
 		}
@@ -201,6 +208,7 @@ public class MultipleAlignmentTrack2 extends Track {
 		if (queriedBlocks < 500) {
 			int yMax = 0;
 			CollisionMap hitmap = new CollisionMap(model);
+			MouseHit mh = null;
 			for (AlignmentBlock ab : abs) {
 				int abCount = 0;
 
@@ -275,23 +283,48 @@ public class MultipleAlignmentTrack2 extends Track {
 
 				}
 				if (lastMouse != null) {
+
 					int xMouse = Convert.translateScreenToGenome(lastMouse.getX(), visible, screenWidth);
 					// System.out.println(rec + "\t" + xMouse + "\t" +
 					// rec.contains(xMouse, lastMouse.getY() + yOffset));
 					if (rec.contains(xMouse, lastMouse.getY() + yOffset)) {
-						int line = 0;
-						for (AlignmentSequence as : ab) {
-							g.setColor(Color.black);
-							char addChar=as.strand()==Strand.FORWARD?'>':'<';
-							String s=addChar+ " " +as.entry().getID()+" "+addChar;
-							Rectangle2D stringSize = g.getFontMetrics().getStringBounds(s, g);
-							g.drawString(s,(int) Math.max(x1-stringSize.getWidth(),5), rec.y + (line + 1) * lineHeight);
-							line++;
-						}
+						mh = new MouseHit();
+						mh.ab = ab;
+						mh.rec = rec;
+						mh.x1 = x1;
 
 					}
 				}
 
+			}
+			if (mh != null) {
+
+				String[] arr = new String[mh.ab.size()];
+				Rectangle2D[] size = new Rectangle2D[mh.ab.size()];
+				int maxWidth = 0;
+				int index = 0;
+				
+				for (AlignmentSequence as : mh.ab) {
+
+					char addChar = as.strand() == Strand.FORWARD ? '>' : '<';
+					String s = addChar + " " + as.entry().getID() + " " + addChar;
+					arr[index] = s;
+					Rectangle2D stringSize = g.getFontMetrics().getStringBounds(s, g);
+					size[index] = stringSize;
+					index++;
+					if(stringSize.getWidth()>maxWidth)
+						maxWidth=(int)stringSize.getWidth();
+
+				}
+				g.setColor(new Color(192, 192, 192,175));
+				g.fillRect((int) Math.max(mh.x1 - maxWidth, 5),  mh.rec.y, maxWidth, arr.length*lineHeight);
+				g.setColor(Color.DARK_GRAY);
+				g.drawRect((int) Math.max(mh.x1 - maxWidth, 5),  mh.rec.y, maxWidth, arr.length*lineHeight);
+				g.setColor(Color.black);
+				for (int i = 0; i < arr.length; i++) {
+					g.drawString(arr[i], (int) Math.max(mh.x1 - size[i].getWidth(), 5), mh.rec.y + (i + 1) * lineHeight);
+
+				}
 			}
 			return yMax - yOffset;
 		} else {/* More than 500 blocks on screen */
