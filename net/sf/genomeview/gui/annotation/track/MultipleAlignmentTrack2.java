@@ -4,22 +4,27 @@
 package net.sf.genomeview.gui.annotation.track;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
-import java.awt.font.TextLayout;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.BitSet;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
+
+import javax.swing.AbstractAction;
+import javax.swing.JPopupMenu;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
@@ -35,110 +40,22 @@ import net.sf.jannot.alignment.MultipleAlignment;
  */
 public class MultipleAlignmentTrack2 extends Track {
 
-	// private int yOffset;
-	// private class Tooltip extends JWindow implements Observer {
-	//
-	// private JLabel floater = new JLabel();
-	// private Rectangle rec;
-	//		
-	//
-	// public Tooltip() {
-	// floater.setBackground(Color.GRAY);
-	// floater.setForeground(Color.BLACK);
-	// Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-	// Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
-	// floater.setBorder(BorderFactory.createCompoundBorder(colorBorder,
-	// emptyBorder));
-	// add(floater);
-	// pack();
-	// }
-	//
-	// public void set(Rectangle rec, AlignmentBlock ab, MouseEvent e) {
-	// this.rec=rec;
-	// StringBuffer text = new StringBuffer();
-	// text.append("<html>");
-	// for (AlignmentSequence as : ab) {
-	// text.append(as.entry() + " " + as.start() + " " + (as.end() - 1) + " " +
-	// as.strand() + "<br/>");
-	// }
-	//
-	// text.append("</html>");
-	// if (!text.toString().equals(floater.getText())) {
-	// floater.setText(text.toString());
-	// this.pack();
-	// }
-	//
-	// setLocation(Math.max((int) rec.getX(), 0), (int) rec.getY() + yOffset);
-	//
-	// if (!isVisible()) {
-	// setVisible(true);
-	// }
-	//
-	// }
-	//
-	// @Override
-	// public void update(Observable o, Object arg) {
-	// if(rec!=null)
-	// setLocation(Math.max((int) rec.getX(), 0), (int) rec.getY() + yOffset);
-	//			
-	// }
-	//
-	// }
+	private class MultipleAlignmentPopUp extends JPopupMenu {
+		public MultipleAlignmentPopUp() {
+			add(new AbstractAction("Toggle all entries mode") {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					showAll = !showAll;
+					model.refresh();
+				}
+
+			});
+		}
+	}
 
 	private MultipleAlignment ma;
 
-	// private final int graphLineHeigh = 50;
-	//
-	// private Tooltip tooltip = new Tooltip();
-
-	//
-	// private class Tooltip extends JWindow {
-	//
-	// private static final long serialVersionUID = -7416732151483650659L;
-	//
-	// private JLabel floater = new JLabel();
-	//
-	// public Tooltip() {
-	// floater.setBackground(Color.GRAY);
-	// floater.setForeground(Color.BLACK);
-	// Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-	// Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
-	// floater.setBorder(BorderFactory.createCompoundBorder(colorBorder,
-	// emptyBorder));
-	// add(floater);
-	// pack();
-	// }
-	//
-	// public void set(int forward, int reverse, int d, MouseEvent e) {
-	// StringBuffer text = new StringBuffer();
-	// text.append("<html>");
-	// text.append("Forward coverage : " + (forward < 0 ? "In progress..." :
-	// forward) + "<br />");
-	// text.append("Reverse coverage: " + (reverse < 0 ? "In progress..." :
-	// reverse) + "<br />");
-	// text.append("Total coverage : " + (d < 0 ? "In progress..." : d) +
-	// "<br />");
-	// text.append("</html>");
-	// if (!text.toString().equals(floater.getText())) {
-	// floater.setText(text.toString());
-	// this.pack();
-	// }
-	// setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
-	//
-	// if (!isVisible()) {
-	// setVisible(true);
-	// }
-	//
-	// }
-	//
-	// }
-
-	// @Override
-	// public boolean mouseExited(int x, int y, MouseEvent source) {
-	// // tooltip.setVisible(false);
-	// return false;
-	// }
-	//
 	private MouseEvent lastMouse;
 
 	@Override
@@ -147,27 +64,24 @@ public class MultipleAlignmentTrack2 extends Track {
 		return false;
 	}
 
+	private static final Logger log = Logger.getLogger(MultipleAlignmentTrack2.class.getCanonicalName());
+
+	public boolean mouseClicked(int x, int y, MouseEvent e) {
+		/* Specific mouse code for this label */
+		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
+			log.finest("Multiple alignment track consumes button2||button3");
+			new MultipleAlignmentPopUp().show(e.getComponent(), e.getX(), currentYOffset + e.getY());
+			e.consume();
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public boolean mouseDragged(int x, int y, MouseEvent source) {
 		lastMouse = source;
 		return false;
 	}
-
-	// // if (paintedBlocks.size() == 0)
-	// // tooltip.setVisible(false);
-	// // for (Map.Entry<Rectangle, AlignmentBlock> e :
-	// paintedBlocks.entrySet()) {
-	// // if (e.getKey().contains(x, y)) {
-	// // if (!tooltip.isVisible())
-	// // tooltip.setVisible(true);
-	// // tooltip.set(e.getKey(), e.getValue(), source);
-	// // return false;
-	// // }
-	// // }
-	// return false;
-	// }
-
-	// private DataSource source;
 
 	public MultipleAlignment getMA() {
 		return ma;
@@ -191,9 +105,37 @@ public class MultipleAlignmentTrack2 extends Track {
 		public int x1;
 	}
 
+	final private HashMap<Entry, Integer> ordering = new HashMap<Entry, Integer>();
+
+	class MAComparator implements Comparator<AlignmentSequence> {
+		private HashMap<Entry, Integer> ordering;
+
+		public MAComparator(HashMap<Entry, Integer> ordering) {
+			this.ordering = ordering;
+		}
+
+		@Override
+		public int compare(AlignmentSequence o1, AlignmentSequence o2) {
+			return ordering.get(o1.entry()).compareTo(ordering.get(o2.entry()));
+		}
+	}
+
+	final private MAComparator macomp = new MAComparator(ordering);
+	/* Indicates whether all entries should be shown */
+	private boolean showAll;
+
+	private int currentYOffset;
+
 	@Override
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
 		// this.yOffset = yOffset;
+		currentYOffset = yOffset;
+
+		if (ordering.size() != model.entries().size()) {
+			updateOrdering();
+
+		}
+
 		paintedBlocks.clear();
 		g.setColor(Color.BLACK);
 		Location visible = model.getAnnotationLocationVisible();
@@ -203,6 +145,7 @@ public class MultipleAlignmentTrack2 extends Track {
 			return 20 + 5;
 		}
 		TreeSet<AlignmentBlock> abs = ma.get(entry, visible);
+
 		queriedBlocks = abs.size();
 
 		if (queriedBlocks < 500) {
@@ -227,6 +170,8 @@ public class MultipleAlignmentTrack2 extends Track {
 
 				int x1 = Convert.translateGenomeToScreen(start, visible, screenWidth);
 				int x2 = Convert.translateGenomeToScreen(end, visible, screenWidth);
+				if (showAll)
+					abCount = ordering.size();
 
 				Rectangle rec = new Rectangle(start, yOffset, end - start - 1, abCount * lineHeight);
 				while (hitmap.collision(rec)) {
@@ -245,11 +190,26 @@ public class MultipleAlignmentTrack2 extends Track {
 					char[] ref = entry.sequence.getSubSequence(visible.start, visible.end + 1).toCharArray();
 					// System.out.println("--block ");
 					int line = 1;
+					/*
+					 * Reorder the alignment sequences to whatever the user
+					 * wants
+					 */
+					TreeSet<AlignmentSequence> ab2 = new TreeSet<AlignmentSequence>(macomp);
 					for (AlignmentSequence as : ab) {
+						assert as != null;
+						ab2.add(as);
+					}
+					BitSet lines=new BitSet(ordering.size());
+					for (AlignmentSequence as : ab2) {
 						// System.out.println("\t" + start + "\t" + end + "\t" +
 						// as.strand());
 						// g.drawString(as.seq().toString(), x1,
 						// rec.y+line*lineHeight);
+						if (showAll){
+							line = ordering.get(as.entry()) + 1;
+							lines.set(line-1);
+						}
+						// System.out.println(as+"\t"+line);
 						for (int i = visible.start; i <= visible.end; i++) {
 							if (i >= start && i < end) {
 								double width = screenWidth / (double) visible.length();
@@ -280,6 +240,14 @@ public class MultipleAlignmentTrack2 extends Track {
 						}
 						line++;
 					}
+					if(showAll){
+						for(int i=0;i<ordering.size();i++){
+							if(!lines.get(i)){
+								g.setColor(Color.YELLOW);
+								g.fillRect(x1, rec.y + i * lineHeight, x2 - x1, lineHeight);
+							}
+						}
+					}
 
 				}
 				if (lastMouse != null) {
@@ -299,27 +267,58 @@ public class MultipleAlignmentTrack2 extends Track {
 			}
 			if (mh != null) {
 
-				String[] arr = new String[mh.ab.size()];
-				Rectangle2D[] size = new Rectangle2D[mh.ab.size()];
+				String[] arr;
+				Rectangle2D[] size;
 				int maxWidth = 0;
-				int index = 0;
-				
-				for (AlignmentSequence as : mh.ab) {
+				if (!showAll) {
+					arr = new String[mh.ab.size()];
+					size = new Rectangle2D[mh.ab.size()];
+					int index = 0;
+					Set<Entry> shown = new HashSet<Entry>();
+					for (AlignmentSequence as : mh.ab) {
+						char addChar = as.strand() == Strand.FORWARD ? '>' : '<';
+						String s = addChar + " " + as.entry().getID() + " " + addChar;
+						arr[index] = s;
+						Rectangle2D stringSize = g.getFontMetrics().getStringBounds(s, g);
+						size[index] = stringSize;
+						index++;
+						if (stringSize.getWidth() > maxWidth)
+							maxWidth = (int) stringSize.getWidth();
+						shown.add(as.entry());
 
-					char addChar = as.strand() == Strand.FORWARD ? '>' : '<';
-					String s = addChar + " " + as.entry().getID() + " " + addChar;
-					arr[index] = s;
-					Rectangle2D stringSize = g.getFontMetrics().getStringBounds(s, g);
-					size[index] = stringSize;
-					index++;
-					if(stringSize.getWidth()>maxWidth)
-						maxWidth=(int)stringSize.getWidth();
+					}
 
+				} else {
+					arr = new String[ordering.size()];
+					size = new Rectangle2D[ordering.size()];
+					for (AlignmentSequence as : mh.ab) {
+						char addChar = as.strand() == Strand.FORWARD ? '>' : '<';
+						String s = addChar + " " + as.entry().getID() + " " + addChar;
+						int index = ordering.get(as.entry());
+						arr[index] = s;
+						Rectangle2D stringSize = g.getFontMetrics().getStringBounds(s, g);
+						size[index] = stringSize;
+						if (stringSize.getWidth() > maxWidth)
+							maxWidth = (int) stringSize.getWidth();
+
+					}
+					/* Fill in the blanks */
+					for (Entry e : ordering.keySet()) {
+						if (arr[ordering.get(e)] == null) {
+							String s = e.getID();
+							arr[ordering.get(e)] = s;
+							Rectangle2D stringSize = g.getFontMetrics().getStringBounds(s, g);
+							size[ordering.get(e)] = stringSize;
+							if (stringSize.getWidth() > maxWidth)
+								maxWidth = (int) stringSize.getWidth();
+						}
+					}
 				}
-				g.setColor(new Color(192, 192, 192,175));
-				g.fillRect((int) Math.max(mh.x1 - maxWidth, 5),  mh.rec.y, maxWidth, arr.length*lineHeight);
+
+				g.setColor(new Color(192, 192, 192, 175));
+				g.fillRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth, arr.length * lineHeight);
 				g.setColor(Color.DARK_GRAY);
-				g.drawRect((int) Math.max(mh.x1 - maxWidth, 5),  mh.rec.y, maxWidth, arr.length*lineHeight);
+				g.drawRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth, arr.length * lineHeight);
 				g.setColor(Color.black);
 				for (int i = 0; i < arr.length; i++) {
 					g.drawString(arr[i], (int) Math.max(mh.x1 - size[i].getWidth(), 5), mh.rec.y + (i + 1) * lineHeight);
@@ -343,272 +342,20 @@ public class MultipleAlignmentTrack2 extends Track {
 				if (counts[i] > yMax)
 					yMax = counts[i];
 				g.drawLine(i, yOffset, i, yOffset + counts[i] * lineHeight);
-
 			}
 
 			return yMax * lineHeight;
 		}
-		// /* Store information to be used in other methods */
-		// currentEntry = entry;
-		// currentScreenWidth = screenWidth;
-		// seqBuffer=null;
-		// /* Configuration options */
-		// int maxReads = Configuration.getInt("shortread:maxReads");
-		// int maxRegion = Configuration.getInt("shortread:maxRegion");
-		// int maxStack = Configuration.getInt("shortread:maxStack");
-		// forwardColor = Configuration.getColor("shortread:forwardColor");
-		// reverseColor = Configuration.getColor("shortread:reverseColor");
-		// pairingColor = Configuration.getColor("shortread:pairingColor");
-		//
-		// currentVisible = model.getAnnotationLocationVisible();
-		//
-		// int originalYOffset = yOffset;
-		//
-		// int readLineHeight = 3;
-		// if (currentVisible.length() <
-		// Configuration.getInt("geneStructureNucleotideWindow")) {
-		// readLineHeight = 14;
-		// }
-		//
-		// /*
-		// * Draw line plot of coverage
-		// */
-		//
-		// double width = screenWidth / (double) currentVisible.length() / 2.0;
-		//
-		// scale = 1;
-		// scaleIndex = 0;
-		// while (scale < (int) Math.ceil(1.0 / width)) {
-		// scale *= 2;
-		// scaleIndex++;
-		// }
-		//
-		// int start = currentVisible.start / scale * scale;
-		// int end = ((currentVisible.end / scale) + 1) * scale;
-		//
-		// ReadGroup rg = entry.shortReads.getReadGroup(source);
-		// if(rg==null)
-		// return 0;
-		// ShortReadCoverage graph = rg.getCoverage();//.get(rg);
-		//
-		//	
-		// GeneralPath conservationGP = new GeneralPath();
-		// GeneralPath conservationGPF = new GeneralPath();
-		// GeneralPath conservationGPR = new GeneralPath();
-		//	
-		// float[] f = graph.get(Strand.FORWARD, start-1, end, scaleIndex);
-		// float[] r = graph.get(Strand.REVERSE, start-1, end, scaleIndex);
-		//		
-		// for (int i = 0; i < f.length; i++) {
-		// int x = Convert.translateGenomeToScreen(start + i * scale,
-		// currentVisible, screenWidth);
-		// double valF = f[i];
-		// double valR = r[i];
-		// double val = f[i] + r[i];
-		// /* Cap value */
-		// if (valF > graph.max())
-		// valF = graph.max();
-		// if (valR > graph.max())
-		// valR = graph.max();
-		// if (val > graph.max())
-		// val = graph.max();
-		// /* Logaritmic scaling */
-		// valF = log2(valF);
-		// valF /= log2(graph.max());
-		// valR = log2(valR);
-		// valR /= log2(graph.max());
-		// val = log2(val);
-		// val /= log2(graph.max());
-		//
-		// /* Draw lines */
-		// if (i == 0) {
-		// conservationGP.moveTo(x - 1, yOffset + (1 - val) * (graphLineHeigh -
-		// 4) + 2);
-		// conservationGPF.moveTo(x - 1, yOffset + (1 - valF) * (graphLineHeigh
-		// - 4) + 2);
-		// conservationGPR.moveTo(x - 1, yOffset + (1 - valR) * (graphLineHeigh
-		// - 4) + 2);
-		// }
-		//
-		// conservationGP.lineTo(x, yOffset + (1 - val) * (graphLineHeigh - 4) +
-		// 2);
-		// conservationGPF.lineTo(x, yOffset + (1 - valF) * (graphLineHeigh - 4)
-		// + 2);
-		// conservationGPR.lineTo(x, yOffset + (1 - valR) * (graphLineHeigh - 4)
-		// + 2);
-		//
-		// }
-		//
-		// /* Draw coverage lines */
-		// g.setColor(forwardColor);
-		// g.draw(conservationGPF);
-		//
-		// g.setColor(reverseColor);
-		// g.draw(conservationGPR);
-		// g.setColor(Color.BLACK);
-		// g.draw(conservationGP);
-		//
-		// g.setColor(Color.BLUE);
-		// g.drawString(StaticUtils.shortify(source.toString()) + " (" + scale +
-		// ")", 10, yOffset + 12 - 2);
-		// yOffset += graphLineHeigh;
-		// // }
-		//
-		// /*
-		// * Draw individual reads when possible
-		// */
-		// Iterable<ShortRead> reads = null;
-		// boolean timeout = false;
-		// int readLength = entry.shortReads.getReadGroup(source).readLength();
-		// if (!isCollapsed() && (currentVisible.length() > maxRegion)) {
-		// g.setColor(Color.BLACK);
-		// g.drawString("Region too big (max " + maxRegion + " nt), zoom in",
-		// 10, yOffset + 10);
-		// yOffset += 20 + 5;
-		// } else if (!isCollapsed()) {
-		// /* Access to BAMread is through buffer for performance! */
-		// reads = rg.get(currentVisible);
-		// if (rg instanceof BAMreads) {
-		// /* Update readLength for paired reads */
-		// readLength = ((BAMreads) rg).getPairLength();
-		//
-		// }
-		// }
-		// int maxPairingDistance =
-		// Configuration.getInt("shortread:maximumPairing");
-		// if (readLength > maxPairingDistance)
-		// readLength = maxPairingDistance;
-		// int lines = 0;
-		// boolean stackExceeded = false;
-		// boolean enablePairing =
-		// Configuration.getBoolean("shortread:enablepairing");
-		// if (reads != null) {
-		// lines = 0;
-		//
-		// BitSet[] tilingCounter = new BitSet[currentVisible.length()];
-		// for (int i = 0; i < tilingCounter.length; i++) {
-		// tilingCounter[i] = new BitSet(maxStack);
-		// }
-		// int visibleReadCount = 0;
-		// try {
-		// for (ShortRead one : reads) {
-		//
-		// if (enablePairing && one.isPaired() && one.isSecondInPair())
-		// continue;
-		//
-		// if (visibleReadCount > maxReads) {
-		// String msg = "Too many short reads to display, only first " +
-		// maxReads + " are displayed ";
-		// FontMetrics metrics = g.getFontMetrics();
-		// int hgt = metrics.getHeight();
-		// int adv = metrics.stringWidth(msg);
-		// g.setColor(Color.WHITE);
-		// g.fillRect(10, yOffset + 20 - hgt, adv + 2, hgt + 2);
-		// g.setColor(Color.RED);
-		// g.drawString(msg, 10, yOffset + 18);
-		// break;
-		// }
-		//
-		// // int x2 = Convert.translateGenomeToScreen(one.end() + 1,
-		// currentVisible, screenWidth);
-		// // if (x2 > 0) {
-		// /* Find empty line */
-		// int pos = one.start() - currentVisible.start;
-		// int line = line(one, pos, tilingCounter);
-		// if (line > maxStack) {
-		// stackExceeded = true;
-		// continue;
-		//
-		// }
-		// int clearStart = one.start();
-		// int clearEnd = one.end();
-		// ExtendedShortRead two = null;
-		// /* Modify empty space finder for paired reads */
-		// if (enablePairing && one instanceof ExtendedShortRead) {
-		// ExtendedShortRead esr = (ExtendedShortRead) one;
-		// if (esr.isPaired() && esr.isFirstInPair()) {
-		// two = ((BAMreads) rg).getSecondRead(esr);
-		// }
-		// if (two != null) {
-		// if (two.start() < one.start()) {
-		//
-		// pos = two.start() - currentVisible.start;
-		// line = line(two, pos, tilingCounter);
-		// clearStart = two.start();
-		// } else {
-		// clearEnd = two.end();
-		// }
-		// }
-		//
-		// }
-		// /* Carve space out of hitmap */
-		// for (int i = clearStart - readLength; i <= clearEnd + 3; i++) {
-		// pos = i - currentVisible.start;
-		// if (pos >= 0 && pos < tilingCounter.length)
-		// tilingCounter[pos].set(line);
-		//						
-		// }
-		//
-		// int yRec = line * readLineHeight + yOffset;
-		//
-		// /* Paint read or read pair */
-		// if (line < maxStack) {
-		// /* paired read - calculate connection coordinates */
-		// if (two != null) {
-		//
-		// int subX1, subX2;
-		// if (one.start() < two.start()) {
-		//
-		// subX1 = Convert.translateGenomeToScreen(one.end(), currentVisible,
-		// screenWidth);
-		// subX2 = Convert.translateGenomeToScreen(two.start(), currentVisible,
-		// screenWidth);
-		//
-		// } else {
-		//
-		// subX1 = Convert.translateGenomeToScreen(one.start(), currentVisible,
-		// screenWidth);
-		// subX2 = Convert.translateGenomeToScreen(two.end(), currentVisible,
-		// screenWidth);
-		//
-		// }
-		//
-		// g.setColor(pairingColor);
-		// g.drawLine(subX1, yRec + readLineHeight / 2, subX2, yRec +
-		// readLineHeight / 2);
-		// }
-		// if (line > lines)
-		// lines = line;
-		//
-		// paintRead(g, one, yRec, screenWidth, readLineHeight, entry);
-		// visibleReadCount++;
-		// if (two != null) {
-		//
-		// paintRead(g, two, yRec, screenWidth, readLineHeight, entry);
-		// visibleReadCount++;
-		// }
-		// } else {
-		// stackExceeded = true;
-		// }
-		// // }
-		// }
-		// } catch (ConcurrentModificationException e) {
-		// // Ignore
-		// }
-		// if (stackExceeded) {
-		// g.setColor(Color.RED);
-		// g.drawString("Max stacking depth reached!", 5, lines * readLineHeight
-		// + yOffset - 2);
-		// g.drawLine(0, lines * readLineHeight + yOffset, (int) screenWidth,
-		// lines * readLineHeight + yOffset);
-		// lines++;
-		//
-		// }
-		// yOffset += (lines + 1) * readLineHeight + 5;
-		//
-		// }
-		// return yOffset - originalYOffset;
-		// return 20;
+	}
+
+	private void updateOrdering() {
+		ordering.clear();
+		int i = 0;
+		for (Entry e : model.entries()) {
+			ordering.put(e, i++);
+		}
+		System.out.println(ordering);
+
 	}
 
 	// private int line(ShortRead one, int pos, BitSet[] tilingCounter) {
