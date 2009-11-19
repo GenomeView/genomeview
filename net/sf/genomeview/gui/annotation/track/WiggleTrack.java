@@ -184,7 +184,7 @@ public class WiggleTrack extends Track {
 		int yUsed = 0;
 		Graph graph = e.graphs.getGraph(name);
 		if (graph != null) {
-			double width = screenWidth / (double) currentVisible.length() / 2.0;
+			double width = screenWidth / (double) currentVisible.length();
 
 			int scale = 1;
 			int scaleIndex = 0;
