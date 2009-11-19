@@ -189,8 +189,15 @@ public class MultipleAlignmentTrack2 extends Track {
 		paintedBlocks.clear();
 		g.setColor(Color.BLACK);
 		Location visible = model.getAnnotationLocationVisible();
+		
+		
+		if(ma.getEstimateCount(visible)>10000){
+			g.drawString("Too many alignment blocks, zoom in to see multiple alignments", 10, yOffset + 10);
+			return 20 + 5;
+		}
 		TreeSet<AlignmentBlock> abs = ma.get(entry, visible);
 		queriedBlocks = abs.size();
+
 		if (queriedBlocks < 500) {
 			int yMax = 0;
 			CollisionMap hitmap = new CollisionMap(model);
