@@ -6,6 +6,7 @@ package net.sf.genomeview.gui.annotation.track;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
@@ -26,6 +27,7 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
+import net.sf.jannot.alignment.AlignmentBlock;
 import net.sf.jannot.shortread.BAMreads;
 import net.sf.jannot.shortread.ExtendedShortRead;
 import net.sf.jannot.shortread.ReadGroup;
@@ -57,12 +59,20 @@ public class ShortReadTrack extends Track {
 			pack();
 		}
 
-		public void set(int forward, int reverse, int d, MouseEvent e) {
+		public void set(int forward, int reverse, int d, MouseEvent e, ShortReadInsertion sri) {
 			StringBuffer text = new StringBuffer();
 			text.append("<html>");
 			text.append("Forward coverage : " + (forward < 0 ? "In progress..." : forward) + "<br />");
 			text.append("Reverse coverage: " + (reverse < 0 ? "In progress..." : reverse) + "<br />");
 			text.append("Total coverage : " + (d < 0 ? "In progress..." : d) + "<br />");
+			if(sri!=null){
+				text.append("Insertion: ");
+				byte[]bases=sri.esr.record().getReadBases();
+				for(int i=sri.start;i<sri.start+sri.len;i++){
+					text.append((char)bases[i]);
+				}
+				text.append("<br/>");
+			}
 			text.append("</html>");
 			if (!text.toString().equals(floater.getText())) {
 				floater.setText(text.toString());
@@ -84,6 +94,8 @@ public class ShortReadTrack extends Track {
 		return false;
 	}
 
+	private int currentYOffset = 0;
+
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
 		if (scale <= 256) {
@@ -94,7 +106,15 @@ public class ShortReadTrack extends Track {
 			int start = Convert.translateScreenToGenome(x, currentVisible, currentScreenWidth);
 			int f = (int) currentBuffer.get(Strand.FORWARD, start - 1);
 			int r = (int) currentBuffer.get(Strand.REVERSE, start - 1);
-			tooltip.set(f, r, f + r, source);
+			
+			ShortReadInsertion sri=null;
+			for(java.util.Map.Entry<Rectangle, ShortReadInsertion>e:paintedBlocks.entrySet()){
+				if(e.getKey().contains(x, y+currentYOffset)){
+					sri=e.getValue();
+					break;
+				}
+			}
+			tooltip.set(f, r, f + r, source,sri);
 		} else {
 			if (tooltip.isVisible())
 				tooltip.setVisible(false);
@@ -132,11 +152,12 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
-
+		paintedBlocks.clear();
 		/* Store information to be used in other methods */
 		currentEntry = entry;
 		currentScreenWidth = screenWidth;
 		seqBuffer = null;
+		this.currentYOffset=yOffset;
 		/* Configuration options */
 		int maxReads = Configuration.getInt("shortread:maxReads");
 		int maxRegion = Configuration.getInt("shortread:maxRegion");
@@ -382,6 +403,8 @@ public class ShortReadTrack extends Track {
 
 	}
 
+	private Map<Rectangle, ShortReadInsertion> paintedBlocks = new HashMap<Rectangle, ShortReadInsertion>();
+
 	private char[] seqBuffer = null;
 
 	private void paintRead(Graphics2D g, ShortRead rf, int yRec, double screenWidth, int readLineHeight, Entry entry) {
@@ -435,36 +458,58 @@ public class ShortReadTrack extends Track {
 						break;
 					}
 					g.fillRect((int) tx1, yRec, (int) (tx2 - tx1), readLineHeight - 1);
-					/* For spliced alignments, the connection is blanked with a white box, now put some color back */
-					if(readNt=='_'){
+					/*
+					 * For spliced alignments, the connection is blanked with a
+					 * white box, now put some color back
+					 */
+					if (readNt == '_') {
 						g.setColor(pairingColor);
-						g.fillRect((int) tx1, yRec+4, (int) (tx2 - tx1), readLineHeight-8 - 1);
+						g.fillRect((int) tx1, yRec + 4, (int) (tx2 - tx1), readLineHeight - 8 - 1);
 					}
-					if (readNt!='_' && model.getAnnotationLocationVisible().length() < 100) {
+					if (readNt != '_' && model.getAnnotationLocationVisible().length() < 100) {
 						g.setColor(c);
 						Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
 						g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 - stringSize.getWidth() / 2)), yRec + readLineHeight - 3);
 
 					}
-					
+
 				}
 			}
-			
-			if(rf instanceof ExtendedShortRead){
-				ExtendedShortRead esr=(ExtendedShortRead)rf;
-				int pos=0;
-				for(CigarElement ce:esr.getCigar().getCigarElements()){
-					if(ce.getOperator()==CigarOperator.I){
-						double tx1 = Convert.translateGenomeToScreen(esr.start()+pos, currentVisible, screenWidth);
-						g.setColor(Color.BLACK);
-						g.fillRect((int) tx1-1, yRec, 2, readLineHeight - 1);
-					}else{
-						pos+=ce.getLength();
+
+			if (rf instanceof ExtendedShortRead) {
+				ExtendedShortRead esr = (ExtendedShortRead) rf;
+				int pos = 0;
+				int esrPos = 0;
+				for (CigarElement ce : esr.getCigar().getCigarElements()) {
+					if (ce.getOperator() == CigarOperator.I) {
+						double tx1 = Convert.translateGenomeToScreen(esr.start() + pos, currentVisible, screenWidth);
+						if(ce.getLength()%3==0)
+							g.setColor(Color.GRAY);
+						else
+							g.setColor(Color.BLACK);
+						Rectangle rec = new Rectangle((int) (tx1 - 1), yRec, 2, readLineHeight - 1);
+						g.fill(rec);
+						/* Make it easier to hit with the mouse */
+						rec.x--;
+						rec.width+=2;
+						ShortReadInsertion in = new ShortReadInsertion();
+						in.esr = esr;
+						in.start = esrPos;
+						in.len = ce.getLength();
+						paintedBlocks.put(rec, in);
+					} else {
+						pos += ce.getLength();
 					}
+					esrPos += ce.getLength();
 				}
 			}
 		}
 
+	}
+
+	private class ShortReadInsertion {
+		ExtendedShortRead esr;
+		int start, len;
 	}
 
 	@Override
