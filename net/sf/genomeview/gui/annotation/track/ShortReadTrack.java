@@ -32,6 +32,8 @@ import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortRead;
 import net.sf.jannot.shortread.ShortReadCoverage;
 import net.sf.jannot.source.DataSource;
+import net.sf.samtools.CigarElement;
+import net.sf.samtools.CigarOperator;
 
 public class ShortReadTrack extends Track {
 
@@ -422,18 +424,18 @@ public class ShortReadTrack extends Track {
 				if (readNt != refNt) {
 					// if (readNt != '_') {
 					switch (readNt) {
-					case '-':
+					case '-':/* Gap */
 						g.setColor(Color.RED);
 						break;
-					case '_':
+					case '_':/* Spliced alignment */
 						g.setColor(Color.WHITE);
 						break;
-					default:
+					default:/* Mismatch */
 						g.setColor(Color.ORANGE);
 						break;
 					}
 					g.fillRect((int) tx1, yRec, (int) (tx2 - tx1), readLineHeight - 1);
-					/* For spliced alignments, the connection is blanked with a white box, put some color back */
+					/* For spliced alignments, the connection is blanked with a white box, now put some color back */
 					if(readNt=='_'){
 						g.setColor(pairingColor);
 						g.fillRect((int) tx1, yRec+4, (int) (tx2 - tx1), readLineHeight-8 - 1);
@@ -445,6 +447,20 @@ public class ShortReadTrack extends Track {
 
 					}
 					
+				}
+			}
+			
+			if(rf instanceof ExtendedShortRead){
+				ExtendedShortRead esr=(ExtendedShortRead)rf;
+				int pos=0;
+				for(CigarElement ce:esr.getCigar().getCigarElements()){
+					if(ce.getOperator()==CigarOperator.I){
+						double tx1 = Convert.translateGenomeToScreen(esr.start()+pos, currentVisible, screenWidth);
+						g.setColor(Color.BLACK);
+						g.fillRect((int) tx1-1, yRec, 2, readLineHeight - 1);
+					}else{
+						pos+=ce.getLength();
+					}
 				}
 			}
 		}
