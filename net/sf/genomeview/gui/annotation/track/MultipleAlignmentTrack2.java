@@ -381,7 +381,7 @@ public class MultipleAlignmentTrack2 extends Track {
 		for (Entry e : model.entries()) {
 			ordering.put(e, i++);
 		}
-		System.out.println(ordering);
+//		System.out.println(ordering);
 
 	}
 
