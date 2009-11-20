@@ -66,6 +66,10 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	private static final Logger log = Logger.getLogger(MultipleAlignmentTrack2.class.getCanonicalName());
 
+	public boolean mouseExited(int x, int y, MouseEvent e) {
+		lastMouse=null;
+		return false;
+	}
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
@@ -185,21 +189,21 @@ public class MultipleAlignmentTrack2 extends Track {
 				// rec.width=x2-x1;
 				g.setColor(Color.BLACK);
 				g.drawRect(x1, rec.y, x2 - x1, rec.height);
-
+				
+				/*
+				 * Reorder the alignment sequences to whatever the user
+				 * wants
+				 */
+				TreeSet<AlignmentSequence> ab2 = new TreeSet<AlignmentSequence>(macomp);
+				for (AlignmentSequence as : ab) {
+					assert as != null;
+					ab2.add(as);
+				}
+				BitSet lines=new BitSet(ordering.size());
 				if (visible.length() < 1000) {
 					char[] ref = entry.sequence.getSubSequence(visible.start, visible.end + 1).toCharArray();
 					// System.out.println("--block ");
 					int line = 1;
-					/*
-					 * Reorder the alignment sequences to whatever the user
-					 * wants
-					 */
-					TreeSet<AlignmentSequence> ab2 = new TreeSet<AlignmentSequence>(macomp);
-					for (AlignmentSequence as : ab) {
-						assert as != null;
-						ab2.add(as);
-					}
-					BitSet lines=new BitSet(ordering.size());
 					for (AlignmentSequence as : ab2) {
 						// System.out.println("\t" + start + "\t" + end + "\t" +
 						// as.strand());
@@ -240,15 +244,37 @@ public class MultipleAlignmentTrack2 extends Track {
 						}
 						line++;
 					}
-					if(showAll){
-						for(int i=0;i<ordering.size();i++){
-							if(!lines.get(i)){
-								g.setColor(Color.YELLOW);
-								g.fillRect(x1, rec.y + i * lineHeight, x2 - x1, lineHeight);
-							}
+					
+
+				}else{/* Not very much zoomed in, but still close */
+					int line = 1;
+					
+					for (AlignmentSequence as : ab2) {
+						if (showAll){
+							line = ordering.get(as.entry()) + 1;
+							lines.set(line-1);
+						}
+						if(as.strand()==Strand.FORWARD){
+							g.setColor(Configuration.getColor("ma:forwardColor"));
+						}else{
+							g.setColor(Configuration.getColor("ma:reverseColor"));
+						}
+						
+						g.fillRect(x1, rec.y + (line-1) * lineHeight, x2 - x1, lineHeight);
+						
+						
+						line++;
+					}
+					
+				}
+				/* Fill in the blanks when showing all */
+				if(showAll){
+					for(int i=0;i<ordering.size();i++){
+						if(!lines.get(i)){
+							g.setColor(Color.YELLOW);
+							g.fillRect(x1, rec.y + i * lineHeight, x2 - x1, lineHeight);
 						}
 					}
-
 				}
 				if (lastMouse != null) {
 
@@ -265,6 +291,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				}
 
 			}
+			/* Mouse is over a block and there is some information to display */
 			if (mh != null) {
 
 				String[] arr;
@@ -358,85 +385,10 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	}
 
-	// private int line(ShortRead one, int pos, BitSet[] tilingCounter) {
-	// if (pos >= 0 && pos < tilingCounter.length)
-	// return tilingCounter[one.start() - currentVisible.start].nextClearBit(0);
-	// else
-	// return tilingCounter[0].nextClearBit(0);
-	//
-	// }
-
-	// private char[]seqBuffer=null;
-	// private void paintRead(Graphics2D g, ShortRead rf, int yRec, double
-	// screenWidth, int readLineHeight, Entry entry) {
-	// Color c = Color.GRAY;
-	// if (rf.strand() == Strand.FORWARD)
-	// c = forwardColor;
-	// else
-	// c = reverseColor;
-	// g.setColor(c);
-	// int subX1 = Convert.translateGenomeToScreen(rf.start(), currentVisible,
-	// screenWidth);
-	// int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, currentVisible,
-	// screenWidth);
-	// if (subX2 < subX1) {
-	// subX2 = subX1;
-	// // FIXME does this ever happen?
-	// // XXX The one time it did happen it pointed to a bug, so it may be
-	// // that it doesn't happen when all goes well.
-	// System.err.println("This happens!");
-	// }
-	// g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
-	//
-	// /* Check mismatches */
-	// if(entry.sequence.size()==0)
-	// return;
-	// if (currentVisible.length() <
-	// Configuration.getInt("geneStructureNucleotideWindow")) {
-	// /* If there is no sequence, return immediately */
-	// if(entry.sequence.size()==0)
-	// return;
-	// if(seqBuffer==null)
-	// seqBuffer=entry.sequence.getSubSequence(currentVisible.start,
-	// currentVisible.end+1).toCharArray();
-	// for (int j = rf.start(); j <= rf.end(); j++) {
-	// if(j>currentVisible.end||j<=currentVisible.start)
-	// continue;
-	// char readNt = rf.getNucleotide(j - rf.start() + 1);
-	// // char refNt = entry.sequence.getNucleotide(j);
-	//				
-	// char refNt=seqBuffer[j-currentVisible.start];
-	// double tx1 = Convert.translateGenomeToScreen(j, currentVisible,
-	// screenWidth);
-	// double tx2 = Convert.translateGenomeToScreen(j + 1, currentVisible,
-	// screenWidth);
-	//
-	// if (readNt != refNt) {
-	// if (readNt == '-') {
-	// g.setColor(Color.RED);
-	// } else
-	// g.setColor(Color.ORANGE);
-	// g.fillRect((int) tx1, yRec, (int) (tx2 - tx1), readLineHeight - 1);
-	// if (model.getAnnotationLocationVisible().length() < 100) {
-	// g.setColor(c);
-	// Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt,
-	// g);
-	// g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 -
-	// stringSize.getWidth() / 2)), yRec + readLineHeight - 3);
-	//
-	// }
-	// }
-	// }
-	// }
-	//
-	// }
-
+	
 	@Override
 	public String displayName() {
 		return "Multiple alignment";
 	}
 
-	// public DataSource source() {
-	// return source;
-	// }
 }
