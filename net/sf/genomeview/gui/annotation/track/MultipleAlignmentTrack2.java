@@ -21,11 +21,15 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
+import net.sf.genomeview.gui.dialog.MultipleAlignmentOrderingDialog;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
@@ -51,6 +55,17 @@ public class MultipleAlignmentTrack2 extends Track {
 				}
 
 			});
+			add(new AbstractAction("Rearrange ordering") {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					MultipleAlignmentOrderingDialog mad = new MultipleAlignmentOrderingDialog(model, ordering);
+					mad.pack();
+					mad.setVisible(true);
+					model.refresh();
+				}
+
+			});
 		}
 	}
 
@@ -67,9 +82,10 @@ public class MultipleAlignmentTrack2 extends Track {
 	private static final Logger log = Logger.getLogger(MultipleAlignmentTrack2.class.getCanonicalName());
 
 	public boolean mouseExited(int x, int y, MouseEvent e) {
-		lastMouse=null;
+		lastMouse = null;
 		return false;
 	}
+
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
@@ -109,12 +125,12 @@ public class MultipleAlignmentTrack2 extends Track {
 		public int x1;
 	}
 
-	final private HashMap<Entry, Integer> ordering = new HashMap<Entry, Integer>();
+	final private BiMap<Entry, Integer> ordering = HashBiMap.create();
 
 	class MAComparator implements Comparator<AlignmentSequence> {
-		private HashMap<Entry, Integer> ordering;
+		private BiMap<Entry, Integer> ordering;
 
-		public MAComparator(HashMap<Entry, Integer> ordering) {
+		public MAComparator(BiMap<Entry, Integer> ordering) {
 			this.ordering = ordering;
 		}
 
@@ -189,17 +205,16 @@ public class MultipleAlignmentTrack2 extends Track {
 				// rec.width=x2-x1;
 				g.setColor(Color.BLACK);
 				g.drawRect(x1, rec.y, x2 - x1, rec.height);
-				
+
 				/*
-				 * Reorder the alignment sequences to whatever the user
-				 * wants
+				 * Reorder the alignment sequences to whatever the user wants
 				 */
 				TreeSet<AlignmentSequence> ab2 = new TreeSet<AlignmentSequence>(macomp);
 				for (AlignmentSequence as : ab) {
 					assert as != null;
 					ab2.add(as);
 				}
-				BitSet lines=new BitSet(ordering.size());
+				BitSet lines = new BitSet(ordering.size());
 				if (visible.length() < 1000) {
 					char[] ref = entry.sequence.getSubSequence(visible.start, visible.end + 1).toCharArray();
 					// System.out.println("--block ");
@@ -209,9 +224,9 @@ public class MultipleAlignmentTrack2 extends Track {
 						// as.strand());
 						// g.drawString(as.seq().toString(), x1,
 						// rec.y+line*lineHeight);
-						if (showAll){
+						if (showAll) {
 							line = ordering.get(as.entry()) + 1;
-							lines.set(line-1);
+							lines.set(line - 1);
 						}
 						// System.out.println(as+"\t"+line);
 						for (int i = visible.start; i <= visible.end; i++) {
@@ -244,33 +259,31 @@ public class MultipleAlignmentTrack2 extends Track {
 						}
 						line++;
 					}
-					
 
-				}else{/* Not very much zoomed in, but still close */
+				} else {/* Not very much zoomed in, but still close */
 					int line = 1;
-					
+
 					for (AlignmentSequence as : ab2) {
-						if (showAll){
+						if (showAll) {
 							line = ordering.get(as.entry()) + 1;
-							lines.set(line-1);
+							lines.set(line - 1);
 						}
-						if(as.strand()==Strand.FORWARD){
+						if (as.strand() == Strand.FORWARD) {
 							g.setColor(Configuration.getColor("ma:forwardColor"));
-						}else{
+						} else {
 							g.setColor(Configuration.getColor("ma:reverseColor"));
 						}
-						
-						g.fillRect(x1, rec.y + (line-1) * lineHeight, x2 - x1, lineHeight);
-						
-						
+
+						g.fillRect(x1, rec.y + (line - 1) * lineHeight, x2 - x1, lineHeight);
+
 						line++;
 					}
-					
+
 				}
 				/* Fill in the blanks when showing all */
-				if(showAll){
-					for(int i=0;i<ordering.size();i++){
-						if(!lines.get(i)){
+				if (showAll) {
+					for (int i = 0; i < ordering.size(); i++) {
+						if (!lines.get(i)) {
 							g.setColor(Color.YELLOW);
 							g.fillRect(x1, rec.y + i * lineHeight, x2 - x1, lineHeight);
 						}
@@ -294,61 +307,84 @@ public class MultipleAlignmentTrack2 extends Track {
 			/* Mouse is over a block and there is some information to display */
 			if (mh != null) {
 
-				String[] arr;
-				Rectangle2D[] size;
-				int maxWidth = 0;
+				Set<Entry> shown = new HashSet<Entry>();
 				if (!showAll) {
-					arr = new String[mh.ab.size()];
-					size = new Rectangle2D[mh.ab.size()];
-					int index = 0;
-					Set<Entry> shown = new HashSet<Entry>();
+					// arr = new String[mh.ab.size()];
+					// size = new Rectangle2D[mh.ab.size()];
+					// int index = 0;
+
 					for (AlignmentSequence as : mh.ab) {
-						char addChar = as.strand() == Strand.FORWARD ? '>' : '<';
-						String s = addChar + " " + as.entry().getID() + " " + addChar;
-						arr[index] = s;
-						Rectangle2D stringSize = g.getFontMetrics().getStringBounds(s, g);
-						size[index] = stringSize;
-						index++;
-						if (stringSize.getWidth() > maxWidth)
-							maxWidth = (int) stringSize.getWidth();
+						// char addChar = as.strand() == Strand.FORWARD ? '>' :
+						// '<';
+						// String s = addChar + " " + as.entry().getID() + " " +
+						// addChar;
+						// arr[index] = s;
+						// Rectangle2D stringSize =
+						// g.getFontMetrics().getStringBounds(s, g);
+						// size[index] = stringSize;
+						// index++;
+						// if (stringSize.getWidth() > maxWidth)
+						// maxWidth = (int) stringSize.getWidth();
 						shown.add(as.entry());
 
 					}
 
 				} else {
-					arr = new String[ordering.size()];
-					size = new Rectangle2D[ordering.size()];
-					for (AlignmentSequence as : mh.ab) {
-						char addChar = as.strand() == Strand.FORWARD ? '>' : '<';
-						String s = addChar + " " + as.entry().getID() + " " + addChar;
-						int index = ordering.get(as.entry());
-						arr[index] = s;
-						Rectangle2D stringSize = g.getFontMetrics().getStringBounds(s, g);
-						size[index] = stringSize;
-						if (stringSize.getWidth() > maxWidth)
-							maxWidth = (int) stringSize.getWidth();
+					for (Entry e : model.entries())
+						shown.add(e);
 
-					}
+					// arr = new String[ordering.size()];
+					// size = new Rectangle2D[ordering.size()];
+					// for (AlignmentSequence as : mh.ab) {
+					// char addChar = as.strand() == Strand.FORWARD ? '>' : '<';
+					// String s = addChar + " " + as.entry().getID() + " " +
+					// addChar;
+					// int index = ordering.get(as.entry());
+					// arr[index] = s;
+					// Rectangle2D stringSize =
+					// g.getFontMetrics().getStringBounds(s, g);
+					// size[index] = stringSize;
+					// if (stringSize.getWidth() > maxWidth)
+					// maxWidth = (int) stringSize.getWidth();
+					//
+					// }
 					/* Fill in the blanks */
-					for (Entry e : ordering.keySet()) {
-						if (arr[ordering.get(e)] == null) {
-							String s = e.getID();
-							arr[ordering.get(e)] = s;
-							Rectangle2D stringSize = g.getFontMetrics().getStringBounds(s, g);
-							size[ordering.get(e)] = stringSize;
-							if (stringSize.getWidth() > maxWidth)
-								maxWidth = (int) stringSize.getWidth();
-						}
-					}
+					// for (Entry e : ordering.keySet()) {
+					// if (arr[ordering.get(e)] == null) {
+					// String s = e.getID();
+					// arr[ordering.get(e)] = s;
+					// Rectangle2D stringSize =
+					// g.getFontMetrics().getStringBounds(s, g);
+					// size[ordering.get(e)] = stringSize;
+					// if (stringSize.getWidth() > maxWidth)
+					// maxWidth = (int) stringSize.getWidth();
+					// }
+					// }
+				}
+				String[] arr = new String[model.entries().size()];
+				Rectangle2D[] size = new Rectangle2D[model.entries().size()];
+				int maxWidth = 0;
+				for (Entry e : shown) {
+					String s = e.getID();
+					arr[ordering.get(e)] = s;
+					Rectangle2D stringSize = g.getFontMetrics().getStringBounds(s, g);
+					size[ordering.get(e)] = stringSize;
+					if (stringSize.getWidth() > maxWidth)
+						maxWidth = (int) stringSize.getWidth();
 				}
 
 				g.setColor(new Color(192, 192, 192, 175));
-				g.fillRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth, arr.length * lineHeight);
+				g.fillRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth, shown.size()* lineHeight);
 				g.setColor(Color.DARK_GRAY);
-				g.drawRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth, arr.length * lineHeight);
+				g.drawRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth, shown.size() * lineHeight);
 				g.setColor(Color.black);
+				int index = 0;
 				for (int i = 0; i < arr.length; i++) {
-					g.drawString(arr[i], (int) Math.max(mh.x1 - size[i].getWidth(), 5), mh.rec.y + (i + 1) * lineHeight);
+					if (arr[i] != null) {
+						g.drawString(arr[i], (int) Math.max(mh.x1 - size[i].getWidth(), 5), mh.rec.y + (index + 1) * lineHeight);
+						index++;
+					}
+					
 
 				}
 			}
@@ -376,16 +412,16 @@ public class MultipleAlignmentTrack2 extends Track {
 	}
 
 	private void updateOrdering() {
+		// TODO keep old ones, only add new ones.
 		ordering.clear();
 		int i = 0;
 		for (Entry e : model.entries()) {
 			ordering.put(e, i++);
 		}
-//		System.out.println(ordering);
+		// System.out.println(ordering);
 
 	}
 
-	
 	@Override
 	public String displayName() {
 		return "Multiple alignment";
