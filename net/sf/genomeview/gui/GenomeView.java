@@ -15,10 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import javax.jnlp.ServiceManager;
-import javax.jnlp.SingleInstanceListener;
-import javax.jnlp.SingleInstanceService;
-import javax.jnlp.UnavailableServiceException;
+
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -28,7 +25,7 @@ import javax.swing.JTextField;
 import net.sf.genomeview.core.Configuration;
 import be.abeel.gui.TitledComponent;
 
-public class GenomeView implements SingleInstanceListener  {
+public class GenomeView {
 	private static Logger logger;
 
 //	public static GenomeView single;
@@ -104,18 +101,6 @@ public class GenomeView implements SingleInstanceListener  {
 			e.printStackTrace();
 		}
 
-		try {
-            SingleInstanceService singleInstanceService =
-                (SingleInstanceService)ServiceManager.
-                    lookup("javax.jnlp.SingleInstanceService");
-            // add the listener to this application!
-            singleInstanceService.addSingleInstanceListener(
-                (SingleInstanceListener)this );
-            logger.info("Registered to the SingleInstanceService");
-        } catch(UnavailableServiceException use) {
-            logger.warning("SingleInstanceService is not available");
-        }
-		
         try {
 			mw = new MainWindow(args);
 			
@@ -141,54 +126,13 @@ public class GenomeView implements SingleInstanceListener  {
 		new GenomeView(args);
 	}
 
-//	private Set<MainWindow> running = new HashSet<MainWindow>();
-
 	/*
 	 * This will create AND SHOW the Splash screen.
 	 */
 	private Splash splash = new Splash();
 
-//	public void kill(MainWindow ID) {
-//		logger.info("Removing " + ID + " from instance manager.");
-//		ID.dispose();
-//		running.remove(ID);
-//		if (running.size() == 0) {
-//			logger.info("Closed all models, exiting");
-//			try {
-//				Configuration.save();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//			System.exit(0);
-//		}
-//
-//	}
 
-//	public boolean isInstancesRunning() {
-//		return running != null && running.size() > 0;
-//	}
-
-	@Override
-	public void newActivation(String[] args) {
-		
-		try {
-			if (!Configuration.getBoolean("general:singleInstance")) {
-				logger.info("Creating new instance");
-				GenomeView.main(args);
-			} else {
-				logger.info("Reusing old instance");
-				assert mw!=null;
-				mw.init(args);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.warning("Couldn't create new instance.");
-			logger.warning("MainWindow message: " + e.getMessage());
-			// check for other instances or close
-			
-		}
-		
-	}
+	
 
 }
 
