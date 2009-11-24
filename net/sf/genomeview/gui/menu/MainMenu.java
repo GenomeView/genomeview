@@ -57,7 +57,7 @@ public class MainMenu extends JMenuBar {
 
 		file.addSeparator();
 		file.add(new SaveAction(model));
-		file.add(new SaveAsAction(model));
+//		file.add(new SaveAsAction(model));
 		file.add(new SaveImage(model));
 
 		file.addSeparator();
