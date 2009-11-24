@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -28,7 +27,7 @@ import be.abeel.gui.TitledComponent;
 public class GenomeView {
 	private static Logger logger;
 
-//	public static GenomeView single;
+	// public static GenomeView single;
 
 	static private class MyAuthenticator extends Authenticator {
 
@@ -77,62 +76,87 @@ public class GenomeView {
 		}
 	}
 
-	private MainWindow mw;
-	public GenomeView(String[] args) {
+	private static MainWindow mw;
+
+	/*
+	 * Rewrite args if started from file association
+	 */
+	private static void jnlprewrite(String[] args) {
+		if (args.length > 0 && args[0].equals("-open"))
+			args[0] = "--file";
+
+	}
+
+	public static void main(final String[] args) {
+		/* Rewrite JNLP arguments */
 		jnlprewrite(args);
-		Authenticator.setDefault(new MyAuthenticator());
 		/*
 		 * The configuration class needs to be called at least once before we
 		 * can start the logger
 		 */
 		System.out.println("Starting GenomeView " + Configuration.version());
+
 		/* Configure logging */
 		try {
 			LogManager.getLogManager().readConfiguration(GenomeView.class.getResourceAsStream("/conf/logging.conf"));
 			logger = Logger.getLogger(GenomeView.class.getCanonicalName());
 		} catch (SecurityException e) {
-			logger.log(Level.SEVERE,"log initialization", e);
-			/* These exceptions likely indicate that the log could not be initialized, print also to console */
+			logger.log(Level.SEVERE, "log initialization", e);
+			/*
+			 * These exceptions likely indicate that the log could not be
+			 * initialized, print also to console
+			 */
 			e.printStackTrace();
-			
+
 		} catch (IOException e) {
-			logger.log(Level.SEVERE,"log initialization", e);
-			/* These exceptions likely indicate that the log could not be initialized, print also to console */
+			logger.log(Level.SEVERE, "log initialization", e);
+			/*
+			 * These exceptions likely indicate that the log could not be
+			 * initialized, print also to console
+			 */
 			e.printStackTrace();
 		}
 
-        try {
+		/* Single instance manager */
+		boolean singleInstance = Configuration.getBoolean("general:singleInstance");
+		if (singleInstance) {
+			if (!ApplicationInstanceManager.registerInstance()) {
+				// instance already running.
+				System.out.println("Another instance of this application is already running.  Exiting.");
+				System.exit(0);
+			}
+			ApplicationInstanceManager.setApplicationInstanceListener(new ApplicationInstanceListener() {
+				public void newInstanceCreated() {
+					System.out.println("New instance detected...");
+					try {
+						mw.init(args);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			});
+		}
+
+		Authenticator.setDefault(new MyAuthenticator());
+
+		try {
 			mw = new MainWindow(args);
-			
+
 		} catch (InterruptedException e) {
-			logger.log(Level.SEVERE,"main window initialization", e);
+			logger.log(Level.SEVERE, "main window initialization", e);
 		} catch (ExecutionException e) {
-			logger.log(Level.SEVERE,"main window initialization", e);
+			logger.log(Level.SEVERE, "main window initialization", e);
 		}
 		splash.dispose();
-	}
-
-/*
- * Rewrite args if started from file association	
- */
-	private void jnlprewrite(String[] args) {
-		if(args.length>0&&args[0].equals("-open"))
-			args[0]="--file";
-		
-	}
-
-
-	public static void main(String[] args) {
-		new GenomeView(args);
 	}
 
 	/*
 	 * This will create AND SHOW the Splash screen.
 	 */
-	private Splash splash = new Splash();
-
-
-	
+	private static Splash splash = new Splash();
 
 }
-
