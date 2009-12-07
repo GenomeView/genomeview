@@ -170,6 +170,9 @@ public class ColorGradient {
 	public Color getColor(int i) {
 		return i > crGradient.size() ? crGradient.get(crGradient.size() - 1) : crGradient.get(i);
 	}
+	public Color getColor(double s) {
+		return getColor((int)(s*crGradient.size()));
+	}
 
 	/**
 	 * Return the entire gradient as a Color list.
@@ -212,4 +215,5 @@ public class ColorGradient {
 		}
 	}
 
+	
 }
