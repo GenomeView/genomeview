@@ -102,7 +102,8 @@ public class Model extends Observable implements IModel {
 	}
 
 	public void clearEntries() {
-		this.setAnnotationLocationVisible(new Location(1, 1));
+		annotationStart=0;
+		annotationEnd=0;
 		loadedSources.clear();
 		entries.clear();
 		selectedLocation.clear();
@@ -384,14 +385,10 @@ public class Model extends Observable implements IModel {
 	 * @throws ReadFailedException
 	 */
 	public void addData(DataSource f) throws ReadFailedException {
-		boolean firstEntry = entries.size() == 0;
+		if(entries.size()==0)
+			setAnnotationLocationVisible(new Location(1, 51));
 		logger.info("Reading source:" + f);
 		f.read(entries);
-		if (firstEntry) {
-			entries.getEntry();// select a default
-			setAnnotationLocationVisible(new Location(1, 10000));
-		}
-
 		logger.info("Model adding data done!");
 		if (f instanceof MultiFileSource)
 			for (DataSource ds : ((MultiFileSource) f).getFileSources()) {
