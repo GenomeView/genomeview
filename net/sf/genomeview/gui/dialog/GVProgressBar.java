@@ -75,5 +75,12 @@ public class GVProgressBar extends JDialog {
 		pb.setValue(progress);
 
 	}
+
+
+
+	public void inc() {
+		pb.setValue(pb.getValue()+1);
+		
+	}
 	
 }
