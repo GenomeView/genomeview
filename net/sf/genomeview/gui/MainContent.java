@@ -57,15 +57,15 @@ public class MainContent {
 			bar.add(new JLabel("Code:"));
 			bar.add(new AAMappingChooser(model));
 		}
-//		String sponsor = Configuration.get("sponsor");
-//		if (sponsor.length() != 0) {
-//			URL url = Icons.class.getResource(sponsor);
-//			logger.info("Sponser logo url: " + url);
-//			if (url != null) {
-//				ImageIcon sponsorLogo = new ImageIcon(url);
-//				bar.add(new JLabel(sponsorLogo));
-//			}
-//		}
+		// String sponsor = Configuration.get("sponsor");
+		// if (sponsor.length() != 0) {
+		// URL url = Icons.class.getResource(sponsor);
+		// logger.info("Sponser logo url: " + url);
+		// if (url != null) {
+		// ImageIcon sponsorLogo = new ImageIcon(url);
+		// bar.add(new JLabel(sponsorLogo));
+		// }
+		// }
 
 		bar.add(new JLabel(new ImageIcon(Icons.class.getResource("/images/vib.png"))));
 		return bar;
@@ -80,6 +80,7 @@ public class MainContent {
 		screen.setSize(screen.getWidth() * 0.7, screen.getHeight() * 0.5);
 
 		JPanel[] out = new JPanel[screens];
+		StatusBar sb = new StatusBar(model);
 		for (int i = 0; i < out.length - 1; i++) {
 			out[i] = new JPanel();
 			// registerKeyboard(out[i], model);
@@ -90,6 +91,7 @@ public class MainContent {
 			af.setPreferredSize(screen);
 
 			out[i].add(af, BorderLayout.CENTER);
+			out[i].add(sb, BorderLayout.SOUTH);
 		}
 		int last = out.length - 1;
 		out[last] = new JPanel();
@@ -119,6 +121,9 @@ public class MainContent {
 
 		leftContainer.add(af, BorderLayout.CENTER);
 
+		StatusBar sb = new StatusBar(model);
+		leftContainer.add(sb, BorderLayout.SOUTH);
+
 		leftRight.setLeftComponent(leftContainer);
 		leftRight.setRightComponent(new InformationFrame(model));
 		// out[last].add(new InformationFrame(model));
@@ -127,5 +132,3 @@ public class MainContent {
 	}
 
 }
-
-
