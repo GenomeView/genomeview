@@ -12,8 +12,8 @@ import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 
+import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.ColorGradient;
 import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;

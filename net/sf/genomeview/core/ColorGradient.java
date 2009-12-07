@@ -3,7 +3,7 @@
  * 
  * Copyright 2004, Generation5. All Rights Reserved.
  */
-package net.sf.genomeview.gui;
+package net.sf.genomeview.core;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -25,12 +25,46 @@ import javax.imageio.ImageIO;
  * @author Thomas Abeel
  */
 public class ColorGradient {
+	/**
+	 * Default 512 step four color gradient (red, yellow, green, blue)
+	 */
+	public static ColorGradient fourColorGradient = null;
+
+	/**
+	 * Default 512 step two color gradient (red, green)
+	 */
+	public static ColorGradient redGreenColorGradient = null;
+
+	/**
+	 * Default 512 step four color gradient (yellow, blue);
+	 */
+	public static ColorGradient yellowBlueGradient = null;
+
+	static {
+		fourColorGradient = new ColorGradient();
+		fourColorGradient.addPoint(Color.red);
+		fourColorGradient.addPoint(Color.yellow);
+		fourColorGradient.addPoint(Color.green);
+		fourColorGradient.addPoint(Color.blue);
+		fourColorGradient.createGradient(512);
+
+		redGreenColorGradient = new ColorGradient();
+		redGreenColorGradient.addPoint(Color.green);
+		redGreenColorGradient.addPoint(Color.red);
+		redGreenColorGradient.createGradient(512);
+
+		yellowBlueGradient = new ColorGradient();
+		yellowBlueGradient.addPoint(Color.yellow);
+		yellowBlueGradient.addPoint(Color.blue);
+		yellowBlueGradient.createGradient(512);
+
+	}
 
 	private List<Color> crGradientPoints = new ArrayList<Color>();
 	private List<Color> crGradient;
-	
+
 	/**
-	 * Add a color to the gradient list. 
+	 * Add a color to the gradient list.
 	 * 
 	 * @param gradientColour
 	 *            the next color in the gradient.
@@ -39,8 +73,18 @@ public class ColorGradient {
 		crGradientPoints.add(gradientColour);
 	}
 
-	public static ColorGradient getSimple(Color start,Color end){
-		ColorGradient out=new ColorGradient();
+	/**
+	 * Creates a 512 step 2 color gradient with the supplied start and end
+	 * colors.
+	 * 
+	 * @param start
+	 *            starting color
+	 * @param end
+	 *            ending color
+	 * @return a gradient between the two colors
+	 */
+	public static ColorGradient createTwoColor(Color start, Color end) {
+		ColorGradient out = new ColorGradient();
 		out.addPoint(start);
 		out.addPoint(end);
 		out.createGradient(512);
@@ -49,8 +93,8 @@ public class ColorGradient {
 
 	/**
 	 * Calculate the RGB deltas between two different color values and over a
-	 * given number of steps. <code>createGradient</code> uses this function
-	 * to connect the gradient points together.
+	 * given number of steps. <code>createGradient</code> uses this function to
+	 * connect the gradient points together.
 	 * 
 	 * @param start
 	 *            the starting color.
@@ -84,7 +128,8 @@ public class ColorGradient {
 	 * Create the gradient using the current gradient list.
 	 * 
 	 * @param numSteps
-	 *            the total number of steps to take from the first color to the last.
+	 *            the total number of steps to take from the first color to the
+	 *            last.
 	 */
 	public void createGradient(int numSteps) {
 		int steps = numSteps / (crGradientPoints.size() - 1);
@@ -93,12 +138,11 @@ public class ColorGradient {
 		crColours[1] = crGradientPoints.get(0).getGreen();
 		crColours[2] = crGradientPoints.get(0).getBlue();
 
-		crGradient = new ArrayList<Color>();//new Color[numSteps];
+		crGradient = new ArrayList<Color>();// new Color[numSteps];
 
 		// For each of the gradient points
 		for (int i = 0; i < crGradientPoints.size() - 1; i++) {
-			double[] delta = getRGBDeltas(crGradientPoints.get(i),
-					crGradientPoints.get(i + 1), steps);
+			double[] delta = getRGBDeltas(crGradientPoints.get(i), crGradientPoints.get(i + 1), steps);
 
 			for (int s = 0; s < steps; s++) {
 				crColours[0] += delta[0];
@@ -110,10 +154,8 @@ public class ColorGradient {
 					crColours[1] = 255;
 				if (crColours[2] > 255)
 					crColours[2] = 255;
-				crGradient.add(new Color((int) Math.round(crColours[0]),
-						(int) Math.round(crColours[1]), (int) Math
-								.round(crColours[2])));
-				
+				crGradient.add(new Color((int) Math.round(crColours[0]), (int) Math.round(crColours[1]), (int) Math.round(crColours[2])));
+
 			}
 		}
 	}
@@ -126,7 +168,7 @@ public class ColorGradient {
 	 * @return the <code>Color</code> value in the gradient.
 	 */
 	public Color getColor(int i) {
-		return i>crGradient.size()?crGradient.get(crGradient.size()-1):crGradient.get(i);
+		return i > crGradient.size() ? crGradient.get(crGradient.size() - 1) : crGradient.get(i);
 	}
 
 	/**
