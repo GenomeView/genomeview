@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
+import net.sf.genomeview.core.ColorFactory;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
@@ -96,7 +97,7 @@ public class FeatureTrack extends Track {
 					notes.addAll(rf.qualifier("color"));
 					if (notes.size() > 0) {
 						String val = notes.get(0).getValue();
-						c = Color.decode(val);
+						c = ColorFactory.decodeColor(val);
 					}
 				}
 				g.setColor(c);
