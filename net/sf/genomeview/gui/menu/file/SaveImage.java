@@ -64,7 +64,7 @@ public class SaveImage extends AbstractAction {
 					// TODO Auto-generated catch block
 					ex.printStackTrace();
 				}				
-
+				Configuration.set("lastDirectory", f.getParentFile());
 			} catch (Exception ex) {
 				// TODO fix
 				ex.printStackTrace();
