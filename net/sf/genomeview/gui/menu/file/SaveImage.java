@@ -48,14 +48,15 @@ public class SaveImage extends AbstractAction {
 			try {
 				File f = chooser.getSelectedFile();
 				GeneEvidenceLabel mw = model.getGUIManager().getEvidenceLabel();
-				BufferedImage bi = new BufferedImage(mw.getWidth()*4,mw.getHeight()*4, BufferedImage.TYPE_INT_RGB);
+				int factor=Configuration.getInt("general:exportMagnifyFactor");
+				BufferedImage bi = new BufferedImage(mw.getWidth()*factor,mw.getHeight()*factor, BufferedImage.TYPE_INT_RGB);
 				Graphics2D g = (Graphics2D) bi.getGraphics();
 				
 				try {
 					RepaintManager currentManager = 
 						  RepaintManager.currentManager(mw);
 						currentManager.setDoubleBufferingEnabled(false);
-					g.scale(4, 4);
+					g.scale(factor, factor);
 					mw.actualPaint(g);
 					ImageIO.write(bi, "PNG", new File(f+".png"));
 					currentManager.setDoubleBufferingEnabled(true);

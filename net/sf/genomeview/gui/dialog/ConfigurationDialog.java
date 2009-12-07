@@ -320,10 +320,16 @@ public class ConfigurationDialog extends JDialog {
 			this.add(new BooleanConfig("general:singleInstance", "Allow only one instance of GenomeView"), gc);
 			gc.gridy++;
 			this.add(new BooleanConfig("geneticCodeSelection", "Enable genetic code selection? (Requires restart)"), gc);
+			gc.gridy++;
+			this.add(new IntegerConfig("general:exportMagnifyFactor", "Resolution increase factor for export images"), gc);
+			
+			
 			
 			gc.gridy++;
 			gc.gridwidth = 1;
 		
+			
+			
 			this.add(new BooleanConfig("general:disableURLCaching", "Disable URL caching?"), gc);
 			gc.weightx=0;
 			gc.gridx++;
