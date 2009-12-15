@@ -211,18 +211,8 @@ public class Model extends Observable implements IModel {
 
 	private int annotationStart = 0, annotationEnd = 0;
 
-	/**
-	 * Set the visible area in the evidence and structure frame to the given
-	 * Location.
-	 * 
-	 * start and end one-based [start,end]
-	 * 
-	 * @param start
-	 * @param annotationEnd
-	 */
-
-	public void setAnnotationLocationVisible(Location r) {
-
+	
+	public void setAnnotationLocationVisible(Location r, boolean mayExpand) {
 		int modStart = -1;
 		int modEnd = -1;
 		if (r.start > 1) {
@@ -241,6 +231,10 @@ public class Model extends Observable implements IModel {
 				modStart = 1;
 		}
 		Location newZoom = new Location(modStart, modEnd);
+		/* When trying to zoom to something really small */
+		if(newZoom.length()<50&&mayExpand){
+			setAnnotationLocationVisible(new Location(modStart-25,modEnd+25));
+		}
 		if (newZoom.length() != annotationEnd - annotationStart + 1 && newZoom.length() < 50)
 			return;
 		if (newZoom.length() != annotationEnd - annotationStart + 1 && newZoom.length() >Configuration.getInt("general:zoomout"))
@@ -251,6 +245,22 @@ public class Model extends Observable implements IModel {
 		ZoomChange zc = new ZoomChange(new Location(annotationStart, annotationEnd), newZoom);
 		zc.doChange();
 		refresh();
+		
+	}
+	
+	/**
+	 * Set the visible area in the evidence and structure frame to the given
+	 * Location.
+	 * 
+	 * start and end one-based [start,end]
+	 * 
+	 * @param start
+	 * @param annotationEnd
+	 */
+
+	public void setAnnotationLocationVisible(Location r) {
+		setAnnotationLocationVisible(r,false);
+		
 	}
 
 	/**
@@ -738,5 +748,7 @@ public class Model extends Observable implements IModel {
 	public GUIManager getGUIManager() {
 		return guimanager;
 	}
+
+	
 
 }

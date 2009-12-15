@@ -686,7 +686,7 @@ public class SearchDialog extends JDialog {
 						model.setSelectedEntry(entry);
 					model.setLocationSelection(f);
 					double border = 0.05 * (f.end() - f.start());
-					model.setAnnotationLocationVisible(new Location((int) (f.start() - border), (int) (f.end() + border)));
+					model.setAnnotationLocationVisible(new Location((int) (f.start() - border), (int) (f.end() + border)),true);
 
 				}
 			});
