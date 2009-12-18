@@ -294,21 +294,23 @@ public class FeatureTrack extends Track {
 					text.append("Name : " + f.toString() + "<br />");
 					text.append("Start : " + f.start() + "<br />");
 					text.append("End : " + f.end() + "<br />");
-					Collection<DataSource> sources = model.getSelectedEntry().shortReads.getSources();
+					int aggregateLenght = agg(f.location());
+					if (aggregateLenght < Configuration.getInt("featuretrack:meanshortread")) {
+						Collection<DataSource> sources = model.getSelectedEntry().shortReads.getSources();
 
-					CountMap<Integer> cm = new CountMap<Integer>();
-					for (DataSource source : sources) {
-						cm.clear();
-						ReadGroup rg = model.getSelectedEntry().shortReads.getReadGroup(source);
-						ShortReadCoverage src = rg.getCoverage();
-						for (Location l : f.location()) {
-							for (int i = l.start(); i <= l.end(); i++) {
-								cm.count((int)(src.get(Strand.FORWARD, i-1)+src.get(Strand.REVERSE, i-1)));
+						CountMap<Integer> cm = new CountMap<Integer>();
+						for (DataSource source : sources) {
+							cm.clear();
+							ReadGroup rg = model.getSelectedEntry().shortReads.getReadGroup(source);
+							ShortReadCoverage src = rg.getCoverage();
+							for (Location l : f.location()) {
+								for (int i = l.start(); i <= l.end(); i++) {
+									cm.count((int) (src.get(Strand.FORWARD, i - 1) + src.get(Strand.REVERSE, i - 1)));
+								}
 							}
+
+							text.append("Mean short read coverage (" + StaticUtils.shortify(source.toString()) + "): " + median(cm) + "<br />");
 						}
-						
-						
-						text.append("Mean short read coverage (" + StaticUtils.shortify(source.toString()) + "): " + median(cm) + "<br />");
 					}
 					// }
 
@@ -321,6 +323,19 @@ public class FeatureTrack extends Track {
 					setVisible(true);
 				}
 			}
+		}
+
+		/**
+		 * Calculates the sum of the lengths of the individual locations.
+		 * 
+		 * @param location
+		 * @return
+		 */
+		private int agg(SortedSet<Location> location) {
+			int sum = 0;
+			for (Location l : location)
+				sum += l.length();
+			return sum;
 		}
 
 		private int median(CountMap<Integer> cm) {
