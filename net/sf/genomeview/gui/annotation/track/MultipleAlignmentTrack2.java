@@ -167,7 +167,12 @@ public class MultipleAlignmentTrack2 extends Track {
 		TreeSet<AlignmentBlock> abs = ma.get(entry, visible);
 
 		queriedBlocks = abs.size();
-
+		
+		if (queriedBlocks==0) {
+			g.drawString("No alignment blocks in this region", 10, yOffset + 10);
+			return 20 + 5;
+		}
+		
 		if (queriedBlocks < 500) {
 			int yMax = 0;
 			CollisionMap hitmap = new CollisionMap(model);
