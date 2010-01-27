@@ -114,8 +114,8 @@ public class MainMenu extends JMenuBar {
 		
 		help.addSeparator();
 		help.add(new ShowInstalledModulesAction(model));
-		help.add(new OpenURLAction("Official list plugins",
-				"http://genomeview.sourceforge.net/plugins"));
+//		help.add(new OpenURLAction("Official list plugins",
+//				"http://genomeview.sourceforge.net/plugins"));
 		JMenu pluginDoc=new JMenu("Plugin documentation");
 		model.getGUIManager().registerPluginDocumentationMenu(pluginDoc);
 		help.add(pluginDoc);
