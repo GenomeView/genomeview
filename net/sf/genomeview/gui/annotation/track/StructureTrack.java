@@ -324,10 +324,10 @@ public class StructureTrack extends Track {
 			nt2 = 'g';
 			break;
 		}
-		if (nt == 'g' && nt2 == 't' && forward) {
+		if (nt == 'g' && (nt2 == 't'||nt2=='c') && forward) {
 			return Color.YELLOW;
 		}
-		if (nt == 't' && nt2 == 'g' && !forward) {
+		if ((nt == 't'||nt=='c') && nt2 == 'g' && !forward) {
 			return Color.YELLOW;
 		}
 		if (nt == 'a' && nt2 == 'g' && forward) {
