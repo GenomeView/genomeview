@@ -58,7 +58,9 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		for (Track track : model.getTrackList()) {
 			if (track.isVisible()) {
 				int height = track.paint(g, model.getSelectedEntry(), framePixelsUsed, screenWidth, index++);
-
+				// FIXME we shouldn't give each paint method the yOffset. We
+				// should use the Graphics translate function to make sure we
+				// are positioned correctly.
 				if (height > 0)
 					tracks.put(framePixelsUsed, track);
 				framePixelsUsed += height;
@@ -68,8 +70,6 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	@Override
 	public void paintComponent(Graphics g) {
-	
-		
 
 		actualPaint(g);
 
@@ -148,7 +148,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		}
 
 		public Track get(MouseEvent e) {
-			if(e.getY()>framePixelsUsed)
+			if (e.getY() > framePixelsUsed)
 				return null;
 			int mouseOffset = getMouseOffset(e);
 			e.translatePoint(0, -mouseOffset);
@@ -229,20 +229,19 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 	}
 
 	private Track last = null;
-	
+
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		/* Transfer MouseEvent to corresponding track */
 
 		Track mouseTrack = tracks.get(e);
-	
+
 		if (last != mouseTrack) {
 			if (last != null)
 				last.mouseExited(e.getX(), e.getY(), e);
 			last = mouseTrack;
 		}
-		
-		
+
 		boolean consumed = false;
 		if (mouseTrack != null) {
 			if (last != mouseTrack) {
@@ -267,7 +266,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		if (mouseTrack != null)
 			mouseTrack.mouseClicked(e.getX(), e.getY(), e);
 		/* Specific mouse code for this label */
-		if (!e.isConsumed()&&(Mouse.button2(e) || Mouse.button3(e))) {
+		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
 			new PopUpMenu(model).show(this, e.getX(), y);
 		}
 	}

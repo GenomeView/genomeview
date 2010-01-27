@@ -29,7 +29,7 @@ public abstract class Track extends Observable {
 	}
 
 	private boolean visible;
-	private static final Logger log=Logger.getLogger(Track.class.getCanonicalName());
+	private static final Logger log = Logger.getLogger(Track.class.getCanonicalName());
 
 	/**
 	 * To pass along mouse clicks from the original panel.
@@ -128,6 +128,19 @@ public abstract class Track extends Observable {
 		return used;
 	}
 
+	/**
+	 * Paint the actual track
+	 * 
+	 * @param g
+	 *            graphics environment
+	 * @param e
+	 *            the currently visible entry
+	 * @param yOffset
+	 *            the yOffset that should be taken into account when painting
+	 * @param width
+	 *            the width of the track
+	 * @return the height this track uses
+	 */
 	protected abstract int paintTrack(Graphics2D g, Entry e, int yOffset, double width);
 
 	/* Keeps track of whether a track is collapsible */
