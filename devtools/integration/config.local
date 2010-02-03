@@ -1,0 +1,8 @@
+sponsor=null
+visibleTypesStructure=CDS
+geneticCodeSelection=false
+general:disableURLCaching=false
+dualscreen=false
+general:zoomout=100000000
+shortread:maxRegion=100000
+TYPE_contig=#0000FF
