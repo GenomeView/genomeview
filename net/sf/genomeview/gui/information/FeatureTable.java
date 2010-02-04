@@ -68,7 +68,7 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 						int min = rf.start();
 						int max = rf.end();
 						double border = 0.05 * (max - min);
-						model.setAnnotationLocationVisible(new Location((int) (min - border), (int) (max + border)));
+						model.setAnnotationLocationVisible(new Location((int) (min - border), (int) (max + border)),true);
 					}
 				}
 				/* Keep selection */
