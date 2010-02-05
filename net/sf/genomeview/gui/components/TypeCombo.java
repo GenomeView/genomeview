@@ -24,9 +24,14 @@ public class TypeCombo extends JComboBox {
 
 	public TypeCombo(Model model) {
 		super(new TypeModel(model));
+		this.setEditable(true);
 
 	}
+	public TypeCombo(Model model, boolean editable) {
+		super(new TypeModel(model));
+		this.setEditable(editable);
 
+	}
 	public Type getTerm() {
 		return (Type) this.getSelectedItem();
 	}
@@ -37,8 +42,11 @@ class TypeModel extends DefaultComboBoxModel implements Observer {
 
 	private static final long serialVersionUID = -5021594934465844712L;
 
+	private Model model;
+	
 	public TypeModel(Model model) {
 		model.addObserver(this);
+		this.model = model;
 	}
 
 	@Override
@@ -55,7 +63,8 @@ class TypeModel extends DefaultComboBoxModel implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		fireContentsChanged(o, 0, Type.values().length);
-
+		model.updateTracks();
 	}
+	
 
 }

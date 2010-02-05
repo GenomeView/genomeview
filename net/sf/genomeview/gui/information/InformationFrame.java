@@ -59,7 +59,7 @@ public class InformationFrame extends GridBagPanel {
         gc.weighty = 0;
         gc.gridwidth=1;
         add(new JLabel("Features"), gc);
-        TypeCombo type=new TypeCombo(model);
+        TypeCombo type=new TypeCombo(model, false);
         type.setSelectedItem(Type.get("CDS"));
         type.addActionListener(annotationTrackList);
         gc.gridx++;
