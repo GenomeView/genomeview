@@ -33,7 +33,7 @@ public class NCBIselectedDnaBlastAction extends AbstractModelAction {
     @Override
     public void actionPerformed(ActionEvent arg0) {
         Location l = model.getSelectedRegion();
-        String seq = model.getSelectedEntry().sequence.getSubSequence(l.start(), l.end());
+        String seq = model.getSelectedEntry().sequence.getSubSequence(l.start(), l.end()+1);
 
         Blast.nucleotideBlast("selection",seq);
 
