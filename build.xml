@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="870" />
+	<property name="version" value="894" />
 	<property name="src" value="." />
 	<property name="build" value="build" />
 	<property name="lib" value="lib" />
@@ -37,7 +37,7 @@
 		</copy>
 		<replaceregexp match="%HEADER%" replace="This file is part of GenomeView, a genome browser and annotation curator${line.separator}
 * ${line.separator}
-* Copyright (C) 2007-2009 Thomas Abeel and Thomas Van Parys${line.separator}
+* Copyright (C) 2007-2010 Thomas Abeel and Thomas Van Parys${line.separator}
 * ${line.separator}
 * This program is free software: you can redistribute it and/or modify${line.separator}
 * it under the terms of the GNU General Public License as published by${line.separator}
