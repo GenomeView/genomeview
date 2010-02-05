@@ -368,6 +368,7 @@ public class Model extends Observable implements IModel {
 
 	public void setLocationSelection(Feature rl) {
 		selectedLocation.clear();
+		setSelectedRegion(null);
 		for (Location l : rl.location())
 			selectedLocation.add(l);
 		refresh();
@@ -376,6 +377,7 @@ public class Model extends Observable implements IModel {
 
 	public void setLocationSelection(Location rl) {
 		selectedLocation.clear();
+		setSelectedRegion(null);
 		this.addLocationSelection(rl);
 
 	}

@@ -10,6 +10,7 @@ import net.sf.genomeview.data.Blast;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Location;
 import net.sf.jannot.utils.SequenceTools;
 
 /**
@@ -28,17 +29,24 @@ public class NCBIproteinBlastAction extends AbstractModelAction {
 
     @Override
     public void update(Observable x, Object y) {
-        setEnabled(model.getFeatureSelection() != null && model.getFeatureSelection().size() == 1);
+        setEnabled((model.getFeatureSelection() != null && model.getFeatureSelection().size() == 1) ||
+        				model.getSelectedRegion() != null);
     }
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
+    	if (model.getLocationSelection() != null && model.getFeatureSelection().size() == 1){
+    		Feature rf = model.getLocationSelection().iterator().next().getParent();
+    		String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence, rf);
 
-        Feature rf = model.getLocationSelection().iterator().next().getParent();
-        String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence, rf);
-
-        String protein = SequenceTools.translate(seq,model.getAAMapping());
-        Blast.proteinBlast(""+rf.toString().hashCode(),protein);
+    		String protein = SequenceTools.translate(seq,model.getAAMapping());
+    		Blast.proteinBlast(""+rf.toString().hashCode(),protein);
+    	} else if (model.getSelectedRegion() != null){
+    		Location l = model.getSelectedRegion();
+   	     	String seq = model.getSelectedEntry().sequence.getSubSequence(l.start(), l.end()+1);
+   	     	String protein = SequenceTools.translate(seq,model.getAAMapping());
+   	     	Blast.nucleotideBlast("selection",protein);
+    	}
 
     }
 

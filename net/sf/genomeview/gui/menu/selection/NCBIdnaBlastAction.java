@@ -10,6 +10,7 @@ import net.sf.genomeview.data.Blast;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Location;
 import net.sf.jannot.utils.SequenceTools;
 
 /**
@@ -28,16 +29,21 @@ public class NCBIdnaBlastAction extends AbstractModelAction {
 
     @Override
     public void update(Observable x, Object y) {
-        setEnabled(model.getFeatureSelection() != null && model.getFeatureSelection().size() == 1);
+        setEnabled((model.getFeatureSelection() != null && model.getFeatureSelection().size() == 1) || 
+        			model.getSelectedRegion() != null);
     }
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
-
-        Feature rf = model.getLocationSelection().iterator().next().getParent();
-        String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence, rf);
-        Blast.nucleotideBlast(""+rf.toString().hashCode(),seq);
-
+    	if (model.getLocationSelection() != null && model.getFeatureSelection().size() == 1){
+    		Feature rf = model.getLocationSelection().iterator().next().getParent();
+    		String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence, rf);
+    		Blast.nucleotideBlast(""+rf.toString().hashCode(),seq);
+    	} else if (model.getSelectedRegion() != null){
+    		 Location l = model.getSelectedRegion();
+    	     String seq = model.getSelectedEntry().sequence.getSubSequence(l.start(), l.end()+1);
+    	     Blast.nucleotideBlast("selection",seq);
+    	}
     }
 
 }

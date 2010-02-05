@@ -88,9 +88,9 @@ public class MainMenu extends JMenuBar {
 
 		JMenu select = new JMenu("Selection");
 		select.add(new ShowSequenceWindowAction(model));
-		select.add(new NCBIdnaBlastAction(model));
-		select.add(new NCBIproteinBlastAction(model));
-		select.add(new NCBIselectedDnaBlastAction(model));
+//		select.add(new NCBIdnaBlastAction(model));
+//		select.add(new NCBIproteinBlastAction(model));
+//		select.add(new NCBIselectedDnaBlastAction(model));
 		select.addSeparator();
 		select.add(new ClearFeatureSelectionAction(model));
 		select.add(new ClearRegionSelectionAction(model));

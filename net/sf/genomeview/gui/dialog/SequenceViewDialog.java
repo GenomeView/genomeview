@@ -44,6 +44,7 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.menu.selection.NCBIdnaBlastAction;
 import net.sf.genomeview.gui.menu.selection.NCBIproteinBlastAction;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Location;
 import net.sf.jannot.utils.SequenceTools;
 import be.abeel.io.ExtensionManager;
 
@@ -74,6 +75,10 @@ public class SequenceViewDialog extends JDialog implements Observer {
     private Map<Feature, String> nucList;
 
     private Map<Feature, String> protList;
+    
+    private String subSequenceNuc;
+    private String subSequenceProt;
+    
 
     private final JButton toggleButton = new JButton(TO_PROT_CAPTION);
 
@@ -199,20 +204,34 @@ public class SequenceViewDialog extends JDialog implements Observer {
     }
 
     private void fillWithNucleotides() {
-        if (nucList == null) {
-            nucList = createNucList();
-        }
-        String nucs = new String();
-        for (Feature feat : nucList.keySet()) {
-            nucs += ">" + feat.toString();
-            nucs += LINE_BREAK;
-            nucs += nucList.get(feat);
-            nucs += LINE_BREAK + LINE_BREAK;
-        }
+    	String nucs = new String();
+    	if (model.getFeatureSelection().size()!=0){
+    		if (nucList == null) {
+    			nucList = createNucList();
+    		}
+    		for (Feature feat : nucList.keySet()) {
+    			nucs += ">" + feat.toString();
+    			nucs += LINE_BREAK;
+    			nucs += nucList.get(feat);
+    			nucs += LINE_BREAK + LINE_BREAK;
+    		}
+    	} else if (model.getSelectedRegion() != null){
+    		if (subSequenceNuc==null){
+    			subSequenceNuc = createSubSequenceNuc();
+    		}
+    		nucs += ">" + "selection";
+    		nucs += LINE_BREAK;
+            nucs += subSequenceNuc;
+    	}
         this.sequenceText.setText(nucs);
     }
 
-    private Map<Feature, String> createNucList() {
+    private String createSubSequenceNuc() {
+    	Location l = model.getSelectedRegion();
+    	return model.getSelectedEntry().sequence.getSubSequence(l.start(), l.end()+1);
+	}
+
+	private Map<Feature, String> createNucList() {
         Map<Feature, String> newList = new HashMap<Feature, String>();
         // String nucs = new String();
         Set<Feature> feats = model.getFeatureSelection();
@@ -238,53 +257,99 @@ public class SequenceViewDialog extends JDialog implements Observer {
     }
 
     private void fillWithProteins() {
-        if (protList == null) {
-            protList = createProtList();
-        }
-        String prots = new String();
-        for (Feature feat : protList.keySet()) {
-            prots += ">" + feat.toString();
-            prots += LINE_BREAK;
-            prots += protList.get(feat);
-            prots += LINE_BREAK + LINE_BREAK;
-        }
+    	String prots = new String();
+    	if (model.getFeatureSelection().size() != 0){
+    		if (protList == null) {
+    			protList = createProtList();
+    		}
+    		for (Feature feat : protList.keySet()) {
+    			prots += ">" + feat.toString();
+    			prots += LINE_BREAK;
+    			prots += protList.get(feat);
+    			prots += LINE_BREAK + LINE_BREAK;
+    		}
+    	} else if (model.getSelectedRegion() != null){
+    		if (subSequenceProt == null){
+    			subSequenceProt = createSubSequenceProt();
+    		}
+    		prots += ">" + "selection";
+    		prots += LINE_BREAK;
+    		prots += subSequenceProt;
+    		prots += LINE_BREAK + LINE_BREAK;
+    	}
         this.sequenceText.setText(prots);
     }
 
-    private void writeProts(PrintWriter writer) {
-        if (protList == null) {
-            protList = createProtList();
-        }
-        for (Feature feat : protList.keySet()) {
-            writer.println(">" + feat.toString());
-            String prots = protList.get(feat);
-            int cursor = 0;
-            int line = 80;
-            while (cursor < prots.length()) {
-                int offset = Math.min(80, prots.length() - cursor);
-                writer.println(prots.substring(cursor, cursor + offset));
-                cursor += line;
-            }
-            writer.println();
-        }
+    private String createSubSequenceProt() {
+    	Location l = model.getSelectedRegion();
+    	String seq = model.getSelectedEntry().sequence.getSubSequence(l.start(), l.end()+1);
+		return SequenceTools.translate(seq,model.getAAMapping());
+	}
+
+	private void writeProts(PrintWriter writer) {
+		if (model.getFeatureSelection().size() != 0){
+			if (protList == null) {
+				protList = createProtList();
+			}
+			for (Feature feat : protList.keySet()) {
+				writer.println(">" + feat.toString());
+				String prots = protList.get(feat);
+				int cursor = 0;
+				int line = 80;
+				while (cursor < prots.length()) {
+					int offset = Math.min(80, prots.length() - cursor);
+					writer.println(prots.substring(cursor, cursor + offset));
+					cursor += line;
+				}
+				writer.println();
+			}
+		} else if (model.getSelectedRegion()!=null){
+			if (subSequenceProt == null){
+				subSequenceProt = createSubSequenceProt();
+			}
+			writer.println(">" + "selection");
+			int cursor = 0;
+			int line = 80;
+			while (cursor < subSequenceProt.length()) {
+				int offset = Math.min(80, subSequenceProt.length() - cursor);
+				writer.println(subSequenceProt.substring(cursor, cursor + offset));
+				cursor += line;
+			}
+			writer.println();
+		}
     }
 
     private void writeNucs(PrintWriter writer) {
-        if (nucList == null) {
-            nucList = createNucList();
-        }
-        for (Feature feat : nucList.keySet()) {
-            writer.println(">" + feat.toString());
-            String nucs = nucList.get(feat);
-            int cursor = 0;
-            int line = 80;
-            while (cursor < nucs.length()) {
-                int offset = Math.min(80, nucs.length() - cursor);
-                writer.println(nucs.substring(cursor, cursor + offset));
-                cursor += line;
-            }
-            writer.println();
-        }
+    	if (model.getFeatureSelection().size() != 0){
+    		if (nucList == null) {
+    			nucList = createNucList();
+    		}
+    		for (Feature feat : nucList.keySet()) {
+    			writer.println(">" + feat.toString());
+    			String nucs = nucList.get(feat);
+    			int cursor = 0;
+    			int line = 80;
+    			while (cursor < nucs.length()) {
+    				int offset = Math.min(80, nucs.length() - cursor);
+    				writer.println(nucs.substring(cursor, cursor + offset));
+    				cursor += line;
+    			}
+    			writer.println();
+    		}
+    	} else if (model.getSelectedRegion()!=null){
+    		if (subSequenceNuc == null){
+				subSequenceNuc = createSubSequenceNuc();
+			}
+			writer.println(">" + "selection");
+			int cursor = 0;
+			int line = 80;
+			while (cursor < subSequenceNuc.length()) {
+				int offset = Math.min(80, subSequenceNuc.length() - cursor);
+				writer.println(subSequenceNuc.substring(cursor, cursor + offset));
+				cursor += line;
+			}
+			writer.println();
+    	}
     }
 
     public int showSequenceViewDialog() {
@@ -296,6 +361,8 @@ public class SequenceViewDialog extends JDialog implements Observer {
     public void update(Observable arg0, Object arg1) {
         nucList = null;
         protList = null;
+        subSequenceNuc = null;
+        subSequenceProt = null;
         if (viewMode == NUC_MODE) {
             fillWithNucleotides();
             toggleButton.setText(TO_PROT_CAPTION);
