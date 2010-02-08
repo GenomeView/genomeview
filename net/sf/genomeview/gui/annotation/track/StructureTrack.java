@@ -697,44 +697,13 @@ public class StructureTrack extends Track {
 
 	@Override
 	public boolean mouseReleased(int x, int y, MouseEvent e) {
+		
 		currentGenomeX = Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth);
 		if (Mouse.button1(e) && dragging) {
-			if (borderHit != null) {
-
-				modifyCoordinate(borderHit, modifyCoordinate, currentGenomeX);
-
+			if (borderHit == null){
+				updateSelectedRegion();
 			} else {
-				int selectionStart = 0;
-				int selectionEnd = 0;
-
-				int start = pressGenomeX < currentGenomeX ? pressGenomeX : currentGenomeX;
-				int end = pressGenomeX < currentGenomeX ? currentGenomeX : pressGenomeX;
-				selectionStart = start;
-				selectionEnd = end + 1;
-				switch (pressTrack) {
-				case 0:
-				case 1:
-				case -1:
-					selectionStart = start;
-					selectionEnd = end;
-					break;
-				case -2:
-				case -3:
-				case -4:
-					selectionStart = snapStartAA(start, -pressTrack - 2);
-					selectionEnd = snapEndAA(end, -pressTrack - 2) + 2;
-					break;
-				case 2:
-				case 3:
-				case 4:
-					selectionStart = snapStartAA(start, pressTrack - 2);
-					selectionEnd = snapEndAA(end, pressTrack - 2) + 2;
-					break;
-				}
-
-				model.setSelectedTrack(pressTrack);
-				model.setSelectedRegion(new Location(selectionStart, selectionEnd));
-
+				modifyCoordinate(borderHit, modifyCoordinate, currentGenomeX);				
 			}
 		}
 		// pressX = -1;
@@ -745,6 +714,39 @@ public class StructureTrack extends Track {
 		setChanged();
 		notifyObservers();
 		return false;
+	}
+	
+	private void updateSelectedRegion(){
+		int selectionStart = 0;
+		int selectionEnd = 0;
+
+		int start = pressGenomeX < currentGenomeX ? pressGenomeX : currentGenomeX;
+		int end = pressGenomeX < currentGenomeX ? currentGenomeX : pressGenomeX;
+		selectionStart = start;
+		selectionEnd = end + 1;
+		switch (pressTrack) {
+		case 0:
+		case 1:
+		case -1:
+			selectionStart = start;
+			selectionEnd = end;
+			break;
+		case -2:
+		case -3:
+		case -4:
+			selectionStart = snapStartAA(start, -pressTrack - 2);
+			selectionEnd = snapEndAA(end, -pressTrack - 2) + 2;
+			break;
+		case 2:
+		case 3:
+		case 4:
+			selectionStart = snapStartAA(start, pressTrack - 2);
+			selectionEnd = snapEndAA(end, pressTrack - 2) + 2;
+			break;
+		}
+
+		model.setSelectedTrack(pressTrack);
+		model.setSelectedRegion(new Location(selectionStart, selectionEnd));
 	}
 
 	private void modifyCoordinate(Location y, int oldCoord, int newCoordinate) {
@@ -761,14 +763,22 @@ public class StructureTrack extends Track {
 				y.setEnd(newCoordinate - 1);
 		} else
 			throw new RuntimeException("This should not happen, sorry, I'm done!");
-		borderHit = null;
+//		borderHit = null;
 
 	}
 
 	@Override
 	public boolean mouseDragged(int x, int y, MouseEvent e) {
-		model.clearLocationSelection();
 		currentGenomeX = Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth);
+		//don't change selection if we're dealing with a borderHit (dragging a feature to resize it)
+		if (borderHit == null){
+			model.clearLocationSelection();
+			updateSelectedRegion();
+		} 
+//		else {
+			//can't modify coordinate on the fly
+//			modifyCoordinate(borderHit, modifyCoordinate, currentGenomeX);
+//		}
 		dragging = true;
 		setChanged();
 		notifyObservers();

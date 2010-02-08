@@ -51,6 +51,7 @@ public class Model extends Observable implements IModel {
 	private Logger logger = Logger.getLogger(Model.class.getCanonicalName());
 
 	private EntrySet entries = new EntrySet(null);
+	
 
 	public Model(JFrame parent) {
 		this.parent = parent;
@@ -751,6 +752,31 @@ public class Model extends Observable implements IModel {
 		return guimanager;
 	}
 
+	/**
+	 * Return the length of the current selection, either region, or location
+	 * @return number of selected nucleotides
+	 */
+	public int getNumberOfSelectedNucs(){
+		if (getSelectedRegion() != null){
+			return getSelectedRegion().length();
+		} else if (getLocationSelection()!=null && getLocationSelection().size()!=0){
+			int size = 0;
+			for (Location loc : getLocationSelection()){
+				size+=loc.length();
+			}
+			return size;
+		} else {
+			return 0;
+		}
+	}
+	
+	/**
+	 * Return the length of the current selection, either region, or location
+	 * @return number of selected proteins
+	 */
+	public int getNumberOfSelectedProts(){
+		return getNumberOfSelectedNucs()/3;
+	}
 	
 
 }
