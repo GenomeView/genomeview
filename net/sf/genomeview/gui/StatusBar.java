@@ -24,12 +24,24 @@ public class StatusBar extends JLabel implements Observer{
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if (model.getNumberOfSelectedNucs()!=0){
-			this.message = "Selected : ";
-			this.message+= model.getNumberOfSelectedNucs()+" nt / "+model.getNumberOfSelectedProts()+" aa";
+		String selected = new String();
+		String coords = new String();
+
+		int currentCoord = model.getCurrentCoord();
+		if (currentCoord == -1){
+			coords = "--";
 		} else {
-			this.message = "No selection";
+			coords = "x: "+currentCoord;
 		}
+		
+		if (model.getNumberOfSelectedNucs()!=0){
+			selected = "         Selected : ";
+			selected+= model.getNumberOfSelectedNucs()+" nt / "+model.getNumberOfSelectedProts()+" aa";
+		} else {
+			selected = new String();
+		}
+		
+		this.message = coords + selected;
 		setText(message);
 	}
 
