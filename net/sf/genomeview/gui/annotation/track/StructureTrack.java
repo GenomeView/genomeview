@@ -639,15 +639,18 @@ public class StructureTrack extends Track {
 	@Override
 	public boolean mousePressed(int x, int y, MouseEvent e) {
 		currentGenomeX = Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth);
-		if (Mouse.button1(e) && !Mouse.modifier(e)) {
-			borderHit = collisionMap.borderHit(e.getX(), e.getY());
+//		if (Mouse.button1(e) && !Mouse.modifier(e)) {
+		if (Mouse.button1(e)) {
+			if (!Mouse.modifier(e)){
+				borderHit = collisionMap.borderHit(e.getX(), e.getY());
 
-			if (borderHit != null) {
-				int genome = Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth);
-				if (Math.abs(genome - borderHit.start()) < Math.abs(genome - borderHit.end())) {
-					modifyCoordinate = borderHit.start();
-				} else {
-					modifyCoordinate = borderHit.end();
+				if (borderHit != null) {
+					int genome = Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth);
+					if (Math.abs(genome - borderHit.start()) < Math.abs(genome - borderHit.end())) {
+						modifyCoordinate = borderHit.start();
+					} else {
+						modifyCoordinate = borderHit.end();
+					}
 				}
 			}
 			pressGenomeX = Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth);
@@ -772,23 +775,23 @@ public class StructureTrack extends Track {
 	public boolean mouseDragged(int x, int y, MouseEvent e) {
 		currentGenomeX = Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth);
 		//don't change selection if we're dealing with a borderHit (dragging a feature to resize it)
-		if (borderHit == null){
-			model.clearLocationSelection();
-			updateSelectedRegion();
-		} 
-//		else {
-			//can't modify coordinate on the fly
-//			modifyCoordinate(borderHit, modifyCoordinate, currentGenomeX);
-//		}
-		dragging = true;
-		setChanged();
-		notifyObservers();
-		return true;
+		if (e.isShiftDown() || borderHit != null){
+			if (borderHit == null){
+				model.clearLocationSelection();
+				updateSelectedRegion();
+			} 
+			dragging = true;
+			setChanged();
+			notifyObservers();
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent e) {
-		if (!collisionMap.nearBorder(x, e.getY()))
+		if (!collisionMap.nearBorder(x, e.getY()) || Mouse.modifier(e))
 			model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		else
 			model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));

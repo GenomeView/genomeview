@@ -44,26 +44,28 @@ public abstract class AbstractGeneLabel extends JLabel implements Observer {
 
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				double rot = e.getWheelRotation() / 5.0;
-				double center = Convert.translateScreenToGenome(e.getX(), model
-						.getAnnotationLocationVisible(),screenWidth);
-				double start = model.getAnnotationLocationVisible().start();
-				double end = model.getAnnotationLocationVisible().end();
-				double length = end - start + 1;
-				double fractionL = (center - start) / length;
-				double fractionR = (end - center) / length;
-				// System.out.println(fractionL+"\t"+fractionR);
-				if (rot < 0
-						&& length < Configuration.getInt("minimumNucleotides")) {
-					return;
-				}
-				double sizeChange = rot * length;
-				// System.out.println("SC:"+sizeChange);
-				int newStart = (int) (start - fractionL * sizeChange);
-				int newEnd = (int) (end + fractionR * sizeChange);
+				if (e.isControlDown()){
+					double rot = e.getWheelRotation() / 5.0;
+					double center = Convert.translateScreenToGenome(e.getX(), model
+							.getAnnotationLocationVisible(),screenWidth);
+					double start = model.getAnnotationLocationVisible().start();
+					double end = model.getAnnotationLocationVisible().end();
+					double length = end - start + 1;
+					double fractionL = (center - start) / length;
+					double fractionR = (end - center) / length;
+					// System.out.println(fractionL+"\t"+fractionR);
+					if (rot < 0
+							&& length < Configuration.getInt("minimumNucleotides")) {
+						return;
+					}
+					double sizeChange = rot * length;
+					// System.out.println("SC:"+sizeChange);
+					int newStart = (int) (start - fractionL * sizeChange);
+					int newEnd = (int) (end + fractionR * sizeChange);
 
-				model.setAnnotationLocationVisible(new Location(newStart,
-						newEnd));
+					model.setAnnotationLocationVisible(new Location(newStart,
+							newEnd));
+				}
 
 			}
 
