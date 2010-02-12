@@ -51,10 +51,16 @@ public class Model extends Observable implements IModel {
 	private Logger logger = Logger.getLogger(Model.class.getCanonicalName());
 
 	private EntrySet entries = new EntrySet(null);
-	
 
+	private SelectionModel selectionModel = new SelectionModel();
+	private MouseModel mouseModel = new MouseModel();
+
+	public MouseModel mouseModel(){
+		return mouseModel;
+	}
 	public Model(JFrame parent) {
 		this.parent = parent;
+		selectionModel.addObserver(this);
 		this.trackList = new TrackList(this);
 		entries.addObserver(this);
 		StructureTrack strack = new StructureTrack(this);
@@ -85,7 +91,7 @@ public class Model extends Observable implements IModel {
 		for (Entry e : entries)
 			if (e.getID().equalsIgnoreCase(id))
 				return e;
-		logger.warning("Entry not found: "+id);
+		logger.warning("Entry not found: " + id);
 		return null;
 	}
 
@@ -103,12 +109,11 @@ public class Model extends Observable implements IModel {
 	}
 
 	public void clearEntries() {
-		annotationStart=0;
-		annotationEnd=0;
+		selectionModel.clear();
+		annotationStart = 0;
+		annotationEnd = 0;
 		loadedSources.clear();
 		entries.clear();
-		selectedLocation.clear();
-		selectedRegion = null;
 		undoStack.clear();
 		redoStack.clear();
 		clearTrackList(trackList);
@@ -132,26 +137,7 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	public Entry getSelectedEntry() {
-		if (entries.size() == 0)
-			return DummyEntry.dummy;
-		return entries.getEntry();
-	}
-
-	public void setSelectedEntry(Entry entry) {
-		for (Entry e : entries)
-			for (ReadGroup rg : e.shortReads.getReadGroups()) {
-				rg.release();
-			}
-		entries.setDefault(entry);
-		selectedLocation.clear();
-		selectedRegion = null;
-
-		setAnnotationLocationVisible(getAnnotationLocationVisible());
-
-		refresh(NotificationTypes.ENTRYCHANGED);
-
-	}
+	
 
 	/**
 	 * The main window of the GUI belonging to this model.
@@ -212,7 +198,6 @@ public class Model extends Observable implements IModel {
 
 	private int annotationStart = 0, annotationEnd = 0;
 
-	
 	public void setAnnotationLocationVisible(Location r, boolean mayExpand) {
 		int modStart = -1;
 		int modEnd = -1;
@@ -233,22 +218,23 @@ public class Model extends Observable implements IModel {
 		}
 		Location newZoom = new Location(modStart, modEnd);
 		/* When trying to zoom to something really small */
-		if(newZoom.length()<50&&mayExpand){
-			setAnnotationLocationVisible(new Location(modStart-25,modEnd+25));
+		if (newZoom.length() < 50 && mayExpand) {
+			setAnnotationLocationVisible(new Location(modStart - 25, modEnd + 25));
 		}
 		if (newZoom.length() != annotationEnd - annotationStart + 1 && newZoom.length() < 50)
 			return;
-		if (newZoom.length() != annotationEnd - annotationStart + 1 && newZoom.length() >Configuration.getInt("general:zoomout"))
+		if (newZoom.length() != annotationEnd - annotationStart + 1
+				&& newZoom.length() > Configuration.getInt("general:zoomout"))
 			return;
-		if(newZoom.start<1||newZoom.end<1)
+		if (newZoom.start < 1 || newZoom.end < 1)
 			return;
-		
+
 		ZoomChange zc = new ZoomChange(new Location(annotationStart, annotationEnd), newZoom);
 		zc.doChange();
 		refresh();
-		
+
 	}
-	
+
 	/**
 	 * Set the visible area in the evidence and structure frame to the given
 	 * Location.
@@ -260,8 +246,8 @@ public class Model extends Observable implements IModel {
 	 */
 
 	public void setAnnotationLocationVisible(Location r) {
-		setAnnotationLocationVisible(r,false);
-		
+		setAnnotationLocationVisible(r, false);
+
 	}
 
 	/**
@@ -354,43 +340,6 @@ public class Model extends Observable implements IModel {
 	}
 
 	/**
-	 * Contains all selected locations, these can be subcomponents of a Feature.
-	 */
-	private SortedSet<Location> selectedLocation = new TreeSet<Location>();
-
-	public void addLocationSelection(Location rl) {
-		selectedLocation.add(rl);
-		refresh();
-	}
-
-	public SortedSet<Location> getLocationSelection() {
-		return selectedLocation;
-	}
-
-	public void setLocationSelection(Feature rl) {
-		selectedLocation.clear();
-		setSelectedRegion(null);
-		for (Location l : rl.location())
-			selectedLocation.add(l);
-		refresh();
-
-	}
-
-	public void setLocationSelection(Location rl) {
-		selectedLocation.clear();
-		setSelectedRegion(null);
-		this.addLocationSelection(rl);
-
-	}
-
-	public void removeLocationSelection(Location rl) {
-
-		selectedLocation.remove(rl);
-		refresh();
-
-	}
-
-	/**
 	 * Load new entries from a data source.
 	 * 
 	 * @param f
@@ -398,7 +347,7 @@ public class Model extends Observable implements IModel {
 	 * @throws ReadFailedException
 	 */
 	public void addData(DataSource f) throws ReadFailedException {
-		if(entries.size()==0)
+		if (entries.size() == 0)
 			setAnnotationLocationVisible(new Location(1, 51));
 		logger.info("Reading source:" + f);
 		f.read(entries);
@@ -413,7 +362,8 @@ public class Model extends Observable implements IModel {
 		refresh(NotificationTypes.GENERAL);
 	}
 
-	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(AminoAcidMapping.STANDARDCODE);
+	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(
+			AminoAcidMapping.STANDARDCODE);
 
 	public AminoAcidMapping getAAMapping(Entry e) {
 		return aamapping.get(e);
@@ -553,7 +503,7 @@ public class Model extends Observable implements IModel {
 			for (Track track : this) {
 				if (track instanceof MultipleAlignmentTrack2) {
 					MultipleAlignmentTrack2 srt = (MultipleAlignmentTrack2) track;
-					
+
 					if (srt.getMA().equals(ma))
 						return true;
 
@@ -582,7 +532,7 @@ public class Model extends Observable implements IModel {
 	 * All types and graphs loaded should have a corresponding track.
 	 */
 	public synchronized void updateTracks() {
-		int startSize=trackList.size();
+		int startSize = trackList.size();
 		for (Type t : Type.values()) {
 			if (!trackList.containsType(t))
 				trackList.add(new FeatureTrack(this, t, true));
@@ -620,9 +570,9 @@ public class Model extends Observable implements IModel {
 
 		/* Multiple alignments tracks */
 		for (MultipleAlignment ma : entries().multiplealignment) {
-			if (!trackList.containsMultipleAlignment(ma)){
+			if (!trackList.containsMultipleAlignment(ma)) {
 				trackList.add(new MultipleAlignmentTrack2(this, ma));
-				logger.info("Added multiple alignment track "+ma);
+				logger.info("Added multiple alignment track " + ma);
 			}
 		}
 		for (String s : targets) {
@@ -631,37 +581,9 @@ public class Model extends Observable implements IModel {
 					trackList.add(new SyntenicTrack(this, s, t));
 			}
 		}
-		if(trackList.size()!=startSize)
+		if (trackList.size() != startSize)
 			refresh(NotificationTypes.UPDATETRACKS);
 
-	}
-
-	public void clearLocationSelection() {
-		selectedLocation.clear();
-		refresh();
-
-	}
-
-	private Location selectedRegion = null;
-
-	@Override
-	public final Location getSelectedRegion() {
-		return selectedRegion;
-	}
-
-	public final void setSelectedRegion(Location selectedRegion) {
-		this.selectedRegion = selectedRegion;
-		refresh();
-	}
-
-	public SortedSet<Feature> getFeatureSelection() {
-		SortedSet<Feature> out = new TreeSet<Feature>();
-		Set<Location>select=new TreeSet<Location>();
-		select.addAll(selectedLocation);
-		for (Location l : select) {
-			out.add(l.getParent());
-		}
-		return out;
 	}
 
 	private Stack<ChangeEvent> undoStack = new Stack<ChangeEvent>();
@@ -754,54 +676,34 @@ public class Model extends Observable implements IModel {
 		return guimanager;
 	}
 
-	/**
-	 * Return the length of the current selection, either region, or location
-	 * @return number of selected nucleotides
-	 */
-	public int getNumberOfSelectedNucs(){
-		if (getSelectedRegion() != null){
-			return getSelectedRegion().length();
-		} else if (getLocationSelection()!=null && getLocationSelection().size()!=0){
-			int size = 0;
-			for (Location loc : getLocationSelection()){
-				size+=loc.length();
+
+	@Override
+	public Location getSelectedRegion() {
+		return selectionModel.getSelectedRegion();
+	}
+
+	public SelectionModel selectionModel() {
+		return selectionModel;
+	}
+
+	public Entry getSelectedEntry() {
+		if (entries.size() == 0)
+			return DummyEntry.dummy;
+		return entries.getEntry();
+	}
+
+	public void setSelectedEntry(Entry entry) {
+		for (Entry e : entries)
+			for (ReadGroup rg : e.shortReads.getReadGroups()) {
+				rg.release();
 			}
-			return size;
-		} else {
-			return 0;
-		}
-	}
-	
-	/**
-	 * Return the length of the current selection, either region, or location
-	 * @return number of selected proteins
-	 */
-	public int getNumberOfSelectedProts(){
-		return getNumberOfSelectedNucs()/3;
-	}
-	
-	/**
-	 * The coordinate (nt) where to mouse is currently hovering.
-	 * -1 when the mouse is outside of the track window.
-	 */
-	private int currentCoord;
-	
-	/**
-	 * Set the current coordinate: the place (nt) where the mouse is currently hovering.
-	 * -1 when the mouse is outside of the track window.
-	 */
-	public void setCurrentCoord(int currentCoord){
-		this.currentCoord = currentCoord;
-		setChanged();
-		notifyObservers();
-	}
-	/**
-	 * Get the current coordinate: the place (nt) where the mouse is currently hovering.
-	 * -1 when the mouse is outside of the track window.
-	 * @return currentCoord
-	 */
-	public int getCurrentCoord(){
-		return currentCoord;
+		entries.setDefault(entry);
+		selectionModel.clear();
+
+		setAnnotationLocationVisible(getAnnotationLocationVisible());
+
+		refresh(NotificationTypes.ENTRYCHANGED);
+
 	}
 
 }

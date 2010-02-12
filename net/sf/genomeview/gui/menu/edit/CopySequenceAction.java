@@ -84,7 +84,7 @@ public class CopySequenceAction extends AbstractModelAction {
 
     @Override
     public void update(Observable o, Object obn) {
-        setEnabled(model.getLocationSelection().size() > 0 || model.getSelectedRegion() != null);
+        setEnabled(model.selectionModel().getLocationSelection().size() > 0 || model.getSelectedRegion() != null);
     }
 
 }

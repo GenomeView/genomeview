@@ -28,8 +28,8 @@ public class SelectFromSelectedForward extends AbstractModelAction {
     @Override
     public void update(Observable o, Object obj) {
 
-        boolean oneFeatureSelection = model.getFeatureSelection() != null && model.getFeatureSelection().size() == 1;
-        boolean oneLocationSelection = model.getLocationSelection() != null && model.getLocationSelection().size() == 1;
+        boolean oneFeatureSelection = model.selectionModel().getFeatureSelection() != null && model.selectionModel().getFeatureSelection().size() == 1;
+        boolean oneLocationSelection = model.selectionModel().getLocationSelection() != null && model.selectionModel().getLocationSelection().size() == 1;
         if (oneFeatureSelection && oneLocationSelection) {
             setEnabled(getNext() != null);
 
@@ -40,8 +40,8 @@ public class SelectFromSelectedForward extends AbstractModelAction {
     }
 
     private Location getNext() {
-        Feature rf = model.getFeatureSelection().first();
-        Location rl = model.getLocationSelection().first();
+        Feature rf = model.selectionModel().getFeatureSelection().first();
+        Location rl = model.selectionModel().getLocationSelection().first();
         ArrayList<Location> loc = new ArrayList<Location>();
         loc.addAll(rf.location());
         int index = loc.indexOf(rl);
@@ -57,7 +57,7 @@ public class SelectFromSelectedForward extends AbstractModelAction {
 
         Location next = getNext();
         if (next != null) {
-            model.setLocationSelection(next);
+            model.selectionModel().setLocationSelection(next);
             model.center(next.start()/2+next.end()/2);
         }
     }

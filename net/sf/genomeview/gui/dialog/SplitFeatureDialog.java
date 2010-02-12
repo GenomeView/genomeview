@@ -39,7 +39,7 @@ public class SplitFeatureDialog extends JDialog {
         gc.insets = new Insets(3, 3, 3, 3);
         gc.fill = GridBagConstraints.BOTH;
 
-        Feature selected = model.getFeatureSelection().iterator().next();
+        Feature selected = model.selectionModel().getFeatureSelection().iterator().next();
 
         final TypeCombo select = new TypeCombo(model);
 
@@ -59,13 +59,13 @@ public class SplitFeatureDialog extends JDialog {
 
             public void actionPerformed(ActionEvent e) {
 
-                assert (model.getLocationSelection().size() == 2);
-                assert (model.getFeatureSelection().size() == 1);
+                assert (model.selectionModel().getLocationSelection().size() == 2);
+                assert (model.selectionModel().getFeatureSelection().size() == 1);
 
-                Feature f = model.getFeatureSelection().first();
+                Feature f = model.selectionModel().getFeatureSelection().first();
                 /* Create left feature */
                 SortedSet<Location> upstream = new TreeSet<Location>();
-                for (Location l : f.location().headSet(model.getLocationSelection().last())) {
+                for (Location l : f.location().headSet(model.selectionModel().getLocationSelection().last())) {
                     upstream.add(l.copy());
                 }
                 Feature left = f.copy();
@@ -74,7 +74,7 @@ public class SplitFeatureDialog extends JDialog {
 
                 /* Create right feature */
                 SortedSet<Location> downstream = new TreeSet<Location>();
-                for (Location l : f.location().tailSet(model.getLocationSelection().last())) {
+                for (Location l : f.location().tailSet(model.selectionModel().getLocationSelection().last())) {
                     downstream.add(l.copy());
                 }
                 Feature right = f.copy();
@@ -86,7 +86,7 @@ public class SplitFeatureDialog extends JDialog {
                     model.getSelectedEntry().annotation.remove(f);
                 }
 
-                model.clearLocationSelection();
+                model.selectionModel().clearLocationSelection();
 
                 _self.dispose();
 

@@ -74,7 +74,7 @@ public class SelectedSequenceDialog extends JDialog {
                 StringBuffer tmp = new StringBuffer();
                 Sequence seq = model.getSelectedEntry().sequence;
                 if (location.isSelected()) {
-                    SortedSet<Location> locs = model.getLocationSelection();
+                    SortedSet<Location> locs = model.selectionModel().getLocationSelection();
                     for (Location l : locs) {
                         Strand s = l.getParent().strand();
                         switch (s) {
@@ -93,7 +93,7 @@ public class SelectedSequenceDialog extends JDialog {
                     }
 
                 } else {// features...
-                    SortedSet<Feature> feats = model.getFeatureSelection();
+                    SortedSet<Feature> feats = model.selectionModel().getFeatureSelection();
                     for (Feature f : feats) {
                         tmp.append(SequenceTools.extractSequence(seq, f));
 

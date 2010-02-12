@@ -178,7 +178,7 @@ public class FeatureTrack extends Track {
 
 					// Set<Feature> selected = model.getFeatureSelection();
 					Set<Location> intersection = new HashSet<Location>(loc);
-					intersection.retainAll(model.getLocationSelection());
+					intersection.retainAll(model.selectionModel().getLocationSelection());
 
 					if (intersection.size() > 0) {
 						g.setColor(Color.BLACK);
@@ -228,7 +228,7 @@ public class FeatureTrack extends Track {
 		Location locationHit = hitmap.uniqueLocation(e.getX(), e.getY());
 		if (locationHit != null) {
 			Feature featHit = locationHit.getParent();
-			model.setLocationSelection(featHit);
+			model.selectionModel().setLocationSelection(featHit);
 			int l = featHit.length();
 			model.setAnnotationLocationVisible(new Location(featHit.start() - (l / 20), featHit.end() + (l / 20)));
 			return true;
@@ -371,15 +371,15 @@ public class FeatureTrack extends Track {
 			Location locationHit = hitmap.uniqueLocation(e.getX(), e.getY());
 			if (Mouse.button1(e)) {
 				if (locationHit == null && !Mouse.modifier(e)) {
-					model.clearLocationSelection();
+					model.selectionModel().clearLocationSelection();
 				} else if (locationHit != null && e.isShiftDown()) {
-					if (model.getLocationSelection().contains(locationHit)) {
-						model.removeLocationSelection(locationHit);
+					if (model.selectionModel().getLocationSelection().contains(locationHit)) {
+						model.selectionModel().removeLocationSelection(locationHit);
 					} else {
-						model.addLocationSelection(locationHit);
+						model.selectionModel().addLocationSelection(locationHit);
 					}
 				} else if (locationHit != null && !Mouse.modifier(e)) {
-					model.setLocationSelection(locationHit);
+					model.selectionModel().setLocationSelection(locationHit);
 
 				}
 				return true;

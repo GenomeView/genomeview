@@ -205,7 +205,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
     private void fillWithNucleotides() {
     	String nucs = new String();
-    	if (model.getFeatureSelection().size()!=0){
+    	if (model.selectionModel().getFeatureSelection().size()!=0){
     		if (nucList == null) {
     			nucList = createNucList();
     		}
@@ -234,7 +234,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 	private Map<Feature, String> createNucList() {
         Map<Feature, String> newList = new HashMap<Feature, String>();
         // String nucs = new String();
-        Set<Feature> feats = model.getFeatureSelection();
+        Set<Feature> feats = model.selectionModel().getFeatureSelection();
         for (Feature feat : feats) {
             String nucs = SequenceTools.extractSequence(model.getSelectedEntry().sequence, feat);
             // SymbolList symbols = feat.getSymbols();
@@ -246,7 +246,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
     private Map<Feature, String> createProtList() {
         Map<Feature, String> newList = new HashMap<Feature, String>();
-        Set<Feature> feats = model.getFeatureSelection();
+        Set<Feature> feats = model.selectionModel().getFeatureSelection();
         for (Feature feat : feats) {
             String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence, feat);
             String prots = SequenceTools.translate(seq,model.getAAMapping());
@@ -258,7 +258,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
     private void fillWithProteins() {
     	String prots = new String();
-    	if (model.getFeatureSelection().size() != 0){
+    	if (model.selectionModel().getFeatureSelection().size() != 0){
     		if (protList == null) {
     			protList = createProtList();
     		}
@@ -287,7 +287,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 	}
 
 	private void writeProts(PrintWriter writer) {
-		if (model.getFeatureSelection().size() != 0){
+		if (model.selectionModel().getFeatureSelection().size() != 0){
 			if (protList == null) {
 				protList = createProtList();
 			}
@@ -320,7 +320,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
     }
 
     private void writeNucs(PrintWriter writer) {
-    	if (model.getFeatureSelection().size() != 0){
+    	if (model.selectionModel().getFeatureSelection().size() != 0){
     		if (nucList == null) {
     			nucList = createNucList();
     		}

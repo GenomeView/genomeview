@@ -47,7 +47,7 @@ public class NoteDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
               
-                Feature rf = model.getFeatureSelection().iterator().next();
+                Feature rf = model.selectionModel().getFeatureSelection().iterator().next();
                 if (currentNote != null) {
                     currentNote.setKey(term.getQualifierKey());
                     currentNote.setValue(value.getText());

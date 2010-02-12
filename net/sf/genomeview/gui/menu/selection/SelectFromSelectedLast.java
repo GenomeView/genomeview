@@ -27,14 +27,14 @@ public class SelectFromSelectedLast extends AbstractModelAction {
 
     @Override
     public void update(Observable o, Object obj) {
-       setEnabled(model.getFeatureSelection()!=null&&model.getFeatureSelection().size()==1);
+       setEnabled(model.selectionModel().getFeatureSelection()!=null&&model.selectionModel().getFeatureSelection().size()==1);
 
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Feature rf=model.getFeatureSelection().iterator().next();
-        model.setLocationSelection(rf.location().last());
+        Feature rf=model.selectionModel().getFeatureSelection().iterator().next();
+        model.selectionModel().setLocationSelection(rf.location().last());
         model.center(rf.location().last().start() / 2 + rf.location().last().end() / 2);
     }
 

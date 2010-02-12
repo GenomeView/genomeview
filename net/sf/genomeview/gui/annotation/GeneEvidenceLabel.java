@@ -83,7 +83,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 		/* Highlight current selection */
 		g.setColor(new Color(180, 180, 180, 120));
-		for (Feature f : model.getFeatureSelection()) {
+		for (Feature f : model.selectionModel().getFeatureSelection()) {
 			for (Location l : f.location()) {
 				highlight(l, g);
 			}

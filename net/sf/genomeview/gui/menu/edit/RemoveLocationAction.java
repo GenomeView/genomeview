@@ -25,14 +25,14 @@ public class RemoveLocationAction extends AbstractModelAction implements Observe
     public void actionPerformed(ActionEvent arg0) {
 
         Set<Location> toRemove = new HashSet<Location>();
-        toRemove.addAll(model.getLocationSelection());
+        toRemove.addAll(model.selectionModel().getLocationSelection());
         for (Location rf : toRemove)
             rf.getParent().removeLocation(rf);
 
     }
 
     public void update(Observable o, Object arg) {
-        SortedSet<Location> set = model.getLocationSelection();
+        SortedSet<Location> set = model.selectionModel().getLocationSelection();
         setEnabled(set.size() > 0);
 
     }

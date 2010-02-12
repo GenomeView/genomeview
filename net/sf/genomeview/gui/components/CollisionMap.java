@@ -111,7 +111,7 @@ this.model=model;
 			f = fh.iterator().next();
 		else {
 
-			SortedSet<Feature> intersection = model.getFeatureSelection();
+			SortedSet<Feature> intersection = model.selectionModel().getFeatureSelection();
 			intersection.retainAll(fh);
 
 			if (intersection.size() == 1)

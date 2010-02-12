@@ -203,7 +203,7 @@ public class EditFeatureWindow extends JDialog {
 
 	public void setVisible(boolean b) {
 		if (b) {
-			this.feature = model.getFeatureSelection().first();
+			this.feature = model.selectionModel().getFeatureSelection().first();
 			/* Fill notes text area */
 			StringBuffer text = new StringBuffer();
 			for (String key : feature.getQualifiersKeys()) {

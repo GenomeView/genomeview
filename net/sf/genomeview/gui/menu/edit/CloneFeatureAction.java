@@ -20,15 +20,15 @@ public class CloneFeatureAction extends AbstractModelAction {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		assert (model.getFeatureSelection() != null);
-		assert (model.getFeatureSelection().size() == 1);
-		Feature rf = model.getFeatureSelection().iterator().next();
+		assert (model.selectionModel().getFeatureSelection() != null);
+		assert (model.selectionModel().getFeatureSelection().size() == 1);
+		Feature rf = model.selectionModel().getFeatureSelection().iterator().next();
 
 		// SimpleFeature rf = (SimpleFeature)
 		// model.getFeatureSelection().iterator().next();
 		Feature copy = rf.copy();
 		model.getSelectedEntry().annotation.add(copy);
-		model.setLocationSelection(copy);
+		model.selectionModel().setLocationSelection(copy);
 		// SimpleFeature srf = new SimpleFeature(rf.getSequence(), rf
 		// .makeTemplate());
 		// srf.setName("clone." + rf.getName());
@@ -41,8 +41,8 @@ public class CloneFeatureAction extends AbstractModelAction {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		setEnabled(model.getFeatureSelection() != null
-				&& model.getFeatureSelection().size() == 1);
+		setEnabled(model.selectionModel().getFeatureSelection() != null
+				&& model.selectionModel().getFeatureSelection().size() == 1);
 
 	}
 

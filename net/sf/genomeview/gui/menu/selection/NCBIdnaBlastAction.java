@@ -29,14 +29,14 @@ public class NCBIdnaBlastAction extends AbstractModelAction {
 
     @Override
     public void update(Observable x, Object y) {
-        setEnabled((model.getFeatureSelection() != null && model.getFeatureSelection().size() == 1) || 
+        setEnabled((model.selectionModel().getFeatureSelection() != null && model.selectionModel().getFeatureSelection().size() == 1) || 
         			model.getSelectedRegion() != null);
     }
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
-    	if (model.getLocationSelection() != null && model.getFeatureSelection().size() == 1){
-    		Feature rf = model.getLocationSelection().iterator().next().getParent();
+    	if (model.selectionModel().getLocationSelection() != null && model.selectionModel().getFeatureSelection().size() == 1){
+    		Feature rf = model.selectionModel().getLocationSelection().iterator().next().getParent();
     		String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence, rf);
     		Blast.nucleotideBlast(""+rf.toString().hashCode(),seq);
     	} else if (model.getSelectedRegion() != null){

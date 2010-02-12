@@ -82,8 +82,8 @@ class NotesTableModel extends AbstractTableModel implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (model.getFeatureSelection() != null && model.getFeatureSelection().size() == 1)
-            refresh(model.getFeatureSelection().iterator().next());
+        if (model.selectionModel().getFeatureSelection() != null && model.selectionModel().getFeatureSelection().size() == 1)
+            refresh(model.selectionModel().getFeatureSelection().iterator().next());
         fireTableDataChanged();
     }
 

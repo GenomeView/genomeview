@@ -22,7 +22,7 @@ public class ClearRegionSelectionAction extends AbstractModelAction implements O
     }
 
     public void actionPerformed(ActionEvent e) {
-        model.setSelectedRegion(null);
+        model.selectionModel().setSelectedRegion(null);
 
     }
 

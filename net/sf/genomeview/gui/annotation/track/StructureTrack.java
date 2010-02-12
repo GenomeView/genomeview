@@ -466,7 +466,7 @@ public class StructureTrack extends Track {
 	 */
 	private void renderCDS(Graphics2D g, Feature rf, int yOffset) {
 		int middle = 4 * lineHeight + tickHeight / 2;
-		boolean featureSelected = model.getFeatureSelection().contains(rf);
+		boolean featureSelected = model.selectionModel().getFeatureSelection().contains(rf);
 		Location last = null;
 		int lastY = 0;
 		for (Location l : rf.location()) {
@@ -491,7 +491,7 @@ public class StructureTrack extends Track {
 			/* Draw black box outline */
 			g.setColor(Color.BLACK);
 			g.draw(r);
-			boolean locationSelected = model.getLocationSelection().contains(l);
+			boolean locationSelected = model.selectionModel().getLocationSelection().contains(l);
 			/* Selected locations have bold outline */
 			if (locationSelected) {
 				g.setStroke(new BasicStroke(2.0f));
@@ -559,18 +559,18 @@ public class StructureTrack extends Track {
 			if (Mouse.button1(e)) {
 				if (rf == null && (!Mouse.modifier(e) || e.isShiftDown())) {
 					// model.clearFeatureSelection();
-					model.clearLocationSelection();
+					model.selectionModel().clearLocationSelection();
 				} else if (rf != null && e.isShiftDown()) {
 					// boolean rfs = model.getFeatureSelection().contains(rf);
-					boolean rls = model.getLocationSelection().contains(rf);
+					boolean rls = model.selectionModel().getLocationSelection().contains(rf);
 					if (rls) {
 						// model.removeFeatureSelection(rf);
-						model.removeLocationSelection(rf);
+						model.selectionModel().removeLocationSelection(rf);
 					} else
-						model.addLocationSelection(rf);
+						model.selectionModel().addLocationSelection(rf);
 
 				} else if (rf != null && !Mouse.modifier(e)) {
-					model.setLocationSelection(rf);
+					model.selectionModel().setLocationSelection(rf);
 					if (e.getClickCount() > 1) {
 						Feature f = rf.getParent();
 						int l = f.length();
@@ -580,7 +580,7 @@ public class StructureTrack extends Track {
 					}
 
 				}
-				model.setSelectedRegion(null);
+				model.selectionModel().setSelectedRegion(null);
 				return true;
 			}
 			return false;
@@ -604,7 +604,7 @@ public class StructureTrack extends Track {
 	@Override
 	public boolean mouseExited(int x, int y, final MouseEvent e) {
 		outside = true;
-		model.setCurrentCoord(-1);
+		model.mouseModel().setCurrentCoord(-1);
 		if (dragging) {
 			new Thread(new Runnable() {
 
@@ -750,7 +750,7 @@ public class StructureTrack extends Track {
 		}
 
 		model.setSelectedTrack(pressTrack);
-		model.setSelectedRegion(new Location(selectionStart, selectionEnd));
+		model.selectionModel().setSelectedRegion(new Location(selectionStart, selectionEnd));
 	}
 
 	private void modifyCoordinate(Location y, int oldCoord, int newCoordinate) {
@@ -777,7 +777,7 @@ public class StructureTrack extends Track {
 		//don't change selection if we're dealing with a borderHit (dragging a feature to resize it)
 		if (e.isShiftDown() || borderHit != null){
 			if (borderHit == null){
-				model.clearLocationSelection();
+				model.selectionModel().clearLocationSelection();
 				updateSelectedRegion();
 			} 
 			dragging = true;
@@ -797,7 +797,7 @@ public class StructureTrack extends Track {
 			model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 		
 		int currentX = Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth);
-		model.setCurrentCoord(currentX);
+		model.mouseModel().setCurrentCoord(currentX);
 		
 		setChanged();
 		notifyObservers();

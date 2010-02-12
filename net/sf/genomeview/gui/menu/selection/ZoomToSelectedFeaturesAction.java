@@ -22,7 +22,7 @@ public class ZoomToSelectedFeaturesAction extends AbstractModelAction implements
     }
 
     public void actionPerformed(ActionEvent e) {
-        Set<Feature> selected = model.getFeatureSelection();
+        Set<Feature> selected = model.selectionModel().getFeatureSelection();
         int min = Integer.MAX_VALUE;
         int max = 0;
         for (Feature f : selected) {
@@ -38,7 +38,7 @@ public class ZoomToSelectedFeaturesAction extends AbstractModelAction implements
     }
 
     public void update(Observable o, Object arg) {
-        setEnabled(model.getFeatureSelection().size() > 0);
+        setEnabled(model.selectionModel().getFeatureSelection().size() > 0);
 
     }
 }

@@ -63,7 +63,7 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 					
 					Feature rf = listModel.getFeature(rowAtPoint(e.getPoint()));
 
-					model.setLocationSelection(rf);
+					model.selectionModel().setLocationSelection(rf);
 
 					if (e.getClickCount() > 1) {
 						int min = rf.start();
@@ -73,7 +73,7 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 					}
 				}
 				/* Keep selection */
-				SortedSet<Feature> fs = model.getFeatureSelection();
+				SortedSet<Feature> fs = model.selectionModel().getFeatureSelection();
 				System.out.println(fs);
 				int row = listModel.getRow(fs.first());
 				getSelectionModel().setSelectionInterval(row, row);
@@ -108,7 +108,7 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		SortedSet<Feature> fs = model.getFeatureSelection();
+		SortedSet<Feature> fs = model.selectionModel().getFeatureSelection();
 
 		if (fs.size() == 1) {
 			// FIXME for multiple structure types

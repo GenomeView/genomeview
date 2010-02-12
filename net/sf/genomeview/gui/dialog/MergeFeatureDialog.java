@@ -42,7 +42,7 @@ public class MergeFeatureDialog extends JDialog {
         gc.fill = GridBagConstraints.BOTH;
 
         final TypeCombo select = new TypeCombo(model);
-        select.setSelectedItem(model.getFeatureSelection().first().type());
+        select.setSelectedItem(model.selectionModel().getFeatureSelection().first().type());
 
         gc.gridwidth = 2;
 
@@ -59,7 +59,7 @@ public class MergeFeatureDialog extends JDialog {
 
                 SortedSet<Location> locations = new TreeSet<Location>();
                 /* Create a deep copy of all locations */
-                for (Feature rf : model.getFeatureSelection()) {
+                for (Feature rf : model.selectionModel().getFeatureSelection()) {
                     for (Location l : rf.location())
                         locations.add(l.copy());
 
@@ -68,7 +68,7 @@ public class MergeFeatureDialog extends JDialog {
                  * Construct a deep copy of the first feature, this one will be
                  * used as a frame for the new feature.
                  */
-                Feature copy = model.getFeatureSelection().first().copy();
+                Feature copy = model.selectionModel().getFeatureSelection().first().copy();
 
                 copy.setLocation(locations);
                 /* Add new feature to the annotation */
@@ -77,11 +77,11 @@ public class MergeFeatureDialog extends JDialog {
                 /* If requested, the original features are deleted */
                 if (remove.isSelected()) {
                     Set<Feature> toRemove = new HashSet<Feature>();
-                    toRemove.addAll(model.getFeatureSelection());
+                    toRemove.addAll(model.selectionModel().getFeatureSelection());
                     for (Feature rf : toRemove)
                         model.getSelectedEntry().annotation.remove(rf);
                 }
-                model.clearLocationSelection();
+                model.selectionModel().clearLocationSelection();
 
                 _self.dispose();
 

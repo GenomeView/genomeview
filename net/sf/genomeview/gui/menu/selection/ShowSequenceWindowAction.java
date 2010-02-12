@@ -29,7 +29,7 @@ public class ShowSequenceWindowAction extends AbstractModelAction {
     }
 
     public void actionPerformed(ActionEvent arg0) {
-        assert ((model.getFeatureSelection() != null  && model.getFeatureSelection().size() > 0) || 
+        assert ((model.selectionModel().getFeatureSelection() != null  && model.selectionModel().getFeatureSelection().size() > 0) || 
         		(model.getSelectedRegion() != null));
         SequenceViewDialog dialog = new SequenceViewDialog(model);
         dialog.showSequenceViewDialog();
@@ -38,7 +38,7 @@ public class ShowSequenceWindowAction extends AbstractModelAction {
 
     @Override
     public void update(Observable o, Object obj) {
-        setEnabled((model.getFeatureSelection() != null && model.getFeatureSelection().size() > 0) ||
+        setEnabled((model.selectionModel().getFeatureSelection() != null && model.selectionModel().getFeatureSelection().size() > 0) ||
         		(model.getSelectedRegion() != null));
     }
 }

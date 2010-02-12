@@ -20,20 +20,20 @@ public class RemoveAction extends AbstractModelAction implements Observer {
 	public RemoveAction(Model model) {
 		super("Remove selected feature", model);
 		model.addObserver(this);
-		setEnabled(model.getFeatureSelection() != null&&model.getFeatureSelection().size()>0);
+		setEnabled(model.selectionModel().getFeatureSelection() != null&&model.selectionModel().getFeatureSelection().size()>0);
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
 
 		Set<Feature> toRemove = new HashSet<Feature>();
-		toRemove.addAll(model.getFeatureSelection());
+		toRemove.addAll(model.selectionModel().getFeatureSelection());
 		for (Feature rf : toRemove)
 			model.getSelectedEntry().annotation.remove(rf);
 
 	}
 
 	public void update(Observable o, Object arg) {
-		setEnabled(model.getFeatureSelection() != null&&model.getFeatureSelection().size()>0);
+		setEnabled(model.selectionModel().getFeatureSelection() != null&&model.selectionModel().getFeatureSelection().size()>0);
 
 	}
 

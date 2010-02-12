@@ -33,8 +33,8 @@ public class SplitFeatureAction extends AbstractModelAction {
 
     @Override
     public void update(Observable o, Object arg) {
-        setEnabled(model.getFeatureSelection() != null && model.getFeatureSelection().size() == 1
-                && model.getLocationSelection() != null && model.getLocationSelection().size() == 2);
+        setEnabled(model.selectionModel().getFeatureSelection() != null && model.selectionModel().getFeatureSelection().size() == 1
+                && model.selectionModel().getLocationSelection() != null && model.selectionModel().getLocationSelection().size() == 2);
 
     }
 

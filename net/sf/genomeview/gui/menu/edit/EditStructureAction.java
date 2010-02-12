@@ -30,7 +30,7 @@ public class EditStructureAction extends AbstractModelAction {
 
     @Override
     public void update(Observable o, Object arg) {
-        setEnabled(model.getFeatureSelection() != null && model.getFeatureSelection().size() == 1);
+        setEnabled(model.selectionModel().getFeatureSelection() != null && model.selectionModel().getFeatureSelection().size() == 1);
 
     }
 

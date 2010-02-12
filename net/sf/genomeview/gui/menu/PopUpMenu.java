@@ -45,7 +45,7 @@ public class PopUpMenu extends JPopupMenu {
         addC(new MergeFeatureAction(model));
         addC(new SplitFeatureAction(model));
         
-        SortedSet<Feature>sf=model.getFeatureSelection();
+        SortedSet<Feature>sf=model.selectionModel().getFeatureSelection();
         List<Action>actions=new ArrayList<Action>();
         for(Feature f:sf){
         	List<Qualifier>lq=f.qualifier("url");

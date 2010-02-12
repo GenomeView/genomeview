@@ -20,12 +20,12 @@ public class ClearFeatureSelectionAction extends AbstractModelAction implements 
     }
 
     public void actionPerformed(ActionEvent e) {
-        model.clearLocationSelection();
+        model.selectionModel().clearLocationSelection();
 
     }
 
     public void update(Observable o, Object arg) {
-        setEnabled(model.getFeatureSelection().size() > 0);
+        setEnabled(model.selectionModel().getFeatureSelection().size() > 0);
 
     }
 }

@@ -204,7 +204,7 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		//TODO implement specific model for selections
-		Set<Feature> set = model.getFeatureSelection();
+		Set<Feature> set = model.selectionModel().getFeatureSelection();
 		if(set!=null&&set.equals(lastSelection))
 			return;
 		String text = "";

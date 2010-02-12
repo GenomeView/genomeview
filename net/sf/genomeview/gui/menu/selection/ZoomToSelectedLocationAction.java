@@ -24,7 +24,7 @@ public class ZoomToSelectedLocationAction extends AbstractModelAction implements
     }
 
     public void actionPerformed(ActionEvent e) {
-        Set<Location> selected = model.getLocationSelection();
+        Set<Location> selected = model.selectionModel().getLocationSelection();
         int min = Integer.MAX_VALUE;
         int max = 0;
         for (Location f : selected) {
@@ -40,7 +40,7 @@ public class ZoomToSelectedLocationAction extends AbstractModelAction implements
     }
 
     public void update(Observable o, Object arg) {
-        setEnabled(model.getFeatureSelection().size() > 0);
+        setEnabled(model.selectionModel().getFeatureSelection().size() > 0);
 
     }
 }

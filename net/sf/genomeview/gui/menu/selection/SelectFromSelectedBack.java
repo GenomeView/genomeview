@@ -27,10 +27,10 @@ public class SelectFromSelectedBack extends AbstractModelAction {
     @Override
     public void update(Observable o, Object obj) {
         try {
-            boolean oneFeatureSelection = model.getFeatureSelection() != null
-                    && model.getFeatureSelection().size() == 1;
-            boolean oneLocationSelection = model.getLocationSelection() != null
-                    && model.getLocationSelection().size() == 1;
+            boolean oneFeatureSelection = model.selectionModel().getFeatureSelection() != null
+                    && model.selectionModel().getFeatureSelection().size() == 1;
+            boolean oneLocationSelection = model.selectionModel().getLocationSelection() != null
+                    && model.selectionModel().getLocationSelection().size() == 1;
             if (oneFeatureSelection && oneLocationSelection) {
                 setEnabled(getPrev() != null);
 
@@ -45,8 +45,8 @@ public class SelectFromSelectedBack extends AbstractModelAction {
     }
 
     private Location getPrev() {
-        Feature rf = model.getFeatureSelection().first();
-        Location rl = model.getLocationSelection().first();
+        Feature rf = model.selectionModel().getFeatureSelection().first();
+        Location rl = model.selectionModel().getLocationSelection().first();
         ArrayList<Location> loc = new ArrayList<Location>();
         loc.addAll(rf.location());
         int index = loc.indexOf(rl);
@@ -62,7 +62,7 @@ public class SelectFromSelectedBack extends AbstractModelAction {
 
         Location prev = getPrev();
         if (prev != null) {
-            model.setLocationSelection(prev);
+            model.selectionModel().setLocationSelection(prev);
             model.center(prev.start() / 2 + prev.end() / 2);
         }
     }

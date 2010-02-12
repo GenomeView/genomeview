@@ -85,9 +85,9 @@ public class GeneStructureView extends JLabel implements Observer {
 
         super.paintComponent(g);
 
-        if (model.getFeatureSelection().size() == 1
-                && Configuration.getTypeSet("geneStructures").contains(model.getFeatureSelection().first().type())) {
-            rf = model.getFeatureSelection().first();
+        if (model.selectionModel().getFeatureSelection().size() == 1
+                && Configuration.getTypeSet("geneStructures").contains(model.selectionModel().getFeatureSelection().first().type())) {
+            rf = model.selectionModel().getFeatureSelection().first();
             entry = model.getSelectedEntry();
         }
         if (rf != null) {
