@@ -162,32 +162,32 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 			}
 
 		});
-		name.setEditorKit(new HTMLEditorKit());
-		name.setDocument(new HTMLDocument());
-		name.addHyperlinkListener(new HyperlinkListener() {
-
-			@Override
-			public void hyperlinkUpdate(HyperlinkEvent e) {
-				if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-
-					System.out.println(e.getDescription());
-					URL url = e.getURL();
-					System.out.println("Hyperlink: " + url);
-					// try {
-					// Desktop.getDesktop().browse(url.toURI());
-					// } catch (IOException e1) {
-					// // TODO Auto-generated catch block
-					// e1.printStackTrace();
-					// } catch (URISyntaxException e1) {
-					// // TODO Auto-generated catch block
-					// e1.printStackTrace();
-					// }
-					//                
-				}
-			}
-
-		});
-		;
+//		name.setEditorKit(new HTMLEditorKit());
+//		name.setDocument(new HTMLDocument());
+//		name.addHyperlinkListener(new HyperlinkListener() {
+//
+//			@Override
+//			public void hyperlinkUpdate(HyperlinkEvent e) {
+//				if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+//
+//					System.out.println(e.getDescription());
+//					URL url = e.getURL();
+//					System.out.println("Hyperlink: " + url);
+//					// try {
+//					// Desktop.getDesktop().browse(url.toURI());
+//					// } catch (IOException e1) {
+//					// // TODO Auto-generated catch block
+//					// e1.printStackTrace();
+//					// } catch (URISyntaxException e1) {
+//					// // TODO Auto-generated catch block
+//					// e1.printStackTrace();
+//					// }
+//					//                
+//				}
+//			}
+//
+//		});
+//		;
 
 		model.addObserver(this);
 		gc.fill = GridBagConstraints.BOTH;
@@ -199,41 +199,45 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 		add(new JLabel(), gc);
 	}
 
-	private int lastHash = 0;
-
+	private Set<Feature>lastSelection=null;
+	
 	@Override
 	public void update(Observable o, Object arg) {
+		//TODO implement specific model for selections
 		Set<Feature> set = model.getFeatureSelection();
+		if(set!=null&&set.equals(lastSelection))
+			return;
 		String text = "";
 
 		if (set != null && set.size() > 0) {
 			for (Feature rf : set) {
-				text += "Data origin: " + rf.getSource() + "<br/>";
+				text += "Data origin: " + rf.getSource() + "\n";
+				if(rf.location()!=null)
 				text += "Location: "
 						+ StaticUtils.escapeHTML(rf.location().toString())
-						+ "<br/>";
-				text += "Strand: " + rf.strand() + "<br/>";
-				text += "Score: " + rf.getScore() + "<br/>";
+						+ "\n";
+				text += "Strand: " + rf.strand() + "\n";
+				text += "Score: " + rf.getScore() + "\n";
 				Set<String> qks = rf.getQualifiersKeys();
 				for (String key : qks) {
 					for (Qualifier q : rf.qualifier(key)) {
-						text += q + "<br/>";
+						text += q + "\n";
 					}
 				}
 
 			}
 
-			text += "---------------------------------------<br/>";
+			text += "---------------------------------------\n";
 //			int hash = text.hashCode();
 //			if (hash != lastHash) {
-				name.setText("<html>" + text + "</html>");
-				name.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
+				name.setText(text);
+//				name.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
 //				lastHash = hash;
 //			}
 
 		} else {
 			name.setText("");
 		}
-
+		lastSelection=set;
 	}
 }
