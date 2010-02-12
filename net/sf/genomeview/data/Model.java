@@ -656,7 +656,9 @@ public class Model extends Observable implements IModel {
 
 	public SortedSet<Feature> getFeatureSelection() {
 		SortedSet<Feature> out = new TreeSet<Feature>();
-		for (Location l : selectedLocation) {
+		Set<Location>select=new TreeSet<Location>();
+		select.addAll(selectedLocation);
+		for (Location l : select) {
 			out.add(l.getParent());
 		}
 		return out;
