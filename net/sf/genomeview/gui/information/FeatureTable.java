@@ -60,7 +60,8 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() > 0) {
-					Feature rf = listModel.getFeature(getSelectedRow());
+					
+					Feature rf = listModel.getFeature(rowAtPoint(e.getPoint()));
 
 					model.setLocationSelection(rf);
 
