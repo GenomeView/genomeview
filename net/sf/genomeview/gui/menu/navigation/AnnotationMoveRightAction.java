@@ -43,5 +43,10 @@ public class AnnotationMoveRightAction extends AbstractModelAction {
         	model.setAnnotationLocationVisible(new Location(r.start() + halve, r.end() + halve));
 
     }
+    
+    public static void perform(Model model){
+    	AnnotationMoveRightAction action = new AnnotationMoveRightAction(model);
+    	action.actionPerformed(null);
+    }
 
 }

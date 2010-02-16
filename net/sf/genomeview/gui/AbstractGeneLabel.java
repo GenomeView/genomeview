@@ -4,16 +4,21 @@
 package net.sf.genomeview.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JLabel;
+import javax.swing.Scrollable;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.menu.navigation.AnnotationMoveLeftAction;
+import net.sf.genomeview.gui.menu.navigation.AnnotationMoveRightAction;
 import net.sf.jannot.Location;
 
 /**
@@ -24,12 +29,18 @@ import net.sf.jannot.Location;
  */
 public abstract class AbstractGeneLabel extends JLabel implements Observer {
 
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5579565140607328154L;
 
 	protected Model model;
+	
+	/**
+	 * The MouseWheelListener passed on from the JScrollPane. Only to be invoked for regular scrolling.
+	 */
+	private MouseWheelListener scrollPaneListener;
 
 	/**
 	 * Map that contains all TrackKey,ItemName pairs and their corresponding
@@ -65,6 +76,14 @@ public abstract class AbstractGeneLabel extends JLabel implements Observer {
 
 					model.setAnnotationLocationVisible(new Location(newStart,
 							newEnd));
+				} else if (e.isShiftDown()){
+					if (e.getWheelRotation() > 0){
+						AnnotationMoveRightAction.perform(model);
+					} else {
+						AnnotationMoveLeftAction.perform(model);
+					}
+				} else {
+					scrollPaneListener.mouseWheelMoved(e);
 				}
 
 			}
@@ -106,6 +125,14 @@ public abstract class AbstractGeneLabel extends JLabel implements Observer {
 
 	public void update(Observable arg0, Object arg1) {
 		repaint();
+	}
+
+	public void setScrollPaneListener(MouseWheelListener scrollPaneListener) {
+		this.scrollPaneListener = scrollPaneListener;
+	}
+
+	public MouseWheelListener getScrollPaneListener() {
+		return scrollPaneListener;
 	}
 
 }

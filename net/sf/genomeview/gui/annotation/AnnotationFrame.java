@@ -4,6 +4,7 @@
 package net.sf.genomeview.gui.annotation;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseWheelListener;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -32,8 +33,12 @@ public class AnnotationFrame extends JPanel {
         /* gene structure and evidence panels */
     	evidenceLabel = new GeneEvidenceLabel(model);
         JScrollPane tmp = new JScrollPane(evidenceLabel);
+        
         tmp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tmp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        MouseWheelListener listener = tmp.getMouseWheelListeners()[0];
+        evidenceLabel.setScrollPaneListener(listener);
+        
         add(tmp, BorderLayout.CENTER);
     }
 }
