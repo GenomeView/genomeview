@@ -39,8 +39,6 @@ import net.sf.samtools.CigarOperator;
 
 public class ShortReadTrack extends Track {
 
-	private final int graphLineHeigh = 50;
-
 	private Tooltip tooltip = new Tooltip();
 
 	private class Tooltip extends JWindow {
@@ -65,11 +63,11 @@ public class ShortReadTrack extends Track {
 			text.append("Forward coverage : " + (forward < 0 ? "In progress..." : forward) + "<br />");
 			text.append("Reverse coverage: " + (reverse < 0 ? "In progress..." : reverse) + "<br />");
 			text.append("Total coverage : " + (d < 0 ? "In progress..." : d) + "<br />");
-			if(sri!=null){
+			if (sri != null) {
 				text.append("Insertion: ");
-				byte[]bases=sri.esr.record().getReadBases();
-				for(int i=sri.start;i<sri.start+sri.len;i++){
-					text.append((char)bases[i]);
+				byte[] bases = sri.esr.record().getReadBases();
+				for (int i = sri.start; i < sri.start + sri.len; i++) {
+					text.append((char) bases[i]);
 				}
 				text.append("<br/>");
 			}
@@ -106,15 +104,15 @@ public class ShortReadTrack extends Track {
 			int start = Convert.translateScreenToGenome(x, currentVisible, currentScreenWidth);
 			int f = (int) currentBuffer.get(Strand.FORWARD, start - 1);
 			int r = (int) currentBuffer.get(Strand.REVERSE, start - 1);
-			
-			ShortReadInsertion sri=null;
-			for(java.util.Map.Entry<Rectangle, ShortReadInsertion>e:paintedBlocks.entrySet()){
-				if(e.getKey().contains(x, y+currentYOffset)){
-					sri=e.getValue();
+
+			ShortReadInsertion sri = null;
+			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : paintedBlocks.entrySet()) {
+				if (e.getKey().contains(x, y + currentYOffset)) {
+					sri = e.getValue();
 					break;
 				}
 			}
-			tooltip.set(f, r, f + r, source,sri);
+			tooltip.set(f, r, f + r, source, sri);
 		} else {
 			if (tooltip.isVisible())
 				tooltip.setVisible(false);
@@ -150,6 +148,10 @@ public class ShortReadTrack extends Track {
 		return Math.log(d) / LOG2;
 	}
 
+	class ShortReadTrackConfiguration {
+
+	}
+
 	@Override
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
 		paintedBlocks.clear();
@@ -157,7 +159,7 @@ public class ShortReadTrack extends Track {
 		currentEntry = entry;
 		currentScreenWidth = screenWidth;
 		seqBuffer = null;
-		this.currentYOffset=yOffset;
+		this.currentYOffset = yOffset;
 		/* Configuration options */
 		int maxReads = Configuration.getInt("shortread:maxReads");
 		int maxRegion = Configuration.getInt("shortread:maxRegion");
@@ -165,6 +167,12 @@ public class ShortReadTrack extends Track {
 		forwardColor = Configuration.getColor("shortread:forwardColor");
 		reverseColor = Configuration.getColor("shortread:reverseColor");
 		pairingColor = Configuration.getColor("shortread:pairingColor");
+
+		boolean logScaling = Configuration.getBoolean("shortread:logScaling");
+		double bottomValue = Configuration.getDouble("shortread:bottomValue");
+		double topValue = Configuration.getDouble("shortread:topValue");
+
+		int graphLineHeigh = Configuration.getInt("shortread:graphLineHeight");
 
 		currentVisible = model.getAnnotationLocationVisible();
 
@@ -195,6 +203,8 @@ public class ShortReadTrack extends Track {
 		if (rg == null)
 			return 0;
 		ShortReadCoverage graph = rg.getCoverage();// .get(rg);
+		if (topValue < 0)
+			topValue = graph.max();
 
 		GeneralPath conservationGP = new GeneralPath();
 		GeneralPath conservationGPF = new GeneralPath();
@@ -209,19 +219,26 @@ public class ShortReadTrack extends Track {
 			double valR = r[i];
 			double val = f[i] + r[i];
 			/* Cap value */
-			if (valF > graph.max())
-				valF = graph.max();
-			if (valR > graph.max())
-				valR = graph.max();
-			if (val > graph.max())
-				val = graph.max();
+			if (valF > topValue)
+				valF = topValue;
+			if (valR > topValue)
+				valR = topValue;
+			if (val > topValue)
+				val = topValue;
 			/* Logaritmic scaling */
-			valF = log2(valF);
-			valF /= log2(graph.max());
-			valR = log2(valR);
-			valR /= log2(graph.max());
-			val = log2(val);
-			val /= log2(graph.max());
+			if (logScaling) {
+				valF = log2(valF);
+				valF /= log2(topValue);
+				valR = log2(valR);
+				valR /= log2(topValue);
+				val = log2(val);
+				val /= log2(topValue);
+			/* Regular scaling */
+			}else{
+				valF/=topValue;
+				valR/=topValue;
+				val/=topValue;
+			}
 
 			/* Draw lines */
 			if (i == 0) {
@@ -469,7 +486,8 @@ public class ShortReadTrack extends Track {
 					if (readNt != '_' && model.getAnnotationLocationVisible().length() < 100) {
 						g.setColor(c);
 						Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
-						g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 - stringSize.getWidth() / 2)), yRec + readLineHeight - 3);
+						g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 - stringSize.getWidth() / 2)), yRec
+								+ readLineHeight - 3);
 
 					}
 
@@ -483,7 +501,7 @@ public class ShortReadTrack extends Track {
 				for (CigarElement ce : esr.getCigar().getCigarElements()) {
 					if (ce.getOperator() == CigarOperator.I) {
 						double tx1 = Convert.translateGenomeToScreen(esr.start() + pos, currentVisible, screenWidth);
-						if(ce.getLength()%3==0)
+						if (ce.getLength() % 3 == 0)
 							g.setColor(Color.GRAY);
 						else
 							g.setColor(Color.BLACK);
@@ -491,7 +509,7 @@ public class ShortReadTrack extends Track {
 						g.fill(rec);
 						/* Make it easier to hit with the mouse */
 						rec.x--;
-						rec.width+=2;
+						rec.width += 2;
 						ShortReadInsertion in = new ShortReadInsertion();
 						in.esr = esr;
 						in.start = esrPos;

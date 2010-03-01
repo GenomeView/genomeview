@@ -301,4 +301,8 @@ public class Configuration {
 		else
 			return null;
 	}
+
+	public static double getDouble(String string) {
+		return Double.parseDouble(get(string));
+	}
 }
