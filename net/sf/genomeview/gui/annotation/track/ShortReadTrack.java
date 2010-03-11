@@ -171,17 +171,12 @@ public class ShortReadTrack extends Track {
 		boolean logScaling = Configuration.getBoolean("shortread:logScaling");
 		double bottomValue = Configuration.getDouble("shortread:bottomValue");
 		double topValue = Configuration.getDouble("shortread:topValue");
-		double range = topValue - bottomValue;
+
 		int graphLineHeigh = Configuration.getInt("shortread:graphLineHeight");
 
 		currentVisible = model.getAnnotationLocationVisible();
 
 		int originalYOffset = yOffset;
-
-		int readLineHeight = 3;
-		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
-			readLineHeight = 14;
-		}
 
 		/*
 		 * Draw line plot of coverage
@@ -213,11 +208,14 @@ public class ShortReadTrack extends Track {
 		float[] f = graph.get(Strand.FORWARD, start - 1, end, scaleIndex);
 		float[] r = graph.get(Strand.REVERSE, start - 1, end, scaleIndex);
 
+		double range = topValue - bottomValue;
+
 		for (int i = 0; i < f.length; i++) {
 			int x = Convert.translateGenomeToScreen(start + i * scale, currentVisible, screenWidth);
-			double valF = f[i];
-			double valR = r[i];
-			double val = f[i] + r[i];
+			/* Coverage is stored +1 in SRC, needs correcting here */
+			double valF = f[i] - 1;
+			double valR = r[i] - 1;
+			double val = f[i] + r[i] - 2;
 			/* Cap value */
 			if (valF > topValue)
 				valF = topValue;
@@ -225,10 +223,10 @@ public class ShortReadTrack extends Track {
 				valR = topValue;
 			if (val > topValue)
 				val = topValue;
+
 			if (valF < bottomValue)
 				valF = bottomValue;
-			if (valR < bottomValue)
-				valR = bottomValue;
+			valR = bottomValue;
 			if (val < bottomValue)
 				val = bottomValue;
 
@@ -238,11 +236,11 @@ public class ShortReadTrack extends Track {
 			val -= bottomValue;
 			/* Logaritmic scaling */
 			if (logScaling) {
-				valF = log2(valF);
+				valF = log2(valF + 1);
 				valF /= log2(range);
-				valR = log2(valR);
+				valR = log2(valR + 1);
 				valR /= log2(range);
-				val = log2(val);
+				val = log2(val + 1);
 				val /= log2(range);
 				/* Regular scaling */
 			} else {
@@ -274,12 +272,12 @@ public class ShortReadTrack extends Track {
 		g.draw(conservationGP);
 
 		g.setColor(Color.BLUE);
-		g.drawLine(0,yOffset,5,yOffset);
-		g.drawString("" +topValue, 10, yOffset + 12 - 2);
+		g.drawLine(0, yOffset, 5, yOffset);
+		g.drawString("" + topValue, 10, yOffset + 12 - 2);
 		g.drawString(StaticUtils.shortify(source.toString()) + " (" + scale + ")", 10, yOffset + 24 - 2);
 		yOffset += graphLineHeigh;
-		g.drawLine(0,yOffset,5,yOffset);
-		g.drawString(""+bottomValue, 10, yOffset - 2);
+		g.drawLine(0, yOffset, 5, yOffset);
+		g.drawString("" + bottomValue, 10, yOffset - 2);
 		// }
 
 		/*
@@ -307,7 +305,25 @@ public class ShortReadTrack extends Track {
 		int lines = 0;
 		boolean stackExceeded = false;
 		boolean enablePairing = Configuration.getBoolean("shortread:enablepairing");
+
+		/* Variables for SNP track */
+		NucCounter nc = new NucCounter();
+		int snpOffset = yOffset;
+		int snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
+
+		int readLineHeight = 3;
+		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+			/*
+			 * Make some room for the SNP track. Although it's painted last, it
+			 * needs to be drawn above the reads
+			 */
+			readLineHeight = 14;
+			yOffset += snpTrackHeight;
+			nc.init(currentVisible.length());
+		}
+
 		if (reads != null) {
+
 			lines = 0;
 
 			BitSet[] tilingCounter = new BitSet[currentVisible.length()];
@@ -399,11 +415,11 @@ public class ShortReadTrack extends Track {
 						if (line > lines)
 							lines = line;
 
-						paintRead(g, one, yRec, screenWidth, readLineHeight, entry);
+						paintRead(g, one, yRec, screenWidth, readLineHeight, entry, nc);
 						visibleReadCount++;
 						if (two != null) {
 
-							paintRead(g, two, yRec, screenWidth, readLineHeight, entry);
+							paintRead(g, two, yRec, screenWidth, readLineHeight, entry, nc);
 							visibleReadCount++;
 						}
 					} else {
@@ -424,6 +440,44 @@ public class ShortReadTrack extends Track {
 			yOffset += (lines + 1) * readLineHeight + 5;
 
 		}
+		/*
+		 * Draw SNP track if possible. This depends on drawing the individual
+		 * reads first as during the iteration over all reads, we store the
+		 * polymorphisms.
+		 */
+
+		
+		char[] nucs = new char[] { 'A', 'T', 'G', 'C' };
+		Color[] color = new Color[4];
+		for (int i = 0; i < 4; i++)
+			color[i] = Configuration.getNucleotideColor(nucs[i]);
+		int nucWidth = (int) (Math.ceil(screenWidth / currentVisible.length()));
+		if (true && nc.hasData() && seqBuffer != null) {
+			g.setColor(Color.LIGHT_GRAY);
+			g.fillRect(0, snpOffset, (int) screenWidth, snpTrackHeight);
+			g.setColor(Color.DARK_GRAY);
+			g.drawLine(0, snpOffset + snpTrackHeight / 2, (int) screenWidth, snpOffset + snpTrackHeight / 2);
+			g.setColor(Color.BLACK);
+			g.drawString("SNPs", 5, snpOffset + snpTrackHeight - 4);
+			for (int i = currentVisible.start; i <= currentVisible.end; i++) {
+				int x1 = Convert.translateGenomeToScreen(i, currentVisible, screenWidth);
+				double total = nc.getTotalCount(i - currentVisible.start);
+				char refNt = seqBuffer[i - currentVisible.start];
+				double done = 0;// Fraction gone to previous nucs
+				for (int j = 0; j < 4; j++) {
+					if (nucs[j] != refNt) {
+						double fraction = nc.getCount(nucs[j], i - currentVisible.start) / total;
+						fraction *= snpTrackHeight;
+						g.setColor(color[j]);
+						g.fillRect(x1, (int) (snpOffset + snpTrackHeight - fraction - done), nucWidth, (int) (Math
+								.ceil(fraction)));
+						done += fraction;
+					}
+				}
+
+			}
+		}
+
 		return yOffset - originalYOffset;
 	}
 
@@ -435,11 +489,64 @@ public class ShortReadTrack extends Track {
 
 	}
 
-	private Map<Rectangle, ShortReadInsertion> paintedBlocks = new HashMap<Rectangle, ShortReadInsertion>();
+	class NucCounter {
+		int[][] counter;
 
+		public NucCounter() {
+			// TODO Auto-generated constructor stub
+		}
+
+		public boolean hasData() {
+			return counter != null;
+		}
+
+		public void init(int len) {
+			if (counter == null)
+				counter = new int[4][len];
+
+		}
+
+		public int getCount(char nuc, int pos) {
+			return counter[ix(nuc)][pos];
+		}
+
+		public int getTotalCount(int pos) {
+			return counter[0][pos] + counter[1][pos] + counter[2][pos] + counter[3][pos];
+		}
+
+		private int ix(char nuc) {
+			switch (nuc) {
+			case 'a':
+			case 'A':
+				return 0;
+			case 'T':
+			case 't':
+				return 1;
+			case 'c':
+			case 'C':
+				return 2;
+			case 'g':
+			case 'G':
+				return 3;
+			default:
+				return -1;
+			}
+		}
+
+		public void count(char nuc, int pos) {
+			counter[ix(nuc)][pos]++;
+		}
+	}
+
+	private Map<Rectangle, ShortReadInsertion> paintedBlocks = new HashMap<Rectangle, ShortReadInsertion>();
+	/*
+	 * Buffer that will contain the visible reference sequence as soon as it has
+	 * been used to paint mismatches
+	 */
 	private char[] seqBuffer = null;
 
-	private void paintRead(Graphics2D g, ShortRead rf, int yRec, double screenWidth, int readLineHeight, Entry entry) {
+	private void paintRead(Graphics2D g, ShortRead rf, int yRec, double screenWidth, int readLineHeight, Entry entry,
+			NucCounter nc) {
 		Color c = Color.GRAY;
 		if (rf.strand() == Strand.FORWARD)
 			c = forwardColor;
@@ -469,6 +576,7 @@ public class ShortReadTrack extends Track {
 			for (int j = rf.start(); j <= rf.end(); j++) {
 				if (j > currentVisible.end || j < currentVisible.start)
 					continue;
+
 				char readNt = rf.getNucleotide(j - rf.start() + 1);
 				// char refNt = entry.sequence.getNucleotide(j);
 
@@ -487,6 +595,7 @@ public class ShortReadTrack extends Track {
 						break;
 					default:/* Mismatch */
 						g.setColor(Color.ORANGE);
+						nc.count(readNt, j - currentVisible.start);
 						break;
 					}
 					g.fillRect((int) tx1, yRec, (int) (tx2 - tx1), readLineHeight - 1);
@@ -506,6 +615,8 @@ public class ShortReadTrack extends Track {
 
 					}
 
+				} else {
+					nc.count(readNt, j - currentVisible.start);
 				}
 			}
 

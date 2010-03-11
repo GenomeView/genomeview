@@ -108,6 +108,9 @@ public class ConfigurationDialog extends JDialog {
 			this.add(ConfigBox.integerInstance("shortread:graphLineHeight", "Height of the coverage graph in pixels"), gc);
 			gc.gridy++;
 			
+			this.add(ConfigBox.integerInstance("shortread:snpTrackHeight", "Height SNP track in pixels"), gc);
+			gc.gridy++;
+			
 			this.add(ConfigBox.integerInstance("shortread:maxReads", "Maximum number of displayed reads"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("shortread:maxRegion", "Maximum range in nucleotides to display individual reads"), gc);
