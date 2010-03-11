@@ -171,7 +171,7 @@ public class ShortReadTrack extends Track {
 		boolean logScaling = Configuration.getBoolean("shortread:logScaling");
 		double bottomValue = Configuration.getDouble("shortread:bottomValue");
 		double topValue = Configuration.getDouble("shortread:topValue");
-
+		double range = topValue - bottomValue;
 		int graphLineHeigh = Configuration.getInt("shortread:graphLineHeight");
 
 		currentVisible = model.getAnnotationLocationVisible();
@@ -225,19 +225,30 @@ public class ShortReadTrack extends Track {
 				valR = topValue;
 			if (val > topValue)
 				val = topValue;
+			if (valF < bottomValue)
+				valF = bottomValue;
+			if (valR < bottomValue)
+				valR = bottomValue;
+			if (val < bottomValue)
+				val = bottomValue;
+
+			/* Translate for bottom point */
+			valF -= bottomValue;
+			valR -= bottomValue;
+			val -= bottomValue;
 			/* Logaritmic scaling */
 			if (logScaling) {
 				valF = log2(valF);
-				valF /= log2(topValue);
+				valF /= log2(range);
 				valR = log2(valR);
-				valR /= log2(topValue);
+				valR /= log2(range);
 				val = log2(val);
-				val /= log2(topValue);
-			/* Regular scaling */
-			}else{
-				valF/=topValue;
-				valR/=topValue;
-				val/=topValue;
+				val /= log2(range);
+				/* Regular scaling */
+			} else {
+				valF /= range;
+				valR /= range;
+				val /= range;
 			}
 
 			/* Draw lines */
@@ -263,8 +274,12 @@ public class ShortReadTrack extends Track {
 		g.draw(conservationGP);
 
 		g.setColor(Color.BLUE);
-		g.drawString(StaticUtils.shortify(source.toString()) + " (" + scale + ")", 10, yOffset + 12 - 2);
+		g.drawLine(0,yOffset,5,yOffset);
+		g.drawString("" +topValue, 10, yOffset + 12 - 2);
+		g.drawString(StaticUtils.shortify(source.toString()) + " (" + scale + ")", 10, yOffset + 24 - 2);
 		yOffset += graphLineHeigh;
+		g.drawLine(0,yOffset,5,yOffset);
+		g.drawString(""+bottomValue, 10, yOffset - 2);
 		// }
 
 		/*
