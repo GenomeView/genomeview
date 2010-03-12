@@ -17,7 +17,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
-import net.sf.genomeview.core.ColorFactory;
+import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
@@ -231,7 +231,7 @@ public class WiggleTrack extends Track {
 						g.fillRect(x, top,(int)Math.ceil(2*width*scale), graphLineHeigh - top + yOffset);
 					}
 				} else {
-					g.setColor(ColorFactory.getColorCoding(val));
+					g.setColor(Colors.getColorCoding(val));
 					g.fillRect(lastX, yOffset, x - lastX, 10);
 
 				}

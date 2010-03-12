@@ -185,7 +185,7 @@ public class Configuration {
 		String tmp = get(string);
 		if (tmp == null)
 			tmp = "GRAY";
-		return ColorFactory.decodeColor(get(string));
+		return Colors.decodeColor(get(string));
 	}
 
 	public static int getInt(String string) {
@@ -270,7 +270,7 @@ public class Configuration {
 	}
 
 	public static void setColor(String key, Color newColor) {
-		set(key, ColorFactory.encode(newColor));
+		set(key, Colors.encode(newColor));
 	}
 
 	public static void setColor(Type type, Color newColor) {

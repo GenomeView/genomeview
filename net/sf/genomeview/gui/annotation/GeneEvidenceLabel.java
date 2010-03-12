@@ -98,7 +98,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 	private void highlight(Location l, Graphics g) {
 		int x1 = Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), screenWidth);
 		int x2 = Convert.translateGenomeToScreen(l.end() + 1, model.getAnnotationLocationVisible(), screenWidth);
-		g.drawLine(x1, 0, x1, this.getPreferredSize().height);
+		g.drawLine(x1-1, 0, x1-1, this.getPreferredSize().height);
 		g.drawLine(x2, 0, x2, this.getPreferredSize().height);
 		g.setColor(new Color(180, 180, 255, 50));
 		g.fillRect(x1, 0, x2 - x1, this.getPreferredSize().height);

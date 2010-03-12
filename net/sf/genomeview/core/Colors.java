@@ -12,8 +12,10 @@ import java.lang.reflect.Field;
  * @author Thomas Abeel
  * 
  */
-public class ColorFactory {
+public class Colors {
 
+	
+	public static final Color LIGHEST_GRAY=new Color(230, 230, 230);
     /**
      * Make a string encoding of the color
      * 
