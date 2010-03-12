@@ -310,6 +310,7 @@ public class ShortReadTrack extends Track {
 		NucCounter nc = new NucCounter();
 		int snpOffset = yOffset;
 		int snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
+		int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
 
 		int readLineHeight = 3;
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
@@ -446,7 +447,6 @@ public class ShortReadTrack extends Track {
 		 * polymorphisms.
 		 */
 
-		
 		char[] nucs = new char[] { 'A', 'T', 'G', 'C' };
 		Color[] color = new Color[4];
 		for (int i = 0; i < 4; i++)
@@ -464,14 +464,16 @@ public class ShortReadTrack extends Track {
 				double total = nc.getTotalCount(i - currentVisible.start);
 				char refNt = seqBuffer[i - currentVisible.start];
 				double done = 0;// Fraction gone to previous nucs
-				for (int j = 0; j < 4; j++) {
-					if (nucs[j] != refNt) {
-						double fraction = nc.getCount(nucs[j], i - currentVisible.start) / total;
-						fraction *= snpTrackHeight;
-						g.setColor(color[j]);
-						g.fillRect(x1, (int) (snpOffset + snpTrackHeight - fraction - done), nucWidth, (int) (Math
-								.ceil(fraction)));
-						done += fraction;
+				if (total > snpTrackMinimumCoverage) {
+					for (int j = 0; j < 4; j++) {
+						if (nucs[j] != refNt) {
+							double fraction = nc.getCount(nucs[j], i - currentVisible.start) / total;
+							fraction *= snpTrackHeight;
+							g.setColor(color[j]);
+							g.fillRect(x1, (int) (snpOffset + snpTrackHeight - fraction - done), nucWidth, (int) (Math
+									.ceil(fraction)));
+							done += fraction;
+						}
 					}
 				}
 
