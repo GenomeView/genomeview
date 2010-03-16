@@ -20,6 +20,8 @@ import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
+import net.sf.genomeview.core.ColorGradient;
+import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
@@ -141,6 +143,8 @@ public class ShortReadTrack extends Track {
 	private Entry currentEntry;
 
 	private double currentScreenWidth;
+	private ColorGradient forwardGradient;
+	private ColorGradient reverseGradient;
 
 	private static final double LOG2 = Math.log(2);
 
@@ -167,6 +171,18 @@ public class ShortReadTrack extends Track {
 		forwardColor = Configuration.getColor("shortread:forwardColor");
 		reverseColor = Configuration.getColor("shortread:reverseColor");
 		pairingColor = Configuration.getColor("shortread:pairingColor");
+		
+		/* Create color gradient for forward reads */
+		forwardGradient=new ColorGradient();
+		forwardGradient.addPoint(Color.WHITE);
+		forwardGradient.addPoint(forwardColor);
+		forwardGradient.createGradient(100);
+		
+		/* Create color gradient for reverse reads */
+		reverseGradient=new ColorGradient();
+		reverseGradient.addPoint(Color.WHITE);
+		reverseGradient.addPoint(reverseColor);
+		reverseGradient.createGradient(100);
 
 		boolean logScaling = Configuration.getBoolean("shortread:logScaling");
 		double bottomValue = Configuration.getDouble("shortread:bottomValue");
@@ -453,9 +469,9 @@ public class ShortReadTrack extends Track {
 			color[i] = Configuration.getNucleotideColor(nucs[i]);
 		int nucWidth = (int) (Math.ceil(screenWidth / currentVisible.length()));
 		if (true && nc.hasData() && seqBuffer != null) {
-			g.setColor(Color.LIGHT_GRAY);
+			g.setColor(Colors.LIGHEST_GRAY);
 			g.fillRect(0, snpOffset, (int) screenWidth, snpTrackHeight);
-			g.setColor(Color.DARK_GRAY);
+			g.setColor(Color.LIGHT_GRAY);
 			g.drawLine(0, snpOffset + snpTrackHeight / 2, (int) screenWidth, snpOffset + snpTrackHeight / 2);
 			g.setColor(Color.BLACK);
 			g.drawString("SNPs", 5, snpOffset + snpTrackHeight - 4);
@@ -550,11 +566,12 @@ public class ShortReadTrack extends Track {
 	private void paintRead(Graphics2D g, ShortRead rf, int yRec, double screenWidth, int readLineHeight, Entry entry,
 			NucCounter nc) {
 		Color c = Color.GRAY;
-		if (rf.strand() == Strand.FORWARD)
+		if (rf.strand() == Strand.FORWARD){
 			c = forwardColor;
-		else
+		}else
 			c = reverseColor;
 		g.setColor(c);
+		
 		int subX1 = Convert.translateGenomeToScreen(rf.start(), currentVisible, screenWidth);
 		int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, currentVisible, screenWidth);
 		if (subX2 < subX1) {
@@ -564,8 +581,19 @@ public class ShortReadTrack extends Track {
 			// that it doesn't happen when all goes well.
 			System.err.println("This happens!");
 		}
+		/* BAM read, has quality information */
+		if (rf instanceof ExtendedShortRead) {
+			ExtendedShortRead esr = (ExtendedShortRead) rf;
+			int qual=esr.record().getMappingQuality();
+			if(c==forwardColor)
+				g.setColor(forwardGradient.getColor(qual));
+			else
+				g.setColor(reverseGradient.getColor(qual));
+		}
 		g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
-
+		g.setColor(c);
+		g.drawRect(subX1, yRec, subX2 - subX1, readLineHeight -2);
+		
 		/* Check mismatches */
 		if (entry.sequence.size() == 0)
 			return;
