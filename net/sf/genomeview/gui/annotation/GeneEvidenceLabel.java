@@ -215,25 +215,42 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		if (consumed)
 			return;
 		/* Specific mouse code for this label */
-
+		
 		currentMouseX = e.getX();
 		if (pressLoc != null) {
+			if (e.isShiftDown()){
+				model.selectionModel().clearLocationSelection();
+			
+				int selectionStart = 0;
+				int selectionEnd = 0;
+				
+				int currentGenomeX = Convert.translateScreenToGenome(currentMouseX, model.getAnnotationLocationVisible(), screenWidth);
+				int pressGenomeX = Convert.translateScreenToGenome(pressX, model.getAnnotationLocationVisible(), screenWidth);
+				
+				int start = pressGenomeX < currentGenomeX ? pressGenomeX : currentGenomeX;
+				int end = pressGenomeX < currentGenomeX ? currentGenomeX : pressGenomeX;
+				
+				selectionStart = start;
+				selectionEnd = end + 1;
+				
+				model.selectionModel().setSelectedRegion(new Location(selectionStart, selectionEnd));
+				
+			} else {
+				double move = (e.getX() - pressX) / screenWidth;
 
-			double move = (e.getX() - pressX) / screenWidth;
-			
-			int start = (int) (pressLoc.start() - pressLoc.length() * move);
-			int end = (int) (pressLoc.end() - pressLoc.length() * move);
-			
-			if (start<1){
-				start=1;
-				end = pressLoc.length();
+				int start = (int) (pressLoc.start() - pressLoc.length() * move);
+				int end = (int) (pressLoc.end() - pressLoc.length() * move);
+
+				if (start<1){
+					start=1;
+					end = pressLoc.length();
+				}
+				if (end>model.getSelectedEntry().size()){
+					end = model.getSelectedEntry().size();
+					start = end - pressLoc.length();
+				}
+				model.setAnnotationLocationVisible(new Location(start, end));
 			}
-			if (end>model.getSelectedEntry().size()){
-				end = model.getSelectedEntry().size();
-				start = end - pressLoc.length();
-			}
-			model.setAnnotationLocationVisible(new Location(start, end));
-			
 
 		}
 
@@ -272,13 +289,18 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		int y = e.getY();
+		boolean consumed = false;
 		/* Transfer MouseEvent to corresponding track */
 		Track mouseTrack = tracks.get(e);
 		if (mouseTrack != null)
-			mouseTrack.mouseClicked(e.getX(), e.getY(), e);
+			consumed = mouseTrack.mouseClicked(e.getX(), e.getY(), e);
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
 			new PopUpMenu(model).show(this, e.getX(), y);
+		} else if (!consumed){
+			model.selectionModel().setSelectedRegion(null);
+			model.selectionModel().clearLocationSelection();
 		}
+		
 	}
 }
