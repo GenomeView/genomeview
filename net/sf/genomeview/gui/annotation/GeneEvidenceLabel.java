@@ -217,7 +217,6 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			return;
 		/* Specific mouse code for this label */
 		
-		System.out.println(currentMouseX);
 		if (pressLoc != null) {
 			if (e.isShiftDown()){
 				model.selectionModel().clearLocationSelection();
