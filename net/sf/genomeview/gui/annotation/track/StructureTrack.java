@@ -635,7 +635,7 @@ public class StructureTrack extends Track {
 	@Override
 	public boolean mouseExited(int x, int y, final MouseEvent e) {
 		outside = true;
-		model.mouseModel().setCurrentCoord(-1);
+//		model.mouseModel().setCurrentCoord(-1);
 		if (dragging) {
 			new Thread(new Runnable() {
 
@@ -829,8 +829,8 @@ public class StructureTrack extends Track {
 		else
 			model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 
-		int currentX = Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth);
-		model.mouseModel().setCurrentCoord(currentX);
+//		int currentX = Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth);
+//		model.mouseModel().setCurrentCoord(currentX);
 
 		setChanged();
 		notifyObservers();

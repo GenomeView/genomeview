@@ -160,6 +160,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	@Override
 	public void mouseExited(MouseEvent e) {
+		model.mouseModel().setCurrentCoord(-1);
 		/* Transfer MouseEvent to corresponding track */
 		if (last != null)
 			last.mouseExited(e.getX(), e.getY(), e);
@@ -206,25 +207,32 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		/* Transfer MouseEvent to corresponding track */
-
-		Track mouseTrack = tracks.get(e);
 		currentMouseX = e.getX();
+		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX, model.getAnnotationLocationVisible(), screenWidth);
+		
+		/* Transfer MouseEvent to corresponding track */
+		Track mouseTrack = tracks.get(e);
 		boolean consumed = false;
 		if (mouseTrack != null)
 			consumed = mouseTrack.mouseDragged(e.getX(), e.getY(), e);
-		if (consumed)
+		if (consumed){
+			//even when consumed, update the mouse position before returning
+			model.mouseModel().setCurrentCoord(currentGenomeX);
 			return;
+		}
+		
+		
 		/* Specific mouse code for this label */
 		
 		if (pressLoc != null) {
+			//shift-drag always selects
 			if (e.isShiftDown()){
 				model.selectionModel().clearLocationSelection();
 			
 				int selectionStart = 0;
 				int selectionEnd = 0;
 				
-				int currentGenomeX = Convert.translateScreenToGenome(currentMouseX, model.getAnnotationLocationVisible(), screenWidth);
+//				int currentGenomeX = Convert.translateScreenToGenome(currentMouseX, model.getAnnotationLocationVisible(), screenWidth);
 				int pressGenomeX = Convert.translateScreenToGenome(pressX, model.getAnnotationLocationVisible(), screenWidth);
 				
 				int start = pressGenomeX < currentGenomeX ? pressGenomeX : currentGenomeX;
@@ -234,8 +242,11 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 				selectionEnd = end + 1;
 				
 				model.selectionModel().setSelectedRegion(new Location(selectionStart, selectionEnd));
+				//when selecting: update the mouse position
+				model.mouseModel().setCurrentCoord(currentGenomeX);
 				
 			} else {
+				//drag always pans
 				double move = (e.getX() - pressX) / screenWidth;
 
 				int start = (int) (pressLoc.start() - pressLoc.length() * move);
@@ -250,6 +261,9 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 					start = end - pressLoc.length();
 				}
 				model.setAnnotationLocationVisible(new Location(start, end));
+				
+				//when panning, don't update the mouse position until done. It should stay the same while panning anyway (but in reality,
+				//it will slightly lag behind the pointer)
 			}
 
 		}
@@ -260,8 +274,11 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		/* Transfer MouseEvent to corresponding track */
+		currentMouseX = e.getX();		
+		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX, model.getAnnotationLocationVisible(), screenWidth);
+		model.mouseModel().setCurrentCoord(currentGenomeX);
 
+		/* Transfer MouseEvent to corresponding track */
 		Track mouseTrack = tracks.get(e);
 
 		if (last != mouseTrack) {
@@ -282,7 +299,6 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		if (consumed)
 			return;
 		/* Specific mouse code for this label */
-		currentMouseX = e.getX();
 		repaint();
 	}
 

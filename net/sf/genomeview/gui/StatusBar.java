@@ -24,7 +24,7 @@ public class StatusBar extends JLabel implements Observer {
 		this.select = model.selectionModel();
 		model.getGUIManager().registerStatusBar(this);
 		setText(message);
-		model.addObserver(this);
+		this.model.addObserver(this);
 	}
 
 	@Override
