@@ -69,8 +69,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 	}
 
 	@Override
-	public void paintComponent(Graphics g) {
-
+	public void paintComponent(Graphics g) {		
 		actualPaint(g);
 
 		// FIXME paintSelectedLocation(g, model.getAnnotationLocationVisible());
@@ -92,6 +91,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			highlight(model.getSelectedRegion(), g);
 
 		g.setColor(new Color(120, 120, 120, 120));
+		//draw guide line.
 		g.drawLine(currentMouseX, 0, currentMouseX, this.getPreferredSize().height);
 	}
 
@@ -209,6 +209,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		/* Transfer MouseEvent to corresponding track */
 
 		Track mouseTrack = tracks.get(e);
+		currentMouseX = e.getX();
 		boolean consumed = false;
 		if (mouseTrack != null)
 			consumed = mouseTrack.mouseDragged(e.getX(), e.getY(), e);
@@ -216,7 +217,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			return;
 		/* Specific mouse code for this label */
 		
-		currentMouseX = e.getX();
+		System.out.println(currentMouseX);
 		if (pressLoc != null) {
 			if (e.isShiftDown()){
 				model.selectionModel().clearLocationSelection();
