@@ -21,7 +21,7 @@ import net.sf.genomeview.gui.annotation.GeneEvidenceLabel;
  */
 public class GUIManager {
 
-	/* There can be multiple menus as ther wil be one for each screen */
+	/* There can be multiple menus as there will be one for each screen */
 	private List<JMenu> pluginMenu = new ArrayList<JMenu>();
 	private List<JMenu> pluginDoc = new ArrayList<JMenu>();
 
