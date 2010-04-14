@@ -23,6 +23,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
+import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 
 public class MergeFeatureDialog extends JDialog {
@@ -72,14 +73,14 @@ public class MergeFeatureDialog extends JDialog {
 
                 copy.setLocation(locations);
                 /* Add new feature to the annotation */
-                model.getSelectedEntry().annotation.add(copy);
+                ((FeatureAnnotation)model.getSelectedEntry().data.get(copy.type())).add(copy);
 
                 /* If requested, the original features are deleted */
                 if (remove.isSelected()) {
                     Set<Feature> toRemove = new HashSet<Feature>();
                     toRemove.addAll(model.selectionModel().getFeatureSelection());
                     for (Feature rf : toRemove)
-                        model.getSelectedEntry().annotation.remove(rf);
+                    	((FeatureAnnotation)model.getSelectedEntry().data.get(rf.type())).remove(rf);
                 }
                 model.selectionModel().clearLocationSelection();
 

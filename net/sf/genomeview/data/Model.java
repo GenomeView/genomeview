@@ -7,14 +7,12 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.Stack;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
@@ -26,18 +24,22 @@ import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack2;
 import net.sf.genomeview.gui.annotation.track.SequenceLogoTrack;
 import net.sf.genomeview.gui.annotation.track.ShortReadTrack;
 import net.sf.genomeview.gui.annotation.track.StructureTrack;
-import net.sf.genomeview.gui.annotation.track.SyntenicTrack;
 import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.gui.annotation.track.WiggleTrack;
 import net.sf.genomeview.plugin.GUIManager;
 import net.sf.jannot.AminoAcidMapping;
+import net.sf.jannot.Data;
+import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
-import net.sf.jannot.Feature;
+import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
+import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
+import net.sf.jannot.alignment.Alignment;
+import net.sf.jannot.alignment.AlignmentAnnotation;
 import net.sf.jannot.alignment.MultipleAlignment;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
@@ -50,27 +52,24 @@ import be.abeel.util.DefaultHashMap;
 public class Model extends Observable implements IModel {
 	private Logger logger = Logger.getLogger(Model.class.getCanonicalName());
 
-	private EntrySet entries = new EntrySet(null);
+	private EntrySet entries = new EntrySet();
 
 	private SelectionModel selectionModel = new SelectionModel();
 	private MouseModel mouseModel = new MouseModel();
 
-	public MouseModel mouseModel(){
+	public MouseModel mouseModel() {
 		return mouseModel;
 	}
+
 	public Model(JFrame parent) {
 		this.parent = parent;
 		selectionModel.addObserver(this);
 		this.trackList = new TrackList(this);
 		entries.addObserver(this);
-		StructureTrack strack = new StructureTrack(this);
-		trackList.add(strack);
-		TickmarkTrack ticks = new TickmarkTrack(this);
-		trackList.add(ticks);
 
 		Set<Type> tmp1 = Configuration.getTypeSet("visibleTypesStructure");
 		for (Type t : tmp1)
-			strack.setTypeVisible(t, true);
+			trackList.structure().setTypeVisible(t, true);
 
 		Configuration.getTypeSet("visibleTypes");
 		updateTracks();
@@ -116,28 +115,27 @@ public class Model extends Observable implements IModel {
 		entries.clear();
 		undoStack.clear();
 		redoStack.clear();
-		clearTrackList(trackList);
+		trackList.clear();
 		refresh(NotificationTypes.GENERAL);
 	}
 
-	private void clearTrackList(TrackList tracklist) {
-		List<Track> remove = new ArrayList<Track>();
-		for (Track t : tracklist) {
-
-			if (!(t instanceof FeatureTrack || t instanceof StructureTrack || t instanceof TickmarkTrack))
-				remove.add(t);
-		}
-		tracklist.removeAll(remove);
-		refresh();
-
-	}
+	// private void clearTrackList(TrackList tracklist) {
+	// List<Track> remove = new ArrayList<Track>();
+	// for (Track t : tracklist) {
+	//
+	// if (!(t instanceof FeatureTrack || t instanceof StructureTrack || t
+	// instanceof TickmarkTrack))
+	// remove.add(t);
+	// }
+	// tracklist.removeAll(remove);
+	// refresh();
+	//
+	// }
 
 	public EntrySet entries() {
 		return entries;
 
 	}
-
-	
 
 	/**
 	 * The main window of the GUI belonging to this model.
@@ -365,6 +363,8 @@ public class Model extends Observable implements IModel {
 	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(
 			AminoAcidMapping.STANDARDCODE);
 
+	// private Configuration trackMap;
+
 	public AminoAcidMapping getAAMapping(Entry e) {
 		return aamapping.get(e);
 	}
@@ -379,6 +379,8 @@ public class Model extends Observable implements IModel {
 		refresh(NotificationTypes.TRANSLATIONTABLECHANGE);
 
 	}
+
+	private final TrackList trackList;
 
 	public void addTrack(Track track) {
 		trackList.add(track);
@@ -400,32 +402,52 @@ public class Model extends Observable implements IModel {
 	//
 	// }
 
-	public class TrackList extends CopyOnWriteArrayList<Track> {
-
+	public class TrackList implements Iterable<Track> {
 		private Model model;
+		private HashMap<DataKey, Track> mapping = new HashMap<DataKey, Track>();
+		private List<DataKey> order = new ArrayList<DataKey>();
 
 		public TrackList(Model model) {
 			this.model = model;
+			init();
+
+		}
+		
+		public Track get(int index){
+			return mapping.get(order.get(index));
+		}
+
+		private void init() {
+			TickmarkTrack ticks = new TickmarkTrack(model);
+			add(ticks);
+			StructureTrack strack = new StructureTrack(model);
+			add(strack);
+
+		}
+
+		public StructureTrack structure() {
+			return (StructureTrack) mapping.get(StructureTrack.key);
+		}
+
+		private void add(Track track) {
+			mapping.put(track.getDataKey(), track);
+			order.add(track.getDataKey());
+
+		}
+
+		public void clear() {
+			mapping.clear();
+			order.clear();
+			init();
 		}
 
 		private static final long serialVersionUID = 6716276343672660196L;
 
-		public boolean containsType(Type type) {
-			for (Track track : this) {
-				if (track instanceof FeatureTrack) {
-					if (((FeatureTrack) track).getType().equals(type))
-						return true;
-
-				}
-			}
-			return false;
-		}
-
 		public void down(int row) {
-			if (row < this.size() - 1) {
-				Track tmp = get(row);
-				set(row, get(row + 1));
-				set(row + 1, tmp);
+			if (row < order.size() - 1) {
+				DataKey tmp = order.get(row);
+				order.set(row, order.get(row + 1));
+				order.set(row + 1, tmp);
 				model.refresh();
 
 			}
@@ -434,82 +456,118 @@ public class Model extends Observable implements IModel {
 
 		public void up(int row) {
 			if (row > 0) {
-				Track tmp = get(row);
-				set(row, get(row - 1));
-				set(row - 1, tmp);
+				DataKey tmp = order.get(row);
+				order.set(row, order.get(row - 1));
+				order.set(row - 1, tmp);
 				model.refresh();
 			}
 
 		}
 
-		public boolean containsGraph(String name) {
-			for (Track track : this) {
-				if (track instanceof WiggleTrack) {
-					if (((WiggleTrack) track).displayName().equals(name))
-						return true;
+		// public boolean containsGraph(String name) {
+		// for (Track track : this) {
+		// if (track instanceof WiggleTrack) {
+		// if (((WiggleTrack) track).displayName().equals(name))
+		// return true;
+		//
+		// }
+		// }
+		// return false;
+		// }
 
-				}
-			}
-			return false;
+		// public boolean containsAlignment(int index) {
+		// for (Track track : this) {
+		// if (track instanceof MultipleAlignmentTrack) {
+		// if (((MultipleAlignmentTrack) track).getIndex() == index)
+		// return true;
+		//
+		// }
+		// }
+		// return false;
+		// }
+
+		// public boolean containsSyntenicTarget(String ref, String target) {
+		// for (Track track : this) {
+		// if (track instanceof SyntenicTrack) {
+		// SyntenicTrack st = ((SyntenicTrack) track);
+		// if (st.reference().equals(ref) && st.target().equals(target))
+		// return true;
+		//
+		// }
+		// }
+		// return false;
+		// }
+
+		// public boolean containsSequenceLogo() {
+		// for (Track track : this) {
+		// if (track instanceof SequenceLogoTrack) {
+		//
+		// return true;
+		//
+		// }
+		// }
+		// return false;
+		// }
+
+		// public boolean containShortReadTrack(DataSource rg) {
+		// for (Track track : this) {
+		// if (track instanceof ShortReadTrack) {
+		// ShortReadTrack srt = (ShortReadTrack) track;
+		// if (srt.source().equals(rg))
+		// return true;
+		//
+		// }
+		// }
+		// return false;
+		// }
+
+		// public boolean containsMultipleAlignment(MultipleAlignment ma) {
+		// for (Track track : this) {
+		// if (track instanceof MultipleAlignmentTrack2) {
+		// MultipleAlignmentTrack2 srt = (MultipleAlignmentTrack2) track;
+		//
+		// if (srt.getMA().equals(ma))
+		// return true;
+		//
+		// }
+		// }
+		// return false;
+		// }
+
+		public boolean containsTrack(DataKey key) {
+			return mapping.keySet().contains(key);
 		}
 
-		public boolean containsAlignment(int index) {
-			for (Track track : this) {
-				if (track instanceof MultipleAlignmentTrack) {
-					if (((MultipleAlignmentTrack) track).getIndex() == index)
-						return true;
-
-				}
-			}
-			return false;
+		public boolean containsTrack(String string) {
+			return containsTrack(new StringKey(string));
 		}
 
-		public boolean containsSyntenicTarget(String ref, String target) {
-			for (Track track : this) {
-				if (track instanceof SyntenicTrack) {
-					SyntenicTrack st = ((SyntenicTrack) track);
-					if (st.reference().equals(ref) && st.target().equals(target))
-						return true;
-
-				}
-			}
-			return false;
+		public int size() {
+			return order.size();
 		}
 
-		public boolean containsSequenceLogo() {
-			for (Track track : this) {
-				if (track instanceof SequenceLogoTrack) {
+		@Override
+		public Iterator<Track> iterator() {
+			return new Iterator<Track>() {
+				int index = 0;
 
-					return true;
+				@Override
+				public boolean hasNext() {
+					return index < order.size();
+				}
+
+				@Override
+				public Track next() {
+					return mapping.get(order.get(index++));
+				}
+
+				@Override
+				public void remove() {
+					throw new UnsupportedOperationException();
 
 				}
-			}
-			return false;
-		}
 
-		public boolean containShortReadTrack(DataSource rg) {
-			for (Track track : this) {
-				if (track instanceof ShortReadTrack) {
-					ShortReadTrack srt = (ShortReadTrack) track;
-					if (srt.source().equals(rg))
-						return true;
-
-				}
-			}
-			return false;
-		}
-
-		public boolean containsMultipleAlignment(MultipleAlignment ma) {
-			for (Track track : this) {
-				if (track instanceof MultipleAlignmentTrack2) {
-					MultipleAlignmentTrack2 srt = (MultipleAlignmentTrack2) track;
-
-					if (srt.getMA().equals(ma))
-						return true;
-
-				}
-			}
-			return false;
+			};
 		}
 	}
 
@@ -520,10 +578,13 @@ public class Model extends Observable implements IModel {
 	 * @return list of tracks
 	 */
 	public TrackList getTrackList() {
+		//FIXME remove method, make tracklist public and final
 		return trackList;
 	}
 
-	private TrackList trackList;
+	// private TrackList trackList;
+	//
+	// private Model model;
 
 	/**
 	 * This method keeps the track list up to date when adding new data to the
@@ -533,54 +594,89 @@ public class Model extends Observable implements IModel {
 	 */
 	public synchronized void updateTracks() {
 		int startSize = trackList.size();
-		for (Type t : Type.values()) {
-			if (!trackList.containsType(t))
-				trackList.add(new FeatureTrack(this, t, true));
-		}
+		// for (Type t : Type.values()) {
+		// if (!trackList.containsType(t))
+		// trackList.add(new FeatureTrack(this, t, true));
+		// }
 		for (Entry e : entries) {
 			/* Graph tracks */
-			for (Graph g : e.graphs.getAll()) {
-				if (!trackList.containsGraph(g.getName()))
-					trackList.add(new WiggleTrack(g.getName(), this, true));
-			}
-			/* Alignment and conservation tracks */
-			for (int i = 0; i < e.alignment.numAlignments(); i++) {
-				if (!trackList.containsAlignment(i))
-					trackList.add(new MultipleAlignmentTrack(e.alignment.getAlignment(i).name(), i, this, true));
-			}
-			if (!trackList.containsSequenceLogo() && e.alignment.numAlignments() > 0)
-				trackList.add(new SequenceLogoTrack(this));
+			for (DataKey key : e.data) {
+				Data data = e.data.get(key);
+				if (data instanceof FeatureAnnotation) {
+					if (!trackList.containsTrack(key))
+						trackList.add(new FeatureTrack(this,(Type)key));
+				}
+				if (data instanceof Graph) {
+					if (!trackList.containsTrack(key))
+						trackList.add(new WiggleTrack(key, this, true));
+				}
+				if (data instanceof AlignmentAnnotation) {
+					if (!trackList.containsTrack(key))
+						trackList.add(new MultipleAlignmentTrack(this, key));
+//					if (!trackList.containsTrack(key))
+//						trackList.add(new SequenceLogoTrack(this, key));
 
-			/* Short read tracks */
-			for (DataSource rg : e.shortReads.getSources()) {
-				if (!trackList.containShortReadTrack(rg)) {
-					trackList.add(new ShortReadTrack(this, rg));
+				}
+				if (data instanceof ReadGroup) {
+					if (!trackList.containsTrack(key))
+						trackList.add(new ShortReadTrack(key, this));
+				}
+				if (data instanceof MultipleAlignment) {
+					if (!trackList.containsTrack(key)) {
+						trackList.add(new MultipleAlignmentTrack2(this, key));
+						// logger.info("Added multiple alignment track " + ma);
+					}
 				}
 			}
+			// if (!trackList.containShortReadTrack(rg)) {
+			// trackList.add(new ShortReadTrack(this, rg));
+			// }
+			// }
+			// for (Graph g : e.graphs.getAll()) {
+			// if (!trackList.containsGraph(g.getName()))
+			// trackList.add(new WiggleTrack(g.getName(), this, true));
+			// }
+			/* Alignment and conservation tracks */
+			// for (int i = 0; i < e.alignment.numAlignments(); i++) {
+			// if (!trackList.containsAlignment(i))
+			// trackList.add(new
+			// MultipleAlignmentTrack(e.alignment.getAlignment(i).name(), i,
+			// this, true));
+			// }
+			// if (!trackList.containsSequenceLogo() &&
+			// e.alignment.numAlignments() > 0)
+			// trackList.add(new SequenceLogoTrack(this));
+
+			/* Short read tracks */
+			// for (DataSource rg : e.shortReads.getSources()) {
+			// if (!trackList.containShortReadTrack(rg)) {
+			// trackList.add(new ShortReadTrack(this, rg));
+			// }
+			// }
+			// /* Multiple alignments tracks */
+			// for (MultipleAlignment ma : e.multiplealignment) {
+			// if (!trackList.containsMultipleAlignment(ma)) {
+			// trackList.add(new MultipleAlignmentTrack2(this, ma));
+			// logger.info("Added multiple alignment track " + ma);
+			// }
+			// }
 
 		}
-		/* Syntenic tracks */
-		Set<String> targets = entries.syntenic.getTargets();
-		for (String s : targets) {
-			for (String t : targets) {
-				if (!trackList.containsSyntenicTarget(s, t))
-					trackList.add(new SyntenicTrack(this, s, t));
-			}
-		}
-
-		/* Multiple alignments tracks */
-		for (MultipleAlignment ma : entries().multiplealignment) {
-			if (!trackList.containsMultipleAlignment(ma)) {
-				trackList.add(new MultipleAlignmentTrack2(this, ma));
-				logger.info("Added multiple alignment track " + ma);
-			}
-		}
-		for (String s : targets) {
-			for (String t : targets) {
-				if (!trackList.containsSyntenicTarget(s, t))
-					trackList.add(new SyntenicTrack(this, s, t));
-			}
-		}
+		// /* Syntenic tracks */
+		// Set<String> targets = entries.syntenic.getTargets();
+		// for (String s : targets) {
+		// for (String t : targets) {
+		// if (!trackList.containsSyntenicTarget(s, t))
+		// trackList.add(new SyntenicTrack(this, s, t));
+		// }
+		// }
+		//
+		// for (String s : targets) {
+		// for (String t : targets) {
+		// if (!trackList.containsSyntenicTarget(s, t))
+		// trackList.add(new SyntenicTrack(this, s, t));
+		// }
+		// }
 		if (trackList.size() != startSize)
 			refresh(NotificationTypes.UPDATETRACKS);
 
@@ -676,7 +772,6 @@ public class Model extends Observable implements IModel {
 		return guimanager;
 	}
 
-
 	@Override
 	public Location getSelectedRegion() {
 		return selectionModel.getSelectedRegion();
@@ -693,10 +788,11 @@ public class Model extends Observable implements IModel {
 	}
 
 	public void setSelectedEntry(Entry entry) {
-		for (Entry e : entries)
-			for (ReadGroup rg : e.shortReads.getReadGroups()) {
-				rg.release();
-			}
+		// for (Entry e : entries)
+		// for (ReadGroup rg : e.shortReads.getReadGroups()) {
+		// rg.release();
+		// }
+		// FIXME reimplement release
 		entries.setDefault(entry);
 		selectionModel.clear();
 

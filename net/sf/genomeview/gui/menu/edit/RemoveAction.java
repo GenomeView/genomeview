@@ -28,7 +28,7 @@ public class RemoveAction extends AbstractModelAction implements Observer {
 		Set<Feature> toRemove = new HashSet<Feature>();
 		toRemove.addAll(model.selectionModel().getFeatureSelection());
 		for (Feature rf : toRemove)
-			model.getSelectedEntry().annotation.remove(rf);
+			model.getSelectedEntry().data.getAnnotation(rf.type()).remove(rf);
 
 	}
 

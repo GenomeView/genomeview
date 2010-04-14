@@ -13,6 +13,7 @@ import java.util.SortedSet;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
+import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.EMBLParser;
@@ -25,10 +26,10 @@ public class TestEMBLParser {
     public void testSample() {
         EMBLParser parser = new EMBLParser();
         try {
-            EntrySet entries = parser.parse(new FileInputStream("sample2.embl"),null, null);
+            EntrySet entries = parser.parse(new FileInputStream("sample2.embl"), null);
 
 //            System.out.println("ACC:" + entries[0].description.getAccessionNumbers());
-            List<Feature> fs = entries.getEntry().annotation.getByType(Type.get("CDS"), new Location(0, 12000));
+            Iterable<Feature> fs = ((FeatureAnnotation)entries.getEntry().data.get(Type.get("CDS"))).get(1, 12000);
             for (Feature f : fs) {
                 // System.out.println(f.type());
                 // System.out.println(f.location());

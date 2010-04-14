@@ -24,17 +24,14 @@ public class CachedURLSource extends URLSource {
 
 	}
 
-	@Override
-	public void saveOwn(EntrySet arg0) throws SaveFailedException {
-		throw new SaveFailedException("Cannot save cached URL data. To save data from a URL, you need to disable URL caching in the Misc. section of the configuration panel.");
-	}
+	
 
 	@Override
 	public EntrySet read(EntrySet set) throws ReadFailedException {
 		if (!SourceCache.contains(url)) {
 			SSL.certify(url);
 			try {
-				super.setParser(Parser.detectParser(url.openStream()));
+				super.setParser(Parser.detectParser(url.openStream(),url));
 				final PipedInputStream in = new PipedInputStream();
 				final PipedOutputStream forParser = new PipedOutputStream(in);
 

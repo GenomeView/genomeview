@@ -13,6 +13,7 @@ import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.NotificationTypes;
 import net.sf.jannot.Feature;
+import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Sequence;
 import net.sf.jannot.Type;
 import net.sf.jannot.utils.SequenceTools;
@@ -30,7 +31,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
      */
 	private static final long serialVersionUID = 320228141380099074L;
 
-	private String[] columns = { "Name", "Start", "Stop", "Internal stop", "Splice sites"};
+	private String[] columns = { "Name", "Start", "Stop", "Internal stop", "Splice sites" };
 
 	@Override
 	public String getColumnName(int column) {
@@ -46,7 +47,8 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	}
 
 	public void update(Observable o, Object arg) {
-		if (arg == NotificationTypes.GENERAL || arg == NotificationTypes.TRANSLATIONTABLECHANGE || arg == NotificationTypes.ENTRYCHANGED || arg == NotificationTypes.JANNOTCHANGE) {
+		if (arg == NotificationTypes.GENERAL || arg == NotificationTypes.TRANSLATIONTABLECHANGE
+				|| arg == NotificationTypes.ENTRYCHANGED || arg == NotificationTypes.JANNOTCHANGE) {
 			fireTableDataChanged();
 		}
 
@@ -59,7 +61,8 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 
 	@Override
 	public int getRowCount() {
-		return model.getSelectedEntry().annotation.noFeatures(type);
+		FeatureAnnotation fa = model.getSelectedEntry().data.getAnnotation(type);
+		return fa.cachedCount();// .noFeatures(type);
 	}
 
 	@Override
@@ -80,13 +83,13 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	}
 
 	public Feature getFeature(int row) {
-		return model.getSelectedEntry().annotation.get(type, row);
+		return model.getSelectedEntry().data.getAnnotation(type).getCached(row);
 	}
 
 	@Override
 	public Object getValueAt(int row, int col) {
 		Feature f = getFeature(row);
-		Sequence seq = model.getSelectedEntry().sequence;
+		Sequence seq = model.getSelectedEntry().sequence();
 		switch (col) {
 		case 0:
 			return f;
@@ -120,7 +123,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	}
 
 	public int getRow(Feature first) {
-		return model.getSelectedEntry().annotation.getByType(type).indexOf(first);
+		return model.getSelectedEntry().data.getAnnotation(type).getCachedIndexOf(first);
 
 	}
 

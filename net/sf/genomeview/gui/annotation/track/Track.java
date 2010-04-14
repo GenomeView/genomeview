@@ -12,6 +12,7 @@ import java.util.Observable;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.data.Model;
+import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 
 /**
@@ -20,9 +21,11 @@ import net.sf.jannot.Entry;
 public abstract class Track extends Observable {
 
 	protected Model model;
+	protected DataKey dataKey;
 
-	public Track(Model model, boolean visible, boolean collapsible) {
+	public Track(DataKey key,Model model, boolean visible, boolean collapsible) {
 		this.model = model;
+		this.dataKey=key;
 		this.visible = visible;
 		this.collapsible = collapsible;
 		this.addObserver(model);
@@ -179,5 +182,9 @@ public abstract class Track extends Observable {
 	}
 
 	public abstract String displayName();
+
+	public DataKey getDataKey() {
+		return dataKey;
+	}
 
 }

@@ -37,13 +37,13 @@ public class NCBIproteinBlastAction extends AbstractModelAction {
     public void actionPerformed(ActionEvent arg0) {
     	if (model.selectionModel().getLocationSelection() != null && model.selectionModel().getFeatureSelection().size() == 1){
     		Feature rf = model.selectionModel().getLocationSelection().iterator().next().getParent();
-    		String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence, rf);
+    		String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence(), rf);
 
     		String protein = SequenceTools.translate(seq,model.getAAMapping());
     		Blast.proteinBlast(""+rf.toString().hashCode(),protein);
     	} else if (model.getSelectedRegion() != null){
     		Location l = model.getSelectedRegion();
-   	     	String seq = model.getSelectedEntry().sequence.getSubSequence(l.start(), l.end()+1);
+   	     	String seq = model.getSelectedEntry().sequence().getSubSequence(l.start(), l.end()+1);
    	     	String protein = SequenceTools.translate(seq,model.getAAMapping());
    	     	Blast.nucleotideBlast("selection",protein);
     	}

@@ -204,6 +204,7 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		//TODO implement specific model for selections
+		//FIXME implement using StringBuffer for speed
 		Set<Feature> set = model.selectionModel().getFeatureSelection();
 		if(set!=null&&set.equals(lastSelection))
 			return;
@@ -211,7 +212,7 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 
 		if (set != null && set.size() > 0) {
 			for (Feature rf : set) {
-				text += "Data origin: " + rf.getSource() + "\n";
+//				text += "Data origin: " + rf.getSource() + "\n";
 				if(rf.location()!=null)
 				text += "Location: "
 						+ StaticUtils.escapeHTML(rf.location().toString())

@@ -36,7 +36,7 @@ public class CopySequenceAction extends AbstractModelAction {
 
         if (model.getSelectedRegion() != null) {
             Location l = model.getSelectedRegion();
-            Sequence seq = model.getSelectedEntry().sequence;
+            Sequence seq = model.getSelectedEntry().sequence();
             StringBuffer sb = new StringBuffer(l.length());
             int track = model.getPressTrack();
             switch (track) {

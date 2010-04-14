@@ -228,7 +228,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
     private String createSubSequenceNuc() {
     	Location l = model.getSelectedRegion();
-    	return model.getSelectedEntry().sequence.getSubSequence(l.start(), l.end()+1);
+    	return model.getSelectedEntry().sequence().getSubSequence(l.start(), l.end()+1);
 	}
 
 	private Map<Feature, String> createNucList() {
@@ -236,7 +236,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
         // String nucs = new String();
         Set<Feature> feats = model.selectionModel().getFeatureSelection();
         for (Feature feat : feats) {
-            String nucs = SequenceTools.extractSequence(model.getSelectedEntry().sequence, feat);
+            String nucs = SequenceTools.extractSequence(model.getSelectedEntry().sequence(), feat);
             // SymbolList symbols = feat.getSymbols();
             // nucs = symbols.seqString();
             newList.put(feat, nucs);
@@ -248,7 +248,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
         Map<Feature, String> newList = new HashMap<Feature, String>();
         Set<Feature> feats = model.selectionModel().getFeatureSelection();
         for (Feature feat : feats) {
-            String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence, feat);
+            String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence(), feat);
             String prots = SequenceTools.translate(seq,model.getAAMapping());
 
             newList.put(feat, prots);
@@ -282,7 +282,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
     private String createSubSequenceProt() {
     	Location l = model.getSelectedRegion();
-    	String seq = model.getSelectedEntry().sequence.getSubSequence(l.start(), l.end()+1);
+    	String seq = model.getSelectedEntry().sequence().getSubSequence(l.start(), l.end()+1);
 		return SequenceTools.translate(seq,model.getAAMapping());
 	}
 

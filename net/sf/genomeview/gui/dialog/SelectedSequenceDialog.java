@@ -72,7 +72,7 @@ public class SelectedSequenceDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 StringBuffer tmp = new StringBuffer();
-                Sequence seq = model.getSelectedEntry().sequence;
+                Sequence seq = model.getSelectedEntry().sequence();
                 if (location.isSelected()) {
                     SortedSet<Location> locs = model.selectionModel().getLocationSelection();
                     for (Location l : locs) {

@@ -21,21 +21,22 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.genomeview.gui.dialog.MultipleAlignmentOrderingDialog;
+import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.alignment.AlignmentBlock;
 import net.sf.jannot.alignment.AlignmentSequence;
 import net.sf.jannot.alignment.MultipleAlignment;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 /**
  * 
@@ -69,7 +70,7 @@ public class MultipleAlignmentTrack2 extends Track {
 		}
 	}
 
-	private MultipleAlignment ma;
+//	private MultipleAlignment ma;
 
 	private MouseEvent lastMouse;
 
@@ -102,15 +103,21 @@ public class MultipleAlignmentTrack2 extends Track {
 		lastMouse = source;
 		return false;
 	}
+//
+//	public MultipleAlignment getMA() {
+//		return ma;
+//	}
 
-	public MultipleAlignment getMA() {
-		return ma;
-	}
+//	public MultipleAlignmentTrack2(Model model, MultipleAlignment ma) {
+//		super(model, true, true);
+//		// model.addObserver(tooltip);
+//		this.ma = ma;
+//	}
 
-	public MultipleAlignmentTrack2(Model model, MultipleAlignment ma) {
-		super(model, true, true);
+	public MultipleAlignmentTrack2(Model model, DataKey key) {
+		super(key,model, true, true);
 		// model.addObserver(tooltip);
-		this.ma = ma;
+		
 	}
 
 	private int lineHeight = 15;
@@ -150,7 +157,7 @@ public class MultipleAlignmentTrack2 extends Track {
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
 		// this.yOffset = yOffset;
 		currentYOffset = yOffset;
-
+		MultipleAlignment ma=(MultipleAlignment)entry.data.get(dataKey);
 		if (ordering.size() != model.entries().size()) {
 			updateOrdering();
 
@@ -164,9 +171,10 @@ public class MultipleAlignmentTrack2 extends Track {
 			g.drawString("Too many alignment blocks, zoom in to see multiple alignments", 10, yOffset + 10);
 			return 20 + 5;
 		}
-		TreeSet<AlignmentBlock> abs = ma.get(entry, visible);
+//		TreeSet<AlignmentBlock> abs = ma.get(entry, visible);
+		Iterable<AlignmentBlock>abs=ma.get(visible.start,visible.end);
 
-		queriedBlocks = abs.size();
+		queriedBlocks =ma.getEstimateCount(visible);
 		
 		if (queriedBlocks==0) {
 			g.drawString("No alignment blocks in this region", 10, yOffset + 10);
@@ -221,7 +229,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				}
 				BitSet lines = new BitSet(ordering.size());
 				if (visible.length() < 1000) {
-					char[] ref = entry.sequence.getSubSequence(visible.start, visible.end + 1).toCharArray();
+					char[] ref = entry.sequence().getSubSequence(visible.start, visible.end + 1).toCharArray();
 					// System.out.println("--block ");
 					int line = 1;
 					for (AlignmentSequence as : ab2) {

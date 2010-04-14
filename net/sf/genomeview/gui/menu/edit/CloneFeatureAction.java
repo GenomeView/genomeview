@@ -27,7 +27,7 @@ public class CloneFeatureAction extends AbstractModelAction {
 		// SimpleFeature rf = (SimpleFeature)
 		// model.getFeatureSelection().iterator().next();
 		Feature copy = rf.copy();
-		model.getSelectedEntry().annotation.add(copy);
+		model.getSelectedEntry().data.getAnnotation(copy.type()).add(copy);
 		model.selectionModel().setLocationSelection(copy);
 		// SimpleFeature srf = new SimpleFeature(rf.getSequence(), rf
 		// .makeTemplate());

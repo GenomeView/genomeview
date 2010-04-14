@@ -70,49 +70,49 @@ public class SaveDialog extends JDialog {
         gc.gridx++;
         add(close, gc);
 
-        save.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                for (DataSourceCheckbox dsb : dss) {
-                    if (dsb.isSelected()) {
-                        boolean continueSave = true;
-                        if (dsb.data.isDestructiveSave()) {
-                            int result = JOptionPane.showConfirmDialog(model.getParent(), "Overwrite existing file?\n"
-                                    + dsb.data, "Overwrite?", JOptionPane.YES_NO_OPTION);
-                            if (result != JOptionPane.YES_OPTION)
-                                continueSave = false;
-                        }
-
-                        if (continueSave) {
-                            boolean seqSaved = false;
-                            for (Entry en : model.entries()) {
-                                if (en.defaultSource.equals(dsb.data))
-                                    seqSaved = true;
-
-                            }
-                            if (!seqSaved) {
-                                int result = JOptionPane.showConfirmDialog(model.getParent(),
-                                        "Save source without sequence?", "No sequence!", JOptionPane.YES_NO_OPTION);
-                                if (result != JOptionPane.YES_OPTION)
-                                    continueSave = false;
-                            }
-                        }
-                        setVisible(false);
-                        if (continueSave) {
-                        	WriteEntriesWorker rw = new WriteEntriesWorker(dsb.data, model);
-                            rw.execute();
-                        } else {
-                            JOptionPane.showMessageDialog(model.getParent(), "Save aborted!");
-                        }
-
-                    }
-                }
-
-            }
-
-        });
+//        save.addActionListener(new ActionListener() {
+//
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//
+//                for (DataSourceCheckbox dsb : dss) {
+//                    if (dsb.isSelected()) {
+//                        boolean continueSave = true;
+//                        if (dsb.data.isDestructiveSave()) {
+//                            int result = JOptionPane.showConfirmDialog(model.getParent(), "Overwrite existing file?\n"
+//                                    + dsb.data, "Overwrite?", JOptionPane.YES_NO_OPTION);
+//                            if (result != JOptionPane.YES_OPTION)
+//                                continueSave = false;
+//                        }
+//
+//                        if (continueSave) {
+//                            boolean seqSaved = false;
+//                            for (Entry en : model.entries()) {
+//                                if (en.defaultSource.equals(dsb.data))
+//                                    seqSaved = true;
+//
+//                            }
+//                            if (!seqSaved) {
+//                                int result = JOptionPane.showConfirmDialog(model.getParent(),
+//                                        "Save source without sequence?", "No sequence!", JOptionPane.YES_NO_OPTION);
+//                                if (result != JOptionPane.YES_OPTION)
+//                                    continueSave = false;
+//                            }
+//                        }
+//                        setVisible(false);
+//                        if (continueSave) {
+//                        	WriteEntriesWorker rw = new WriteEntriesWorker(dsb.data, model);
+//                            rw.execute();
+//                        } else {
+//                            JOptionPane.showMessageDialog(model.getParent(), "Save aborted!");
+//                        }
+//
+//                    }
+//                }
+//
+//            }
+//
+//        });
 
         close.addActionListener(new ActionListener() {
 

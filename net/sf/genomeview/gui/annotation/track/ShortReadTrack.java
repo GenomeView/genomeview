@@ -26,10 +26,10 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
-import net.sf.jannot.alignment.AlignmentBlock;
 import net.sf.jannot.shortread.BAMreads;
 import net.sf.jannot.shortread.ExtendedShortRead;
 import net.sf.jannot.shortread.ReadGroup;
@@ -40,6 +40,10 @@ import net.sf.samtools.CigarElement;
 import net.sf.samtools.CigarOperator;
 
 public class ShortReadTrack extends Track {
+
+	public ShortReadTrack(DataKey key, Model model) {
+		super(key, model, true, true);
+	}
 
 	private Tooltip tooltip = new Tooltip();
 
@@ -101,7 +105,8 @@ public class ShortReadTrack extends Track {
 		if (scale <= 256) {
 			if (!tooltip.isVisible())
 				tooltip.setVisible(true);
-			ReadGroup rg = currentEntry.shortReads.getReadGroup(this.source);
+			// ReadGroup rg = currentEntry.shortReads.getReadGroup(this.source);
+			ReadGroup rg = (ReadGroup) currentEntry.data.get(dataKey);
 			ShortReadCoverage currentBuffer = rg.getCoverage();
 			int start = Convert.translateScreenToGenome(x, currentVisible, currentScreenWidth);
 			int f = (int) currentBuffer.get(Strand.FORWARD, start - 1);
@@ -123,11 +128,6 @@ public class ShortReadTrack extends Track {
 	}
 
 	private DataSource source;
-
-	public ShortReadTrack(Model model, DataSource source) {
-		super(model, true, true);
-		this.source = source;
-	}
 
 	private int scale = 1;
 	private int scaleIndex = 0;
@@ -171,15 +171,15 @@ public class ShortReadTrack extends Track {
 		forwardColor = Configuration.getColor("shortread:forwardColor");
 		reverseColor = Configuration.getColor("shortread:reverseColor");
 		pairingColor = Configuration.getColor("shortread:pairingColor");
-		
+
 		/* Create color gradient for forward reads */
-		forwardGradient=new ColorGradient();
+		forwardGradient = new ColorGradient();
 		forwardGradient.addPoint(Color.WHITE);
 		forwardGradient.addPoint(forwardColor);
 		forwardGradient.createGradient(100);
-		
+
 		/* Create color gradient for reverse reads */
-		reverseGradient=new ColorGradient();
+		reverseGradient = new ColorGradient();
 		reverseGradient.addPoint(Color.WHITE);
 		reverseGradient.addPoint(reverseColor);
 		reverseGradient.createGradient(100);
@@ -210,7 +210,7 @@ public class ShortReadTrack extends Track {
 		int start = currentVisible.start / scale * scale;
 		int end = ((currentVisible.end / scale) + 1) * scale;
 
-		ReadGroup rg = entry.shortReads.getReadGroup(source);
+		ReadGroup rg = (ReadGroup) entry.data.get(dataKey);// entry.shortReads.getReadGroup(source);
 		if (rg == null)
 			return 0;
 		ShortReadCoverage graph = rg.getCoverage();// .get(rg);
@@ -301,14 +301,14 @@ public class ShortReadTrack extends Track {
 		 */
 		Iterable<ShortRead> reads = null;
 		boolean timeout = false;
-		int readLength = entry.shortReads.getReadGroup(source).readLength();
+		int readLength = ((ReadGroup) entry.data.get(dataKey)).readLength();// entry.shortReads.getReadGroup(source).readLength();
 		if (!isCollapsed() && (currentVisible.length() > maxRegion)) {
 			g.setColor(Color.BLACK);
 			g.drawString("Region too big (max " + maxRegion + " nt), zoom in", 10, yOffset + 10);
 			yOffset += 20 + 5;
 		} else if (!isCollapsed()) {
 			/* Access to BAMread is through buffer for performance! */
-			reads = rg.get(currentVisible);
+			reads = rg.get(currentVisible.start, currentVisible.end);
 			if (rg instanceof BAMreads) {
 				/* Update readLength for paired reads */
 				readLength = ((BAMreads) rg).getPairLength();
@@ -566,12 +566,12 @@ public class ShortReadTrack extends Track {
 	private void paintRead(Graphics2D g, ShortRead rf, int yRec, double screenWidth, int readLineHeight, Entry entry,
 			NucCounter nc) {
 		Color c = Color.GRAY;
-		if (rf.strand() == Strand.FORWARD){
+		if (rf.strand() == Strand.FORWARD) {
 			c = forwardColor;
-		}else
+		} else
 			c = reverseColor;
 		g.setColor(c);
-		
+
 		int subX1 = Convert.translateGenomeToScreen(rf.start(), currentVisible, screenWidth);
 		int subX2 = Convert.translateGenomeToScreen(rf.end() + 1, currentVisible, screenWidth);
 		if (subX2 < subX1) {
@@ -584,25 +584,25 @@ public class ShortReadTrack extends Track {
 		/* BAM read, has quality information */
 		if (rf instanceof ExtendedShortRead) {
 			ExtendedShortRead esr = (ExtendedShortRead) rf;
-			int qual=esr.record().getMappingQuality();
-			if(c==forwardColor)
+			int qual = esr.record().getMappingQuality();
+			if (c == forwardColor)
 				g.setColor(forwardGradient.getColor(qual));
 			else
 				g.setColor(reverseGradient.getColor(qual));
 		}
 		g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
 		g.setColor(c);
-		g.drawRect(subX1, yRec, subX2 - subX1, readLineHeight -2);
-		
+		g.drawRect(subX1, yRec, subX2 - subX1, readLineHeight - 2);
+
 		/* Check mismatches */
-		if (entry.sequence.size() == 0)
+		if (entry.sequence().size() == 0)
 			return;
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			/* If there is no sequence, return immediately */
-			if (entry.sequence.size() == 0)
+			if (entry.sequence().size() == 0)
 				return;
 			if (seqBuffer == null)
-				seqBuffer = entry.sequence.getSubSequence(currentVisible.start, currentVisible.end + 1).toCharArray();
+				seqBuffer = entry.sequence().getSubSequence(currentVisible.start, currentVisible.end + 1).toCharArray();
 			for (int j = rf.start(); j <= rf.end(); j++) {
 				if (j > currentVisible.end || j < currentVisible.start)
 					continue;

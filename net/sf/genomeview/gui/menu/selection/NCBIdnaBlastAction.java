@@ -21,6 +21,7 @@ import net.sf.jannot.utils.SequenceTools;
  */
 public class NCBIdnaBlastAction extends AbstractModelAction {
 
+	
     private static final long serialVersionUID = -10339770203425228L;
 
     public NCBIdnaBlastAction(Model model) {
@@ -37,11 +38,11 @@ public class NCBIdnaBlastAction extends AbstractModelAction {
     public void actionPerformed(ActionEvent arg0) {
     	if (model.selectionModel().getLocationSelection() != null && model.selectionModel().getFeatureSelection().size() == 1){
     		Feature rf = model.selectionModel().getLocationSelection().iterator().next().getParent();
-    		String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence, rf);
+    		String seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence(), rf);
     		Blast.nucleotideBlast(""+rf.toString().hashCode(),seq);
     	} else if (model.getSelectedRegion() != null){
     		 Location l = model.getSelectedRegion();
-    	     String seq = model.getSelectedEntry().sequence.getSubSequence(l.start(), l.end()+1);
+    	     String seq = model.getSelectedEntry().sequence().getSubSequence(l.start(), l.end()+1);
     	     Blast.nucleotideBlast("selection",seq);
     	}
     }

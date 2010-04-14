@@ -24,14 +24,14 @@ public class WriteEntriesWorker extends DataSourceWorker {
 
     @Override
     protected Void doInBackground() {
-        try {
-            source.saveOwn(model.entries());
-        } catch (Throwable e) {
-        	  pb.done();
-        	JOptionPane.showMessageDialog(model.getParent(), "<html>"+e.getMessage()+"<br/></html>", "Error!",JOptionPane.ERROR_MESSAGE);
-        	e.printStackTrace();
-        }
-        pb.done();
+//        try {
+//            source.saveOwn(model.entries());
+//        } catch (Throwable e) {
+//        	  pb.done();
+//        	JOptionPane.showMessageDialog(model.getParent(), "<html>"+e.getMessage()+"<br/></html>", "Error!",JOptionPane.ERROR_MESSAGE);
+//        	e.printStackTrace();
+//        }
+//        pb.done();
         return null;
     }
 

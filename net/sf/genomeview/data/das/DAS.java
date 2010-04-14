@@ -17,6 +17,7 @@ import javax.xml.parsers.SAXParserFactory;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
+import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
@@ -111,16 +112,20 @@ public class DAS extends DataSource {
 
 	private Entry getEntry(String ref, EntryPoint ep) throws MalformedURLException, ParserConfigurationException, SAXException, IOException {
 		StringBuffer seq = this.getSequence(ref, ep);
-		Entry out = new Entry(ref + ":" + ep,null);
+		Entry out = new Entry(ref + ":" + ep);
 //		out.setID();
-		out.sequence.setSequence(seq);
+		out.sequence().setSequence(seq);
 		// System.out.println("Ref: " + ref);
 		// if (ref.contains("Homo")) {
 		System.out.println("Ref: " + ref);
 
 		for (String source : this.getDSN().getSources(ref)) {
 			List<Feature> list = this.getFeatures(source, ep);
-			out.annotation.addAll(list);
+			for(Feature f:list){
+//				out.annotation.addAll(list);
+				FeatureAnnotation fa = (FeatureAnnotation) out.data.get(f.type());
+				fa.add(f);
+			}
 		}
 		// System.out.println("** " + list);
 
@@ -172,7 +177,7 @@ public class DAS extends DataSource {
 				throw new SAXException("Tags do not match: expected=" + stackName + "; actual=" + name);
 			}
 			if (name.equalsIgnoreCase("feature")) {
-				Feature f = new Feature(null);
+				Feature f = new Feature();
 				f.addLocation(new Location(start, end));
 				f.setType(Type.get(typeID));
 				f.addQualifier("source", methodID);
@@ -250,16 +255,16 @@ public class DAS extends DataSource {
 
 	}
 
-	@Override
-	public boolean isDestructiveSave() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+//	@Override
+//	public boolean isDestructiveSave() {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
 
 	@Override
 	public EntrySet read(EntrySet set) throws ReadFailedException {
 		if (set == null)
-			set = new EntrySet(this);
+			set = new EntrySet();
 		if(ep==null||reference==null)
 			throw new ReadFailedException("Both the EntryPoint and the Reference need to be set!");
 		try {
@@ -280,11 +285,6 @@ public class DAS extends DataSource {
 		return set;
 	}
 
-	@Override
-	public void saveOwn(EntrySet arg0) throws SaveFailedException {
-		throw new SaveFailedException("GenomeView does not support saving to DAS");
-
-	}
 
 	public List<String> getReferences() {
 		return dsn.getReferences();

@@ -18,8 +18,10 @@ import java.util.TreeMap;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
+import net.sf.jannot.alignment.AlignmentAnnotation;
 
 /**
  * Represents the conservation at a position with a sequence logo.
@@ -28,17 +30,18 @@ import net.sf.jannot.Location;
  * 
  */
 public class SequenceLogoTrack extends Track {
-	public SequenceLogoTrack(Model model) {
-		super(model, true,false);
+
+	public SequenceLogoTrack(Model model, DataKey align) {
+		super(align, model, true, false);
 	}
-	
+
 	@Override
 	public String displayName() {
 		return "Multiple alignment sequence logo";
 	}
 
-	public void draw(Map<Integer, String> map, Graphics2D g, int numAlign,
-			int position, int lineHeight, Model m, double width, int yOffset) {
+	public void draw(Map<Integer, String> map, Graphics2D g, int numAlign, int position, int lineHeight, Model m,
+			double width, int yOffset) {
 
 		int left = lineHeight;
 		for (int key : map.keySet()) {
@@ -52,16 +55,13 @@ public class SequenceLogoTrack extends Track {
 				// System.out.println(position + "\t" + c + "\t" + lineHeight
 				// + "\t" + fraction + "\t"
 				// + (fraction * lineHeight));
-				Font font2 = font.deriveFont(AffineTransform.getScaleInstance(
-						width / lineHeight * 1.2, fraction * 1.4));
+				Font font2 = font
+						.deriveFont(AffineTransform.getScaleInstance(width / lineHeight * 1.2, fraction * 1.4));
 
-				GlyphVector glyphvector = font2.createGlyphVector(g
-						.getFontRenderContext(), "" + c);
+				GlyphVector glyphvector = font2.createGlyphVector(g.getFontRenderContext(), "" + c);
 				//
-				Rectangle2D stringSize = font2.getStringBounds("" + c, g
-						.getFontRenderContext());
-				int x = (int) (((position - model
-						.getAnnotationLocationVisible().start()) * width) + (width - stringSize
+				Rectangle2D stringSize = font2.getStringBounds("" + c, g.getFontRenderContext());
+				int x = (int) (((position - model.getAnnotationLocationVisible().start()) * width) + (width - stringSize
 						.getWidth()) / 2);
 				int y = (int) (yOffset + left);
 				// System.out.println("\t"+x+"\t" + (y - yOffset));
@@ -81,15 +81,16 @@ public class SequenceLogoTrack extends Track {
 
 	@Override
 	public int paintTrack(Graphics2D g, Entry e, int yOffset, double screenWidth) {
-		
+		AlignmentAnnotation align = (AlignmentAnnotation) e.data.get(dataKey);
+		if (align == null)
+			return 0;
 		Location r = model.getAnnotationLocationVisible();
 		int lineHeigh = 40;
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0, yOffset, (int) screenWidth, lineHeigh);
 		if (r.length() > 1000000) {
 			g.setColor(Color.BLACK);
-			g.drawString("Too much data in alignment, zoom in to see details",
-					5, yOffset + lineHeigh - 2);
+			g.drawString("Too much data in alignment, zoom in to see details", 5, yOffset + lineHeigh - 2);
 			return lineHeigh;
 		}
 		if (model.getAnnotationLocationVisible().length() < 100) {
@@ -98,66 +99,55 @@ public class SequenceLogoTrack extends Track {
 			for (int i = r.start(); i <= r.end(); i += grouping) {
 				// TODO do something with zoom-out
 
-				SortedMap<Integer, String> map = new TreeMap<Integer, String>(
-						Collections.reverseOrder());
+				SortedMap<Integer, String> map = new TreeMap<Integer, String>(Collections.reverseOrder());
 
-				map.put(e.alignment.getNucleotideCount('a', i), "A");
+				map.put(align.getNucleotideCount('a', i), "A");
 
-				if (map.containsKey(e.alignment.getNucleotideCount('c', i))) {
-					map.put(e.alignment.getNucleotideCount('c', i), map
-							.get(e.alignment.getNucleotideCount('c', i))
-							+ "C");
+				if (map.containsKey(align.getNucleotideCount('c', i))) {
+					map.put(align.getNucleotideCount('c', i), map.get(align.getNucleotideCount('c', i)) + "C");
 				} else {
-					map.put(e.alignment.getNucleotideCount('c', i), "C");
+					map.put(align.getNucleotideCount('c', i), "C");
 				}
-				if (map.containsKey(e.alignment.getNucleotideCount('g', i))) {
-					map.put(e.alignment.getNucleotideCount('g', i), map
-							.get(e.alignment.getNucleotideCount('g', i))
-							+ "G");
+				if (map.containsKey(align.getNucleotideCount('g', i))) {
+					map.put(align.getNucleotideCount('g', i), map.get(align.getNucleotideCount('g', i)) + "G");
 				} else {
-					map.put(e.alignment.getNucleotideCount('g', i), "G");
+					map.put(align.getNucleotideCount('g', i), "G");
 				}
-				if (map.containsKey(e.alignment.getNucleotideCount('t', i))) {
-					map.put(e.alignment.getNucleotideCount('t', i), map
-							.get(e.alignment.getNucleotideCount('t', i))
-							+ "T");
+				if (map.containsKey(align.getNucleotideCount('t', i))) {
+					map.put(align.getNucleotideCount('t', i), map.get(align.getNucleotideCount('t', i)) + "T");
 				} else {
-					map.put(e.alignment.getNucleotideCount('t', i), "T");
+					map.put(align.getNucleotideCount('t', i), "T");
 				}
-				draw(map, g, e.alignment.numAlignments(), i, lineHeigh, model,
-						width, yOffset);
+				draw(map, g, align.numAlignments(), i, lineHeigh, model, width, yOffset);
 			}
 		} else {
 			double width = screenWidth / (double) r.length() / 10.0;
 			int grouping = (int) Math.ceil(1.0 / width);
-//			System.out.println("WG: " + width + "\t" + grouping);
+			// System.out.println("WG: " + width + "\t" + grouping);
 			GeneralPath conservationGP = new GeneralPath();
 			GeneralPath footprintGP = new GeneralPath();
 			conservationGP.moveTo(0, yOffset);
 			footprintGP.moveTo(0, yOffset);
-			for (int i = r.start(); i <= r.end()+grouping; i += grouping) {
+			for (int i = r.start(); i <= r.end() + grouping; i += grouping) {
 
 				double conservation = 0;
 				double footprint = 0;
 				for (int j = 0; j < grouping; j++) {
-					conservation += e.alignment.getConservation(i + j);
-					footprint += e.alignment.getFootprint(i + j);
+					conservation += align.getConservation(i + j);
+					footprint += align.getFootprint(i + j);
 				}
 				conservation /= grouping;
 				footprint /= grouping;
-				conservationGP.lineTo((int) ((i - r.start()) * width * 10),
-						yOffset + (1 - conservation) * lineHeigh);
-				footprintGP.lineTo((int) ((i - r.start()) * width * 10),
-						yOffset + (1 - footprint) *  lineHeigh);
+				conservationGP.lineTo((int) ((i - r.start()) * width * 10), yOffset + (1 - conservation) * lineHeigh);
+				footprintGP.lineTo((int) ((i - r.start()) * width * 10), yOffset + (1 - footprint) * lineHeigh);
 
 			}
 			g.setColor(Color.BLUE);
 			g.draw(conservationGP);
 			g.setColor(Color.RED);
 			g.draw(footprintGP);
-			g.drawString(this.displayName() + " (" + grouping + ")", 10,
-					yOffset + lineHeigh - 2);
-//			return 3 * lineHeigh;
+			g.drawString(this.displayName() + " (" + grouping + ")", 10, yOffset + lineHeigh - 2);
+			// return 3 * lineHeigh;
 		}
 
 		return lineHeigh;

@@ -42,24 +42,24 @@ public class SaveAsAction extends AbstractAction {
     public void actionPerformed(ActionEvent arg0) {
         // TODO currently saves everything in the data model to an EMBL file.
 
-        JFileChooser f = new JFileChooser(Configuration.getFile("lastDirectory"));
-        f.showSaveDialog(model.getParent());
-        File outputFile = f.getSelectedFile();
-        if (outputFile != null) {
-            Configuration.set("lastDirectory", outputFile.getParentFile());
-            Parser p = new EMBLParser();
-            try {
-                FileOutputStream fos = new FileOutputStream(ExtensionManager.extension(outputFile, "embl"));
-                for (Entry e : model.entries()) {
-                    p.write(fos, e, null);
-                }
-                fos.close();
-            } catch (IOException e) {
-
-                e.printStackTrace();
-
-            }
-        }
+//        JFileChooser f = new JFileChooser(Configuration.getFile("lastDirectory"));
+//        f.showSaveDialog(model.getParent());
+//        File outputFile = f.getSelectedFile();
+//        if (outputFile != null) {
+//            Configuration.set("lastDirectory", outputFile.getParentFile());
+//            Parser p = new EMBLParser();
+//            try {
+//                FileOutputStream fos = new FileOutputStream(ExtensionManager.extension(outputFile, "embl"));
+//                for (Entry e : model.entries()) {
+//                    p.write(fos, e, null);
+//                }
+//                fos.close();
+//            } catch (IOException e) {
+//
+//                e.printStackTrace();
+//
+//            }
+//        }
 
     }
 }

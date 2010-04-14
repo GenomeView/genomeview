@@ -16,17 +16,24 @@ import java.util.Map;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
+import net.sf.jannot.Data;
+import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
+import net.sf.jannot.StringKey;
 import net.sf.jannot.alignment.Alignment;
+import net.sf.jannot.alignment.AlignmentAnnotation;
 
 public class MultipleAlignmentTrack extends Track {
-	private int index;
+	// private int index;
 	private String name;
 	double LOG2 = Math.log(2);
 	int bareScale = 32;
 	int bareScaleIndex = 5;
 	private Map<Entry, Buffer> buffers = new HashMap<Entry, Buffer>();
+
+	// private Alignment alignment;
+	// private AlignmentAnnotation entireAlignment;
 
 	class Buffer {
 		private Alignment a;
@@ -86,11 +93,19 @@ public class MultipleAlignmentTrack extends Track {
 
 	}
 
-	public MultipleAlignmentTrack(String name, int index, Model model, boolean b) {
-		super(model, b, false);
-		this.index = index;
-		this.name = name;
+	// public MultipleAlignmentTrack(String name, int index, Model model,
+	// boolean b) {
+	// super(model, b, false);
+	// this.index = index;
+	// this.name = name;
+	//
+	// }
 
+	public MultipleAlignmentTrack(Model model, DataKey key) {
+		super(key, model, true, false);
+		this.name = key.toString();
+		// this.alignment=a;
+		// this.entireAlignment=entireAlignment;
 	}
 
 	@Override
@@ -138,124 +153,129 @@ public class MultipleAlignmentTrack extends Track {
 	public int paintTrack(Graphics2D g, Entry e, int yOffset, double screenWidth) {
 		Location r = model.getAnnotationLocationVisible();
 		int lineHeigh = 20;
-
-		Alignment align = e.alignment.getAlignment(index);
-
-		if (align != null) {
-			if (r.length() > 10000000) {
-				g.setColor(Color.BLACK);
-				g.drawString("Too much data in alignment, zoom in to see details", 5, yOffset + lineHeigh - 2);
-				return lineHeigh;
-			}
-			if (r.length() < 1000) {
-				double width = screenWidth / (double) r.length();
-				int grouping = (int) Math.ceil(1.0 / width);
-				for (int i = r.start(); i <= r.end(); i += grouping) {
-					char nt = ' ';
-					double conservation = 0;
-					boolean dash = false;
-					for (int j = 0; j < grouping; j++) {
-						nt = align.getNucleotide(i + j);
-						conservation += e.alignment.getConservation(i + j);
-						if (nt == '-')
-							dash = true;
-
-					}
-					conservation /= grouping;
-					if ((int)conservation == 1) {
-						// g.setColor(new Color(0x00,0x00,0x33));/*blue */
-						// g.setColor(new Color(0x00,0x33,0x00));/*green */
-						g.setColor(Color.BLACK);
-					} else if (conservation > 0.75) {
-						// g.setColor(new Color(0x00,0x66,0x00));/*green */
-						// g.setColor(new Color(0x00,0x00,0x66));/*blue*/
-						g.setColor(Color.DARK_GRAY);
-					} else if (conservation > 0.5) {
-						// g.setColor(new Color(0x00,0x00,0xff));/*blue*/
-						// g.setColor(new Color(0x00,0xff,0x00));/*green */
-						g.setColor(Color.LIGHT_GRAY);
-					} else
-						// g.setColor(new Color(0xcc,0xff,0x00));
-						g.setColor(Color.WHITE);
-					if (dash) {
-						g.setColor(Color.RED);
-					}
-
-					g.fillRect((int) ((i - r.start()) * width), yOffset, (int) (width * grouping) + 1, lineHeigh);
-					if (align.sizeGapAfter(i) > 0) {
-						g.setColor(Color.ORANGE);
-						g.fillRect((int) ((i - r.start()) * width + width * 3 / 4), yOffset, (int) (width * grouping) / 2 + 1, lineHeigh);
-					}
-					if (model.getAnnotationLocationVisible().length() < 100) {
-						Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
-						if (conservation > 0.75) {
-							g.setColor(Color.WHITE);
-						} else
-							g.setColor(Color.BLACK);
-						g.drawString("" + nt, (int) (((i - r.start()) * width - stringSize.getWidth() / 2) + (width / 2)), yOffset + lineHeigh - 2);
-					}
-				}
-			
-				FontMetrics metrics = g.getFontMetrics();
-				int hgt = metrics.getHeight();
-				int adv = metrics.stringWidth(this.displayName());
-				
-				g.setColor(Color.WHITE);
-				g.fillRect(10, yOffset + lineHeigh-hgt, adv+2, hgt+2);
-				
-				g.setColor(Color.BLUE);
-				// if (model.getAnnotationLocationVisible().length() >= 100)
-				g.drawString(this.displayName(), 10, yOffset + lineHeigh - 2);
-				return lineHeigh;
-			} else {
-
-				double width = screenWidth / (double) r.length() / 5.0;
-
-				int scale = 1;
-				while (scale < (int) Math.ceil(1.0 / width))
-					scale *= 2;
-
-				GeneralPath conservationGP = new GeneralPath();
-				conservationGP.moveTo(0, yOffset);
-
-				int start = r.start() / scale * scale;
-				int end = ((r.end() / scale) + 1) * scale;
-				// if (!cache.hasData(scale, r.start(), r.end())) {
-				// double[] cacheValues = new double[(end - start) / scale];
-				// Buffer b=buffers.get(e);
-				// for (int i = 0; i < cacheValues.length; i++) {
-				// double conservation = 0;
-				// conservation = b.get(start + i * scale, scale);
-				// cacheValues[i] = conservation;
-				// }
-				// cache.store(scale, start, end, cacheValues);
-				// }
-				// /* Plot whatever is in the cache */
-				if (!buffers.containsKey(e))
-					buffers.put(e, new Buffer(e.alignment.getAlignment(index)));
-				Buffer b = buffers.get(e);
-				// double[] cValues = cache.get();
-				// int cStart = cache.start();
-				// int cScale = cache.scale();
-				for (int i = 0; i < (end - start) / scale; i++) {
-					int x = Convert.translateGenomeToScreen(start + i * scale, r, screenWidth) + 5;
-					// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
-					// (lineHeigh - 4) + 2);
-					conservationGP.lineTo(x, yOffset + (1 - b.get(start + i * scale, scale)) * (lineHeigh - 4) + 2);
-				}
-				g.setColor(Color.BLACK);
-				g.draw(conservationGP);
-				g.setColor(Color.BLUE);
-				g.drawString(this.displayName() + " (" + scale + ")", 10, yOffset + lineHeigh - 2);
-				return lineHeigh;
-
-			}
+		AlignmentAnnotation alignment = (AlignmentAnnotation) e.data.get(dataKey);
+		System.out.println("Drawing multiple alignment: "+alignment);
+//		AlignmentAnnotation entireAlignment=(AlignmentAnnotation)e.data.get
+		//FIXME THIS NEEDS TO BE IMPLEMENTED AGAIN...
+		//FIXME all tracks are one
+		//FIXME merge with sequencelogo
+		if (alignment != null) {
+//			if (r.length() > 10000000) {
+//				g.setColor(Color.BLACK);
+//				g.drawString("Too much data in alignment, zoom in to see details", 5, yOffset + lineHeigh - 2);
+//				return lineHeigh;
+//			}
+//			if (r.length() < 1000) {
+//				double width = screenWidth / (double) r.length();
+//				int grouping = (int) Math.ceil(1.0 / width);
+//				for (int i = r.start(); i <= r.end(); i += grouping) {
+//					char nt = ' ';
+//					double conservation = 0;
+//					boolean dash = false;
+//					for (int j = 0; j < grouping; j++) {
+//						nt = alignment.getNucleotide(i + j);
+//						conservation += entireAlignment.getConservation(i + j);
+//						if (nt == '-')
+//							dash = true;
+//
+//					}
+//					conservation /= grouping;
+//					if ((int) conservation == 1) {
+//						// g.setColor(new Color(0x00,0x00,0x33));/*blue */
+//						// g.setColor(new Color(0x00,0x33,0x00));/*green */
+//						g.setColor(Color.BLACK);
+//					} else if (conservation > 0.75) {
+//						// g.setColor(new Color(0x00,0x66,0x00));/*green */
+//						// g.setColor(new Color(0x00,0x00,0x66));/*blue*/
+//						g.setColor(Color.DARK_GRAY);
+//					} else if (conservation > 0.5) {
+//						// g.setColor(new Color(0x00,0x00,0xff));/*blue*/
+//						// g.setColor(new Color(0x00,0xff,0x00));/*green */
+//						g.setColor(Color.LIGHT_GRAY);
+//					} else
+//						// g.setColor(new Color(0xcc,0xff,0x00));
+//						g.setColor(Color.WHITE);
+//					if (dash) {
+//						g.setColor(Color.RED);
+//					}
+//
+//					g.fillRect((int) ((i - r.start()) * width), yOffset, (int) (width * grouping) + 1, lineHeigh);
+//					if (alignment.sizeGapAfter(i) > 0) {
+//						g.setColor(Color.ORANGE);
+//						g.fillRect((int) ((i - r.start()) * width + width * 3 / 4), yOffset,
+//								(int) (width * grouping) / 2 + 1, lineHeigh);
+//					}
+//					if (model.getAnnotationLocationVisible().length() < 100) {
+//						Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
+//						if (conservation > 0.75) {
+//							g.setColor(Color.WHITE);
+//						} else
+//							g.setColor(Color.BLACK);
+//						g.drawString("" + nt,
+//								(int) (((i - r.start()) * width - stringSize.getWidth() / 2) + (width / 2)), yOffset
+//										+ lineHeigh - 2);
+//					}
+//				}
+//
+//				FontMetrics metrics = g.getFontMetrics();
+//				int hgt = metrics.getHeight();
+//				int adv = metrics.stringWidth(this.displayName());
+//
+//				g.setColor(Color.WHITE);
+//				g.fillRect(10, yOffset + lineHeigh - hgt, adv + 2, hgt + 2);
+//
+//				g.setColor(Color.BLUE);
+//				// if (model.getAnnotationLocationVisible().length() >= 100)
+//				g.drawString(this.displayName(), 10, yOffset + lineHeigh - 2);
+//				return lineHeigh;
+//			} else {
+//
+//				double width = screenWidth / (double) r.length() / 5.0;
+//
+//				int scale = 1;
+//				while (scale < (int) Math.ceil(1.0 / width))
+//					scale *= 2;
+//
+//				GeneralPath conservationGP = new GeneralPath();
+//				conservationGP.moveTo(0, yOffset);
+//
+//				int start = r.start() / scale * scale;
+//				int end = ((r.end() / scale) + 1) * scale;
+//				// if (!cache.hasData(scale, r.start(), r.end())) {
+//				// double[] cacheValues = new double[(end - start) / scale];
+//				// Buffer b=buffers.get(e);
+//				// for (int i = 0; i < cacheValues.length; i++) {
+//				// double conservation = 0;
+//				// conservation = b.get(start + i * scale, scale);
+//				// cacheValues[i] = conservation;
+//				// }
+//				// cache.store(scale, start, end, cacheValues);
+//				// }
+//				// /* Plot whatever is in the cache */
+//				if (!buffers.containsKey(e))
+//					buffers.put(e, new Buffer(alignment));
+//				Buffer b = buffers.get(e);
+//				// double[] cValues = cache.get();
+//				// int cStart = cache.start();
+//				// int cScale = cache.scale();
+//				for (int i = 0; i < (end - start) / scale; i++) {
+//					int x = Convert.translateGenomeToScreen(start + i * scale, r, screenWidth) + 5;
+//					// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
+//					// (lineHeigh - 4) + 2);
+//					conservationGP.lineTo(x, yOffset + (1 - b.get(start + i * scale, scale)) * (lineHeigh - 4) + 2);
+//				}
+//				g.setColor(Color.BLACK);
+//				g.draw(conservationGP);
+//				g.setColor(Color.BLUE);
+//				g.drawString(this.displayName() + " (" + scale + ")", 10, yOffset + lineHeigh - 2);
+//				return lineHeigh;
+//
+//			}
 
 		}
 		return 0;
 	}
-
-	public int getIndex() {
-		return index;
-	}
+	// public int getIndex() {
+	// return index;
+	// }
 }

@@ -29,8 +29,11 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.AminoAcidMapping;
+import net.sf.jannot.Data;
+import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
+import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 import net.sf.jannot.Qualifier;
 import net.sf.jannot.Strand;
@@ -180,14 +183,20 @@ public class SearchDialog extends JDialog {
 							performAminoAcidSearch();
 						}
 					} catch (IllegalArgumentException ie) {
-						JOptionPane.showMessageDialog(model.getParent(), "<html>Mismatch search has some limitations:<br/>" + "<table><tr><td>Editing distance</td><td>maximum pattern length</td></tr><tr><td>"
-								+ "1</td><td>15</td></tr><tr><td>" + "2-3</td><td>10</td></tr><tr><td>" + "4-5</td><td>7</td></tr></table></html>", "Too many mismatches", JOptionPane.WARNING_MESSAGE);
+						JOptionPane
+								.showMessageDialog(
+										model.getParent(),
+										"<html>Mismatch search has some limitations:<br/>"
+												+ "<table><tr><td>Editing distance</td><td>maximum pattern length</td></tr><tr><td>"
+												+ "1</td><td>15</td></tr><tr><td>" + "2-3</td><td>10</td></tr><tr><td>"
+												+ "4-5</td><td>7</td></tr></table></html>", "Too many mismatches",
+										JOptionPane.WARNING_MESSAGE);
 					}
 
 				}
 
 				private void performAminoAcidSearch() {
-					byte[] byteSequence = model.getSelectedEntry().sequence.getSequence().toUpperCase().getBytes();
+					byte[] byteSequence = model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
 					byte[] translation = translate(byteSequence, 0);
 					forwardSearch(translation, 0);
 					translation = translate(byteSequence, 1);
@@ -212,7 +221,8 @@ public class SearchDialog extends JDialog {
 					byte[] out = new byte[seq.length / 3];
 					for (int i = 0; i < out.length && 3 * i + offset + 2 < seq.length; i++) {
 						AminoAcidMapping aamap = model.getAAMapping(model.getSelectedEntry());
-						out[i] = (byte) aamap.get("" + (char) seq[3 * i + offset] + (char) seq[3 * i + offset + 1] + (char) seq[3 * i + offset + 2]);
+						out[i] = (byte) aamap.get("" + (char) seq[3 * i + offset] + (char) seq[3 * i + offset + 1]
+								+ (char) seq[3 * i + offset + 2]);
 						// System.out.println((char)out[i]);
 					}
 					return out;
@@ -230,7 +240,8 @@ public class SearchDialog extends JDialog {
 						if (mismatch == 0)
 							lastPos[0] = bm.searchBytes(byteSequence, lastPos[0], byteSequence.length, bytePattern);
 						else
-							lastPos = som.searchBytes(byteSequence, lastPos[0], byteSequence.length, bytePattern, mismatch);
+							lastPos = som.searchBytes(byteSequence, lastPos[0], byteSequence.length, bytePattern,
+									mismatch);
 
 						if (lastPos[0] >= 0) {
 
@@ -241,7 +252,8 @@ public class SearchDialog extends JDialog {
 								l = new Location(lastPos[0], lastPos[0] + bytePattern.length);
 								break;
 							case AminoAcid:
-								l = new Location(lastPos[0] * 3 + offset - 2, lastPos[0] * 3 + bytePattern.length * 3 + offset - 2);
+								l = new Location(lastPos[0] * 3 + offset - 2, lastPos[0] * 3 + bytePattern.length * 3
+										+ offset - 2);
 								break;
 							}
 
@@ -255,7 +267,7 @@ public class SearchDialog extends JDialog {
 				}
 
 				private void performNucleotideSearch() {
-					byte[] byteSequence = model.getSelectedEntry().sequence.getSequence().toUpperCase().getBytes();
+					byte[] byteSequence = model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
 					forwardSearch(byteSequence, 0);
 					reverseArray(byteSequence);
 					for (int i = 0; i < byteSequence.length; i++) {
@@ -291,16 +303,20 @@ public class SearchDialog extends JDialog {
 						if (mismatch == 0)
 							lastPos[0] = bm.searchBytes(byteSequence, lastPos[0], byteSequence.length, bytePattern);
 						else
-							lastPos = som.searchBytes(byteSequence, lastPos[0], byteSequence.length, bytePattern, mismatch);
+							lastPos = som.searchBytes(byteSequence, lastPos[0], byteSequence.length, bytePattern,
+									mismatch);
 
 						if (lastPos[0] >= 0) {
 							Location l = null;
 							switch (type) {
 							case Nucleotide:
-								l = new Location(byteSequence.length - lastPos[0] + 1, byteSequence.length - (lastPos[0] + bytePattern.length) + 1);
+								l = new Location(byteSequence.length - lastPos[0] + 1, byteSequence.length
+										- (lastPos[0] + bytePattern.length) + 1);
 								break;
 							case AminoAcid:
-								l = new Location(byteSequence.length * 3 - lastPos[0] * 3 + 2 - offset, byteSequence.length * 3 - (lastPos[0] * 3 + bytePattern.length * 3) + 2 - offset);
+								l = new Location(byteSequence.length * 3 - lastPos[0] * 3 + 2 - offset,
+										byteSequence.length * 3 - (lastPos[0] * 3 + bytePattern.length * 3) + 2
+												- offset);
 								break;
 
 							}
@@ -346,9 +362,9 @@ public class SearchDialog extends JDialog {
 
 	class FeatureOverlapSearchPane extends GridBagPanel {
 		public FeatureOverlapSearchPane(final Model model) {
-			gc.weightx=1;
-			gc.weighty=0;
-			gc.fill=GridBagConstraints.BOTH;
+			gc.weightx = 1;
+			gc.weighty = 0;
+			gc.fill = GridBagConstraints.BOTH;
 			final JTextArea seq = new JTextArea(7, 30);
 			focusField = seq;
 			final TypeCombo sourceType = new TypeCombo(model);
@@ -362,7 +378,8 @@ public class SearchDialog extends JDialog {
 					Feature f = srm.getFeature(row);
 					model.selectionModel().setLocationSelection(f);
 					double border = 0.05 * (f.end() - f.start());
-					model.setAnnotationLocationVisible(new Location((int) (f.start() - border), (int) (f.end() + border)));
+					model.setAnnotationLocationVisible(new Location((int) (f.start() - border),
+							(int) (f.end() + border)));
 
 				}
 			});
@@ -399,7 +416,7 @@ public class SearchDialog extends JDialog {
 			gc.gridwidth = 2;
 
 			gc.gridy++;
-			gc.weighty=1;
+			gc.weighty = 1;
 			add(new JScrollPane(results), gc);
 
 		}
@@ -413,7 +430,7 @@ public class SearchDialog extends JDialog {
 		private static final long serialVersionUID = -3270709193426284702L;
 
 		public SearchSequencePane(final Model model) {
-			gc.fill=GridBagConstraints.BOTH;
+			gc.fill = GridBagConstraints.BOTH;
 			final JTextArea seq = new JTextArea(7, 30);
 			focusField = seq;
 			final JComboBox mismatch = new JComboBox();
@@ -442,7 +459,8 @@ public class SearchDialog extends JDialog {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
-					srm.search(model, seq.getText().trim(), mismatch.getSelectedIndex(), (SequenceType) type.getSelectedItem());
+					srm.search(model, seq.getText().trim(), mismatch.getSelectedIndex(), (SequenceType) type
+							.getSelectedItem());
 
 				}
 
@@ -491,7 +509,7 @@ public class SearchDialog extends JDialog {
 	class KeywordSearchResultModel extends AbstractTableModel {
 
 		private static final long serialVersionUID = -6980331160054705283L;
-		
+
 		private ArrayList<Feature> features = new ArrayList<Feature>();
 		private ArrayList<Entry> entries = new ArrayList<Entry>();
 
@@ -503,10 +521,11 @@ public class SearchDialog extends JDialog {
 			this.model = model;
 		}
 
-		private String[]columns=new String[]{"Entry","Feature"};
+		private String[] columns = new String[] { "Entry", "Feature" };
+
 		@Override
 		public String getColumnName(int col) {
-			
+
 			return columns[col];
 
 		}
@@ -523,45 +542,52 @@ public class SearchDialog extends JDialog {
 
 		@Override
 		public Object getValueAt(int row, int col) {
-			switch(col){
+			switch (col) {
 			case 0:
 				return entries.get(row);
 			case 1:
 				return features.get(row);
 			}
 			return null;
-			
+
 		}
-		
-		public Entry getEntry(int row){
+
+		public Entry getEntry(int row) {
 			return entries.get(row);
-			
+
 		}
 
 		public void search(String text) {
 			String lowerCaseText = text.toLowerCase();
 			clear();
 			for (Entry e : model.entries()) {
-				for (Type t : Type.values()) {
-					for (Feature f : e.annotation.getByType(t)) {
-						if (!featuresSet.contains(f)) {
-							for (String key : f.getQualifiersKeys()) {
-								for (Qualifier q : f.qualifier(key)) {
-									if (q.getKey().toLowerCase().contains(lowerCaseText) || q.getValue().toLowerCase().contains(lowerCaseText)) {
-										if(!featuresSet.contains(f)){
-											features.add(f);
-											entries.add(e);
-											featuresSet.add(f);
+//				for (Type t : Type.values()) {
+//					for (Feature f : e.annotation.getByType(t)) {
+				for(DataKey d:e.data){
+					if(e.data.get(d) instanceof FeatureAnnotation){
+						for(Feature f:((FeatureAnnotation)e.data.get(d)).get()){
+							if (!featuresSet.contains(f)){
+								for (String key : f.getQualifiersKeys()) {
+									for (Qualifier q : f.qualifier(key)) {
+										if (q.getKey().toLowerCase().contains(lowerCaseText) || q.getValue().toLowerCase().contains(lowerCaseText)) {
+											if(!featuresSet.contains(f)){
+												features.add(f);
+												entries.add(e);
+												featuresSet.add(f);
+											}
 										}
-									}
 
+									}
 								}
 							}
 						}
 					}
 				}
-			}
-			
+			}		
+////					}
+//				}
+//			}
+//			}
 			fireTableDataChanged();
 
 		}
@@ -593,15 +619,15 @@ public class SearchDialog extends JDialog {
 		}
 
 		public void search(Type source, Type target) {
-			for (Feature f : model.getSelectedEntry().annotation.getByType(source)) {
-				for (Feature g : model.getSelectedEntry().annotation.getByType(target)) {
-					if(f.overlaps(g)){
+			for (Feature f : ((FeatureAnnotation)model.getSelectedEntry().data.get(source)).get()) {
+				for (Feature g :  ((FeatureAnnotation)model.getSelectedEntry().data.get(target)).get()) {
+					if (f.overlaps(g)) {
 						features.add(f);
 						break;
 					}
-					
+
 				}
-				
+
 			}
 			fireTableDataChanged();
 
@@ -628,29 +654,30 @@ public class SearchDialog extends JDialog {
 			return features.get(row);
 		}
 
-//		public void search(String text) {
-//			String lowerCaseText = text.toLowerCase();
-//			clear();
-//			for (Entry e : model.entries()) {
-//				for (Type t : Type.values()) {
-//					for (Feature f : e.annotation.getByType(t)) {
-//						if (!featuresSet.contains(f)) {
-//							for (String key : f.getQualifiersKeys()) {
-//								for (Qualifier q : f.qualifier(key)) {
-//									if (q.getKey().toLowerCase().contains(lowerCaseText) || q.getValue().toLowerCase().contains(lowerCaseText)) {
-//										features.add(f);
-//										featuresSet.add(f);
-//									}
-//
-//								}
-//							}
-//						}
-//					}
-//				}
-//			}
-//			fireTableDataChanged();
-//
-//		}
+		// public void search(String text) {
+		// String lowerCaseText = text.toLowerCase();
+		// clear();
+		// for (Entry e : model.entries()) {
+		// for (Type t : Type.values()) {
+		// for (Feature f : e.annotation.getByType(t)) {
+		// if (!featuresSet.contains(f)) {
+		// for (String key : f.getQualifiersKeys()) {
+		// for (Qualifier q : f.qualifier(key)) {
+		// if (q.getKey().toLowerCase().contains(lowerCaseText) ||
+		// q.getValue().toLowerCase().contains(lowerCaseText)) {
+		// features.add(f);
+		// featuresSet.add(f);
+		// }
+		//
+		// }
+		// }
+		// }
+		// }
+		// }
+		// }
+		// fireTableDataChanged();
+		//
+		// }
 
 		public Feature getFeature(int row) {
 			return features.get(row);
@@ -668,9 +695,9 @@ public class SearchDialog extends JDialog {
 		private static final long serialVersionUID = -7531967816569386730L;
 
 		public SearchKeywordPane(final Model model) {
-			gc.weightx=1;
-			gc.weighty=0;
-			gc.fill=GridBagConstraints.BOTH;
+			gc.weightx = 1;
+			gc.weighty = 0;
+			gc.fill = GridBagConstraints.BOTH;
 			final JTextArea text = new JTextArea(5, 30);
 			JButton searchButton = new JButton("Search");
 			JButton clearButton = new JButton("Clear result");
@@ -681,12 +708,13 @@ public class SearchDialog extends JDialog {
 				public void mouseClicked(MouseEvent e) {
 					int row = resultTable.getSelectedRow();
 					Feature f = srm.getFeature(row);
-					Entry entry=srm.getEntry(row);
-					if(model.getSelectedEntry()!=entry)
+					Entry entry = srm.getEntry(row);
+					if (model.getSelectedEntry() != entry)
 						model.setSelectedEntry(entry);
 					model.selectionModel().setLocationSelection(f);
 					double border = 0.05 * (f.end() - f.start());
-					model.setAnnotationLocationVisible(new Location((int) (f.start() - border), (int) (f.end() + border)),true);
+					model.setAnnotationLocationVisible(new Location((int) (f.start() - border),
+							(int) (f.end() + border)), true);
 
 				}
 			});
@@ -720,7 +748,7 @@ public class SearchDialog extends JDialog {
 			gc.gridwidth = 2;
 
 			gc.gridy++;
-			gc.weighty=1;
+			gc.weighty = 1;
 			add(new JScrollPane(resultTable), gc);
 
 		}

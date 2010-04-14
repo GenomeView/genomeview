@@ -31,23 +31,15 @@ public class TestClear {
 
 	class TestDataSource extends DataSource {
 
-		@Override
-		public boolean isDestructiveSave() {
-			return false;
-		}
+
+	
 
 	
 
 		@Override
-		public void saveOwn(EntrySet entries) throws SaveFailedException {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
 		public EntrySet read(EntrySet add) throws ReadFailedException {
 			for(int i=0;i<5;i++)
-				add.getOrCreateEntry("entry"+i, null);
+				add.getOrCreateEntry("entry"+i);
 			return add;
 		}
 

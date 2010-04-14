@@ -26,6 +26,7 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.StrandCombo;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
+import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 import net.sf.jannot.Type;
 
@@ -85,11 +86,13 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     SortedSet<Location> loc = parse(coordinates.getText());
-                    Feature f = new Feature(model.getSelectedEntry().defaultSource);
+                    Feature f = new Feature();
                     f.setLocation(loc);
                     f.setType(typeCombo.getTerm());
                     f.setStrand(strandSelection.getStrand());
-                    model.getSelectedEntry().annotation.add(f);
+//                    model.getSelectedEntry().annotation.add(f);
+                    FeatureAnnotation fa = (FeatureAnnotation) model.getSelectedEntry().data.get(f.type());
+    				fa.add(f);
                     // model.setSelectedRegion(null);
                     _self.dispose();
                 } catch (Exception ex) {

@@ -23,16 +23,19 @@ import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
+import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
+import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
 import be.abeel.util.DefaultHashMap;
 
 public class StructureTrack extends Track {
 	private double letterSpacing;
+	public static final StringKey key = new StringKey("STRUC&*(#%&*(@#%&*(@%(*STRUC");
 
 	public StructureTrack(Model model) {
-		super(model, Configuration.getBoolean("track:showStructure"), false);
+		super(key, model, Configuration.getBoolean("track:showStructure"), false);
 		collisionMap = new CollisionMap(model);
 
 		// this.addMouseListener(this);
@@ -272,9 +275,9 @@ public class StructureTrack extends Track {
 		for (int i = r.start(); i <= r.end(); i++) {
 			char nt;
 			if (forward)
-				nt = model.getSelectedEntry().sequence.getNucleotide(i);
+				nt = model.getSelectedEntry().sequence().getNucleotide(i);
 			else
-				nt = model.getSelectedEntry().sequence.getReverseNucleotide(i);
+				nt = model.getSelectedEntry().sequence().getReverseNucleotide(i);
 			if (spliceSitePaint) {
 				Color spliceSite = checkSpliceSite(i, model, forward);
 
@@ -306,9 +309,9 @@ public class StructureTrack extends Track {
 	private Color checkSpliceSite(int i, Model model, boolean forward) {
 		char nt, nt2;
 		if (forward)
-			nt = model.getSelectedEntry().sequence.getNucleotide(i);
+			nt = model.getSelectedEntry().sequence().getNucleotide(i);
 		else
-			nt = model.getSelectedEntry().sequence.getReverseNucleotide(i);
+			nt = model.getSelectedEntry().sequence().getReverseNucleotide(i);
 		switch (nt) {
 		case 'A':
 			nt = 'a';
@@ -325,9 +328,9 @@ public class StructureTrack extends Track {
 		}
 
 		if (forward)
-			nt2 = model.getSelectedEntry().sequence.getNucleotide(i + 1);
+			nt2 = model.getSelectedEntry().sequence().getNucleotide(i + 1);
 		else
-			nt2 = model.getSelectedEntry().sequence.getReverseNucleotide(i + 1);
+			nt2 = model.getSelectedEntry().sequence().getReverseNucleotide(i + 1);
 		switch (nt2) {
 		case 'A':
 			nt2 = 'a';
@@ -369,15 +372,15 @@ public class StructureTrack extends Track {
 			char aa;
 			String codon;
 			if (forward) {
-				aa = model.getSelectedEntry().sequence.getAminoAcid(i, model.getAAMapping());
-				codon = "" + model.getSelectedEntry().sequence.getNucleotide(i)
-						+ model.getSelectedEntry().sequence.getNucleotide(i + 1)
-						+ model.getSelectedEntry().sequence.getNucleotide(i + 2);
+				aa = model.getSelectedEntry().sequence().getAminoAcid(i, model.getAAMapping());
+				codon = "" + model.getSelectedEntry().sequence().getNucleotide(i)
+						+ model.getSelectedEntry().sequence().getNucleotide(i + 1)
+						+ model.getSelectedEntry().sequence().getNucleotide(i + 2);
 			} else {
-				aa = model.getSelectedEntry().sequence.getReverseAminoAcid(i, model.getAAMapping());
-				codon = "" + model.getSelectedEntry().sequence.getReverseNucleotide(i + 2)
-						+ model.getSelectedEntry().sequence.getReverseNucleotide(i + 1)
-						+ model.getSelectedEntry().sequence.getReverseNucleotide(i);
+				aa = model.getSelectedEntry().sequence().getReverseAminoAcid(i, model.getAAMapping());
+				codon = "" + model.getSelectedEntry().sequence().getReverseNucleotide(i + 2)
+						+ model.getSelectedEntry().sequence().getReverseNucleotide(i + 1)
+						+ model.getSelectedEntry().sequence().getReverseNucleotide(i);
 			}
 			/* draw amino acid box */
 			int x = (int) (((i - r.start()) * width));
@@ -446,13 +449,17 @@ public class StructureTrack extends Track {
 		int y = lineHeight - 2;
 		for (Type type : Type.values()) {
 			if (visibleTypes.get(type)) {
-				List<Feature> trackData = model.getSelectedEntry().annotation.getByType(type, model
-						.getAnnotationLocationVisible());// model
-				if (trackData.size() <= Configuration.getInt("structureview:maximumNoVisibleFeatures")) {
+				// List<Feature> trackData =
+				// model.getSelectedEntry().annotation.getByType(type, model
+				// .getAnnotationLocationVisible());// model
 
+				Location l = model.getAnnotationLocationVisible();
+				FeatureAnnotation annot = (FeatureAnnotation) model.getSelectedEntry().data.get(type);
+				Iterable<Feature> trackData = annot.get(l.start, l.end);
+				if (annot.getEstimateCount(l) <= Configuration.getInt("structureview:maximumNoVisibleFeatures")) {
 					for (Feature rf : trackData) {
-						if (!model.isSourceVisible(rf.getSource()))
-							continue;
+						// if (!model.isSourceVisible(rf.getSource()))
+						// continue;
 
 						g.setColor(Color.BLACK);
 						renderCDS(g, rf, yOffset);
@@ -635,7 +642,7 @@ public class StructureTrack extends Track {
 	@Override
 	public boolean mouseExited(int x, int y, final MouseEvent e) {
 		outside = true;
-//		model.mouseModel().setCurrentCoord(-1);
+		// model.mouseModel().setCurrentCoord(-1);
 		if (dragging) {
 			new Thread(new Runnable() {
 
@@ -725,7 +732,7 @@ public class StructureTrack extends Track {
 			return -2;
 		if (y < 7 * lineHeight + tickHeight)
 			return -3;
-		if (y < 8 * lineHeight + tickHeight)
+		if (y <= 8 * lineHeight + tickHeight)
 			return -4;
 		else
 			throw new RuntimeException("Should never happen");
@@ -829,8 +836,9 @@ public class StructureTrack extends Track {
 		else
 			model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 
-//		int currentX = Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth);
-//		model.mouseModel().setCurrentCoord(currentX);
+		// int currentX = Convert.translateScreenToGenome(e.getX(),
+		// model.getAnnotationLocationVisible(), screenWidth);
+		// model.mouseModel().setCurrentCoord(currentX);
 
 		setChanged();
 		notifyObservers();

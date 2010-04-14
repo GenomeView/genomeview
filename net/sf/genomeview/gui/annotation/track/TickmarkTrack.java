@@ -11,11 +11,13 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
+import net.sf.jannot.StringKey;
 
 public class TickmarkTrack extends Track {
-
+	public static final StringKey key = new StringKey("TICK&*(#%&*(@#%&*(@%(*TICK");
 	public TickmarkTrack(Model model) {
-		super(model,true,false);
+		
+		super(key,model,true,false);
 	}
 
 	@Override

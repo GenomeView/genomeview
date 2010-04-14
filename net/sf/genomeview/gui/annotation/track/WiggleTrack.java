@@ -21,6 +21,7 @@ import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
+import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.wiggle.Graph;
@@ -132,31 +133,39 @@ public class WiggleTrack extends Track {
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent e) {
 		super.mouseMoved(x, y, e);
-		
+
 		if (!e.isConsumed()) {
-			Graph g=entry.graphs.getGraph(name);
-			if(g!=null){
-				int pos=Convert.translateScreenToGenome(e.getX(), currentVisible, screenWidth);
+			Graph g =(Graph)entry.data.get(dataKey);// entry.graphs.getGraph(name);
+			if (g != null) {
+				int pos = Convert.translateScreenToGenome(e.getX(), currentVisible, screenWidth);
 				tooltip.set(g.value(pos), e);
-				
+
 			}
 		}
 		return false;
 
 	}
 
-	private String name;
+	// private String name;
 	private Location currentVisible;
 	private int currentYOffset;
 
-	public WiggleTrack(String name, Model model, boolean b) {
-		super(model, b, true);
-		this.name = name;
+	public WiggleTrack(DataKey key, Model model, boolean b) {
+		super(key, model, b, true);
+		// this.name = name;
 	}
+
+	// public WiggleTrack(DataKey key, Data data) {
+	// // TODO Auto-generated constructor stub
+	// }
+	//
+	// public WiggleTrack(Model model, DataKey key, Data data) {
+	// // TODO Auto-generated constructor stub
+	// }
 
 	@Override
 	public String displayName() {
-		return name;
+		return dataKey.toString();
 	}
 
 	// private HashMap<Entry, Graph> graphs = new HashMap<Entry, Graph>();
@@ -182,7 +191,7 @@ public class WiggleTrack extends Track {
 		g.setColor(Color.BLACK);
 		/* keeps track of the space used during painting */
 		int yUsed = 0;
-		Graph graph = e.graphs.getGraph(name);
+		Graph graph = (Graph)e.data.get(dataKey);//e.graphs.getGraph(name);
 		if (graph != null) {
 			double width = screenWidth / (double) currentVisible.length();
 
@@ -228,14 +237,14 @@ public class WiggleTrack extends Track {
 						conservationGP.lineTo(x, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
 					} else {
 						int top = (int) (yOffset + (1 - val) * graphLineHeigh);
-						g.fillRect(x, top,(int)Math.ceil(2*width*scale), graphLineHeigh - top + yOffset);
+						g.fillRect(x, top, (int) Math.ceil(2 * width * scale), graphLineHeigh - top + yOffset);
 					}
 				} else {
 					g.setColor(Colors.getColorCoding(val));
 					g.fillRect(lastX, yOffset, x - lastX, 10);
 
 				}
-				
+
 				lastX = x;
 
 			}
@@ -246,7 +255,7 @@ public class WiggleTrack extends Track {
 			}
 
 			g.setColor(Color.black);
-			g.drawString(graph.getName(), 10, yOffset + yUsed + 15);
+			g.drawString(displayName(), 10, yOffset + yUsed + 15);
 			if (isCollapsed())
 				yUsed += 10;
 			else

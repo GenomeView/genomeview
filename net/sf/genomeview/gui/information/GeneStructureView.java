@@ -196,7 +196,7 @@ public class GeneStructureView extends JLabel implements Observer {
             Rectangle r = new Rectangle(lmin + hGap, hor + vGap, lmax - lmin, lineHeight);
             /* Draw box */
             Color cdsColor = Configuration.getColor("TYPE_CDS");
-            if (SequenceTools.hasInternalStopCodon(entry.sequence, rf, l,model.getAAMapping())) {
+            if (SequenceTools.hasInternalStopCodon(entry.sequence(), rf, l,model.getAAMapping())) {
                 g.setColor(Color.RED);
             } else {
                 g.setColor(cdsColor);
@@ -209,14 +209,14 @@ public class GeneStructureView extends JLabel implements Observer {
 
             /* Draw wrong splice site lines */
             g.setStroke(new BasicStroke(4.0f));
-            if (SequenceTools.missingDonor(entry.sequence, rf, l)) {
+            if (SequenceTools.missingDonor(entry.sequence(), rf, l)) {
                 g.setColor(Color.RED);
                 if (rf.strand() == Strand.FORWARD)
                     g.drawLine(r.x + r.width, r.y, r.x + r.width, r.y + r.height);
                 else
                     g.drawLine(r.x, r.y, r.x, r.y + r.height);
             }
-            if (SequenceTools.missingAcceptor(entry.sequence, rf, l)) {
+            if (SequenceTools.missingAcceptor(entry.sequence(), rf, l)) {
                 g.setColor(Color.RED);
                 if (rf.strand() == Strand.REVERSE)
                     g.drawLine(r.x + r.width, r.y, r.x + r.width, r.y + r.height);

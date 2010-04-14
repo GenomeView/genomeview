@@ -31,7 +31,7 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
     @Override
     public void update(Observable o, Object obj) {
         if (model.selectionModel().getFeatureSelection().size() == 1 && model.selectionModel().getFeatureSelection().first().type() == Type.get("CDS")) {
-            setEnabled(SequenceTools.hasMissingStopCodon(model.getSelectedEntry().sequence, model.selectionModel().getFeatureSelection()
+            setEnabled(SequenceTools.hasMissingStopCodon(model.getSelectedEntry().sequence(), model.selectionModel().getFeatureSelection()
                     .first(),model.getAAMapping()));
         } else
             setEnabled(false);
@@ -43,13 +43,13 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
         assert (model.selectionModel().getFeatureSelection() != null);
         assert (model.selectionModel().getFeatureSelection().size() == 1);
         Feature rf = model.selectionModel().getFeatureSelection().iterator().next();
-        Sequence seq = model.getSelectedEntry().sequence;
+        Sequence seq = model.getSelectedEntry().sequence();
         String nt = SequenceTools.extractSequence(seq, rf);
         int rest = nt.length() % 3;
-        assert (SequenceTools.hasMissingStopCodon(model.getSelectedEntry().sequence, rf,model.getAAMapping()));
+        assert (SequenceTools.hasMissingStopCodon(model.getSelectedEntry().sequence(), rf,model.getAAMapping()));
         if (rf.strand() == Strand.FORWARD) {
             int start = rf.end() - rest + 1;
-            while (model.getSelectedEntry().sequence.getAminoAcid(start,model.getAAMapping()) != '*') {
+            while (model.getSelectedEntry().sequence().getAminoAcid(start,model.getAAMapping()) != '*') {
                 start += 3;
             }
             start += 2;
@@ -58,7 +58,7 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
         } else if (rf.strand() == Strand.REVERSE) {
             int start = rf.start() + rest;
             System.out.println(start);
-            while (model.getSelectedEntry().sequence.getReverseAminoAcid(start,model.getAAMapping()) != '*') {
+            while (model.getSelectedEntry().sequence().getReverseAminoAcid(start,model.getAAMapping()) != '*') {
 
                 start -= 3;
             }

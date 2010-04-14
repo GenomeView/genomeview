@@ -70,7 +70,7 @@ public class SplitFeatureDialog extends JDialog {
                 }
                 Feature left = f.copy();
                 left.setLocation(upstream);
-                model.getSelectedEntry().annotation.add(left);
+                model.getSelectedEntry().data.getAnnotation(left.type()).add(left);////.annotation.add(left);
 
                 /* Create right feature */
                 SortedSet<Location> downstream = new TreeSet<Location>();
@@ -79,11 +79,11 @@ public class SplitFeatureDialog extends JDialog {
                 }
                 Feature right = f.copy();
                 right.setLocation(downstream);
-                model.getSelectedEntry().annotation.add(right);
+                model.getSelectedEntry().data.getAnnotation(right.type()).add(right);
 
                 /* Remove original features if requested */
                 if (remove.isSelected()) {
-                    model.getSelectedEntry().annotation.remove(f);
+                    model.getSelectedEntry().data.getAnnotation(f.type()).remove(f);
                 }
 
                 model.selectionModel().clearLocationSelection();

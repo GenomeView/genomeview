@@ -15,6 +15,7 @@ import java.util.List;
 import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
+import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.SyntenicBlock;
@@ -27,8 +28,8 @@ import net.sf.jannot.SyntenicBlock;
  */
 public class SyntenicTrack extends Track {
 
-	private String ref;
-	private String target;
+	// private Entry ref;
+	// private String target;
 	private ColorGradient gradient;
 	private int colors = 512;
 
@@ -63,10 +64,10 @@ public class SyntenicTrack extends Track {
 
 	}
 
-	public SyntenicTrack(Model model, String ref, String target) {
-		super(model, true, false);
-		this.ref = ref;
-		this.target = target;
+	public SyntenicTrack(Model model, DataKey ref, String target) {
+		super(ref, model, true, false);
+		// this.ref = ref;
+		// this.target = target;
 		this.gradient = new ColorGradient();
 		gradient.addPoint(Color.red);
 		gradient.addPoint(Color.yellow);
@@ -78,91 +79,107 @@ public class SyntenicTrack extends Track {
 
 	@Override
 	public String displayName() {
-		return "Syntheny " + ref + " - " + target;
+		return "Synteny " + "foo" + " - " + "bar";
 	}
 
 	private HashMap<Rectangle, SyntenicBlock> hitmap = new HashMap<Rectangle, SyntenicBlock>();
 
 	@Override
 	public int paintTrack(Graphics2D g, Entry e, int yOffset, double width) {
-		hitmap.clear();
-
-		if (!e.getID().equals(ref)) {
-			// Dont paint when reference does not match
-			return 0;
-		} else {
-			double colorBlockLength = (e.sequence.size() + 1.0) / colors;
-			/* Reference color scheme in 20 steps */
-			if (target.equals(ref)) {
-				for (int i = 0; i <= 20; i++) {
-					int length = model.getAnnotationLocationVisible().end() - model.getAnnotationLocationVisible().start() + 1;
-					int start = model.getAnnotationLocationVisible().start() + (int) (length / 20.0 * i);
-					int end = model.getAnnotationLocationVisible().start() + (int) (length / 20.0 * (i + 1));
-					Color startColor = gradient.getColor((int) (start / colorBlockLength));
-					Color endColor = gradient.getColor((int) (end / colorBlockLength));
-					int screenStart = Convert.translateGenomeToScreen(start, model.getAnnotationLocationVisible(), width);
-					int screenEnd = Convert.translateGenomeToScreen(end, model.getAnnotationLocationVisible(), width);
-					GradientPaint gp = new GradientPaint(screenStart, 0, startColor, screenEnd, 0, endColor);
-					g.setPaint(gp);
-					g.fillRect(screenStart, yOffset + 15, screenEnd - screenStart + 1, 10);
-
-				}
-
-			} else {
-
-				List<SyntenicBlock> list = model.entries().syntenic.get(e,model.getAnnotationLocationVisible());
-				for (SyntenicBlock sb : list) {
-					if (sb.target().equals(target)) {
-
-						Location targetLoc = sb.targetLocation();
-						Location refLoc = sb.refLocation();
-						if (refLoc.overlaps(model.getAnnotationLocationVisible())) {
-
-							try {
-								// Color startColor = gradient.getColor((int)
-								// (refLoc.start() / colorBlockLength));
-								// Color endColor = gradient.getColor((int)
-								// (refLoc.end() / colorBlockLength));
-								//
-								// int screenStart =
-								// Convert.translateGenomeToScreen(targetLoc.start(),
-								// model.getAnnotationLocationVisible(), width);
-								// int screenEnd =
-								// Convert.translateGenomeToScreen(targetLoc.end(),
-								// model.getAnnotationLocationVisible(), width);
-								Color startColor = gradient.getColor((int) (targetLoc.start() / colorBlockLength));
-								Color endColor = gradient.getColor((int) (targetLoc.end() / colorBlockLength));
-
-								int screenStart = Convert.translateGenomeToScreen(refLoc.start(), model.getAnnotationLocationVisible(), width);
-								int screenEnd = Convert.translateGenomeToScreen(refLoc.end(), model.getAnnotationLocationVisible(), width);
-								GradientPaint gp = new GradientPaint(screenStart, 0, startColor, screenEnd, 0, endColor);
-								g.setPaint(gp);
-								Rectangle r = new Rectangle(screenStart, yOffset + 15, screenEnd - screenStart + 1, 10);
-								g.fill(r);
-								r.translate(0, -yOffset);
-								hitmap.put(r, sb);
-							} catch (Exception x) {
-								System.err.println(refLoc);
-								System.err.println(colorBlockLength);
-							}
-						}
-					}
-				}
-			}
-
-			g.setColor(Color.black);
-			g.drawString(displayName(), 10, yOffset + 13);
-			return 25;
-
-		}
+		return 25;
+		// hitmap.clear();
+		//
+		// if (!e.getID().equals(ref)) {
+		// // Dont paint when reference does not match
+		// return 0;
+		// } else {
+		// double colorBlockLength = (e.sequence.size() + 1.0) / colors;
+		// /* Reference color scheme in 20 steps */
+		// if (target.equals(ref)) {
+		// for (int i = 0; i <= 20; i++) {
+		// int length = model.getAnnotationLocationVisible().end() -
+		// model.getAnnotationLocationVisible().start() + 1;
+		// int start = model.getAnnotationLocationVisible().start() + (int)
+		// (length / 20.0 * i);
+		// int end = model.getAnnotationLocationVisible().start() + (int)
+		// (length / 20.0 * (i + 1));
+		// Color startColor = gradient.getColor((int) (start /
+		// colorBlockLength));
+		// Color endColor = gradient.getColor((int) (end / colorBlockLength));
+		// int screenStart = Convert.translateGenomeToScreen(start,
+		// model.getAnnotationLocationVisible(), width);
+		// int screenEnd = Convert.translateGenomeToScreen(end,
+		// model.getAnnotationLocationVisible(), width);
+		// GradientPaint gp = new GradientPaint(screenStart, 0, startColor,
+		// screenEnd, 0, endColor);
+		// g.setPaint(gp);
+		// g.fillRect(screenStart, yOffset + 15, screenEnd - screenStart + 1,
+		// 10);
+		//
+		// }
+		//
+		// } else {
+		//
+		// List<SyntenicBlock> list =
+		// model.entries().syntenic.get(e,model.getAnnotationLocationVisible());
+		// for (SyntenicBlock sb : list) {
+		// if (sb.target().equals(target)) {
+		//
+		// Location targetLoc = sb.targetLocation();
+		// Location refLoc = sb.refLocation();
+		// if (refLoc.overlaps(model.getAnnotationLocationVisible())) {
+		//
+		// try {
+		// // Color startColor = gradient.getColor((int)
+		// // (refLoc.start() / colorBlockLength));
+		// // Color endColor = gradient.getColor((int)
+		// // (refLoc.end() / colorBlockLength));
+		// //
+		// // int screenStart =
+		// // Convert.translateGenomeToScreen(targetLoc.start(),
+		// // model.getAnnotationLocationVisible(), width);
+		// // int screenEnd =
+		// // Convert.translateGenomeToScreen(targetLoc.end(),
+		// // model.getAnnotationLocationVisible(), width);
+		// Color startColor = gradient.getColor((int) (targetLoc.start() /
+		// colorBlockLength));
+		// Color endColor = gradient.getColor((int) (targetLoc.end() /
+		// colorBlockLength));
+		//
+		// int screenStart = Convert.translateGenomeToScreen(refLoc.start(),
+		// model.getAnnotationLocationVisible(), width);
+		// int screenEnd = Convert.translateGenomeToScreen(refLoc.end(),
+		// model.getAnnotationLocationVisible(), width);
+		// GradientPaint gp = new GradientPaint(screenStart, 0, startColor,
+		// screenEnd, 0, endColor);
+		// g.setPaint(gp);
+		// Rectangle r = new Rectangle(screenStart, yOffset + 15, screenEnd -
+		// screenStart + 1, 10);
+		// g.fill(r);
+		// r.translate(0, -yOffset);
+		// hitmap.put(r, sb);
+		// } catch (Exception x) {
+		// System.err.println(refLoc);
+		// System.err.println(colorBlockLength);
+		// }
+		// }
+		// }
+		// }
+		// }
+		//
+		// g.setColor(Color.black);
+		// g.drawString(displayName(), 10, yOffset + 13);
+		// return 25;
+		//
+		// }
 	}
 
 	public String reference() {
-		return ref;
+		return "foo";
 	}
 
 	public String target() {
-		return target;
+		return "bar";
 	}
 
 }

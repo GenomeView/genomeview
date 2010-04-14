@@ -14,7 +14,7 @@ final public class DummyEntry extends Entry {
 	
 	public static Entry dummy=new DummyEntry();
 	private DummyEntry() {
-		super("Nothing loaded", null);
+		super("Nothing loaded");
 	}
 
 }
