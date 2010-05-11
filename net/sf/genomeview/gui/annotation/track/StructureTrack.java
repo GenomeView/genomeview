@@ -454,7 +454,7 @@ public class StructureTrack extends Track {
 				// .getAnnotationLocationVisible());// model
 
 				Location l = model.getAnnotationLocationVisible();
-				FeatureAnnotation annot = (FeatureAnnotation) model.getSelectedEntry().data.get(type);
+				FeatureAnnotation annot =  model.getSelectedEntry().getAnnotation(type);
 				Iterable<Feature> trackData = annot.get(l.start, l.end);
 				if (annot.getEstimateCount(l) <= Configuration.getInt("structureview:maximumNoVisibleFeatures")) {
 					for (Feature rf : trackData) {

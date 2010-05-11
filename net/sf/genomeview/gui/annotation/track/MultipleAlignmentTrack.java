@@ -153,7 +153,7 @@ public class MultipleAlignmentTrack extends Track {
 	public int paintTrack(Graphics2D g, Entry e, int yOffset, double screenWidth) {
 		Location r = model.getAnnotationLocationVisible();
 		int lineHeigh = 20;
-		AlignmentAnnotation alignment = (AlignmentAnnotation) e.data.get(dataKey);
+		AlignmentAnnotation alignment = (AlignmentAnnotation) e.get(dataKey);
 		System.out.println("Drawing multiple alignment: "+alignment);
 //		AlignmentAnnotation entireAlignment=(AlignmentAnnotation)e.data.get
 		//FIXME THIS NEEDS TO BE IMPLEMENTED AGAIN...

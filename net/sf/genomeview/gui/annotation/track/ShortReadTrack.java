@@ -106,7 +106,7 @@ public class ShortReadTrack extends Track {
 			if (!tooltip.isVisible())
 				tooltip.setVisible(true);
 			// ReadGroup rg = currentEntry.shortReads.getReadGroup(this.source);
-			ReadGroup rg = (ReadGroup) currentEntry.data.get(dataKey);
+			ReadGroup rg = (ReadGroup) currentEntry.get(dataKey);
 			ShortReadCoverage currentBuffer = rg.getCoverage();
 			int start = Convert.translateScreenToGenome(x, currentVisible, currentScreenWidth);
 			int f = (int) currentBuffer.get(Strand.FORWARD, start - 1);
@@ -210,7 +210,7 @@ public class ShortReadTrack extends Track {
 		int start = currentVisible.start / scale * scale;
 		int end = ((currentVisible.end / scale) + 1) * scale;
 
-		ReadGroup rg = (ReadGroup) entry.data.get(dataKey);// entry.shortReads.getReadGroup(source);
+		ReadGroup rg = (ReadGroup) entry.get(dataKey);// entry.shortReads.getReadGroup(source);
 		if (rg == null)
 			return 0;
 		ShortReadCoverage graph = rg.getCoverage();// .get(rg);
@@ -301,7 +301,7 @@ public class ShortReadTrack extends Track {
 		 */
 		Iterable<ShortRead> reads = null;
 		boolean timeout = false;
-		int readLength = ((ReadGroup) entry.data.get(dataKey)).readLength();// entry.shortReads.getReadGroup(source).readLength();
+		int readLength = ((ReadGroup) entry.get(dataKey)).readLength();// entry.shortReads.getReadGroup(source).readLength();
 		if (!isCollapsed() && (currentVisible.length() > maxRegion)) {
 			g.setColor(Color.BLACK);
 			g.drawString("Region too big (max " + maxRegion + " nt), zoom in", 10, yOffset + 10);

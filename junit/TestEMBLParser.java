@@ -29,7 +29,7 @@ public class TestEMBLParser {
             EntrySet entries = parser.parse(new FileInputStream("sample2.embl"), null);
 
 //            System.out.println("ACC:" + entries[0].description.getAccessionNumbers());
-            Iterable<Feature> fs = ((FeatureAnnotation)entries.getEntry().data.get(Type.get("CDS"))).get(1, 12000);
+            Iterable<Feature> fs = ((FeatureAnnotation)entries.getEntry().get(Type.get("CDS"))).get(1, 12000);
             for (Feature f : fs) {
                 // System.out.println(f.type());
                 // System.out.println(f.location());

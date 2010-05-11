@@ -123,7 +123,7 @@ public class DAS extends DataSource {
 			List<Feature> list = this.getFeatures(source, ep);
 			for(Feature f:list){
 //				out.annotation.addAll(list);
-				FeatureAnnotation fa = (FeatureAnnotation) out.data.get(f.type());
+				FeatureAnnotation fa = out.getAnnotation(f.type());
 				fa.add(f);
 			}
 		}

@@ -68,7 +68,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		Location full = new Location(1, model.getSelectedEntry().size());
+		Location full = new Location(1, model.getSelectedEntry().getMaximumLength());
 		int pressedX = Convert.translateScreenToGenome(pressed.getX(), full, this.getWidth());
 		if (left) {
 			int mouseX = Convert.translateScreenToGenome(e.getX(), full, this.getWidth());
@@ -114,7 +114,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 		super.paintComponent(g1);
 		Graphics2D g = (Graphics2D) g1;
 		/* Paint tick marks */
-		Location r = new Location(1, model.getSelectedEntry().size());
+		Location r = new Location(1, model.getSelectedEntry().getMaximumLength());
 		g.setColor(Color.BLACK);
 		g.drawLine(0, 15, g.getClipBounds().width, 15);
 
@@ -159,7 +159,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	private void loc(Graphics2D g,Location current,Color light,Color dark) {
 		Dimension dim = this.getSize();
-		Location full = new Location(1, model.getSelectedEntry().size());
+		Location full = new Location(1, model.getSelectedEntry().getMaximumLength());
 		int start = Convert.translateGenomeToScreen(current.start(), full, dim.width);
 		int end = Convert.translateGenomeToScreen(current.end(), full, dim.width);
 	
@@ -221,7 +221,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		Location full = new Location(1, model.getSelectedEntry().size());
+		Location full = new Location(1, model.getSelectedEntry().getMaximumLength());
 		int x = Convert.translateScreenToGenome(pressed.getX(), full, this.getWidth());
 		model.center(x);
 	}

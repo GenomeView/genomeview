@@ -91,7 +91,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
                     f.setType(typeCombo.getTerm());
                     f.setStrand(strandSelection.getStrand());
 //                    model.getSelectedEntry().annotation.add(f);
-                    FeatureAnnotation fa = (FeatureAnnotation) model.getSelectedEntry().data.get(f.type());
+                    FeatureAnnotation fa = (FeatureAnnotation) model.getSelectedEntry().get(f.type());
     				fa.add(f);
                     // model.setSelectedRegion(null);
                     _self.dispose();

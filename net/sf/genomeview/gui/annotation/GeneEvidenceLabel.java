@@ -256,8 +256,8 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 					start=1;
 					end = pressLoc.length();
 				}
-				if (end>model.getSelectedEntry().size()){
-					end = model.getSelectedEntry().size();
+				if (end>model.getSelectedEntry().getMaximumLength()){
+					end = model.getSelectedEntry().getMaximumLength();
 					start = end - pressLoc.length();
 				}
 				model.setAnnotationLocationVisible(new Location(start, end));

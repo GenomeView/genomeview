@@ -73,14 +73,14 @@ public class MergeFeatureDialog extends JDialog {
 
                 copy.setLocation(locations);
                 /* Add new feature to the annotation */
-                ((FeatureAnnotation)model.getSelectedEntry().data.get(copy.type())).add(copy);
+                ((FeatureAnnotation)model.getSelectedEntry().get(copy.type())).add(copy);
 
                 /* If requested, the original features are deleted */
                 if (remove.isSelected()) {
                     Set<Feature> toRemove = new HashSet<Feature>();
                     toRemove.addAll(model.selectionModel().getFeatureSelection());
                     for (Feature rf : toRemove)
-                    	((FeatureAnnotation)model.getSelectedEntry().data.get(rf.type())).remove(rf);
+                    	((FeatureAnnotation)model.getSelectedEntry().get(rf.type())).remove(rf);
                 }
                 model.selectionModel().clearLocationSelection();
 

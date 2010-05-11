@@ -563,9 +563,9 @@ public class SearchDialog extends JDialog {
 			for (Entry e : model.entries()) {
 //				for (Type t : Type.values()) {
 //					for (Feature f : e.annotation.getByType(t)) {
-				for(DataKey d:e.data){
-					if(e.data.get(d) instanceof FeatureAnnotation){
-						for(Feature f:((FeatureAnnotation)e.data.get(d)).get()){
+				for(DataKey d:e){
+					if(e.get(d) instanceof FeatureAnnotation){
+						for(Feature f:((FeatureAnnotation)e.get(d)).get()){
 							if (!featuresSet.contains(f)){
 								for (String key : f.getQualifiersKeys()) {
 									for (Qualifier q : f.qualifier(key)) {
@@ -619,8 +619,8 @@ public class SearchDialog extends JDialog {
 		}
 
 		public void search(Type source, Type target) {
-			for (Feature f : ((FeatureAnnotation)model.getSelectedEntry().data.get(source)).get()) {
-				for (Feature g :  ((FeatureAnnotation)model.getSelectedEntry().data.get(target)).get()) {
+			for (Feature f : ((FeatureAnnotation)model.getSelectedEntry().get(source)).get()) {
+				for (Feature g :  ((FeatureAnnotation)model.getSelectedEntry().get(target)).get()) {
 					if (f.overlaps(g)) {
 						features.add(f);
 						break;

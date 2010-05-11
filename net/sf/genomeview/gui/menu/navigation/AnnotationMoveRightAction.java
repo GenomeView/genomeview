@@ -22,7 +22,7 @@ public class AnnotationMoveRightAction extends AbstractModelAction {
 
     @Override
     public void update(Observable o, Object obj) {
-        setEnabled(model.getAnnotationLocationVisible().end() < model.getSelectedEntry().size());
+        setEnabled(model.getAnnotationLocationVisible().end() < model.getSelectedEntry().getMaximumLength());
     }
 
     /**

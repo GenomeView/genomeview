@@ -61,7 +61,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 
 	@Override
 	public int getRowCount() {
-		FeatureAnnotation fa = model.getSelectedEntry().data.getAnnotation(type);
+		FeatureAnnotation fa = model.getSelectedEntry().getAnnotation(type);
 		return fa.cachedCount();// .noFeatures(type);
 	}
 
@@ -83,7 +83,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	}
 
 	public Feature getFeature(int row) {
-		return model.getSelectedEntry().data.getAnnotation(type).getCached(row);
+		return model.getSelectedEntry().getAnnotation(type).getCached(row);
 	}
 
 	@Override
@@ -123,7 +123,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	}
 
 	public int getRow(Feature first) {
-		return model.getSelectedEntry().data.getAnnotation(type).getCachedIndexOf(first);
+		return model.getSelectedEntry().getAnnotation(type).getCachedIndexOf(first);
 
 	}
 

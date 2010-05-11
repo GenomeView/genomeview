@@ -27,7 +27,7 @@ public class AnnotationEndAction extends AbstractModelAction {
     @Override
     public void actionPerformed(ActionEvent arg0) {
         Location r = model.getAnnotationLocationVisible();
-        model.setAnnotationLocationVisible(new Location(model.getSelectedEntry().size()-r.length(),model.getSelectedEntry().size()));
+        model.setAnnotationLocationVisible(new Location(model.getSelectedEntry().getMaximumLength()-r.length(),model.getSelectedEntry().getMaximumLength()));
 
     }
 

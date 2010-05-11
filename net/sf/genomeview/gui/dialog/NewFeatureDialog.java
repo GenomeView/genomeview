@@ -68,7 +68,7 @@ public class NewFeatureDialog extends JDialog {
                 f.setLocation(loc);
                 f.setType(typeCombo.getTerm());
                 f.setStrand(strandSelection.getStrand());
-                FeatureAnnotation fa = (FeatureAnnotation) model.getSelectedEntry().data.get(f.type());
+                FeatureAnnotation fa = (FeatureAnnotation) model.getSelectedEntry().get(f.type());
 				fa.add(f);
                // model.getSelectedEntry().annotation.add(f);
                 model.selectionModel().setSelectedRegion(null);

@@ -135,7 +135,7 @@ public class WiggleTrack extends Track {
 		super.mouseMoved(x, y, e);
 
 		if (!e.isConsumed()) {
-			Graph g =(Graph)entry.data.get(dataKey);// entry.graphs.getGraph(name);
+			Graph g =(Graph)entry.get(dataKey);// entry.graphs.getGraph(name);
 			if (g != null) {
 				int pos = Convert.translateScreenToGenome(e.getX(), currentVisible, screenWidth);
 				tooltip.set(g.value(pos), e);
@@ -191,7 +191,7 @@ public class WiggleTrack extends Track {
 		g.setColor(Color.BLACK);
 		/* keeps track of the space used during painting */
 		int yUsed = 0;
-		Graph graph = (Graph)e.data.get(dataKey);//e.graphs.getGraph(name);
+		Graph graph = (Graph)e.get(dataKey);//e.graphs.getGraph(name);
 		if (graph != null) {
 			double width = screenWidth / (double) currentVisible.length();
 

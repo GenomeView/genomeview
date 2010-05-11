@@ -157,7 +157,7 @@ public class MultipleAlignmentTrack2 extends Track {
 	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
 		// this.yOffset = yOffset;
 		currentYOffset = yOffset;
-		MultipleAlignment ma=(MultipleAlignment)entry.data.get(dataKey);
+		MultipleAlignment ma=(MultipleAlignment)entry.get(dataKey);
 		if (ordering.size() != model.entries().size()) {
 			updateOrdering();
 

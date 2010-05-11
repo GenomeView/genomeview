@@ -205,7 +205,7 @@ public class Model extends Observable implements IModel {
 			modStart = 1;
 			modEnd = r.length();
 		}
-		int chromLength = getSelectedEntry().size();
+		int chromLength = getSelectedEntry().getMaximumLength();
 		if (r.end < chromLength || chromLength == 0) {
 			modEnd = r.end;
 		} else {
@@ -600,8 +600,8 @@ public class Model extends Observable implements IModel {
 		// }
 		for (Entry e : entries) {
 			/* Graph tracks */
-			for (DataKey key : e.data) {
-				Data data = e.data.get(key);
+			for (DataKey key : e) {
+				Data data = e.get(key);
 				if (data instanceof FeatureAnnotation) {
 					if (!trackList.containsTrack(key))
 						trackList.add(new FeatureTrack(this,(Type)key));

@@ -81,7 +81,7 @@ public class SequenceLogoTrack extends Track {
 
 	@Override
 	public int paintTrack(Graphics2D g, Entry e, int yOffset, double screenWidth) {
-		AlignmentAnnotation align = (AlignmentAnnotation) e.data.get(dataKey);
+		AlignmentAnnotation align = (AlignmentAnnotation) e.get(dataKey);
 		if (align == null)
 			return 0;
 		Location r = model.getAnnotationLocationVisible();
