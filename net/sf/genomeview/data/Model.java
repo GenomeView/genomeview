@@ -37,8 +37,8 @@ import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
-import net.sf.jannot.alignment.AlignmentAnnotation;
-import net.sf.jannot.alignment.MultipleAlignment;
+import net.sf.jannot.alignment.maf.MAFMultipleAlignment;
+import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.shortread.ReadGroup;
@@ -620,7 +620,7 @@ public class Model extends Observable implements IModel {
 						trackList.add(new ShortReadTrack(key, this));
 					}
 				}
-				if (data instanceof MultipleAlignment) {
+				if (data instanceof MAFMultipleAlignment) {
 					if (!trackList.containsTrack(key)) {
 						trackList.add(new MultipleAlignmentTrack2(this, key));
 						// logger.info("Added multiple alignment track " + ma);

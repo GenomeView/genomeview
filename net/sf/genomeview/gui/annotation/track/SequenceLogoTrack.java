@@ -21,7 +21,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
-import net.sf.jannot.alignment.AlignmentAnnotation;
+import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 
 /**
  * Represents the conservation at a position with a sequence logo.

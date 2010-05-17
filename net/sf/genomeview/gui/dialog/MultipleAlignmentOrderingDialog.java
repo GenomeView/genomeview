@@ -42,7 +42,7 @@ import net.sf.jannot.Type;
  * 
  */
 public class MultipleAlignmentOrderingDialog extends JDialog {
-	public MultipleAlignmentOrderingDialog(Model model,BiMap<Entry, Integer> ordering) {
+	public MultipleAlignmentOrderingDialog(Model model,BiMap<String, Integer> ordering) {
 		setModal(true);
 		final JDialog _self=this;
 		final OrderingTableModel listModel = new OrderingTableModel(ordering);
@@ -74,10 +74,10 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 		private boolean draggingRow = false;
 		private int startDragPoint;
 		private int dyOffset;
-		private BiMap<Integer, Entry> ordering;
+		private BiMap<Integer, String> ordering;
 		private Model model;
 
-		public DragDropRowTableUI(Model model,BiMap<Integer, Entry>ordering){
+		public DragDropRowTableUI(Model model,BiMap<Integer, String>ordering){
 			this.ordering=ordering;
 			this.model=model;
 		}
@@ -133,8 +133,8 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 					}
 
 					if (toRow >= 0 && toRow < table.getRowCount()) {
-						Entry a=ordering.get(fromRow);
-						Entry b=ordering.get(toRow);
+						String a=ordering.get(fromRow);
+						String b=ordering.get(toRow);
 						ordering.forcePut(fromRow, b);
 						ordering.forcePut(toRow, a);
 						table.setRowSelectionInterval(toRow, toRow);
@@ -157,7 +157,7 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 	}
 
 	class OrderingTableModel extends AbstractTableModel {
-		private BiMap<Integer, Entry> ordering;
+		private BiMap<Integer, String> ordering;
 
 		@Override
 		public String getColumnName(int column) {
@@ -166,7 +166,7 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 
 		
 
-		public OrderingTableModel(BiMap<Entry, Integer> ordering2) {
+		public OrderingTableModel(BiMap<String, Integer> ordering2) {
 			this.ordering=ordering2.inverse();
 		}
 

@@ -21,8 +21,8 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.StringKey;
-import net.sf.jannot.alignment.Alignment;
-import net.sf.jannot.alignment.AlignmentAnnotation;
+import net.sf.jannot.alignment.mfa.Alignment;
+import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 
 public class MultipleAlignmentTrack extends Track {
 	// private int index;
