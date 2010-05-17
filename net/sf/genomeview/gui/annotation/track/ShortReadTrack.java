@@ -35,7 +35,6 @@ import net.sf.jannot.shortread.ExtendedShortRead;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortRead;
 import net.sf.jannot.shortread.ShortReadCoverage;
-import net.sf.jannot.source.DataSource;
 import net.sf.samtools.CigarElement;
 import net.sf.samtools.CigarOperator;
 
@@ -127,7 +126,7 @@ public class ShortReadTrack extends Track {
 		return false;
 	}
 
-	private DataSource source;
+	//private DataSource source;
 
 	private int scale = 1;
 	private int scaleIndex = 0;
@@ -150,10 +149,6 @@ public class ShortReadTrack extends Track {
 
 	private double log2(double d) {
 		return Math.log(d) / LOG2;
-	}
-
-	class ShortReadTrackConfiguration {
-
 	}
 
 	@Override
@@ -290,7 +285,7 @@ public class ShortReadTrack extends Track {
 		g.setColor(Color.BLUE);
 		g.drawLine(0, yOffset, 5, yOffset);
 		g.drawString("" + topValue, 10, yOffset + 12 - 2);
-		g.drawString(StaticUtils.shortify(source.toString()) + " (" + scale + ")", 10, yOffset + 24 - 2);
+		g.drawString(StaticUtils.shortify(super.dataKey.toString()) + " (" + scale + ")", 10, yOffset + 24 - 2);
 		yOffset += graphLineHeigh;
 		g.drawLine(0, yOffset, 5, yOffset);
 		g.drawString("" + bottomValue, 10, yOffset - 2);
@@ -300,7 +295,7 @@ public class ShortReadTrack extends Track {
 		 * Draw individual reads when possible
 		 */
 		Iterable<ShortRead> reads = null;
-		boolean timeout = false;
+	
 		int readLength = ((ReadGroup) entry.get(dataKey)).readLength();// entry.shortReads.getReadGroup(source).readLength();
 		if (!isCollapsed() && (currentVisible.length() > maxRegion)) {
 			g.setColor(Color.BLACK);
@@ -688,10 +683,10 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public String displayName() {
-		return "Short reads: " + source.toString();
+		return "Short reads: " + super.dataKey;
 	}
 
-	public DataSource source() {
-		return source;
-	}
+//	public DataSource source() {
+//		return source;
+//	}
 }

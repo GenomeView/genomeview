@@ -21,7 +21,6 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
 import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack;
 import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack2;
-import net.sf.genomeview.gui.annotation.track.SequenceLogoTrack;
 import net.sf.genomeview.gui.annotation.track.ShortReadTrack;
 import net.sf.genomeview.gui.annotation.track.StructureTrack;
 import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
@@ -38,7 +37,6 @@ import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
-import net.sf.jannot.alignment.Alignment;
 import net.sf.jannot.alignment.AlignmentAnnotation;
 import net.sf.jannot.alignment.MultipleAlignment;
 import net.sf.jannot.event.ChangeEvent;
@@ -601,7 +599,7 @@ public class Model extends Observable implements IModel {
 		for (Entry e : entries) {
 			/* Graph tracks */
 			for (DataKey key : e) {
-				Data data = e.get(key);
+				Data<?> data = e.get(key);
 				if (data instanceof FeatureAnnotation) {
 					if (!trackList.containsTrack(key))
 						trackList.add(new FeatureTrack(this,(Type)key));
@@ -618,8 +616,9 @@ public class Model extends Observable implements IModel {
 
 				}
 				if (data instanceof ReadGroup) {
-					if (!trackList.containsTrack(key))
+					if (!trackList.containsTrack(key)){
 						trackList.add(new ShortReadTrack(key, this));
+					}
 				}
 				if (data instanceof MultipleAlignment) {
 					if (!trackList.containsTrack(key)) {
