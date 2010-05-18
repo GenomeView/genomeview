@@ -8,33 +8,21 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
 import java.util.Observable;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.ToolTipManager;
 import javax.swing.event.MouseInputListener;
 import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.AbstractTableModel;
 
-import com.google.common.collect.BiMap;
-
-
-
-import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.annotation.track.FeatureTrack;
-import net.sf.genomeview.gui.annotation.track.StructureTrack;
-import net.sf.genomeview.gui.annotation.track.Track;
-import net.sf.jannot.Entry;
-import net.sf.jannot.Type;
+
+import com.google.common.collect.BiMap;
 
 /**
  * 

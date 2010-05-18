@@ -145,9 +145,6 @@ public class MultipleAlignmentTrack2 extends Track {
 
 		@Override
 		public int compare(AlignmentSequence o1, AlignmentSequence o2) {
-//			System.out.println(ordering);
-//			System.out.println(o1.getName());
-//			System.out.println(o2.getName());
 			return ordering.get(o1.getName()).compareTo(ordering.get(o2.getName()));
 		}
 	}
@@ -167,8 +164,13 @@ public class MultipleAlignmentTrack2 extends Track {
 			g.drawString("No multiple alignment loaded for this entry", 10, yOffset + 10);
 			return 20 + 5;
 		}
-		if (ordering.size() != model.entries().size()) {
-			updateOrdering(entry);
+		/* Make sure there is an ordering, start with the one from the species in the MA*/
+		if (ordering.size() != ma.species().size()) {
+			ordering.clear();
+			int i=0;
+			for (String e : ma.species()) {
+				ordering.put(e, i++);
+			}
 
 		}
 
@@ -435,17 +437,17 @@ public class MultipleAlignmentTrack2 extends Track {
 		}
 	}
 
-	private void updateOrdering(Entry entry) {
-		MAFMultipleAlignment ma = (MAFMultipleAlignment) entry.get(dataKey);
-		// TODO keep old ones, only add new ones.
-		ordering.clear();
-		int i = 0;
-		for (String e : ma.species()) {
-			ordering.put(e, i++);
-		}
-		// System.out.println(ordering);
-
-	}
+//	private void updateOrdering(Entry entry) {
+//		MAFMultipleAlignment ma = (MAFMultipleAlignment) entry.get(dataKey);
+//		// TODO keep old ones, only add new ones.
+//		ordering.clear();
+//		int i = 0;
+//		for (String e : ma.species()) {
+//			ordering.put(e, i++);
+//		}
+//		// System.out.println(ordering);
+//
+//	}
 
 	@Override
 	public String displayName() {
