@@ -158,11 +158,7 @@ public class MultipleAlignmentTrack extends Track {
 		Location r = model.getAnnotationLocationVisible();
 		int lineHeigh = 20;
 		AlignmentAnnotation entireAlignment = (AlignmentAnnotation) e.get(dataKey);
-		//System.out.println("Drawing multiple alignment: " + entireAlignment);
-
-		// FIXME THIS NEEDS TO BE IMPLEMENTED AGAIN...
-		// FIXME all tracks are one
-		// FIXME merge with sequencelogo
+		
 		if (entireAlignment != null) {
 			if (r.length() > 10000000) {
 				g.setColor(Color.BLACK);
