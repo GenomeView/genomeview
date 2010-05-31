@@ -154,7 +154,7 @@ public class DataSourceFactory {
 							public boolean accept(File f) {
 								if (f.isDirectory())
 									return true;
-								return f.getName().endsWith(ext) || f.getName().endsWith(ext + ".gz");
+								return f.getName().toLowerCase().endsWith(ext) || f.getName().toLowerCase().endsWith(ext + ".gz");
 							}
 
 							@Override
@@ -172,7 +172,7 @@ public class DataSourceFactory {
 								return true;
 							for (String ext : extensions) {
 
-								if (f.getName().endsWith(ext) || f.getName().endsWith(ext + ".gz")) {
+								if (f.getName().toLowerCase().endsWith(ext) || f.getName().toLowerCase().endsWith(ext + ".gz")) {
 									return true;
 								}
 							}
