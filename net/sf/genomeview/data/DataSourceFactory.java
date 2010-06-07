@@ -22,6 +22,7 @@ import net.sf.genomeview.data.das.DAS;
 import net.sf.genomeview.data.das.DAS.EntryPoint;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
+import net.sf.jannot.source.IndexedFastaDataSource;
 import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.source.SAMDataSource;
 import net.sf.jannot.source.SSL;
@@ -29,7 +30,7 @@ import net.sf.jannot.source.URLSource;
 
 public class DataSourceFactory {
 	private static Logger log = Logger.getLogger(DataSourceFactory.class.getCanonicalName());
-	
+
 	public enum Sources {
 		LOCALFILE, URL, DIRECTORY, DAS;
 		@Override
@@ -48,30 +49,23 @@ public class DataSourceFactory {
 		}
 	}
 
-	public static SAMDataSource constructSAM(URL url) throws IOException {
-		SSL.certify(url);
-		return new SAMDataSource(url);
+//	private static SAMDataSource constructSAM(URL url) throws IOException {
+//		SSL.certify(url);
+//		return new SAMDataSource(url);
+//
+//	}
 
-	}
-	public static SAMDataSource constructSAM(File file) throws IOException {
-		return new SAMDataSource(file);
-
-	}
-	
-	
 	public static DataSource createURL(URL url) throws IOException {
-		String urlString = url.toString();
-		log.info("creating URL:" + urlString);
-		if (urlString.endsWith(".bai")) {
-			url = new URL(urlString.substring(0, urlString.length() - 4));
-			return constructSAM(url);
+		DataSource indexedSource = tryIndexedStuff(url);
+		if (indexedSource != null) {
+			return indexedSource;
 		} else {
-			if(Configuration.getBoolean("general:disableURLCaching")){
-				return new URLSource(url);	
-			}else{
+			if (Configuration.getBoolean("general:disableURLCaching")) {
+				return new URLSource(url);
+			} else {
 				return new CachedURLSource(url);
 			}
-			
+
 		}
 	}
 
@@ -114,11 +108,11 @@ public class DataSourceFactory {
 		case URL:
 
 			try {
-				String input=JOptionPane.showInputDialog(model.getParent(), "Give the URL of the data");
-				if(input!=null&&input.trim().length()>0){
+				String input = JOptionPane.showInputDialog(model.getParent(), "Give the URL of the data");
+				if (input != null && input.trim().length() > 0) {
 					URL url = new URI(input.trim()).toURL();
 					return new DataSource[] { createURL(url) };
-				}else
+				} else
 					return null;
 
 			} catch (Exception e) {
@@ -131,9 +125,11 @@ public class DataSourceFactory {
 				DAS das = new DAS(url);
 				List<String> refs = das.getReferences();
 				Collections.sort(refs);
-				String ref = (String) JOptionPane.showInputDialog(model.getParent(), "Select reference genome", "Reference selection", JOptionPane.INFORMATION_MESSAGE, null, refs.toArray(), refs.get(0));
+				String ref = (String) JOptionPane.showInputDialog(model.getParent(), "Select reference genome",
+						"Reference selection", JOptionPane.INFORMATION_MESSAGE, null, refs.toArray(), refs.get(0));
 				List<EntryPoint> eps = das.getEntryPoints(ref);
-				EntryPoint ep = (EntryPoint) JOptionPane.showInputDialog(model.getParent(), "Select entry point", "Entry point selection", JOptionPane.INFORMATION_MESSAGE, null, eps.toArray(), eps.get(0));
+				EntryPoint ep = (EntryPoint) JOptionPane.showInputDialog(model.getParent(), "Select entry point",
+						"Entry point selection", JOptionPane.INFORMATION_MESSAGE, null, eps.toArray(), eps.get(0));
 				das.setEntryPoint(ep);
 				das.setReference(ref);
 				return new DataSource[] { das };
@@ -154,7 +150,8 @@ public class DataSourceFactory {
 							public boolean accept(File f) {
 								if (f.isDirectory())
 									return true;
-								return f.getName().toLowerCase().endsWith(ext) || f.getName().toLowerCase().endsWith(ext + ".gz");
+								return f.getName().toLowerCase().endsWith(ext)
+										|| f.getName().toLowerCase().endsWith(ext + ".gz");
 							}
 
 							@Override
@@ -172,7 +169,8 @@ public class DataSourceFactory {
 								return true;
 							for (String ext : extensions) {
 
-								if (f.getName().toLowerCase().endsWith(ext) || f.getName().toLowerCase().endsWith(ext + ".gz")) {
+								if (f.getName().toLowerCase().endsWith(ext)
+										|| f.getName().toLowerCase().endsWith(ext + ".gz")) {
 									return true;
 								}
 							}
@@ -193,7 +191,7 @@ public class DataSourceFactory {
 					File[] files = chooser.getSelectedFiles();
 					DataSource[] out = new DataSource[files.length];
 					for (int i = 0; i < files.length; i++) {
-						out[i]=createFile(files[i]);
+						out[i] = createFile(files[i]);
 
 					}
 					Configuration.set("lastDirectory", files[0].getParentFile());
@@ -208,11 +206,59 @@ public class DataSourceFactory {
 		}
 		return null;
 	}
+
 	public static DataSource createFile(File file) throws IOException {
-		if (file.getName().toLowerCase().endsWith("bai")) {
-			String fileName = file.toString();
-			return  new SAMDataSource(new File(fileName.substring(0, fileName.length() - 4)));
-		} else
+		DataSource indexedSource = tryIndexedStuff(file);
+		if (indexedSource != null)
+			return indexedSource;
+		else
 			return new FileSource(file);
 	}
+
+	/**
+	 * Method will return <code>null</code> when the input object does not allow
+	 * indexed access. The caller should handle this by defaulting to the memory
+	 * based parsers.
+	 * 
+	 * @param in
+	 * @return
+	 * @throws IOException
+	 */
+	private static DataSource tryIndexedStuff(Object in) throws IOException {
+		String fileName = in.toString();
+		if (fileName.toLowerCase().endsWith("bai")) {
+			if (in instanceof File)
+				return new SAMDataSource(new File(fileName.substring(0, fileName.length() - 4)));
+			if (in instanceof URL){
+				SSL.certify((URL)in);
+				return new SAMDataSource(new URL(fileName.substring(0, fileName.length() - 4)));
+				
+			}
+		} else {
+			String indexName = fileName + ".fai";
+			if (checkExist(in, indexName)) {
+				if (in instanceof File)
+					return new IndexedFastaDataSource((File) in);
+				if (in instanceof URL)
+					return new IndexedFastaDataSource((URL) in);
+			}
+		}
+		/* No indexing scheme found */
+		return null;
+	}
+
+	private static boolean checkExist(Object in, String string) {
+		if (in instanceof File)
+			return new File(string).exists();
+		if (in instanceof URL)
+			try {
+				new URL(string).openStream().close();
+				return true;
+			} catch (IOException ioe) {
+				System.err.println(ioe);
+				return false;
+			}
+		return false;
+	}
+
 }
