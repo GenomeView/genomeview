@@ -6,6 +6,7 @@ package net.sf.genomeview.gui.menu.selection;
 import java.awt.event.ActionEvent;
 import java.util.Observable;
 
+import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.data.Blast;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
@@ -42,7 +43,9 @@ public class NCBIdnaBlastAction extends AbstractModelAction {
     		Blast.nucleotideBlast(""+rf.toString().hashCode(),seq);
     	} else if (model.getSelectedRegion() != null){
     		 Location l = model.getSelectedRegion();
-    	     String seq = model.getSelectedEntry().sequence().getSubSequence(l.start(), l.end()+1);
+    	     String seq = //model.getSelectedEntry().sequence().getSubSequence(l.start(), l.end()+1);
+    	    new BufferSeq(model.getSelectedEntry().sequence(),l).toString();
+				
     	     Blast.nucleotideBlast("selection",seq);
     	}
     }

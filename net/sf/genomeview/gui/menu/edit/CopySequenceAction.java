@@ -11,11 +11,12 @@ import java.util.Observable;
 
 import javax.swing.KeyStroke;
 
+import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.SelectedSequenceDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Location;
-import net.sf.jannot.Sequence;
+import net.sf.jannot.refseq.Sequence;
 /**
  * Copies the selected sequence to the system clip board.
  * 
@@ -39,27 +40,30 @@ public class CopySequenceAction extends AbstractModelAction {
             Sequence seq = model.getSelectedEntry().sequence();
             StringBuffer sb = new StringBuffer(l.length());
             int track = model.getPressTrack();
+            
+            BufferSeq bs=new BufferSeq(model.getSelectedEntry().sequence(),l);
+            
             switch (track) {
             case 0:
             case 1:
                 for (int i = l.start(); i <= l.end(); i++)
-                    sb.append(seq.getNucleotide(i));
+                    sb.append(bs.getNucleotide(i));
                 break;
             case 2:
             case 3:
             case 4:
                 for (int i = l.start(); i <= l.end(); i += 3)
-                    sb.append(seq.getAminoAcid(i,model.getAAMapping()));
+                    sb.append(bs.getAminoAcid(i,model.getAAMapping()));
                 break;
             case -1:
             	 for (int i = l.start(); i <= l.end(); i++)
-                    sb.append(seq.getReverseNucleotide(i));
+                    sb.append(bs.getReverseNucleotide(i));
                 break;
             case -2:
             case -3:
             case -4:
                 for (int i = l.end(); i >= l.start(); i -= 3)
-                    sb.append(seq.getReverseAminoAcid(i - 2,model.getAAMapping()));
+                    sb.append(bs.getReverseAminoAcid(i - 2,model.getAAMapping()));
                 break;
             }
 

@@ -16,12 +16,13 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
+import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
-import net.sf.jannot.Sequence;
 import net.sf.jannot.Strand;
+import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.utils.SequenceTools;
 
 public class SelectedSequenceDialog extends JDialog {
@@ -73,20 +74,24 @@ public class SelectedSequenceDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 StringBuffer tmp = new StringBuffer();
                 Sequence seq = model.getSelectedEntry().sequence();
+                
+               
+                
                 if (location.isSelected()) {
                     SortedSet<Location> locs = model.selectionModel().getLocationSelection();
                     for (Location l : locs) {
+                    	 BufferSeq bs=new BufferSeq(seq,l);
                         Strand s = l.getParent().strand();
                         switch (s) {
                         case FORWARD:
                         case UNKNOWN:
                             for (int i = l.start(); i <= l.end(); i++) {
-                                tmp.append(seq.getNucleotide(i));
+                                tmp.append(bs.getNucleotide(i));
                             }
                             break;
                         case REVERSE:
                             for (int i = l.end(); i >= l.start(); i--) {
-                                tmp.append(seq.getReverseNucleotide(i));
+                                tmp.append(bs.getReverseNucleotide(i));
                             }
                             break;
                         }

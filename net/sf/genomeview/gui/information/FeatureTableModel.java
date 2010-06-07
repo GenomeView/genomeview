@@ -14,8 +14,8 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.NotificationTypes;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
-import net.sf.jannot.Sequence;
 import net.sf.jannot.Type;
+import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.utils.SequenceTools;
 
 /**

@@ -596,8 +596,19 @@ public class ShortReadTrack extends Track {
 			/* If there is no sequence, return immediately */
 			if (entry.sequence().size() == 0)
 				return;
-			if (seqBuffer == null)
-				seqBuffer = entry.sequence().getSubSequence(currentVisible.start, currentVisible.end + 1).toCharArray();
+			if (seqBuffer == null){
+//				seqBuffer = entry.sequence().getSubSequence(currentVisible.start, currentVisible.end + 1).toCharArray();
+				Iterable<Character> bufferedSeq = entry.sequence().get(
+						currentVisible.start , currentVisible.end);
+
+				seqBuffer  = new char[currentVisible.length()];
+				int idx = 0;
+				for (char cc : bufferedSeq) {
+					seqBuffer[idx++] = cc;
+				} 
+				
+			}
+				
 			for (int j = rf.start(); j <= rf.end(); j++) {
 				if (j > currentVisible.end || j < currentVisible.start)
 					continue;

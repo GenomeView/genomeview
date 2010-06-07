@@ -23,6 +23,7 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.exception.SaveFailedException;
+import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.source.DataSource;
 
 import org.xml.sax.Attributes;
@@ -114,7 +115,7 @@ public class DAS extends DataSource {
 		StringBuffer seq = this.getSequence(ref, ep);
 		Entry out = new Entry(ref + ":" + ep);
 //		out.setID();
-		out.sequence().setSequence(seq);
+		out.setSequence(new MemorySequence(seq));
 		// System.out.println("Ref: " + ref);
 		// if (ref.contains("Homo")) {
 		System.out.println("Ref: " + ref);

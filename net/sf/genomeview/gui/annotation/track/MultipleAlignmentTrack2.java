@@ -240,7 +240,15 @@ public class MultipleAlignmentTrack2 extends Track {
 				}
 				BitSet lines = new BitSet(ordering.size());
 				if (visible.length() < 1000) {
-					char[] ref = entry.sequence().getSubSequence(visible.start, visible.end + 1).toCharArray();
+//					char[] ref = entry.sequence().getSubSequence(visible.start, visible.end + 1).toCharArray();
+					Iterable<Character> bufferedSeq = entry.sequence().get(
+							visible.start , visible.end);
+
+					char[] ref  = new char[visible.length()];
+					int idx = 0;
+					for (char c : bufferedSeq) {
+						ref[idx++] = c;
+					}
 					// System.out.println("--block ");
 					int line = 1;
 					for (AlignmentSequence as : ab2) {

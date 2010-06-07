@@ -25,6 +25,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.table.AbstractTableModel;
 
+import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.TypeCombo;
@@ -196,7 +197,8 @@ public class SearchDialog extends JDialog {
 				}
 
 				private void performAminoAcidSearch() {
-					byte[] byteSequence = model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
+					//byte[] byteSequence = model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
+					byte[] byteSequence = new BufferSeq(model.getSelectedEntry().sequence()).toString().toUpperCase().getBytes();
 					byte[] translation = translate(byteSequence, 0);
 					forwardSearch(translation, 0);
 					translation = translate(byteSequence, 1);
@@ -267,7 +269,9 @@ public class SearchDialog extends JDialog {
 				}
 
 				private void performNucleotideSearch() {
-					byte[] byteSequence = model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
+					//byte[] byteSequence = model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
+					byte[] byteSequence = new BufferSeq(model.getSelectedEntry().sequence()).toString().toUpperCase().getBytes();
+					
 					forwardSearch(byteSequence, 0);
 					reverseArray(byteSequence);
 					for (int i = 0; i < byteSequence.length; i++) {

@@ -39,6 +39,7 @@ import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
+import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.menu.selection.NCBIdnaBlastAction;
@@ -228,7 +229,9 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
     private String createSubSequenceNuc() {
     	Location l = model.getSelectedRegion();
-    	return model.getSelectedEntry().sequence().getSubSequence(l.start(), l.end()+1);
+    	String seq=new BufferSeq(model.getSelectedEntry().sequence(),l).toString();
+    	return seq;
+//    	return model.getSelectedEntry().sequence().getSubSequence(l.start(), l.end()+1);
 	}
 
 	private Map<Feature, String> createNucList() {
@@ -282,7 +285,8 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
     private String createSubSequenceProt() {
     	Location l = model.getSelectedRegion();
-    	String seq = model.getSelectedEntry().sequence().getSubSequence(l.start(), l.end()+1);
+    	//String seq = model.getSelectedEntry().sequence().getSubSequence(l.start(), l.end()+1);
+    	String seq=new BufferSeq(model.getSelectedEntry().sequence(),l).toString();
 		return SequenceTools.translate(seq,model.getAAMapping());
 	}
 
