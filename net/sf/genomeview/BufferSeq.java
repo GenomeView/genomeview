@@ -27,11 +27,14 @@ public class BufferSeq {
 	}
 
 	public char getNucleotide(int i) {
+		int index=i-l.start;
+		if (index < 0 || index >= buffer.length)
+			return '_';
 		return buffer[i - l.start];
 	}
 
 	public char getReverseNucleotide(int i) {
-		return SequenceTools.complement(buffer[i - l.start]);
+		return SequenceTools.complement(getNucleotide(i));
 	}
 	
 	public String toString(){
@@ -39,15 +42,21 @@ public class BufferSeq {
 	}
 
 	public char getAminoAcid(int pos, AminoAcidMapping mapping) {
-		String codon = "" + getNucleotide(pos) + getNucleotide(pos + 1)
-				+ getNucleotide(pos + 2);
-		return mapping.get(codon);
+		return mapping.get(getCodon(pos));
 	}
 
 	public char getReverseAminoAcid(int pos, AminoAcidMapping mapping) {
-		String codon = "" + getReverseNucleotide(pos + 2)
-				+ getReverseNucleotide(pos + 1) + getReverseNucleotide(pos);
-		return mapping.get(codon);
+		return mapping.get(getReverseCodon(pos));
 	}
 
+	public String getCodon(int pos) {
+		String codon = "" + getNucleotide(pos) + getNucleotide(pos + 1)
+		+ getNucleotide(pos + 2);
+		return codon;
+	}
+	public String getReverseCodon(int pos) {
+		String codon = "" + getReverseNucleotide(pos + 2)
+		+ getReverseNucleotide(pos + 1) + getReverseNucleotide(pos);
+		return codon;
+	}
 }
