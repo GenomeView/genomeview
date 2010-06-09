@@ -23,8 +23,8 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
-import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
+import net.sf.jannot.MemoryFeatureAnnotation;
 
 public class MergeFeatureDialog extends JDialog {
     private static final long serialVersionUID = -770863087750087961L;
@@ -73,14 +73,14 @@ public class MergeFeatureDialog extends JDialog {
 
                 copy.setLocation(locations);
                 /* Add new feature to the annotation */
-                ((FeatureAnnotation)model.getSelectedEntry().get(copy.type())).add(copy);
+                ((MemoryFeatureAnnotation)model.getSelectedEntry().get(copy.type())).add(copy);
 
                 /* If requested, the original features are deleted */
                 if (remove.isSelected()) {
                     Set<Feature> toRemove = new HashSet<Feature>();
                     toRemove.addAll(model.selectionModel().getFeatureSelection());
                     for (Feature rf : toRemove)
-                    	((FeatureAnnotation)model.getSelectedEntry().get(rf.type())).remove(rf);
+                    	((MemoryFeatureAnnotation)model.getSelectedEntry().get(rf.type())).remove(rf);
                 }
                 model.selectionModel().clearLocationSelection();
 

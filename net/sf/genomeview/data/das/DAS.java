@@ -17,12 +17,11 @@ import javax.xml.parsers.SAXParserFactory;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Feature;
-import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
+import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.exception.ReadFailedException;
-import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.source.DataSource;
 
@@ -124,7 +123,7 @@ public class DAS extends DataSource {
 			List<Feature> list = this.getFeatures(source, ep);
 			for(Feature f:list){
 //				out.annotation.addAll(list);
-				FeatureAnnotation fa = out.getAnnotation(f.type());
+				MemoryFeatureAnnotation fa = out.getMemoryAnnotation(f.type());
 				fa.add(f);
 			}
 		}

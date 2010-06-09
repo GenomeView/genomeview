@@ -29,7 +29,7 @@ public class TestGenbankParser {
 
             // System.out.println("ACC:" +
             // entries[0].description.getAccessionNumbers());
-            Iterable<Feature> fs = entries.getEntry().getAnnotation(Type.get("CDS")).get();
+            Iterable<Feature> fs = entries.getEntry().getMemoryAnnotation(Type.get("CDS")).get();
             for (Feature f : fs) {
                 // System.out.println(f.type());
                 // System.out.println(f.location());

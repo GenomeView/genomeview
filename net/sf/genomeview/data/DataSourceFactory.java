@@ -27,6 +27,7 @@ import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.source.SAMDataSource;
 import net.sf.jannot.source.SSL;
 import net.sf.jannot.source.URLSource;
+import net.sf.jannot.tabix.IndexedFeatureFile;
 
 public class DataSourceFactory {
 	private static Logger log = Logger.getLogger(DataSourceFactory.class.getCanonicalName());
@@ -237,11 +238,22 @@ public class DataSourceFactory {
 		} else {
 			String indexName = fileName + ".fai";
 			if (checkExist(in, indexName)) {
+				System.out.println("Reading faidx file...");
 				if (in instanceof File)
 					return new IndexedFastaDataSource((File) in);
 				if (in instanceof URL)
 					return new IndexedFastaDataSource((URL) in);
 			}
+			
+			indexName = fileName + ".tbi";
+			if (checkExist(in, indexName)) {
+				System.out.println("Reading tabix file...");
+				if (in instanceof File)
+					return new IndexedFeatureFile((File) in);
+				if (in instanceof URL)
+					return new IndexedFeatureFile((URL) in);
+			}
+			
 		}
 		/* No indexing scheme found */
 		return null;

@@ -13,7 +13,7 @@ import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.NotificationTypes;
 import net.sf.jannot.Feature;
-import net.sf.jannot.FeatureAnnotation;
+import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
 import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.utils.SequenceTools;
@@ -61,7 +61,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 
 	@Override
 	public int getRowCount() {
-		FeatureAnnotation fa = model.getSelectedEntry().getAnnotation(type);
+		MemoryFeatureAnnotation fa = model.getSelectedEntry().getMemoryAnnotation(type);
 		return fa.cachedCount();// .noFeatures(type);
 	}
 
@@ -83,7 +83,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	}
 
 	public Feature getFeature(int row) {
-		return model.getSelectedEntry().getAnnotation(type).getCached(row);
+		return model.getSelectedEntry().getMemoryAnnotation(type).getCached(row);
 	}
 
 	@Override
@@ -123,7 +123,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	}
 
 	public int getRow(Feature first) {
-		return model.getSelectedEntry().getAnnotation(type).getCachedIndexOf(first);
+		return model.getSelectedEntry().getMemoryAnnotation(type).getCachedIndexOf(first);
 
 	}
 

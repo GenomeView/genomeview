@@ -34,6 +34,7 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
+import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
@@ -44,6 +45,7 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.MultiFileSource;
+import net.sf.jannot.tabix.GFFWrapper;
 import net.sf.jannot.wiggle.Graph;
 import be.abeel.util.DefaultHashMap;
 
@@ -410,8 +412,8 @@ public class Model extends Observable implements IModel {
 			init();
 
 		}
-		
-		public Track get(int index){
+
+		public Track get(int index) {
 			return mapping.get(order.get(index));
 		}
 
@@ -576,7 +578,7 @@ public class Model extends Observable implements IModel {
 	 * @return list of tracks
 	 */
 	public TrackList getTrackList() {
-		//FIXME remove method, make tracklist public and final
+		// FIXME remove method, make tracklist public and final
 		return trackList;
 	}
 
@@ -600,10 +602,21 @@ public class Model extends Observable implements IModel {
 			/* Graph tracks */
 			for (DataKey key : e) {
 				Data<?> data = e.get(key);
-				if (data instanceof FeatureAnnotation) {
+				if (data instanceof MemoryFeatureAnnotation) {
 					if (!trackList.containsTrack(key))
-						trackList.add(new FeatureTrack(this,(Type)key));
+						trackList.add(new FeatureTrack(this, (Type) key));
+
 				}
+				if (data instanceof GFFWrapper) {
+					if (!trackList.containsTrack(key))
+						trackList.add(new FeatureTrack(this, (Type) key));
+
+				}
+//				if (data instanceof GFFWrapper) {
+//					if (!trackList.containsTrack(key))
+//						trackList.add(new FeatureTrack(this,key));
+//				}
+
 				if (data instanceof Graph) {
 					if (!trackList.containsTrack(key))
 						trackList.add(new WiggleTrack(key, this, true));
@@ -611,12 +624,12 @@ public class Model extends Observable implements IModel {
 				if (data instanceof AlignmentAnnotation) {
 					if (!trackList.containsTrack(key))
 						trackList.add(new MultipleAlignmentTrack(this, key));
-//					if (!trackList.containsTrack(key))
-//						trackList.add(new SequenceLogoTrack(this, key));
+					// if (!trackList.containsTrack(key))
+					// trackList.add(new SequenceLogoTrack(this, key));
 
 				}
 				if (data instanceof ReadGroup) {
-					if (!trackList.containsTrack(key)){
+					if (!trackList.containsTrack(key)) {
 						trackList.add(new ShortReadTrack(key, this));
 					}
 				}

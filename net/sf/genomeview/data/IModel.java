@@ -9,7 +9,6 @@ import javax.swing.JFrame;
 
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.plugin.GUIManager;
-import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Location;

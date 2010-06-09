@@ -52,6 +52,7 @@ public class FeatureTrack extends Track {
 	 * @return type represented by this track
 	 */
 	public Type getType() {
+		
 		return Type.get(type.toString());
 	}
 
@@ -72,8 +73,10 @@ public class FeatureTrack extends Track {
 		hitmap.clear();
 		Location visible = model.getAnnotationLocationVisible();
 		// List<Feature> types = entry.annotation.getByType(type,);
-		FeatureAnnotation annot = entry.getAnnotation(type);
-
+//		FeatureAnnotation annot = entry.getAnnotation(type);
+		FeatureAnnotation annot=(FeatureAnnotation)entry.get(type);
+		//System.out.println("FA: "+type+"\t"+annot);
+		//System.out.println(entry.)
 		int estimate = annot.getEstimateCount(visible);
 		// System.out.println("Estimated number of features: "+estimate);
 
