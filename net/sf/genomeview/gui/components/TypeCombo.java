@@ -63,7 +63,6 @@ class TypeModel extends DefaultComboBoxModel implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		fireContentsChanged(o, 0, Type.values().length);
-		model.updateTracks();
 	}
 	
 

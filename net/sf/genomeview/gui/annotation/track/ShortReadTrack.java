@@ -34,7 +34,7 @@ import net.sf.jannot.shortread.BAMreads;
 import net.sf.jannot.shortread.ExtendedShortRead;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortRead;
-import net.sf.jannot.shortread.ShortReadCoverage;
+//import net.sf.jannot.shortread.ShortReadCoverage;//
 import net.sf.samtools.CigarElement;
 import net.sf.samtools.CigarOperator;
 
@@ -106,10 +106,10 @@ public class ShortReadTrack extends Track {
 				tooltip.setVisible(true);
 			// ReadGroup rg = currentEntry.shortReads.getReadGroup(this.source);
 			ReadGroup rg = (ReadGroup) currentEntry.get(dataKey);
-			ShortReadCoverage currentBuffer = rg.getCoverage();
+//			ShortReadCoverage currentBuffer = rg.getCoverage();
 			int start = Convert.translateScreenToGenome(x, currentVisible, currentScreenWidth);
-			int f = (int) currentBuffer.get(Strand.FORWARD, start - 1);
-			int r = (int) currentBuffer.get(Strand.REVERSE, start - 1);
+//			int f = (int) currentBuffer.get(Strand.FORWARD, start - 1);
+//			int r = (int) currentBuffer.get(Strand.REVERSE, start - 1);
 
 			ShortReadInsertion sri = null;
 			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : paintedBlocks.entrySet()) {
@@ -118,7 +118,7 @@ public class ShortReadTrack extends Track {
 					break;
 				}
 			}
-			tooltip.set(f, r, f + r, source, sri);
+//			tooltip.set(f, r, f + r, source, sri);
 		} else {
 			if (tooltip.isVisible())
 				tooltip.setVisible(false);
@@ -181,7 +181,7 @@ public class ShortReadTrack extends Track {
 
 		boolean logScaling = Configuration.getBoolean("shortread:logScaling");
 		double bottomValue = Configuration.getDouble("shortread:bottomValue");
-		double topValue = Configuration.getDouble("shortread:topValue");
+//		double topValue = Configuration.getDouble("shortread:topValue");
 
 		int graphLineHeigh = Configuration.getInt("shortread:graphLineHeight");
 
@@ -208,83 +208,83 @@ public class ShortReadTrack extends Track {
 		ReadGroup rg = (ReadGroup) entry.get(dataKey);// entry.shortReads.getReadGroup(source);
 		if (rg == null)
 			return 0;
-		ShortReadCoverage graph = rg.getCoverage();// .get(rg);
-		if (topValue < 0)
-			topValue = graph.max();
+//		ShortReadCoverage graph = rg.getCoverage();// .get(rg);
+//		if (topValue < 0)
+//			topValue = graph.max();
 
-		GeneralPath conservationGP = new GeneralPath();
-		GeneralPath conservationGPF = new GeneralPath();
-		GeneralPath conservationGPR = new GeneralPath();
+//		GeneralPath conservationGP = new GeneralPath();
+//		GeneralPath conservationGPF = new GeneralPath();
+//		GeneralPath conservationGPR = new GeneralPath();
 
-		float[] f = graph.get(Strand.FORWARD, start - 1, end, scaleIndex);
-		float[] r = graph.get(Strand.REVERSE, start - 1, end, scaleIndex);
+//		float[] f = graph.get(Strand.FORWARD, start - 1, end, scaleIndex);
+//		float[] r = graph.get(Strand.REVERSE, start - 1, end, scaleIndex);
+//
+//		double range = topValue - bottomValue;
 
-		double range = topValue - bottomValue;
+//		for (int i = 0; i < f.length; i++) {
+//			int x = Convert.translateGenomeToScreen(start + i * scale, currentVisible, screenWidth);
+//			/* Coverage is stored +1 in SRC, needs correcting here */
+//			double valF = f[i] - 1;
+//			double valR = r[i] - 1;
+//			double val = f[i] + r[i] - 2;
+//			/* Cap value */
+//			if (valF > topValue)
+//				valF = topValue;
+//			if (valR > topValue)
+//				valR = topValue;
+//			if (val > topValue)
+//				val = topValue;
+//
+//			if (valF < bottomValue)
+//				valF = bottomValue;
+//			valR = bottomValue;
+//			if (val < bottomValue)
+//				val = bottomValue;
+//
+//			/* Translate for bottom point */
+//			valF -= bottomValue;
+//			valR -= bottomValue;
+//			val -= bottomValue;
+//			/* Logaritmic scaling */
+//			if (logScaling) {
+//				valF = log2(valF + 1);
+//				valF /= log2(range);
+//				valR = log2(valR + 1);
+//				valR /= log2(range);
+//				val = log2(val + 1);
+//				val /= log2(range);
+//				/* Regular scaling */
+//			} else {
+//				valF /= range;
+//				valR /= range;
+//				val /= range;
+//			}
+//
+//			/* Draw lines */
+//			if (i == 0) {
+//				conservationGP.moveTo(x - 1, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
+//				conservationGPF.moveTo(x - 1, yOffset + (1 - valF) * (graphLineHeigh - 4) + 2);
+//				conservationGPR.moveTo(x - 1, yOffset + (1 - valR) * (graphLineHeigh - 4) + 2);
+//			}
+//
+//			conservationGP.lineTo(x, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
+//			conservationGPF.lineTo(x, yOffset + (1 - valF) * (graphLineHeigh - 4) + 2);
+//			conservationGPR.lineTo(x, yOffset + (1 - valR) * (graphLineHeigh - 4) + 2);
+//
+//		}
 
-		for (int i = 0; i < f.length; i++) {
-			int x = Convert.translateGenomeToScreen(start + i * scale, currentVisible, screenWidth);
-			/* Coverage is stored +1 in SRC, needs correcting here */
-			double valF = f[i] - 1;
-			double valR = r[i] - 1;
-			double val = f[i] + r[i] - 2;
-			/* Cap value */
-			if (valF > topValue)
-				valF = topValue;
-			if (valR > topValue)
-				valR = topValue;
-			if (val > topValue)
-				val = topValue;
-
-			if (valF < bottomValue)
-				valF = bottomValue;
-			valR = bottomValue;
-			if (val < bottomValue)
-				val = bottomValue;
-
-			/* Translate for bottom point */
-			valF -= bottomValue;
-			valR -= bottomValue;
-			val -= bottomValue;
-			/* Logaritmic scaling */
-			if (logScaling) {
-				valF = log2(valF + 1);
-				valF /= log2(range);
-				valR = log2(valR + 1);
-				valR /= log2(range);
-				val = log2(val + 1);
-				val /= log2(range);
-				/* Regular scaling */
-			} else {
-				valF /= range;
-				valR /= range;
-				val /= range;
-			}
-
-			/* Draw lines */
-			if (i == 0) {
-				conservationGP.moveTo(x - 1, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
-				conservationGPF.moveTo(x - 1, yOffset + (1 - valF) * (graphLineHeigh - 4) + 2);
-				conservationGPR.moveTo(x - 1, yOffset + (1 - valR) * (graphLineHeigh - 4) + 2);
-			}
-
-			conservationGP.lineTo(x, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
-			conservationGPF.lineTo(x, yOffset + (1 - valF) * (graphLineHeigh - 4) + 2);
-			conservationGPR.lineTo(x, yOffset + (1 - valR) * (graphLineHeigh - 4) + 2);
-
-		}
-
-		/* Draw coverage lines */
-		g.setColor(forwardColor);
-		g.draw(conservationGPF);
-
-		g.setColor(reverseColor);
-		g.draw(conservationGPR);
-		g.setColor(Color.BLACK);
-		g.draw(conservationGP);
+//		/* Draw coverage lines */
+//		g.setColor(forwardColor);
+//		g.draw(conservationGPF);
+//
+//		g.setColor(reverseColor);
+//		g.draw(conservationGPR);
+//		g.setColor(Color.BLACK);
+//		g.draw(conservationGP);
 
 		g.setColor(Color.BLUE);
 		g.drawLine(0, yOffset, 5, yOffset);
-		g.drawString("" + topValue, 10, yOffset + 12 - 2);
+//		g.drawString("" + topValue, 10, yOffset + 12 - 2);
 		g.drawString(StaticUtils.shortify(super.dataKey.toString()) + " (" + scale + ")", 10, yOffset + 24 - 2);
 		yOffset += graphLineHeigh;
 		g.drawLine(0, yOffset, 5, yOffset);

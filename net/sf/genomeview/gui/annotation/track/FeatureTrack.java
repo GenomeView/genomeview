@@ -38,7 +38,7 @@ import net.sf.jannot.Qualifier;
 import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.shortread.ReadGroup;
-import net.sf.jannot.shortread.ShortReadCoverage;
+//import net.sf.jannot.shortread.ShortReadCoverage;
 import be.abeel.util.CountMap;
 
 public class FeatureTrack extends Track {
@@ -367,14 +367,14 @@ public class FeatureTrack extends Track {
 						for (ReadGroup rg : sources) {
 							cm.clear();
 
-							ShortReadCoverage src = rg.getCoverage();
-							for (Location l : f.location()) {
-								for (int i = l.start(); i <= l.end(); i++) {
-									cm.count((int) (src.get(Strand.FORWARD,
-											i - 1) + src.get(Strand.REVERSE,
-											i - 1)));
-								}
-							}
+////							ShortReadCoverage src = rg.getCoverage();
+//							for (Location l : f.location()) {
+//								for (int i = l.start(); i <= l.end(); i++) {
+//									cm.count((int) (src.get(Strand.FORWARD,
+//											i - 1) + src.get(Strand.REVERSE,
+//											i - 1)));
+//								}
+//							}
 
 							text.append("Mean short read coverage ("
 									+ StaticUtils.shortify(rg.toString())
@@ -465,7 +465,7 @@ public class FeatureTrack extends Track {
 
 	@Override
 	public String displayName() {
-		return type.toString();
+		return "Feature: "+type.toString();
 	}
 
 }

@@ -21,6 +21,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
 import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack;
 import net.sf.genomeview.gui.annotation.track.MultipleAlignmentTrack2;
+import net.sf.genomeview.gui.annotation.track.PileupTrack;
 import net.sf.genomeview.gui.annotation.track.ShortReadTrack;
 import net.sf.genomeview.gui.annotation.track.StructureTrack;
 import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
@@ -45,7 +46,9 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.MultiFileSource;
+import net.sf.jannot.tabix.BEDWrapper;
 import net.sf.jannot.tabix.GFFWrapper;
+import net.sf.jannot.tabix.PileupWrapper;
 import net.sf.jannot.wiggle.Graph;
 import be.abeel.util.DefaultHashMap;
 
@@ -387,21 +390,6 @@ public class Model extends Observable implements IModel {
 		refresh();
 	}
 
-	// /*
-	// * Looks in the list of loaded entries and returns the one with a matching
-	// * id. Null is returned when no entries match
-	// */
-	// private Entry findEntry(String id) {
-	// if (id == null)
-	// return null;
-	// for (Entry f : entries) {
-	// if (id.equals(f.getID()))
-	// return f;
-	// }
-	// return null;
-	//
-	// }
-
 	public class TrackList implements Iterable<Track> {
 		private Model model;
 		private HashMap<DataKey, Track> mapping = new HashMap<DataKey, Track>();
@@ -569,6 +557,13 @@ public class Model extends Observable implements IModel {
 
 			};
 		}
+
+		public void printDebug() {
+			System.out.println("Tracklist debug:");
+			System.out.println("Order:" + order);
+			System.out.println("Mapping: " + mapping);
+
+		}
 	}
 
 	/**
@@ -594,86 +589,93 @@ public class Model extends Observable implements IModel {
 	 */
 	public synchronized void updateTracks() {
 		int startSize = trackList.size();
-		// for (Type t : Type.values()) {
-		// if (!trackList.containsType(t))
-		// trackList.add(new FeatureTrack(this, t, true));
-		// }
-		for (Entry e : entries) {
-			/* Graph tracks */
-			for (DataKey key : e) {
-				Data<?> data = e.get(key);
-				if (data instanceof MemoryFeatureAnnotation) {
-					if (!trackList.containsTrack(key))
-						trackList.add(new FeatureTrack(this, (Type) key));
+System.out.println("Updating traccks...");
+		// for (Entry e : entries) {
+		Entry e = this.getSelectedEntry();
+		/* Graph tracks */
+		for (DataKey key : e) {
+			Data<?> data = e.get(key);
+			if (data instanceof MemoryFeatureAnnotation) {
+				if (!trackList.containsTrack(key))
+					trackList.add(new FeatureTrack(this, (Type) key));
 
-				}
-				if (data instanceof GFFWrapper) {
-					if (!trackList.containsTrack(key))
-						trackList.add(new FeatureTrack(this, (Type) key));
+			}
+			if (data instanceof GFFWrapper || data instanceof BEDWrapper) {
+				if (!trackList.containsTrack(key))
+					trackList.add(new FeatureTrack(this, (Type) key));
 
-				}
-//				if (data instanceof GFFWrapper) {
-//					if (!trackList.containsTrack(key))
-//						trackList.add(new FeatureTrack(this,key));
-//				}
+			}
 
-				if (data instanceof Graph) {
-					if (!trackList.containsTrack(key))
-						trackList.add(new WiggleTrack(key, this, true));
-				}
-				if (data instanceof AlignmentAnnotation) {
-					if (!trackList.containsTrack(key))
-						trackList.add(new MultipleAlignmentTrack(this, key));
-					// if (!trackList.containsTrack(key))
-					// trackList.add(new SequenceLogoTrack(this, key));
+			if (data instanceof PileupWrapper) {
 
-				}
-				if (data instanceof ReadGroup) {
-					if (!trackList.containsTrack(key)) {
-						trackList.add(new ShortReadTrack(key, this));
-					}
-				}
-				if (data instanceof MAFMultipleAlignment) {
-					if (!trackList.containsTrack(key)) {
-						trackList.add(new MultipleAlignmentTrack2(this, key));
-						// logger.info("Added multiple alignment track " + ma);
-					}
+				//trackList.printDebug();
+
+				if (!trackList.containsTrack(key))
+					trackList.add(new PileupTrack(key, this));
+			}
+
+			// if (data instanceof GFFWrapper) {
+			// if (!trackList.containsTrack(key))
+			// trackList.add(new FeatureTrack(this,key));
+			// }
+
+			if (data instanceof Graph) {
+				if (!trackList.containsTrack(key))
+					trackList.add(new WiggleTrack(key, this, true));
+			}
+			if (data instanceof AlignmentAnnotation) {
+				if (!trackList.containsTrack(key))
+					trackList.add(new MultipleAlignmentTrack(this, key));
+				// if (!trackList.containsTrack(key))
+				// trackList.add(new SequenceLogoTrack(this, key));
+
+			}
+			if (data instanceof ReadGroup) {
+				if (!trackList.containsTrack(key)) {
+					trackList.add(new ShortReadTrack(key, this));
 				}
 			}
-			// if (!trackList.containShortReadTrack(rg)) {
-			// trackList.add(new ShortReadTrack(this, rg));
-			// }
-			// }
-			// for (Graph g : e.graphs.getAll()) {
-			// if (!trackList.containsGraph(g.getName()))
-			// trackList.add(new WiggleTrack(g.getName(), this, true));
-			// }
-			/* Alignment and conservation tracks */
-			// for (int i = 0; i < e.alignment.numAlignments(); i++) {
-			// if (!trackList.containsAlignment(i))
-			// trackList.add(new
-			// MultipleAlignmentTrack(e.alignment.getAlignment(i).name(), i,
-			// this, true));
-			// }
-			// if (!trackList.containsSequenceLogo() &&
-			// e.alignment.numAlignments() > 0)
-			// trackList.add(new SequenceLogoTrack(this));
-
-			/* Short read tracks */
-			// for (DataSource rg : e.shortReads.getSources()) {
-			// if (!trackList.containShortReadTrack(rg)) {
-			// trackList.add(new ShortReadTrack(this, rg));
-			// }
-			// }
-			// /* Multiple alignments tracks */
-			// for (MultipleAlignment ma : e.multiplealignment) {
-			// if (!trackList.containsMultipleAlignment(ma)) {
-			// trackList.add(new MultipleAlignmentTrack2(this, ma));
-			// logger.info("Added multiple alignment track " + ma);
-			// }
-			// }
-
+			if (data instanceof MAFMultipleAlignment) {
+				if (!trackList.containsTrack(key)) {
+					trackList.add(new MultipleAlignmentTrack2(this, key));
+					// logger.info("Added multiple alignment track " + ma);
+				}
+			}
 		}
+		// if (!trackList.containShortReadTrack(rg)) {
+		// trackList.add(new ShortReadTrack(this, rg));
+		// }
+		// }
+		// for (Graph g : e.graphs.getAll()) {
+		// if (!trackList.containsGraph(g.getName()))
+		// trackList.add(new WiggleTrack(g.getName(), this, true));
+		// }
+		/* Alignment and conservation tracks */
+		// for (int i = 0; i < e.alignment.numAlignments(); i++) {
+		// if (!trackList.containsAlignment(i))
+		// trackList.add(new
+		// MultipleAlignmentTrack(e.alignment.getAlignment(i).name(), i,
+		// this, true));
+		// }
+		// if (!trackList.containsSequenceLogo() &&
+		// e.alignment.numAlignments() > 0)
+		// trackList.add(new SequenceLogoTrack(this));
+
+		/* Short read tracks */
+		// for (DataSource rg : e.shortReads.getSources()) {
+		// if (!trackList.containShortReadTrack(rg)) {
+		// trackList.add(new ShortReadTrack(this, rg));
+		// }
+		// }
+		// /* Multiple alignments tracks */
+		// for (MultipleAlignment ma : e.multiplealignment) {
+		// if (!trackList.containsMultipleAlignment(ma)) {
+		// trackList.add(new MultipleAlignmentTrack2(this, ma));
+		// logger.info("Added multiple alignment track " + ma);
+		// }
+		// }
+
+		// }
 		// /* Syntenic tracks */
 		// Set<String> targets = entries.syntenic.getTargets();
 		// for (String s : targets) {
@@ -809,7 +811,8 @@ public class Model extends Observable implements IModel {
 		selectionModel.clear();
 
 		setAnnotationLocationVisible(getAnnotationLocationVisible());
-
+		trackList.clear();
+		updateTracks();
 		refresh(NotificationTypes.ENTRYCHANGED);
 
 	}
