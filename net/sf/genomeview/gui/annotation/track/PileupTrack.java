@@ -93,8 +93,6 @@ public class PileupTrack extends Track {
 					for (Pile p : piles) {
 						if (p.getPos() >= idx * CHUNK && p.getPos() < (idx + 1) * CHUNK) {
 							summary[(p.getPos() - 1) / SUMMARYSIZE] += p.getCoverage();
-//							System.out.println((p.getPos() - 1) / SUMMARYSIZE + "-"
-//									+ summary[(p.getPos() - 1) / SUMMARYSIZE]);
 							if (p.getCoverage() > maxPile) {
 								maxPile = p.getCoverage();
 							}
