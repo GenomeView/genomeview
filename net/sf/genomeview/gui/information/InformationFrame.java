@@ -3,13 +3,22 @@
  */
 package net.sf.genomeview.gui.information;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 
+import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Type;
@@ -28,8 +37,10 @@ import be.abeel.gui.GridBagPanel;
 public class InformationFrame extends GridBagPanel {
 
     private static final long serialVersionUID = -8504854026653847566L;
+	private Model model;
 
     public InformationFrame(final Model model) {
+    	this.model=model;
         gc.fill = GridBagConstraints.BOTH;
         gc.weightx = 1;
         gc.weighty = 1;
@@ -74,16 +85,42 @@ public class InformationFrame extends GridBagPanel {
         gc.weighty = 0;
         add(new JLabel("Details on selected items:"), gc);
         gc.gridy++;
+        gc.weightx=0;
+        add(new SearchButtons(),gc);
+        gc.weightx=1;
+        gc.gridy++;
+        
         gc.weighty = 1;
         JPanel detail = new FeatureDetailPanel(model);
         add(new JScrollPane(detail), gc);
 
         gc.gridy++;
         gc.weighty = 0.3;
+        
         add(new GeneStructureView(model), gc);
 
         setPreferredSize(new Dimension(250, this.getPreferredSize().height));
 
+    }
+    class SearchButtons extends JToolBar{
+    	
+    	public SearchButtons(){
+    		super.setFloatable(false);
+    		JButton g=new JButton(Icons.GOOGLE);
+    		g.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Query.google.query(model.selectionModel().getFeatureSelection().first().toString());
+					
+				}
+			});
+    		
+    		add(g);
+    		super.addSeparator();
+    		
+    		
+    	}
     }
 
 }
