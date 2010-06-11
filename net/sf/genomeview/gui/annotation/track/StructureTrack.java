@@ -24,6 +24,7 @@ import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
+import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
@@ -492,7 +493,7 @@ public class StructureTrack extends Track {
 		for (Type type : Type.values()) {
 			if (visibleTypes.get(type)) {
 				Location l = model.getAnnotationLocationVisible();
-				MemoryFeatureAnnotation annot = model.getSelectedEntry().getMemoryAnnotation(type);
+				FeatureAnnotation annot = (FeatureAnnotation)model.getSelectedEntry().get(type);
 				Iterable<Feature> trackData = annot.get(l.start, l.end);
 				if (annot.getEstimateCount(l) <= Configuration.getInt("structureview:maximumNoVisibleFeatures")) {
 					for (Feature rf : trackData) {
