@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.util.BitSet;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -23,7 +24,6 @@ import net.sf.genomeview.scheduler.Task;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
-import net.sf.jannot.Strand;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.tabix.PileupWrapper;
 
@@ -63,14 +63,16 @@ public class PileupTrack extends Track {
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
-
 		return false;
 	}
 
-	/* Queue in blocks of 1000 */
+	/* Queue in blocks of CHUNK */
 	private BitSet queued = new BitSet();
+	/* Queue in blocks of CHUNK */
+	private BitSet ready = new BitSet();
 	private int[] summary;
 	private int maxPile = 0;
+	private int maxSummary = 0;
 
 	private static final int CHUNK = 2000;
 	private static final int SUMMARYSIZE = 100;
@@ -81,25 +83,39 @@ public class PileupTrack extends Track {
 		return Math.log(d) / LOG2;
 	}
 
+	private Logger log = Logger.getLogger(PileupTrack.class.toString());
+
 	public synchronized void queue(final int idx, final PileupWrapper pw) {
-		final PileupTrack pt=this;
+		final PileupTrack pt = this;
 		if (!queued.get(idx)) {
 			queued.set(idx);
 			GenomeViewScheduler.submit(new Task() {
 
 				@Override
 				public void run() {
-					Iterable<Pile> piles = pw.get(idx * CHUNK, (idx + 1) * CHUNK);
-					for (Pile p : piles) {
-						if (p.getPos() >= idx * CHUNK && p.getPos() < (idx + 1) * CHUNK) {
-							summary[(p.getPos() - 1) / SUMMARYSIZE] += p.getCoverage();
-							if (p.getCoverage() > maxPile) {
-								maxPile = p.getCoverage();
+					try {
+						Iterable<Pile> piles = pw.get(idx * CHUNK, (idx + 1) * CHUNK);
+						for (Pile p : piles) {
+							if (p.getPos() >= idx * CHUNK && p.getPos() < (idx + 1) * CHUNK) {
+								summary[(p.getPos() - 1) / SUMMARYSIZE] += p.getCoverage();
+								if (p.getCoverage() > maxPile) {
+									maxPile = p.getCoverage();
+								}
+								if (summary[(p.getPos() - 1) / SUMMARYSIZE] > maxSummary)
+									maxSummary = summary[(p.getPos() - 1) / SUMMARYSIZE];
 							}
 						}
+						// System.out.println("Pilerequest: " + idx +
+						// " completed "+maxSummary);
+						ready.set(idx);
+						pt.model.refresh();
+					} catch (Exception e) {
+						log.severe("Scheduler exception: " + pw + "\t" + idx + "\tpw.get(" + idx * CHUNK + ", "
+								+ (idx + 1) * CHUNK + ")\n\t"+e);
+					} catch(Error er){
+						log.severe("Scheduler error: " + pw + "\t" + idx + "\tpw.get(" + idx * CHUNK + ", "
+								+ (idx + 1) * CHUNK + ")\n\t"+er);
 					}
-					System.out.println("Pilerequest: " + idx + " completed");
-					pt.model.refresh();
 				}
 
 			});
@@ -137,17 +153,21 @@ public class PileupTrack extends Track {
 				if (coverage > maxPile)
 					maxPile = coverage;
 				double frac = coverage / (double) maxPile;
-				int size = (int) (frac * 50);
+				int size = (int) (frac * graphLineHeigh);
 				int width = (int) Math.ceil(screenWidth / visible.length());
 				// System.out.println(size);
 				int screenX = Convert.translateGenomeToScreen(pos, visible, screenWidth);
-				g.fillRect(screenX, yOffset + 50 - size, width, size);
+				g.fillRect(screenX, yOffset + graphLineHeigh - size, width, size);
 
 			}
 
 		} else {
 			/* Queue data retrieval */
-			for (int i = visible.start / CHUNK; i < visible.end / CHUNK + 1; i++) {
+			int startChunk = visible.start / CHUNK;
+			int endChunk = visible.end / CHUNK;
+			int stepChunk = (endChunk - startChunk) / 20 + 1;
+			// System.out.println(startChunk+"\t"+endChunk+"\t"+stepChunk);
+			for (int i = visible.start / CHUNK; i < visible.end / CHUNK + 1; i += stepChunk) {
 				final int idx = i;
 				queue(idx, pw);
 
@@ -170,16 +190,25 @@ public class PileupTrack extends Track {
 			// double range = topValue - bottomValue;
 
 			int vs = visible.start / SUMMARYSIZE * SUMMARYSIZE + SUMMARYSIZE / 2;
-			double topValue = maxPile;
+			double topValue = maxSummary;
 			double range = topValue - bottomValue;
+
+			conservationGP.moveTo(-5, yOffset+graphLineHeigh);
+
 			for (int i = vs; i < visible.end + SUMMARYSIZE; i += SUMMARYSIZE) {
+				if (!ready.get(i / CHUNK))
+					continue;
 				int x = Convert.translateGenomeToScreen(i, visible, screenWidth);
 
 				// double valF = f[i] - 1;
 				// double valR = r[i] - 1;
-				//System.out.println("P-" + (i / SUMMARYSIZE) + " " + summary[i / SUMMARYSIZE]);
-				double val = summary[i / SUMMARYSIZE] / SUMMARYSIZE;// /f[i] +
-																	// r[i] - 2;
+				// System.out.println("P-" + (i / SUMMARYSIZE) + " " + summary[i
+				// / SUMMARYSIZE]);
+
+				double val = summary[i / SUMMARYSIZE];// / (double)maxSummary;//
+														// /f[i] +
+
+				// r[i] - 2;
 				/* Cap value */
 				// if (valF > topValue)
 				// valF = topValue;
@@ -212,15 +241,16 @@ public class PileupTrack extends Track {
 					// valR /= range;
 					val /= range;
 				}
-				//System.out.println("VAL: " + val);
+				// System.out.println("VAL: " + val);
 				/* Draw lines */
-				if (i == vs) {
-					conservationGP.moveTo(x - 1, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
-					// conservationGPF.moveTo(x - 1, yOffset + (1 - valF) *
-					// (graphLineHeigh - 4) + 2);
-					// conservationGPR.moveTo(x - 1, yOffset + (1 - valR) *
-					// (graphLineHeigh - 4) + 2);
-				}
+				// if (i == vs) {
+				// conservationGP.moveTo(x - 1, yOffset + (1 - val) *
+				// (graphLineHeigh - 4) + 2);
+				// // conservationGPF.moveTo(x - 1, yOffset + (1 - valF) *
+				// // (graphLineHeigh - 4) + 2);
+				// // conservationGPR.moveTo(x - 1, yOffset + (1 - valR) *
+				// // (graphLineHeigh - 4) + 2);
+				// }
 
 				conservationGP.lineTo(x, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
 				// conservationGPF.lineTo(x, yOffset + (1 - valF) *
@@ -246,9 +276,11 @@ public class PileupTrack extends Track {
 			// g.setColor(reverseColor);
 			// g.draw(conservationGPR);
 			g.setColor(Color.BLACK);
+			conservationGP.lineTo(screenWidth + 5, yOffset+graphLineHeigh);
 			g.draw(conservationGP);
 
 		}
+
 		g.setColor(Color.BLACK);
 		g.drawString(StaticUtils.shortify(super.dataKey.toString()), 10, yOffset + 24 - 2);
 		return graphLineHeigh;
