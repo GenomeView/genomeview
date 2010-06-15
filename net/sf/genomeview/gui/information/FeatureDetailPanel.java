@@ -7,17 +7,11 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -93,7 +87,7 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 						String[] arr = extra.split(";");
 						for (String s : arr) {
 							String[] tmp = s.split(",");
-							JMenuItem extramenu = wrapMenu(new Query(tmp[0], tmp[1]));
+							JMenuItem extramenu = wrapMenu(new Query(tmp[0], tmp[1],null));
 							popupMenu.add(extramenu);
 						}
 					}
@@ -104,13 +98,14 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 			}
 
 			private JMenuItem wrapMenu(final Query q) {
-				return new JMenu(new AbstractAction() {
+				return new JMenuItem(new AbstractAction(q.getLabel(),q.getIcon()) {
 
 					private static final long serialVersionUID = -3208849232821620577L;
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						q.query(name.getText());
+						
+						q.query(name.getSelectedText());
 
 					}
 				});
