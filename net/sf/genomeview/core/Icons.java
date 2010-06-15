@@ -3,18 +3,13 @@
  */
 package net.sf.genomeview.core;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import net.sf.image4j.codec.ico.ICODecoder;
-
 public class Icons {
-	
-	
+
 	public static final Icon DELETE = new ImageIcon(Icons.class.getResource("/images/delete.png"));
 
 	public static final Icon YES = new ImageIcon(Icons.class.getResource("/images/yes.png"));
@@ -30,8 +25,12 @@ public class Icons {
 
 	public static final Icon HELP = new ImageIcon(Icons.class.getResource("/images/help.png"));
 
-	public static Icon GOOGLE= new ImageIcon(Icons.class.getResource("/images/search/google.png"));;
-	
+	public static final Icon PLAZA = new ImageIcon(Icons.class.getResource("/images/search/plaza.png"));
+
+	public static Icon GOOGLE = new ImageIcon(Icons.class.getResource("/images/search/google.png"));
+	public static Icon NCBI = new ImageIcon(Icons.class.getResource("/images/search/ncbi.png"));
+	public static Icon Ensembl = new ImageIcon(Icons.class.getResource("/images/search/ensembl.png"));
+
 	private Icons() throws IOException {
 
 	}
