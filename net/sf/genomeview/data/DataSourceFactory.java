@@ -16,6 +16,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import be.abeel.io.LineIterator;
+
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.cache.CachedURLSource;
 import net.sf.genomeview.data.das.DAS;
@@ -264,7 +266,15 @@ public class DataSourceFactory {
 			return new File(string).exists();
 		if (in instanceof URL)
 			try {
-				new URL(string).openStream().close();
+				System.out.println("Checking: "+string);
+				System.out.println(new URL(string).openConnection().getHeaderFields());
+				LineIterator it=new LineIterator(new URL(string).openStream());
+				String line=it.next();
+				it.close();
+				/* This is not supposed to happend, except with badly configured CMS that take over */
+				if(line.startsWith("<!DOCTYPE html"))
+					return false;;
+				
 				return true;
 			} catch (IOException ioe) {
 				System.err.println(ioe);
