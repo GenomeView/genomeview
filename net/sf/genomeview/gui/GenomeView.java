@@ -36,6 +36,15 @@ public class GenomeView {
 
 		protected PasswordAuthentication getPasswordAuthentication() {
 			final JDialog jd = new JDialog();
+			ActionListener dps = new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					jd.dispose();
+
+				}
+			};
+			
 			jd.setTitle("Enter password");
 			jd.setModal(true);
 			jd.setLayout(new GridBagLayout());
@@ -44,23 +53,22 @@ public class GenomeView {
 			gc.gridy = 0;
 			gc.fill = GridBagConstraints.BOTH;
 
-			JLabel jl = new JLabel("Please enter login details for: " + getRequestingPrompt() + " at " + getRequestingHost());
+			JLabel jl = new JLabel("Please enter login details for: " + getRequestingPrompt() + " at "
+					+ getRequestingHost());
 			jd.add(jl, gc);
 			gc.gridy++;
 			JTextField username = new JTextField(user);
+			username.addActionListener(dps);
 			jd.add(new TitledComponent("User name", username), gc);
 			gc.gridy++;
 			JPasswordField password = new JPasswordField(new String(pass));
-
+			password.addActionListener(dps);
 			jd.add(new TitledComponent("Password", password), gc);
 			gc.gridy++;
 			JButton jb = new JButton("OK");
+			jb.addActionListener(dps);
 			jd.add(jb, gc);
-			jb.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					jd.dispose();
-				}
-			});
+			
 			jd.pack();
 			StaticUtils.center(jd);
 			jd.setVisible(true);
@@ -129,6 +137,7 @@ public class GenomeView {
 				public void newInstanceCreated() {
 					System.out.println("New instance detected...");
 					try {
+						assert mw!=null;
 						mw.init(args);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
