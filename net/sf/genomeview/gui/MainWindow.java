@@ -161,6 +161,8 @@ public class MainWindow implements WindowListener, Observer {
 	}
 
 	public void init(String[] args) throws InterruptedException, ExecutionException {
+		//FIXME special handling if this is not the first time the application is initialized
+		
 		/* Initialize the command line options */
 		AutoHelpCmdLineParser parser = new AutoHelpCmdLineParser();
 		Option urlO = parser.addHelp(parser.addStringOption("url"), "Start GenomeView with data loaded from the URL");
@@ -258,18 +260,13 @@ public class MainWindow implements WindowListener, Observer {
 		 */
 		DataSource[] data = null;
 		if (cmdFile == null && cmdUrl == null) {
-			logger.info("File, url and bogas options are null!");
-			// Sources source = (Sources) JOptionPane.showInputDialog(window,
-			// "Select main data source", "Data selection",
-			// JOptionPane.INFORMATION_MESSAGE, null, Sources.values(),
-			// Sources.values()[0]);
-			// if(source!=null)
-			// data = DataSourceFactory.create(source, model);
-
+			logger.info("File and url options are null!");
+			// do nothing
+			
 		} else if (cmdUrl != null) {
 			logger.info("URL commandline option is set: " + cmdUrl);
 			try {
-				data = new DataSource[] { DataSourceFactory.createURL(new URI(cmdUrl).toURL()) };
+				data = new DataSource[] { DataSourceFactory.createURL(new URL(cmdUrl)) };
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
