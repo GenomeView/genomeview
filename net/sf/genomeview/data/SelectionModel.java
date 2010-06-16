@@ -17,7 +17,7 @@ import net.sf.jannot.shortread.ReadGroup;
  * Keeps track of whatever is selected.
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 public class SelectionModel extends Observable {
 
@@ -34,7 +34,7 @@ public class SelectionModel extends Observable {
 	private void refresh() {
 		setChanged();
 		notifyObservers();
-		
+
 	}
 
 	public SortedSet<Location> getLocationSelection() {
@@ -63,8 +63,8 @@ public class SelectionModel extends Observable {
 		refresh();
 
 	}
-	private Location selectedRegion = null;
 
+	private Location selectedRegion = null;
 
 	public final Location getSelectedRegion() {
 		return selectedRegion;
@@ -77,21 +77,23 @@ public class SelectionModel extends Observable {
 
 	public SortedSet<Feature> getFeatureSelection() {
 		SortedSet<Feature> out = new TreeSet<Feature>();
-		Set<Location>select=new TreeSet<Location>();
+		Set<Location> select = new TreeSet<Location>();
 		select.addAll(selectedLocation);
 		for (Location l : select) {
 			out.add(l.getParent());
 		}
 		return out;
 	}
-	
+
 	/**
 	 * Return the length of the current selection, either region, or location
+	 * 
 	 * @return number of selected proteins
 	 */
-	public int getNumberOfSelectedProts(){
-		return getNumberOfSelectedNucs()/3;
+	public int getNumberOfSelectedProts() {
+		return getNumberOfSelectedNucs() / 3;
 	}
+
 	public void clearLocationSelection() {
 		selectedLocation.clear();
 		refresh();
@@ -100,15 +102,16 @@ public class SelectionModel extends Observable {
 
 	/**
 	 * Return the length of the current selection, either region, or location
+	 * 
 	 * @return number of selected nucleotides
 	 */
-	public int getNumberOfSelectedNucs(){
-		if (getSelectedRegion() != null){
+	public int getNumberOfSelectedNucs() {
+		if (getSelectedRegion() != null) {
 			return getSelectedRegion().length();
-		} else if (getLocationSelection()!=null && getLocationSelection().size()!=0){
+		} else if (getLocationSelection() != null && getLocationSelection().size() != 0) {
 			int size = 0;
-			for (Location loc : getLocationSelection()){
-				size+=loc.length();
+			for (Location loc : getLocationSelection()) {
+				size += loc.length();
 			}
 			return size;
 		} else {
@@ -119,5 +122,15 @@ public class SelectionModel extends Observable {
 	public void clear() {
 		selectedLocation.clear();
 		selectedRegion = null;
+	}
+
+	/**
+	 * Returns true if there is a feature selected, returns false in other
+	 * cases.
+	 * 
+	 * @return
+	 */
+	public boolean isFeatureSelected() {
+		return selectedLocation.size()>0;
 	}
 }

@@ -30,7 +30,11 @@ import net.sf.jannot.source.SAMDataSource;
 import net.sf.jannot.source.SSL;
 import net.sf.jannot.source.URLSource;
 import net.sf.jannot.tabix.IndexedFeatureFile;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class DataSourceFactory {
 	private static Logger log = Logger.getLogger(DataSourceFactory.class.getCanonicalName());
 

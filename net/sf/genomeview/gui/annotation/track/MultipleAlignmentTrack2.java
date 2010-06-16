@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 
+import net.sf.genomeview.core.BiMap;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
@@ -30,14 +31,10 @@ import net.sf.genomeview.gui.dialog.MultipleAlignmentOrderingDialog;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
-import net.sf.jannot.MemoryListData;
 import net.sf.jannot.Strand;
 import net.sf.jannot.alignment.maf.AlignmentBlock;
 import net.sf.jannot.alignment.maf.AlignmentSequence;
 import net.sf.jannot.alignment.maf.MAFMultipleAlignment;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 
 /**
  * 
@@ -126,7 +123,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	private Map<Rectangle, AlignmentBlock> paintedBlocks = new HashMap<Rectangle, AlignmentBlock>();
 
-//	private int queriedBlocks = 0;
+	// private int queriedBlocks = 0;
 
 	class MouseHit {
 		AlignmentBlock ab;
@@ -134,7 +131,9 @@ public class MultipleAlignmentTrack2 extends Track {
 		public int x1;
 	}
 
-	final private BiMap<String, Integer> ordering = HashBiMap.create();
+	
+
+	final private BiMap<String, Integer> ordering = new BiMap<String, Integer>();
 
 	class MAComparator implements Comparator<AlignmentSequence> {
 		private BiMap<String, Integer> ordering;
@@ -145,7 +144,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 		@Override
 		public int compare(AlignmentSequence o1, AlignmentSequence o2) {
-			return ordering.get(o1.getName()).compareTo(ordering.get(o2.getName()));
+			return ordering.getForward(o1.getName()).compareTo(ordering.getForward(o2.getName()));
 		}
 	}
 
@@ -164,12 +163,15 @@ public class MultipleAlignmentTrack2 extends Track {
 			g.drawString("No multiple alignment loaded for this entry", 10, yOffset + 10);
 			return 20 + 5;
 		}
-		/* Make sure there is an ordering, start with the one from the species in the MA*/
+		/*
+		 * Make sure there is an ordering, start with the one from the species
+		 * in the MA
+		 */
 		if (ordering.size() != ma.species().size()) {
 			ordering.clear();
-			int i=0;
+			int i = 0;
 			for (String e : ma.species()) {
-				ordering.put(e, i++);
+				ordering.putForward(e, i++);
 			}
 
 		}
@@ -178,18 +180,19 @@ public class MultipleAlignmentTrack2 extends Track {
 		g.setColor(Color.BLACK);
 		Location visible = model.getAnnotationLocationVisible();
 
-		int estCount=(int)(model.getAnnotationLocationVisible().length()/(double)entry.getMaximumLength()*ma.size());
-		//System.out.println("Number of alignment blocks: "+ma.size());
-		if ( estCount> 10000) {
+		int estCount = (int) (model.getAnnotationLocationVisible().length() / (double) entry.getMaximumLength() * ma
+				.size());
+		// System.out.println("Number of alignment blocks: "+ma.size());
+		if (estCount > 10000) {
 			g.drawString("Too many alignment blocks, zoom in to see multiple alignments", 10, yOffset + 10);
-//			System.out.println("estimated count="+estCount);
+			// System.out.println("estimated count="+estCount);
 			return 20 + 5;
 		}
 		// TreeSet<AlignmentBlock> abs = ma.get(entry, visible);
-		//System.out.println("Querying location: "+visible);
+		// System.out.println("Querying location: "+visible);
 		Iterable<AlignmentBlock> abs = ma.get(visible.start, visible.end);
 
-//		queriedBlocks = ma.getEstimateCount(visible);
+		// queriedBlocks = ma.getEstimateCount(visible);
 
 		if (!abs.iterator().hasNext()) {
 			g.drawString("No alignment blocks in this region", 10, yOffset + 10);
@@ -203,13 +206,12 @@ public class MultipleAlignmentTrack2 extends Track {
 			for (AlignmentBlock ab : abs) {
 				int abCount = 0;
 
-				int start =ab.getLocation().start;
+				int start = ab.getLocation().start;
 				int end = ab.getLocation().end;
-				
-				
+
 				for (AlignmentSequence as : ab) {
 					abCount++;
-					
+
 				}
 
 				int x1 = Convert.translateGenomeToScreen(start, visible, screenWidth);
@@ -240,11 +242,12 @@ public class MultipleAlignmentTrack2 extends Track {
 				}
 				BitSet lines = new BitSet(ordering.size());
 				if (visible.length() < 1000) {
-//					char[] ref = entry.sequence().getSubSequence(visible.start, visible.end + 1).toCharArray();
-					Iterable<Character> bufferedSeq = entry.sequence().get(
-							visible.start , visible.end);
+					// char[] ref =
+					// entry.sequence().getSubSequence(visible.start,
+					// visible.end + 1).toCharArray();
+					Iterable<Character> bufferedSeq = entry.sequence().get(visible.start, visible.end);
 
-					char[] ref  = new char[visible.length()];
+					char[] ref = new char[visible.length()];
 					int idx = 0;
 					for (char c : bufferedSeq) {
 						ref[idx++] = c;
@@ -257,7 +260,7 @@ public class MultipleAlignmentTrack2 extends Track {
 						// g.drawString(as.seq().toString(), x1,
 						// rec.y+line*lineHeight);
 						if (showAll) {
-							line = ordering.get(as.getName()) + 1;
+							line = ordering.getForward(as.getName()) + 1;
 							lines.set(line - 1);
 						}
 						// System.out.println(as+"\t"+line);
@@ -299,7 +302,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 					for (AlignmentSequence as : ab2) {
 						if (showAll) {
-							line = ordering.get(as.getName()) + 1;
+							line = ordering.getForward(as.getName()) + 1;
 							lines.set(line - 1);
 						}
 						if (as.strand() == Strand.FORWARD) {
@@ -399,10 +402,10 @@ public class MultipleAlignmentTrack2 extends Track {
 				Rectangle2D[] size = new Rectangle2D[ma.species().size()];
 				int maxWidth = 0;
 				for (String e : shown) {
-//					String s = e.getID();
-					arr[ordering.get(e)] = e;
+					// String s = e.getID();
+					arr[ordering.getForward(e)] = e;
 					Rectangle2D stringSize = g.getFontMetrics().getStringBounds(e, g);
-					size[ordering.get(e)] = stringSize;
+					size[ordering.getForward(e)] = stringSize;
 					if (stringSize.getWidth() > maxWidth)
 						maxWidth = (int) stringSize.getWidth();
 				}
@@ -445,17 +448,17 @@ public class MultipleAlignmentTrack2 extends Track {
 		}
 	}
 
-//	private void updateOrdering(Entry entry) {
-//		MAFMultipleAlignment ma = (MAFMultipleAlignment) entry.get(dataKey);
-//		// TODO keep old ones, only add new ones.
-//		ordering.clear();
-//		int i = 0;
-//		for (String e : ma.species()) {
-//			ordering.put(e, i++);
-//		}
-//		// System.out.println(ordering);
-//
-//	}
+	// private void updateOrdering(Entry entry) {
+	// MAFMultipleAlignment ma = (MAFMultipleAlignment) entry.get(dataKey);
+	// // TODO keep old ones, only add new ones.
+	// ordering.clear();
+	// int i = 0;
+	// for (String e : ma.species()) {
+	// ordering.put(e, i++);
+	// }
+	// // System.out.println(ordering);
+	//
+	// }
 
 	@Override
 	public String displayName() {

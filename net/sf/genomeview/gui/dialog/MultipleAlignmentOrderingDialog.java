@@ -20,9 +20,9 @@ import javax.swing.event.MouseInputListener;
 import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.AbstractTableModel;
 
+import net.sf.genomeview.core.BiMap;
 import net.sf.genomeview.data.Model;
 
-import com.google.common.collect.BiMap;
 
 /**
  * 
@@ -35,7 +35,7 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 		final JDialog _self=this;
 		final OrderingTableModel listModel = new OrderingTableModel(ordering);
 		final JTable table=new JTable(listModel);
-		table.setUI(new DragDropRowTableUI(model, ordering.inverse()));
+		table.setUI(new DragDropRowTableUI(model, ordering));
 		table.setCellSelectionEnabled(false);
 		table.setRowSelectionAllowed(false);
 		table.setColumnSelectionAllowed(false);
@@ -62,10 +62,10 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 		private boolean draggingRow = false;
 		private int startDragPoint;
 		private int dyOffset;
-		private BiMap<Integer, String> ordering;
+		private BiMap<String, Integer> ordering;
 		private Model model;
 
-		public DragDropRowTableUI(Model model,BiMap<Integer, String>ordering){
+		public DragDropRowTableUI(Model model,BiMap<String, Integer>ordering){
 			this.ordering=ordering;
 			this.model=model;
 		}
@@ -121,10 +121,10 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 					}
 
 					if (toRow >= 0 && toRow < table.getRowCount()) {
-						String a=ordering.get(fromRow);
-						String b=ordering.get(toRow);
-						ordering.forcePut(fromRow, b);
-						ordering.forcePut(toRow, a);
+						String a=ordering.getReverse(fromRow);
+						String b=ordering.getReverse(toRow);
+						ordering.putReverse(fromRow, b);
+						ordering.putReverse(toRow, a);
 						table.setRowSelectionInterval(toRow, toRow);
 						startDragPoint = yMousePoint;
 						model.refresh();
@@ -145,7 +145,7 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 	}
 
 	class OrderingTableModel extends AbstractTableModel {
-		private BiMap<Integer, String> ordering;
+		private BiMap<String, Integer> ordering;
 
 		@Override
 		public String getColumnName(int column) {
@@ -155,7 +155,7 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 		
 
 		public OrderingTableModel(BiMap<String, Integer> ordering2) {
-			this.ordering=ordering2.inverse();
+			this.ordering=ordering2;
 		}
 
 		public void update(Observable o, Object arg) {
@@ -176,7 +176,7 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 
 		@Override
 		public Object getValueAt(int row, int col) {
-			return ordering.get(row);
+			return ordering.getReverse(row);
 			
 
 		}
