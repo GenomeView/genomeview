@@ -28,6 +28,7 @@ import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.gui.annotation.track.WiggleTrack;
 import net.sf.genomeview.plugin.GUIManager;
+import net.sf.genomeview.scheduler.GenomeViewScheduler;
 import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
@@ -66,6 +67,24 @@ public class Model extends Observable implements IModel {
 
 	public Model(JFrame parent) {
 		this.parent = parent;
+		/* Scheduler booster thread */
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				while (true) {
+					GenomeViewScheduler.boost(getAnnotationLocationVisible());
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+			}
+		}).start();
+
 		selectionModel.addObserver(this);
 		this.trackList = new TrackList(this);
 		entries.addObserver(this);
@@ -352,7 +371,7 @@ public class Model extends Observable implements IModel {
 			setAnnotationLocationVisible(new Location(1, 51));
 		logger.info("Reading source:" + f);
 		f.read(entries);
-		System.out.println("Entries: "+entries.size());
+		System.out.println("Entries: " + entries.size());
 		logger.info("Model adding data done!");
 		if (f instanceof MultiFileSource)
 			for (DataSource ds : ((MultiFileSource) f).getFileSources()) {
@@ -590,10 +609,10 @@ public class Model extends Observable implements IModel {
 	 */
 	public synchronized void updateTracks() {
 		int startSize = trackList.size();
-		
+
 		// for (Entry e : entries) {
 		Entry e = this.getSelectedEntry();
-		System.out.println("Updating tracks for "+e);
+		System.out.println("Updating tracks for " + e);
 		/* Graph tracks */
 		for (DataKey key : e) {
 			Data<?> data = e.get(key);

@@ -67,9 +67,9 @@ public class PileupTrack extends Track {
 	}
 
 	/* Queue in blocks of CHUNK */
-	private BitSet queued=null;
+	private BitSet queued = null;
 	/* Queue in blocks of CHUNK */
-	private BitSet ready=null;
+	private BitSet ready = null;
 	private int[] summary;
 	private int maxPile = 0;
 	private int maxSummary = 0;
@@ -85,52 +85,56 @@ public class PileupTrack extends Track {
 
 	private Logger log = Logger.getLogger(PileupTrack.class.toString());
 
-	public synchronized void queue(final int idx, final PileupWrapper pw) {
-		final PileupTrack pt = this;
-		if (!queued.get(idx)) {
-			queued.set(idx);
-			GenomeViewScheduler.submit(new Task() {
+	class PileupTask extends Task {
+		private int idx;
+		private PileupWrapper pw;
 
-				@Override
-				public void run() {
-					try {
-						Iterable<Pile> piles = pw.get(idx * CHUNK, (idx + 1) * CHUNK);
-						for (Pile p : piles) {
-							if (p.getPos() >= idx * CHUNK && p.getPos() < (idx + 1) * CHUNK) {
-								summary[(p.getPos() - 1) / SUMMARYSIZE] += p.getCoverage();
-								if (p.getCoverage() > maxPile) {
-									maxPile = p.getCoverage();
-								}
-								if (summary[(p.getPos() - 1) / SUMMARYSIZE] > maxSummary)
-									maxSummary = summary[(p.getPos() - 1) / SUMMARYSIZE];
-							}
+		public PileupTask(PileupWrapper pw, int idx) {
+			super(new Location(idx * CHUNK, (idx + 1) * CHUNK));
+			this.pw = pw;
+			this.idx = idx;
+
+		}
+
+		@Override
+		public void run() {
+			try {
+				Iterable<Pile> piles = pw.get(idx * CHUNK, (idx + 1) * CHUNK);
+				for (Pile p : piles) {
+					if (p.getPos() >= idx * CHUNK && p.getPos() < (idx + 1) * CHUNK) {
+						summary[(p.getPos() - 1) / SUMMARYSIZE] += p.getCoverage();
+						if (p.getCoverage() > maxPile) {
+							maxPile = p.getCoverage();
 						}
-						// System.out.println("Pilerequest: " + idx +
-						// " completed "+maxSummary);
-						ready.set(idx);
-						pt.model.refresh();
-					} catch (Exception e) {
-						log.severe("Scheduler exception: " + pw + "\t" + idx + "\tpw.get(" + idx * CHUNK + ", "
-								+ (idx + 1) * CHUNK + ")\n\t"+e);
-					} catch(Error er){
-						log.severe("Scheduler error: " + pw + "\t" + idx + "\tpw.get(" + idx * CHUNK + ", "
-								+ (idx + 1) * CHUNK + ")\n\t"+er);
+						if (summary[(p.getPos() - 1) / SUMMARYSIZE] > maxSummary)
+							maxSummary = summary[(p.getPos() - 1) / SUMMARYSIZE];
 					}
 				}
-
-			});
-
-			System.out.println("Queue: " + idx);
-
+				System.out.println("Pilerequest: " + idx + " completed " + maxSummary);
+				ready.set(idx);
+				if (!queued.get(idx + 1)) {
+					if ((idx + 1) * CHUNK < entry.getMaximumLength()) {
+						queued.set(idx + 1);
+						GenomeViewScheduler.submit(new PileupTask(pw, idx + 1));
+					}
+				}
+				model.refresh();
+			} catch (Exception e) {
+				log.severe("Scheduler exception: " + pw + "\t" + idx + "\tpw.get(" + idx * CHUNK + ", " + (idx + 1)
+						* CHUNK + ")\n\t" + e);
+			} catch (Error er) {
+				log.severe("Scheduler error: " + pw + "\t" + idx + "\tpw.get(" + idx * CHUNK + ", " + (idx + 1) * CHUNK
+						+ ")\n\t" + er);
+			}
 		}
 	}
 
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth) {
-		if (summary == null||summary.length==0){
+		if (summary == null || summary.length <= 1) {
 			reset();
 		}
-		
+
 		/* Get configuration */
 		boolean logScaling = Configuration.getBoolean("shortread:logScaling");
 		double bottomValue = Configuration.getDouble("shortread:bottomValue");
@@ -142,7 +146,6 @@ public class PileupTrack extends Track {
 
 		// System.out.println("PW=" + pw);
 		Location visible = model.getAnnotationLocationVisible();
-
 		if (visible.length() < CHUNK) {
 			// System.out.println("Show individual");
 			Iterable<Pile> piles = pw.get(visible.start, visible.end);
@@ -156,7 +159,7 @@ public class PileupTrack extends Track {
 					maxPile = coverage;
 				double frac = coverage / (double) maxPile;
 				int size = (int) (frac * graphLineHeigh);
-				
+
 				// System.out.println(size);
 				int screenX = Convert.translateGenomeToScreen(pos, visible, screenWidth);
 				g.fillRect(screenX, yOffset + graphLineHeigh - size, width, size);
@@ -171,8 +174,23 @@ public class PileupTrack extends Track {
 			// System.out.println(startChunk+"\t"+endChunk+"\t"+stepChunk);
 			for (int i = visible.start / CHUNK; i < visible.end / CHUNK + 1; i += stepChunk) {
 				final int idx = i;
-				queue(idx, pw);
+				if (!queued.get(idx)) {
+					queued.set(idx);
+					GenomeViewScheduler.submit(new PileupTask(pw, idx));
 
+				}
+
+			}
+			/* Draw status */
+			int chunkWidth = (int) Math.ceil(CHUNK * screenWidth / visible.length());
+			for (int i = visible.start; i < visible.end; i += CHUNK) {
+				int x = Convert.translateGenomeToScreen((i / CHUNK) * CHUNK, visible, screenWidth);
+				if (queued.get(i / CHUNK))
+					g.setColor(Color.ORANGE);
+				if (ready.get(i / CHUNK))
+					g.setColor(Color.GREEN);
+				if (queued.get(i / CHUNK) || ready.get(i / CHUNK))
+					g.fillRect(x, yOffset, chunkWidth, graphLineHeigh);
 			}
 
 			/* Paint coverage plot */
@@ -195,7 +213,7 @@ public class PileupTrack extends Track {
 			double topValue = maxSummary;
 			double range = topValue - bottomValue;
 
-			conservationGP.moveTo(-5, yOffset+graphLineHeigh);
+			conservationGP.moveTo(-5, yOffset + graphLineHeigh);
 
 			for (int i = vs; i < visible.end + SUMMARYSIZE; i += SUMMARYSIZE) {
 				if (!ready.get(i / CHUNK))
@@ -206,9 +224,16 @@ public class PileupTrack extends Track {
 				// double valR = r[i] - 1;
 				// System.out.println("P-" + (i / SUMMARYSIZE) + " " + summary[i
 				// / SUMMARYSIZE]);
+				// try {
+				int idx = i / SUMMARYSIZE;
+				if (idx >= summary.length) {
+					// System.err.println(idx);
+					idx = summary.length - 1;
+				}
+				double val = summary[idx];// /
+				// (double)maxSummary;//
 
-				double val = summary[i / SUMMARYSIZE];// / (double)maxSummary;//
-														// /f[i] +
+				// /f[i] +
 
 				// r[i] - 2;
 				/* Cap value */
@@ -259,7 +284,11 @@ public class PileupTrack extends Track {
 				// (graphLineHeigh - 4) + 2);
 				// conservationGPR.lineTo(x, yOffset + (1 - valR) *
 				// (graphLineHeigh - 4) + 2);
-
+				// } catch (ArrayIndexOutOfBoundsException e) {
+				// System.err.println(e);
+				// System.err.println(summary.length);
+				// System.out.println(entry.getMaximumLength());
+				// }
 			}
 			// for (int i = 0; i < f.length; i++) {
 			// int x = Convert.translateGenomeToScreen(start + i * scale,
@@ -278,7 +307,7 @@ public class PileupTrack extends Track {
 			// g.setColor(reverseColor);
 			// g.draw(conservationGPR);
 			g.setColor(Color.BLACK);
-			conservationGP.lineTo(screenWidth + 5, yOffset+graphLineHeigh);
+			conservationGP.lineTo(screenWidth + 5, yOffset + graphLineHeigh);
 			g.draw(conservationGP);
 
 		}
@@ -290,12 +319,12 @@ public class PileupTrack extends Track {
 	}
 
 	private void reset() {
-		//System.out.println(entry);
-		summary = new int[entry.getMaximumLength() / SUMMARYSIZE];
-		//System.out.println("Piluptrack: "+summary.length);
-		ready=new BitSet();
-		queued=new BitSet();
-		
+		// System.out.println(entry);
+		summary = new int[entry.getMaximumLength() / SUMMARYSIZE + 1];
+		// System.out.println("Piluptrack: "+summary.length);
+		ready = new BitSet();
+		queued = new BitSet();
+
 	}
 
 	@Override
