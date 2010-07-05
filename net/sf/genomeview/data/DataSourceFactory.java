@@ -255,9 +255,9 @@ public class DataSourceFactory {
 			if (checkExist(in, indexName)) {
 				System.out.println("Reading tabix file...");
 				if (in instanceof File)
-					return new IndexedFeatureFile((File) in);
+					return new IndexedFeatureFile((File) in,8000,50);
 				if (in instanceof URL)
-					return new IndexedFeatureFile((URL) in);
+					return new IndexedFeatureFile((URL) in,8000,50);
 			}
 			
 		}

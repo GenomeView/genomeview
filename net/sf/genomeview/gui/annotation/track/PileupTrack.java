@@ -70,11 +70,12 @@ public class PileupTrack extends Track {
 	private BitSet queued = null;
 	/* Queue in blocks of CHUNK */
 	private BitSet ready = null;
+	private BitSet running = null;
 	private int[] summary;
 	private int maxPile = 0;
 	private int maxSummary = 0;
 
-	private static final int CHUNK = 2000;
+	private static final int CHUNK = 32000;
 	private static final int SUMMARYSIZE = 100;
 
 	private static final double LOG2 = Math.log(2);
@@ -99,6 +100,7 @@ public class PileupTrack extends Track {
 		@Override
 		public void run() {
 			try {
+				running.set(idx);
 				Iterable<Pile> piles = pw.get(idx * CHUNK, (idx + 1) * CHUNK);
 				for (Pile p : piles) {
 					if (p.getPos() >= idx * CHUNK && p.getPos() < (idx + 1) * CHUNK) {
@@ -183,13 +185,14 @@ public class PileupTrack extends Track {
 			}
 			/* Draw status */
 			int chunkWidth = (int) Math.ceil(CHUNK * screenWidth / visible.length());
-			for (int i = visible.start; i < visible.end; i += CHUNK) {
+			for (int i = visible.start; i < visible.end+CHUNK; i += CHUNK) {
 				int x = Convert.translateGenomeToScreen((i / CHUNK) * CHUNK, visible, screenWidth);
+				g.setColor(Color.red);
 				if (queued.get(i / CHUNK))
 					g.setColor(Color.ORANGE);
-				if (ready.get(i / CHUNK))
+				if (running.get(i / CHUNK))
 					g.setColor(Color.GREEN);
-				if (queued.get(i / CHUNK) || ready.get(i / CHUNK))
+				if (!ready.get(i / CHUNK))
 					g.fillRect(x, yOffset, chunkWidth, graphLineHeigh);
 			}
 
@@ -324,6 +327,7 @@ public class PileupTrack extends Track {
 		// System.out.println("Piluptrack: "+summary.length);
 		ready = new BitSet();
 		queued = new BitSet();
+		running=new BitSet();
 
 	}
 
