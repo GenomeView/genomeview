@@ -17,16 +17,15 @@ import java.util.List;
 import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.DummyEntry;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Model.Highlight;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
-import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
-import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
@@ -493,7 +492,7 @@ public class StructureTrack extends Track {
 		for (Type type : Type.values()) {
 			if (visibleTypes.get(type)) {
 				Location l = model.getAnnotationLocationVisible();
-				FeatureAnnotation annot = (FeatureAnnotation)model.getSelectedEntry().get(type);
+				FeatureAnnotation annot = (FeatureAnnotation) model.getSelectedEntry().get(type);
 				Iterable<Feature> trackData = annot.get(l.start, l.end);
 				if (annot.getEstimateCount(l) <= Configuration.getInt("structureview:maximumNoVisibleFeatures")) {
 					for (Feature rf : trackData) {
@@ -890,8 +889,10 @@ public class StructureTrack extends Track {
 	private BufferSeq bs;
 
 	@Override
-	public int paintTrack(Graphics2D g, Entry e, int yOffset, double width) {
-		bs=null;
+	public int paintTrack(Graphics2D g, int yOffset, double width) {
+		if(entry instanceof DummyEntry)
+			entry=model.getSelectedEntry();
+		bs = null;
 		GlyphVector gv = g.getFont().createGlyphVector(g.getFontRenderContext(), new char[] { 'A' });
 		letterSpacing = Math.floor((lineHeight - gv.getVisualBounds().getHeight()) / 2);
 		this.screenWidth = width;
@@ -911,7 +912,7 @@ public class StructureTrack extends Track {
 		/* paint amino acids */
 		if (model.getAnnotationLocationVisible().length() < Configuration.getInt("geneStructureAminoAcidWindow")) {
 			if (bs == null)
-				bs = new BufferSeq(e.sequence(), new Location(visibleRegion.start - 3, visibleRegion.end + 3));
+				bs = new BufferSeq(entry.sequence(), new Location(visibleRegion.start - 3, visibleRegion.end + 3));
 			// forward strand
 			paintAminoAcidReadingFrame(g, true, yOffset);
 			// reverse strand
@@ -926,7 +927,7 @@ public class StructureTrack extends Track {
 		/* paint sequence */
 		if (model.getAnnotationLocationVisible().length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			if (bs == null)
-				bs = new BufferSeq(e.sequence(), new Location(visibleRegion.start - 3, visibleRegion.end + 3));
+				bs = new BufferSeq(entry.sequence(), new Location(visibleRegion.start - 3, visibleRegion.end + 3));
 			// forward strand sequence
 			paintSequence(g, true, yOffset);
 			// reverse strand sequence

@@ -8,7 +8,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.util.BitSet;
 import java.util.ConcurrentModificationException;
@@ -34,7 +33,6 @@ import net.sf.jannot.shortread.BAMreads;
 import net.sf.jannot.shortread.ExtendedShortRead;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortRead;
-//import net.sf.jannot.shortread.ShortReadCoverage;//
 import net.sf.samtools.CigarElement;
 import net.sf.samtools.CigarOperator;
 
@@ -152,7 +150,7 @@ public class ShortReadTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth) {
 		paintedBlocks.clear();
 		/* Store information to be used in other methods */
 		currentEntry = entry;

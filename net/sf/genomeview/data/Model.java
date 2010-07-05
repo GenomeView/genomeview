@@ -352,6 +352,7 @@ public class Model extends Observable implements IModel {
 			setAnnotationLocationVisible(new Location(1, 51));
 		logger.info("Reading source:" + f);
 		f.read(entries);
+		System.out.println("Entries: "+entries.size());
 		logger.info("Model adding data done!");
 		if (f instanceof MultiFileSource)
 			for (DataSource ds : ((MultiFileSource) f).getFileSources()) {
@@ -589,9 +590,10 @@ public class Model extends Observable implements IModel {
 	 */
 	public synchronized void updateTracks() {
 		int startSize = trackList.size();
-System.out.println("Updating traccks...");
+		
 		// for (Entry e : entries) {
 		Entry e = this.getSelectedEntry();
+		System.out.println("Updating tracks for "+e);
 		/* Graph tracks */
 		for (DataKey key : e) {
 			Data<?> data = e.get(key);
@@ -608,7 +610,7 @@ System.out.println("Updating traccks...");
 
 			if (data instanceof PileupWrapper) {
 
-				//trackList.printDebug();
+				// trackList.printDebug();
 
 				if (!trackList.containsTrack(key))
 					trackList.add(new PileupTrack(key, this));

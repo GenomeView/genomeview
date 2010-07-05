@@ -29,7 +29,6 @@ import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.genomeview.gui.dialog.MultipleAlignmentOrderingDialog;
 import net.sf.jannot.DataKey;
-import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.alignment.maf.AlignmentBlock;
@@ -155,7 +154,7 @@ public class MultipleAlignmentTrack2 extends Track {
 	private int currentYOffset;
 
 	@Override
-	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
+	public int paintTrack(Graphics2D g,  int yOffset, double screenWidth) {
 		// this.yOffset = yOffset;
 		currentYOffset = yOffset;
 		MAFMultipleAlignment ma = (MAFMultipleAlignment) entry.get(dataKey);

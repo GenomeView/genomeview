@@ -13,15 +13,17 @@ import java.net.URI;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.EditFeatureWindow;
 import net.sf.genomeview.gui.dialog.MergeFeatureDialog;
 import net.sf.genomeview.gui.dialog.SplitFeatureDialog;
-import net.sf.genomeview.gui.menu.PopUpMenu;
-
-public abstract class StaticUtils {
+/**
+ * 
+ * @author Administrator
+ *
+ */
+public final class StaticUtils {
 	/*
 	 * This class should never be instantiated, so we make the constructor
 	 * private.
@@ -43,7 +45,6 @@ public abstract class StaticUtils {
 
 	private static SplitFeatureDialog splitFeature;
 
-
 	/**
 	 * Centers the window on the screen. This method should always be called
 	 * after pack().
@@ -54,7 +55,8 @@ public abstract class StaticUtils {
 	public static void center(Window window) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension windowSize = window.getPreferredSize();
-		window.setLocation(screenSize.width / 2 - (windowSize.width / 2), screenSize.height / 2 - (windowSize.height / 2));
+		window.setLocation(screenSize.width / 2 - (windowSize.width / 2), screenSize.height / 2
+				- (windowSize.height / 2));
 
 	}
 
@@ -77,7 +79,10 @@ public abstract class StaticUtils {
 
 	public static String shortify(String in) {
 		String s = in.replace('\\', '/');
-		return s.substring(s.lastIndexOf('/'));
+		int idx = s.lastIndexOf('/');
+		if (idx > 0)
+			s = s.substring(idx);
+		return s; 
 	}
 
 	public static String escapeHTML(String in) {
@@ -103,10 +108,12 @@ public abstract class StaticUtils {
 			Desktop.getDesktop().browse(uri);
 		} catch (IOException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Could not open the specified url: " + uri, "URL open failed", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Could not open the specified url: " + uri, "URL open failed",
+					JOptionPane.ERROR_MESSAGE);
 		} catch (UnsupportedOperationException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Could not open the specified url: " + uri, "URL open failed", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Could not open the specified url: " + uri, "URL open failed",
+					JOptionPane.ERROR_MESSAGE);
 
 		}
 

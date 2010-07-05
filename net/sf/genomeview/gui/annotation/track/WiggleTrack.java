@@ -22,7 +22,6 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.jannot.DataKey;
-import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.wiggle.Graph;
 
@@ -135,7 +134,7 @@ public class WiggleTrack extends Track {
 		super.mouseMoved(x, y, e);
 
 		if (!e.isConsumed()) {
-			Graph g =(Graph)entry.get(dataKey);// entry.graphs.getGraph(name);
+			Graph g = (Graph) entry.get(dataKey);// entry.graphs.getGraph(name);
 			if (g != null) {
 				int pos = Convert.translateScreenToGenome(e.getX(), currentVisible, screenWidth);
 				tooltip.set(g.value(pos), e);
@@ -178,20 +177,17 @@ public class WiggleTrack extends Track {
 	private int plotType = 0;
 	private double screenWidth;
 
-	/* Last painted entry */
-	private Entry entry;
-
 	@Override
-	public int paintTrack(Graphics2D g, Entry e, int yOffset, double screenWidth) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth) {
 		this.currentVisible = model.getAnnotationLocationVisible();
 		this.currentYOffset = yOffset;
 		this.screenWidth = screenWidth;
-		this.entry = e;
+
 		int graphLineHeigh = 50;
 		g.setColor(Color.BLACK);
 		/* keeps track of the space used during painting */
 		int yUsed = 0;
-		Graph graph = (Graph)e.get(dataKey);//e.graphs.getGraph(name);
+		Graph graph = (Graph) entry.get(dataKey);// e.graphs.getGraph(name);
 		if (graph != null) {
 			double width = screenWidth / (double) currentVisible.length();
 

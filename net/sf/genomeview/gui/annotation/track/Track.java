@@ -22,11 +22,13 @@ public abstract class Track extends Observable {
 
 	protected Model model;
 	protected DataKey dataKey;
+	protected Entry entry;
 
-	public Track(DataKey key,Model model, boolean visible, boolean collapsible) {
+	public Track(DataKey key, Model model, boolean visible, boolean collapsible) {
 		this.model = model;
-		this.dataKey=key;
+		this.dataKey = key;
 		this.visible = visible;
+		this.entry=model.getSelectedEntry();
 		this.collapsible = collapsible;
 		this.addObserver(model);
 	}
@@ -117,9 +119,9 @@ public abstract class Track extends Observable {
 	 *            the entry that is currently displayed
 	 * @return the height that was painted
 	 */
-	public int paint(Graphics g, Entry e, int yOffset, double width, int index) {
+	public int paint(Graphics g, int yOffset, double width, int index) {
 
-		int used = paintTrack((Graphics2D) g, e, yOffset, width);
+		int used = paintTrack((Graphics2D) g, yOffset, width);
 
 		if (!(this instanceof StructureTrack)) {
 			Rectangle r = new Rectangle(0, yOffset, (int) width + 1, used);
@@ -144,7 +146,7 @@ public abstract class Track extends Observable {
 	 *            the width of the track
 	 * @return the height this track uses
 	 */
-	protected abstract int paintTrack(Graphics2D g, Entry e, int yOffset, double width);
+	protected abstract int paintTrack(Graphics2D g, int yOffset, double width);
 
 	/* Keeps track of whether a track is collapsible */
 	private boolean collapsible = false;

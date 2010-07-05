@@ -154,10 +154,10 @@ public class MultipleAlignmentTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, Entry e, int yOffset, double screenWidth) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth) {
 		Location r = model.getAnnotationLocationVisible();
 		int lineHeigh = 20;
-		AlignmentAnnotation entireAlignment = (AlignmentAnnotation) e.get(dataKey);
+		AlignmentAnnotation entireAlignment = (AlignmentAnnotation) entry.get(dataKey);
 		
 		if (entireAlignment != null) {
 			if (r.length() > 10000000) {
@@ -258,9 +258,9 @@ public class MultipleAlignmentTrack extends Track {
 					// cache.store(scale, start, end, cacheValues);
 					// }
 					// /* Plot whatever is in the cache */
-					if (!buffers.containsKey(e))
-						buffers.put(e, new Buffer(alignment));
-					Buffer b = buffers.get(e);
+					if (!buffers.containsKey(entry))
+						buffers.put(entry, new Buffer(alignment));
+					Buffer b = buffers.get(entry);
 					// double[] cValues = cache.get();
 					// int cStart = cache.start();
 					// int cScale = cache.scale();

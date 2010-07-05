@@ -85,7 +85,7 @@ public class SyntenicTrack extends Track {
 	private HashMap<Rectangle, SyntenicBlock> hitmap = new HashMap<Rectangle, SyntenicBlock>();
 
 	@Override
-	public int paintTrack(Graphics2D g, Entry e, int yOffset, double width) {
+	public int paintTrack(Graphics2D g, int yOffset, double width) {
 		return 25;
 		// hitmap.clear();
 		//

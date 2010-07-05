@@ -67,9 +67,9 @@ public class PileupTrack extends Track {
 	}
 
 	/* Queue in blocks of CHUNK */
-	private BitSet queued = new BitSet();
+	private BitSet queued=null;
 	/* Queue in blocks of CHUNK */
-	private BitSet ready = new BitSet();
+	private BitSet ready=null;
 	private int[] summary;
 	private int maxPile = 0;
 	private int maxSummary = 0;
@@ -126,10 +126,11 @@ public class PileupTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, final Entry entry, int yOffset, double screenWidth) {
-		if (summary == null)
-			summary = new int[entry.getMaximumLength() / SUMMARYSIZE];
-
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth) {
+		if (summary == null||summary.length==0){
+			reset();
+		}
+		
 		/* Get configuration */
 		boolean logScaling = Configuration.getBoolean("shortread:logScaling");
 		double bottomValue = Configuration.getDouble("shortread:bottomValue");
@@ -146,6 +147,7 @@ public class PileupTrack extends Track {
 			// System.out.println("Show individual");
 			Iterable<Pile> piles = pw.get(visible.start, visible.end);
 			g.setColor(Color.GRAY);
+			int width = (int) Math.ceil(screenWidth / visible.length());
 			for (Pile p : piles) {
 
 				int pos = p.getLocation().start;
@@ -154,7 +156,7 @@ public class PileupTrack extends Track {
 					maxPile = coverage;
 				double frac = coverage / (double) maxPile;
 				int size = (int) (frac * graphLineHeigh);
-				int width = (int) Math.ceil(screenWidth / visible.length());
+				
 				// System.out.println(size);
 				int screenX = Convert.translateGenomeToScreen(pos, visible, screenWidth);
 				g.fillRect(screenX, yOffset + graphLineHeigh - size, width, size);
@@ -285,6 +287,15 @@ public class PileupTrack extends Track {
 		g.drawString(StaticUtils.shortify(super.dataKey.toString()), 10, yOffset + 24 - 2);
 		return graphLineHeigh;
 
+	}
+
+	private void reset() {
+		//System.out.println(entry);
+		summary = new int[entry.getMaximumLength() / SUMMARYSIZE];
+		//System.out.println("Piluptrack: "+summary.length);
+		ready=new BitSet();
+		queued=new BitSet();
+		
 	}
 
 	@Override

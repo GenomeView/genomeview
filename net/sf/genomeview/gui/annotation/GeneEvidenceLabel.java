@@ -57,7 +57,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		int index = 0;
 		for (Track track : model.getTrackList()) {
 			if (track.isVisible()) {
-				int height = track.paint(g, model.getSelectedEntry(), framePixelsUsed, screenWidth, index++);
+				int height = track.paint(g, framePixelsUsed, screenWidth, index++);
 				// FIXME we shouldn't give each paint method the yOffset. We
 				// should use the Graphics translate function to make sure we
 				// are positioned correctly.

@@ -29,16 +29,12 @@ import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.annotation.GeneEvidenceLabel.FillMode;
 import net.sf.genomeview.gui.components.CollisionMap;
-import net.sf.jannot.DataKey;
-import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 import net.sf.jannot.Qualifier;
-import net.sf.jannot.Strand;
 import net.sf.jannot.Type;
 import net.sf.jannot.shortread.ReadGroup;
-//import net.sf.jannot.shortread.ShortReadCoverage;
 import be.abeel.util.CountMap;
 
 public class FeatureTrack extends Track {
@@ -68,7 +64,7 @@ public class FeatureTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, Entry entry, int yOffset, double width) {
+	public int paintTrack(Graphics2D g, int yOffset, double width) {
 		boolean collision = false;
 		hitmap.clear();
 		Location visible = model.getAnnotationLocationVisible();
