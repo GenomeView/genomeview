@@ -22,11 +22,14 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.scheduler.GenomeViewScheduler;
 import net.sf.genomeview.scheduler.Task;
 import net.sf.jannot.DataKey;
-import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.tabix.PileupWrapper;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class PileupTrack extends Track {
 
 	public PileupTrack(DataKey key, Model model) {
@@ -116,8 +119,12 @@ public class PileupTrack extends Track {
 				ready.set(idx);
 				if (!queued.get(idx + 1)) {
 					if ((idx + 1) * CHUNK < entry.getMaximumLength()) {
-						queued.set(idx + 1);
-						GenomeViewScheduler.submit(new PileupTask(pw, idx + 1));
+						/* Only queue additional chunks in visible region */
+						if ((idx + 1) * CHUNK < model.getAnnotationLocationVisible().end
+								&& (idx + 2) * CHUNK > model.getAnnotationLocationVisible().start) {
+							queued.set(idx + 1);
+							GenomeViewScheduler.submit(new PileupTask(pw, idx + 1));
+						}
 					}
 				}
 				model.refresh();
@@ -185,7 +192,7 @@ public class PileupTrack extends Track {
 			}
 			/* Draw status */
 			int chunkWidth = (int) Math.ceil(CHUNK * screenWidth / visible.length());
-			for (int i = visible.start; i < visible.end+CHUNK; i += CHUNK) {
+			for (int i = visible.start; i < visible.end + CHUNK; i += CHUNK) {
 				int x = Convert.translateGenomeToScreen((i / CHUNK) * CHUNK, visible, screenWidth);
 				g.setColor(Color.red);
 				if (queued.get(i / CHUNK))
@@ -327,7 +334,7 @@ public class PileupTrack extends Track {
 		// System.out.println("Piluptrack: "+summary.length);
 		ready = new BitSet();
 		queued = new BitSet();
-		running=new BitSet();
+		running = new BitSet();
 
 	}
 
