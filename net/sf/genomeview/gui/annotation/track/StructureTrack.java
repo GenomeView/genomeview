@@ -14,6 +14,8 @@ import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
+import javax.swing.JViewport;
+
 import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
@@ -889,7 +891,7 @@ public class StructureTrack extends Track {
 	private BufferSeq bs;
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double width) {
+	public int paintTrack(Graphics2D g, int yOffset, double width,JViewport view) {
 		if(entry instanceof DummyEntry)
 			entry=model.getSelectedEntry();
 		bs = null;

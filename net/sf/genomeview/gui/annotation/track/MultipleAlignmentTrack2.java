@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
+import javax.swing.JViewport;
 
 import net.sf.genomeview.core.BiMap;
 import net.sf.genomeview.core.Configuration;
@@ -154,7 +155,7 @@ public class MultipleAlignmentTrack2 extends Track {
 	private int currentYOffset;
 
 	@Override
-	public int paintTrack(Graphics2D g,  int yOffset, double screenWidth) {
+	public int paintTrack(Graphics2D g,  int yOffset, double screenWidth,JViewport view) {
 		// this.yOffset = yOffset;
 		currentYOffset = yOffset;
 		MAFMultipleAlignment ma = (MAFMultipleAlignment) entry.get(dataKey);

@@ -18,6 +18,7 @@ import java.util.SortedSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JViewport;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
@@ -64,7 +65,8 @@ public class FeatureTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double width) {
+	public int paintTrack(Graphics2D g, int yOffset, double width,JViewport view) {
+		
 		boolean collision = false;
 		hitmap.clear();
 		Location visible = model.getAnnotationLocationVisible();

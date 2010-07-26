@@ -12,6 +12,8 @@ import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JViewport;
+
 import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
@@ -85,7 +87,7 @@ public class SyntenicTrack extends Track {
 	private HashMap<Rectangle, SyntenicBlock> hitmap = new HashMap<Rectangle, SyntenicBlock>();
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double width) {
+	public int paintTrack(Graphics2D g, int yOffset, double width,JViewport view) {
 		return 25;
 		// hitmap.clear();
 		//

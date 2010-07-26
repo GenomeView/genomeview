@@ -7,11 +7,14 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.Observable;
 import java.util.TreeMap;
+
+import javax.swing.JViewport;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.AbstractGeneLabel;
@@ -49,15 +52,23 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	}
 
-	public void actualPaint(Graphics g) {
+	public void actualPaint(Graphics g,JViewport view) {
 		tracks.clear();
 		framePixelsUsed = 0;
 		screenWidth = this.getSize().width + 1;
+		if(view==null){
+			view=new JViewport(){
+				public Rectangle getViewRect(){
+					return new Rectangle(0,0,(int)screenWidth,Integer.MAX_VALUE);
+				}
+			};
+		}
+		
 		super.paintComponent(g);
 		int index = 0;
 		for (Track track : model.getTrackList()) {
 			if (track.isVisible()) {
-				int height = track.paint(g, framePixelsUsed, screenWidth, index++);
+				int height = track.paint(g, framePixelsUsed, screenWidth, index++,view);
 				// FIXME we shouldn't give each paint method the yOffset. We
 				// should use the Graphics translate function to make sure we
 				// are positioned correctly.
@@ -70,7 +81,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	@Override
 	public void paintComponent(Graphics g) {		
-		actualPaint(g);
+		actualPaint(g,viewport);
 
 		// FIXME paintSelectedLocation(g, model.getAnnotationLocationVisible());
 
@@ -272,6 +283,8 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	private Track last = null;
 
+	private JViewport viewport;
+
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		currentMouseX = e.getX();		
@@ -317,6 +330,12 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			model.selectionModel().setSelectedRegion(null);
 			model.selectionModel().clearLocationSelection();
 		}
+		
+	}
+
+	
+	public void setViewport(JViewport viewport) {
+		this.viewport=viewport;
 		
 	}
 }

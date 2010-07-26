@@ -11,6 +11,8 @@ import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.logging.Logger;
 
+import javax.swing.JViewport;
+
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
@@ -115,13 +117,14 @@ public abstract class Track extends Observable {
 	 * 
 	 * @param g
 	 *            graphics context to paint on
+	 * @param view 
 	 * @param model
 	 *            the entry that is currently displayed
 	 * @return the height that was painted
 	 */
-	public int paint(Graphics g, int yOffset, double width, int index) {
+	public int paint(Graphics g, int yOffset, double width, int index, JViewport view) {
 
-		int used = paintTrack((Graphics2D) g, yOffset, width);
+		int used = paintTrack((Graphics2D) g, yOffset, width,view);
 
 		if (!(this instanceof StructureTrack)) {
 			Rectangle r = new Rectangle(0, yOffset, (int) width + 1, used);
@@ -144,9 +147,10 @@ public abstract class Track extends Observable {
 	 *            the yOffset that should be taken into account when painting
 	 * @param width
 	 *            the width of the track
+	 * @param view 
 	 * @return the height this track uses
 	 */
-	protected abstract int paintTrack(Graphics2D g, int yOffset, double width);
+	protected abstract int paintTrack(Graphics2D g, int yOffset, double width, JViewport view);
 
 	/* Keeps track of whether a track is collapsible */
 	private boolean collapsible = false;

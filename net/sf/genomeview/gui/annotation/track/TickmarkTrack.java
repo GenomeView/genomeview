@@ -6,6 +6,8 @@ package net.sf.genomeview.gui.annotation.track;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import javax.swing.JViewport;
+
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Location;
@@ -20,7 +22,7 @@ public class TickmarkTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,JViewport view) {
 		Location r = model.getAnnotationLocationVisible();
 		g.setColor(Color.BLACK);
 		g.drawLine(0, yOffset + 15, (int) screenWidth + 1, yOffset + 15);

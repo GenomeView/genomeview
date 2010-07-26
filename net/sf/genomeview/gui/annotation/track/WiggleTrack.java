@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.annotation.track;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
@@ -14,6 +15,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
+import javax.swing.JViewport;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
@@ -47,7 +49,8 @@ public class WiggleTrack extends Track {
 			floater.setForeground(Color.BLACK);
 			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
-			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder,
+					emptyBorder));
 			add(floater);
 			pack();
 		}
@@ -107,7 +110,8 @@ public class WiggleTrack extends Track {
 		}
 	}
 
-	private static final Logger log = Logger.getLogger(WiggleTrack.class.getCanonicalName());
+	private static final Logger log = Logger.getLogger(WiggleTrack.class
+			.getCanonicalName());
 
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
@@ -115,7 +119,8 @@ public class WiggleTrack extends Track {
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
 			log.finest("Wiggle track consumes button2||button3");
-			new WigglePopup().show(e.getComponent(), e.getX(), currentYOffset + e.getY());
+			new WigglePopup().show(e.getComponent(), e.getX(), currentYOffset
+					+ e.getY());
 			e.consume();
 			return true;
 		}
@@ -136,7 +141,8 @@ public class WiggleTrack extends Track {
 		if (!e.isConsumed()) {
 			Graph g = (Graph) entry.get(dataKey);// entry.graphs.getGraph(name);
 			if (g != null) {
-				int pos = Convert.translateScreenToGenome(e.getX(), currentVisible, screenWidth);
+				int pos = Convert.translateScreenToGenome(e.getX(),
+						currentVisible, screenWidth);
 				tooltip.set(g.value(pos), e);
 
 			}
@@ -178,17 +184,27 @@ public class WiggleTrack extends Track {
 	private double screenWidth;
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,
+			JViewport view) {
 		this.currentVisible = model.getAnnotationLocationVisible();
 		this.currentYOffset = yOffset;
 		this.screenWidth = screenWidth;
 
 		int graphLineHeigh = 50;
+		if (isCollapsed())
+			graphLineHeigh = 10;
+
 		g.setColor(Color.BLACK);
-		/* keeps track of the space used during painting */
-		int yUsed = 0;
+
 		Graph graph = (Graph) entry.get(dataKey);// e.graphs.getGraph(name);
-		if (graph != null) {
+		/* When there is no data, return immediately */
+		if (graph == null)
+			return 0;
+
+		/* Check whether this graph is visible, if not, don't bother */
+		Rectangle rec = view.getViewRect();
+		if (yOffset < rec.y + rec.height && yOffset + graphLineHeigh > rec.y) {
+
 			double width = screenWidth / (double) currentVisible.length();
 
 			int scale = 1;
@@ -206,14 +222,16 @@ public class WiggleTrack extends Track {
 			int lastX = 0;
 			GeneralPath conservationGP = new GeneralPath();
 			for (int i = 0; i < f.length; i++) {
-				int x = Convert.translateGenomeToScreen(start + i * scale, currentVisible, screenWidth);
+				int x = Convert.translateGenomeToScreen(start + i * scale,
+						currentVisible, screenWidth);
 				double val = f[i];
 
 				if (val > graph.max())
 					val = graph.max();
 
 				if (logScaled) {
-					double logrange = log2(graph.max() + 1) - log2(graph.min() + 1);
+					double logrange = log2(graph.max() + 1)
+							- log2(graph.min() + 1);
 					val -= log2(graph.min() + 1);
 					val = log2(val + 1);
 					val /= logrange;
@@ -227,23 +245,27 @@ public class WiggleTrack extends Track {
 					/* Draw lines */
 					if (plotType == 0) {
 						if (i == 0) {
-							conservationGP.moveTo(x - 1, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
+							conservationGP.moveTo(x - 1, yOffset + (1 - val)
+									* (graphLineHeigh - 4) + 2);
 						}
 
-						conservationGP.lineTo(x, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
+						conservationGP.lineTo(x, yOffset + (1 - val)
+								* (graphLineHeigh - 4) + 2);
 					} else {
 						int top = (int) (yOffset + (1 - val) * graphLineHeigh);
-						g.fillRect(x, top, (int) Math.ceil(2 * width * scale), graphLineHeigh - top + yOffset);
+						g.fillRect(x, top, (int) Math.ceil(2 * width * scale),
+								graphLineHeigh - top + yOffset);
 					}
 				} else {
 					g.setColor(Colors.getColorCoding(val));
-					g.fillRect(lastX, yOffset, x - lastX, 10);
+					g.fillRect(lastX, yOffset, x - lastX, graphLineHeigh);
 
 				}
 
 				lastX = x;
 
 			}
+
 			if (!isCollapsed()) {
 				g.setColor(Color.BLACK);
 				g.draw(conservationGP);
@@ -251,13 +273,10 @@ public class WiggleTrack extends Track {
 			}
 
 			g.setColor(Color.black);
-			g.drawString(displayName(), 10, yOffset + yUsed + 15);
-			if (isCollapsed())
-				yUsed += 10;
-			else
-				yUsed += graphLineHeigh;
+			g.drawString(displayName(), 10, yOffset + 15);
 		}
 
-		return yUsed;
+		return graphLineHeigh;
+
 	}
 }

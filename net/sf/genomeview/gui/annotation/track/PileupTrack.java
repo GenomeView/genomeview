@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JViewport;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
@@ -139,7 +140,7 @@ public class PileupTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,JViewport view) {
 		if (summary == null || summary.length <= 1) {
 			reset();
 		}

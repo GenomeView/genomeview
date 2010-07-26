@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import javax.swing.JViewport;
+
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
@@ -154,7 +156,7 @@ public class MultipleAlignmentTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,JViewport view) {
 		Location r = model.getAnnotationLocationVisible();
 		int lineHeigh = 20;
 		AlignmentAnnotation entireAlignment = (AlignmentAnnotation) entry.get(dataKey);
