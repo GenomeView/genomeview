@@ -1,0 +1,18 @@
+<html>
+<head><title>Example Applet Launching Javascript</title></head>
+<body>
+
+<body>
+    <script src="http://www.java.com/js/deployJava.js"></script>
+    <script> 
+        var attributes = { code:'net.sf.genomeview.gui.GVApplet',  width:800, height:500} ; 
+        var parameters = {jnlp_href: "launch.jnlp.php?applet=true",
+			  config: "http://www.broadinstitute.org/software/genomeview/demo_c_elegans/local.conf",
+			  extra: "http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.fasta.gz http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.gff.gz http://www.broadinstitute.org/software/genomeview/demo_c_elegans/uwgs-rw_L2_FC6218_3.CHROMOSOME_IV.sorted.bam.bai"} ; 
+        deployJava.runApplet(attributes, parameters, '1.6'); 
+    </script>
+</body>
+
+</body>
+</html>
+
