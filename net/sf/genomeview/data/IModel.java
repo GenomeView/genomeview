@@ -3,9 +3,8 @@
  */
 package net.sf.genomeview.data;
 
+import java.awt.Frame;
 import java.util.Observer;
-
-import javax.swing.JFrame;
 
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.plugin.GUIManager;
@@ -36,7 +35,7 @@ public interface IModel extends Observer {
 	 */
 	public Location getSelectedRegion();
 
-	public JFrame getParent();
+	public Frame getParent();
 
 	public GUIManager getGUIManager();
 

@@ -4,6 +4,7 @@
 package net.sf.genomeview.data;
 
 import java.awt.Color;
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,8 +15,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
-
-import javax.swing.JFrame;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.annotation.track.FeatureTrack;
@@ -34,7 +33,6 @@ import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
-import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
@@ -52,7 +50,7 @@ import net.sf.jannot.tabix.GFFWrapper;
 import net.sf.jannot.tabix.PileupWrapper;
 import net.sf.jannot.wiggle.Graph;
 import be.abeel.util.DefaultHashMap;
-
+//also test
 public class Model extends Observable implements IModel {
 	private Logger logger = Logger.getLogger(Model.class.getCanonicalName());
 
@@ -65,7 +63,7 @@ public class Model extends Observable implements IModel {
 		return mouseModel;
 	}
 
-	public Model(JFrame parent) {
+	public Model(Frame parent) {
 		this.parent = parent;
 		/* Scheduler booster thread */
 		new Thread(new Runnable() {
@@ -162,9 +160,9 @@ public class Model extends Observable implements IModel {
 	/**
 	 * The main window of the GUI belonging to this model.
 	 */
-	private JFrame parent;
+	private Frame parent;
 
-	public JFrame getParent() {
+	public Frame getParent() {
 		return parent;
 	}
 
