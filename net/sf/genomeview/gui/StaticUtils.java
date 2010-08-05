@@ -6,12 +6,12 @@ package net.sf.genomeview.gui;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import net.sf.genomeview.data.Model;
@@ -97,7 +97,7 @@ public final class StaticUtils {
 	 * Put this component in the top-right corner of the supplied JFrame
 	 * 
 	 */
-	public static void right(Component comp, JFrame parent) {
+	public static void right(Component comp, Frame parent) {
 		int width = parent.getWidth();
 		comp.setLocation(width - comp.getWidth(), 0);
 

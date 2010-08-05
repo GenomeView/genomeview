@@ -4,11 +4,11 @@
 package net.sf.genomeview.gui.dialog;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
@@ -30,7 +30,7 @@ public class GVProgressBar extends JDialog {
 	private JProgressBar pb = new JProgressBar();
 
 	
-	public GVProgressBar(String title, String initText, JFrame parent) {
+	public GVProgressBar(String title, String initText, Frame parent) {
 		super(parent, title);
 		setAlwaysOnTop(true);
 		requestFocus();

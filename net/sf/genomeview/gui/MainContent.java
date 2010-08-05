@@ -126,6 +126,7 @@ public class MainContent {
 
 		leftRight.setLeftComponent(leftContainer);
 		leftRight.setRightComponent(new InformationFrame(model));
+		leftRight.setDividerLocation(0.75);
 		// out[last].add(new InformationFrame(model));
 		out[last].add(leftRight);
 		return out;

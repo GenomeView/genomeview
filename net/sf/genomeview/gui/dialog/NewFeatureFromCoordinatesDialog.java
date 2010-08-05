@@ -38,7 +38,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 	private static final long serialVersionUID = -5266511180264863028L;
 
 	public NewFeatureFromCoordinatesDialog(final Model model) {
-		super((JFrame) model.getParent(), "Create new feature");
+		super(model.getParent(), "Create new feature");
 		final NewFeatureFromCoordinatesDialog _self = this;
 		setModal(true);
 		setAlwaysOnTop(true);

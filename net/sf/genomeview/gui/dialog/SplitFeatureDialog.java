@@ -27,7 +27,7 @@ public class SplitFeatureDialog extends JDialog {
     private static final long serialVersionUID = -770863087750087961L;
 
     public SplitFeatureDialog(final Model model) {
-        super((JFrame) model.getParent(), "Split feature");
+    	super(model.getParent(), "Split feature");
         final SplitFeatureDialog _self = this;
         setModal(true);
         setAlwaysOnTop(true);

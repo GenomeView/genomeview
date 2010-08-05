@@ -286,7 +286,7 @@ public class ConfigurationDialog extends JDialog {
 	}
 
 	public ConfigurationDialog(Model model) {
-		super((JFrame) model.getParent(), "Configuration panel");
+		super(model.getParent(), "Configuration panel");
 		setModal(true);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {

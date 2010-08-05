@@ -36,7 +36,7 @@ public class NewFeatureDialog extends JDialog {
     private static final long serialVersionUID = -770863087750087961L;
 
     public NewFeatureDialog(final Model model) {
-        super((JFrame) model.getParent(), "Create new feature");
+    	super(model.getParent(), "Create new feature");
         final NewFeatureDialog _self = this;
         setModal(true);
         setAlwaysOnTop(true);
