@@ -227,14 +227,14 @@ public class MainWindow implements WindowListener, Observer {
 			JPanel[] content = MainContent.createContent(model, Configuration.getBoolean("dualscreen") ? gs.length : 1);
 
 			window.setContentPane(content[0]);
-			window.setJMenuBar(new MainMenu(model, this));
+			window.setJMenuBar(new MainMenu(model));
 			window.setVisible(true);
 			window.pack();
 			window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			if (content.length > 1) {
 				for (int i = 1; i < content.length; i++) {
 					helper = new JFrame("GenomeView :: " + Configuration.version(), gs[i].getDefaultConfiguration());
-					helper.setJMenuBar(new MainMenu(model, this));
+					helper.setJMenuBar(new MainMenu(model));
 					helper.setIconImage(new ImageIcon(this.getClass().getResource("/images/gv2.png")).getImage());
 					helper.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 					helper.setContentPane(content[i]);

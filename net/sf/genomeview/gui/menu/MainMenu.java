@@ -40,7 +40,7 @@ public class MainMenu extends JMenuBar {
 
 	private static final long serialVersionUID = 6478474621947392346L;
 
-	public MainMenu(Model model, MainWindow mainWindow) {
+	public MainMenu(Model model) {
 		JMenu file = new JMenu("File");
 		file.add(new ClearEntriesAction(model));
 		file.addSeparator();
