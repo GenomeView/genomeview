@@ -11,10 +11,10 @@ if ($webstart){
 
 echo('<?xml version="1.0" encoding="utf-8"?>');
 
-//$siteroot = 'http://' . $_SERVER["HTTP_HOST"] . str_replace(basename($_SERVER["PHP_SELF"]), "", $_SERVER["PHP_SELF"]);
+$siteroot = 'http://' . $_SERVER["HTTP_HOST"] . str_replace(basename($_SERVER["PHP_SELF"]), "", $_SERVER["PHP_SELF"]);
 //$siteroot="http://sourceforge.net/projects/genomeview/files/webstart/";
 //$siteroot="http://downloads.sourceforge.net/project/genomeview/webstart/";
-$siteroot="http://localhost/";
+//$siteroot="http://localhost/";
 
 
 $param = html_entity_decode($_SERVER["QUERY_STRING"]);
@@ -114,7 +114,11 @@ if (!empty($param)){
       main-class="net.sf.genomeview.gui.GVApplet"
       width="800"
       height="500">   
+    <param name="image" value="gv_logo_ani.gif"/>
+    <param name="boxborder" value="false" />
+    <param name="centerimage" value="true" />
   </applet-desc>
+
 <?php endif; ?>
 
 </jnlp>
