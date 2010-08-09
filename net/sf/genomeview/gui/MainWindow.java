@@ -229,7 +229,9 @@ public class MainWindow implements WindowListener, Observer {
 			window.setJMenuBar(new MainMenu(model));
 			window.setVisible(true);
 			window.pack();
-			window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+//			window.setExtendedState(JFrame.MAXIMIZED_VERT);
+//			window.setExtendedState(JFrame.MAXIMIZED_HORIZ);
+//			window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			if (content.length > 1) {
 				for (int i = 1; i < content.length; i++) {
 					helper = new JFrame("GenomeView :: " + Configuration.version(), gs[i].getDefaultConfiguration());

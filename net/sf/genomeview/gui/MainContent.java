@@ -77,9 +77,9 @@ public class MainContent {
 		}
 
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		screen.setSize(screen.getWidth() * 0.7, screen.getHeight() * 0.5);
 		logger.info("Detected screen width: "+screen.getWidth());
 		logger.info("Detected screen height: "+screen.getHeight());
+		screen.setSize(screen.getWidth() * 0.7, screen.getHeight() * 0.5);
 
 		JPanel[] out = new JPanel[screens];
 		StatusBar sb = new StatusBar(model);
