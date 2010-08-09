@@ -225,7 +225,6 @@ public class MainWindow implements WindowListener, Observer {
 
 		if (freshwindow) {
 			JPanel[] content = MainContent.createContent(model, Configuration.getBoolean("dualscreen") ? gs.length : 1);
-
 			window.setContentPane(content[0]);
 			window.setJMenuBar(new MainMenu(model));
 			window.setVisible(true);

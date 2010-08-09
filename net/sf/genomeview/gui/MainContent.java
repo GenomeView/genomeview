@@ -78,6 +78,8 @@ public class MainContent {
 
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		screen.setSize(screen.getWidth() * 0.7, screen.getHeight() * 0.5);
+		logger.info("Detected screen width: "+screen.getWidth());
+		logger.info("Detected screen height: "+screen.getHeight());
 
 		JPanel[] out = new JPanel[screens];
 		StatusBar sb = new StatusBar(model);
@@ -88,10 +90,11 @@ public class MainContent {
 			out[i].add(createToolBar(model), BorderLayout.PAGE_START);
 
 			AnnotationFrame af = new AnnotationFrame(i, model);
-			af.setPreferredSize(screen);
+//			af.setPreferredSize(screen);
 
 			out[i].add(af, BorderLayout.CENTER);
 			out[i].add(sb, BorderLayout.SOUTH);
+			out[i].setPreferredSize(screen);
 		}
 		int last = out.length - 1;
 		out[last] = new JPanel();
@@ -103,6 +106,8 @@ public class MainContent {
 
 	private static JPanel[] createOne(Model model) {
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+		logger.info("Detected screen width: "+screen.getWidth());
+		logger.info("Detected screen height: "+screen.getHeight());
 		screen.setSize(screen.getWidth() * 0.7, screen.getHeight() * 0.5);
 		JPanel[] out = new JPanel[1];
 		int last = out.length - 1;
@@ -126,7 +131,9 @@ public class MainContent {
 
 		leftRight.setLeftComponent(leftContainer);
 		leftRight.setRightComponent(new InformationFrame(model));
-		leftRight.setDividerLocation(0.75);
+		leftRight.setResizeWeight(1);
+		leftRight.setOneTouchExpandable(true);
+		
 		// out[last].add(new InformationFrame(model));
 		out[last].add(leftRight);
 		return out;
