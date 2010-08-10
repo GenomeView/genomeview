@@ -573,7 +573,8 @@ public class ShortReadTrack extends Track {
 
 		public void init(int len) {
 			if (counter == null)
-				counter = new int[4][len];
+				/* 4 nucleotides and N */
+				counter = new int[5][len];
 
 		}
 
@@ -600,6 +601,9 @@ public class ShortReadTrack extends Track {
 			case 'g':
 			case 'G':
 				return 3;
+			case 'n':
+			case 'N':
+				return 4;
 			default:
 				return -1;
 			}
