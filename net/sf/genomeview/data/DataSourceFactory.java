@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -271,14 +272,17 @@ public class DataSourceFactory {
 		if (in instanceof URL)
 			try {
 				System.out.println("Checking: "+string);
-				System.out.println(new URL(string).openConnection().getHeaderFields());
-				LineIterator it=new LineIterator(new URL(string).openStream());
+				URLConnection conn=new URL(string).openConnection();
+				conn.setUseCaches(false);
+				System.out.println(conn.getHeaderFields());
+				LineIterator it=new LineIterator(conn.getInputStream());
 				it.setSkipBlanks(true);
 				String line=it.next().trim();
 				while(line.length()<1)
 					line=it.next().trim();
 				System.out.println("Checkline: "+line );
 				it.close();
+				
 				/* This is not supposed to happend, except with badly configured CMS that take over */
 				if(line.startsWith("<!DOCTYPE"))
 					return false;;
