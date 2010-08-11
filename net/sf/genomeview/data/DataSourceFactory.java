@@ -273,10 +273,14 @@ public class DataSourceFactory {
 				System.out.println("Checking: "+string);
 				System.out.println(new URL(string).openConnection().getHeaderFields());
 				LineIterator it=new LineIterator(new URL(string).openStream());
-				String line=it.next();
+				it.setSkipBlanks(true);
+				String line=it.next().trim();
+				while(line.length()<1)
+					line=it.next().trim();
+				System.out.println("Checkline: "+line );
 				it.close();
 				/* This is not supposed to happend, except with badly configured CMS that take over */
-				if(line.startsWith("<!DOCTYPE html"))
+				if(line.startsWith("<!DOCTYPE"))
 					return false;;
 				
 				return true;
