@@ -7,9 +7,12 @@ import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 
+import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -65,7 +68,7 @@ public class MainWindow implements WindowListener, Observer {
 
 	public MainWindow(String args[]) throws InterruptedException, ExecutionException {
 		running++;
-		logger.info("Started running instance" +running);
+		logger.info("Started running instance" + running);
 		init(args);
 	}
 
@@ -73,9 +76,9 @@ public class MainWindow implements WindowListener, Observer {
 		try {
 			parser.parse(args);
 		} catch (IllegalOptionValueException e) {
-			logger.log(Level.SEVERE,"parsing command line options", e);
+			logger.log(Level.SEVERE, "parsing command line options", e);
 		} catch (UnknownOptionException e) {
-			logger.log(Level.SEVERE,"", e);
+			logger.log(Level.SEVERE, "", e);
 		}
 
 	}
@@ -132,7 +135,8 @@ public class MainWindow implements WindowListener, Observer {
 
 	}
 
-	private static int running=0;
+	private static int running = 0;
+
 	/**
 	 * Keeps an eye on the model (used to detect exitRequested)
 	 * 
@@ -141,7 +145,7 @@ public class MainWindow implements WindowListener, Observer {
 	 */
 	@Override
 	public void update(Observable o, Object arg) {
-		
+
 		if (model.isExitRequested()) {
 			model.deleteObserver(this);
 			logger.info("Disposing the window in MainWindow.update()");
@@ -149,11 +153,11 @@ public class MainWindow implements WindowListener, Observer {
 			try {
 				Configuration.save();
 			} catch (IOException e) {
-				logger.log(Level.SEVERE,"saving configuration", e);
+				logger.log(Level.SEVERE, "saving configuration", e);
 			}
 			running--;
-			logger.info("Instances still running: "+running);
-			if(running<1){
+			logger.info("Instances still running: " + running);
+			if (running < 1) {
 				logger.info("No instances left, exiting VM");
 				System.exit(0);
 			}
@@ -161,17 +165,20 @@ public class MainWindow implements WindowListener, Observer {
 	}
 
 	public void init(String[] args) throws InterruptedException, ExecutionException {
-		//FIXME special handling if this is not the first time the application is initialized
-		
+		// FIXME special handling if this is not the first time the application
+		// is initialized
+
 		/* Initialize the command line options */
 		AutoHelpCmdLineParser parser = new AutoHelpCmdLineParser();
 		Option urlO = parser.addHelp(parser.addStringOption("url"), "Start GenomeView with data loaded from the URL");
 
 		Option fileO = parser.addHelp(parser.addStringOption("file"), "Start GenomeView with data loaded from a file.");
 
-		Option configurationO = parser.addHelp(parser.addStringOption("config"), "Provide additional configuration to load.");
+		Option configurationO = parser.addHelp(parser.addStringOption("config"),
+				"Provide additional configuration to load.");
 
-		Option positionO = parser.addHelp(parser.addStringOption("position"), "Provide the initial region that should be visible.");
+		Option positionO = parser.addHelp(parser.addStringOption("position"),
+				"Provide the initial region that should be visible.");
 
 		parse(parser, args);
 
@@ -189,11 +196,11 @@ public class MainWindow implements WindowListener, Observer {
 					Configuration.loadExtra(new FileInputStream(config));
 				}
 			} catch (MalformedURLException e) {
-				logger.log(Level.SEVERE,"loading extra configuration", e);
+				logger.log(Level.SEVERE, "loading extra configuration", e);
 			} catch (IOException e) {
-				logger.log(Level.SEVERE,"loading extra configuration", e);
+				logger.log(Level.SEVERE, "loading extra configuration", e);
 			} catch (URISyntaxException e) {
-				logger.log(Level.SEVERE,"loading extra configuration", e);
+				logger.log(Level.SEVERE, "loading extra configuration", e);
 			}
 		}
 
@@ -201,17 +208,16 @@ public class MainWindow implements WindowListener, Observer {
 		GraphicsDevice[] gs = ge.getScreenDevices();
 		boolean freshwindow = false;
 		if (window == null) {
-			freshwindow=true;
+			freshwindow = true;
 			logger.info("Creating new window");
 			window = new JFrame("GenomeView :: " + Configuration.version(), gs[0].getDefaultConfiguration());
 
 			window.setIconImage(new ImageIcon(this.getClass().getResource("/images/gv2.png")).getImage());
 			window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			window.addWindowListener(this);
-			
 
 		}
-		if (model == null){
+		if (model == null) {
 			model = new Model(window);
 			window.getRootPane().setTransferHandler(new DropTransferHandler(model));
 			model.addObserver(this);
@@ -221,17 +227,23 @@ public class MainWindow implements WindowListener, Observer {
 		model.setSilent(true);
 		model.clearEntries();
 
-		
-
 		if (freshwindow) {
 			JPanel[] content = MainContent.createContent(model, Configuration.getBoolean("dualscreen") ? gs.length : 1);
 			window.setContentPane(content[0]);
 			window.setJMenuBar(new MainMenu(model));
 			window.setVisible(true);
 			window.pack();
-//			window.setExtendedState(JFrame.MAXIMIZED_VERT);
-//			window.setExtendedState(JFrame.MAXIMIZED_HORIZ);
-//			window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+			Rectangle rec = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+			window.setSize(rec.width, rec.height);
+//			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+//			logger.info("Detected screen width: " + screen.getWidth());
+//			logger.info("Detected screen height: " + screen.getHeight());
+//			window.setSize((int)(screen.getWidth() * 0.7),(int)( screen.getHeight() * 0.4));
+
+			// window.setExtendedState(JFrame.MAXIMIZED_VERT);
+			// window.setExtendedState(JFrame.MAXIMIZED_HORIZ);
+			// window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			if (content.length > 1) {
 				for (int i = 1; i < content.length; i++) {
 					helper = new JFrame("GenomeView :: " + Configuration.version(), gs[i].getDefaultConfiguration());
@@ -262,7 +274,7 @@ public class MainWindow implements WindowListener, Observer {
 		if (cmdFile == null && cmdUrl == null) {
 			logger.info("File and url options are null!");
 			// do nothing
-			
+
 		} else if (cmdUrl != null) {
 			logger.info("URL commandline option is set: " + cmdUrl);
 			try {
@@ -284,9 +296,9 @@ public class MainWindow implements WindowListener, Observer {
 
 		/* Load the source, if one was constructed */
 		if (data != null) {
-			
+
 			assert (data.length == 1);
-			logger.info("Loading with priority: "+data[0]);
+			logger.info("Loading with priority: " + data[0]);
 			final ReadWorker rw = new ReadWorker(data[0], model);
 			rw.execute();
 			rw.get();
@@ -323,17 +335,16 @@ public class MainWindow implements WindowListener, Observer {
 		String initialLocation = (String) parser.getOptionValue(positionO);
 		if (initialLocation != null) {
 			String[] arr = initialLocation.split(":");
-			assert arr.length==2||arr.length==3;
-			if(arr.length==3){
+			assert arr.length == 2 || arr.length == 3;
+			if (arr.length == 3) {
 				model.setSelectedEntry(model.entry(arr[0]));
 				model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[1]), Integer.parseInt(arr[2])));
-			}else if(arr.length==2){
-				model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[0]), Integer.parseInt(arr[1])));	
+			} else if (arr.length == 2) {
+				model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[0]), Integer.parseInt(arr[1])));
 			}
-			
 
 		}
-		
+
 		/* Start acting */
 		model.setSilent(false);
 
