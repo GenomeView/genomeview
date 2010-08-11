@@ -24,25 +24,12 @@ if (!empty($param)){
   $this_file.="?".$param;
 }
 
-
-//Usage counter
-/*
-$link=mysql_connect(localhost,"******","*******");
-mysql_select_db("web_abeel",$link);
-
-$ip=$_SERVER["REMOTE_ADDR"];
-$mparam=mysql_real_escape_string($ip.'/'.$param,$link);
-$sql="insert into genomeview_launch set ip=INET_ATON('$ip'), parameters='$mparam'";
-mysql_query($sql,$link);
-mysql_close($link) ; 
-*/
-
-$jars[]="genomeview-922.jar";
-$jars[]="jannot_992.jar";
+$jars[]="genomeview-1028.jar";
+$jars[]="jannot-1026.jar";
 $jars[]="jargs.jar";
 $jars[]="commons-logging.jar";
 $jars[]="sam-938.jar";
-$jars[]="ajt_180.jar";
+$jars[]="ajt-2.4.jar";
 $jars[]="collections-1.0.jar";
 
 ?>
@@ -52,25 +39,13 @@ $jars[]="collections-1.0.jar";
   spec="1.0+"
   codebase="<?=$siteroot?>"
   href="<?=$siteroot?><?=$this_file?>"
-  <?php endif; ?>
->
+  <?php endif; ?>>
 <information>
   <title>GenomeView</title>
   <vendor>Thomas Abeel</vendor>
   <homepage href="http://genomeview.sf.net" />
   <icon href="http://broadinstitute.org/software/genomeview/gv2.png" width="47" height="47"  />
- <?php
- /*
-  <offline-allowed/>
-  <shortcut online="false">
-  	<desktop/>
-  </shortcut>
-  <association mime-type="application-x/genomeview-fasta" extensions="fasta" />    
-  <association mime-type="application-x/genomeview-gff" extensions="gff" />
-  <association mime-type="application-x/genomeview-fa" extensions="fa" />
-  */
-  ?>
-  <description>GenomeView: Genome Browser and Curator</description>
+  <description>GenomeView: a next-generation genome browser and editor</description>
 </information>
 <security>
   <all-permissions />
