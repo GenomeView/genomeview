@@ -34,8 +34,7 @@ $jars[]="collections-1.0.jar";
 
 ?>
 
-<jnlp 
-  <?php if ($webstart):   ?>
+<jnlp<?php if ($webstart):   ?>
   spec="1.0+"
   codebase="<?=$siteroot?>"
   href="<?=$siteroot?><?=$this_file?>"
