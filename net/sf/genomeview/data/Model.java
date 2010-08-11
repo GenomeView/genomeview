@@ -77,6 +77,7 @@ public class Model extends Observable implements IModel {
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						return;
 					}
 				}
 
