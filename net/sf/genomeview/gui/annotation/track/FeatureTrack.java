@@ -374,9 +374,9 @@ public class FeatureTrack extends Track {
 //								}
 //							}
 
-							text.append("Mean short read coverage ("
-									+ StaticUtils.shortify(rg.toString())
-									+ "): " + median(cm) + "<br />");
+//							text.append("Mean short read coverage ("
+//									+ StaticUtils.shortify(rg.toString())
+//									+ "): " + median(cm) + "<br />");
 						}
 					}
 					// }
@@ -405,17 +405,17 @@ public class FeatureTrack extends Track {
 			return sum;
 		}
 
-		private int median(CountMap<Integer> cm) {
-			int total = cm.totalCount();
-			int sum = 0;
-			for (java.util.Map.Entry<Integer, Integer> e : cm.entrySet()) {
-				sum += e.getValue();
-				if (sum > total / 2)
-					return e.getKey();
-			}
-			throw new RuntimeException(
-					"This should not happen while calculating the median.");
-		}
+//		private int median(CountMap<Integer> cm) {
+//			int total = cm.totalCount();
+//			int sum = 0;
+//			for (java.util.Map.Entry<Integer, Integer> e : cm.entrySet()) {
+//				sum += e.getValue();
+//				if (sum > total / 2)
+//					return e.getKey();
+//			}
+//			throw new RuntimeException(
+//					"This should not happen while calculating the median.");
+//		}
 
 	}
 
