@@ -14,7 +14,11 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.DataSourceFactory.Sources;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.source.DataSource;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class LoadFeaturesAction extends AbstractAction {
 
     private static final long serialVersionUID = 4601582100774593419L;
@@ -22,7 +26,7 @@ public class LoadFeaturesAction extends AbstractAction {
     private Model model;
 
     public LoadFeaturesAction(Model model) {
-        super("Load features...");
+        super("Load data...");
         super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control O"));
         this.model = model;
 

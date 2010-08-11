@@ -7,7 +7,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MainWindow;
 import net.sf.genomeview.gui.menu.edit.CloneFeatureAction;
 import net.sf.genomeview.gui.menu.edit.CopySequenceAction;
 import net.sf.genomeview.gui.menu.edit.CreateNewFeatureAction;
@@ -42,21 +41,19 @@ public class MainMenu extends JMenuBar {
 
 	public MainMenu(Model model) {
 		JMenu file = new JMenu("File");
-		file.add(new ClearEntriesAction(model));
+		
+		file.add(new LoadFeaturesAction(model));
 		file.addSeparator();
 		file.add(new SaveSessionAction(model));
 		file.add(new LoadSessionAction(model));
-		file.addSeparator();
-		file.add(new LoadFeaturesAction(model));
-//		file.add(new LoadDirectoryAction(model));
-
+		
 		file.addSeparator();
 		file.add(new SaveAction(model));
-//		file.add(new SaveAsAction(model));
 		file.add(new SaveImage(model));
 
 		file.addSeparator();
 		file.add(new ShowConfigurationAction(model));
+		file.add(new ClearEntriesAction(model));
 		file.addSeparator();
 		file.add(new ExitAction(model));
 		add(file);

@@ -9,14 +9,18 @@ import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
 import net.sf.genomeview.data.Model;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class ClearEntriesAction extends AbstractAction {
 
 	private static final long serialVersionUID = 1349866639638385199L;
 	private Model model;
 
 	public ClearEntriesAction(Model model) {
-		super("Clear entries");
+		super("Unload all data");
 		this.model = model;
 	}
 
