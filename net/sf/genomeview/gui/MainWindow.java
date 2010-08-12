@@ -7,12 +7,10 @@ import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 
-import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -231,7 +229,7 @@ public class MainWindow implements WindowListener, Observer {
 			JPanel[] content = MainContent.createContent(model, Configuration.getBoolean("dualscreen") ? gs.length : 1);
 			window.setContentPane(content[0]);
 			window.setJMenuBar(new MainMenu(model));
-			window.setVisible(true);
+			
 			window.pack();
 
 			Rectangle rec = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
@@ -255,7 +253,7 @@ public class MainWindow implements WindowListener, Observer {
 					helper.pack();
 				}
 			}
-
+			window.setVisible(true);
 			PluginLoader.load(model);
 
 		}
