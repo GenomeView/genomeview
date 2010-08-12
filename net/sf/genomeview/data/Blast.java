@@ -10,26 +10,34 @@ import java.net.URISyntaxException;
 
 import net.sf.genomeview.gui.StaticUtils;
 
+/**
+ * 
+ * @author Thomas Abeel
+ * 
+ */
 public class Blast {
 
-    public static void nucleotideBlast(String header,String seq) {
-        String url = "http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Web&PAGE=Nucleotides&QUERY=%3E"+header+"%0A" + seq;
+	public static void blastn(String header, String seq) {
+		go("http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?PROGRAM=blastn&BLAST_PROGRAMS=megaBlast&PAGE_TYPE=BlastSearch&SHOW_DEFAULTS=on&BLAST_SPEC=&LINK_LOC=blasttab&QUERY=%3E"
+				+ header + "%0A" + seq);
+	}
 
-        try {
-            StaticUtils.browse(new URI(url));
-        } catch (URISyntaxException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	public static void blastp(String header, String seq) {
+		go("http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?PROGRAM=blastp&BLAST_PROGRAMS=blastp&PAGE_TYPE=BlastSearch&SHOW_DEFAULTS=on&BLAST_SPEC=&LINK_LOC=blasttab&QUERY=%3E"
+				+ header + "%0A" + seq);
+	}
 
-    public static void proteinBlast(String header, String protein) {
-        String url = "http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Web&PAGE=Proteins&QUERY=%3E"+header+"%0A" + protein;
+	public static void blastx(String header, String seq) {
+		go("http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?PROGRAM=blastx&BLAST_PROGRAMS=blastx&PAGE_TYPE=BlastSearch&SHOW_DEFAULTS=on&BLAST_SPEC=&LINK_LOC=blasttab&QUERY=%3E"
+				+ header + "%0A" + seq);
+	}
 
-        try {
-            StaticUtils.browse(new URI(url));
-        } catch (URISyntaxException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }}
+	private static void go(String url) {
+		try {
+			StaticUtils.browse(new URI(url));
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

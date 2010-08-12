@@ -22,6 +22,7 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
+import net.sf.jannot.refseq.MemorySequence;
 import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.utils.SequenceTools;
 
@@ -104,8 +105,9 @@ public class SelectedSequenceDialog extends JDialog {
 
                     }
                 }
+                
                 if (aa.isSelected()) {
-                    selectedSequence = SequenceTools.translate(tmp.toString(),model.getAAMapping());
+                    selectedSequence = SequenceTools.translate(new MemorySequence(tmp),model.getAAMapping());
                 } else
                     selectedSequence = tmp.toString();
                 setVisible(false);
