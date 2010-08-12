@@ -96,7 +96,7 @@ public class InformationFrame extends GridBagPanel {
 
 		add(new GeneStructureView(model), gc);
 
-		setMinimumSize(new Dimension(200, this.getPreferredSize().height));
+		setMinimumSize(new Dimension(200,200));
 
 
 	}
