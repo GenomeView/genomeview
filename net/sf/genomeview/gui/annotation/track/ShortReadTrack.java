@@ -678,7 +678,7 @@ public class ShortReadTrack extends Track {
 						currentVisible.start, currentVisible.end+1);
 				
 
-				seqBuffer = new char[currentVisible.length()];
+				seqBuffer = new char[currentVisible.length()+1];
 				int idx = 0;
 				for (char cc : bufferedSeq) {
 					seqBuffer[idx++] = cc;
