@@ -641,7 +641,7 @@ public class StructureTrack extends Track {
 				g.drawLine(lastX, lastY + yOffset, middleX, maxY + yOffset);
 				g.drawLine(middleX, maxY + yOffset, currentX, currentY + yOffset);
 			}
-
+			r.y-=yOffset;
 			collisionMap.addLocation(r, l);
 			last = l;
 			lastY = hor + height / 2;
@@ -923,15 +923,10 @@ public class StructureTrack extends Track {
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent e) {
-		if (!collisionMap.nearBorder(x, e.getY()) || Mouse.modifier(e))
+		if (!collisionMap.nearBorder(x, y) || Mouse.modifier(e))
 			model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		else
 			model.getParent().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-
-		// int currentX = Convert.translateScreenToGenome(e.getX(),
-		// model.getAnnotationLocationVisible(), screenWidth);
-		// model.mouseModel().setCurrentCoord(currentX);
-
 		setChanged();
 		notifyObservers();
 		return false;
