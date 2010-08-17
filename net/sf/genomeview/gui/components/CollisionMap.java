@@ -23,7 +23,7 @@ public class CollisionMap {
 	private Model model;
 
 	public CollisionMap(Model model) {
-this.model=model;
+		this.model = model;
 	}
 
 	/**
@@ -33,6 +33,10 @@ this.model=model;
 		locationMap.clear();
 	}
 
+	@Override
+	public String toString(){
+		return locationMap.toString();
+	}
 	public Location uniqueLocation(int x, int y) {
 
 		Set<Location> locHits = locationHits(x, y);
