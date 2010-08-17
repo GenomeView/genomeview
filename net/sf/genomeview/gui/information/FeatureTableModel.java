@@ -31,7 +31,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
      */
 	private static final long serialVersionUID = 320228141380099074L;
 
-	private String[] columns = { "Name", "Start", "Stop", "Internal stop", "Splice sites" };
+	private String[] columns = { "Name"};
 
 	@Override
 	public String getColumnName(int column) {
@@ -67,18 +67,19 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 
 	@Override
 	public Class<?> getColumnClass(int col) {
-		switch (col) {
-		case 0:
-			return String.class;
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-			return Icon.class;
-		default:
-			return String.class;
-
-		}
+		return String.class;
+//		switch (col) {
+//		case 0:
+//			return String.class;
+//		case 1:
+//		case 2:
+//		case 3:
+//		case 4:
+//			return Icon.class;
+//		default:
+//			return String.class;
+//
+//		}
 
 	}
 
@@ -89,37 +90,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	@Override
 	public Object getValueAt(int row, int col) {
 		Feature f = getFeature(row);
-		Sequence seq = model.getSelectedEntry().sequence();
-		switch (col) {
-		case 0:
-			return f;
-		case 1:
-			if (SequenceTools.hasMissingStartCodon(seq, f, model.getAAMapping())) {
-				return Icons.NO;
-			} else {
-				return Icons.YES;
-			}
-		case 2:
-			if (SequenceTools.hasMissingStopCodon(seq, f, model.getAAMapping())) {
-				return Icons.NO;
-			} else {
-				return Icons.YES;
-			}
-		case 3:
-			if (SequenceTools.hasInternalStopCodon(seq, f, model.getAAMapping())) {
-				return Icons.NO;
-			} else {
-				return Icons.YES;
-			}
-		case 4:
-			if (SequenceTools.hasWrongSpliceSite(seq, f)) {
-				return Icons.NO;
-			} else {
-				return Icons.YES;
-			}
-		default:
-			return null;
-		}
+		return f;
 	}
 
 	public int getRow(Feature first) {

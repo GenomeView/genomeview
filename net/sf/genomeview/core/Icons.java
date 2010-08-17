@@ -17,6 +17,9 @@ public class Icons {
 	public static final Icon NO = new ImageIcon(Icons.class.getResource("/images/no.png"));
 	public static final Icon BDASH = new ImageIcon(Icons.class.getResource("/images/bdash.png"));
 
+	public static final Icon VISIBLE=new ImageIcon(Icons.class.getResource("/images/visible.png"));
+	public static final Icon INVISIBLE=new ImageIcon(Icons.class.getResource("/images/invisible.png"));
+	
 	public static final Icon EDIT = new ImageIcon(Icons.class.getResource("/images/edit.png"));
 
 	public static final Icon DOWN_ARROW = new ImageIcon(Icons.class.getResource("/images/downarrow.png"));
@@ -36,3 +39,4 @@ public class Icons {
 	}
 
 }
+

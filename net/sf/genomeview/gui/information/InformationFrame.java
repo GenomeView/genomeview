@@ -42,15 +42,15 @@ public class InformationFrame extends GridBagPanel {
 		gc.weightx = 1;
 		gc.weighty = 1;
 		gc.gridwidth = 2;
-
-		final SourceTable sourceTrackList = new SourceTable(model);
-		gc.gridy++;
-		gc.weighty = 0;
-		add(new JLabel("Data sources"), gc);
-		gc.gridy++;
-		gc.weighty = 0.5;
-		add(new JScrollPane(sourceTrackList), gc);
-		gc.gridy++;
+//
+//		final SourceTable sourceTrackList = new SourceTable(model);
+//		gc.gridy++;
+//		gc.weighty = 0;
+//		add(new JLabel("Data sources"), gc);
+//		gc.gridy++;
+//		gc.weighty = 0.5;
+//		add(new JScrollPane(sourceTrackList), gc);
+//		gc.gridy++;
 
 		final TrackTable featureTrackList = new TrackTable(model);
 

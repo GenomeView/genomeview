@@ -92,18 +92,18 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 			if (track instanceof FeatureTrack) {
 				Type ct = ((FeatureTrack) track).getType();
 				if (getStructureTrack().isTypeVisible(ct)) {
-					return Icons.YES;
+					return Icons.VISIBLE;
 				} else {
-					return Icons.NO;
+					return Icons.INVISIBLE;
 				}
 			} else {
 				return Icons.BDASH;
 			}
 		case 1:
 			if (model.getTrackList().get(row).isVisible()) {
-				return Icons.YES;
+				return Icons.VISIBLE;
 			} else {
-				return Icons.NO;
+				return Icons.INVISIBLE;
 			}
 		case 2:
 			if (track.isCollapsible()) {
