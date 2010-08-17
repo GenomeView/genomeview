@@ -763,16 +763,7 @@ public class Model extends Observable implements IModel {
 			return "";
 	}
 
-	private HashMap<DataSource, Boolean> sourceVisibility = new DefaultHashMap<DataSource, Boolean>(Boolean.TRUE);
-
-	public boolean isSourceVisible(DataSource dataSource) {
-		return sourceVisibility.get(dataSource);
-	}
-
-	public void setSourceVisibility(DataSource key, boolean b) {
-		sourceVisibility.put(key, b);
-		refresh();
-	}
+	
 
 	/* Cache of the sources that are currently loaded */
 	private ConcurrentSkipListSet<DataSource> loadedSources = new ConcurrentSkipListSet<DataSource>();
