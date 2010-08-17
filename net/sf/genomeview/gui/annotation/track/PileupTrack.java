@@ -5,13 +5,19 @@ package net.sf.genomeview.gui.annotation.track;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JViewport;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
@@ -26,18 +32,33 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.tabix.PileupWrapper;
+
 /**
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 public class PileupTrack extends Track {
+
+	class PileupTrackModel {
+		private boolean logscaling=false;
+
+		public boolean isLogscaling() {
+			return logscaling;
+		}
+
+		public void setLogscaling(boolean logscaling) {
+			this.logscaling = logscaling;
+		}
+
+	}
 
 	public PileupTrack(DataKey key, Model model) {
 		super(key, model, true, true);
 	}
 
 	private Tooltip tooltip = new Tooltip();
+	private PileupTrackModel ptm = new PileupTrackModel();
 
 	private class Tooltip extends JWindow {
 
@@ -140,14 +161,14 @@ public class PileupTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,JViewport view) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
 		if (summary == null || summary.length <= 1) {
 			reset();
 		}
-
+		//System.out.println("LOG="+ptm.isLogscaling());
 		/* Get configuration */
-		boolean logScaling = Configuration.getBoolean("shortread:logScaling");
-		double bottomValue = Configuration.getDouble("shortread:bottomValue");
+//		boolean logScaling = Configuration.getBoolean("shortread:logScaling");
+//		double bottomValue = Configuration.getDouble("shortread:bottomValue");
 		// double topValue = Configuration.getDouble("shortread:topValue");
 
 		int graphLineHeigh = Configuration.getInt("shortread:graphLineHeight");
@@ -222,7 +243,7 @@ public class PileupTrack extends Track {
 
 			int vs = visible.start / SUMMARYSIZE * SUMMARYSIZE + SUMMARYSIZE / 2;
 			double topValue = maxSummary;
-			double range = topValue - bottomValue;
+			//double range = topValue - bottomValue;
 
 			conservationGP.moveTo(-5, yOffset + graphLineHeigh);
 
@@ -257,27 +278,21 @@ public class PileupTrack extends Track {
 
 				// if (valF < bottomValue)
 				// valF = bottomValue;
-				// valR = bottomValue;
-				if (val < bottomValue)
-					val = bottomValue;
+//				// valR = bottomValue;
+//				if (val < bottomValue)
+//					val = bottomValue;
 
 				/* Translate for bottom point */
 				// valF -= bottomValue;
 				// valR -= bottomValue;
-				val -= bottomValue;
+//				val -= bottomValue;
 				/* Logaritmic scaling */
-				if (logScaling) {
-					// valF = log2(valF + 1);
-					// valF /= log2(range);
-					// valR = log2(valR + 1);
-					// valR /= log2(range);
-					val = log2(val + 1);
-					val /= log2(range);
+				if (ptm.isLogscaling()) {
+					val = log2(val + 1);	
+					val /= log2(maxSummary);
 					/* Regular scaling */
 				} else {
-					// valF /= range;
-					// valR /= range;
-					val /= range;
+					val /= maxSummary;
 				}
 				// System.out.println("VAL: " + val);
 				/* Draw lines */
@@ -337,6 +352,24 @@ public class PileupTrack extends Track {
 		queued = new BitSet();
 		running = new BitSet();
 
+	}
+
+	@Override
+	public List<JMenuItem> getMenuItems() {
+		ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
+		final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
+		item.setSelected(ptm.isLogscaling());
+		item.setAction(new AbstractAction("Use log scaling") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ptm.setLogscaling(item.isSelected());
+
+			}
+
+		});
+		out.add(item);
+
+		return out;
 	}
 
 	@Override
