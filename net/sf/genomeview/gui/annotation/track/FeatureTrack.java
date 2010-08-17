@@ -57,9 +57,20 @@ public class FeatureTrack extends Track {
 			return colorQualifier;
 		}
 
+		/* Indicates whether any of the features in this track have a /color tag */
+		private boolean colorQualifierEnabled = false;
+
+		public boolean isColorQualifierEnabled() {
+			return colorQualifierEnabled;
+		}
+
+		public void setColorQualifierEnabled(boolean colorQualifierEnabled) {
+			this.colorQualifierEnabled = colorQualifierEnabled;
+		}
+
 		public void setColorQualifier(boolean colorQualifier) {
 			this.colorQualifier = colorQualifier;
-			Configuration.set("feature:useColorQualifierTag_"+type, colorQualifier);
+			Configuration.set("feature:useColorQualifierTag_" + type, colorQualifier);
 			model.refresh(this);
 		}
 
@@ -71,8 +82,8 @@ public class FeatureTrack extends Track {
 
 		public FeatureTrackModel(Model model) {
 			this.model = model;
-			colorQualifier = Configuration.getBoolean("feature:useColorQualifierTag_"+type);
-			scoreColorGradient = Configuration.getBoolean("feature:scoreColorGradient"+type);
+			colorQualifier = Configuration.getBoolean("feature:useColorQualifierTag_" + type);
+			scoreColorGradient = Configuration.getBoolean("feature:scoreColorGradient" + type);
 
 		}
 
@@ -82,7 +93,7 @@ public class FeatureTrack extends Track {
 
 		public void setScoreColorGradient(boolean scoreColorGradient) {
 			this.scoreColorGradient = scoreColorGradient;
-			Configuration.set("feature:scoreColorGradient_"+type, scoreColorGradient);
+			Configuration.set("feature:scoreColorGradient_" + type, scoreColorGradient);
 			model.refresh(this);
 		}
 
@@ -120,7 +131,9 @@ public class FeatureTrack extends Track {
 		// List<Feature> types = entry.annotation.getByType(type,);
 		// FeatureAnnotation annot = entry.getAnnotation(type);
 		FeatureAnnotation annot = (FeatureAnnotation) entry.get(type);
-		//System.out.println("Min-max: "+annot.getMinScore()+"\t"+annot.getMaxScore());
+		if (annot.qualifierKeys().contains("color") || annot.qualifierKeys().contains("colour"))
+			ftm.setColorQualifierEnabled(true);
+		// System.out.println("Min-max: "+annot.getMinScore()+"\t"+annot.getMaxScore());
 		// System.out.println("FA: "+type+"\t"+annot);
 		// System.out.println(entry.)
 		int estimate = annot.getEstimateCount(visible);
@@ -143,6 +156,7 @@ public class FeatureTrack extends Track {
 		int lines = 0;
 		// int paintedFeatures=0;
 		for (Feature rf : list) {
+
 			// paintedFeatures++;
 			// if (!model.isSourceVisible(rf.getSource()))
 			// continue;
@@ -150,19 +164,16 @@ public class FeatureTrack extends Track {
 			int thisLine = 0;
 
 			Color c = Configuration.getColor("TYPE_" + rf.type());
-			if (ftm.isColorQualifier()) {
-				List<Qualifier> notes = rf.qualifier("colour");
-				notes.addAll(rf.qualifier("color"));
-				if (notes.size() > 0) {
-					String val = notes.get(0).getValue();
-					c = Colors.decodeColor(val);
+			if (ftm.isColorQualifierEnabled() && ftm.isColorQualifier()) {
+				String color = rf.getColor();
+				if (color != null) {
+					c = Colors.decodeColor(color);
 				}
 			}
 			if (ftm.isScoreColorGradient()) {
 				double range = annot.getMaxScore() - annot.getMinScore();
 				if (range > 0.00001)
-					;
-				c = ftm.getColor(rf.getScore() / range);
+					c = ftm.getColor(rf.getScore() / range);
 			}
 
 			g.setColor(c);
@@ -498,21 +509,33 @@ public class FeatureTrack extends Track {
 	}
 
 	@Override
-	public List<JMenuItem>getMenuItems(){
-		ArrayList<JMenuItem>out=new ArrayList<JMenuItem>();
-		final JCheckBoxMenuItem item=new JCheckBoxMenuItem();
+	public List<JMenuItem> getMenuItems() {
+		ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
+		/* Color gradient coloring based on score */
+		final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
 		item.setSelected(ftm.isScoreColorGradient());
-		item.setAction(new AbstractAction("Use score color gradient"){
+		item.setAction(new AbstractAction("Use score color gradient") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ftm.setScoreColorGradient(item.isSelected());
-				
-				
+
 			}
-			
+
 		});
 		out.add(item);
-		
+		if (ftm.isColorQualifierEnabled()) {
+			final JCheckBoxMenuItem colorQualifier = new JCheckBoxMenuItem();
+			colorQualifier.setSelected(ftm.isColorQualifier());
+			colorQualifier.setAction(new AbstractAction("Use /color qualifier") {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					ftm.setColorQualifier(colorQualifier.isSelected());
+
+				}
+
+			});
+			out.add(colorQualifier);
+		}
 		return out;
 	}
 }
