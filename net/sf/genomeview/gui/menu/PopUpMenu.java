@@ -15,6 +15,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.annotation.track.StructureTrack;
+import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
 import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.gui.menu.edit.CloneFeatureAction;
 import net.sf.genomeview.gui.menu.edit.CreateNewFeatureAction;
@@ -46,19 +48,22 @@ public class PopUpMenu extends JPopupMenu {
 			}
 			if (count > 0)
 				addSeparator();
-			JMenuItem clear = new JMenuItem(new AbstractAction("Unload track") {
+			/* Don't remove structure of TickmarkTrack */
+			if (!(t instanceof StructureTrack)&&!(t instanceof TickmarkTrack)) {
+				JMenuItem clear = new JMenuItem(new AbstractAction("Unload track") {
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					int result = JOptionPane.showConfirmDialog(model.getParent(),
-							"Are you sure you want to clear this track?");
-					if (result == JOptionPane.YES_OPTION) {
-						model.remove(t.getDataKey());
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						int result = JOptionPane.showConfirmDialog(model.getParent(),
+								"Are you sure you want to clear this track?");
+						if (result == JOptionPane.YES_OPTION) {
+							model.remove(t.getDataKey());
+						}
 					}
-				}
 
-			});
-			add(clear);
+				});
+				add(clear);
+			}
 		}
 		count = 0;
 
