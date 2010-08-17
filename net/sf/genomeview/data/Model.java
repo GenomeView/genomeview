@@ -50,6 +50,7 @@ import net.sf.jannot.tabix.GFFWrapper;
 import net.sf.jannot.tabix.PileupWrapper;
 import net.sf.jannot.wiggle.Graph;
 import be.abeel.util.DefaultHashMap;
+
 //also test
 public class Model extends Observable implements IModel {
 	private Logger logger = Logger.getLogger(Model.class.getCanonicalName());
@@ -442,6 +443,7 @@ public class Model extends Observable implements IModel {
 
 		}
 
+		@Deprecated
 		public void clear() {
 			mapping.clear();
 			order.clear();
@@ -469,6 +471,11 @@ public class Model extends Observable implements IModel {
 				model.refresh();
 			}
 
+		}
+
+		public void remove(DataKey key) {
+			order.remove(key);
+			mapping.remove(key);
 		}
 
 		// public boolean containsGraph(String name) {
@@ -834,6 +841,17 @@ public class Model extends Observable implements IModel {
 		trackList.clear();
 		updateTracks();
 		refresh(NotificationTypes.ENTRYCHANGED);
+
+	}
+
+	/**
+	 * Removes a datakey from the visualization.
+	 * 
+	 * @param dataKey
+	 */
+	public void remove(DataKey dataKey) {
+		getSelectedEntry().remove(dataKey);
+		trackList.remove(dataKey);
 
 	}
 

@@ -11,6 +11,7 @@ import java.util.SortedSet;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import net.sf.genomeview.data.Model;
@@ -33,7 +34,7 @@ public class PopUpMenu extends JPopupMenu {
 
 	private int count = 0;
 
-	public PopUpMenu(Model model, Track t) {
+	public PopUpMenu(final Model model, final Track t) {
 		/* Track specific actions, if there is a track */
 		if (t != null) {
 			List<JMenuItem> list = t.getMenuItems();
@@ -45,16 +46,30 @@ public class PopUpMenu extends JPopupMenu {
 			}
 			if (count > 0)
 				addSeparator();
+			JMenuItem clear = new JMenuItem(new AbstractAction("Unload track") {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					int result = JOptionPane.showConfirmDialog(model.getParent(),
+							"Are you sure you want to clear this track?");
+					if (result == JOptionPane.YES_OPTION) {
+						model.remove(t.getDataKey());
+					}
+				}
+
+			});
+			add(clear);
 		}
-		count=0;
-		/* Other actions */
+		count = 0;
+
+		/* Selected feature actions */
 		addC(new RemoveAction(model));
 		addC(new EditStructureAction(model));
 		addC(new ClearFeatureSelectionAction(model));
 		addC(new ShowSequenceWindowAction(model));
 		if (count > 0)
 			addSeparator();
-		count=0;
+		count = 0;
 		addC(new ClearRegionSelectionAction(model));
 
 		addC(new CreateNewFeatureAction(model));
@@ -77,6 +92,7 @@ public class PopUpMenu extends JPopupMenu {
 		for (Action a : actions)
 			add(a);
 		count += actions.size();
+
 		if (count == 0) {
 			add(new AbstractAction("No actions available") {
 
