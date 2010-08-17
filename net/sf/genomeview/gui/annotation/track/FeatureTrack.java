@@ -59,7 +59,7 @@ public class FeatureTrack extends Track {
 
 		public void setColorQualifier(boolean colorQualifier) {
 			this.colorQualifier = colorQualifier;
-			Configuration.set("useColorQualifierTag", colorQualifier);
+			Configuration.set("feature:useColorQualifierTag_"+type, colorQualifier);
 			model.refresh(this);
 		}
 
@@ -71,8 +71,8 @@ public class FeatureTrack extends Track {
 
 		public FeatureTrackModel(Model model) {
 			this.model = model;
-			colorQualifier = Configuration.getBoolean("useColorQualifierTag");
-			scoreColorGradient = Configuration.getBoolean("feature:scoreColorGradient");
+			colorQualifier = Configuration.getBoolean("feature:useColorQualifierTag_"+type);
+			scoreColorGradient = Configuration.getBoolean("feature:scoreColorGradient"+type);
 
 		}
 
@@ -82,7 +82,7 @@ public class FeatureTrack extends Track {
 
 		public void setScoreColorGradient(boolean scoreColorGradient) {
 			this.scoreColorGradient = scoreColorGradient;
-			Configuration.set("feature:scoreColorGradient", scoreColorGradient);
+			Configuration.set("feature:scoreColorGradient_"+type, scoreColorGradient);
 			model.refresh(this);
 		}
 
