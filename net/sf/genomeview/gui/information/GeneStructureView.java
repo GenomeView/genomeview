@@ -11,8 +11,13 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.SortedSet;
 
 import javax.swing.JLabel;
 
@@ -138,9 +143,10 @@ public class GeneStructureView extends JLabel implements Observer {
 		private AminoAcidMapping aa;
 
 		public AnalyzedFeature(Sequence sequence, Feature rf, AminoAcidMapping aminoAcidMapping) {
-			this.seq=sequence;
-			this.f=rf;
-			this.aa=aminoAcidMapping;
+			this.seq = sequence;
+			this.f = rf;
+			this.aa = aminoAcidMapping;
+
 		}
 
 		/**
@@ -193,37 +199,36 @@ public class GeneStructureView extends JLabel implements Observer {
 		 * @return
 		 */
 		public boolean missingDonor(Location l) {
-			return true;
-			// FIXME implement again
-			// assert (f.location().contains(l));
-			// if (f.strand() == Strand.FORWARD) {
-			//
-			// char plus1 = seq.getNucleotide(l.end() + 1);
-			// char plus2 = seq.getNucleotide(l.end() + 2);
-			// boolean gt = (plus1 == 'g' || plus1 == 'G')
-			// && (plus2 == 't' || plus2 == 'T'||plus2 == 'c' || plus2 == 'C');
-			//
-			// if (l.equals(f.location().last()))
-			// gt = true;
-			// if (!gt)
-			// return true;
-			//
-			// }
-			// if (f.strand() == Strand.REVERSE) {
-			// char min2 = seq.getReverseNucleotide(l.start() - 2);
-			// char min1 = seq.getReverseNucleotide(l.start() - 1);
-			//
-			// boolean gt = (min2 == 't' || min2 == 'T'||min2 == 'c' || min2 ==
-			// 'C')
-			// && (min1 == 'g' || min1 == 'G');
-			// if (l.equals(f.location().first()))
-			// gt = true;
-			//
-			// if (!gt)
-			// return true;
-			//
-			// }
-			// return false;
+			
+			if (f.strand() == Strand.FORWARD) {
+				String s = seq.subsequence(l.end + 1, l.end + 3).stringRepresentation();
+				// char plus2 = seq.getNucleotide(l.end() + 2);
+				// boolean gt = (plus1 == 'g' || plus1 == 'G')
+				// && (plus2 == 't' || plus2 == 'T'||plus2 == 'c' || plus2 ==
+				// 'C');
+				return !(s.equalsIgnoreCase("gt") || s.equalsIgnoreCase("gc"));
+				// if (l.equals(f.location().last()))
+				// gt = true;
+				// if (!gt)
+				// return true;
+
+			}
+			if (f.strand() == Strand.REVERSE) {
+				String s = seq.subsequence(l.start - 2, l.start).stringRepresentation();
+				return !(s.equalsIgnoreCase("gc") || s.equalsIgnoreCase("tc"));
+				// char min2 = seq.getReverseNucleotide(l.start() - 2);
+				// char min1 = seq.getReverseNucleotide(l.start() - 1);
+				//
+				// boolean gt = (min2 == 't' || min2 == 'T' || min2 == 'c' ||
+				// min2 == 'C') && (min1 == 'g' || min1 == 'G');
+				// if (l.equals(f.location().first()))
+				// gt = true;
+				//
+				// if (!gt)
+				// return true;
+
+			}
+			return false;
 		}
 
 		public boolean hasMissingStartCodon() {
@@ -259,14 +264,18 @@ public class GeneStructureView extends JLabel implements Observer {
 		 * @param rf
 		 * @return
 		 */
-		public boolean hasInternalStopCodon(Location l) {
+		public List<Location> getIternalStopCodons() {
+			ArrayList<Location> out = new ArrayList<Location>();
+
 			Sequence dna = SequenceTools.extractSequence(seq, f);
-			System.out.println("DNA: "+dna);
+			// System.out.println("DNA: "+dna);
 			String s = SequenceTools.translate(dna, aa);
-			System.out.println("PROTEIN: "+s);
-			boolean missingStop=s.indexOf('*') < s.length() - 2;
-			System.out.println("Missing stop: "+missingStop);
-			return missingStop;
+			for (int i = 0; i < s.length() - 1; i++) {
+				if (s.charAt(i) == '*') {
+					out.add(getntpos(i));
+				}
+			}
+			return out;
 
 			// FIXME hasInternalStopCodon
 			// for (int i = 0; i < dna.length() - 3; i += 3) {
@@ -277,6 +286,19 @@ public class GeneStructureView extends JLabel implements Observer {
 			// }
 			// }
 			// return false;
+
+		}
+
+		private Location getntpos(int aapos) {
+			SortedSet<Location> set = rf.location();
+			ArrayList<Integer> list = new ArrayList<Integer>();
+			for (Location l : rf.location()) {
+				for (int i = l.start; i <= l.end; i++)
+					list.add(i);
+			}
+			if (rf.strand() == Strand.REVERSE)
+				Collections.reverse(list);
+			return new Location(list.get(aapos * 3), list.get(aapos * 3 + 2));
 
 		}
 
@@ -328,8 +350,10 @@ public class GeneStructureView extends JLabel implements Observer {
 		int lastY = 0;
 		int arrowDrawFrame = -1;
 		AnalyzedFeature af = new AnalyzedFeature(entry.sequence(), rf, model.getAAMapping());
+		HashMap<Location, Integer> drawFrameMapping = new HashMap<Location, Integer>();
 		for (Location l : rf.location()) {
 			int drawFrame = getDrawFrame(l, rf);
+			drawFrameMapping.put(l, drawFrame);
 			/* Keep track of the frame we have to draw the arrow in */
 			if (rf.strand() == Strand.REVERSE && last == null)
 				arrowDrawFrame = drawFrame;
@@ -351,11 +375,7 @@ public class GeneStructureView extends JLabel implements Observer {
 			Rectangle r = new Rectangle(lmin + hGap, hor + vGap, lmax - lmin, lineHeight);
 			/* Draw box */
 			Color cdsColor = Configuration.getColor("TYPE_CDS");
-			if (af.hasInternalStopCodon(l)) {
-				g.setColor(Color.RED);
-			} else {
-				g.setColor(cdsColor);
-			}
+			g.setColor(cdsColor);
 			g.fill(r);
 
 			/* Draw darker box outline */
@@ -413,6 +433,31 @@ public class GeneStructureView extends JLabel implements Observer {
 			g.drawLine(x, hor, x - arrowLenght, hor + (lineHeight / 2));
 			g.drawLine(x - arrowLenght, hor + (lineHeight / 2), x, hor + lineHeight);
 		}
+		/* Draw inframe stop codons */
+		List<Location> list = af.getIternalStopCodons();
+		for (Location l : list) {
+			/* Start of the block */
+			int lmin = (int) ((l.start() - rf.start()) * posPixelRatio);
+			/* End of the block */
+			int lmax = (int) ((l.end() - rf.start() + 1) * posPixelRatio);
+			/* Horizontal position */
+
+			// if (rf.strand() == Strand.REVERSE)
+			// hor = middle + (drawFrame * lineHeight) + tickHeight / 2 + gap;
+			// else
+			for (java.util.Map.Entry<Location, Integer> en : drawFrameMapping.entrySet()) {
+				if (en.getKey().overlaps(l))
+					hor = ((en.getValue() - 1) * lineHeight);
+			}
+
+			/* Create box */
+			Rectangle r = new Rectangle(lmin + hGap, hor + vGap, lmax - lmin, lineHeight);
+			/* Draw box */
+			g.setColor(Color.RED);
+
+			g.fill(r);
+		}
+
 		/* --------------------- */
 		/* Paint viewport */
 		/* --------------------- */
