@@ -32,44 +32,16 @@ import net.sf.genomeview.gui.menu.navigation.AnnotationMoveRightAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationZoomInAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationZoomOutAction;
 import net.sf.jannot.Entry;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class MainContent {
 
 	private static Logger logger = Logger.getLogger(MainContent.class.getCanonicalName());
 
 	private static final long serialVersionUID = -2304899922750491897L;
-
-	private static JToolBar createToolBar(Model model) {
-		JToolBar bar = new JToolBar();
-		bar.setFloatable(false);
-
-		bar.add(new UndoAction(model));
-		bar.add(new RedoAction(model));
-		bar.addSeparator();
-		bar.add(new AnnotationZoomInAction(model));
-		bar.add(new AnnotationZoomOutAction(model));
-		bar.add(new AnnotationMoveLeftAction(model));
-		bar.add(new AnnotationMoveRightAction(model));
-		bar.addSeparator();
-		bar.add(new JLabel("Entry:"));
-		bar.add(new JComboBox(new EntryListModel(model)));
-		if (Configuration.getBoolean("geneticCodeSelection")) {
-			bar.add(new JLabel("Code:"));
-			bar.add(new AAMappingChooser(model));
-		}
-		// String sponsor = Configuration.get("sponsor");
-		// if (sponsor.length() != 0) {
-		// URL url = Icons.class.getResource(sponsor);
-		// logger.info("Sponser logo url: " + url);
-		// if (url != null) {
-		// ImageIcon sponsorLogo = new ImageIcon(url);
-		// bar.add(new JLabel(sponsorLogo));
-		// }
-		// }
-
-		bar.add(new JLabel(new ImageIcon(Icons.class.getResource("/images/vib.png"))));
-		return bar;
-	}
 
 	public static JPanel[] createContent(Model model, int screens) {
 		if (screens == 1) {
@@ -87,7 +59,7 @@ public class MainContent {
 			out[i] = new JPanel();
 			// registerKeyboard(out[i], model);
 			out[i].setLayout(new BorderLayout());
-			out[i].add(createToolBar(model), BorderLayout.PAGE_START);
+			out[i].add(new Toolbar(model), BorderLayout.PAGE_START);
 
 			AnnotationFrame af = new AnnotationFrame(i, model);
 //			af.setPreferredSize(screen);
@@ -114,7 +86,7 @@ public class MainContent {
 		out[last] = new JPanel();
 		// registerKeyboard(out[last], model);
 		out[last].setLayout(new BorderLayout());
-		out[last].add(createToolBar(model), BorderLayout.PAGE_START);
+		out[last].add(new Toolbar(model), BorderLayout.PAGE_START);
 
 		JSplitPane leftRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		Container leftContainer = new Container();
