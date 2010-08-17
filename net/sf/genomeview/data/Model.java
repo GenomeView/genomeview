@@ -847,12 +847,15 @@ public class Model extends Observable implements IModel {
 	/**
 	 * Removes a datakey from the visualization.
 	 * 
-	 * @param dataKey
+	 * @param track
 	 */
-	public void remove(DataKey dataKey) {
-		getSelectedEntry().remove(dataKey);
-		trackList.remove(dataKey);
-
+	public void remove(Track track) {
+		if (!(track instanceof StructureTrack) && !(track instanceof TickmarkTrack)) {
+			getSelectedEntry().remove(track.getDataKey());
+			trackList.remove(track.getDataKey());
+		}
+		setChanged();
+		notifyObservers(NotificationTypes.UPDATETRACKS);
 	}
 
 }

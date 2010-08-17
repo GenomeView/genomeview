@@ -26,16 +26,17 @@ public class TrackTable extends JTable {
     public TrackTable(final Model model) {
         super(new TrackTableModel(model));
         final TrackTableModel listModel = (TrackTableModel) this.getModel();
-        getTableHeader().addMouseMotionListener(new ColumnHeaderToolTips(listModel));
-        getTableHeader().setReorderingAllowed(false);
+        //getTableHeader().addMouseMotionListener(new ColumnHeaderToolTips(listModel));
+        //getTableHeader().setReorderingAllowed(false);
+        setTableHeader(null);
         setUI(new DragDropRowTableUI(model));
         /* Set column widths */
 //        setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //        getColumnModel().getColumn(0).setPreferredWidth(150);
-        for (int i = 0; i < this.getColumnCount()-1; i++){
-            getColumnModel().getColumn(i).setPreferredWidth(20);
-            getColumnModel().getColumn(i).setMaxWidth(50);
-        }
+        getColumnModel().getColumn(0).setPreferredWidth(20);
+        getColumnModel().getColumn(0).setMaxWidth(50);
+        getColumnModel().getColumn(2).setPreferredWidth(20);
+        getColumnModel().getColumn(2).setMaxWidth(50);
 
         ToolTipManager.sharedInstance().setInitialDelay(0);
         setCellSelectionEnabled(false);

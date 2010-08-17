@@ -48,22 +48,21 @@ public class PopUpMenu extends JPopupMenu {
 			}
 			if (count > 0)
 				addSeparator();
-			/* Don't remove structure of TickmarkTrack */
-			if (!(t instanceof StructureTrack)&&!(t instanceof TickmarkTrack)) {
-				JMenuItem clear = new JMenuItem(new AbstractAction("Unload track") {
 
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						int result = JOptionPane.showConfirmDialog(model.getParent(),
-								"Are you sure you want to clear this track?");
-						if (result == JOptionPane.YES_OPTION) {
-							model.remove(t.getDataKey());
-						}
+			JMenuItem clear = new JMenuItem(new AbstractAction("Unload track") {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					int result = JOptionPane.showConfirmDialog(model.getParent(),
+							"Are you sure you want to clear this track?");
+					if (result == JOptionPane.YES_OPTION) {
+						model.remove(t);
 					}
+				}
 
-				});
-				add(clear);
-			}
+			});
+			add(clear);
+
 		}
 		count = 0;
 
