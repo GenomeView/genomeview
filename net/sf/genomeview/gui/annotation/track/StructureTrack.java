@@ -9,12 +9,18 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
 import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 
 import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.core.Colors;
@@ -25,6 +31,7 @@ import net.sf.genomeview.data.Model.Highlight;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
+import net.sf.genomeview.gui.dialog.StructureTrackConfig;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
@@ -35,13 +42,55 @@ import net.sf.jannot.utils.SequenceTools;
 import be.abeel.util.DefaultHashMap;
 
 public class StructureTrack extends Track {
+
+	@Override
+	public List<JMenuItem> getMenuItems() {
+		ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
+		JMenuItem item = new JMenuItem();
+		item.setAction(new AbstractAction("Configure visible types") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				StructureTrackConfig.display(model, stm);
+
+			}
+		});
+		out.add(item);
+		return out;
+	}
+
+	public class StructureTrackModel {
+		private Model model;
+		private DefaultHashMap<Type, Boolean> visibleTypes = new DefaultHashMap<Type, Boolean>(Boolean.FALSE);
+
+		public StructureTrackModel(Model model) {
+			this.model = model;
+			Set<Type> tmp1 = Configuration.getTypeSet("visibleTypesStructure");
+			for (Type t : tmp1)
+				setTypeVisible(t, true);
+		}
+
+		public boolean isTypeVisible(Type ct) {
+			return visibleTypes.get(ct);
+		}
+
+		public void setTypeVisible(Type t, boolean b) {
+			visibleTypes.put(t, b);
+			setChanged();
+			notifyObservers();
+
+		}
+
+	}
+
 	private double letterSpacing;
+	private StructureTrackModel stm;
 	public static final StringKey key = new StringKey("STRUC&*(#%&*(@#%&*(@%(*STRUC");
 
 	public StructureTrack(Model model) {
 		super(key, model, Configuration.getBoolean("track:showStructure"), false);
 		collisionMap = new CollisionMap(model);
-
+		stm = new StructureTrackModel(model);
 		// this.addMouseListener(this);
 		// this.addMouseMotionListener(this);
 		// model.addObserver(this);
@@ -487,27 +536,27 @@ public class StructureTrack extends Track {
 
 	}
 
-	private DefaultHashMap<Type, Boolean> visibleTypes = new DefaultHashMap<Type, Boolean>(Boolean.FALSE);
-
 	private void paintCDS(Graphics2D g, int yOffset) {
 		int y = lineHeight - 2;
 		for (Type type : Type.values()) {
-			if (visibleTypes.get(type)) {
+			if (stm.isTypeVisible(type)) {
 				Location l = model.getAnnotationLocationVisible();
 				FeatureAnnotation annot = (FeatureAnnotation) model.getSelectedEntry().get(type);
-				Iterable<Feature> trackData = annot.get(l.start, l.end);
-				if (annot.getEstimateCount(l) <= Configuration.getInt("structureview:maximumNoVisibleFeatures")) {
-					for (Feature rf : trackData) {
-						// if (!model.isSourceVisible(rf.getSource()))
-						// continue;
+				if (annot != null) {
+					Iterable<Feature> trackData = annot.get(l.start, l.end);
+					if (annot.getEstimateCount(l) <= Configuration.getInt("structureview:maximumNoVisibleFeatures")) {
+						for (Feature rf : trackData) {
+							// if (!model.isSourceVisible(rf.getSource()))
+							// continue;
 
-						g.setColor(Color.BLACK);
-						renderCDS(g, rf, yOffset);
+							g.setColor(Color.BLACK);
+							renderCDS(g, rf, yOffset);
 
+						}
+					} else {
+						g.drawString(type + ": Too many structures to paint, please zoom in", 10, y);
+						y += lineHeight;
 					}
-				} else {
-					g.drawString(type + ": Too many structures to paint, please zoom in", 10, y);
-					y += lineHeight;
 				}
 			}
 		}
@@ -891,9 +940,9 @@ public class StructureTrack extends Track {
 	private BufferSeq bs;
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double width,JViewport view) {
-		if(entry instanceof DummyEntry)
-			entry=model.getSelectedEntry();
+	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view) {
+		if (entry instanceof DummyEntry)
+			entry = model.getSelectedEntry();
 		bs = null;
 		GlyphVector gv = g.getFont().createGlyphVector(g.getFontRenderContext(), new char[] { 'A' });
 		letterSpacing = Math.floor((lineHeight - gv.getVisualBounds().getHeight()) / 2);
@@ -950,17 +999,6 @@ public class StructureTrack extends Track {
 
 		paintHighlights(g, model.getHighlight(model.getAnnotationLocationVisible()), yOffset);
 		return 8 * lineHeight + tickHeight;
-	}
-
-	public boolean isTypeVisible(Type ct) {
-		return visibleTypes.get(ct);
-	}
-
-	public void setTypeVisible(Type t, boolean b) {
-		visibleTypes.put(t, b);
-		setChanged();
-		notifyObservers();
-
 	}
 
 	@Override

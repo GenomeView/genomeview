@@ -89,9 +89,7 @@ public class Model extends Observable implements IModel {
 		this.trackList = new TrackList(this);
 		entries.addObserver(this);
 
-		Set<Type> tmp1 = Configuration.getTypeSet("visibleTypesStructure");
-		for (Type t : tmp1)
-			trackList.structure().setTypeVisible(t, true);
+		
 
 		Configuration.getTypeSet("visibleTypes");
 		updateTracks();
