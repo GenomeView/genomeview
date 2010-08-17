@@ -137,7 +137,7 @@ public class PileupTrack extends Track {
 							maxSummary = summary[(p.getPos() - 1) / SUMMARYSIZE];
 					}
 				}
-				System.out.println("Pilerequest: " + idx + " completed " + maxSummary);
+				//System.out.println("Pilerequest: " + idx + " completed " + maxSummary);
 				ready.set(idx);
 				if (!queued.get(idx + 1)) {
 					if ((idx + 1) * CHUNK < entry.getMaximumLength()) {
