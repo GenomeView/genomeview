@@ -85,8 +85,6 @@ public class FeatureTrack extends Track {
 			colorQualifier = Configuration.getBoolean("feature:useColorQualifierTag_" + type);
 			
 			scoreColorGradient = Configuration.getBoolean("feature:scoreColorGradient_" + type);
-			System.out.println("feature:scoreColorGradient_" + type+"\t"+Configuration.getBoolean("feature:scoreColorGradient_" + type));
-
 		}
 
 		public boolean isScoreColorGradient() {
