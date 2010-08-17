@@ -14,14 +14,10 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
 import java.util.SortedSet;
 
-import javax.management.Notification;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
@@ -34,16 +30,13 @@ import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.data.NotificationTypes;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
-import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.annotation.GeneEvidenceLabel.FillMode;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
-import net.sf.jannot.Qualifier;
 import net.sf.jannot.Type;
 import net.sf.jannot.shortread.ReadGroup;
 import be.abeel.util.CountMap;
@@ -75,6 +68,7 @@ public class FeatureTrack extends Track {
 		}
 
 		private Model model;
+		private boolean scoreColorGradientEnabled;
 
 		private Color getColor(double normalizedScore) {
 			return ColorGradient.fourColorGradient.getColor(normalizedScore);
@@ -83,7 +77,7 @@ public class FeatureTrack extends Track {
 		public FeatureTrackModel(Model model) {
 			this.model = model;
 			colorQualifier = Configuration.getBoolean("feature:useColorQualifierTag_" + type);
-			
+
 			scoreColorGradient = Configuration.getBoolean("feature:scoreColorGradient_" + type);
 		}
 
@@ -95,6 +89,15 @@ public class FeatureTrack extends Track {
 			this.scoreColorGradient = scoreColorGradient;
 			Configuration.set("feature:scoreColorGradient_" + type, scoreColorGradient);
 			model.refresh(this);
+		}
+
+		public boolean isScoreColorGradientEnabled() {
+			return scoreColorGradientEnabled;
+		}
+
+		public void setScoreColorGradientEnabled(boolean b) {
+			this.scoreColorGradientEnabled=true;
+			
 		}
 
 	}
@@ -119,7 +122,6 @@ public class FeatureTrack extends Track {
 		hitmap = new CollisionMap(model);
 		this.type = key;
 		ftm = new FeatureTrackModel(model);
-		
 
 	}
 
@@ -134,6 +136,10 @@ public class FeatureTrack extends Track {
 		FeatureAnnotation annot = (FeatureAnnotation) entry.get(type);
 		if (annot.qualifierKeys().contains("color") || annot.qualifierKeys().contains("colour"))
 			ftm.setColorQualifierEnabled(true);
+		/* If there are proper scores, enable color gradient */
+		if(annot.getMaxScore()-annot.getMinScore()>0.00001)
+			ftm.setScoreColorGradientEnabled(true);
+		
 		// System.out.println("Min-max: "+annot.getMinScore()+"\t"+annot.getMaxScore());
 		// System.out.println("FA: "+type+"\t"+annot);
 		// System.out.println(entry.)
@@ -512,18 +518,20 @@ public class FeatureTrack extends Track {
 	@Override
 	public List<JMenuItem> getMenuItems() {
 		ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
-		/* Color gradient coloring based on score */
-		final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
-		item.setSelected(ftm.isScoreColorGradient());
-		item.setAction(new AbstractAction("Use score color gradient") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ftm.setScoreColorGradient(item.isSelected());
+		if (ftm.isScoreColorGradientEnabled()) {
+			/* Color gradient coloring based on score */
+			final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
+			item.setSelected(ftm.isScoreColorGradient());
+			item.setAction(new AbstractAction("Use score color gradient") {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					ftm.setScoreColorGradient(item.isSelected());
 
-			}
+				}
 
-		});
-		out.add(item);
+			});
+			out.add(item);
+		}
 		if (ftm.isColorQualifierEnabled()) {
 			final JCheckBoxMenuItem colorQualifier = new JCheckBoxMenuItem();
 			colorQualifier.setSelected(ftm.isColorQualifier());
