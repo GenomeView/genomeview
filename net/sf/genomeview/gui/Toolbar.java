@@ -37,7 +37,7 @@ public class Toolbar extends JToolBar {
 		add(new AnnotationMoveLeftAction(model));
 		add(new AnnotationMoveRightAction(model));
 		addSeparator();
-		add(new JLabel("Entry:"));
+		add(new JLabel("Chromosome:"));
 		add(new JComboBox(new EntryListModel(model)));
 		if (Configuration.getBoolean("geneticCodeSelection")) {
 			add(new JLabel("Code:"));
