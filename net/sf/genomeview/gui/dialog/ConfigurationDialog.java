@@ -96,14 +96,14 @@ public class ConfigurationDialog extends JDialog {
 
 		public ShortReadConfigPanel(Model model) {
 			
-			this.add(ConfigBox.booleanInstance("shortread:logScaling", "Use logarithmic scaling"), gc);
-			gc.gridy++;
-			
-			this.add(ConfigBox.doubleInstance("shortread:bottomValue", "Bottom value"), gc);
-			gc.gridy++;
-			
-			this.add(ConfigBox.doubleInstance("shortread:topValue", "Top value, use negative value for unlimited"), gc);
-			gc.gridy++;
+//			this.add(ConfigBox.booleanInstance("shortread:logScaling", "Use logarithmic scaling"), gc);
+//			gc.gridy++;
+//			
+//			this.add(ConfigBox.doubleInstance("shortread:bottomValue", "Bottom value"), gc);
+//			gc.gridy++;
+//			
+//			this.add(ConfigBox.doubleInstance("shortread:topValue", "Top value, use negative value for unlimited"), gc);
+//			gc.gridy++;
 			
 			this.add(ConfigBox.integerInstance("shortread:graphLineHeight", "Height of the coverage graph in pixels"), gc);
 			gc.gridy++;
