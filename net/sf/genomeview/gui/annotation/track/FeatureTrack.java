@@ -83,7 +83,9 @@ public class FeatureTrack extends Track {
 		public FeatureTrackModel(Model model) {
 			this.model = model;
 			colorQualifier = Configuration.getBoolean("feature:useColorQualifierTag_" + type);
-			scoreColorGradient = Configuration.getBoolean("feature:scoreColorGradient" + type);
+			
+			scoreColorGradient = Configuration.getBoolean("feature:scoreColorGradient_" + type);
+			System.out.println("feature:scoreColorGradient_" + type+"\t"+Configuration.getBoolean("feature:scoreColorGradient_" + type));
 
 		}
 
@@ -117,8 +119,9 @@ public class FeatureTrack extends Track {
 	public FeatureTrack(Model model, Type key) {
 		super(key, model, true, true);
 		hitmap = new CollisionMap(model);
-		ftm = new FeatureTrackModel(model);
 		this.type = key;
+		ftm = new FeatureTrackModel(model);
+		
 
 	}
 
