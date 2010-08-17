@@ -8,9 +8,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.logging.Logger;
 
+import javax.swing.Action;
+import javax.swing.JMenuItem;
 import javax.swing.JViewport;
 
 import net.sf.genomeview.data.Model;
@@ -191,6 +195,10 @@ public abstract class Track extends Observable {
 
 	public DataKey getDataKey() {
 		return dataKey;
+	}
+
+	public List<JMenuItem> getMenuItems() {
+		return new ArrayList<JMenuItem>();
 	}
 
 }

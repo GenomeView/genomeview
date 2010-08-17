@@ -9,22 +9,32 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 import java.util.SortedSet;
 
+import javax.management.Notification;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JViewport;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
+import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.NotificationTypes;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.StaticUtils;
@@ -39,9 +49,49 @@ import net.sf.jannot.shortread.ReadGroup;
 import be.abeel.util.CountMap;
 
 public class FeatureTrack extends Track {
+
+	class FeatureTrackModel {
+		private boolean scoreColorGradient, colorQualifier;
+
+		public boolean isColorQualifier() {
+			return colorQualifier;
+		}
+
+		public void setColorQualifier(boolean colorQualifier) {
+			this.colorQualifier = colorQualifier;
+			Configuration.set("useColorQualifierTag", colorQualifier);
+			model.refresh(this);
+		}
+
+		private Model model;
+
+		private Color getColor(double normalizedScore) {
+			return ColorGradient.fourColorGradient.getColor(normalizedScore);
+		}
+
+		public FeatureTrackModel(Model model) {
+			this.model = model;
+			colorQualifier = Configuration.getBoolean("useColorQualifierTag");
+			scoreColorGradient = Configuration.getBoolean("feature:scoreColorGradient");
+
+		}
+
+		public boolean isScoreColorGradient() {
+			return scoreColorGradient;
+		}
+
+		public void setScoreColorGradient(boolean scoreColorGradient) {
+			this.scoreColorGradient = scoreColorGradient;
+			Configuration.set("feature:scoreColorGradient", scoreColorGradient);
+			model.refresh(this);
+		}
+
+	}
+
 	/* Type that is represented by this track */
 	private Type type;
 	private CollisionMap hitmap;
+	private FeatureTrackModel ftm;
 
 	/**
 	 * Returns the type this track represents
@@ -49,44 +99,37 @@ public class FeatureTrack extends Track {
 	 * @return type represented by this track
 	 */
 	public Type getType() {
-		
+
 		return Type.get(type.toString());
 	}
-
-	// public FeatureTrack(Model model, Type type) {
-	// this(model, type, true);
-	// }
 
 	public FeatureTrack(Model model, Type key) {
 		super(key, model, true, true);
 		hitmap = new CollisionMap(model);
+		ftm = new FeatureTrackModel(model);
 		this.type = key;
 
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double width,JViewport view) {
-		
+	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view) {
+
 		boolean collision = false;
 		hitmap.clear();
 		Location visible = model.getAnnotationLocationVisible();
 		// List<Feature> types = entry.annotation.getByType(type,);
-//		FeatureAnnotation annot = entry.getAnnotation(type);
-		FeatureAnnotation annot=(FeatureAnnotation)entry.get(type);
-		//System.out.println("FA: "+type+"\t"+annot);
-		//System.out.println(entry.)
+		// FeatureAnnotation annot = entry.getAnnotation(type);
+		FeatureAnnotation annot = (FeatureAnnotation) entry.get(type);
+		//System.out.println("Min-max: "+annot.getMinScore()+"\t"+annot.getMaxScore());
+		// System.out.println("FA: "+type+"\t"+annot);
+		// System.out.println(entry.)
 		int estimate = annot.getEstimateCount(visible);
 		// System.out.println("Estimated number of features: "+estimate);
 
-		if (estimate > Configuration
-				.getInt("annotationview:maximumNoVisibleFeatures")) {
+		if (estimate > Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
 
 			g.setColor(Color.BLACK);
-			g
-					.drawString(
-							type
-									+ ": Too many features to display, zoom in to see features",
-							10, yOffset + 10);
+			g.drawString(type + ": Too many features to display, zoom in to see features", 10, yOffset + 10);
 			return 20 + 5;
 		}
 		Iterable<Feature> list = annot.get(visible.start, visible.end);
@@ -107,7 +150,7 @@ public class FeatureTrack extends Track {
 			int thisLine = 0;
 
 			Color c = Configuration.getColor("TYPE_" + rf.type());
-			if (Configuration.getBoolean("useColorQualifierTag")) {
+			if (ftm.isColorQualifier()) {
 				List<Qualifier> notes = rf.qualifier("colour");
 				notes.addAll(rf.qualifier("color"));
 				if (notes.size() > 0) {
@@ -115,11 +158,16 @@ public class FeatureTrack extends Track {
 					c = Colors.decodeColor(val);
 				}
 			}
+			if (ftm.isScoreColorGradient()) {
+				double range = annot.getMaxScore() - annot.getMinScore();
+				if (range > 0.00001)
+					;
+				c = ftm.getColor(rf.getScore() / range);
+			}
+
 			g.setColor(c);
-			int x1 = Convert.translateGenomeToScreen(rf.start(), model
-					.getAnnotationLocationVisible(), width);
-			int x2 = Convert.translateGenomeToScreen(rf.end() + 1, model
-					.getAnnotationLocationVisible(), width);
+			int x1 = Convert.translateGenomeToScreen(rf.start(), model.getAnnotationLocationVisible(), width);
+			int x2 = Convert.translateGenomeToScreen(rf.end() + 1, model.getAnnotationLocationVisible(), width);
 
 			// TODO is this not always the case?
 			if (x2 > 0) {
@@ -131,9 +179,8 @@ public class FeatureTrack extends Track {
 				 * overlapping?
 				 */
 				int closenessOverlap = Configuration.getInt("closenessOverlap");
-				Rectangle r = new Rectangle(x1 - closenessOverlap, thisLine
-						* lineThickness, maxX - x1 + 2 * closenessOverlap,
-						lineThickness);
+				Rectangle r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness, maxX - x1 + 2
+						* closenessOverlap, lineThickness);
 				// only when the blocks should be tiled, do we need to
 				// determine an empty place.
 				if (!collision)
@@ -145,8 +192,7 @@ public class FeatureTrack extends Track {
 
 						if (thisLine > lines)
 							lines = thisLine;
-						r = new Rectangle(x1 - closenessOverlap, thisLine
-								* lineThickness, maxX - x1 + 2
+						r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness, maxX - x1 + 2
 								* closenessOverlap, lineThickness);
 					}
 				}
@@ -162,12 +208,10 @@ public class FeatureTrack extends Track {
 				ArrayList<Rectangle> rectList = new ArrayList<Rectangle>();
 				for (Location l : loc) {
 
-					int subX1 = Convert.translateGenomeToScreen(l.start(),
-							model.getAnnotationLocationVisible(), width);
-					int subX2 = Convert.translateGenomeToScreen(l.end() + 1,
-							model.getAnnotationLocationVisible(), width);
-					Rectangle rec = new Rectangle(subX1, thisLine
-							* lineThickness, subX2 - subX1, lineThickness - 5);
+					int subX1 = Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), width);
+					int subX2 = Convert.translateGenomeToScreen(l.end() + 1, model.getAnnotationLocationVisible(),
+							width);
+					Rectangle rec = new Rectangle(subX1, thisLine * lineThickness, subX2 - subX1, lineThickness - 5);
 					/* Add this rectangle to the location hits */
 					hitmap.addLocation(rec, l);
 					rectList.add(rec);
@@ -183,17 +227,17 @@ public class FeatureTrack extends Track {
 				int trianglehalf = (lineThickness - 5) / 2;
 				switch (rf.strand()) {
 				case REVERSE:// reverse arrow
-					g.drawLine(x1, thisLine * lineThickness, x1 - trianglehalf,
-							thisLine * lineThickness + trianglehalf);
-					g.drawLine(x1 - trianglehalf, thisLine * lineThickness
-							+ trianglehalf, x1, thisLine * lineThickness
+					g
+							.drawLine(x1, thisLine * lineThickness, x1 - trianglehalf, thisLine * lineThickness
+									+ trianglehalf);
+					g.drawLine(x1 - trianglehalf, thisLine * lineThickness + trianglehalf, x1, thisLine * lineThickness
 							+ lineThickness - 5);
 					break;
 				case FORWARD:// forward arrow
-					g.drawLine(x2, thisLine * lineThickness, x2 + trianglehalf,
-							thisLine * lineThickness + trianglehalf);
-					g.drawLine(x2 + trianglehalf, thisLine * lineThickness
-							+ trianglehalf, x2, thisLine * lineThickness
+					g
+							.drawLine(x2, thisLine * lineThickness, x2 + trianglehalf, thisLine * lineThickness
+									+ trianglehalf);
+					g.drawLine(x2 + trianglehalf, thisLine * lineThickness + trianglehalf, x2, thisLine * lineThickness
 							+ lineThickness - 5);
 					break;
 				default:// do nothing
@@ -208,8 +252,7 @@ public class FeatureTrack extends Track {
 
 				// Set<Feature> selected = model.getFeatureSelection();
 				Set<Location> intersection = new HashSet<Location>(loc);
-				intersection.retainAll(model.selectionModel()
-						.getLocationSelection());
+				intersection.retainAll(model.selectionModel().getLocationSelection());
 
 				if (intersection.size() > 0) {
 					g.setColor(Color.BLACK);
@@ -222,18 +265,15 @@ public class FeatureTrack extends Track {
 				 * the feature in it
 				 */
 				if (x2 - x1 > 100) {
-					int a = Convert.translateGenomeToScreen(
-							loc.first().start(), model
-									.getAnnotationLocationVisible(), width);
-					int b = Convert.translateGenomeToScreen(
-							loc.first().end() + 1, model
-									.getAnnotationLocationVisible(), width);
+					int a = Convert.translateGenomeToScreen(loc.first().start(), model.getAnnotationLocationVisible(),
+							width);
+					int b = Convert.translateGenomeToScreen(loc.first().end() + 1,
+							model.getAnnotationLocationVisible(), width);
 					if (b - a > 100) {
 						Font resetFont = g.getFont();
 						g.setColor(c.darker().darker().darker());
 						g.setFont(new Font("SansSerif", Font.PLAIN, 10));
-						g.drawString(rf.toString(), a + 5, thisLine
-								* lineThickness + 9);
+						g.drawString(rf.toString(), a + 5, thisLine * lineThickness + 9);
 						g.setFont(resetFont);
 					}
 
@@ -266,8 +306,7 @@ public class FeatureTrack extends Track {
 			Feature featHit = locationHit.getParent();
 			model.selectionModel().setLocationSelection(featHit);
 			int l = featHit.length();
-			model.setAnnotationLocationVisible(new Location(featHit.start()
-					- (l / 20), featHit.end() + (l / 20)));
+			model.setAnnotationLocationVisible(new Location(featHit.start() - (l / 20), featHit.end() + (l / 20)));
 			return true;
 		}
 		return false;
@@ -279,8 +318,7 @@ public class FeatureTrack extends Track {
 		return false;
 	}
 
-	private void drawRects(Graphics g, ArrayList<Rectangle> rectList,
-			FillMode fm) {
+	private void drawRects(Graphics g, ArrayList<Rectangle> rectList, FillMode fm) {
 		Point lastPoint = null;
 
 		for (Rectangle rect : rectList) {
@@ -296,8 +334,7 @@ public class FeatureTrack extends Track {
 				break;
 			}
 			if (lastPoint != null) {
-				g.drawLine(rect.x, rect.y + rect.height / 2, lastPoint.x,
-						lastPoint.y);
+				g.drawLine(rect.x, rect.y + rect.height / 2, lastPoint.x, lastPoint.y);
 			}
 			lastPoint = new Point(rect.x + rect.width, rect.y + rect.height / 2);
 		}
@@ -317,8 +354,7 @@ public class FeatureTrack extends Track {
 			floater.setForeground(Color.BLACK);
 			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
-			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder,
-					emptyBorder));
+			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
 			add(floater);
 			pack();
 		}
@@ -335,8 +371,7 @@ public class FeatureTrack extends Track {
 					text.append("Start : " + f.start() + "<br />");
 					text.append("End : " + f.end() + "<br />");
 					int aggregateLenght = agg(f.location());
-					if (aggregateLenght < Configuration
-							.getInt("featuretrack:meanshortread")) {
+					if (aggregateLenght < Configuration.getInt("featuretrack:meanshortread")) {
 						// Collection<DataSource> sources =
 						// model.getSelectedEntry().shortReads.getSources();
 						//
@@ -344,7 +379,7 @@ public class FeatureTrack extends Track {
 						// for (DataSource source : sources) {
 						// cm.clear();
 						// ReadGroup rg =
-						//model.getSelectedEntry().shortReads.getReadGroup(source
+						// model.getSelectedEntry().shortReads.getReadGroup(source
 						// );
 						// ShortReadCoverage src = rg.getCoverage();
 						// for (Location l : f.location()) {
@@ -358,25 +393,24 @@ public class FeatureTrack extends Track {
 						// StaticUtils.shortify(source.toString()) + "): "
 						// + median(cm) + "<br />");
 						// }
-						Iterable<ReadGroup> sources = model.getSelectedEntry()
-								.shortReads();
+						Iterable<ReadGroup> sources = model.getSelectedEntry().shortReads();
 
 						CountMap<Integer> cm = new CountMap<Integer>();
 						for (ReadGroup rg : sources) {
 							cm.clear();
 
-////							ShortReadCoverage src = rg.getCoverage();
-//							for (Location l : f.location()) {
-//								for (int i = l.start(); i <= l.end(); i++) {
-//									cm.count((int) (src.get(Strand.FORWARD,
-//											i - 1) + src.get(Strand.REVERSE,
-//											i - 1)));
-//								}
-//							}
+							// // ShortReadCoverage src = rg.getCoverage();
+							// for (Location l : f.location()) {
+							// for (int i = l.start(); i <= l.end(); i++) {
+							// cm.count((int) (src.get(Strand.FORWARD,
+							// i - 1) + src.get(Strand.REVERSE,
+							// i - 1)));
+							// }
+							// }
 
-//							text.append("Mean short read coverage ("
-//									+ StaticUtils.shortify(rg.toString())
-//									+ "): " + median(cm) + "<br />");
+							// text.append("Mean short read coverage ("
+							// + StaticUtils.shortify(rg.toString())
+							// + "): " + median(cm) + "<br />");
 						}
 					}
 					// }
@@ -405,17 +439,17 @@ public class FeatureTrack extends Track {
 			return sum;
 		}
 
-//		private int median(CountMap<Integer> cm) {
-//			int total = cm.totalCount();
-//			int sum = 0;
-//			for (java.util.Map.Entry<Integer, Integer> e : cm.entrySet()) {
-//				sum += e.getValue();
-//				if (sum > total / 2)
-//					return e.getKey();
-//			}
-//			throw new RuntimeException(
-//					"This should not happen while calculating the median.");
-//		}
+		// private int median(CountMap<Integer> cm) {
+		// int total = cm.totalCount();
+		// int sum = 0;
+		// for (java.util.Map.Entry<Integer, Integer> e : cm.entrySet()) {
+		// sum += e.getValue();
+		// if (sum > total / 2)
+		// return e.getKey();
+		// }
+		// throw new RuntimeException(
+		// "This should not happen while calculating the median.");
+		// }
 
 	}
 
@@ -441,13 +475,10 @@ public class FeatureTrack extends Track {
 				if (locationHit == null && !Mouse.modifier(e)) {
 					model.selectionModel().clearLocationSelection();
 				} else if (locationHit != null && e.isShiftDown()) {
-					if (model.selectionModel().getLocationSelection().contains(
-							locationHit)) {
-						model.selectionModel().removeLocationSelection(
-								locationHit);
+					if (model.selectionModel().getLocationSelection().contains(locationHit)) {
+						model.selectionModel().removeLocationSelection(locationHit);
 					} else {
-						model.selectionModel()
-								.addLocationSelection(locationHit);
+						model.selectionModel().addLocationSelection(locationHit);
 					}
 				} else if (locationHit != null && !Mouse.modifier(e)) {
 					model.selectionModel().setLocationSelection(locationHit);
@@ -463,7 +494,25 @@ public class FeatureTrack extends Track {
 
 	@Override
 	public String displayName() {
-		return "Feature: "+type.toString();
+		return "Feature: " + type.toString();
 	}
 
+	@Override
+	public List<JMenuItem>getMenuItems(){
+		ArrayList<JMenuItem>out=new ArrayList<JMenuItem>();
+		final JCheckBoxMenuItem item=new JCheckBoxMenuItem();
+		item.setSelected(ftm.isScoreColorGradient());
+		item.setAction(new AbstractAction("Use score color gradient"){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ftm.setScoreColorGradient(item.isSelected());
+				
+				
+			}
+			
+		});
+		out.add(item);
+		
+		return out;
+	}
 }

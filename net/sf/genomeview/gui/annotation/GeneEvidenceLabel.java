@@ -25,7 +25,11 @@ import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.gui.menu.PopUpMenu;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListener, MouseMotionListener {
 
 	private static final long serialVersionUID = -8338383664013028337L;
@@ -325,7 +329,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			consumed = mouseTrack.mouseClicked(e.getX(), e.getY(), e);
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
-			new PopUpMenu(model).show(this, e.getX(), y);
+			new PopUpMenu(model,mouseTrack).show(this, e.getX(), y);
 		} else if (!consumed){
 			model.selectionModel().setSelectedRegion(null);
 			model.selectionModel().clearLocationSelection();

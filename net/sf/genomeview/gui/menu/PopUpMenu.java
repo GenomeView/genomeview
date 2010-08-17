@@ -10,9 +10,11 @@ import java.util.SortedSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.gui.menu.edit.CloneFeatureAction;
 import net.sf.genomeview.gui.menu.edit.CreateNewFeatureAction;
 import net.sf.genomeview.gui.menu.edit.EditStructureAction;
@@ -31,12 +33,25 @@ public class PopUpMenu extends JPopupMenu {
     private static final long serialVersionUID = 2573433669184123608L;
 
     private int count=0;
-    public PopUpMenu(Model model) {
+    public PopUpMenu(Model model,Track t) {
+    	/* Track specific actions */
+    	List<JMenuItem>list=t.getMenuItems();
+    	for(JMenuItem a:list){
+    		if(a.isEnabled()){
+    			count++;
+    			add(a);
+    		}
+    	}
+    	if(count>0)
+    		addSeparator();
+    	
+    	/* Other actions */
         addC(new RemoveAction(model));
         addC(new EditStructureAction(model));
         addC(new ClearFeatureSelectionAction(model));
         addC(new ShowSequenceWindowAction(model));
-        addSeparator();
+        if(count>0)
+        	addSeparator();
 
         addC(new ClearRegionSelectionAction(model));
 
