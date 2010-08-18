@@ -5,8 +5,10 @@ package net.sf.genomeview.gui.menu;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.components.OverlayListener;
 import net.sf.genomeview.gui.menu.edit.CloneFeatureAction;
 import net.sf.genomeview.gui.menu.edit.CopySequenceAction;
 import net.sf.genomeview.gui.menu.edit.CreateNewFeatureAction;
@@ -42,7 +44,10 @@ public class MainMenu extends JMenuBar {
 	public MainMenu(Model model) {
 		JMenu file = new JMenu("File");
 		
-		file.add(new LoadFeaturesAction(model));
+		JMenuItem i=new JMenuItem(new LoadFeaturesAction(model));
+		i.addMouseListener(new OverlayListener("This allows you to load data.<br/><br/><strong>Sources:</strong><br/>You can load data from either a local file on your computer or from a URL.<br/><br/><b>Supported formats</b>"));
+		file.add(i);
+		
 		file.addSeparator();
 		file.add(new SaveSessionAction(model));
 		file.add(new LoadSessionAction(model));

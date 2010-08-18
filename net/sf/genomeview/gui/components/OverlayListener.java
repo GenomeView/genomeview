@@ -4,43 +4,51 @@
 package net.sf.genomeview.gui.components;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JWindow;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class OverlayListener extends MouseAdapter {
 
-	class Overlay extends JWindow {
+	class Overlay extends JPanel {
 
 		private JLabel floater = new JLabel();
 
-		public Overlay(int x, int y, String message) {
+		public Overlay(String message) {
 			// this.setBounds(bounds);
-			this.setAlwaysOnTop(true);
 			floater.setHorizontalAlignment(SwingConstants.CENTER);
 			floater.setVerticalAlignment(SwingConstants.CENTER);
-			floater.setAlignmentY(CENTER_ALIGNMENT);
-			this.setLocation(x, y);
-			Color c = new Color(100, 100, 100, 50);
+			//floater.setAlignmentY(CENTER_ALIGNMENT);
+		
+			Color c = new Color(200, 200, 200, 50);
 			floater.setBackground(c);
 			floater.setOpaque(true);
-			floater.setText("<html><table width=400>" + message + "</table></html>");
+			if (message.length() > 50)
+				floater.setText("<html><table width=400>" + message + "</table></html>");
+			else
+				floater.setText("<html><table>" + message + "</table></html>");
 			floater.setForeground(Color.BLACK);
 			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
 			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
 			add(floater);
-			pack();
-			setVisible(true);
+			
 		}
 	}
 
-	private Overlay overlay = null;
+	private JWindow overlay = null;
 	private String message;
 
 	public OverlayListener(String message) {
@@ -51,7 +59,18 @@ public class OverlayListener extends MouseAdapter {
 	public void mouseEntered(MouseEvent e) {
 		if (overlay != null)
 			overlay.dispose();
-		overlay = new Overlay(e.getXOnScreen(), e.getYOnScreen(), message);
+		Point p = e.getComponent().getLocationOnScreen();
+		int x = p.x + e.getComponent().getWidth();
+		int y = p.y;
+
+		// }else{
+		overlay=new JWindow();
+		overlay.setContentPane(new Overlay(message));
+		overlay.pack();
+		overlay.setLocation(x, y);
+		overlay.setVisible(true);
+//		overlay = ;
+		// }
 
 	}
 
