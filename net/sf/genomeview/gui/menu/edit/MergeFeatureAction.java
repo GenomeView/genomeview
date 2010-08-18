@@ -9,10 +9,14 @@ import java.util.Observable;
 import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.StaticUtils;
+import net.sf.genomeview.gui.dialog.MergeFeatureDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class MergeFeatureAction extends AbstractModelAction {
 
     /**
@@ -27,7 +31,7 @@ public class MergeFeatureAction extends AbstractModelAction {
 
     public void actionPerformed(ActionEvent e) {
         if (isEnabled())
-            StaticUtils.getMergeFeature(model).setVisible(true);
+        	new MergeFeatureDialog(model);
 
     }
 

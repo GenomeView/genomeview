@@ -47,8 +47,7 @@ public final class StaticUtils {
 		return editStructure;
 	}
 
-	private static MergeFeatureDialog mergeFeature = null;
-
+	
 	private static SplitFeatureDialog splitFeature;
 
 	/**
@@ -75,11 +74,7 @@ public final class StaticUtils {
 		window.setLocation(screenSize.width / 4 * 3, 50);
 	}
 
-	public static MergeFeatureDialog getMergeFeature(Model model) {
-		if (mergeFeature == null)
-			mergeFeature = new MergeFeatureDialog(model);
-		return mergeFeature;
-	}
+
 
 	public static SplitFeatureDialog splitFeature(Model model) {
 		if (splitFeature == null)
