@@ -87,7 +87,7 @@ public class Model extends Observable implements IModel {
 
 		selectionModel.addObserver(this);
 		this.trackList = new TrackList(this);
-		entries.addObserver(this);
+		//entries.addObserver(this);
 
 		Configuration.getTypeSet("visibleTypes");
 		updateTracks();

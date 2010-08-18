@@ -110,9 +110,9 @@ public class DAS extends DataSource {
 
 	}
 
-	private Entry getEntry(String ref, EntryPoint ep) throws MalformedURLException, ParserConfigurationException, SAXException, IOException {
+	private void getEntry(EntrySet set,String ref, EntryPoint ep) throws MalformedURLException, ParserConfigurationException, SAXException, IOException {
 		StringBuffer seq = this.getSequence(ref, ep);
-		Entry out = new Entry(ref + ":" + ep);
+		Entry out = set.getOrCreateEntry(ref + ":" + ep);
 //		out.setID();
 		out.setSequence(new MemorySequence(seq));
 		// System.out.println("Ref: " + ref);
@@ -130,7 +130,7 @@ public class DAS extends DataSource {
 		// System.out.println("** " + list);
 
 		// }
-		return out;
+		
 
 	}
 
@@ -268,7 +268,7 @@ public class DAS extends DataSource {
 		if(ep==null||reference==null)
 			throw new ReadFailedException("Both the EntryPoint and the Reference need to be set!");
 		try {
-			set.add(this.getEntry(reference, ep));
+			this.getEntry(set,reference, ep);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			throw new ReadFailedException(e);
