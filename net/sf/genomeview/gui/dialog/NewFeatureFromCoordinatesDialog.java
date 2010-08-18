@@ -41,7 +41,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 		super(model.getGUIManager().getParent(), "Create new feature");
 		final NewFeatureFromCoordinatesDialog _self = this;
 		setModal(true);
-		setAlwaysOnTop(true);
+		//setAlwaysOnTop(true);
 		Container c = new Container();
 		c.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -69,7 +69,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 		c.add(coordinates, gc);
 		gc.gridx += 2;
 		c
-				.add(new HelpDialog(
+				.add(new HelpButton(
 						this,
 						"Fill in the coordinates of the feature you want to create.<br/><br/>One location is defined as two coordinates with two dots (..) between, multiple locations are separated with a comma (,).<br/><br/>For example: 100..200,300..400 creates a feature with two locations, one from 100 to 200 and the other from 300 to 400."));
 
@@ -91,7 +91,8 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 					f.setType(typeCombo.getTerm());
 					f.setStrand(strandSelection.getStrand());
 					// model.getSelectedEntry().annotation.add(f);
-					MemoryFeatureAnnotation fa = (MemoryFeatureAnnotation) model.getSelectedEntry().get(f.type());
+//					MemoryFeatureAnnotation fa = (MemoryFeatureAnnotation) model.getSelectedEntry().get(f.type());
+					MemoryFeatureAnnotation fa =model.getSelectedEntry().getMemoryAnnotation(f.type());
 					fa.add(f);
 					// model.setSelectedRegion(null);
 					_self.dispose();

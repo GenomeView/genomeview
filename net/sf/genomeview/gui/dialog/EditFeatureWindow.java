@@ -78,7 +78,7 @@ public class EditFeatureWindow extends JDialog {
 			gc.gridwidth = 1;
 			this.add(new JLabel("Notes"), gc);
 			gc.gridx++;
-			this.add(new HelpDialog(_self, "One qualifier per line, key=value"), gc);
+			this.add(new HelpButton(_self, "One qualifier per line, key=value"), gc);
 
 			/* Notes text area */
 			gc.gridy++;
@@ -94,7 +94,7 @@ public class EditFeatureWindow extends JDialog {
 			gc.gridwidth = 1;
 			this.add(new JLabel("Location"), gc);
 			gc.gridx++;
-			this.add(new HelpDialog(_self, "Locations separated with a comma, start and stop coordinate separated with two dots. White space and new lines are ignored."), gc);
+			this.add(new HelpButton(_self, "Locations separated with a comma, start and stop coordinate separated with two dots. White space and new lines are ignored."), gc);
 
 			/* Location text area */
 			gc.gridy++;

@@ -243,7 +243,7 @@ public class ConfigurationDialog extends JDialog {
 			this.add(ConfigBox.booleanInstance("general:disableURLCaching", "Disable URL caching?"), gc);
 			gc.weightx=0;
 			gc.gridx++;
-			this.add(new HelpDialog(model.getGUIManager().getParent(), "URL caching needs to be disabled to be able to save to URLs."),gc);
+			this.add(new HelpButton(model.getGUIManager().getParent(), "URL caching needs to be disabled to be able to save to URLs."),gc);
 			gc.gridwidth = 2;
 			gc.weightx=1;
 			gc.gridx=0;
