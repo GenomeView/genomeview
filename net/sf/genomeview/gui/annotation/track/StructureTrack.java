@@ -617,15 +617,17 @@ public class StructureTrack extends Track {
 			g.setColor(Color.BLACK);
 			g.draw(r);
 			boolean locationSelected = model.selectionModel().getLocationSelection().contains(l);
-			/* Selected locations have bold outline */
+			/* Selected locations have bold outline and orange background */
 			if (locationSelected) {
 				g.setStroke(new BasicStroke(2.0f));
 				g.setColor(Color.BLACK);
 				g.draw(r);
 				g.setStroke(new BasicStroke(1.0f));
+				g.setColor(new Color(1f, 0.5f, 0, 0.5f));
+				g.fill(r);
 			}
 			/* Selected features have colored background */
-			if (featureSelected) {
+			else if (featureSelected) {
 				g.setColor(new Color(0, 0, 1, 0.5f));
 				g.fill(r);
 			}
