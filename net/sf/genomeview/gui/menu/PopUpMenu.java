@@ -37,6 +37,47 @@ public class PopUpMenu extends JPopupMenu {
 	private int count = 0;
 
 	public PopUpMenu(final Model model, final Track t) {
+
+		count = 0;
+
+		/* Selected feature actions */
+		addC(new RemoveAction(model));
+		addC(new EditStructureAction(model));
+		addC(new ClearFeatureSelectionAction(model));
+		addC(new ShowSequenceWindowAction(model));
+		if (count > 0)
+			addSeparator();
+		count = 0;
+		addC(new ClearRegionSelectionAction(model));
+
+		addC(new CreateNewFeatureAction(model));
+		addC(new CloneFeatureAction(model));
+		addC(new MergeFeatureAction(model));
+		addC(new SplitFeatureAction(model));
+
+		if (count > 0)
+			addSeparator();
+		count = 0;
+
+		SortedSet<Feature> sf = model.selectionModel().getFeatureSelection();
+		List<Action> actions = new ArrayList<Action>();
+		for (Feature f : sf) {
+			List<Qualifier> lq = f.qualifier("url");
+			for (Qualifier q : lq) {
+				String name = q.getValue().split(":")[0];
+				String url = q.getValue().substring(q.getValue().indexOf(':') + 1);
+				actions.add(new OpenURLAction(name, url));
+			}
+		}
+		if (actions.size() > 0)
+			addSeparator();
+		for (Action a : actions)
+			add(a);
+		count += actions.size();
+
+		if (count > 0)
+			addSeparator();
+		count = 0;
 		/* Track specific actions, if there is a track */
 		if (t != null) {
 			List<JMenuItem> list = t.getMenuItems();
@@ -64,40 +105,8 @@ public class PopUpMenu extends JPopupMenu {
 			add(clear);
 
 		}
-		count = 0;
 
-		/* Selected feature actions */
-		addC(new RemoveAction(model));
-		addC(new EditStructureAction(model));
-		addC(new ClearFeatureSelectionAction(model));
-		addC(new ShowSequenceWindowAction(model));
-		if (count > 0)
-			addSeparator();
-		count = 0;
-		addC(new ClearRegionSelectionAction(model));
-
-		addC(new CreateNewFeatureAction(model));
-		addC(new CloneFeatureAction(model));
-		addC(new MergeFeatureAction(model));
-		addC(new SplitFeatureAction(model));
-
-		SortedSet<Feature> sf = model.selectionModel().getFeatureSelection();
-		List<Action> actions = new ArrayList<Action>();
-		for (Feature f : sf) {
-			List<Qualifier> lq = f.qualifier("url");
-			for (Qualifier q : lq) {
-				String name = q.getValue().split(":")[0];
-				String url = q.getValue().substring(q.getValue().indexOf(':') + 1);
-				actions.add(new OpenURLAction(name, url));
-			}
-		}
-		if (actions.size() > 0)
-			addSeparator();
-		for (Action a : actions)
-			add(a);
-		count += actions.size();
-
-		if (count == 0) {
+		if (this.getComponentCount() == 0) {
 			add(new AbstractAction("No actions available") {
 
 				@Override
