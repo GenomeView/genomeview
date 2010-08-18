@@ -10,6 +10,7 @@ import javax.swing.Action;
 import javax.swing.FocusManager;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.menu.edit.RemoveAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationEndAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationMoveLeftAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationMoveRightAction;
@@ -30,9 +31,10 @@ public class Hotkeys implements KeyEventDispatcher {
 		this.model = model;
 		this.start=new AnnotationStartAction(model);
 		this.end=new AnnotationEndAction(model);
+		this.remove=new RemoveAction(model);
 	}
 
-	private Action left, right, zoomin, zoomout,start,end;
+	private Action left, right, zoomin, zoomout,start,end,remove;
 
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
@@ -66,7 +68,10 @@ public class Hotkeys implements KeyEventDispatcher {
 			case KeyEvent.VK_MINUS:
 				zoomout.actionPerformed(null);
 				return true;
-
+			case KeyEvent.VK_DELETE:
+			case KeyEvent.VK_BACK_SPACE:
+				remove.actionPerformed(null);
+				return true;
 			default:
 				return false;
 				// do nothing
