@@ -134,7 +134,7 @@ public class EditFeatureWindow extends JDialog {
 					feature.setType(typeSelection.getTerm());
 
 					try {
-						feature.setMute(true);
+//						feature.setMute(true);
 						/* Construct new qualifiers */
 						List<Qualifier> list = new ArrayList<Qualifier>();
 						for (String line : new LineIterator(new StringReader(notes.getText()))) {
@@ -157,7 +157,7 @@ public class EditFeatureWindow extends JDialog {
 						for (Qualifier q : list) {
 							feature.addQualifier(q);
 						}
-						feature.setMute(false);
+//						feature.setMute(false);
 					} catch (Exception e) {
 						e.printStackTrace();
 						JOptionPane.showMessageDialog(_self, "Failed to parse the notes, please double check!", "Notes failed", JOptionPane.WARNING_MESSAGE);
