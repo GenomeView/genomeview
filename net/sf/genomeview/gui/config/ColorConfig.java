@@ -35,7 +35,7 @@ public class ColorConfig extends GridBagPanel {
 				super(new ColorIcon(Configuration.getColor(configKey), 16));
 				this.addMouseListener(new MouseAdapter() {
 					public void mouseClicked(MouseEvent e) {
-						Color newColor = JColorChooser.showDialog(model.getParent(), "Choose color", Configuration.getColor(configKey));
+						Color newColor = JColorChooser.showDialog(model.getGUIManager().getParent(), "Choose color", Configuration.getColor(configKey));
 
 						if (newColor != null) {
 							Configuration.setColor(configKey, newColor);

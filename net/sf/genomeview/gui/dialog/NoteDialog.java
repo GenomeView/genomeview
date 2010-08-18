@@ -30,7 +30,7 @@ public class NoteDialog extends JDialog {
     private final QualifierCombo term;
 
     private NoteDialog(final Model model) {
-    	super(model.getParent(), "Note editor");
+    	super(model.getGUIManager().getParent(), "Note editor");
         setModal(true);
 
         term = new QualifierCombo();

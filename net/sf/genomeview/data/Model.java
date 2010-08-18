@@ -65,7 +65,7 @@ public class Model extends Observable implements IModel {
 	}
 
 	public Model(Frame parent) {
-		this.parent = parent;
+		guimanager=new GUIManager(parent);
 		/* Scheduler booster thread */
 		new Thread(new Runnable() {
 
@@ -155,14 +155,7 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	/**
-	 * The main window of the GUI belonging to this model.
-	 */
-	private Frame parent;
-
-	public Frame getParent() {
-		return parent;
-	}
+	
 
 	private boolean silent;
 
@@ -738,7 +731,7 @@ public class Model extends Observable implements IModel {
 		this.pressTrack = pressTrack;
 	}
 
-	private GUIManager guimanager = new GUIManager();
+	private final GUIManager guimanager;
 
 	public GUIManager getGUIManager() {
 		return guimanager;

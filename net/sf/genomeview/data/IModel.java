@@ -35,8 +35,6 @@ public interface IModel extends Observer {
 	 */
 	public Location getSelectedRegion();
 
-	public Frame getParent();
-
 	public GUIManager getGUIManager();
 
 	public void addTrack(Track track);

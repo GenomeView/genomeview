@@ -30,7 +30,7 @@ public class StructureTrackConfig extends JDialog {
 	private static final long serialVersionUID = -5209291628487502687L;
 
 	private StructureTrackConfig(final Model model, final StructureTrackModel stm) {
-		super(model.getParent(), "Structure track configuration", true);
+		super(model.getGUIManager().getParent(), "Structure track configuration", true);
 		final Window _self=this;
 		setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagPanel().gc;

@@ -32,7 +32,7 @@ public abstract class DataSourceWorker extends SwingWorker<Void, Void> {
     public DataSourceWorker(DataSource source, Model model) {
         this.source = source;
         this.model = model;
-        this.pb= new GVProgressBar("Background task", "Doing background task", model.getParent());
+        this.pb= new GVProgressBar("Background task", "Doing background task", model.getGUIManager().getParent());
     }
 
     @Override

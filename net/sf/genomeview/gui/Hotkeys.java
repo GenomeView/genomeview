@@ -37,7 +37,7 @@ public class Hotkeys implements KeyEventDispatcher {
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
 		
-		if (!FocusManager.getCurrentManager().getActiveWindow().equals(model.getParent()))
+		if (!FocusManager.getCurrentManager().getActiveWindow().equals(model.getGUIManager().getParent()))
 			return false;
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
 			switch (e.getKeyCode()) {

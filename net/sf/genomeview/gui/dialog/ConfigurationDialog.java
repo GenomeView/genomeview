@@ -243,7 +243,7 @@ public class ConfigurationDialog extends JDialog {
 			this.add(ConfigBox.booleanInstance("general:disableURLCaching", "Disable URL caching?"), gc);
 			gc.weightx=0;
 			gc.gridx++;
-			this.add(new HelpDialog(model.getParent(), "URL caching needs to be disabled to be able to save to URLs."),gc);
+			this.add(new HelpDialog(model.getGUIManager().getParent(), "URL caching needs to be disabled to be able to save to URLs."),gc);
 			gc.gridwidth = 2;
 			gc.weightx=1;
 			gc.gridx=0;
@@ -273,7 +273,7 @@ public class ConfigurationDialog extends JDialog {
 						System.out.println("Marking for deletion:" + f);
 						f.deleteOnExit();
 					}
-					JOptionPane.showMessageDialog(model.getParent(), "<html>Cached files have been marked for deletion, they will be removed when you close GenomeView</html>", "Cache cleared!", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "<html>Cached files have been marked for deletion, they will be removed when you close GenomeView</html>", "Cache cleared!", JOptionPane.INFORMATION_MESSAGE);
 
 				}
 
@@ -286,7 +286,7 @@ public class ConfigurationDialog extends JDialog {
 	}
 
 	public ConfigurationDialog(Model model) {
-		super(model.getParent(), "Configuration panel");
+		super(model.getGUIManager().getParent(), "Configuration panel");
 		setModal(true);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {

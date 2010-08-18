@@ -216,7 +216,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileDialog = new JFileChooser();
-				fileDialog.showSaveDialog(model.getParent());
+				fileDialog.showSaveDialog(model.getGUIManager().getParent());
 				File save = fileDialog.getSelectedFile();
 				if (save != null) {
 					save = ExtensionManager.extension(save, "fasta");
@@ -243,7 +243,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		this.add(buttonPanel, BorderLayout.SOUTH);
 
 		this.pack();
-		StaticUtils.right(this, model.getParent());
+		StaticUtils.right(this, model.getGUIManager().getParent());
 
 	}
 

@@ -28,7 +28,7 @@ public class WriteEntriesWorker extends DataSourceWorker {
 //            source.saveOwn(model.entries());
 //        } catch (Throwable e) {
 //        	  pb.done();
-//        	JOptionPane.showMessageDialog(model.getParent(), "<html>"+e.getMessage()+"<br/></html>", "Error!",JOptionPane.ERROR_MESSAGE);
+//        	JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "<html>"+e.getMessage()+"<br/></html>", "Error!",JOptionPane.ERROR_MESSAGE);
 //        	e.printStackTrace();
 //        }
 //        pb.done();

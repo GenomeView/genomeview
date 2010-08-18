@@ -53,11 +53,11 @@ public class LoadSessionAction extends AbstractAction {
 
 		});
 
-		int result = chooser.showOpenDialog(model.getParent());
+		int result = chooser.showOpenDialog(model.getGUIManager().getParent());
 
 		if (result == JFileChooser.APPROVE_OPTION) {
 			if (model.loadedSources().size() != 0) {
-				result = JOptionPane.showConfirmDialog(model.getParent(), "Do you really want to load a session? This will clear all currently loaded data!", "Clear entries?", JOptionPane.YES_NO_OPTION);
+				result = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(), "Do you really want to load a session? This will clear all currently loaded data!", "Clear entries?", JOptionPane.YES_NO_OPTION);
 				if (result != JOptionPane.YES_OPTION) {
 					return;
 				}

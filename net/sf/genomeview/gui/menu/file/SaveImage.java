@@ -77,11 +77,11 @@ public class SaveImage extends AbstractAction {
 		final JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
 		chooser.setMultiSelectionEnabled(false);
 
-		int result = chooser.showSaveDialog(model.getParent());
+		int result = chooser.showSaveDialog(model.getGUIManager().getParent());
 		if (result == JFileChooser.APPROVE_OPTION) {
 			final File ef = ExtensionManager.extension(chooser.getSelectedFile(), ExtensionManager.PNG);
 			if (ef.exists()) {
-				int confirm = JOptionPane.showConfirmDialog(model.getParent(),
+				int confirm = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
 						"This file exists, are you certain you want to overwrite it?");
 				if (confirm != JOptionPane.YES_OPTION) {
 					return;
@@ -89,7 +89,7 @@ public class SaveImage extends AbstractAction {
 
 			}
 
-			Rectangle r = model.getParent().getBounds();
+			Rectangle r = model.getGUIManager().getParent().getBounds();
 			final Hider h = new Hider(r);
 			h.setVisible(true);
 			SwingUtilities.invokeLater(new Runnable() {

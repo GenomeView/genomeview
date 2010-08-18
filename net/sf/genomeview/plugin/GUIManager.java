@@ -4,6 +4,7 @@
 package net.sf.genomeview.plugin;
 
 import java.awt.Component;
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,19 @@ import net.sf.genomeview.gui.annotation.GeneEvidenceLabel;
  * 
  */
 public class GUIManager {
+
+	/**
+	 * The main window of the GUI belonging to this model.
+	 */
+	private Frame parent;
+
+	public GUIManager(Frame parent) {
+		this.parent = parent;
+	}
+
+	public Frame getParent() {
+		return parent;
+	}
 
 	/* There can be multiple menus as there will be one for each screen */
 	private List<JMenu> pluginMenu = new ArrayList<JMenu>();

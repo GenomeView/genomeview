@@ -29,7 +29,7 @@ public class GotoPosition extends AbstractModelAction {
         		int i = Integer.parseInt(input.trim());
         		super.model.center(i);
             }catch(NumberFormatException e){
-            	JOptionPane.showMessageDialog(model.getParent(), "Invalid location");
+            	JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Invalid location");
             }
             
         }

@@ -30,7 +30,7 @@ public class MergeFeatureDialog extends JDialog {
     private static final long serialVersionUID = -770863087750087961L;
 
     public MergeFeatureDialog(final Model model) {
-    	super(model.getParent(), "Merge features");
+    	super(model.getGUIManager().getParent(), "Merge features");
         final MergeFeatureDialog _self = this;
         setModal(true);
         setAlwaysOnTop(true);

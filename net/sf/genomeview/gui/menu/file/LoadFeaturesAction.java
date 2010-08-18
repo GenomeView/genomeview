@@ -33,7 +33,7 @@ public class LoadFeaturesAction extends AbstractAction {
     }
 	
     public void actionPerformed(ActionEvent arg0) {
-        Sources source = (Sources) JOptionPane.showInputDialog(model.getParent(), "Select feature source",
+        Sources source = (Sources) JOptionPane.showInputDialog(model.getGUIManager().getParent(), "Select feature source",
                 "Data selection", JOptionPane.INFORMATION_MESSAGE, null, Sources.values(), Sources.values()[0]);
         if (source != null) {
             DataSource[] data = DataSourceFactory.create(source, model,new String[]{"fasta","fa","fas","embl","fna","gtf","gff","gff3","maln","syn","wig","mfa","bed","mapview","bai","maf","snp","tbl","gb","gbk","pileup","con","peaks"});

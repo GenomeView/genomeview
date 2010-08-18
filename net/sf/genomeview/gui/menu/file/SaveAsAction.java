@@ -43,7 +43,7 @@ public class SaveAsAction extends AbstractAction {
         // TODO currently saves everything in the data model to an EMBL file.
 
 //        JFileChooser f = new JFileChooser(Configuration.getFile("lastDirectory"));
-//        f.showSaveDialog(model.getParent());
+//        f.showSaveDialog(model.getGUIManager().getParent());
 //        File outputFile = f.getSelectedFile();
 //        if (outputFile != null) {
 //            Configuration.set("lastDirectory", outputFile.getParentFile());

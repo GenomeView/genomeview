@@ -57,10 +57,10 @@ public class SearchDialog extends JDialog {
 
 	private SearchDialog(Model model) {
 
-		super(model.getParent(), "Search");
+		super(model.getGUIManager().getParent(), "Search");
 		setContentPane(new SearchDialogContent(model));
 		pack();
-		StaticUtils.right(this, model.getParent());
+		StaticUtils.right(this, model.getGUIManager().getParent());
 
 	}
 
@@ -186,7 +186,7 @@ public class SearchDialog extends JDialog {
 					} catch (IllegalArgumentException ie) {
 						JOptionPane
 								.showMessageDialog(
-										model.getParent(),
+										model.getGUIManager().getParent(),
 										"<html>Mismatch search has some limitations:<br/>"
 												+ "<table><tr><td>Editing distance</td><td>maximum pattern length</td></tr><tr><td>"
 												+ "1</td><td>15</td></tr><tr><td>" + "2-3</td><td>10</td></tr><tr><td>"

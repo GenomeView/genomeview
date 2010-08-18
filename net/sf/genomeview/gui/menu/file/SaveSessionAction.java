@@ -34,7 +34,7 @@ public class SaveSessionAction extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// int result = JOptionPane.showConfirmDialog(model.getParent(),
+		// int result = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
 		// "Do you really want to clear all loaded data?",
 		// "Clear entries?", JOptionPane.YES_NO_OPTION);
 		JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
@@ -55,7 +55,7 @@ public class SaveSessionAction extends AbstractAction {
 		// if (result == JOptionPane.YES_OPTION)
 		// model.clearEntries();
 
-		int result = chooser.showSaveDialog(model.getParent());
+		int result = chooser.showSaveDialog(model.getGUIManager().getParent());
 
 		if (result == JFileChooser.APPROVE_OPTION) {
 			try {

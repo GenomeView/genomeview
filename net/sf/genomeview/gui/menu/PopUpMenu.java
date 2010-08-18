@@ -53,7 +53,7 @@ public class PopUpMenu extends JPopupMenu {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					int result = JOptionPane.showConfirmDialog(model.getParent(),
+					int result = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
 							"Are you sure you want to clear this track?");
 					if (result == JOptionPane.YES_OPTION) {
 						model.remove(t);

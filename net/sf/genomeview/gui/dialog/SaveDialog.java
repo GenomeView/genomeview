@@ -40,7 +40,7 @@ public class SaveDialog extends JDialog {
     }
 
     private SaveDialog(final Model model) {
-        super(model.getParent(), "Save dialog", true);
+        super(model.getGUIManager().getParent(), "Save dialog", true);
         setLayout(new GridBagLayout());
 
         GridBagConstraints gc = new GridBagConstraints();
@@ -79,7 +79,7 @@ public class SaveDialog extends JDialog {
 //                    if (dsb.isSelected()) {
 //                        boolean continueSave = true;
 //                        if (dsb.data.isDestructiveSave()) {
-//                            int result = JOptionPane.showConfirmDialog(model.getParent(), "Overwrite existing file?\n"
+//                            int result = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(), "Overwrite existing file?\n"
 //                                    + dsb.data, "Overwrite?", JOptionPane.YES_NO_OPTION);
 //                            if (result != JOptionPane.YES_OPTION)
 //                                continueSave = false;
@@ -93,7 +93,7 @@ public class SaveDialog extends JDialog {
 //
 //                            }
 //                            if (!seqSaved) {
-//                                int result = JOptionPane.showConfirmDialog(model.getParent(),
+//                                int result = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
 //                                        "Save source without sequence?", "No sequence!", JOptionPane.YES_NO_OPTION);
 //                                if (result != JOptionPane.YES_OPTION)
 //                                    continueSave = false;
@@ -104,7 +104,7 @@ public class SaveDialog extends JDialog {
 //                        	WriteEntriesWorker rw = new WriteEntriesWorker(dsb.data, model);
 //                            rw.execute();
 //                        } else {
-//                            JOptionPane.showMessageDialog(model.getParent(), "Save aborted!");
+//                            JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Save aborted!");
 //                        }
 //
 //                    }

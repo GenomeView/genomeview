@@ -97,7 +97,7 @@ public class DataSourceFactory {
 					}
 
 				});
-				int returnVal = chooser.showOpenDialog(model.getParent());
+				int returnVal = chooser.showOpenDialog(model.getGUIManager().getParent());
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 
 					File file = chooser.getSelectedFile();
@@ -116,7 +116,7 @@ public class DataSourceFactory {
 		case URL:
 
 			try {
-				String input = JOptionPane.showInputDialog(model.getParent(), "Give the URL of the data");
+				String input = JOptionPane.showInputDialog(model.getGUIManager().getParent(), "Give the URL of the data");
 				if (input != null && input.trim().length() > 0) {
 					URL url = new URI(input.trim()).toURL();
 					return new DataSource[] { createURL(url) };
@@ -129,14 +129,14 @@ public class DataSourceFactory {
 			break;
 		case DAS:
 			try {
-				String url = JOptionPane.showInputDialog(model.getParent(), "Give the URL of the data").trim();
+				String url = JOptionPane.showInputDialog(model.getGUIManager().getParent(), "Give the URL of the data").trim();
 				DAS das = new DAS(url);
 				List<String> refs = das.getReferences();
 				Collections.sort(refs);
-				String ref = (String) JOptionPane.showInputDialog(model.getParent(), "Select reference genome",
+				String ref = (String) JOptionPane.showInputDialog(model.getGUIManager().getParent(), "Select reference genome",
 						"Reference selection", JOptionPane.INFORMATION_MESSAGE, null, refs.toArray(), refs.get(0));
 				List<EntryPoint> eps = das.getEntryPoints(ref);
-				EntryPoint ep = (EntryPoint) JOptionPane.showInputDialog(model.getParent(), "Select entry point",
+				EntryPoint ep = (EntryPoint) JOptionPane.showInputDialog(model.getGUIManager().getParent(), "Select entry point",
 						"Entry point selection", JOptionPane.INFORMATION_MESSAGE, null, eps.toArray(), eps.get(0));
 				das.setEntryPoint(ep);
 				das.setReference(ref);
@@ -194,7 +194,7 @@ public class DataSourceFactory {
 				}
 
 				chooser.setMultiSelectionEnabled(true);
-				int returnVal = chooser.showOpenDialog(model.getParent());
+				int returnVal = chooser.showOpenDialog(model.getGUIManager().getParent());
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					File[] files = chooser.getSelectedFiles();
 					DataSource[] out = new DataSource[files.length];

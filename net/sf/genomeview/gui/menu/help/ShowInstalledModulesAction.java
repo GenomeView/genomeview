@@ -47,7 +47,7 @@ public class ShowInstalledModulesAction extends AbstractAction {
         }
         message += "</html>";
 
-        JOptionPane.showMessageDialog(model.getParent(), message, "Installed modules", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(model.getGUIManager().getParent(), message, "Installed modules", JOptionPane.INFORMATION_MESSAGE);
     }
 
 }

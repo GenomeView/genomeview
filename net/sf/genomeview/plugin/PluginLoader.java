@@ -118,7 +118,7 @@ public class PluginLoader {
             }
             if (errorMessage.length() > 0) {
                 errorMessage.append("\nTo fix this, please update your plugins to the latest version");
-                JOptionPane.showMessageDialog(model.getParent(), errorMessage,"Plugin error!",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(model.getGUIManager().getParent(), errorMessage,"Plugin error!",JOptionPane.ERROR_MESSAGE);
             }
 
         
