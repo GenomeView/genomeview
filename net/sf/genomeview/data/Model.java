@@ -89,8 +89,6 @@ public class Model extends Observable implements IModel {
 		this.trackList = new TrackList(this);
 		entries.addObserver(this);
 
-		
-
 		Configuration.getTypeSet("visibleTypes");
 		updateTracks();
 
@@ -597,13 +595,8 @@ public class Model extends Observable implements IModel {
 	 * @return list of tracks
 	 */
 	public TrackList getTrackList() {
-		// FIXME remove method, make tracklist public and final
 		return trackList;
 	}
-
-	// private TrackList trackList;
-	//
-	// private Model model;
 
 	/**
 	 * This method keeps the track list up to date when adding new data to the
@@ -667,55 +660,6 @@ public class Model extends Observable implements IModel {
 				}
 			}
 		}
-		// if (!trackList.containShortReadTrack(rg)) {
-		// trackList.add(new ShortReadTrack(this, rg));
-		// }
-		// }
-		// for (Graph g : e.graphs.getAll()) {
-		// if (!trackList.containsGraph(g.getName()))
-		// trackList.add(new WiggleTrack(g.getName(), this, true));
-		// }
-		/* Alignment and conservation tracks */
-		// for (int i = 0; i < e.alignment.numAlignments(); i++) {
-		// if (!trackList.containsAlignment(i))
-		// trackList.add(new
-		// MultipleAlignmentTrack(e.alignment.getAlignment(i).name(), i,
-		// this, true));
-		// }
-		// if (!trackList.containsSequenceLogo() &&
-		// e.alignment.numAlignments() > 0)
-		// trackList.add(new SequenceLogoTrack(this));
-
-		/* Short read tracks */
-		// for (DataSource rg : e.shortReads.getSources()) {
-		// if (!trackList.containShortReadTrack(rg)) {
-		// trackList.add(new ShortReadTrack(this, rg));
-		// }
-		// }
-		// /* Multiple alignments tracks */
-		// for (MultipleAlignment ma : e.multiplealignment) {
-		// if (!trackList.containsMultipleAlignment(ma)) {
-		// trackList.add(new MultipleAlignmentTrack2(this, ma));
-		// logger.info("Added multiple alignment track " + ma);
-		// }
-		// }
-
-		// }
-		// /* Syntenic tracks */
-		// Set<String> targets = entries.syntenic.getTargets();
-		// for (String s : targets) {
-		// for (String t : targets) {
-		// if (!trackList.containsSyntenicTarget(s, t))
-		// trackList.add(new SyntenicTrack(this, s, t));
-		// }
-		// }
-		//
-		// for (String s : targets) {
-		// for (String t : targets) {
-		// if (!trackList.containsSyntenicTarget(s, t))
-		// trackList.add(new SyntenicTrack(this, s, t));
-		// }
-		// }
 		if (trackList.size() != startSize)
 			refresh(NotificationTypes.UPDATETRACKS);
 
@@ -760,8 +704,6 @@ public class Model extends Observable implements IModel {
 		else
 			return "";
 	}
-
-	
 
 	/* Cache of the sources that are currently loaded */
 	private ConcurrentSkipListSet<DataSource> loadedSources = new ConcurrentSkipListSet<DataSource>();
@@ -818,11 +760,6 @@ public class Model extends Observable implements IModel {
 	}
 
 	public void setSelectedEntry(Entry entry) {
-		// for (Entry e : entries)
-		// for (ReadGroup rg : e.shortReads.getReadGroups()) {
-		// rg.release();
-		// }
-		// FIXME reimplement release
 		entries.setDefault(entry);
 		selectionModel.clear();
 
