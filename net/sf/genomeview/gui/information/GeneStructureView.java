@@ -141,11 +141,17 @@ public class GeneStructureView extends JLabel implements Observer {
 		private Sequence seq;
 		private Feature f;
 		private AminoAcidMapping aa;
+		private String translation;
+		private Sequence dna;
+		private String startCodon;
 
 		public AnalyzedFeature(Sequence sequence, Feature rf, AminoAcidMapping aminoAcidMapping) {
 			this.seq = sequence;
 			this.f = rf;
 			this.aa = aminoAcidMapping;
+			dna = SequenceTools.extractSequence(seq, f);
+			startCodon = dna.subsequence(1, 4).stringRepresentation();
+			translation = SequenceTools.translate(dna, aa);
 
 		}
 
@@ -158,33 +164,16 @@ public class GeneStructureView extends JLabel implements Observer {
 		 * @return
 		 */
 		public boolean missingAcceptor(Location l) {
-			return true;
-			// FIXME implement
-			// assert (f.location().contains(l));
-			// if (f.strand() == Strand.FORWARD) {
-			// char min2 = seq.getNucleotide(l.start() - 2);
-			// char min1 = seq.getNucleotide(l.start() - 1);
-			//
-			// boolean ag = (min2 == 'a' || min2 == 'A')
-			// && (min1 == 'G' || min1 == 'g');
-			// if (l.equals(f.location().first()))
-			// ag = true;
-			// if (!ag)
-			// return true;
-			//
-			// }
-			// if (f.strand() == Strand.REVERSE) {
-			// char plus1 = seq.getReverseNucleotide(l.end() + 1);
-			// char plus2 = seq.getReverseNucleotide(l.end() + 2);
-			// boolean ag = (plus1 == 'g' || plus1 == 'G')
-			// && (plus2 == 'a' || plus2 == 'A');
-			// if (l.equals(f.location().last()))
-			// ag = true;
-			// if (!ag)
-			// return true;
-			//
-			// }
-			// return false;
+			if (!l.equals(rf.location().first()) && f.strand() == Strand.FORWARD) {
+				String s = seq.subsequence(l.start - 2, l.start).stringRepresentation();
+				return !(s.equalsIgnoreCase("ag"));
+			}
+			if (!l.equals(rf.location().last()) && f.strand() == Strand.REVERSE) {
+				String s = seq.subsequence(l.end + 1, l.end + 3).stringRepresentation();
+				return !(s.equalsIgnoreCase("ct"));
+			}
+			return false;
+
 		}
 
 		/**
@@ -199,61 +188,25 @@ public class GeneStructureView extends JLabel implements Observer {
 		 * @return
 		 */
 		public boolean missingDonor(Location l) {
-			
-			if (f.strand() == Strand.FORWARD) {
+
+			if (!l.equals(rf.location().last()) && f.strand() == Strand.FORWARD) {
 				String s = seq.subsequence(l.end + 1, l.end + 3).stringRepresentation();
-				// char plus2 = seq.getNucleotide(l.end() + 2);
-				// boolean gt = (plus1 == 'g' || plus1 == 'G')
-				// && (plus2 == 't' || plus2 == 'T'||plus2 == 'c' || plus2 ==
-				// 'C');
 				return !(s.equalsIgnoreCase("gt") || s.equalsIgnoreCase("gc"));
-				// if (l.equals(f.location().last()))
-				// gt = true;
-				// if (!gt)
-				// return true;
-
 			}
-			if (f.strand() == Strand.REVERSE) {
+			if (!l.equals(rf.location().first()) && f.strand() == Strand.REVERSE) {
 				String s = seq.subsequence(l.start - 2, l.start).stringRepresentation();
-				return !(s.equalsIgnoreCase("gc") || s.equalsIgnoreCase("tc"));
-				// char min2 = seq.getReverseNucleotide(l.start() - 2);
-				// char min1 = seq.getReverseNucleotide(l.start() - 1);
-				//
-				// boolean gt = (min2 == 't' || min2 == 'T' || min2 == 'c' ||
-				// min2 == 'C') && (min1 == 'g' || min1 == 'G');
-				// if (l.equals(f.location().first()))
-				// gt = true;
-				//
-				// if (!gt)
-				// return true;
-
+				return !(s.equalsIgnoreCase("ac") || s.equalsIgnoreCase("gc"));
 			}
 			return false;
 		}
 
 		public boolean hasMissingStartCodon() {
-			Sequence dna = SequenceTools.extractSequence(seq, f);
-			System.out.println(dna.subsequence(1, 4).stringRepresentation());
+			return !aa.isStart(startCodon);
 
-			return true;
-			// FIXME hasMissingStartCodon
-			// if (dna.length() < 3)
-			// return true;
-			// String codon = "" + dna.charAt(0) + dna.charAt(1) +
-			// dna.charAt(2);
-			// return !mapping.isStart(codon);
 		}
 
 		public boolean hasMissingStopCodon() {
-			Sequence dna = SequenceTools.extractSequence(seq, f);
-			// FIXME hasMissingStopCodon
-			return true;
-			// if (dna.length() < 3)
-			// return true;
-			// String codon = "" + dna.charAt(dna.length() - 3) +
-			// dna.charAt(dna.length() - 2) + dna.charAt(dna.length() - 1);
-			//
-			// return mapping.get(codon) != '*';
+			return !translation.endsWith("*");
 
 		}
 
@@ -266,31 +219,15 @@ public class GeneStructureView extends JLabel implements Observer {
 		 */
 		public List<Location> getIternalStopCodons() {
 			ArrayList<Location> out = new ArrayList<Location>();
-
-			Sequence dna = SequenceTools.extractSequence(seq, f);
-			// System.out.println("DNA: "+dna);
-			String s = SequenceTools.translate(dna, aa);
-			for (int i = 0; i < s.length() - 1; i++) {
-				if (s.charAt(i) == '*') {
+			for (int i = 0; i < translation.length() - 1; i++) {
+				if (translation.charAt(i) == '*') {
 					out.add(getntpos(i));
 				}
 			}
 			return out;
-
-			// FIXME hasInternalStopCodon
-			// for (int i = 0; i < dna.length() - 3; i += 3) {
-			// String codon = "" + dna.charAt(i) + dna.charAt(i + 1) +
-			// dna.charAt(i + 2);
-			// if (mapping.get(codon) == '*') {
-			// return true;
-			// }
-			// }
-			// return false;
-
 		}
 
 		private Location getntpos(int aapos) {
-			SortedSet<Location> set = rf.location();
 			ArrayList<Integer> list = new ArrayList<Integer>();
 			for (Location l : rf.location()) {
 				for (int i = l.start; i <= l.end; i++)
@@ -398,6 +335,26 @@ public class GeneStructureView extends JLabel implements Observer {
 				else
 					g.drawLine(r.x, r.y, r.x, r.y + r.height);
 			}
+			g.setColor(Color.RED);
+			/* Draw missing start codon */
+			if (af.hasMissingStartCodon()) {
+				if (rf.strand() == Strand.FORWARD && l.equals(rf.location().first())) {
+					g.drawLine(r.x, r.y, r.x, r.y + r.height);
+				}
+				if (rf.strand() == Strand.REVERSE && l.equals(rf.location().last())) {
+					g.drawLine(r.x + r.width, r.y, r.x + r.width, r.y + r.height);
+				}
+			}
+			/* Draw missing stop codon */
+			if (af.hasMissingStopCodon()) {
+				if (rf.strand() == Strand.FORWARD && l.equals(rf.location().last())) {
+					g.drawLine(r.x, r.y, r.x, r.y + r.height);
+				}
+				if (rf.strand() == Strand.REVERSE && l.equals(rf.location().first())) {
+					g.drawLine(r.x + r.width, r.y, r.x + r.width, r.y + r.height);
+				}
+			}
+			
 			g.setStroke(new BasicStroke(1.0f));
 
 			/* Draw line between boxes */
