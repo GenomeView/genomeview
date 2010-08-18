@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.logging.Logger;
 
-import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JViewport;
 

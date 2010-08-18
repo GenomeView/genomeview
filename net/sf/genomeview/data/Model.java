@@ -777,4 +777,9 @@ public class Model extends Observable implements IModel {
 		notifyObservers(NotificationTypes.UPDATETRACKS);
 	}
 
+	public void change(ChangeEvent change) {
+		undoStack.push(change);
+		
+	}
+
 }

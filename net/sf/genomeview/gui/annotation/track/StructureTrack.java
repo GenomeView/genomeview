@@ -38,6 +38,7 @@ import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
+import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.utils.SequenceTools;
 import be.abeel.util.DefaultHashMap;
 
@@ -838,7 +839,7 @@ public class StructureTrack extends Track {
 			if (borderHit == null) {
 				updateSelectedRegion();
 			} else {
-				modifyCoordinate(borderHit, modifyCoordinate, currentGenomeX);
+				model.change(modifyCoordinate(borderHit, modifyCoordinate, currentGenomeX));
 			}
 		}
 		// pressX = -1;
@@ -884,18 +885,18 @@ public class StructureTrack extends Track {
 		model.selectionModel().setSelectedRegion(new Location(selectionStart, selectionEnd));
 	}
 
-	private void modifyCoordinate(Location y, int oldCoord, int newCoordinate) {
+	private ChangeEvent modifyCoordinate(Location y, int oldCoord, int newCoordinate) {
 
 		if (y.start() == oldCoord) {
 			if (oldCoord <= newCoordinate)
-				y.setStart(newCoordinate + 1);
+				return y.setStart(newCoordinate + 1);
 			else
-				y.setStart(newCoordinate);
+				return y.setStart(newCoordinate);
 		} else if (y.end() == oldCoord) {
 			if (oldCoord < newCoordinate)
-				y.setEnd(newCoordinate);
+				return y.setEnd(newCoordinate);
 			else
-				y.setEnd(newCoordinate - 1);
+				return y.setEnd(newCoordinate - 1);
 		} else
 			throw new RuntimeException("This should not happen, sorry, I'm done!");
 		// borderHit = null;
