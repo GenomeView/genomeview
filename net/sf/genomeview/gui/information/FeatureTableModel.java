@@ -62,6 +62,8 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	@Override
 	public int getRowCount() {
 		MemoryFeatureAnnotation fa = model.getSelectedEntry().getMemoryAnnotation(type);
+		if(fa==null)
+			return 0;
 		return fa.cachedCount();// .noFeatures(type);
 	}
 
