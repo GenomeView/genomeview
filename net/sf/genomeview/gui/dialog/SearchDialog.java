@@ -197,8 +197,10 @@ public class SearchDialog extends JDialog {
 				}
 
 				private void performAminoAcidSearch() {
-					//byte[] byteSequence = model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
-					byte[] byteSequence = new BufferSeq(model.getSelectedEntry().sequence()).toString().toUpperCase().getBytes();
+					// byte[] byteSequence =
+					// model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
+					byte[] byteSequence = new BufferSeq(model.getSelectedEntry().sequence()).toString().toUpperCase()
+							.getBytes();
 					byte[] translation = translate(byteSequence, 0);
 					forwardSearch(translation, 0);
 					translation = translate(byteSequence, 1);
@@ -269,9 +271,11 @@ public class SearchDialog extends JDialog {
 				}
 
 				private void performNucleotideSearch() {
-					//byte[] byteSequence = model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
-					byte[] byteSequence = new BufferSeq(model.getSelectedEntry().sequence()).toString().toUpperCase().getBytes();
-					
+					// byte[] byteSequence =
+					// model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
+					byte[] byteSequence = new BufferSeq(model.getSelectedEntry().sequence()).toString().toUpperCase()
+							.getBytes();
+
 					forwardSearch(byteSequence, 0);
 					reverseArray(byteSequence);
 					for (int i = 0; i < byteSequence.length; i++) {
@@ -452,8 +456,11 @@ public class SearchDialog extends JDialog {
 			final JTable results = new JTable(srm);
 			results.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
-					Location l = srm.getLocation(results.getSelectedRow());
-					model.center((l.start() + l.end()) / 2);
+					int row = results.getSelectedRow();
+					if (row >= 0) {
+						Location l = srm.getLocation(row);
+						model.center((l.start() + l.end()) / 2);
+					}
 				}
 			});
 			final JComboBox type = new JComboBox(SequenceType.values());
@@ -483,9 +490,9 @@ public class SearchDialog extends JDialog {
 			/* Query sequence box */
 			gc.weightx = 1;
 			gc.gridwidth = 4;
-			gc.weighty = 0;
+			gc.weighty = 0.1;
 			add(new TitledComponent("Query sequence", new JScrollPane(seq)), gc);
-
+			gc.weighty = 0;
 			gc.gridwidth = 1;
 			gc.gridy++;
 			add(type, gc);
@@ -565,16 +572,17 @@ public class SearchDialog extends JDialog {
 			String lowerCaseText = text.toLowerCase();
 			clear();
 			for (Entry e : model.entries()) {
-//				for (Type t : Type.values()) {
-//					for (Feature f : e.annotation.getByType(t)) {
-				for(DataKey d:e){
-					if(e.get(d) instanceof FeatureAnnotation){
-						for(Feature f:((FeatureAnnotation)e.get(d)).get()){
-							if (!featuresSet.contains(f)){
+				// for (Type t : Type.values()) {
+				// for (Feature f : e.annotation.getByType(t)) {
+				for (DataKey d : e) {
+					if (e.get(d) instanceof FeatureAnnotation) {
+						for (Feature f : ((FeatureAnnotation) e.get(d)).get()) {
+							if (!featuresSet.contains(f)) {
 								for (String key : f.getQualifiersKeys()) {
 									for (Qualifier q : f.qualifier(key)) {
-										if (q.getKey().toLowerCase().contains(lowerCaseText) || q.getValue().toLowerCase().contains(lowerCaseText)) {
-											if(!featuresSet.contains(f)){
+										if (q.getKey().toLowerCase().contains(lowerCaseText)
+												|| q.getValue().toLowerCase().contains(lowerCaseText)) {
+											if (!featuresSet.contains(f)) {
 												features.add(f);
 												entries.add(e);
 												featuresSet.add(f);
@@ -587,11 +595,11 @@ public class SearchDialog extends JDialog {
 						}
 					}
 				}
-			}		
-////					}
-//				}
-//			}
-//			}
+			}
+			// // }
+			// }
+			// }
+			// }
 			fireTableDataChanged();
 
 		}
@@ -623,8 +631,8 @@ public class SearchDialog extends JDialog {
 		}
 
 		public void search(Type source, Type target) {
-			for (Feature f : ((FeatureAnnotation)model.getSelectedEntry().get(source)).get()) {
-				for (Feature g :  ((FeatureAnnotation)model.getSelectedEntry().get(target)).get()) {
+			for (Feature f : ((FeatureAnnotation) model.getSelectedEntry().get(source)).get()) {
+				for (Feature g : ((FeatureAnnotation) model.getSelectedEntry().get(target)).get()) {
 					if (f.overlaps(g)) {
 						features.add(f);
 						break;
