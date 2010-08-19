@@ -1,12 +1,13 @@
 <?php
-
 $applet = $_GET['applet']=="true";
 $webstart = !$applet;
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+header('Pragma: no-cache');
 
 if ($webstart){
   header('Content-Type: application/x-java-jnlp-file');
   header("Content-Disposition: attachment; filename=GenomeView.jnlp");
-  header('Pragma: no-cache');
 }
 
 echo('<?xml version="1.0" encoding="utf-8"?>');
@@ -24,8 +25,8 @@ if (!empty($param)){
   $this_file.="?".$param;
 }
 
-$jars[]="genomeview-1028.jar";
-$jars[]="jannot-1026.jar";
+$jars[]="genomeview-1097i3.jar";
+$jars[]="jannot-1097.jar";
 $jars[]="jargs.jar";
 $jars[]="commons-logging.jar";
 $jars[]="sam-938.jar";
@@ -34,10 +35,9 @@ $jars[]="collections-1.0.jar";
 
 ?>
 
-<jnlp<?php if ($webstart):   ?>
+<jnlp <?php if ($webstart):   ?>
   spec="1.0+"
   codebase="<?=$siteroot?>"
-  href="<?=$siteroot?><?=$this_file?>"
   <?php endif; ?>>
 <information>
   <title>GenomeView</title>
@@ -49,6 +49,7 @@ $jars[]="collections-1.0.jar";
 <security>
   <all-permissions />
 </security>
+<update check="always" policy="always" />
 <resources>
  <j2se version="1.6+" java-vm-args="-ea" initial-heap-size="128M" max-heap-size="1000M"/> 
   	 <?php
