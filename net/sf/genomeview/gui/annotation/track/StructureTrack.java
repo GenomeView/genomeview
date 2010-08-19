@@ -488,12 +488,12 @@ public class StructureTrack extends Track {
 
 			/* Only color start and stop codons. */
 			if (Configuration.getBoolean("colorStopCodons") && model.getAAMapping().isStop(aa)) {
-				g.setColor(Configuration.getAminoAcidColor(aa));
+				g.setColor(Configuration.getAminoAcidColor('*'));
 				g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width, lineHeight);
 			}
 
 			if (Configuration.getBoolean("colorStartCodons") && model.getAAMapping().isStart(codon)) {
-				g.setColor(Configuration.getAminoAcidColor(aa));
+				g.setColor(Configuration.getAminoAcidColor('M'));
 				g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width, lineHeight);
 			}
 
