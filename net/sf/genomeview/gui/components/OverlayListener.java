@@ -36,13 +36,14 @@ public class OverlayListener extends MouseAdapter {
 			floater.setBackground(c);
 			floater.setOpaque(true);
 			if (message.length() > 50)
-				floater.setText("<html><table width=400>" + message + "</table></html>");
+				floater.setText("<html><table width=250>" + message + "</table></html>");
 			else
 				floater.setText("<html><table>" + message + "</table></html>");
 			floater.setForeground(Color.BLACK);
-			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+			Border emptyBorder = BorderFactory.createEmptyBorder(2, 2, 2, 2);
 			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
 			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+//			floater.setBorder(colorBorder);
 			add(floater);
 			
 		}
@@ -67,7 +68,7 @@ public class OverlayListener extends MouseAdapter {
 		overlay=new JWindow();
 		overlay.setContentPane(new Overlay(message));
 		overlay.pack();
-		overlay.setLocation(x, y);
+		overlay.setLocation(x+2, y-5);
 		overlay.setVisible(true);
 //		overlay = ;
 		// }
