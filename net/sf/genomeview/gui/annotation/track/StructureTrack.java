@@ -392,7 +392,7 @@ public class StructureTrack extends Track {
 			break;
 		}
 
-		nt2 = bs.getNucleotide(i);
+		nt2 = bs.getNucleotide(i+1);
 		if (!forward)
 			nt2 = SequenceTools.complement(nt2);
 		// if (forward)
@@ -449,33 +449,7 @@ public class StructureTrack extends Track {
 				codon = bs.getReverseCodon(i);
 			}
 
-			// if (forward) {
-			// // aa = model.getSelectedEntry().sequence().getAminoAcid(i,
-			// // model.getAAMapping());
-			// // codon = "" +
-			// // model.getSelectedEntry().sequence().getNucleotide(i)
-			// // + model.getSelectedEntry().sequence().getNucleotide(i + 1)
-			// // + model.getSelectedEntry().sequence().getNucleotide(i + 2);
-			// codon = "" + bs.getNucleotide(i)(i) + getNuc(i + 1) + getNuc(i +
-			// 2);
-			// } else {
-			// // aa =
-			// // model.getSelectedEntry().sequence().getReverseAminoAcid(i,
-			// // model.getAAMapping());
-			// // codon = "" +
-			// // model.getSelectedEntry().sequence().getReverseNucleotide(i +
-			// // 2)
-			// // + model.getSelectedEntry().sequence().getReverseNucleotide(i
-			// // + 1)
-			// // +
-			// // model.getSelectedEntry().sequence().getReverseNucleotide(i);
-			// codon = "" + SequenceTools.complement(getNuc(i + 2)) +
-			// SequenceTools.complement(getNuc(i + 1))
-			// + SequenceTools.complement(getNuc(i));
-			//
-			// }
-			// char aa = SequenceTools.translate(codon,
-			// model.getAAMapping()).charAt(0);
+			
 			/* draw amino acid box */
 			int x = (int) (((i - r.start()) * width));
 			int y;
