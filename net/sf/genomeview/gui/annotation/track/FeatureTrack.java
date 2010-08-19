@@ -140,12 +140,8 @@ public class FeatureTrack extends Track {
 		if(annot.getMaxScore()-annot.getMinScore()>0.00001)
 			ftm.setScoreColorGradientEnabled(true);
 		
-		// System.out.println("Min-max: "+annot.getMinScore()+"\t"+annot.getMaxScore());
-		// System.out.println("FA: "+type+"\t"+annot);
-		// System.out.println(entry.)
+		/* Get feature estimate */
 		int estimate = annot.getEstimateCount(visible);
-		// System.out.println("Estimated number of features: "+estimate);
-
 		if (estimate > Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
 
 			g.setColor(Color.BLACK);
@@ -153,7 +149,7 @@ public class FeatureTrack extends Track {
 			return 20 + 5;
 		}
 		Iterable<Feature> list = annot.get(visible.start, visible.end);
-		g.translate(0, yOffset);
+		g.translate(0, yOffset+2);
 		CollisionMap fullBlockMap = new CollisionMap(model);
 
 		int lineThickness = Configuration.getInt("evidenceLineHeight");
@@ -303,8 +299,8 @@ public class FeatureTrack extends Track {
 			g.setColor(Color.black);
 			g.drawString(type.toString(), 10, lineThickness);
 		}
-		g.translate(0, -yOffset);
-		return (lines + 1) * lineThickness + 5;
+		g.translate(0, -yOffset-2);
+		return (lines + 1) * lineThickness + 4;
 
 		// }
 
