@@ -379,6 +379,7 @@ public class GeneStructureView extends JLabel implements Observer {
 
 		}
 		/* Draw arrow */
+		g.setColor(Color.BLACK);
 		int hor = ((arrowDrawFrame - 1) * lineHeight) + vGap;
 		int arrowLenght = 10;
 		if (rf.strand() == Strand.FORWARD) {
