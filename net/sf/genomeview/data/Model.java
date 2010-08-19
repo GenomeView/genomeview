@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
 
@@ -299,7 +300,7 @@ public class Model extends Observable implements IModel {
 		return exitRequested;
 	}
 
-	private ArrayList<Highlight> highlights = new ArrayList<Highlight>();
+	private ConcurrentLinkedQueue<Highlight> highlights = new ConcurrentLinkedQueue<Highlight>();
 
 	public class Highlight {
 		final public Location location;
