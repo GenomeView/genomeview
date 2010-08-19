@@ -42,7 +42,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		this.addMouseMotionListener(this);
 		model.addObserver(this);
 		model.getGUIManager().registerEvidenceLabel(this);
-		this.setPreferredSize(new Dimension(this.getPreferredSize().width, 200));
+		//this.setPreferredSize(new Dimension(this.getPreferredSize().width, 200));
 
 	}
 

@@ -7,6 +7,7 @@ import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 
+import java.awt.Component;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
@@ -29,6 +30,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.DataSourceFactory;
@@ -209,7 +211,6 @@ public class MainWindow implements WindowListener, Observer {
 			freshwindow = true;
 			logger.info("Creating new window");
 			window = new JFrame("GenomeView :: " + Configuration.version(), gs[0].getDefaultConfiguration());
-
 			window.setIconImage(new ImageIcon(this.getClass().getResource("/images/gv2.png")).getImage());
 			window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			window.addWindowListener(this);
@@ -231,9 +232,11 @@ public class MainWindow implements WindowListener, Observer {
 			window.setJMenuBar(new MainMenu(model));
 			
 			window.pack();
-
 			Rectangle rec = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 			window.setSize(rec.width, rec.height);
+			
+			
+			
 //			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 //			logger.info("Detected screen width: " + screen.getWidth());
 //			logger.info("Detected screen height: " + screen.getHeight());

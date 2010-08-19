@@ -3,6 +3,7 @@
  */
 package net.sf.genomeview.gui.components;
 
+import java.awt.Dimension;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -23,14 +24,15 @@ public class TypeCombo extends JComboBox {
 	private static final long serialVersionUID = 3311298470708351886L;
 
 	public TypeCombo(Model model) {
-		super(new TypeModel(model));
-		this.setEditable(true);
+		this(model,true);
+		
 
 	}
 	public TypeCombo(Model model, boolean editable) {
 		super(new TypeModel(model));
 		this.setEditable(editable);
-
+		setMinimumSize(new Dimension(25,this.getPreferredSize().height));
+		//setPreferredSize(new Dimension(25,this.getPreferredSize().height));
 	}
 	public Type getTerm() {
 		return (Type) this.getSelectedItem();

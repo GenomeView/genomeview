@@ -97,7 +97,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	public Zoomer(final Model model) {
 		this.model = model;
-		this.setPreferredSize(new Dimension(250, 40));
+		//this.setPreferredSize(new Dimension(250, 40));
 		this.setBackground(Color.WHITE);
 		this.setOpaque(true);
 		model.addObserver(this);

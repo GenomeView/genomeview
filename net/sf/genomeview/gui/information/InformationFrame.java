@@ -66,11 +66,13 @@ public class InformationFrame extends GridBagPanel {
 
 		gc.weighty = 0;
 		gc.gridwidth = 1;
+		gc.weightx=0;
 		add(new JLabel("Features"), gc);
 		TypeCombo type = new TypeCombo(model, false);
 		type.setSelectedItem(Type.get("CDS"));
 		type.addActionListener(annotationTrackList);
 		gc.gridx++;
+		gc.weightx=1;
 		add(type, gc);
 
 		gc.gridwidth = 2;
@@ -96,7 +98,7 @@ public class InformationFrame extends GridBagPanel {
 
 		add(new GeneStructureView(model), gc);
 
-		setMinimumSize(new Dimension(200,200));
+		setPreferredSize(new Dimension(180,50));
 
 
 	}

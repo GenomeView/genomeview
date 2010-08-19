@@ -6,32 +6,16 @@ package net.sf.genomeview.gui;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.util.Observable;
-import java.util.Observer;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.util.logging.Logger;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
 
-import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.annotation.AnnotationFrame;
-import net.sf.genomeview.gui.components.AAMappingChooser;
 import net.sf.genomeview.gui.information.InformationFrame;
-import net.sf.genomeview.gui.menu.edit.RedoAction;
-import net.sf.genomeview.gui.menu.edit.UndoAction;
-import net.sf.genomeview.gui.menu.navigation.AnnotationMoveLeftAction;
-import net.sf.genomeview.gui.menu.navigation.AnnotationMoveRightAction;
-import net.sf.genomeview.gui.menu.navigation.AnnotationZoomInAction;
-import net.sf.genomeview.gui.menu.navigation.AnnotationZoomOutAction;
-import net.sf.jannot.Entry;
 /**
  * 
  * @author Thomas Abeel
@@ -71,7 +55,7 @@ public class MainContent {
 		int last = out.length - 1;
 		out[last] = new JPanel();
 		out[last].setLayout(new BorderLayout());
-		out[last].add(new InformationFrame(model));
+		out[last].add(new InformationFrame(model),BorderLayout.CENTER);
 
 		return out;
 	}
@@ -82,18 +66,18 @@ public class MainContent {
 //		logger.info("Detected screen height: "+screen.getHeight());
 //		screen.setSize(screen.getWidth() * 0.7, screen.getHeight() * 0.5);
 		JPanel[] out = new JPanel[1];
-		int last = out.length - 1;
-		out[last] = new JPanel();
-		// registerKeyboard(out[last], model);
-		out[last].setLayout(new BorderLayout());
-		out[last].add(new Toolbar(model), BorderLayout.PAGE_START);
+	
+		out[0] = new JPanel();
+		// registerKeyboard(out[0], model);
+		out[0].setLayout(new BorderLayout());
+		out[0].add(new Toolbar(model), BorderLayout.PAGE_START);
 
 		JSplitPane leftRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		Container leftContainer = new Container();
 
 		leftContainer.setLayout(new BorderLayout());
 
-		AnnotationFrame af = new AnnotationFrame(last, model);
+		AnnotationFrame af = new AnnotationFrame(0, model);
 //		af.setPreferredSize(screen);
 
 		leftContainer.add(af, BorderLayout.CENTER);
@@ -103,11 +87,14 @@ public class MainContent {
 
 		leftRight.setLeftComponent(leftContainer);
 		leftRight.setRightComponent(new InformationFrame(model));
-		leftRight.setResizeWeight(1);
+		Rectangle rec=GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		leftRight.setPreferredSize(new Dimension(rec.width,rec.height));
+		leftRight.setResizeWeight(0.99);
+		
 		leftRight.setOneTouchExpandable(true);
 		
-		// out[last].add(new InformationFrame(model));
-		out[last].add(leftRight);
+		// out[0].add(new InformationFrame(model));
+		out[0].add(leftRight,BorderLayout.CENTER);
 		return out;
 	}
 
