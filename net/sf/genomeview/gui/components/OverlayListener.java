@@ -15,10 +15,11 @@ import javax.swing.JPanel;
 import javax.swing.JWindow;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+
 /**
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 public class OverlayListener extends MouseAdapter {
 
@@ -30,8 +31,8 @@ public class OverlayListener extends MouseAdapter {
 			// this.setBounds(bounds);
 			floater.setHorizontalAlignment(SwingConstants.CENTER);
 			floater.setVerticalAlignment(SwingConstants.CENTER);
-			//floater.setAlignmentY(CENTER_ALIGNMENT);
-		
+			// floater.setAlignmentY(CENTER_ALIGNMENT);
+
 			Color c = new Color(200, 200, 200, 50);
 			floater.setBackground(c);
 			floater.setOpaque(true);
@@ -43,9 +44,9 @@ public class OverlayListener extends MouseAdapter {
 			Border emptyBorder = BorderFactory.createEmptyBorder(2, 2, 2, 2);
 			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
 			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
-//			floater.setBorder(colorBorder);
+			// floater.setBorder(colorBorder);
 			add(floater);
-			
+
 		}
 	}
 
@@ -65,13 +66,22 @@ public class OverlayListener extends MouseAdapter {
 		int y = p.y;
 
 		// }else{
-		overlay=new JWindow();
+		overlay = new JWindow();
 		overlay.setContentPane(new Overlay(message));
 		overlay.pack();
-		overlay.setLocation(x+2, y-5);
+		overlay.setLocation(x + 2, y - 5);
 		overlay.setVisible(true);
-//		overlay = ;
+		// overlay = ;
 		// }
+
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if (overlay != null) {
+			if (e.getSource() instanceof JMenuItem)
+				overlay.dispose();
+		}
 
 	}
 
