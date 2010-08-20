@@ -5,7 +5,6 @@ package net.sf.genomeview.data;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
@@ -16,8 +15,6 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
-
-import be.abeel.io.LineIterator;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.cache.CachedURLSource;
@@ -31,6 +28,7 @@ import net.sf.jannot.source.SAMDataSource;
 import net.sf.jannot.source.SSL;
 import net.sf.jannot.source.URLSource;
 import net.sf.jannot.tabix.IndexedFeatureFile;
+import be.abeel.io.LineIterator;
 /**
  * 
  * @author Thomas Abeel
@@ -118,7 +116,7 @@ public class DataSourceFactory {
 			try {
 				String input = JOptionPane.showInputDialog(model.getGUIManager().getParent(), "Give the URL of the data");
 				if (input != null && input.trim().length() > 0) {
-					URL url = new URI(input.trim()).toURL();
+					URL url=new URL(input.trim());
 					return new DataSource[] { createURL(url) };
 				} else
 					return null;
@@ -245,7 +243,7 @@ public class DataSourceFactory {
 		} else {
 			String indexName = fileName + ".fai";
 			if (checkExist(in, indexName)) {
-				System.out.println("Reading faidx file...");
+				log.fine("Reading faidx file...");
 				if (in instanceof File)
 					return new IndexedFastaDataSource((File) in);
 				if (in instanceof URL)
@@ -254,7 +252,7 @@ public class DataSourceFactory {
 			
 			indexName = fileName + ".tbi";
 			if (checkExist(in, indexName)) {
-				System.out.println("Reading tabix file...");
+				log.fine("Reading tabix file...");
 				if (in instanceof File)
 					return new IndexedFeatureFile((File) in,8000,50);
 				if (in instanceof URL)
@@ -271,16 +269,16 @@ public class DataSourceFactory {
 			return new File(string).exists();
 		if (in instanceof URL)
 			try {
-				System.out.println("Checking: "+string);
+				log.fine("Checking: "+string);
 				URLConnection conn=new URL(string).openConnection();
 				conn.setUseCaches(false);
-				System.out.println(conn.getHeaderFields());
+				log.fine(conn.getHeaderFields().toString());
 				LineIterator it=new LineIterator(conn.getInputStream());
 				it.setSkipBlanks(true);
 				String line=it.next().trim();
 				while(line.length()<1)
 					line=it.next().trim();
-				System.out.println("Checkline: "+line );
+				log.fine("Checkline: "+line );
 				it.close();
 				
 				/* This is not supposed to happend, except with badly configured CMS that take over */
