@@ -273,7 +273,10 @@ public class WiggleTrack extends Track {
 			}
 
 			g.setColor(Color.black);
-			g.drawString(displayName(), 10, yOffset + 15);
+			if(displayName()!=null)
+				g.drawString(displayName(), 10, yOffset + 15);
+			else 
+				g.drawString("graph", 10, yOffset+15);
 		}
 
 		return graphLineHeigh;
