@@ -45,7 +45,9 @@ public class MainMenu extends JMenuBar {
 		JMenu file = new JMenu("File");
 		
 		JMenuItem i=new JMenuItem(new LoadFeaturesAction(model));
-		i.addMouseListener(new OverlayListener("This allows you to load data.<br/><br/><strong>Sources:</strong><br/>You can load data from either a local file on your computer or from a URL.<br/><br/><b>Supported formats</b>"));
+		OverlayListener ol=new OverlayListener("This allows you to load data.<br/><br/><strong>Sources:</strong><br/>You can load data from either a local file on your computer or from a URL.<br/><br/><b>Supported formats</b>");
+		i.addMouseListener(ol);
+		i.addActionListener(ol);
 		file.add(i);
 		
 		file.addSeparator();

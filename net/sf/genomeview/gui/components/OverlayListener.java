@@ -5,6 +5,8 @@ package net.sf.genomeview.gui.components;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -21,7 +23,7 @@ import javax.swing.border.Border;
  * @author Thomas Abeel
  * 
  */
-public class OverlayListener extends MouseAdapter {
+public class OverlayListener extends MouseAdapter implements ActionListener{
 
 	class Overlay extends JPanel {
 
@@ -29,6 +31,7 @@ public class OverlayListener extends MouseAdapter {
 
 		public Overlay(String message) {
 			// this.setBounds(bounds);
+			
 			floater.setHorizontalAlignment(SwingConstants.CENTER);
 			floater.setVerticalAlignment(SwingConstants.CENTER);
 			// floater.setAlignmentY(CENTER_ALIGNMENT);
@@ -65,31 +68,32 @@ public class OverlayListener extends MouseAdapter {
 		int x = p.x + e.getComponent().getWidth();
 		int y = p.y;
 
-		// }else{
 		overlay = new JWindow();
+		overlay.setAlwaysOnTop(true);
 		overlay.setContentPane(new Overlay(message));
 		overlay.pack();
 		overlay.setLocation(x + 2, y - 5);
 		overlay.setVisible(true);
-		// overlay = ;
-		// }
-
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		if (overlay != null) {
-			if (e.getSource() instanceof JMenuItem)
-				overlay.dispose();
-		}
 
-	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
 		if (overlay != null)
 			overlay.dispose();
 
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (overlay != null) {
+			if (e.getSource() instanceof JMenuItem){
+				System.out.println(e.getSource());
+				overlay.dispose();
+			}
+		}
+		
 	}
 
 }
