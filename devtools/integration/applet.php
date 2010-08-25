@@ -12,8 +12,6 @@ applet {
 }
 </style>
 <body>
-<h1>GenomeView: C. Elegans</h1>
-
 <?php
 $pageURL = 'http';
 if (isset($_SERVER["HTTPS"])&&$_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
@@ -21,9 +19,6 @@ $pageURL .= "://";
 $baseurl = $pageURL .$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 $baseurl =substr($baseurl, 0, strripos($baseurl, "/") + 1);
 $basedir = substr($_SERVER["SCRIPT_FILENAME"], 0, strripos($_SERVER["SCRIPT_FILENAME"], "/") + 1);
-
-echo "BI".$baseurl.'/BI';
-echo 'BD'.$basedir.'/BD';
 
 $tracks = dirList($basedir . ".");
 ?>
@@ -72,7 +67,7 @@ function dirList($directory) {
 		 * .htaccess
 		 * All *.bam files, the bai will be included
 		 */
-		if ($file != '.' && $file != '..' && $file != '.htaccess'&&!endsWith($file,".html")&&!endsWith($file,".php")&&!endsWith($file,".bam")&& $file != 'config.local'&& $file != 'index.php')
+		if (!is_dir($file)&&$file != '.' && $file != '..' && $file != '.htaccess'&&!endsWith($file,".html")&&!endsWith($file,".php")&&!endsWith($file,".bam")&& $file != 'config.local'&& $file != 'index.php')
 		$results[] = $file;
 	}
 
