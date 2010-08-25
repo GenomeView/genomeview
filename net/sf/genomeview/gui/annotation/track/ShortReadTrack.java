@@ -165,6 +165,7 @@ public class ShortReadTrack extends Track {
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,JViewport view) {
 		paintedBlocks.clear();
+		
 		this.view=view;
 //		/* Store information to be used in other methods */
 //		currentEntry = entry;
@@ -219,6 +220,7 @@ public class ShortReadTrack extends Track {
 
 		ReadGroup rg = (ReadGroup) entry.get(dataKey);// entry.shortReads.
 														// getReadGroup(source);
+		//System.out.println("MaxLength: "+rg.readLength());
 		if (rg == null)
 			return 0;
 		// ShortReadCoverage graph = rg.getCoverage();// .get(rg);
@@ -317,15 +319,8 @@ public class ShortReadTrack extends Track {
 		 */
 		Iterable<SAMRecord> reads = null;
 
-		int readLength = ((ReadGroup) entry.get(dataKey)).readLength();// entry.
-																		// shortReads
-																		// .
-																		// getReadGroup
-																		// (
-																		// source
-																		// ).
-																		// readLength
-																		// ();
+		int readLength = ((ReadGroup) entry.get(dataKey)).readLength();
+		
 		if (!isCollapsed() && (currentVisible.length() > maxRegion)) {
 			g.setColor(Color.BLACK);
 			g.drawString("Region too big (max " + maxRegion + " nt), zoom in",
@@ -419,7 +414,7 @@ public class ShortReadTrack extends Track {
 							two = rg.getSecondRead(one);
 						}
 						if (two != null) {
-							if (two.getAlignmentEnd() < one.getAlignmentStart()) {
+							if (two.getAlignmentStart() < one.getAlignmentStart()) {
 
 								pos = two.getAlignmentStart()
 										- currentVisible.start;
@@ -629,6 +624,7 @@ public class ShortReadTrack extends Track {
 			return;
 		}
 		
+		
 		Color c = Color.GRAY;
 		if (ShortReadTools.strand(rf) == Strand.FORWARD) {
 			c = forwardColor;
@@ -673,7 +669,6 @@ public class ShortReadTrack extends Track {
 				// entry.sequence().getSubSequence(currentVisible.start,
 				// currentVisible.end + 1).toCharArray();
 				
-				// FIXME Why is this +1?
 				Iterable<Character> bufferedSeq = entry.sequence().get(
 						currentVisible.start, currentVisible.end+1);
 				
