@@ -13,7 +13,11 @@ import java.util.SortedSet;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Location;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class RemoveLocationAction extends AbstractModelAction implements Observer {
 
     private static final long serialVersionUID = -5857913546086864524L;
@@ -26,8 +30,10 @@ public class RemoveLocationAction extends AbstractModelAction implements Observe
 
         Set<Location> toRemove = new HashSet<Location>();
         toRemove.addAll(model.selectionModel().getLocationSelection());
+        model.selectionModel().clearLocationSelection();
         for (Location rf : toRemove)
             rf.getParent().removeLocation(rf);
+        
 
     }
 
