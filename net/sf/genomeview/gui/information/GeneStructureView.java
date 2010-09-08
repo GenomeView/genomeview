@@ -240,10 +240,10 @@ public class GeneStructureView extends JLabel implements Observer {
 			/* Draw missing stop codon */
 			if (af.hasMissingStopCodon()) {
 				if (rf.strand() == Strand.FORWARD && l.equals(rf.location().last())) {
-					g.drawLine(r.x, r.y, r.x, r.y + r.height);
+					g.drawLine(r.x+ r.width, r.y, r.x+ r.width, r.y + r.height);
 				}
 				if (rf.strand() == Strand.REVERSE && l.equals(rf.location().first())) {
-					g.drawLine(r.x + r.width, r.y, r.x + r.width, r.y + r.height);
+					g.drawLine(r.x , r.y, r.x , r.y + r.height);
 				}
 			}
 			
