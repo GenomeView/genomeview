@@ -24,7 +24,7 @@ public class SelectionModel extends Observable {
 	/**
 	 * Contains all selected locations, these can be subcomponents of a Feature.
 	 */
-	private SortedSet<Location> selectedLocation = new TreeSet<Location>();
+	private SortedSet<Location> selectedLocation = new ExactSet();
 
 	public void addLocationSelection(Location rl) {
 		selectedLocation.add(rl);
@@ -35,6 +35,18 @@ public class SelectionModel extends Observable {
 		setChanged();
 		notifyObservers();
 
+	}
+
+	class ExactSet extends TreeSet<Location> {
+		@Override
+		public boolean contains(Object l) {
+			for (Location ll : this) {
+				if (ll == l)
+					return true;
+
+			}
+			return false;
+		}
 	}
 
 	public SortedSet<Location> getLocationSelection() {
@@ -131,6 +143,6 @@ public class SelectionModel extends Observable {
 	 * @return
 	 */
 	public boolean isFeatureSelected() {
-		return selectedLocation.size()>0;
+		return selectedLocation.size() > 0;
 	}
 }
