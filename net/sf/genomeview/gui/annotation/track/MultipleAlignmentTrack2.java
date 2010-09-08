@@ -269,10 +269,14 @@ public class MultipleAlignmentTrack2 extends Track {
 								double width = screenWidth / (double) visible.length();
 								int translated = ab.translate(i - start);
 								char nt;
+//								if (as.strand() == Strand.FORWARD)
+//									nt = as.seq().getNucleotide(translated + 1);
+//								else
+//									nt = as.seq().getReverseNucleotide(as.seq().size() - translated);
 								if (as.strand() == Strand.FORWARD)
-									nt = as.seq().getNucleotide(translated + 1);
+									nt = as.seq().get(translated+1,translated+2).iterator().next();
 								else
-									nt = as.seq().getReverseNucleotide(as.seq().size() - translated);
+									nt = as.seq().get(as.seq().size() - translated,as.seq().size() - translated+1).iterator().next();
 								// System.out.println(nt + "\t" + ref[i -
 								// visible.start]);
 								if (ref[i - visible.start] != nt) {
