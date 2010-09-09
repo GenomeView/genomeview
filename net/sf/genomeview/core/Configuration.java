@@ -12,10 +12,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.CrashHandler;
 import net.sf.jannot.Type;
 import be.abeel.io.GZIPPrintWriter;
 import be.abeel.io.LineIterator;
@@ -74,8 +76,8 @@ public class Configuration {
 			 */
 			save();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			CrashHandler.crash(Level.SEVERE, "IOException while loading configuration", e);
+			
 		}
 	}
 
@@ -231,7 +233,7 @@ public class Configuration {
 		String tmp = get(string);
 		Set<Type> out = new HashSet<Type>();
 		for (String s : tmp.split(",")) {
-			out.add(Type.valueOf(s.trim()));
+			out.add(Type.get(s.trim()));
 		}
 		return out;
 	}
@@ -288,8 +290,7 @@ public class Configuration {
 		try {
 			load();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			CrashHandler.crash(Level.SEVERE, "IOException while loading configuration", e);
 		}
 		model.refresh();
 	}
