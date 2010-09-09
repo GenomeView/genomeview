@@ -101,8 +101,8 @@ public class CrashHandler {
 	}
 	private static Logger log=Logger.getLogger(CrashHandler.class.getCanonicalName());
 
-	public static void crash(Level severe, String string, IOException e) {
-		log.log(severe, string, e);
+	public static void crash(Level severe, String string, Throwable ex) {
+		log.log(severe, string, ex);
 		new CrashHandler();
 		
 	}
