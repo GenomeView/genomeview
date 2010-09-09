@@ -3,19 +3,26 @@
  */
 package net.sf.genomeview.gui.information;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.ToolTipManager;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
@@ -38,8 +45,92 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 
 	private Model model;
 
+	class FeatureTableCellRenderer extends DefaultTableCellRenderer {
+
+		public Component getTableCellRendererComponent(JTable tbl, Object v, boolean isSelected, boolean isFocused,
+				int row, int col) {
+			this.setForeground(Color.DARK_GRAY);
+			Component c = super.getTableCellRendererComponent(tbl, v, isSelected, isFocused, row, col);
+			
+			if (tbl.getSelectionModel().isSelectedIndex(row)) {
+				c.setBackground(new Color((float)0.7, (float) 0.7, (float) 1.0));
+			} else {
+				c.setBackground(Color.white);
+			}
+
+			return c;
+		}
+
+	}
+
+	class FeatureTableSelectionModel extends DefaultListSelectionModel implements Observer {
+
+		private Model model;
+
+		public FeatureTableSelectionModel(Model model) {
+			this.model = model;
+			model.addObserver(this);
+		}
+
+		@Override
+		public int getMaxSelectionIndex() {
+			if(isSelectionEmpty())
+				return -1;
+			return selection.last();
+		}
+
+		@Override
+		public int getMinSelectionIndex() {
+			if(isSelectionEmpty())
+				return -1;
+			return selection.first();
+		}
+
+		@Override
+		public boolean isSelectedIndex(int index) {
+			return selection.contains(index);
+		}
+
+		@Override
+		public boolean isSelectionEmpty() {
+			return selection.size() == 0;
+		}
+
+		private SortedSet<Integer> selection = new TreeSet<Integer>();
+
+		@Override
+		public void update(Observable o, Object arg) {
+
+			Set<Integer> oldSelection = new HashSet<Integer>();
+			oldSelection.addAll(selection);
+
+			SortedSet<Feature> fs = model.selectionModel().getFeatureSelection();
+			// System.out.println(fs);
+			// int prevIndex = selectedIndex;
+			if (fs.size() > 0) {
+				for (Feature f : fs) {
+					selection.add(listModel.getRow(f));
+				}
+
+			} else {
+				selection.clear();
+			}
+			oldSelection.retainAll(selection);
+			if (oldSelection.size() != selection.size()) {
+				fireValueChanged(false);
+			}
+
+			// getSelectionModel().setSelectionInterval(row, row);
+
+		}
+
+	}
+
 	public FeatureTable(final Model model) {
 		super(new FeatureTableModel(model));
+		FeatureTableSelectionModel ftsm = new FeatureTableSelectionModel(model);
+		setSelectionModel(ftsm);
+		setDefaultRenderer(String.class, new FeatureTableCellRenderer());
 		model.addObserver(this);
 		this.model = model;
 		listModel = (FeatureTableModel) this.getModel();
@@ -52,15 +143,14 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 		}
 		getTableHeader().addMouseMotionListener(new ColumnHeaderToolTips(listModel));
 		getTableHeader().setReorderingAllowed(false);
-		
+
 		ToolTipManager.sharedInstance().setInitialDelay(0);
 
-		
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() > 0) {
-					
+
 					Feature rf = listModel.getFeature(rowAtPoint(e.getPoint()));
 
 					model.selectionModel().setLocationSelection(rf);
@@ -69,14 +159,10 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 						int min = rf.start();
 						int max = rf.end();
 						double border = 0.05 * (max - min);
-						model.setAnnotationLocationVisible(new Location((int) (min - border), (int) (max + border)),true);
+						model.setAnnotationLocationVisible(new Location((int) (min - border), (int) (max + border)),
+								true);
 					}
 				}
-				/* Keep selection */
-				SortedSet<Feature> fs = model.selectionModel().getFeatureSelection();
-				System.out.println(fs);
-				int row = listModel.getRow(fs.first());
-				getSelectionModel().setSelectionInterval(row, row);
 
 			}
 		});
@@ -111,13 +197,10 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 		SortedSet<Feature> fs = model.selectionModel().getFeatureSelection();
 
 		if (fs.size() == 1) {
-			// FIXME for multiple structure types
-			// if
-			// (Configuration.getTypeSet("geneStructures").contains(fs.first().type()))
-			// {
+			
 			if (fs.first().type() == listModel.getType()) {
 				int row = listModel.getRow(fs.first());
-				getSelectionModel().setSelectionInterval(row, row);
+				// getSelectionModel().setSelectionInterval(row, row);
 				if (!(getParent() instanceof JViewport)) {
 					return;
 				}
@@ -158,6 +241,7 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 
 				// Scroll the area into view.
 				viewport.scrollRectToVisible(rect);
+				
 			}
 		}
 
