@@ -58,11 +58,6 @@ public final class StaticUtils {
 	 *            the window to center
 	 */
 	public static void center(Window window) {
-		// Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		// Dimension windowSize = window.getPreferredSize();
-		// window.setLocation(screenSize.width / 2 - (windowSize.width / 2),
-		// screenSize.height / 2
-		// - (windowSize.height / 2));
 		Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 		window.setLocation(bounds.x + bounds.width / 2 - window.getWidth() / 2, bounds.y + bounds.height / 2
 				- window.getHeight() / 2);
