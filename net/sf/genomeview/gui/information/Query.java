@@ -28,7 +28,7 @@ public class Query {
 	public static Query ncbiQuery = new Query("Query at NCBI Entrez",
 			"http://www.ncbi.nlm.nih.gov/sites/gquery?term=%query%",Icons.NCBI);
 	public static Query ensemblQuery = new Query("Query at Ensembl",
-			"http://www.ensembl.org/Homo_sapiens/Search/Summary?species=all;idx=;q=%query%",Icons.Ensembl);
+			"http://www.ensembl.org/common/Search/Results?species=all;idx=;q=%query%",Icons.Ensembl);
 	public static Query ebi = new Query("Query at EMBL-EBI",
 			"http://www.ebi.ac.uk/ebisearch/search.ebi?db=allebi&query=%query%",null);
 
