@@ -103,6 +103,7 @@ public class CrashHandler {
 
 	public static void crash(Level severe, String string, Throwable ex) {
 		log.log(severe, string, ex);
+		log.severe("GenomeView is dead, initializing post-mortem.");
 		new CrashHandler();
 		
 	}

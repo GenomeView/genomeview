@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.plugin.PluginLoader;
+import net.sf.jannot.Cleaner;
 
 public class GVApplet extends JApplet {
 
@@ -98,6 +99,8 @@ public class GVApplet extends JApplet {
 
 	@Override
 	public void destroy() {
+		logger.info("Destroying applet");
+		Cleaner.exit();
 		System.exit(0);
 	}
 

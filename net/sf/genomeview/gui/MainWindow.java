@@ -38,6 +38,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.genomeview.plugin.PluginLoader;
+import net.sf.jannot.Cleaner;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
@@ -153,12 +154,13 @@ public class MainWindow implements WindowListener, Observer {
 			try {
 				Configuration.save();
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, "saving configuration", e);
+				logger.log(Level.SEVERE, "Problem saving configuration", e);
 			}
 			running--;
 			logger.info("Instances still running: " + running);
 			if (running < 1) {
 				logger.info("No instances left, exiting VM");
+				Cleaner.exit();
 				System.exit(0);
 			}
 		}
