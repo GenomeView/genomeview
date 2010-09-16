@@ -214,6 +214,7 @@ public class DataSourceFactory {
 	}
 
 	public static DataSource createFile(File file) throws IOException {
+		
 		DataSource indexedSource = tryIndexedStuff(file);
 		if (indexedSource != null)
 			return indexedSource;
@@ -232,6 +233,11 @@ public class DataSourceFactory {
 	 */
 	private static DataSource tryIndexedStuff(Object in) throws IOException {
 		String fileName = in.toString();
+		/* Don't try for webservices, that's not going to work */
+		if(fileName.indexOf('&')>=0||fileName.indexOf('?')>=0){
+			log.info("Not trying indexing, this looks like a webservice: "+fileName);
+			return null;
+		}
 		if (fileName.toLowerCase().endsWith("bai")) {
 			if (in instanceof File)
 				return new SAMDataSource(new File(fileName.substring(0, fileName.length() - 4)));
