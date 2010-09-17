@@ -359,7 +359,7 @@ public class Model extends Observable implements IModel {
 			setAnnotationLocationVisible(new Location(1, 51));
 		logger.info("Reading source:" + f);
 		f.read(entries);
-		System.out.println("Entries: " + entries.size());
+		logger.info("Entries: " + entries.size());
 		logger.info("Model adding data done!");
 		if (f instanceof MultiFileSource)
 			for (DataSource ds : ((MultiFileSource) f).getFileSources()) {
@@ -369,6 +369,7 @@ public class Model extends Observable implements IModel {
 			loadedSources.add(f);
 		updateTracks();
 		refresh(NotificationTypes.GENERAL);
+		
 	}
 
 	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(
