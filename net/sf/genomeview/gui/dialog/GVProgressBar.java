@@ -4,9 +4,11 @@
 package net.sf.genomeview.gui.dialog;
 
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Window;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -29,7 +31,6 @@ public class GVProgressBar extends JDialog {
 
 	private JProgressBar pb = new JProgressBar();
 
-	
 	public GVProgressBar(String title, String initText, Frame parent) {
 		super(parent, title);
 		setAlwaysOnTop(true);
@@ -53,12 +54,18 @@ public class GVProgressBar extends JDialog {
 		setVisible(true);
 	}
 
-	
-
 	public void done() {
+		final Window jf = this;
+		EventQueue.invokeLater(new Runnable() {
 
-		setVisible(false);
-		dispose();
+			@Override
+			public void run() {
+				jf.setVisible(false);
+				jf.dispose();
+			}
+
+		});
+		
 	}
 
 	public void setComment(String comment) {
@@ -66,21 +73,19 @@ public class GVProgressBar extends JDialog {
 
 	}
 
-	
-	public void setMax(int max){
+	public void setMax(int max) {
 		pb.setIndeterminate(false);
 		pb.setMaximum(max);
 	}
+
 	public void setProgress(int progress) {
 		pb.setValue(progress);
 
 	}
 
-
-
 	public void inc() {
-		pb.setValue(pb.getValue()+1);
-		
+		pb.setValue(pb.getValue() + 1);
+
 	}
-	
+
 }
