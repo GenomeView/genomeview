@@ -45,7 +45,7 @@ public class MergeFeatureDialog extends JDialog {
 		final MergeFeatureDialog _self = this;
 		setModal(true);
 		setAlwaysOnTop(true);
-		setBackground(Color.WHITE);
+	
 
 		Container c = new Container();
 		c.setLayout(new GridBagLayout());
@@ -70,7 +70,7 @@ public class MergeFeatureDialog extends JDialog {
 		cp.add(exon, BorderLayout.SOUTH);
 		c.add(new TitledComponent("Merge type", cp), gc);
 		gc.gridy++;
-
+		setBackground(exon.getBackground());
 		// final TypeCombo select = new TypeCombo(model);
 		// select.setSelectedItem(model.selectionModel().getFeatureSelection().first().type());
 		final ButtonGroup bg = new ButtonGroup();
