@@ -81,8 +81,11 @@ public class MergeFeatureDialog extends JDialog {
 		int index = 0;
 
 		for (Feature f : set) {
-			JRadioButton button = new JRadioButton(f.toString());
-			button.setActionCommand(f.toString());
+			String label=f.toString();
+			if(label.length()>50)
+				label=label.substring(0, 50)+"...";
+			JRadioButton button = new JRadioButton(label);
+			button.setActionCommand(f.toString()+f.hashCode());
 			if (index == 0)
 				button.setSelected(true);
 			bg.add(button);
