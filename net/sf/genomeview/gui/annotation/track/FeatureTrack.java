@@ -381,7 +381,10 @@ public class FeatureTrack extends Track {
 				StringBuffer text = new StringBuffer();
 				text.append("<html>");
 				for (Feature f : features) {
-					text.append("Name : " + f.toString() + "<br />");
+					String name=f.toString();
+					if(name.length()>50)
+						name=name.substring(0,50);
+					text.append("Name : " + name + "<br />");
 					text.append("Start : " + f.start() + "<br />");
 					text.append("End : " + f.end() + "<br />");
 					int aggregateLenght = agg(f.location());
