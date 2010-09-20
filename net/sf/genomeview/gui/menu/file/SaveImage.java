@@ -29,6 +29,7 @@ import be.abeel.io.ExtensionManager;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.annotation.GeneEvidenceLabel;
+import net.sf.genomeview.gui.dialog.Hider;
 
 /**
  * 
@@ -45,32 +46,7 @@ public class SaveImage extends AbstractAction {
 		this.model = model;
 	}
 
-	// FIXME Should be made a separate class at some point as a central
-	// messaging method
-	class Hider extends JWindow {
-
-		private JLabel floater = new JLabel();
-
-		public Hider(Rectangle bounds) {
-			// this.setBounds(bounds);
-			this.setAlwaysOnTop(true);
-			floater.setPreferredSize(new Dimension(bounds.width / 5, bounds.height / 5));
-			floater.setHorizontalAlignment(SwingConstants.CENTER);
-			floater.setVerticalAlignment(SwingConstants.CENTER);
-			floater.setAlignmentY(CENTER_ALIGNMENT);
-			this.setLocation(bounds.x + bounds.width / 5 * 2, bounds.y + bounds.height / 5 * 2);
-			Color c = new Color(100, 100, 100, 50);
-			floater.setBackground(c);
-			floater.setOpaque(true);
-			floater.setText("Exporting image...");
-			floater.setForeground(Color.BLACK);
-			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
-			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
-			add(floater);
-			pack();
-		}
-	}
+	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -89,8 +65,8 @@ public class SaveImage extends AbstractAction {
 
 			}
 
-			Rectangle r = model.getGUIManager().getParent().getBounds();
-			final Hider h = new Hider(r);
+			
+			final Hider h = new Hider(model,"Exporting image...");
 			h.setVisible(true);
 			SwingUtilities.invokeLater(new Runnable() {
 

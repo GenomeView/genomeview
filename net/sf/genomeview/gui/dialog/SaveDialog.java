@@ -4,6 +4,7 @@
 package net.sf.genomeview.gui.dialog;
 
 import java.awt.Container;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -112,80 +113,94 @@ public class SaveDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					/* Default save locations? */
-					String defaultLocation = Configuration.get("save:defaultLocation");
-					if (defaultLocation.equals("null")) {
-						defaultLocation = file();
-					}
-					if (defaultLocation == null) {
-						return;
-					}
-					EMBLParser parser = new EMBLParser();
-					parser.storeSequence = false;
-					File tmp = File.createTempFile("GV_", ".save");
-					tmp.deleteOnExit();
-
-					FileOutputStream fos = new FileOutputStream(tmp);
-
-					for (DataSourceCheckbox dsb : dss) {
-						if (dsb.isSelected()) {
-							parser.write(fos, dsb.data);
-							// for (Feature f : (Iterable<Feature>)
-							// dsb.data.get()) {
-							// pw.println(parser.line(f));
-							// }
-						}
-					}
-					fos.close();
-					setVisible(false);
-					if (defaultLocation.startsWith("http://") || defaultLocation.startsWith("https://")) {
+				final Hider h = new Hider(model, "Saving data...");
+				h.setVisible(true);
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
 						try {
-							URL url=new URL(defaultLocation);
-							System.out.println(url.getProtocol() + "://" + url.getHost() + url.getPath());
-							url = new URL(url.getProtocol() + "://" + url.getHost() + url.getPath());
-							
-							LineIterator it = new LineIterator(tmp);
-							System.out.println("-------");
-							System.out.println("Uploaded file:");
-							for (String line : it)
-								System.out.println(line);
-							System.out.println("---EOF---");
-							it.close();
-
-							String reply = ClientHttpUpload.upload(tmp, url);
-							System.out.println("SERVER REPLY: " + reply);
-							// TODO add more checks on the reply.
-							if (reply.equals("")) {
-
-								throw new SaveFailedException("Empty reply from server");
-
+							/* Default save locations? */
+							String defaultLocation = Configuration.get("save:defaultLocation");
+							if (defaultLocation.equals("null")) {
+								defaultLocation = file();
 							}
-							if (reply.toLowerCase().contains("error")) {
-								JOptionPane.showMessageDialog(null, reply);
-								throw new SaveFailedException("Error reply from server");
-
+							if (defaultLocation == null) {
+								return;
 							}
-							JOptionPane.showMessageDialog(model.getGUIManager().getParent(), reply);
+							EMBLParser parser = new EMBLParser();
+							parser.storeSequence = false;
+							File tmp = File.createTempFile("GV_", ".save");
+							tmp.deleteOnExit();
 
-						} catch (IOException ex) {
+							// TODO Auto-generated method stub
 
+							FileOutputStream fos = new FileOutputStream(tmp);
+
+							for (DataSourceCheckbox dsb : dss) {
+								if (dsb.isSelected()) {
+									parser.write(fos, dsb.data);
+									// for (Feature f : (Iterable<Feature>)
+									// dsb.data.get()) {
+									// pw.println(parser.line(f));
+									// }
+								}
+							}
+							fos.close();
+							setVisible(false);
+							if (defaultLocation.startsWith("http://") || defaultLocation.startsWith("https://")) {
+								try {
+									URL url = new URL(defaultLocation);
+									System.out.println(url.getProtocol() + "://" + url.getHost() + url.getPath());
+									url = new URL(url.getProtocol() + "://" + url.getHost() + url.getPath());
+
+									LineIterator it = new LineIterator(tmp);
+									System.out.println("-------");
+									System.out.println("Uploaded file:");
+									for (String line : it)
+										System.out.println(line);
+									System.out.println("---EOF---");
+									it.close();
+
+									String reply = ClientHttpUpload.upload(tmp, url);
+									System.out.println("SERVER REPLY: " + reply);
+									// TODO add more checks on the reply.
+									if (reply.equals("")) {
+
+										throw new SaveFailedException("Empty reply from server");
+
+									}
+									if (reply.toLowerCase().contains("error")) {
+										JOptionPane.showMessageDialog(null, reply);
+										throw new SaveFailedException("Error reply from server");
+
+									}
+									h.dispose();
+									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), reply);
+
+								} catch (IOException ex) {
+
+									ex.printStackTrace();
+									throw new SaveFailedException("IOException");
+								}
+							} else {
+								File out = new File(defaultLocation);
+								out = ExtensionManager.extension(out, "embl");
+								boolean succes = tmp.renameTo(out);
+								h.dispose();
+								if (!succes) {
+									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Save failed!");
+								} else {
+									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Save succeeded!");
+								}
+							}
+
+						} catch (Exception ex) {
 							ex.printStackTrace();
-							throw new SaveFailedException("IOException");
 						}
-					} else {
-						File out = new File(defaultLocation);
-						out = ExtensionManager.extension(out, "embl");
-						boolean succes = tmp.renameTo(out);
-						if (!succes) {
-							JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Save failed!");
-						} else {
-							JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Save succeeded!");
-						}
+						h.dispose();
 					}
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
+
+				});
 			}
 
 			private String file() {
