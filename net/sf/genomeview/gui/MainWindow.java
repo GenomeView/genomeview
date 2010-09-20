@@ -7,20 +7,13 @@ import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 
-import java.awt.Component;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutionException;
@@ -30,22 +23,18 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
-import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Cleaner;
-import net.sf.jannot.Location;
-import net.sf.jannot.source.DataSource;
-import net.sf.jannot.source.FileSource;
 import be.abeel.jargs.AutoHelpCmdLineParser;
 
 /**
  * MainWindow is the container for a single GenomeView instance.
+ * 
+ * @author Thomas Abeel
  * 
  */
 public class MainWindow implements WindowListener, Observer {
@@ -67,10 +56,10 @@ public class MainWindow implements WindowListener, Observer {
 		model.addObserver(o);
 	}
 
-	public MainWindow(String args[]) throws InterruptedException, ExecutionException {
+	public MainWindow(String args[],Splash splash) throws InterruptedException, ExecutionException {
 		running++;
 		logger.info("Started running instance" + running);
-		init(args);
+		init(args,splash);
 	}
 
 	private void parse(AutoHelpCmdLineParser parser, String[] args) {
@@ -166,10 +155,11 @@ public class MainWindow implements WindowListener, Observer {
 		}
 	}
 
-	public void init(String[] args) throws InterruptedException, ExecutionException {
+	public void init(String[] args, Splash splash) throws InterruptedException, ExecutionException {
 		// FIXME special handling if this is not the first time the application
 		// is initialized
 
+		splash.setText("Parsing parameters...");
 		/* Initialize the command line options */
 		AutoHelpCmdLineParser parser = new AutoHelpCmdLineParser();
 		Option urlO = parser.addHelp(parser.addStringOption("url"), "Start GenomeView with data loaded from the URL");
@@ -188,24 +178,8 @@ public class MainWindow implements WindowListener, Observer {
 			System.exit(0);
 		}
 
-		/* Load the additional configuration */
-		String config = (String) parser.getOptionValue(configurationO);
-		if (config != null) {
-			try {
-				if (config.startsWith("http") || config.startsWith("ftp")) {
-					Configuration.loadExtra(new URI(config).toURL().openStream());
-				} else {
-					Configuration.loadExtra(new FileInputStream(config));
-				}
-			} catch (MalformedURLException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
-			} catch (IOException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
-			} catch (URISyntaxException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
-			}
-		}
-
+		
+		splash.setText("Creating windows...");
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice[] gs = ge.getScreenDevices();
 		boolean freshwindow = false;
@@ -237,16 +211,6 @@ public class MainWindow implements WindowListener, Observer {
 			Rectangle rec = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 			window.setSize(rec.width, rec.height);
 			
-			
-			
-//			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-//			logger.info("Detected screen width: " + screen.getWidth());
-//			logger.info("Detected screen height: " + screen.getHeight());
-//			window.setSize((int)(screen.getWidth() * 0.7),(int)( screen.getHeight() * 0.4));
-
-			// window.setExtendedState(JFrame.MAXIMIZED_VERT);
-			// window.setExtendedState(JFrame.MAXIMIZED_HORIZ);
-			// window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			if (content.length > 1) {
 				for (int i = 1; i < content.length; i++) {
 					helper = new JFrame("GenomeView :: " + Configuration.version(), gs[i].getDefaultConfiguration());
@@ -262,91 +226,19 @@ public class MainWindow implements WindowListener, Observer {
 			PluginLoader.load(model);
 
 		}
+		splash.setText("Loading data...");
 		/* Data specified on command line */
 		String cmdUrl = (String) parser.getOptionValue(urlO);
 		String cmdFile = (String) parser.getOptionValue(fileO);
-
-		/*
-		 * Select data source. If an URL or file are specified on the command
-		 * line, that is selected. In other cases a dialog pops-up to let the
-		 * user select.
-		 * 
-		 * If both file and url are specified, the URL is loaded.
-		 */
-		DataSource[] data = null;
-		if (cmdFile == null && cmdUrl == null) {
-			logger.info("File and url options are null!");
-			// do nothing
-
-		} else if (cmdUrl != null) {
-			logger.info("URL commandline option is set: " + cmdUrl);
-			try {
-				data = new DataSource[] { DataSourceFactory.createURL(new URL(cmdUrl)) };
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		} else if (cmdFile != null) {
-			logger.info("File commandline option is set: " + cmdFile);
-			try {
-				data = new DataSource[] { new FileSource(new File(cmdFile)) };
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		/* Load the source, if one was constructed */
-		if (data != null) {
-
-			assert (data.length == 1);
-			logger.info("Loading with priority: " + data[0]);
-			final ReadWorker rw = new ReadWorker(data[0], model);
-			rw.execute();
-			rw.get();
-		}
-		/* Load additional files */
 		String[] remArgs = parser.getRemainingArgs();
-		for (String s : remArgs) {
-			logger.info("loading additional from commandline: " + s);
-			try {
-				if (!s.startsWith("http:") && !s.startsWith("ftp:") && !s.startsWith("https:")) {
-					DataSource ds = new FileSource(new File(s));
-
-					ReadWorker rf = new ReadWorker(ds, model);
-					rf.execute();
-
-				} else {
-					DataSource ds = DataSourceFactory.createURL(new URL(s));
-					ReadWorker rf = new ReadWorker(ds, model);
-					rf.execute();
-
-				}
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
 		String initialLocation = (String) parser.getOptionValue(positionO);
-		if (initialLocation != null) {
-			String[] arr = initialLocation.split(":");
-			assert arr.length == 2 || arr.length == 3;
-			if (arr.length == 3) {
-				model.setSelectedEntry(model.entry(arr[0]));
-				model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[1]), Integer.parseInt(arr[2])));
-			} else if (arr.length == 2) {
-				model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[0]), Integer.parseInt(arr[1])));
-			}
-
-		}
+		/* Load the additional configuration */
+		String config = (String) parser.getOptionValue(configurationO);
+		
+		InitDataLoader idl=new InitDataLoader(model);
+		idl.init(config, cmdUrl, cmdFile, remArgs, initialLocation);
+		
+		
 
 		/* Start acting */
 		model.setSilent(false);

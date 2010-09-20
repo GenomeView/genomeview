@@ -3,12 +3,10 @@
  */
 package net.sf.genomeview.gui;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Authenticator;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -45,47 +43,26 @@ public class GenomeView {
 				}
 			});
 		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			//Ignore, it's not like we really care
 		} catch (InvocationTargetException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			//Ignore, it's not like we really care
 		}
 		
+		/* Rewrite JNLP arguments */
+		jnlprewrite(args);
+		/*
+		 * The configuration class needs to be called at least once
+		 * before we can start the logger
+		 */
+		System.out.println("Starting GenomeView " + Configuration.version());
 		
-		SwingUtilities.invokeLater(new Runnable() {
+		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				/* Rewrite JNLP arguments */
-				jnlprewrite(args);
-				/*
-				 * The configuration class needs to be called at least once
-				 * before we can start the logger
-				 */
-				System.out.println("Starting GenomeView " + Configuration.version());
+				
 
-				/* Configure logging */
-				try {
-					LogManager.getLogManager().readConfiguration(
-							GenomeView.class.getResourceAsStream("/conf/logging.conf"));
-					logger = Logger.getLogger(GenomeView.class.getCanonicalName());
-				} catch (SecurityException e) {
-					logger.log(Level.SEVERE, "log initialization", e);
-					/*
-					 * These exceptions likely indicate that the log could not
-					 * be initialized, print also to console
-					 */
-					e.printStackTrace();
-
-				} catch (IOException e) {
-					logger.log(Level.SEVERE, "log initialization", e);
-					/*
-					 * These exceptions likely indicate that the log could not
-					 * be initialized, print also to console
-					 */
-					e.printStackTrace();
-				}
+				LogConfigurator.config();
 
 				/* Single instance manager */
 				boolean singleInstance = Configuration.getBoolean("general:singleInstance");
@@ -100,7 +77,7 @@ public class GenomeView {
 							System.out.println("New instance detected...");
 							try {
 								assert mw != null;
-								mw.init(args);
+								mw.init(args,splash);
 							} catch (InterruptedException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -115,8 +92,8 @@ public class GenomeView {
 				Authenticator.setDefault(new MyAuthenticator());
 
 				try {
-					mw = new MainWindow(args);
-
+					mw = new MainWindow(args,splash);
+					
 				} catch (InterruptedException e) {
 					logger.log(Level.SEVERE, "main window initialization", e);
 				} catch (ExecutionException e) {
@@ -124,7 +101,7 @@ public class GenomeView {
 				}
 				splash.dispose();
 			}
-		});
+		}).start();
 	}
 
 }
