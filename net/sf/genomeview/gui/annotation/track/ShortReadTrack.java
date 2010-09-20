@@ -30,6 +30,7 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
+import net.sf.jannot.shortread.BAMreads;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortReadTools;
 import net.sf.samtools.CigarElement;
@@ -320,6 +321,10 @@ public class ShortReadTrack extends Track {
 		Iterable<SAMRecord> reads = null;
 
 		int readLength = ((ReadGroup) entry.get(dataKey)).readLength();
+		int pairLength= readLength;
+		if(entry.get(dataKey) instanceof BAMreads)
+			pairLength = ((BAMreads) entry.get(dataKey)).getPairLength();
+		
 		
 		if (!isCollapsed() && (currentVisible.length() > maxRegion)) {
 			g.setColor(Color.BLACK);
@@ -335,10 +340,7 @@ public class ShortReadTrack extends Track {
 			//
 			// }
 		}
-		int maxPairingDistance = Configuration
-				.getInt("shortread:maximumPairing");
-		if (readLength > maxPairingDistance)
-			readLength = maxPairingDistance;
+		
 		int lines = 0;
 		boolean stackExceeded = false;
 		boolean enablePairing = Configuration
@@ -407,7 +409,7 @@ public class ShortReadTrack extends Track {
 					int clearEnd = one.getAlignmentEnd();
 					SAMRecord two = null;
 					/* Modify empty space finder for paired reads */
-					if (enablePairing && one instanceof SAMRecord) {
+					if (enablePairing) {
 						// ShortReadTools esr = (ShortReadTools) one;
 						if (ShortReadTools.isPaired(one)
 								&& ShortReadTools.isFirstInPair(one)) {
@@ -427,7 +429,7 @@ public class ShortReadTrack extends Track {
 
 					}
 					/* Carve space out of hitmap */
-					for (int i = clearStart - readLength; i <= clearEnd + 3; i++) {
+					for (int i = clearStart - pairLength; i <= clearEnd + 3; i++) {
 						pos = i - currentVisible.start;
 						if (pos >= 0 && pos < tilingCounter.length)
 							tilingCounter[pos].set(line);
