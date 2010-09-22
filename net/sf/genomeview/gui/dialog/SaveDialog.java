@@ -164,17 +164,19 @@ public class SaveDialog extends JDialog {
 									String reply = ClientHttpUpload.upload(tmp, url);
 									System.out.println("SERVER REPLY: " + reply);
 									// TODO add more checks on the reply.
+									h.dispose();
 									if (reply.equals("")) {
 
 										throw new SaveFailedException("Empty reply from server");
 
 									}
+								
 									if (reply.toLowerCase().contains("error")) {
 										JOptionPane.showMessageDialog(null, reply);
 										throw new SaveFailedException("Error reply from server");
 
 									}
-									h.dispose();
+									
 									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), reply);
 
 								} catch (IOException ex) {
