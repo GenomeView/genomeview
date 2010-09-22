@@ -34,10 +34,15 @@ public class GVApplet extends JApplet {
 		Authenticator.setDefault(new MyAuthenticator());
 
 		final String configO = getParameter("config");
+		logger.info("ConfigO: "+configO);
 		final String fileO = getParameter("file");
+		logger.info("fileO: "+fileO);
 		final String urlO = getParameter("url");
+		logger.info("urlO: "+urlO);
 		final String positionO = getParameter("position");
+		logger.info("positionO: "+positionO);
 		final String extraO = getParameter("extra");
+		logger.info("extraO: "+extraO);
 
 		final Frame parentFrame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, this);
 
@@ -59,7 +64,7 @@ public class GVApplet extends JApplet {
 
 					InitDataLoader initLoader = new InitDataLoader(model);
 					try {
-						initLoader.init(configO, fileO, urlO, remArgs, positionO);
+						initLoader.init(configO, urlO, fileO, remArgs, positionO);
 					} catch (InterruptedException e) {
 						logger.info(e.getMessage());
 					} catch (ExecutionException e) {
