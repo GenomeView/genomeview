@@ -56,20 +56,14 @@ $all = "";
 foreach ($tracks as $track) {
 	$all .= " ".$baseurl. $track;
 }
-echo $all;
-
-
-
 ?>
+
 <script src="http://www.java.com/js/deployJava.js"></script>
+<script src="http://www.abeel.be/genomeview/deployGV.js"></script>
 <script> 
-	var attributes = { code:'net.sf.genomeview.gui.GVApplet',  width:800, height:500} ; 
-    var parameters = {jnlp_href: "http://genomeview.sf.net/start.jnlp.php?applet=true",
-	extra: "<?php echo $all;?>"} ; 
-    deployJava.runApplet(attributes, parameters, '1.6'); 
+   	var gv_extra="<?php echo $all;?>";
+	startGV(null,null,null,gv_extra,800,600); 
 </script>
-
-
 </body>
 </html>
 
@@ -94,7 +88,7 @@ function dirList($directory) {
 		 * .htaccess
 		 * All *.bam files, the bai will be included
 		 */
-		if (!is_dir($file)&&$file != '.' && $file != '..' && $file != '.htaccess'&&!endsWith($file,".html")&&!endsWith($file,".php")&&!endsWith($file,".bam")&& $file != 'config.local'&& $file != 'index.php')
+		if (!is_dir($file)&&$file != '.' && $file != '..' && $file != '.htaccess'&&!endsWith($file,".html")&&!endsWith($file,".php")&&!endsWith($file,".tbi")&&!endsWith($file,".bam")&& $file != 'config.local'&& $file != 'index.php')
 		$results[] = $file;
 	}
 
