@@ -17,6 +17,7 @@ import javax.swing.TransferHandler;
 import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.task.ReadWorker;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 
 /**
@@ -76,6 +77,8 @@ class DropTransferHandler extends TransferHandler {
 				System.err.println("IOError getting data: " + ex);
 			} catch (UnsupportedFlavorException e) {
 				System.err.println("Unsupported Flavor: " + e);
+			} catch (ReadFailedException ex) {
+				System.err.println("Readfailed exception getting data: " + ex);
 			}
 		}
 		return false;

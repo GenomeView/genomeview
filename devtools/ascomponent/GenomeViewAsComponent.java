@@ -11,11 +11,12 @@ import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MainContent;
 import net.sf.genomeview.gui.task.ReadWorker;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 
 public class GenomeViewAsComponent {
 
-	public static void main(String[] args) throws MalformedURLException, IOException {
+	public static void main(String[] args) throws MalformedURLException, IOException, ReadFailedException {
 		JFrame frame = new JFrame("GenomeView as component demo");
 		Model model=new Model(frame);
 		JPanel[] content=MainContent.createContent(model,1);

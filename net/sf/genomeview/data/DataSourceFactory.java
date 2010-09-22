@@ -20,6 +20,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.cache.CachedURLSource;
 import net.sf.genomeview.data.das.DAS;
 import net.sf.genomeview.data.das.DAS.EntryPoint;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.IndexedFastaDataSource;
@@ -29,10 +30,11 @@ import net.sf.jannot.source.SSL;
 import net.sf.jannot.source.URLSource;
 import net.sf.jannot.tabix.IndexedFeatureFile;
 import be.abeel.io.LineIterator;
+
 /**
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 public class DataSourceFactory {
 	private static Logger log = Logger.getLogger(DataSourceFactory.class.getCanonicalName());
@@ -55,13 +57,13 @@ public class DataSourceFactory {
 		}
 	}
 
-//	private static SAMDataSource constructSAM(URL url) throws IOException {
-//		SSL.certify(url);
-//		return new SAMDataSource(url);
-//
-//	}
+	// private static SAMDataSource constructSAM(URL url) throws IOException {
+	// SSL.certify(url);
+	// return new SAMDataSource(url);
+	//
+	// }
 
-	public static DataSource createURL(URL url) throws IOException {
+	public static DataSource createURL(URL url) throws IOException, ReadFailedException {
 		DataSource indexedSource = tryIndexedStuff(url);
 		if (indexedSource != null) {
 			return indexedSource;
@@ -114,28 +116,35 @@ public class DataSourceFactory {
 		case URL:
 
 			try {
-				String input = JOptionPane.showInputDialog(model.getGUIManager().getParent(), "Give the URL of the data");
+				String input = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+						"Give the URL of the data");
 				if (input != null && input.trim().length() > 0) {
-					URL url=new URL(input.trim());
+					URL url = new URL(input.trim());
 					return new DataSource[] { createURL(url) };
 				} else
 					return null;
 
+			} catch (ReadFailedException re) {
+				JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Could not read data from source: "
+						+ re.getMessage(),"Error!",JOptionPane.ERROR_MESSAGE);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			break;
 		case DAS:
 			try {
-				String url = JOptionPane.showInputDialog(model.getGUIManager().getParent(), "Give the URL of the data").trim();
+				String url = JOptionPane.showInputDialog(model.getGUIManager().getParent(), "Give the URL of the data")
+						.trim();
 				DAS das = new DAS(url);
 				List<String> refs = das.getReferences();
 				Collections.sort(refs);
-				String ref = (String) JOptionPane.showInputDialog(model.getGUIManager().getParent(), "Select reference genome",
-						"Reference selection", JOptionPane.INFORMATION_MESSAGE, null, refs.toArray(), refs.get(0));
+				String ref = (String) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+						"Select reference genome", "Reference selection", JOptionPane.INFORMATION_MESSAGE, null, refs
+								.toArray(), refs.get(0));
 				List<EntryPoint> eps = das.getEntryPoints(ref);
-				EntryPoint ep = (EntryPoint) JOptionPane.showInputDialog(model.getGUIManager().getParent(), "Select entry point",
-						"Entry point selection", JOptionPane.INFORMATION_MESSAGE, null, eps.toArray(), eps.get(0));
+				EntryPoint ep = (EntryPoint) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+						"Select entry point", "Entry point selection", JOptionPane.INFORMATION_MESSAGE, null, eps
+								.toArray(), eps.get(0));
 				das.setEntryPoint(ep);
 				das.setReference(ref);
 				return new DataSource[] { das };
@@ -213,8 +222,8 @@ public class DataSourceFactory {
 		return null;
 	}
 
-	public static DataSource createFile(File file) throws IOException {
-		
+	public static DataSource createFile(File file) throws IOException, ReadFailedException {
+
 		DataSource indexedSource = tryIndexedStuff(file);
 		if (indexedSource != null)
 			return indexedSource;
@@ -230,21 +239,22 @@ public class DataSourceFactory {
 	 * @param in
 	 * @return
 	 * @throws IOException
+	 * @throws ReadFailedException
 	 */
-	private static DataSource tryIndexedStuff(Object in) throws IOException {
+	private static DataSource tryIndexedStuff(Object in) throws IOException, ReadFailedException {
 		String fileName = in.toString();
 		/* Don't try for webservices, that's not going to work */
-		if(fileName.indexOf('&')>=0||fileName.indexOf('?')>=0){
-			log.info("Not trying indexing, this looks like a webservice: "+fileName);
+		if (fileName.indexOf('&') >= 0 || fileName.indexOf('?') >= 0) {
+			log.info("Not trying indexing, this looks like a webservice: " + fileName);
 			return null;
 		}
 		if (fileName.toLowerCase().endsWith("bai")) {
 			if (in instanceof File)
 				return new SAMDataSource(new File(fileName.substring(0, fileName.length() - 4)));
-			if (in instanceof URL){
-				SSL.certify((URL)in);
+			if (in instanceof URL) {
+				SSL.certify((URL) in);
 				return new SAMDataSource(new URL(fileName.substring(0, fileName.length() - 4)));
-				
+
 			}
 		} else {
 			String indexName = fileName + ".fai";
@@ -255,16 +265,16 @@ public class DataSourceFactory {
 				if (in instanceof URL)
 					return new IndexedFastaDataSource((URL) in);
 			}
-			
+
 			indexName = fileName + ".tbi";
 			if (checkExist(in, indexName)) {
 				log.fine("Reading tabix file...");
 				if (in instanceof File)
-					return new IndexedFeatureFile((File) in,8000,50);
+					return new IndexedFeatureFile((File) in, 8000, 50);
 				if (in instanceof URL)
-					return new IndexedFeatureFile((URL) in,8000,50);
+					return new IndexedFeatureFile((URL) in, 8000, 50);
 			}
-			
+
 		}
 		/* No indexing scheme found */
 		return null;
@@ -275,22 +285,26 @@ public class DataSourceFactory {
 			return new File(string).exists();
 		if (in instanceof URL)
 			try {
-				log.fine("Checking: "+string);
-				URLConnection conn=new URL(string).openConnection();
+				log.fine("Checking: " + string);
+				URLConnection conn = new URL(string).openConnection();
 				conn.setUseCaches(false);
 				log.fine(conn.getHeaderFields().toString());
-				LineIterator it=new LineIterator(conn.getInputStream());
+				LineIterator it = new LineIterator(conn.getInputStream());
 				it.setSkipBlanks(true);
-				String line=it.next().trim();
-				while(line.length()<1)
-					line=it.next().trim();
-				log.fine("Checkline: "+line );
+				String line = it.next().trim();
+				while (line.length() < 1)
+					line = it.next().trim();
+				log.fine("Checkline: " + line);
 				it.close();
-				
-				/* This is not supposed to happend, except with badly configured CMS that take over */
-				if(line.startsWith("<!DOCTYPE"))
-					return false;;
-				
+
+				/*
+				 * This is not supposed to happend, except with badly configured
+				 * CMS that take over
+				 */
+				if (line.startsWith("<!DOCTYPE"))
+					return false;
+				;
+
 				return true;
 			} catch (IOException ioe) {
 				System.err.println(ioe);
