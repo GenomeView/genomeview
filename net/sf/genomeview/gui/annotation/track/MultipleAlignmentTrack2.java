@@ -35,6 +35,7 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.alignment.maf.AlignmentBlock;
 import net.sf.jannot.alignment.maf.AlignmentSequence;
 import net.sf.jannot.alignment.maf.MAFMultipleAlignment;
+import net.sf.jannot.utils.SequenceTools;
 
 /**
  * 
@@ -276,7 +277,7 @@ public class MultipleAlignmentTrack2 extends Track {
 								if (as.strand() == Strand.FORWARD)
 									nt = as.seq().get(translated+1,translated+2).iterator().next();
 								else
-									nt = as.seq().get(as.seq().size() - translated,as.seq().size() - translated+1).iterator().next();
+									nt = SequenceTools.complement(as.seq().get(as.seq().size() - translated,as.seq().size() - translated+1).iterator().next());
 								// System.out.println(nt + "\t" + ref[i -
 								// visible.start]);
 								if (ref[i - visible.start] != nt) {
