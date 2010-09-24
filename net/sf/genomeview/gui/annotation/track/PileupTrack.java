@@ -8,9 +8,12 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -18,6 +21,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JViewport;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
@@ -39,7 +43,7 @@ import net.sf.jannot.tabix.PileupWrapper;
  * 
  */
 public class PileupTrack extends Track {
-
+	
 	class PileupTrackModel {
 		private boolean logscaling = false;
 
@@ -52,9 +56,10 @@ public class PileupTrack extends Track {
 		}
 
 	}
-
+	private NumberFormat nf=NumberFormat.getInstance(Locale.US);
 	public PileupTrack(DataKey key, Model model) {
 		super(key, model, true, true);
+		nf.setMaximumFractionDigits(0);
 	}
 
 	private Tooltip tooltip = new Tooltip();
@@ -97,7 +102,7 @@ public class PileupTrack extends Track {
 	private BitSet ready = null;
 	private BitSet running = null;
 	private int[] summary;
-	private int maxPile = 0;
+	private double maxPile = 0;
 	private int maxSummary = 0;
 
 	private static final int CHUNK = 32000;
@@ -175,17 +180,21 @@ public class PileupTrack extends Track {
 		// double topValue = Configuration.getDouble("shortread:topValue");
 		/* Translucent forward reads */
 		Color forwardColor = Configuration.getColor("shortread:forwardColor");
-		//forwardColor = new Color(forwardColor.getRed(), forwardColor.getGreen(), forwardColor.getBlue(), 40);
+		// forwardColor = new Color(forwardColor.getRed(),
+		// forwardColor.getGreen(), forwardColor.getBlue(), 40);
 		/* Translucent reverse reads */
 		Color reverseColor = Configuration.getColor("shortread:reverseColor");
-	//	reverseColor = new Color(reverseColor.getRed(), reverseColor.getGreen(), reverseColor.getBlue(), 40);
+		// reverseColor = new Color(reverseColor.getRed(),
+		// reverseColor.getGreen(), reverseColor.getBlue(), 40);
 
 		int graphLineHeigh = Configuration.getInt("shortread:graphLineHeight");
 
 		final PileupWrapper pw = (PileupWrapper) entry.get(super.dataKey);
 
 		Location visible = model.getAnnotationLocationVisible();
+
 		/* Draw individual piles */
+		double div = maxPile;
 		if (visible.length() < CHUNK) {
 			// System.out.println("Show individual");
 			Iterable<Pile> piles = pw.get(visible.start, visible.end);
@@ -194,23 +203,37 @@ public class PileupTrack extends Track {
 			for (Pile p : piles) {
 
 				int pos = p.getLocation().start;
-				int coverage = p.getCoverage();
-				int fcov = p.getFCoverage();
-				int rcov = p.getRCoverage();
+				double coverage = p.getCoverage();
+				double fcov = p.getFCoverage();
+				double rcov = p.getRCoverage();
+
 				if (coverage > maxPile)
 					maxPile = coverage;
-				double frac = coverage / (double) maxPile;
+				
+
+				/* Max value set, truncate */
+				if (maxValue > 0) {
+					div = maxValue;
+					if (coverage > maxValue)
+						coverage = maxValue;
+					if (rcov > maxValue)
+						rcov = maxValue;
+					if (fcov > maxValue)
+						fcov = maxValue;
+				}
+
+				double frac = coverage / div;
 				int size = (int) (frac * graphLineHeigh);
-				double ffrac = fcov / (double) maxPile;
+				double ffrac = fcov / div;
 				int fsize = (int) (ffrac * graphLineHeigh);
-				double rfrac = rcov / (double) maxPile;
+				double rfrac = rcov / div;
 				int rsize = (int) (rfrac * graphLineHeigh);
 				// System.out.println(size);
 
 				int screenX = Convert.translateGenomeToScreen(pos, visible, screenWidth);
 
 				g.setColor(Color.ORANGE);
-				g.fillRect(screenX, yOffset + graphLineHeigh - size, width, 2*size);
+				g.fillRect(screenX, yOffset + graphLineHeigh - size, width, 2 * size);
 
 				g.setColor(forwardColor);
 				g.fillRect(screenX, yOffset + graphLineHeigh - fsize, width, fsize);
@@ -219,7 +242,21 @@ public class PileupTrack extends Track {
 				g.fillRect(screenX, yOffset + graphLineHeigh, width, rsize);
 			}
 			/* Return twice the size */
-			graphLineHeigh=2*graphLineHeigh;
+			
+			g.setColor(Color.BLACK);
+			/* Draw tick labels */
+			g.drawLine(0, yOffset, 5, yOffset);
+			g.drawLine(0, yOffset+graphLineHeigh, 5, yOffset+graphLineHeigh);
+			g.drawLine(0, yOffset+2*graphLineHeigh, 5, yOffset+2*graphLineHeigh);
+			
+			g.drawString("" + div, 10, yOffset+10);
+			g.drawString("" + div, 10, yOffset+2*graphLineHeigh);
+			g.drawString("0" +
+					"", 10, yOffset+graphLineHeigh+5);
+			g.drawString(StaticUtils.shortify(super.dataKey.toString()), 10, yOffset + graphLineHeigh + 24 - 2);
+		
+			graphLineHeigh = 2 * graphLineHeigh;
+			return graphLineHeigh;
 		} else {/* Draw coverage lines */
 			/* Queue data retrieval */
 			int startChunk = visible.start / CHUNK;
@@ -358,12 +395,20 @@ public class PileupTrack extends Track {
 			g.setColor(Color.BLACK);
 			conservationGP.lineTo(screenWidth + 5, yOffset + graphLineHeigh);
 			g.draw(conservationGP);
+			g.setColor(Color.BLACK);
+			
+			/* Draw tick labels */
+			g.drawLine(0, yOffset, 5, yOffset);
+			
+			
+			g.drawString("" + nf.format(maxSummary/(double)SUMMARYSIZE), 10, yOffset+10);
+			g.drawString("0", 10, yOffset+graphLineHeigh);
+			
+			
+			g.drawString(StaticUtils.shortify(super.dataKey.toString()), 10, yOffset + 24 - 2);
+			return graphLineHeigh;
 
 		}
-
-		g.setColor(Color.BLACK);
-		g.drawString(StaticUtils.shortify(super.dataKey.toString()), 10, yOffset + 24 - 2);
-		return graphLineHeigh;
 
 	}
 
@@ -377,9 +422,13 @@ public class PileupTrack extends Track {
 
 	}
 
+	/* User settable maximum value for charts, use negative for unlimited */
+	private double maxValue = -1;
+
 	@Override
 	public List<JMenuItem> getMenuItems() {
 		ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
+		/* Log scaling of line graph */
 		final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
 		item.setSelected(ptm.isLogscaling());
 		item.setAction(new AbstractAction("Use log scaling for line graph") {
@@ -392,6 +441,26 @@ public class PileupTrack extends Track {
 		});
 		out.add(item);
 
+		/* Maximum value */
+		final JMenuItem item2 = new JMenuItem(new AbstractAction("Set maximum value") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String in = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+						"Input the maximum value, choose a negative number for unlimited", "Input maximum value",
+						JOptionPane.QUESTION_MESSAGE);
+				if (in != null) {
+					try {
+						Double d = Double.parseDouble(in);
+						maxValue = d;
+					} catch (Exception ex) {
+						log.log(Level.WARNING, "Unparseble value for maximum in PileupTrack: " + in, ex);
+					}
+				}
+
+			}
+		});
+		out.add(item2);
 		return out;
 	}
 
@@ -400,3 +469,4 @@ public class PileupTrack extends Track {
 		return "Pileup: " + super.dataKey;
 	}
 }
+
