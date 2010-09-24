@@ -41,7 +41,7 @@ import net.sf.jannot.tabix.PileupWrapper;
 public class PileupTrack extends Track {
 
 	class PileupTrackModel {
-		private boolean logscaling=false;
+		private boolean logscaling = false;
 
 		public boolean isLogscaling() {
 			return logscaling;
@@ -137,7 +137,8 @@ public class PileupTrack extends Track {
 							maxSummary = summary[(p.getPos() - 1) / SUMMARYSIZE];
 					}
 				}
-				//System.out.println("Pilerequest: " + idx + " completed " + maxSummary);
+				// System.out.println("Pilerequest: " + idx + " completed " +
+				// maxSummary);
 				ready.set(idx);
 				if (!queued.get(idx + 1)) {
 					if ((idx + 1) * CHUNK < entry.getMaximumLength()) {
@@ -165,18 +166,26 @@ public class PileupTrack extends Track {
 		if (summary == null || summary.length <= 1) {
 			reset();
 		}
-		//System.out.println("LOG="+ptm.isLogscaling());
+		// System.out.println("LOG="+ptm.isLogscaling());
 		/* Get configuration */
-//		boolean logScaling = Configuration.getBoolean("shortread:logScaling");
-//		double bottomValue = Configuration.getDouble("shortread:bottomValue");
+		// boolean logScaling =
+		// Configuration.getBoolean("shortread:logScaling");
+		// double bottomValue =
+		// Configuration.getDouble("shortread:bottomValue");
 		// double topValue = Configuration.getDouble("shortread:topValue");
+		/* Translucent forward reads */
+		Color forwardColor = Configuration.getColor("shortread:forwardColor");
+		//forwardColor = new Color(forwardColor.getRed(), forwardColor.getGreen(), forwardColor.getBlue(), 40);
+		/* Translucent reverse reads */
+		Color reverseColor = Configuration.getColor("shortread:reverseColor");
+	//	reverseColor = new Color(reverseColor.getRed(), reverseColor.getGreen(), reverseColor.getBlue(), 40);
 
 		int graphLineHeigh = Configuration.getInt("shortread:graphLineHeight");
 
 		final PileupWrapper pw = (PileupWrapper) entry.get(super.dataKey);
 
-		// System.out.println("PW=" + pw);
 		Location visible = model.getAnnotationLocationVisible();
+		/* Draw individual piles */
 		if (visible.length() < CHUNK) {
 			// System.out.println("Show individual");
 			Iterable<Pile> piles = pw.get(visible.start, visible.end);
@@ -186,18 +195,32 @@ public class PileupTrack extends Track {
 
 				int pos = p.getLocation().start;
 				int coverage = p.getCoverage();
+				int fcov = p.getFCoverage();
+				int rcov = p.getRCoverage();
 				if (coverage > maxPile)
 					maxPile = coverage;
 				double frac = coverage / (double) maxPile;
 				int size = (int) (frac * graphLineHeigh);
-
+				double ffrac = fcov / (double) maxPile;
+				int fsize = (int) (ffrac * graphLineHeigh);
+				double rfrac = rcov / (double) maxPile;
+				int rsize = (int) (rfrac * graphLineHeigh);
 				// System.out.println(size);
+
 				int screenX = Convert.translateGenomeToScreen(pos, visible, screenWidth);
-				g.fillRect(screenX, yOffset + graphLineHeigh - size, width, size);
 
+				g.setColor(Color.ORANGE);
+				g.fillRect(screenX, yOffset + graphLineHeigh - size, width, 2*size);
+
+				g.setColor(forwardColor);
+				g.fillRect(screenX, yOffset + graphLineHeigh - fsize, width, fsize);
+
+				g.setColor(reverseColor);
+				g.fillRect(screenX, yOffset + graphLineHeigh, width, rsize);
 			}
-
-		} else {
+			/* Return twice the size */
+			graphLineHeigh=2*graphLineHeigh;
+		} else {/* Draw coverage lines */
 			/* Queue data retrieval */
 			int startChunk = visible.start / CHUNK;
 			int endChunk = visible.end / CHUNK;
@@ -243,7 +266,7 @@ public class PileupTrack extends Track {
 
 			int vs = visible.start / SUMMARYSIZE * SUMMARYSIZE + SUMMARYSIZE / 2;
 			double topValue = maxSummary;
-			//double range = topValue - bottomValue;
+			// double range = topValue - bottomValue;
 
 			conservationGP.moveTo(-5, yOffset + graphLineHeigh);
 
@@ -278,17 +301,17 @@ public class PileupTrack extends Track {
 
 				// if (valF < bottomValue)
 				// valF = bottomValue;
-//				// valR = bottomValue;
-//				if (val < bottomValue)
-//					val = bottomValue;
+				// // valR = bottomValue;
+				// if (val < bottomValue)
+				// val = bottomValue;
 
 				/* Translate for bottom point */
 				// valF -= bottomValue;
 				// valR -= bottomValue;
-//				val -= bottomValue;
+				// val -= bottomValue;
 				/* Logaritmic scaling */
 				if (ptm.isLogscaling()) {
-					val = log2(val + 1);	
+					val = log2(val + 1);
 					val /= log2(maxSummary);
 					/* Regular scaling */
 				} else {
@@ -359,7 +382,7 @@ public class PileupTrack extends Track {
 		ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
 		final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
 		item.setSelected(ptm.isLogscaling());
-		item.setAction(new AbstractAction("Use log scaling") {
+		item.setAction(new AbstractAction("Use log scaling for line graph") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ptm.setLogscaling(item.isSelected());
