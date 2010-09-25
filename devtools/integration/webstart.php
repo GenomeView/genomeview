@@ -3,9 +3,6 @@ $baseurl = substr($_SERVER["SCRIPT_URI"], 0, strripos($_SERVER["SCRIPT_URI"], "/
 $basedir = substr($_SERVER["SCRIPT_FILENAME"], 0, strripos($_SERVER["SCRIPT_FILENAME"], "/") + 1);
 
 $tracks = dirList($basedir . ".");
-?>
-
-<?php
 
 /* We very strongly recommend using the central GenomeView release. 
  * This version is always up to date and is distributed through the
