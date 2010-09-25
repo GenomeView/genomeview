@@ -10,7 +10,7 @@ $tracks = dirList($basedir . ".");
 /* We very strongly recommend using the central GenomeView release. 
  * This version is always up to date and is distributed through the
  * global Sourceforge download mirror network */ 
-$starturl='http://genomeview.sf.net/start.jnlp.php?--config ' . $baseurl . 'config.local';
+$starturl='http://genomeview.org/start/snapshot.jnlp?--config ' . $baseurl . 'config.local';
 
 $all = "";
 foreach ($tracks as $track) {

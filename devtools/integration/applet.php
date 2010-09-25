@@ -59,7 +59,7 @@ foreach ($tracks as $track) {
 ?>
 
 <script src="http://www.java.com/js/deployJava.js"></script>
-<script src="http://www.abeel.be/genomeview/deployGV.js"></script>
+<script src="http://genomeview.org/start/deployGV.js"></script>
 <script> 
    	var gv_extra="<?php echo $all;?>";
 	startGV(null,null,null,gv_extra,800,600); 
