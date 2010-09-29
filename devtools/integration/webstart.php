@@ -39,7 +39,7 @@ function dirList($directory) {
 		 * .htaccess
 		 * All *.bam files, the bai will be included
 		 */
-		if ($file != '.' && $file != '..' && $file != '.htaccess'&&!endsWith($file,".bam")&& $file != 'config.local'&& $file != 'index.php')
+				if (!is_dir($file)&&$file != '.' && $file != '..' && $file != '.htaccess'&&!endsWith($file,".html")&&!endsWith($file,".php")&&!endsWith($file,".tbi")&&!endsWith($file,".bam")&& $file != 'config.local'&& $file != 'index.php')
 			$results[] = $file;
 	}
 
