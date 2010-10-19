@@ -223,7 +223,7 @@ public class MultipleAlignmentTrack extends Track {
 
 					FontMetrics metrics = g.getFontMetrics();
 					int hgt = metrics.getHeight();
-					int adv = metrics.stringWidth(this.displayName());
+					int adv = metrics.stringWidth(alignment.name());
 
 					g.setColor(Color.WHITE);
 					g.fillRect(10, yOffset + lineHeigh - hgt, adv + 2, hgt + 2);
