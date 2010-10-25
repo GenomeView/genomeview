@@ -10,7 +10,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Locale;
@@ -46,7 +45,7 @@ import net.sf.jannot.tabix.PileupWrapper;
  * 
  */
 public class PileupTrack extends Track {
-	
+
 	class PileupTrackModel {
 		private boolean logscaling = false;
 
@@ -59,7 +58,9 @@ public class PileupTrack extends Track {
 		}
 
 	}
-	private NumberFormat nf=NumberFormat.getInstance(Locale.US);
+
+	private NumberFormat nf = NumberFormat.getInstance(Locale.US);
+
 	public PileupTrack(DataKey key, Model model) {
 		super(key, model, true, true);
 		nf.setMaximumFractionDigits(0);
@@ -69,12 +70,14 @@ public class PileupTrack extends Track {
 	private PileupTrackModel ptm = new PileupTrackModel();
 
 	private class Tooltip extends JWindow {
-
+		private NumberFormat nf=NumberFormat.getPercentInstance(Locale.US);
+		
 		private static final long serialVersionUID = -7416732151483650659L;
 
 		private JLabel floater = new JLabel();
 
 		public Tooltip() {
+			nf.setMaximumFractionDigits(1);
 			floater.setBackground(Color.GRAY);
 			floater.setForeground(Color.BLACK);
 			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
@@ -84,7 +87,55 @@ public class PileupTrack extends Track {
 			pack();
 		}
 
+		public void set(MouseEvent e) {
+			if (isDetailed() && nc != null) {
+				StringBuffer text = new StringBuffer();
+				text.append("<html>");
+				
+				int start=model.getAnnotationLocationVisible().start;
+				int xGenome=Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(), screenWidth);
+				int effectivePosition=xGenome-start;
+				int total=nc.getTotalCount(xGenome-start);
+				
+				
+				text.append("<strong>Matches:</strong>:"+format(nc.getCount('.', effectivePosition),total)+"<br/>");
+				
+				text.append("<strong>Mismatches:</strong><br/>");
+				text.append("A: "+format(nc.getCount('A', effectivePosition),total));
+				text.append("<br/>");
+				text.append("T: "+format(nc.getCount('T', effectivePosition),total));
+				text.append("<br/>");
+				text.append("G: "+format(nc.getCount('G', effectivePosition),total));
+				text.append("<br/>");
+				text.append("C: "+format(nc.getCount('C', effectivePosition),total));
+				text.append("<br/>");
+				//System.out.println("xGEnome: "+xGenome+"\t"+(xGenome-start));
+//				byte[] bases = sri.esr.getReadBases();
+//				for (int i = sri.start; i < sri.start + sri.len; i++) {
+//					text.append((char) bases[i]);
+//				}
+				//text.append("<br/>");
+
+				text.append("</html>");
+				if (!text.toString().equals(floater.getText())) {
+					floater.setText(text.toString());
+					this.pack();
+				}
+				setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
+
+				if (!isVisible()) {
+					setVisible(true);
+				}
+			}
+		}
+
+		private String format(int count, int total) {
+			return count+" ("+nf.format(count/(double)total)+")";
+		}
 	}
+
+	/* Keeps track of the last screenwidht used for drawing, needed for coordinate conversion */
+	private double screenWidth;
 
 	@Override
 	public boolean mouseExited(int x, int y, MouseEvent source) {
@@ -96,6 +147,7 @@ public class PileupTrack extends Track {
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
+		tooltip.set(source);
 		return false;
 	}
 
@@ -168,6 +220,7 @@ public class PileupTrack extends Track {
 			}
 		}
 	}
+
 	class NucCounter {
 		int[][] counter;
 
@@ -181,7 +234,7 @@ public class PileupTrack extends Track {
 
 		public void init(int len) {
 			if (counter == null)
-				/* 4 nucleotides and N */
+				/* 4 nucleotides and N and other symbols */
 				counter = new int[6][len];
 
 		}
@@ -191,7 +244,7 @@ public class PileupTrack extends Track {
 		}
 
 		public int getTotalCount(int pos) {
-			return counter[0][pos] + counter[1][pos] + counter[2][pos] + counter[3][pos]+counter[5][pos];
+			return counter[0][pos] + counter[1][pos] + counter[2][pos] + counter[3][pos] + counter[5][pos];
 		}
 
 		private int ix(char nuc) {
@@ -220,19 +273,28 @@ public class PileupTrack extends Track {
 		}
 
 		public void count(char nuc, int pos) {
-//			System.out.println("P:"+pos);
-			//System.out.println("Miss: "+nuc+"\t"+pos);
-			int ix=ix(nuc);
-			if(ix>=0&&pos>=0&&pos<counter[0].length)
+			// System.out.println("P:"+pos);
+			// System.out.println("Miss: "+nuc+"\t"+pos);
+			int ix = ix(nuc);
+			if (ix >= 0 && pos >= 0 && pos < counter[0].length)
 				counter[ix][pos]++;
 		}
 	}
+
+	private boolean isDetailed() {
+		return model.getAnnotationLocationVisible().length() < CHUNK;
+	}
+
+	/* Data for detailed zoom */
+	private NucCounter nc;
+
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
 		if (summary == null || summary.length <= 1) {
 			reset();
 		}
-		
+		nc = null;
+
 		Color forwardColor = Configuration.getColor("shortread:forwardColor");
 		Color reverseColor = Configuration.getColor("shortread:reverseColor");
 		int graphLineHeigh = Configuration.getInt("shortread:graphLineHeight");
@@ -240,25 +302,25 @@ public class PileupTrack extends Track {
 		final PileupWrapper pw = (PileupWrapper) entry.get(super.dataKey);
 
 		Location visible = model.getAnnotationLocationVisible();
-
+		this.screenWidth=screenWidth;
 		/* Draw individual piles */
 		double div = maxPile;
-		if (visible.length() < CHUNK) {
+		if (isDetailed()) {
 			/* Variables for SNP track */
-			NucCounter nc = new NucCounter();
+			nc = new NucCounter();
 			nc.init(visible.length());
-//			int snpOffset = yOffset;
+			// int snpOffset = yOffset;
 			int snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
 			int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
-			
+
 			// System.out.println("Show individual");
 			Iterable<Pile> piles = pw.get(visible.start, visible.end);
 			g.setColor(Color.GRAY);
 			int width = (int) Math.ceil(screenWidth / visible.length());
 			for (Pile p : piles) {
-				if(p.getPos()<visible.start||p.getPos()>visible.end)
+				if (p.getPos() < visible.start || p.getPos() > visible.end)
 					continue;
-				count(nc,p,visible);
+				count(nc, p, visible);
 				int pos = p.getLocation().start;
 				double coverage = p.getCoverage();
 				double fcov = p.getFCoverage();
@@ -266,7 +328,6 @@ public class PileupTrack extends Track {
 
 				if (coverage > maxPile)
 					maxPile = coverage;
-				
 
 				/* Max value set, truncate */
 				if (maxValue > 0) {
@@ -298,29 +359,26 @@ public class PileupTrack extends Track {
 				g.setColor(reverseColor);
 				g.fillRect(screenX, yOffset + graphLineHeigh, width, rsize);
 			}
-			
-			
+
 			g.setColor(Color.BLACK);
-			
-			
-			
-			yOffset+=2*graphLineHeigh;
-			
-			//System.out.println("DD:"+Arrays.deepToString(nc.counter));
-			
+
+			yOffset += 2 * graphLineHeigh;
+
+			// System.out.println("DD:"+Arrays.deepToString(nc.counter));
+
 			/*
-			 * Draw SNP track if possible. This depends on drawing the individual
-			 * reads first as during the iteration over all reads, we store the
-			 * polymorphisms.
+			 * Draw SNP track if possible. This depends on drawing the
+			 * individual reads first as during the iteration over all reads, we
+			 * store the polymorphisms.
 			 */
-			
-			Sequence sb=entry.sequence().subsequence(visible.start, visible.end + 1);
+
+			Sequence sb = entry.sequence().subsequence(visible.start, visible.end + 1);
 			char[] seqBuffer = new char[visible.length()];
 			int idx = 0;
-			for(char cc:sb.get()){
+			for (char cc : sb.get()) {
 				seqBuffer[idx++] = cc;
 			}
-			//System.out.println("Array: "+Arrays.toString(seqBuffer));
+			// System.out.println("Array: "+Arrays.toString(seqBuffer));
 
 			char[] nucs = new char[] { 'A', 'T', 'G', 'C' };
 			Color[] color = new Color[4];
@@ -328,28 +386,29 @@ public class PileupTrack extends Track {
 				color[i] = Configuration.getNucleotideColor(nucs[i]);
 			int nucWidth = (int) (Math.ceil(screenWidth / visible.length()));
 			if (nc.hasData() && seqBuffer != null) {
-				
+
 				g.setColor(Colors.LIGHEST_GRAY);
 				g.fillRect(0, yOffset, (int) screenWidth, snpTrackHeight);
 				g.setColor(Color.LIGHT_GRAY);
 				g.drawLine(0, yOffset + snpTrackHeight / 2, (int) screenWidth, yOffset + snpTrackHeight / 2);
 				g.setColor(Color.BLACK);
 				g.drawString("SNPs", 5, yOffset + snpTrackHeight - 4);
-				//System.out.println("Drawing snps: "+visible);
+				// System.out.println("Drawing snps: "+visible);
 				for (int i = visible.start; i <= visible.end; i++) {
 					int x1 = Convert.translateGenomeToScreen(i, visible, screenWidth);
 					double total = nc.getTotalCount(i - visible.start);
 					char refNt = seqBuffer[i - visible.start];
 					double done = 0;// Fraction gone to previous nucs
-					//System.out.println(seqBuffer[i - visible.start]+" "+total);
+					// System.out.println(seqBuffer[i -
+					// visible.start]+" "+total);
 					if (total > snpTrackMinimumCoverage) {
 						for (int j = 0; j < 4; j++) {
 							if (nucs[j] != refNt) {
 								double fraction = nc.getCount(nucs[j], i - visible.start) / total;
 								fraction *= snpTrackHeight;
 								g.setColor(color[j]);
-								g.fillRect(x1, (int) (yOffset + snpTrackHeight - fraction - done), nucWidth, (int) (Math
-										.ceil(fraction)));
+								g.fillRect(x1, (int) (yOffset + snpTrackHeight - fraction - done), nucWidth,
+										(int) (Math.ceil(fraction)));
 								done += fraction;
 							}
 						}
@@ -360,16 +419,15 @@ public class PileupTrack extends Track {
 			/* Draw tick labels on coverage plot */
 			g.setColor(Color.BLACK);
 			g.drawLine(0, yOffset, 5, yOffset);
-			g.drawLine(0, yOffset-graphLineHeigh, 5, yOffset-graphLineHeigh);
-			g.drawLine(0, yOffset-2*graphLineHeigh, 5, yOffset-2*graphLineHeigh);
-			
-			g.drawString("" + div, 10, yOffset+10);
-			g.drawString("" + div, 10, yOffset-2*graphLineHeigh);
-			g.drawString("0" +
-					"", 10, yOffset-graphLineHeigh+5);
+			g.drawLine(0, yOffset - graphLineHeigh, 5, yOffset - graphLineHeigh);
+			g.drawLine(0, yOffset - 2 * graphLineHeigh, 5, yOffset - 2 * graphLineHeigh);
+
+			g.drawString("" + div, 10, yOffset + 10);
+			g.drawString("" + div, 10, yOffset - 2 * graphLineHeigh);
+			g.drawString("0" + "", 10, yOffset - graphLineHeigh + 5);
 			g.drawString(StaticUtils.shortify(super.dataKey.toString()), 10, yOffset - graphLineHeigh + 24 - 2);
-			
-			return 2*graphLineHeigh+snpTrackHeight;
+
+			return 2 * graphLineHeigh + snpTrackHeight;
 		} else {/* Draw coverage lines */
 			/* Queue data retrieval */
 			int startChunk = visible.start / CHUNK;
@@ -509,15 +567,13 @@ public class PileupTrack extends Track {
 			conservationGP.lineTo(screenWidth + 5, yOffset + graphLineHeigh);
 			g.draw(conservationGP);
 			g.setColor(Color.BLACK);
-			
+
 			/* Draw tick labels */
 			g.drawLine(0, yOffset, 5, yOffset);
-			
-			
-			g.drawString("" + nf.format(maxSummary/(double)SUMMARYSIZE), 10, yOffset+10);
-			g.drawString("0", 10, yOffset+graphLineHeigh);
-			
-			
+
+			g.drawString("" + nf.format(maxSummary / (double) SUMMARYSIZE), 10, yOffset + 10);
+			g.drawString("0", 10, yOffset + graphLineHeigh);
+
 			g.drawString(StaticUtils.shortify(super.dataKey.toString()), 10, yOffset + 24 - 2);
 			return graphLineHeigh;
 
@@ -526,14 +582,14 @@ public class PileupTrack extends Track {
 	}
 
 	private void count(NucCounter nc, Pile p, Location visible) {
-		//System.out.print("P: "+p.getPos());
-		for(byte b:p.getBases()){
-			char c=(char)b;
-			//System.out.print(" "+c);
-			nc.count(c, p.getPos()-visible.start);
+		// System.out.print("P: "+p.getPos());
+		for (byte b : p.getBases()) {
+			char c = (char) b;
+			// System.out.print(" "+c);
+			nc.count(c, p.getPos() - visible.start);
 		}
-		//.out.println();
-		
+		// .out.println();
+
 	}
 
 	private void reset() {
@@ -593,4 +649,3 @@ public class PileupTrack extends Track {
 		return "Pileup: " + super.dataKey;
 	}
 }
-
