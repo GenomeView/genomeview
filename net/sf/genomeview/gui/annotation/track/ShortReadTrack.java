@@ -67,6 +67,8 @@ public class ShortReadTrack extends Track {
 		}
 
 		public void set(MouseEvent e, ShortReadInsertion sri) {
+			if(sri==null)
+				return;
 			StringBuffer text = new StringBuffer();
 			text.append("<html>");
 			// text.append("Forward coverage : "
