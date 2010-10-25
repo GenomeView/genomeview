@@ -25,6 +25,7 @@ import net.sf.genomeview.gui.components.StrandCombo;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
+import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Qualifier;
 import be.abeel.gui.GridBagPanel;
 import be.abeel.gui.TitledComponent;
@@ -131,7 +132,16 @@ public class EditFeatureWindow extends JDialog {
 						warning = true;
 					}
 					feature.setStrand(strandSelection.getStrand());
-					feature.setType(typeSelection.getTerm());
+					
+					if(feature.type()!=typeSelection.getTerm()){
+						MemoryFeatureAnnotation mf=model.getSelectedEntry().getMemoryAnnotation(feature.type());
+						mf.remove(feature);
+						feature.setType(typeSelection.getTerm());
+						mf=model.getSelectedEntry().getMemoryAnnotation(typeSelection.getTerm());
+						mf.add(feature);
+						
+						
+					}
 
 					try {
 //						feature.setMute(true);
