@@ -12,6 +12,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.BitSet;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -21,7 +22,6 @@ import javax.swing.JWindow;
 import javax.swing.border.Border;
 
 import net.sf.genomeview.core.ColorGradient;
-import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
@@ -159,12 +159,12 @@ public class ShortReadTrack extends Track {
 	// private double log2(double d) {
 	// return Math.log(d) / LOG2;
 	// }
-	//private boolean insertionsVisible = false;
+	// private boolean insertionsVisible = false;
 
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
 		paintedBlocks.clear();
-		
+
 		this.view = view;
 		// /* Store information to be used in other methods */
 		// currentEntry = entry;
@@ -245,11 +245,13 @@ public class ShortReadTrack extends Track {
 		boolean stackExceeded = false;
 		boolean enablePairing = Configuration.getBoolean("shortread:enablepairing");
 
-//		/* Variables for SNP track */
-//		NucCounter nc = new NucCounter();
-//		int snpOffset = yOffset;
-//		int snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
-//		int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
+		// /* Variables for SNP track */
+		// NucCounter nc = new NucCounter();
+		// int snpOffset = yOffset;
+		// int snpTrackHeight =
+		// Configuration.getInt("shortread:snpTrackHeight");
+		// int snpTrackMinimumCoverage =
+		// Configuration.getInt("shortread:snpTrackMinimumCoverage");
 
 		int readLineHeight = 3;
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
@@ -258,8 +260,8 @@ public class ShortReadTrack extends Track {
 			 * needs to be drawn above the reads
 			 */
 			readLineHeight = 14;
-//			yOffset += snpTrackHeight;
-//			nc.init(currentVisible.length());
+			// yOffset += snpTrackHeight;
+			// nc.init(currentVisible.length());
 		}
 
 		if (reads != null) {
@@ -387,44 +389,49 @@ public class ShortReadTrack extends Track {
 				yOffset += 25;
 
 		}
-//		/*
-//		 * Draw SNP track if possible. This depends on drawing the individual
-//		 * reads first as during the iteration over all reads, we store the
-//		 * polymorphisms.
-//		 */
-//
-//		char[] nucs = new char[] { 'A', 'T', 'G', 'C' };
-//		Color[] color = new Color[4];
-//		for (int i = 0; i < 4; i++)
-//			color[i] = Configuration.getNucleotideColor(nucs[i]);
-//		int nucWidth = (int) (Math.ceil(screenWidth / currentVisible.length()));
-//		if (true && nc.hasData() && seqBuffer != null) {
-//			g.setColor(Colors.LIGHEST_GRAY);
-//			g.fillRect(0, snpOffset, (int) screenWidth, snpTrackHeight);
-//			g.setColor(Color.LIGHT_GRAY);
-//			g.drawLine(0, snpOffset + snpTrackHeight / 2, (int) screenWidth, snpOffset + snpTrackHeight / 2);
-//			g.setColor(Color.BLACK);
-//			g.drawString("SNPs", 5, snpOffset + snpTrackHeight - 4);
-//			for (int i = currentVisible.start; i <= currentVisible.end; i++) {
-//				int x1 = Convert.translateGenomeToScreen(i, currentVisible, screenWidth);
-//				double total = nc.getTotalCount(i - currentVisible.start);
-//				char refNt = seqBuffer[i - currentVisible.start];
-//				double done = 0;// Fraction gone to previous nucs
-//				if (total > snpTrackMinimumCoverage) {
-//					for (int j = 0; j < 4; j++) {
-//						if (nucs[j] != refNt) {
-//							double fraction = nc.getCount(nucs[j], i - currentVisible.start) / total;
-//							fraction *= snpTrackHeight;
-//							g.setColor(color[j]);
-//							g.fillRect(x1, (int) (snpOffset + snpTrackHeight - fraction - done), nucWidth, (int) (Math
-//									.ceil(fraction)));
-//							done += fraction;
-//						}
-//					}
-//				}
-//
-//			}
-//		}
+		// /*
+		// * Draw SNP track if possible. This depends on drawing the individual
+		// * reads first as during the iteration over all reads, we store the
+		// * polymorphisms.
+		// */
+		//
+		// char[] nucs = new char[] { 'A', 'T', 'G', 'C' };
+		// Color[] color = new Color[4];
+		// for (int i = 0; i < 4; i++)
+		// color[i] = Configuration.getNucleotideColor(nucs[i]);
+		// int nucWidth = (int) (Math.ceil(screenWidth /
+		// currentVisible.length()));
+		// if (true && nc.hasData() && seqBuffer != null) {
+		// g.setColor(Colors.LIGHEST_GRAY);
+		// g.fillRect(0, snpOffset, (int) screenWidth, snpTrackHeight);
+		// g.setColor(Color.LIGHT_GRAY);
+		// g.drawLine(0, snpOffset + snpTrackHeight / 2, (int) screenWidth,
+		// snpOffset + snpTrackHeight / 2);
+		// g.setColor(Color.BLACK);
+		// g.drawString("SNPs", 5, snpOffset + snpTrackHeight - 4);
+		// for (int i = currentVisible.start; i <= currentVisible.end; i++) {
+		// int x1 = Convert.translateGenomeToScreen(i, currentVisible,
+		// screenWidth);
+		// double total = nc.getTotalCount(i - currentVisible.start);
+		// char refNt = seqBuffer[i - currentVisible.start];
+		// double done = 0;// Fraction gone to previous nucs
+		// if (total > snpTrackMinimumCoverage) {
+		// for (int j = 0; j < 4; j++) {
+		// if (nucs[j] != refNt) {
+		// double fraction = nc.getCount(nucs[j], i - currentVisible.start) /
+		// total;
+		// fraction *= snpTrackHeight;
+		// g.setColor(color[j]);
+		// g.fillRect(x1, (int) (snpOffset + snpTrackHeight - fraction - done),
+		// nucWidth, (int) (Math
+		// .ceil(fraction)));
+		// done += fraction;
+		// }
+		// }
+		// }
+		//
+		// }
+		// }
 		/* Draw label */
 		String name = StaticUtils.shortify(super.dataKey.toString());
 		FontMetrics metrics = g.getFontMetrics();
@@ -447,8 +454,6 @@ public class ShortReadTrack extends Track {
 			return tilingCounter[0].nextClearBit(0);
 
 	}
-
-	
 
 	/* Keeps track of the short-read insertions */
 	private Map<Rectangle, ShortReadInsertion> paintedBlocks = new HashMap<Rectangle, ShortReadInsertion>();
@@ -480,9 +485,7 @@ public class ShortReadTrack extends Track {
 			// that it doesn't happen when all goes well.
 			System.err.println("This happens!");
 		}
-		// /* BAM read, has quality information */
-		// if (rf instanceof ShortReadTools) {
-		// ShortReadTools esr = (ShortReadTools) rf;
+
 		int qual = rf.getMappingQuality();
 		if (c == forwardColor)
 			g.setColor(forwardGradient.getColor(qual));
@@ -493,6 +496,8 @@ public class ShortReadTrack extends Track {
 		g.setColor(c);
 		g.drawRect(subX1, yRec, subX2 - subX1, readLineHeight - 2);
 
+		
+
 		/* Check mismatches */
 		if (entry.sequence().size() == 0)
 			return;
@@ -501,9 +506,6 @@ public class ShortReadTrack extends Track {
 			if (entry.sequence().size() == 0)
 				return;
 			if (seqBuffer == null) {
-				// seqBuffer =
-				// entry.sequence().getSubSequence(currentVisible.start,
-				// currentVisible.end + 1).toCharArray();
 
 				Iterable<Character> bufferedSeq = entry.sequence().get(currentVisible.start, currentVisible.end + 1);
 
@@ -512,7 +514,6 @@ public class ShortReadTrack extends Track {
 				for (char cc : bufferedSeq) {
 					seqBuffer[idx++] = cc;
 				}
-				// System.out.println("SS:"+new String(seqBuffer));
 
 			}
 			byte[] readNts = ShortReadTools.construct(rf);
@@ -540,7 +541,7 @@ public class ShortReadTrack extends Track {
 						break;
 					default:/* Mismatch */
 						g.setColor(Color.ORANGE);
-						//nc.count(readNt, j - currentVisible.start);
+						// nc.count(readNt, j - currentVisible.start);
 						break;
 					}
 					int width = (int) (tx2 - tx1);
@@ -563,8 +564,6 @@ public class ShortReadTrack extends Track {
 
 					}
 
-				} else {
-				//	nc.count(readNt, j - currentVisible.start);
 				}
 			}
 
@@ -595,9 +594,63 @@ public class ShortReadTrack extends Track {
 				}
 				esrPos += ce.getLength();
 			}
+		}else{
+			
+			int[][] locs = splice(rf);
+			for(int i=0;i<locs[0].length;i++){
+				int lx1 = Convert.translateGenomeToScreen(rf.getAlignmentStart()+locs[0][i], currentVisible, screenWidth);
+				int lx2 = Convert.translateGenomeToScreen(rf.getAlignmentStart()+locs[1][i], currentVisible, screenWidth);
+				g.setColor(pairingColor);
+				g.fillRect(lx1, yRec, lx2-lx1, readLineHeight-1);
+			}
 		}
 		// }
 
+	}
+
+	private int[][] splice(SAMRecord rf) {
+		List<CigarElement> list = rf.getCigar().getCigarElements();
+		int len = 0;
+		for (CigarElement ce : list) {
+			if (ce.getOperator() == CigarOperator.N) {
+				len++;
+			}
+
+		}
+		int[][] out = new int[2][len];
+		int idx = 0;
+		int pos = 0;
+		for (CigarElement ce : list) {
+			switch (ce.getOperator()) {
+			case I:
+				// pos+=ce.getLength();
+				// System.out.println("I: "+pos);
+				break;
+			case N:
+				out[0][idx] = pos;
+				pos += +ce.getLength();
+				out[1][idx] = pos;
+				idx++;
+				break;
+			case D:
+				// System.out.println("D: "+pos);
+				pos += ce.getLength();
+				break;
+			case M:
+				pos += ce.getLength();
+				break;
+			case S:
+				// //out[pos] = readBases[superPos];
+				// //pos++;
+				// superPos++;
+				break;
+			case H:
+				// i++;
+				break;
+			default:
+			}
+		}
+		return out;
 	}
 
 	private class ShortReadInsertion {
