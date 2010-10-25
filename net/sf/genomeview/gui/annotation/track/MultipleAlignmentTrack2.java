@@ -181,9 +181,13 @@ public class MultipleAlignmentTrack2 extends Track {
 		g.setColor(Color.BLACK);
 		Location visible = model.getAnnotationLocationVisible();
 
-		int estCount = (int) (model.getAnnotationLocationVisible().length() / (double) entry.getMaximumLength() * ma
+		double frac=model.getAnnotationLocationVisible().length() / (double) entry.getMaximumLength();
+//		System.out.println("Visible fraction: "+frac+"\t"+entry.getMaximumLength());
+		int estCount = (int) (frac * ma
 				.size());
-		// System.out.println("Number of alignment blocks: "+ma.size());
+		
+//		System.out.println("Number of alignment blocks: "+ma.size());
+//		System.out.println("Est. count: "+estCount);
 		if (estCount > 10000) {
 			g.drawString("Too many alignment blocks, zoom in to see multiple alignments", 10, yOffset + 10);
 			// System.out.println("estimated count="+estCount);
