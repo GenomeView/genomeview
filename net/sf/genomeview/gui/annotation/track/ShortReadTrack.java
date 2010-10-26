@@ -45,7 +45,7 @@ import net.sf.samtools.SAMRecord;
 public class ShortReadTrack extends Track {
 
 	public ShortReadTrack(DataKey key, Model model) {
-		super(key, model, true, true);
+		super(key, model, true, false);
 	}
 
 	private Tooltip tooltip = new Tooltip();

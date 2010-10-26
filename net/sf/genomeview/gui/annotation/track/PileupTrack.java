@@ -70,7 +70,7 @@ public class PileupTrack extends Track {
 	private NumberFormat nf = NumberFormat.getInstance(Locale.US);
 
 	public PileupTrack(DataKey key, Model model) {
-		super(key, model, true, true);
+		super(key, model, true, false);
 		nf.setMaximumFractionDigits(0);
 	}
 
