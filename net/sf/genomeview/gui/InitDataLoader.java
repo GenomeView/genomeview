@@ -76,7 +76,7 @@ public class InitDataLoader {
 		} else if (cmdFile != null) {
 			logger.info("File commandline option is set: " + cmdFile);
 			try {
-				data = new DataSource[] { new FileSource(new File(cmdFile)) };
+				data = new DataSource[] { DataSourceFactory.createFile(new File(cmdFile)) };
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -98,7 +98,7 @@ public class InitDataLoader {
 			logger.info("loading additional from commandline: " + s);
 			try {
 				if (!s.startsWith("http:") && !s.startsWith("ftp:") && !s.startsWith("https:")) {
-					DataSource ds = new FileSource(new File(s));
+					DataSource ds = DataSourceFactory.createFile(new File(s));
 
 					ReadWorker rf = new ReadWorker(ds, model);
 					rf.execute();
