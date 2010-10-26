@@ -231,9 +231,9 @@ public class Model extends Observable implements IModel {
 		}
 		if (newZoom.length() != annotationEnd - annotationStart + 1 && newZoom.length() < 50)
 			return;
-		if (newZoom.length() != annotationEnd - annotationStart + 1
-				&& newZoom.length() > Configuration.getInt("general:zoomout"))
-			return;
+//		if (newZoom.length() != annotationEnd - annotationStart + 1
+//				&& newZoom.length() > Configuration.getInt("general:zoomout"))
+//			return;
 		if (newZoom.start < 1 || newZoom.end < 1)
 			return;
 
