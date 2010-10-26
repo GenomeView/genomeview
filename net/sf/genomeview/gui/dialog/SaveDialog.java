@@ -3,6 +3,7 @@
  */
 package net.sf.genomeview.gui.dialog;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -24,6 +26,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.ClientHttpUpload;
@@ -170,14 +173,15 @@ public class SaveDialog extends JDialog {
 										throw new SaveFailedException("Empty reply from server");
 
 									}
-								
+
 									if (reply.toLowerCase().contains("error")) {
-										JOptionPane.showMessageDialog(null, reply);
+										showServerMessage(reply);
 										throw new SaveFailedException("Error reply from server");
 
 									}
-									
-									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), reply);
+									showServerMessage(reply);
+									// JOptionPane.showMessageDialog(model.getGUIManager().getParent(),
+									// reply);
 
 								} catch (IOException ex) {
 
@@ -200,6 +204,28 @@ public class SaveDialog extends JDialog {
 							ex.printStackTrace();
 						}
 						h.dispose();
+					}
+
+					private void showServerMessage(String reply) {
+						final JDialog diag = new JDialog(model.getGUIManager().getParent());
+						JTextArea txt = new JTextArea(10, 20);
+						txt.setEditable(false);
+						txt.setText(reply);
+						diag.setTitle("Server reply");
+						diag.getContentPane().setLayout(new BorderLayout());
+						diag.getContentPane().add(txt, BorderLayout.CENTER);
+						diag.getContentPane().add(new JButton(new AbstractAction("OK") {
+
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								diag.dispose();
+							}
+
+						}),BorderLayout.SOUTH);
+						diag.pack();
+						StaticUtils.center(diag);
+						diag.setVisible(true);
+						
 					}
 
 				});
