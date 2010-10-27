@@ -365,6 +365,7 @@ public class PileupTrack extends Track {
 		this.screenWidth = screenWidth;
 
 		if (isDetailed()) {
+			int lastX = -1;
 			double div = maxPile;
 			int width = (int) Math.ceil(screenWidth / visible.length());
 			for (int i = 0; i < ptm.detailedRects[0].length; i++) {
@@ -392,14 +393,17 @@ public class PileupTrack extends Track {
 				int rsize = (int) (rfrac * graphLineHeigh);
 				int screenX = Convert.translateGenomeToScreen(i + visible.start, visible, screenWidth);
 
-				g.setColor(Color.ORANGE);
-				g.fillRect(screenX, yOffset + graphLineHeigh - size, width, 2 * size);
+				if (screenX > lastX) {
+					lastX=screenX;
+					g.setColor(Color.ORANGE);
+					g.fillRect(screenX, yOffset + graphLineHeigh - size, width, 2 * size);
 
-				g.setColor(forwardColor);
-				g.fillRect(screenX, yOffset + graphLineHeigh - fsize, width, fsize);
+					g.setColor(forwardColor);
+					g.fillRect(screenX, yOffset + graphLineHeigh - fsize, width, fsize);
 
-				g.setColor(reverseColor);
-				g.fillRect(screenX, yOffset + graphLineHeigh, width, rsize);
+					g.setColor(reverseColor);
+					g.fillRect(screenX, yOffset + graphLineHeigh, width, rsize);
+				}
 				// System.out.println("Show individual");
 
 				g.setColor(Color.GRAY);
@@ -440,6 +444,8 @@ public class PileupTrack extends Track {
 				g.setColor(Color.BLACK);
 				g.drawString("SNPs", 5, yOffset + snpTrackHeight - 4);
 				// System.out.println("Drawing snps: "+visible);
+//				int skipped = 0;
+//				int totl=0;
 				for (int i = visible.start; i <= visible.end; i++) {
 					int x1 = Convert.translateGenomeToScreen(i, visible, screenWidth);
 					double total = ptm.nc.getTotalCount(i - visible.start);
@@ -452,15 +458,22 @@ public class PileupTrack extends Track {
 							if (nucs[j] != refNt) {
 								double fraction = ptm.nc.getCount(nucs[j], i - visible.start) / total;
 								fraction *= snpTrackHeight;
-								g.setColor(color[j]);
-								g.fillRect(x1, (int) (yOffset + snpTrackHeight - fraction - done), nucWidth,
-										(int) (Math.ceil(fraction)));
+								//totl++;
+								if (fraction > 0.05) {
+									g.setColor(color[j]);
+									g.fillRect(x1, (int) (yOffset + snpTrackHeight - fraction - done), nucWidth,
+											(int) (Math.ceil(fraction)));
+								} 
+//								else {
+//									skipped++;
+//								}
 								done += fraction;
 							}
 						}
 					}
 
 				}
+				//System.out.println("Skipped: "+skipped +"/"+totl);
 			}
 			/* Draw tick labels on coverage plot */
 			g.setColor(Color.BLACK);
@@ -622,7 +635,7 @@ public class PileupTrack extends Track {
 			char c = (char) reads[i];
 			// System.out.print(" "+c);
 			if (c == '^')
-				i+=2;
+				i += 2;
 			else if (c == '-' || c == '+') {
 				int jump = reads[++i];
 				i += Integer.parseInt("" + (char) jump) + 1;
