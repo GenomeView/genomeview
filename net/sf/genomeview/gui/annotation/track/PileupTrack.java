@@ -106,7 +106,7 @@ public class PileupTrack extends Track {
 				int effectivePosition = xGenome - start;
 				int total = ptm.nc.getTotalCount(xGenome - start);
 
-				text.append("<strong>Matches:</strong>" + format(ptm.nc.getCount('.', effectivePosition), total)
+				text.append("<strong>Matches:</strong> " + format(ptm.nc.getCount('.', effectivePosition), total)
 						+ "<br/>");
 
 				text.append("<strong>Mismatches:</strong><br/>");
@@ -136,7 +136,10 @@ public class PileupTrack extends Track {
 		}
 
 		private String format(int count, int total) {
-			return count + " (" + nf.format(count / (double) total) + ")";
+			if(total>0)
+				return count + " (" + nf.format(count / (double) total) + ")";
+			else
+				return ""+count;
 		}
 	}
 
