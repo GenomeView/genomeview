@@ -394,10 +394,10 @@ public class Model extends Observable implements IModel {
 
 	private final TrackList trackList;
 
-	public void addTrack(Track track) {
-		trackList.add(track);
-		refresh();
-	}
+//	public void addTrack(Track track) {
+//		trackList.add(track);
+//		refresh();
+//	}
 
 	public class TrackList implements Iterable<Track> {
 		private Model model;
@@ -467,83 +467,15 @@ public class Model extends Observable implements IModel {
 			mapping.remove(key);
 		}
 
-		// public boolean containsGraph(String name) {
-		// for (Track track : this) {
-		// if (track instanceof WiggleTrack) {
-		// if (((WiggleTrack) track).displayName().equals(name))
-		// return true;
-		//
-		// }
-		// }
-		// return false;
-		// }
-
-		// public boolean containsAlignment(int index) {
-		// for (Track track : this) {
-		// if (track instanceof MultipleAlignmentTrack) {
-		// if (((MultipleAlignmentTrack) track).getIndex() == index)
-		// return true;
-		//
-		// }
-		// }
-		// return false;
-		// }
-
-		// public boolean containsSyntenicTarget(String ref, String target) {
-		// for (Track track : this) {
-		// if (track instanceof SyntenicTrack) {
-		// SyntenicTrack st = ((SyntenicTrack) track);
-		// if (st.reference().equals(ref) && st.target().equals(target))
-		// return true;
-		//
-		// }
-		// }
-		// return false;
-		// }
-
-		// public boolean containsSequenceLogo() {
-		// for (Track track : this) {
-		// if (track instanceof SequenceLogoTrack) {
-		//
-		// return true;
-		//
-		// }
-		// }
-		// return false;
-		// }
-
-		// public boolean containShortReadTrack(DataSource rg) {
-		// for (Track track : this) {
-		// if (track instanceof ShortReadTrack) {
-		// ShortReadTrack srt = (ShortReadTrack) track;
-		// if (srt.source().equals(rg))
-		// return true;
-		//
-		// }
-		// }
-		// return false;
-		// }
-
-		// public boolean containsMultipleAlignment(MultipleAlignment ma) {
-		// for (Track track : this) {
-		// if (track instanceof MultipleAlignmentTrack2) {
-		// MultipleAlignmentTrack2 srt = (MultipleAlignmentTrack2) track;
-		//
-		// if (srt.getMA().equals(ma))
-		// return true;
-		//
-		// }
-		// }
-		// return false;
-		// }
+		
 
 		public boolean containsTrack(DataKey key) {
 			return mapping.keySet().contains(key);
 		}
 
-		public boolean containsTrack(String string) {
-			return containsTrack(new StringKey(string));
-		}
+//		public boolean containsTrack(String string) {
+//			return containsTrack(new StringKey(string));
+//		}
 
 		public int size() {
 			return order.size();
@@ -752,7 +684,7 @@ public class Model extends Observable implements IModel {
 		return entries.getEntry();
 	}
 
-	public void setSelectedEntry(Entry entry) {
+	public synchronized void setSelectedEntry(Entry entry) {
 		entries.setDefault(entry);
 		selectionModel.clear();
 

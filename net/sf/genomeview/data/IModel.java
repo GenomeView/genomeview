@@ -37,7 +37,7 @@ public interface IModel extends Observer {
 
 	public GUIManager getGUIManager();
 
-	public void addTrack(Track track);
+	//public void addTrack(Track track);
 
 	public void updateTracks();
 
