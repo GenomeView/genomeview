@@ -106,7 +106,7 @@ public class PileupTrack extends Track {
 				int effectivePosition = xGenome - start;
 				int total = ptm.nc.getTotalCount(xGenome - start);
 
-				text.append("<strong>Matches:</strong>:" + format(ptm.nc.getCount('.', effectivePosition), total)
+				text.append("<strong>Matches:</strong>" + format(ptm.nc.getCount('.', effectivePosition), total)
 						+ "<br/>");
 
 				text.append("<strong>Mismatches:</strong><br/>");
@@ -118,12 +118,9 @@ public class PileupTrack extends Track {
 				text.append("<br/>");
 				text.append("C: " + format(ptm.nc.getCount('C', effectivePosition), total));
 				text.append("<br/>");
-				// System.out.println("xGEnome: "+xGenome+"\t"+(xGenome-start));
-				// byte[] bases = sri.esr.getReadBases();
-				// for (int i = sri.start; i < sri.start + sri.len; i++) {
-				// text.append((char) bases[i]);
-				// }
-				// text.append("<br/>");
+				text.append("<strong>Coverage:</strong><br/>");
+				text.append("Forward: " + ptm.detailedRects[0][effectivePosition] + "<br/>");
+				text.append("Reverse: " + ptm.detailedRects[1][effectivePosition] + "<br/>");
 
 				text.append("</html>");
 				if (!text.toString().equals(floater.getText())) {
@@ -304,11 +301,13 @@ public class PileupTrack extends Track {
 		}
 		Location visible = model.getAnnotationLocationVisible();
 		/* Only retrieve data when location changed */
-	
-		if (ptm.lastQuery == null ||!ptm.lastQuery.equals(model.getAnnotationLocationVisible())) {
-			ptm.lastQuery=model.getAnnotationLocationVisible();
+
+		if (ptm.lastQuery == null || !ptm.lastQuery.equals(model.getAnnotationLocationVisible())) {
+			
 			final PileupWrapper pw = (PileupWrapper) entry.get(super.dataKey);
 			/* Data for detailed panel */
+			if(pw!=null)
+				ptm.lastQuery = model.getAnnotationLocationVisible();
 			if (isDetailed()) {
 				/* Draw individual piles */
 				// update data...
@@ -404,51 +403,7 @@ public class PileupTrack extends Track {
 				// System.out.println("Show individual");
 
 				g.setColor(Color.GRAY);
-				// int width = (int) Math.ceil(screenWidth / visible.length());
-				// for (Pile p : piles) {
-				// if (p.getPos() < visible.start || p.getPos() > visible.end)
-				// continue;
-				// count(nc, p, visible);
-				// int pos = p.getLocation().start;
-				// double coverage = p.getCoverage();
-				// double fcov = p.getFCoverage();
-				// double rcov = p.getRCoverage();
-				//
-				// if (coverage > maxPile)
-				// maxPile = coverage;
-				//
-				// /* Max value set, truncate */
-				// if (maxValue > 0) {
-				// div = maxValue;
-				// if (coverage > maxValue)
-				// coverage = maxValue;
-				// if (rcov > maxValue)
-				// rcov = maxValue;
-				// if (fcov > maxValue)
-				// fcov = maxValue;
-				// }
-				//
-				// double frac = coverage / div;
-				// int size = (int) (frac * graphLineHeigh);
-				// double ffrac = fcov / div;
-				// int fsize = (int) (ffrac * graphLineHeigh);
-				// double rfrac = rcov / div;
-				// int rsize = (int) (rfrac * graphLineHeigh);
-				// // System.out.println(size);
-				//
-				// int screenX = Convert.translateGenomeToScreen(pos, visible,
-				// screenWidth);
-				//
-				// g.setColor(Color.ORANGE);
-				// g.fillRect(screenX, yOffset + graphLineHeigh - size, width, 2
-				// * size);
-				//
-				// g.setColor(forwardColor);
-				// g.fillRect(screenX, yOffset + graphLineHeigh - fsize, width,
-				// fsize);
-				//
-				// g.setColor(reverseColor);
-				// g.fillRect(screenX, yOffset + graphLineHeigh, width, rsize);
+
 			}
 
 			g.setColor(Color.BLACK);
@@ -515,8 +470,8 @@ public class PileupTrack extends Track {
 
 			g.drawString("" + div, 10, yOffset);
 			g.drawString("0" + "", 10, yOffset - graphLineHeigh + 5);
-			g.drawString("" + div, 10, yOffset - 2 * graphLineHeigh+ 10);
-			
+			g.drawString("" + div, 10, yOffset - 2 * graphLineHeigh + 10);
+
 			g.drawString(StaticUtils.shortify(super.dataKey.toString()), 10, yOffset - graphLineHeigh + 24 - 2);
 
 			return 2 * graphLineHeigh + snpTrackHeight;
@@ -662,10 +617,18 @@ public class PileupTrack extends Track {
 
 	private void count(NucCounter nc, Pile p, Location visible) {
 		// System.out.print("P: "+p.getPos());
-		for (byte b : p.getBases()) {
-			char c = (char) b;
-			// System.out.print(" "+c);
-			nc.count(c, p.getPos() - visible.start);
+		byte[] reads = p.getBases();
+		for (int i = 0; i < reads.length; i++) {
+			char c = (char) reads[i];
+			//System.out.print(" "+c);
+			if (c == '-' || c == '+') {
+				int jump = reads[++i];
+				i += Integer.parseInt("" + (char) jump)+1;
+				//System.out.println("Jumping: "+(char) jump);
+			}
+			/* Might have jumped past the end */
+			if(i<reads.length)
+				nc.count((char) reads[i], p.getPos() - visible.start);
 		}
 		// .out.println();
 
