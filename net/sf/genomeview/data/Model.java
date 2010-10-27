@@ -539,7 +539,7 @@ public class Model extends Observable implements IModel {
 		for (DataKey key : e) {
 			Data<?> data = e.get(key);
 			if (data instanceof MemoryFeatureAnnotation) {
-				if (!trackList.containsTrack(key))
+				if (!trackList.containsTrack(key)&&((MemoryFeatureAnnotation)data).cachedCount()>0)
 					trackList.add(new FeatureTrack(this, (Type) key));
 
 			}
