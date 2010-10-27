@@ -303,10 +303,10 @@ public class PileupTrack extends Track {
 		/* Only retrieve data when location changed */
 
 		if (ptm.lastQuery == null || !ptm.lastQuery.equals(model.getAnnotationLocationVisible())) {
-			
+
 			final PileupWrapper pw = (PileupWrapper) entry.get(super.dataKey);
 			/* Data for detailed panel */
-			if(pw!=null)
+			if (pw != null)
 				ptm.lastQuery = model.getAnnotationLocationVisible();
 			if (isDetailed()) {
 				/* Draw individual piles */
@@ -620,14 +620,16 @@ public class PileupTrack extends Track {
 		byte[] reads = p.getBases();
 		for (int i = 0; i < reads.length; i++) {
 			char c = (char) reads[i];
-			//System.out.print(" "+c);
-			if (c == '-' || c == '+') {
+			// System.out.print(" "+c);
+			if (c == '^')
+				i+=2;
+			else if (c == '-' || c == '+') {
 				int jump = reads[++i];
-				i += Integer.parseInt("" + (char) jump)+1;
-				//System.out.println("Jumping: "+(char) jump);
+				i += Integer.parseInt("" + (char) jump) + 1;
+				// System.out.println("Jumping: "+(char) jump);
 			}
 			/* Might have jumped past the end */
-			if(i<reads.length)
+			if (i < reads.length)
 				nc.count((char) reads[i], p.getPos() - visible.start);
 		}
 		// .out.println();
