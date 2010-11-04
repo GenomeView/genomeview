@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -86,6 +87,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					SortedSet<Location> loc = parse(coordinates.getText());
+					filterLocation(loc,new Location(1,model.getSelectedEntry().getMaximumLength()));
 					Feature f = new Feature();
 					f.setLocation(loc);
 					f.setType(typeCombo.getTerm());
@@ -102,6 +104,22 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 							JOptionPane.WARNING_MESSAGE);
 				}
 
+			}
+
+			private void filterLocation(SortedSet<Location> loc, Location range) {
+				Iterator<Location>it=loc.iterator();
+				while(it.hasNext()){
+					Location l=it.next();
+					if(l.end<range.start)
+						it.remove();
+					else if(l.start<range.start)
+						l.setStart(range.start);
+					else if(l.start>range.end)
+						it.remove();
+					else if(l.end>range.end)
+						l.setEnd(range.end);
+				}
+				
 			}
 
 			private SortedSet<Location> parse(String text) {
