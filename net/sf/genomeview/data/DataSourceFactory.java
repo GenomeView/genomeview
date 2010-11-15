@@ -24,6 +24,7 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.IndexedFastaDataSource;
+import net.sf.jannot.source.IndexedMAFDataSource;
 import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.source.SAMDataSource;
 import net.sf.jannot.source.SSL;
@@ -273,6 +274,15 @@ public class DataSourceFactory {
 					return new IndexedFeatureFile((File) in, 8000, 50);
 				if (in instanceof URL)
 					return new IndexedFeatureFile((URL) in, 8000, 50);
+			}
+			
+			indexName = fileName + ".mfi";
+			if (checkExist(in, indexName)) {
+				log.fine("Reading mafix file...");
+				if (in instanceof File)
+					return new IndexedMAFDataSource((File) in);
+				if (in instanceof URL)
+					return new IndexedMAFDataSource((URL) in);
 			}
 
 		}
