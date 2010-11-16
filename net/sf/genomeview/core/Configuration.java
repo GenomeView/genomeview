@@ -37,24 +37,24 @@ public class Configuration {
 	}
 
 	public static char[] getAminoAcids() {
-		return new char[] { 'M', '*', 'X', 'Y', 'W', 'V', 'U', 'T', 'S', 'R', 'Q', 'P', 'N', 'L', 'K', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'A' };
+		return new char[] { 'M', '*', 'X', 'Y', 'W', 'V', 'U', 'T', 'S', 'R', 'Q', 'P', 'N', 'L', 'K', 'I', 'H', 'G',
+				'F', 'E', 'D', 'C', 'A' };
 
 	}
+
 	private static Logger logger = Logger.getLogger(Configuration.class.getCanonicalName());
-	
+
 	static {
 		String s = System.getProperty("user.home");
 		confDir = new File(s + "/.genomeview");
 		if (!confDir.exists()) {
-			if(!confDir.mkdir())
-				logger.warning("Could not create configuration directory: "+confDir);
+			if (!confDir.mkdir())
+				logger.warning("Could not create configuration directory: " + confDir);
 
 		}
 		logger.info("User config: " + confDir);
 
 	}
-
-	
 
 	/* Map with default genomeview configuration */
 	private static HashMap<String, String> defaultMap = new HashMap<String, String>();
@@ -77,7 +77,7 @@ public class Configuration {
 			save();
 		} catch (IOException e) {
 			CrashHandler.crash(Level.SEVERE, "IOException while loading configuration", e);
-			
+
 		}
 	}
 
@@ -99,15 +99,16 @@ public class Configuration {
 	private static File configFile;
 
 	private static void load() throws IOException {
-		InputStream is=null;
+		InputStream is = null;
 		try {
-			is=Configuration.class.getResourceAsStream("/genomeview.properties");
+			is = Configuration.class.getResourceAsStream("/genomeview.properties");
 			gvProperties.load(is);
 		} catch (Exception e1) {
-			logger.warning("genomeview.properties file could not be loaded! GenomeView assumes your are a developer and know why you can ignore this.");
+			logger
+					.warning("genomeview.properties file could not be loaded! GenomeView assumes your are a developer and know why you can ignore this.");
 
-		}finally{
-			if(is!=null)
+		} finally {
+			if (is != null)
 				is.close();
 		}
 
@@ -115,7 +116,7 @@ public class Configuration {
 
 		logger.info("Loading default configuration...");
 		LineIterator it;
-		
+
 		it = new LineIterator(Configuration.class.getResourceAsStream("/conf/default.conf"));
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
@@ -129,33 +130,30 @@ public class Configuration {
 		/* look for local configuration and load it if present */
 		logger.info("Configuration directory: " + confDir);
 
-		
-
 		configFile = new File(confDir, "personal.conf.gz");
 		if (!configFile.exists()) {
-			if(!configFile.createNewFile()){
-				logger.warning("Cannot create your personal configuration file sure GenomeView has write access to you home directory!");
+			if (!configFile.createNewFile()) {
+				logger
+						.warning("Cannot create your personal configuration file sure GenomeView has write access to you home directory!");
 			}
 		} else {
 			it = new LineIterator(new GZIPInputStream(new FileInputStream(configFile)));
 			it.setSkipBlanks(true);
 			it.setSkipComments(true);
 			for (String line : it) {
-			    if(line.indexOf('=')>0){
-			        String key = line.substring(0, line.indexOf('='));
-				    String value = line.substring(line.indexOf('=') + 1);
-				    localMap.put(key.trim(), value.trim());
-			    }else{
-			        logger.warning("Invalid line in configuration file! '"+line+"'");
-			    }
+				if (line.indexOf('=') > 0) {
+					String key = line.substring(0, line.indexOf('='));
+					String value = line.substring(line.indexOf('=') + 1);
+					localMap.put(key.trim(), value.trim());
+				} else {
+					logger.warning("Invalid line in configuration file! '" + line + "'");
+				}
 
 			}
 			it.close();
 		}
 
 	}
-
-	
 
 	/**
 	 * Save all configuration back to the respective files.
@@ -177,7 +175,6 @@ public class Configuration {
 	public static File getDirectory() {
 		return confDir;
 	}
-
 
 	public static Color getColor(Type t) {
 		return getColor("TYPE_" + t);
@@ -248,9 +245,13 @@ public class Configuration {
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
 		for (String line : it) {
-			String key = line.substring(0, line.indexOf('='));
-			String value = line.substring(line.indexOf('=') + 1);
-			extraMap.put(key.trim(), value.trim());
+			try {
+				String key = line.substring(0, line.indexOf('='));
+				String value = line.substring(line.indexOf('=') + 1);
+				extraMap.put(key.trim(), value.trim());
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Failed to parse line: " + line, e);
+			}
 		}
 		it.close();
 
@@ -259,8 +260,9 @@ public class Configuration {
 	public static File getPluginDirectory() {
 		File modules = new File(confDir, "plugin");
 		if (!modules.exists()) {
-			if(!modules.mkdir())
-				logger.warning("Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
+			if (!modules.mkdir())
+				logger
+						.warning("Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
 		}
 
 		return modules;
