@@ -167,7 +167,8 @@ public class DataSourceFactory {
 								if (f.isDirectory())
 									return true;
 								return f.getName().toLowerCase().endsWith(ext)
-										|| f.getName().toLowerCase().endsWith(ext + ".gz");
+										|| f.getName().toLowerCase().endsWith(ext + ".gz")
+										|| f.getName().toLowerCase().endsWith(ext + ".bgz");
 							}
 
 							@Override
@@ -186,7 +187,8 @@ public class DataSourceFactory {
 							for (String ext : extensions) {
 
 								if (f.getName().toLowerCase().endsWith(ext)
-										|| f.getName().toLowerCase().endsWith(ext + ".gz")) {
+										|| f.getName().toLowerCase().endsWith(ext + ".gz")
+										|| f.getName().toLowerCase().endsWith(ext + ".bgz")) {
 									return true;
 								}
 							}
