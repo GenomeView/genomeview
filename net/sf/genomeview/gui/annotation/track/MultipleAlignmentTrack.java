@@ -16,8 +16,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.swing.JViewport;
 
@@ -95,11 +98,14 @@ public class MultipleAlignmentTrack extends Track {
 
 	}
 
-	
+	private MultipleAlignmentTrackModel mat = null;
 
 	public MultipleAlignmentTrack(Model model, DataKey key) {
 		super(key, model, true, false);
 		this.name = key.toString();
+		AlignmentAnnotation entireAlignment = (AlignmentAnnotation) entry.get(dataKey);
+		mat = new MultipleAlignmentTrackModel(entireAlignment);
+
 	}
 
 	@Override
@@ -143,13 +149,81 @@ public class MultipleAlignmentTrack extends Track {
 
 	}
 
+	class MultipleAlignmentTrackModel {
+
+		private AlignmentAnnotation aa;
+
+		private List<Alignment> ordering;
+
+		public MultipleAlignmentTrackModel(AlignmentAnnotation entireAlignment) {
+			this.aa = entireAlignment;
+			List<WeightedAlignment> set = new ArrayList<WeightedAlignment>();
+
+			for (Alignment a : aa.get()) {
+				double d = Configuration.getDouble("MAWEIGHT_" + a.name(), 0);
+				//System.out.println("Getting: " + "MAWEIGHT_" + a.name());
+				set.add(new WeightedAlignment(d, a));
+			}
+			Collections.sort(set);
+			ordering = new ArrayList<Alignment>();
+			for (WeightedAlignment wa : set){
+				//System.out.println("OO: "+wa.weight+"\t"+wa.a.name());
+				ordering.add(wa.a);
+			}
+			// System.out.println("Ordered elements: " + ordering.size());
+			// return out;
+			// ororderingdering=out;
+		}
+
+		public boolean hasData() {
+			return aa != null;
+		}
+
+		class WeightedAlignment implements Comparable<WeightedAlignment> {
+			Alignment a;
+			double weight;
+
+			public WeightedAlignment(double d, Alignment a) {
+				this.weight = d;
+				this.a = a;
+			}
+
+			@Override
+			public int compareTo(WeightedAlignment o) {
+				int d=Double.compare(weight, o.weight);
+				System.out.println("Compare: "+weight+"\t"+o.weight+"\t"+d);
+				return Double.compare(weight, o.weight);
+			}
+
+		}
+
+		public Iterable<Alignment> ordered() {
+			return ordering;
+		}
+
+		public double getConservation(int i) {
+			return aa.getConservation(i);
+		}
+
+		public Integer getNucleotideCount(char c, int i) {
+			return aa.getNucleotideCount(c, i);
+		}
+
+		public double getFootprint(int i) {
+			return aa.getFootprint(i);
+		}
+
+		public int numAlignments() {
+			return aa.numAlignments();
+		}
+	}
+
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,JViewport view) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
 		Location r = model.getAnnotationLocationVisible();
 		int lineHeigh = 20;
-		AlignmentAnnotation entireAlignment = (AlignmentAnnotation) entry.get(dataKey);
-		
-		if (entireAlignment != null) {
+
+		if (mat.hasData()) {
 			if (r.length() > 10000000) {
 				g.setColor(Color.BLACK);
 				g.drawString("Too much data in alignment, zoom in to see details", 5, yOffset + lineHeigh - 2);
@@ -157,7 +231,7 @@ public class MultipleAlignmentTrack extends Track {
 			}
 			if (r.length() < 1000) {
 
-				for (Alignment alignment : entireAlignment.get()) {
+				for (Alignment alignment : mat.ordered()) {
 					double width = screenWidth / (double) r.length();
 					int grouping = (int) Math.ceil(1.0 / width);
 					for (int i = r.start(); i <= r.end(); i += grouping) {
@@ -166,7 +240,7 @@ public class MultipleAlignmentTrack extends Track {
 						boolean dash = false;
 						for (int j = 0; j < grouping; j++) {
 							nt = alignment.getNucleotide(i + j);
-							conservation += entireAlignment.getConservation(i + j);
+							conservation += mat.getConservation(i + j);
 							if (nt == '-')
 								dash = true;
 
@@ -225,7 +299,7 @@ public class MultipleAlignmentTrack extends Track {
 
 			} else {
 
-				for (Alignment alignment : entireAlignment.get()) {
+				for (Alignment alignment : mat.ordered()) {
 					double width = screenWidth / (double) r.length() / 5.0;
 
 					int scale = 1;
@@ -237,15 +311,15 @@ public class MultipleAlignmentTrack extends Track {
 
 					int start = r.start() / scale * scale;
 					int end = ((r.end() / scale) + 1) * scale;
-					
+
 					// /* Plot whatever is in the cache */
 					if (!buffers.containsKey(entry))
 						buffers.put(entry, new Buffer(alignment));
 					Buffer b = buffers.get(entry);
-					
+
 					for (int i = 0; i < (end - start) / scale; i++) {
 						int x = Convert.translateGenomeToScreen(start + i * scale, r, screenWidth) + 5;
-						
+
 						conservationGP.lineTo(x, yOffset + (1 - b.get(start + i * scale, scale)) * (lineHeigh - 4) + 2);
 					}
 					g.setColor(Color.BLACK);
@@ -256,7 +330,7 @@ public class MultipleAlignmentTrack extends Track {
 				}
 
 			}
-			int logoLineHeight=40;
+			int logoLineHeight = 40;
 			if (model.getAnnotationLocationVisible().length() < 100) {
 				double width = screenWidth / (double) r.length();
 				int grouping = (int) Math.ceil(1.0 / width);
@@ -265,35 +339,29 @@ public class MultipleAlignmentTrack extends Track {
 
 					SortedMap<Integer, String> map = new TreeMap<Integer, String>(Collections.reverseOrder());
 
-					map.put(entireAlignment.getNucleotideCount('a', i), "A");
+					map.put(mat.getNucleotideCount('a', i), "A");
 
-					if (map.containsKey(entireAlignment.getNucleotideCount('c', i))) {
-						map.put(entireAlignment.getNucleotideCount('c', i), map.get(entireAlignment.getNucleotideCount(
-								'c', i))
-								+ "C");
+					if (map.containsKey(mat.getNucleotideCount('c', i))) {
+						map.put(mat.getNucleotideCount('c', i), map.get(mat.getNucleotideCount('c', i)) + "C");
 					} else {
-						map.put(entireAlignment.getNucleotideCount('c', i), "C");
+						map.put(mat.getNucleotideCount('c', i), "C");
 					}
-					if (map.containsKey(entireAlignment.getNucleotideCount('g', i))) {
-						map.put(entireAlignment.getNucleotideCount('g', i), map.get(entireAlignment.getNucleotideCount(
-								'g', i))
-								+ "G");
+					if (map.containsKey(mat.getNucleotideCount('g', i))) {
+						map.put(mat.getNucleotideCount('g', i), map.get(mat.getNucleotideCount('g', i)) + "G");
 					} else {
-						map.put(entireAlignment.getNucleotideCount('g', i), "G");
+						map.put(mat.getNucleotideCount('g', i), "G");
 					}
-					if (map.containsKey(entireAlignment.getNucleotideCount('t', i))) {
-						map.put(entireAlignment.getNucleotideCount('t', i), map.get(entireAlignment.getNucleotideCount(
-								't', i))
-								+ "T");
+					if (map.containsKey(mat.getNucleotideCount('t', i))) {
+						map.put(mat.getNucleotideCount('t', i), map.get(mat.getNucleotideCount('t', i)) + "T");
 					} else {
-						map.put(entireAlignment.getNucleotideCount('t', i), "T");
+						map.put(mat.getNucleotideCount('t', i), "T");
 					}
-					draw(map, g, entireAlignment.numAlignments(), i, logoLineHeight, model, width, yOffset);
+					draw(map, g, mat.numAlignments(), i, logoLineHeight, model, width, yOffset);
 				}
 			} else {
 				double width = screenWidth / (double) r.length() / 10.0;
 				int grouping = (int) Math.ceil(1.0 / width);
-				
+
 				GeneralPath conservationGP = new GeneralPath();
 				GeneralPath footprintGP = new GeneralPath();
 				conservationGP.moveTo(0, yOffset);
@@ -303,14 +371,15 @@ public class MultipleAlignmentTrack extends Track {
 					double conservation = 0;
 					double footprint = 0;
 					for (int j = 0; j < grouping; j++) {
-						conservation += entireAlignment.getConservation(i + j);
-						footprint += entireAlignment.getFootprint(i + j);
+						conservation += mat.getConservation(i + j);
+						footprint += mat.getFootprint(i + j);
 					}
 					conservation /= grouping;
 					footprint /= grouping;
 					conservationGP.lineTo((int) ((i - r.start()) * width * 10), yOffset + (1 - conservation)
 							* lineHeigh);
-					footprintGP.lineTo((int) ((i - r.start()) * width * 10), yOffset + (1 - footprint) * logoLineHeight);
+					footprintGP
+							.lineTo((int) ((i - r.start()) * width * 10), yOffset + (1 - footprint) * logoLineHeight);
 
 				}
 				g.setColor(Color.BLUE);
@@ -320,13 +389,13 @@ public class MultipleAlignmentTrack extends Track {
 				g.drawString(this.displayName() + " (" + grouping + ")", 10, yOffset + logoLineHeight - 2);
 				// return 3 * lineHeigh;
 			}
-			return entireAlignment.numAlignments() * lineHeigh + logoLineHeight;
+			return mat.numAlignments() * lineHeigh + logoLineHeight;
 
 		}
 		return 0;
 	}
 
-	public void draw(Map<Integer, String> map, Graphics2D g, int numAlign, int position, int lineHeight, Model m,
+	private void draw(Map<Integer, String> map, Graphics2D g, int numAlign, int position, int lineHeight, Model m,
 			double width, int yOffset) {
 
 		int left = lineHeight;
@@ -337,7 +406,7 @@ public class MultipleAlignmentTrack extends Track {
 				double fraction = key / (double) numAlign;
 
 				Font font = new Font("Sans serif", 1, lineHeight);
-				
+
 				Font font2 = font
 						.deriveFont(AffineTransform.getScaleInstance(width / lineHeight * 1.2, fraction * 1.4));
 
