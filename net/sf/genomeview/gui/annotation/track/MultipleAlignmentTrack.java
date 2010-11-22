@@ -31,15 +31,11 @@ import net.sf.jannot.alignment.mfa.Alignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 
 public class MultipleAlignmentTrack extends Track {
-	// private int index;
 	private String name;
 	double LOG2 = Math.log(2);
 	int bareScale = 32;
 	int bareScaleIndex = 5;
 	private Map<Entry, Buffer> buffers = new HashMap<Entry, Buffer>();
-
-	// private Alignment alignment;
-	// private AlignmentAnnotation entireAlignment;
 
 	class Buffer {
 		private Alignment a;
@@ -99,19 +95,11 @@ public class MultipleAlignmentTrack extends Track {
 
 	}
 
-	// public MultipleAlignmentTrack(String name, int index, Model model,
-	// boolean b) {
-	// super(model, b, false);
-	// this.index = index;
-	// this.name = name;
-	//
-	// }
+	
 
 	public MultipleAlignmentTrack(Model model, DataKey key) {
 		super(key, model, true, false);
 		this.name = key.toString();
-		// this.alignment=a;
-		// this.entireAlignment=entireAlignment;
 	}
 
 	@Override
@@ -169,7 +157,7 @@ public class MultipleAlignmentTrack extends Track {
 			}
 			if (r.length() < 1000) {
 
-				for (Alignment alignment : entireAlignment) {
+				for (Alignment alignment : entireAlignment.get()) {
 					double width = screenWidth / (double) r.length();
 					int grouping = (int) Math.ceil(1.0 / width);
 					for (int i = r.start(); i <= r.end(); i += grouping) {
@@ -237,7 +225,7 @@ public class MultipleAlignmentTrack extends Track {
 
 			} else {
 
-				for (Alignment alignment : entireAlignment) {
+				for (Alignment alignment : entireAlignment.get()) {
 					double width = screenWidth / (double) r.length() / 5.0;
 
 					int scale = 1;
@@ -249,27 +237,15 @@ public class MultipleAlignmentTrack extends Track {
 
 					int start = r.start() / scale * scale;
 					int end = ((r.end() / scale) + 1) * scale;
-					// if (!cache.hasData(scale, r.start(), r.end())) {
-					// double[] cacheValues = new double[(end - start) / scale];
-					// Buffer b=buffers.get(e);
-					// for (int i = 0; i < cacheValues.length; i++) {
-					// double conservation = 0;
-					// conservation = b.get(start + i * scale, scale);
-					// cacheValues[i] = conservation;
-					// }
-					// cache.store(scale, start, end, cacheValues);
-					// }
+					
 					// /* Plot whatever is in the cache */
 					if (!buffers.containsKey(entry))
 						buffers.put(entry, new Buffer(alignment));
 					Buffer b = buffers.get(entry);
-					// double[] cValues = cache.get();
-					// int cStart = cache.start();
-					// int cScale = cache.scale();
+					
 					for (int i = 0; i < (end - start) / scale; i++) {
 						int x = Convert.translateGenomeToScreen(start + i * scale, r, screenWidth) + 5;
-						// conservationGP.lineTo(x, yOffset + (1 - cValues[i]) *
-						// (lineHeigh - 4) + 2);
+						
 						conservationGP.lineTo(x, yOffset + (1 - b.get(start + i * scale, scale)) * (lineHeigh - 4) + 2);
 					}
 					g.setColor(Color.BLACK);
@@ -317,7 +293,7 @@ public class MultipleAlignmentTrack extends Track {
 			} else {
 				double width = screenWidth / (double) r.length() / 10.0;
 				int grouping = (int) Math.ceil(1.0 / width);
-				// System.out.println("WG: " + width + "\t" + grouping);
+				
 				GeneralPath conservationGP = new GeneralPath();
 				GeneralPath footprintGP = new GeneralPath();
 				conservationGP.moveTo(0, yOffset);
@@ -361,10 +337,7 @@ public class MultipleAlignmentTrack extends Track {
 				double fraction = key / (double) numAlign;
 
 				Font font = new Font("Sans serif", 1, lineHeight);
-				// float f3 = 1.5F;
-				// System.out.println(position + "\t" + c + "\t" + lineHeight
-				// + "\t" + fraction + "\t"
-				// + (fraction * lineHeight));
+				
 				Font font2 = font
 						.deriveFont(AffineTransform.getScaleInstance(width / lineHeight * 1.2, fraction * 1.4));
 
@@ -374,10 +347,6 @@ public class MultipleAlignmentTrack extends Track {
 				int x = (int) (((position - model.getAnnotationLocationVisible().start()) * width) + (width - stringSize
 						.getWidth()) / 2);
 				int y = (int) (yOffset + left);
-				// System.out.println("\t"+x+"\t" + (y - yOffset));
-				// LineMetrics lm=font.getLineMetrics("" + c, g
-				// .getFontRenderContext());
-				// System.out.println("-"+lm.getDescent()+"\t"+lm.getLeading()+"\t"+lm.getAscent()+"\t"+lm.getHeight());
 				g.translate(x, y);
 				left -= fraction * lineHeight;
 				java.awt.Shape shape = glyphvector.getGlyphOutline(0);
@@ -388,7 +357,4 @@ public class MultipleAlignmentTrack extends Track {
 			}
 		}
 	}
-	// public int getIndex() {
-	// return index;
-	// }
 }
