@@ -305,6 +305,14 @@ public class Configuration {
 			return null;
 	}
 
+	public static double getDouble(String string, double defaultValue) {
+		String s = get(string);
+		if (s == null)
+			return defaultValue;
+		else
+			return Double.parseDouble(get(string));
+	}
+
 	public static double getDouble(String string) {
 		return Double.parseDouble(get(string));
 	}
