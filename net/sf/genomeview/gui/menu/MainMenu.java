@@ -14,6 +14,7 @@ import net.sf.genomeview.gui.menu.edit.CopySequenceAction;
 import net.sf.genomeview.gui.menu.edit.CreateNewFeatureAction;
 import net.sf.genomeview.gui.menu.edit.CreateNewFeatureFromCoordinatesAction;
 import net.sf.genomeview.gui.menu.edit.EditStructureAction;
+import net.sf.genomeview.gui.menu.edit.ExtendToStartCodonAction;
 import net.sf.genomeview.gui.menu.edit.ExtendToStopCodonAction;
 import net.sf.genomeview.gui.menu.edit.MergeFeatureAction;
 import net.sf.genomeview.gui.menu.edit.RemoveAction;
@@ -78,7 +79,9 @@ public class MainMenu extends JMenuBar {
 		edit.add(new CreateNewFeatureAction(model));
 		edit.add(new MergeFeatureAction(model));
 		edit.add(new SplitFeatureAction(model));
+		edit.add(new ExtendToStartCodonAction(model));
 		edit.add(new ExtendToStopCodonAction(model));
+		
 		add(edit);
 
 		JMenu navigation = new JMenu("Navigation");

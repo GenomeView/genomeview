@@ -170,6 +170,8 @@ public class ConfigurationDialog extends JDialog {
 		private static final long serialVersionUID = 7503579007314777946L;
 
 		public StructureConfigPanel() {
+			this.add(ConfigBox.booleanInstance("general:onlyMethionineAsStart","Show only Methionine as start codon"),gc);
+			gc.gridy++;
 			this.add(ConfigBox.booleanInstance("track:showStructure", "Show structure track on start-up"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("geneStructureLineHeight", "Height of a track in pixels"), gc);

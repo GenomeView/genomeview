@@ -85,7 +85,10 @@ public class AnalyzedFeature {
 	}
 
 	public boolean hasMissingStartCodon() {
-		return !aa.isStart(startCodon);
+		if(aa.isStart(startCodon))
+			if (!Configuration.getBoolean("general:onlyMethionineAsStart") || aa.get(startCodon) == 'M')
+				return false;
+		return true;
 
 	}
 

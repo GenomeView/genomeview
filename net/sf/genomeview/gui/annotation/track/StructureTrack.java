@@ -392,7 +392,7 @@ public class StructureTrack extends Track {
 			break;
 		}
 
-		nt2 = bs.getNucleotide(i+1);
+		nt2 = bs.getNucleotide(i + 1);
 		if (!forward)
 			nt2 = SequenceTools.complement(nt2);
 		// if (forward)
@@ -449,7 +449,6 @@ public class StructureTrack extends Track {
 				codon = bs.getReverseCodon(i);
 			}
 
-			
 			/* draw amino acid box */
 			int x = (int) (((i - r.start()) * width));
 			int y;
@@ -468,7 +467,8 @@ public class StructureTrack extends Track {
 
 			if (Configuration.getBoolean("colorStartCodons") && model.getAAMapping().isStart(codon)) {
 				g.setColor(Configuration.getAminoAcidColor('M'));
-				g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width, lineHeight);
+				if (!Configuration.getBoolean("general:onlyMethionineAsStart") || model.getAAMapping().get(codon) == 'M')
+					g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width, lineHeight);
 			}
 
 			if (model.getAnnotationLocationVisible().length() < Configuration
@@ -618,7 +618,7 @@ public class StructureTrack extends Track {
 				g.drawLine(lastX, lastY + yOffset, middleX, maxY + yOffset);
 				g.drawLine(middleX, maxY + yOffset, currentX, currentY + yOffset);
 			}
-			r.y-=yOffset;
+			r.y -= yOffset;
 			collisionMap.addLocation(r, l);
 			last = l;
 			lastY = hor + height / 2;
