@@ -282,7 +282,7 @@ public class ShortReadTrack extends Track {
 						continue;
 
 					if (visibleReadCount > maxReads) {
-						String msg = "Too many short reads to display, only first " + maxReads + " are displayed ";
+						String msg = "Too many short reads to display, only first " + visibleReadCount + " are displayed ";
 						FontMetrics metrics = g.getFontMetrics();
 						int hgt = metrics.getHeight();
 						int adv = metrics.stringWidth(msg);
@@ -363,12 +363,11 @@ public class ShortReadTrack extends Track {
 						if (line > lines)
 							lines = line;
 
-						paintRead(g, one, yRec, screenWidth, readLineHeight, entry);
-						visibleReadCount++;
-						if (two != null) {
-
-							paintRead(g, two, yRec, screenWidth, readLineHeight, entry);
+						if(paintRead(g, one, yRec, screenWidth, readLineHeight, entry))
 							visibleReadCount++;
+						if (two != null) {
+							if(paintRead(g, two, yRec, screenWidth, readLineHeight, entry))
+								visibleReadCount++;
 						}
 					} else {
 						stackExceeded = true;
@@ -465,11 +464,20 @@ public class ShortReadTrack extends Track {
 	 */
 	private char[] seqBuffer = null;
 
-	private void paintRead(Graphics2D g, SAMRecord rf, int yRec, double screenWidth, int readLineHeight, Entry entry) {
+	/*
+	 * Returns true if the read was actually painted.
+	 */
+	private boolean paintRead(Graphics2D g, SAMRecord rf, int yRec, double screenWidth, int readLineHeight, Entry entry) {
+		/* If outside vertical view, return immediately */
 		if (yRec < view.getViewRect().y || yRec > view.getViewRect().y + view.getViewRect().height) {
-			// System.out.println("Skipping");
-			return;
+			return false;
 		}
+		int subX1 = Convert.translateGenomeToScreen(rf.getAlignmentStart(), currentVisible, screenWidth);
+		int subX2 = Convert.translateGenomeToScreen(rf.getAlignmentEnd() + 1, currentVisible, screenWidth);
+		
+		/* If outside of screen, return immediately */
+		if(subX1>screenWidth||subX2<0)
+			return false;
 
 		Color c = Color.GRAY;
 		if (ShortReadTools.strand(rf) == Strand.FORWARD) {
@@ -478,8 +486,7 @@ public class ShortReadTrack extends Track {
 			c = reverseColor;
 		g.setColor(c);
 
-		int subX1 = Convert.translateGenomeToScreen(rf.getAlignmentStart(), currentVisible, screenWidth);
-		int subX2 = Convert.translateGenomeToScreen(rf.getAlignmentEnd() + 1, currentVisible, screenWidth);
+		
 		if (subX2 < subX1) {
 			subX2 = subX1;
 			// FIXME does this ever happen?
@@ -493,7 +500,7 @@ public class ShortReadTrack extends Track {
 			g.setColor(forwardGradient.getColor(qual));
 		else
 			g.setColor(reverseGradient.getColor(qual));
-		// }
+
 		g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
 		g.setColor(c);
 		g.drawRect(subX1, yRec, subX2 - subX1, readLineHeight - 2);
@@ -502,11 +509,11 @@ public class ShortReadTrack extends Track {
 
 		/* Check mismatches */
 		if (entry.sequence().size() == 0)
-			return;
+			return true;
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			/* If there is no sequence, return immediately */
 			if (entry.sequence().size() == 0)
-				return;
+				return true;
 			if (seqBuffer == null) {
 
 				Iterable<Character> bufferedSeq = entry.sequence().get(currentVisible.start, currentVisible.end + 1);
@@ -606,6 +613,7 @@ public class ShortReadTrack extends Track {
 				g.fillRect(lx1, yRec, lx2-lx1, readLineHeight-1);
 			}
 		}
+		return true;
 		// }
 
 	}
