@@ -67,7 +67,7 @@ public class ShortReadTrack extends Track {
 		}
 
 		public void set(MouseEvent e, ShortReadInsertion sri) {
-			if(sri==null)
+			if (sri == null)
 				return;
 			StringBuffer text = new StringBuffer();
 			text.append("<html>");
@@ -164,8 +164,64 @@ public class ShortReadTrack extends Track {
 	// private boolean insertionsVisible = false;
 
 	/* Keep track of the last x-coordinate that has been used for painting */
-	private int lastX=100;
-	
+	private int lastX = 100;
+
+	class TilingMatrix {
+		/* One place Bitset per pixel column on screen */
+		private BitSet[] tc;
+		private int visibleLength;
+
+		/* Get a free line for the tranlated genomic coordinate */
+		int getFreeLine(int startX) {
+			if (startX >= 0 && startX < tc.length)
+				return tc[translate(startX)].nextClearBit(0);
+			else
+				return tc[0].nextClearBit(0);
+
+		}
+		private int translate(int startX) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+		public TilingMatrix(double screenWidth,int visibleLength, int maxStack) {
+			this.visibleLength=visibleLength;
+			tc = new BitSet[(int)screenWidth+1];
+			for (int i = 0; i < tc.length; i++) {
+				tc[i] = new BitSet(maxStack);
+			}
+		}
+
+		public int length() {
+			return tc.length;
+		}
+
+//		public BitSet get(int i) {
+//			return tc[i];
+//		}
+
+		public void set(int pos, int line) {
+			if (pos > 0 && pos < tc.length)
+				tc[translate(pos)].set(line);
+
+		}
+
+		/*
+		 * set from all x [from,to[
+		 */
+		public void rangeSet(int fromX, int toX, int y) {
+			int pos = -1;
+			for (int i = translate(fromX); i < translate(toX); i++) {
+				//pos = i - currentVisible.start;
+				if (pos > 0 && pos < tc.length)
+					tc[translate(pos)].set(y);
+
+			}
+		
+
+		}
+
+	}
+
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
 		paintedBlocks.clear();
@@ -273,10 +329,8 @@ public class ShortReadTrack extends Track {
 
 			lines = 0;
 
-			BitSet[] tilingCounter = new BitSet[currentVisible.length()];
-			for (int i = 0; i < tilingCounter.length; i++) {
-				tilingCounter[i] = new BitSet(maxStack);
-			}
+			TilingMatrix tilingCounter = new TilingMatrix(screenWidth,currentVisible.length(), maxStack);
+
 			int visibleReadCount = 0;
 			try {
 				for (SAMRecord one : reads) {
@@ -289,21 +343,20 @@ public class ShortReadTrack extends Track {
 						FontMetrics metrics = g.getFontMetrics();
 						int hgt = metrics.getHeight();
 						int adv = metrics.stringWidth(msg);
-						
-						
-						int h=25;
+
+						int h = 25;
 						if ((lines + 1) * readLineHeight + 5 > h)
-							h= (lines + 1) * readLineHeight + 5;
-						
-						g.setColor(new Color(255,0,0,100));
-						g.fillRect(lastX, yOffset, (int)screenWidth, h);
-						
+							h = (lines + 1) * readLineHeight + 5;
+
+						g.setColor(new Color(255, 0, 0, 100));
+						g.fillRect(lastX, yOffset, (int) screenWidth, h);
+
 						g.setColor(Color.WHITE);
-						g.fillRect((int)(screenWidth/2-adv/2), yOffset + h/2 - hgt, adv + 2, hgt + 2);
+						g.fillRect((int) (screenWidth / 2 - adv / 2), yOffset + h / 2 - hgt, adv + 2, hgt + 2);
 						g.setColor(Color.RED);
-						g.drawRect((int)(screenWidth/2-adv/2), yOffset + h/2 - hgt, adv + 2, hgt + 2);
-						g.drawString(msg, (int)(screenWidth/2-adv/2)+2, yOffset+h/2 -2);
-						
+						g.drawRect((int) (screenWidth / 2 - adv / 2), yOffset + h / 2 - hgt, adv + 2, hgt + 2);
+						g.drawString(msg, (int) (screenWidth / 2 - adv / 2) + 2, yOffset + h / 2 - 2);
+
 						break;
 					}
 
@@ -312,7 +365,7 @@ public class ShortReadTrack extends Track {
 					// if (x2 > 0) {
 					/* Find empty line */
 					int pos = one.getAlignmentStart() - currentVisible.start;
-					int line = line(one, pos, tilingCounter);
+					int line = tilingCounter.getFreeLine(pos);
 					if (line > maxStack) {
 						stackExceeded = true;
 						continue;
@@ -331,7 +384,7 @@ public class ShortReadTrack extends Track {
 							if (two.getAlignmentStart() < one.getAlignmentStart()) {
 
 								pos = two.getAlignmentStart() - currentVisible.start;
-								line = line(two, pos, tilingCounter);
+								line = tilingCounter.getFreeLine(pos);
 								clearStart = two.getAlignmentStart();
 							} else {
 								clearEnd = two.getAlignmentEnd();
@@ -340,12 +393,8 @@ public class ShortReadTrack extends Track {
 
 					}
 					/* Carve space out of hitmap */
-					for (int i = clearStart - pairLength; i <= clearEnd + 3; i++) {
-						pos = i - currentVisible.start;
-						if (pos >= 0 && pos < tilingCounter.length)
-							tilingCounter[pos].set(line);
+					tilingCounter.rangeSet(clearStart - pairLength-currentVisible.start, clearEnd + 4-currentVisible.start, line);
 
-					}
 					/* The y-coordinate of the read */
 					int yRec = line * readLineHeight + yOffset;
 
@@ -377,10 +426,10 @@ public class ShortReadTrack extends Track {
 						if (line > lines)
 							lines = line;
 
-						if(paintRead(g, one, yRec, screenWidth, readLineHeight, entry))
+						if (paintRead(g, one, yRec, screenWidth, readLineHeight, entry))
 							visibleReadCount++;
 						if (two != null) {
-							if(paintRead(g, two, yRec, screenWidth, readLineHeight, entry))
+							if (paintRead(g, two, yRec, screenWidth, readLineHeight, entry))
 								visibleReadCount++;
 						}
 					} else {
@@ -462,13 +511,7 @@ public class ShortReadTrack extends Track {
 		return yOffset - originalYOffset;
 	}
 
-	private int line(SAMRecord one, int pos, BitSet[] tilingCounter) {
-		if (pos >= 0 && pos < tilingCounter.length)
-			return tilingCounter[one.getAlignmentStart() - currentVisible.start].nextClearBit(0);
-		else
-			return tilingCounter[0].nextClearBit(0);
-
-	}
+	
 
 	/* Keeps track of the short-read insertions */
 	private Map<Rectangle, ShortReadInsertion> paintedBlocks = new HashMap<Rectangle, ShortReadInsertion>();
@@ -488,13 +531,12 @@ public class ShortReadTrack extends Track {
 		}
 		int subX1 = Convert.translateGenomeToScreen(rf.getAlignmentStart(), currentVisible, screenWidth);
 		int subX2 = Convert.translateGenomeToScreen(rf.getAlignmentEnd() + 1, currentVisible, screenWidth);
-		
+
 		/* If outside of screen, return immediately */
-		if(subX1>screenWidth||subX2<0)
+		if (subX1 > screenWidth || subX2 < 0)
 			return false;
 
-		
-		lastX=subX2;
+		lastX = subX2;
 		Color c = Color.GRAY;
 		if (ShortReadTools.strand(rf) == Strand.FORWARD) {
 			c = forwardColor;
@@ -502,7 +544,6 @@ public class ShortReadTrack extends Track {
 			c = reverseColor;
 		g.setColor(c);
 
-		
 		if (subX2 < subX1) {
 			subX2 = subX1;
 			// FIXME does this ever happen?
@@ -520,8 +561,6 @@ public class ShortReadTrack extends Track {
 		g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
 		g.setColor(c);
 		g.drawRect(subX1, yRec, subX2 - subX1, readLineHeight - 2);
-
-		
 
 		/* Check mismatches */
 		if (entry.sequence().size() == 0)
@@ -619,14 +658,16 @@ public class ShortReadTrack extends Track {
 				}
 				esrPos += ce.getLength();
 			}
-		}else{
-			
+		} else {
+
 			int[][] locs = splice(rf);
-			for(int i=0;i<locs[0].length;i++){
-				int lx1 = Convert.translateGenomeToScreen(rf.getAlignmentStart()+locs[0][i], currentVisible, screenWidth);
-				int lx2 = Convert.translateGenomeToScreen(rf.getAlignmentStart()+locs[1][i], currentVisible, screenWidth);
+			for (int i = 0; i < locs[0].length; i++) {
+				int lx1 = Convert.translateGenomeToScreen(rf.getAlignmentStart() + locs[0][i], currentVisible,
+						screenWidth);
+				int lx2 = Convert.translateGenomeToScreen(rf.getAlignmentStart() + locs[1][i], currentVisible,
+						screenWidth);
 				g.setColor(pairingColor);
-				g.fillRect(lx1, yRec, lx2-lx1, readLineHeight-1);
+				g.fillRect(lx1, yRec, lx2 - lx1, readLineHeight - 1);
 			}
 		}
 		return true;
