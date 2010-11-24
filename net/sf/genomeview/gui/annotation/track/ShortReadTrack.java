@@ -163,6 +163,9 @@ public class ShortReadTrack extends Track {
 	// }
 	// private boolean insertionsVisible = false;
 
+	/* Keep track of the last x-coordinate that has been used for painting */
+	private int lastX=100;
+	
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
 		paintedBlocks.clear();
@@ -282,14 +285,25 @@ public class ShortReadTrack extends Track {
 						continue;
 
 					if (visibleReadCount > maxReads) {
-						String msg = "Too many short reads to display, only first " + visibleReadCount + " are displayed ";
+						String msg = "Too many short reads to display, only first " + maxReads + " are displayed ";
 						FontMetrics metrics = g.getFontMetrics();
 						int hgt = metrics.getHeight();
 						int adv = metrics.stringWidth(msg);
+						
+						
+						int h=25;
+						if ((lines + 1) * readLineHeight + 5 > h)
+							h= (lines + 1) * readLineHeight + 5;
+						
+						g.setColor(new Color(255,0,0,100));
+						g.fillRect(lastX, yOffset, (int)screenWidth, h);
+						
 						g.setColor(Color.WHITE);
-						g.fillRect(10, yOffset + 20 - hgt, adv + 2, hgt + 2);
+						g.fillRect((int)(screenWidth/2-adv/2), yOffset + h/2 - hgt, adv + 2, hgt + 2);
 						g.setColor(Color.RED);
-						g.drawString(msg, 10, yOffset + 18);
+						g.drawRect((int)(screenWidth/2-adv/2), yOffset + h/2 - hgt, adv + 2, hgt + 2);
+						g.drawString(msg, (int)(screenWidth/2-adv/2)+2, yOffset+h/2 -2);
+						
 						break;
 					}
 
@@ -479,6 +493,8 @@ public class ShortReadTrack extends Track {
 		if(subX1>screenWidth||subX2<0)
 			return false;
 
+		
+		lastX=subX2;
 		Color c = Color.GRAY;
 		if (ShortReadTools.strand(rf) == Strand.FORWARD) {
 			c = forwardColor;
