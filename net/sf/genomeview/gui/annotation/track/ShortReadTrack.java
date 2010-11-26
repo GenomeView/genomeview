@@ -21,6 +21,8 @@ import javax.swing.JViewport;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
+import sun.java2d.ScreenUpdateManager;
+
 import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
@@ -173,15 +175,16 @@ public class ShortReadTrack extends Track {
 
 		/* Get a free line for the tranlated genomic coordinate */
 		int getFreeLine(int startX) {
-			if (startX >= 0 && startX < tc.length)
-				return tc[translate(startX)].nextClearBit(0);
+			int transX=translate(startX);
+			if (transX >= 0 && transX < tc.length)
+				return tc[transX].nextClearBit(0);
 			else
 				return tc[0].nextClearBit(0);
 
 		}
 		private int translate(int startX) {
-			// TODO Auto-generated method stub
-			return 0;
+			return (int)(startX*((double)tc.length/(double)visibleLength));
+			
 		}
 		public TilingMatrix(double screenWidth,int visibleLength, int maxStack) {
 			this.visibleLength=visibleLength;
@@ -195,25 +198,19 @@ public class ShortReadTrack extends Track {
 			return tc.length;
 		}
 
-//		public BitSet get(int i) {
-//			return tc[i];
-//		}
-
-		public void set(int pos, int line) {
-			if (pos > 0 && pos < tc.length)
-				tc[translate(pos)].set(line);
-
-		}
-
 		/*
 		 * set from all x [from,to[
 		 */
 		public void rangeSet(int fromX, int toX, int y) {
-			int pos = -1;
-			for (int i = translate(fromX); i < translate(toX); i++) {
-				//pos = i - currentVisible.start;
-				if (pos > 0 && pos < tc.length)
-					tc[translate(pos)].set(y);
+			fromX=translate(fromX);
+			toX=translate(toX);
+			if(fromX<0)
+				fromX=0;
+			if(toX>tc.length)
+				toX=tc.length;
+			for (int i = fromX; i < toX; i++) {
+				if (i > 0 && i < tc.length)
+					tc[i].set(y);
 
 			}
 		
@@ -366,40 +363,34 @@ public class ShortReadTrack extends Track {
 					/* Find empty line */
 					int pos = one.getAlignmentStart() - currentVisible.start;
 					int line = tilingCounter.getFreeLine(pos);
-					if (line > maxStack) {
-						stackExceeded = true;
-						continue;
-
-					}
-					int clearStart = one.getAlignmentStart();
-					int clearEnd = one.getAlignmentEnd();
-					SAMRecord two = null;
-					/* Modify empty space finder for paired reads */
-					if (enablePairing) {
-						// ShortReadTools esr = (ShortReadTools) one;
-						if (ShortReadTools.isPaired(one) && ShortReadTools.isFirstInPair(one)) {
-							two = rg.getSecondRead(one);
-						}
-						if (two != null) {
-							if (two.getAlignmentStart() < one.getAlignmentStart()) {
-
-								pos = two.getAlignmentStart() - currentVisible.start;
-								line = tilingCounter.getFreeLine(pos);
-								clearStart = two.getAlignmentStart();
-							} else {
-								clearEnd = two.getAlignmentEnd();
-							}
-						}
-
-					}
-					/* Carve space out of hitmap */
-					tilingCounter.rangeSet(clearStart - pairLength-currentVisible.start, clearEnd + 4-currentVisible.start, line);
-
-					/* The y-coordinate of the read */
-					int yRec = line * readLineHeight + yOffset;
-
+								
+			
 					/* Paint read or read pair */
 					if (line < maxStack) {
+						int clearStart = one.getAlignmentStart();
+						int clearEnd = one.getAlignmentEnd();
+						SAMRecord two = null;
+						/* Modify empty space finder for paired reads */
+						if (enablePairing) {
+							// ShortReadTools esr = (ShortReadTools) one;
+							if (ShortReadTools.isPaired(one) && ShortReadTools.isFirstInPair(one)) {
+								two = rg.getSecondRead(one);
+							}
+							if (two != null) {
+								if (two.getAlignmentStart() < one.getAlignmentStart()) {
+
+									pos = two.getAlignmentStart() - currentVisible.start;
+									line = tilingCounter.getFreeLine(pos);
+									clearStart = two.getAlignmentStart();
+								} else {
+									clearEnd = two.getAlignmentEnd();
+								}
+							}
+
+						}
+						/* The y-coordinate of the read */
+						int yRec = line * readLineHeight + yOffset;
+
 						/* paired read - calculate connection coordinates */
 						if (two != null) {
 
@@ -425,13 +416,21 @@ public class ShortReadTrack extends Track {
 						}
 						if (line > lines)
 							lines = line;
-
-						if (paintRead(g, one, yRec, screenWidth, readLineHeight, entry))
+						
+						boolean paintOne=paintRead(g, one, yRec, screenWidth, readLineHeight, entry);
+						boolean paintTwo=false;
+						if (paintOne)
 							visibleReadCount++;
 						if (two != null) {
-							if (paintRead(g, two, yRec, screenWidth, readLineHeight, entry))
+							paintTwo=paintRead(g, two, yRec, screenWidth, readLineHeight, entry);
+							if (paintTwo)
 								visibleReadCount++;
 						}
+
+						/* Carve space out of hitmap */
+						if(paintOne||paintTwo)
+							tilingCounter.rangeSet(clearStart - pairLength-currentVisible.start, clearEnd + 4-currentVisible.start, line);
+
 					} else {
 						stackExceeded = true;
 					}
