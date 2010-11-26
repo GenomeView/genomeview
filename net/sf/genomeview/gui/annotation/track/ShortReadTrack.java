@@ -21,8 +21,6 @@ import javax.swing.JViewport;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
-import sun.java2d.ScreenUpdateManager;
-
 import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
