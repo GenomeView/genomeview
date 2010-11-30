@@ -99,7 +99,7 @@ public class CollisionMap {
 			double a = Math.abs(x - rec.getMinX());
 			double b = Math.abs(x - rec.getMaxX());
 			boolean yCheck = y >= rec.y && y <= rec.y + rec.height;
-			if ((a < 2 || b < 2) && yCheck) {
+			if ((a < 4 || b < 4) && yCheck) {
 				hits.addAll(locationMap.get(rec));
 			}
 		}
