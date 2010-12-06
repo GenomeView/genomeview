@@ -426,7 +426,7 @@ public class ShortReadTrack extends Track {
 						}
 
 						/* Carve space out of hitmap */
-						if(paintOne||paintTwo)
+						if(true||paintOne||paintTwo)
 							tilingCounter.rangeSet(clearStart - pairLength-currentVisible.start, clearEnd + 4-currentVisible.start, line);
 
 					} else {
