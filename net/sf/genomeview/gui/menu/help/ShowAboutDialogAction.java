@@ -32,7 +32,7 @@ public class ShowAboutDialogAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        String message = "GenomeView " + Configuration.version()+"\n\nAuthors:\n\tThomas Abeel\n\tThomas Van Parys\n\nhttp://genomeview.sourceforge.net/\n\nConfiguration, logs and plugins:\n"+Configuration.getDirectory().toString()+"\n\n\nCopyright 2007-2010";
+        String message = "GenomeView " + Configuration.version()+"\n\nAuthor:\n\tThomas Abeel, VIB\n\nContributors:\n\tThomas Van Parys, VIB\n\tMarijn Vandevoorde, VIB\n\nhttp://genomeview.org/\n\nConfiguration, logs and plugins:\n"+Configuration.getDirectory().toString()+"\n\n\nCopyright 2007-2010";
         
         JOptionPane.showMessageDialog(model.getGUIManager().getParent(), message, "GenomeView " + Configuration.version(),
                 JOptionPane.INFORMATION_MESSAGE);

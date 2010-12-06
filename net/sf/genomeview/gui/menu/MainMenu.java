@@ -111,10 +111,10 @@ public class MainMenu extends JMenuBar {
 		JMenu help = new JMenu("Help");
 		help
 				.add(new OpenURLAction("User documentation",
-						"http://genomeview.sourceforge.net/content/user-documentation"));
+						"http://genomeview.org/content/user-documentation"));
 		help.add(new OpenURLAction("Post bug report or feature request",
 				"http://sourceforge.net/tracker/?group_id=208107"));
-		
+		help.add(new OpenURLAction("Join mailinglist", "https://lists.sourceforge.net/lists/listinfo/genomeview-support"));
 		help.addSeparator();
 		help.add(new ShowInstalledModulesAction(model));
 //		help.add(new OpenURLAction("Official list plugins",
