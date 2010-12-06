@@ -173,20 +173,22 @@ public class ShortReadTrack extends Track {
 
 		/* Get a free line for the tranlated genomic coordinate */
 		int getFreeLine(int startX) {
-			int transX=translate(startX);
+			int transX = translate(startX);
 			if (transX >= 0 && transX < tc.length)
 				return tc[transX].nextClearBit(0);
 			else
 				return tc[0].nextClearBit(0);
 
 		}
+
 		private int translate(int startX) {
-			return (int)(startX*((double)tc.length/(double)visibleLength));
-			
+			return (int) (startX * ((double) tc.length / (double) visibleLength));
+
 		}
-		public TilingMatrix(double screenWidth,int visibleLength, int maxStack) {
-			this.visibleLength=visibleLength;
-			tc = new BitSet[(int)screenWidth+1];
+
+		public TilingMatrix(double screenWidth, int visibleLength, int maxStack) {
+			this.visibleLength = visibleLength;
+			tc = new BitSet[(int) screenWidth + 1];
 			for (int i = 0; i < tc.length; i++) {
 				tc[i] = new BitSet(maxStack);
 			}
@@ -200,18 +202,17 @@ public class ShortReadTrack extends Track {
 		 * set from all x [from,to[
 		 */
 		public void rangeSet(int fromX, int toX, int y) {
-			fromX=translate(fromX);
-			toX=translate(toX);
-			if(fromX<0)
-				fromX=0;
-			if(toX>tc.length)
-				toX=tc.length;
+			fromX = translate(fromX);
+			toX = translate(toX);
+			if (fromX < 0)
+				fromX = 0;
+			if (toX > tc.length)
+				toX = tc.length;
 			for (int i = fromX; i < toX; i++) {
 				if (i > 0 && i < tc.length)
 					tc[i].set(y);
 
 			}
-		
 
 		}
 
@@ -324,7 +325,7 @@ public class ShortReadTrack extends Track {
 
 			lines = 0;
 
-			TilingMatrix tilingCounter = new TilingMatrix(screenWidth,currentVisible.length(), maxStack);
+			TilingMatrix tilingCounter = new TilingMatrix(screenWidth, currentVisible.length(), maxStack);
 
 			int visibleReadCount = 0;
 			try {
@@ -361,8 +362,7 @@ public class ShortReadTrack extends Track {
 					/* Find empty line */
 					int pos = one.getAlignmentStart() - currentVisible.start;
 					int line = tilingCounter.getFreeLine(pos);
-								
-			
+
 					/* Paint read or read pair */
 					if (line < maxStack) {
 						int clearStart = one.getAlignmentStart();
@@ -414,20 +414,24 @@ public class ShortReadTrack extends Track {
 						}
 						if (line > lines)
 							lines = line;
-						
-						boolean paintOne=paintRead(g, one, yRec, screenWidth, readLineHeight, entry);
-						boolean paintTwo=false;
+
+						boolean paintOne = paintRead(g, one, yRec, screenWidth, readLineHeight, entry);
+						boolean paintTwo = false;
 						if (paintOne)
 							visibleReadCount++;
 						if (two != null) {
-							paintTwo=paintRead(g, two, yRec, screenWidth, readLineHeight, entry);
+							paintTwo = paintRead(g, two, yRec, screenWidth, readLineHeight, entry);
 							if (paintTwo)
 								visibleReadCount++;
 						}
 
 						/* Carve space out of hitmap */
-						if(true||paintOne||paintTwo)
-							tilingCounter.rangeSet(clearStart - pairLength-currentVisible.start, clearEnd + 4-currentVisible.start, line);
+						// FIXME this range set has to be done because this will
+						// determine the number of lines which will be used to
+						// determine the size of the track, which is needed to properly set the scrollbars.
+						if (true || paintOne || paintTwo)
+							tilingCounter.rangeSet(clearStart - pairLength - currentVisible.start, clearEnd + 4
+									- currentVisible.start, line);
 
 					} else {
 						stackExceeded = true;
@@ -507,8 +511,6 @@ public class ShortReadTrack extends Track {
 
 		return yOffset - originalYOffset;
 	}
-
-	
 
 	/* Keeps track of the short-read insertions */
 	private Map<Rectangle, ShortReadInsertion> paintedBlocks = new HashMap<Rectangle, ShortReadInsertion>();
