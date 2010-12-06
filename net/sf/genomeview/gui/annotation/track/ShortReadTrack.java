@@ -209,7 +209,7 @@ public class ShortReadTrack extends Track {
 			if (toX > tc.length)
 				toX = tc.length;
 			for (int i = fromX; i < toX; i++) {
-				if (i > 0 && i < tc.length)
+				if (i >= 0 && i < tc.length)
 					tc[i].set(y);
 
 			}
@@ -330,7 +330,7 @@ public class ShortReadTrack extends Track {
 			int visibleReadCount = 0;
 			try {
 				for (SAMRecord one : reads) {
-
+					
 					if (enablePairing && one.getReadPairedFlag() && ShortReadTools.isSecondInPair(one))
 						continue;
 
