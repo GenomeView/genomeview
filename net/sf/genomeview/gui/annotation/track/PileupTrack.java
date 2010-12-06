@@ -635,18 +635,24 @@ public class PileupTrack extends Track {
 		// System.out.print("P: "+p.getPos());
 		byte[] reads = p.getBases();
 		for (int i = 0; i < reads.length; i++) {
+			try{
 			char c = (char) reads[i];
-			// System.out.print(" "+c);
-			if (c == '^')
-				i += 2;
+			if (c == '^'){
+				i++;
+				continue;
+			}
 			else if (c == '-' || c == '+') {
 				int jump = reads[++i];
-				i += Integer.parseInt("" + (char) jump) + 1;
-				// System.out.println("Jumping: "+(char) jump);
+				i += Integer.parseInt("" + (char) jump);
+				continue;
 			}
 			/* Might have jumped past the end */
 			if (i < reads.length)
 				nc.count((char) reads[i], p.getPos() - visible.start);
+			}catch(NumberFormatException ne){
+				log.log(Level.WARNING, "Pileup parser failed on line: "+new String(reads), ne);
+				System.err.println("Pileup parser failed on line: "+new String(reads));
+			}
 		}
 		// .out.println();
 
