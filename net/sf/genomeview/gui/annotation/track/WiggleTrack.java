@@ -206,7 +206,12 @@ public class WiggleTrack extends Track {
 		if (yOffset < rec.y + rec.height && yOffset + graphLineHeigh > rec.y) {
 
 			double width = screenWidth / (double) currentVisible.length();
-
+			
+			double min=graph.min();
+			if(min>0)
+				min=0;
+			double max=graph.max();
+			
 			int scale = 1;
 			int scaleIndex = 0;
 			while (scale < (int) Math.ceil(1.0 / width)) {
@@ -230,14 +235,14 @@ public class WiggleTrack extends Track {
 					val = graph.max();
 
 				if (logScaled) {
-					double logrange = log2(graph.max() + 1)
-							- log2(graph.min() + 1);
-					val -= log2(graph.min() + 1);
+					double logrange = log2(max + 1)
+							- log2(min + 1);
+					val -= log2(min + 1);
 					val = log2(val + 1);
 					val /= logrange;
 				} else {
-					double range = graph.max() - graph.min();
-					val -= graph.min();
+					double range = max - min;
+					val -= min;
 					val /= range;
 				}
 
