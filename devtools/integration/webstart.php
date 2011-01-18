@@ -7,7 +7,7 @@ $tracks = dirList($basedir . ".");
 /* We very strongly recommend using the central GenomeView release. 
  * This version is always up to date and is distributed through the
  * global Sourceforge download mirror network */ 
-$starturl='http://genomeview.org/start/snapshot.jnlp?--config ' . $baseurl . 'config.local';
+$starturl='http://genomeview.org/start/snapshot.jnlp?--config ' . $baseurl . 'genomeview.txt';
 
 $all = "";
 foreach ($tracks as $track) {
@@ -39,7 +39,7 @@ function dirList($directory) {
 		 * .htaccess
 		 * All *.bam files, the bai will be included
 		 */
-				if (!is_dir($file)&&$file != '.' && $file != '..' && $file != '.htaccess'&&!endsWith($file,".html")&&!endsWith($file,".php")&&!endsWith($file,".tbi")&&!endsWith($file,".bam")&& $file != 'config.local'&& $file != 'index.php')
+				if (!is_dir($file)&&$file != '.' && $file != '..' && $file != '.htaccess'&&!endsWith($file,".html")&&!endsWith($file,".php")&&!endsWith($file,".fai")&&!endsWith($file,".tbi")&&!endsWith($file,".bam")&& $file != 'genomeview.txt'&& $file != 'index.php')
 			$results[] = $file;
 	}
 
