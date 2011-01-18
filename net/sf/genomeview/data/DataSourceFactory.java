@@ -289,6 +289,7 @@ public class DataSourceFactory {
 
 		}
 		/* No indexing scheme found */
+		log.fine("No index file found for "+fileName);
 		return null;
 	}
 
