@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.zip.ZipException;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -127,7 +128,7 @@ public class DataSourceFactory {
 
 			} catch (ReadFailedException re) {
 				JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Could not read data from source: "
-						+ re.getMessage(),"Error!",JOptionPane.ERROR_MESSAGE);
+						+ re.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -140,12 +141,12 @@ public class DataSourceFactory {
 				List<String> refs = das.getReferences();
 				Collections.sort(refs);
 				String ref = (String) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-						"Select reference genome", "Reference selection", JOptionPane.INFORMATION_MESSAGE, null, refs
-								.toArray(), refs.get(0));
+						"Select reference genome", "Reference selection", JOptionPane.INFORMATION_MESSAGE, null,
+						refs.toArray(), refs.get(0));
 				List<EntryPoint> eps = das.getEntryPoints(ref);
 				EntryPoint ep = (EntryPoint) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-						"Select entry point", "Entry point selection", JOptionPane.INFORMATION_MESSAGE, null, eps
-								.toArray(), eps.get(0));
+						"Select entry point", "Entry point selection", JOptionPane.INFORMATION_MESSAGE, null,
+						eps.toArray(), eps.get(0));
 				das.setEntryPoint(ep);
 				das.setReference(ref);
 				return new DataSource[] { das };
@@ -277,7 +278,7 @@ public class DataSourceFactory {
 				if (in instanceof URL)
 					return new IndexedFeatureFile((URL) in, 8000, 50);
 			}
-			
+
 			indexName = fileName + ".mfi";
 			if (checkExist(in, indexName)) {
 				log.fine("Reading mafix file...");
@@ -289,7 +290,7 @@ public class DataSourceFactory {
 
 		}
 		/* No indexing scheme found */
-		log.fine("No index file found for "+fileName);
+		log.fine("No index file found for " + fileName);
 		return null;
 	}
 
@@ -302,22 +303,36 @@ public class DataSourceFactory {
 				URLConnection conn = new URL(string).openConnection();
 				conn.setUseCaches(false);
 				log.fine(conn.getHeaderFields().toString());
-				LineIterator it = new LineIterator(conn.getInputStream());
-				it.setSkipBlanks(true);
-				String line = it.next().trim();
-				while (line.length() < 1)
-					line = it.next().trim();
-				log.fine("Checkline: " + line);
-				it.close();
+				try {
+					LineIterator it = new LineIterator(conn.getInputStream());
+					it.setSkipBlanks(true);
+					String line = it.next().trim();
+					while (line.length() < 1)
+						line = it.next().trim();
+					log.fine("Checkline: " + line);
+					it.close();
 
-				/*
-				 * This is not supposed to happend, except with badly configured
-				 * CMS that take over
-				 */
-				if (line.startsWith("<!DOCTYPE"))
+					/*
+					 * This is not supposed to happend, except with badly
+					 * configured CMS that take over
+					 */
+					if (line.startsWith("<!DOCTYPE"))
+						return false;
+					;
+				} catch (RuntimeException ze) {
+					// This is not supposed to happen either, but what can you
+					// do...
+					/*
+					 * This case is a proper block compressed file, with non 0
+					 * zero length, but LineIterator can't handle it properly
+					 */
+					if (ze.getCause() instanceof ZipException) {
+						return true;
+
+					}
 					return false;
-				;
 
+				}
 				return true;
 			} catch (IOException ioe) {
 				System.err.println(ioe);
@@ -325,5 +340,4 @@ public class DataSourceFactory {
 			}
 		return false;
 	}
-
 }
