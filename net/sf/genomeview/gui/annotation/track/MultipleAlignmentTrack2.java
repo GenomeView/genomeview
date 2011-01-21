@@ -32,7 +32,7 @@ import net.sf.genomeview.gui.dialog.MultipleAlignmentOrderingDialog;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
-import net.sf.jannot.alignment.maf.AlignmentBlock;
+import net.sf.jannot.alignment.maf.AbstractAlignmentBlock;
 import net.sf.jannot.alignment.maf.AlignmentSequence;
 import net.sf.jannot.alignment.maf.MAFMultipleAlignment;
 import net.sf.jannot.utils.SequenceTools;
@@ -122,12 +122,12 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	private int lineHeight = 15;
 
-	private Map<Rectangle, AlignmentBlock> paintedBlocks = new HashMap<Rectangle, AlignmentBlock>();
+	private Map<Rectangle, AbstractAlignmentBlock> paintedBlocks = new HashMap<Rectangle, AbstractAlignmentBlock>();
 
 	// private int queriedBlocks = 0;
 
 	class MouseHit {
-		AlignmentBlock ab;
+		AbstractAlignmentBlock ab;
 		Rectangle rec;
 		public int x1;
 	}
@@ -195,7 +195,7 @@ public class MultipleAlignmentTrack2 extends Track {
 		}
 		// TreeSet<AlignmentBlock> abs = ma.get(entry, visible);
 		// System.out.println("Querying location: "+visible);
-		Iterable<AlignmentBlock> abs = ma.get(visible.start, visible.end);
+		Iterable<AbstractAlignmentBlock> abs = ma.get(visible.start, visible.end);
 
 		// queriedBlocks = ma.getEstimateCount(visible);
 
@@ -208,7 +208,7 @@ public class MultipleAlignmentTrack2 extends Track {
 			int yMax = 0;
 			CollisionMap hitmap = new CollisionMap(model);
 			MouseHit mh = null;
-			for (AlignmentBlock ab : abs) {
+			for (AbstractAlignmentBlock ab : abs) {
 				int abCount = 0;
 
 				int start = ab.getLocation().start;
@@ -437,7 +437,7 @@ public class MultipleAlignmentTrack2 extends Track {
 			return yMax - yOffset;
 		} else {/* More than 500 blocks on screen */
 			int[] counts = new int[(int) Math.ceil(screenWidth)];
-			for (AlignmentBlock ab : abs) {
+			for (AbstractAlignmentBlock ab : abs) {
 				AlignmentSequence as = ab.getAlignmentSequence(0);
 				int start = Convert.translateGenomeToScreen(as.start(), visible, screenWidth);
 				int end = Convert.translateGenomeToScreen(as.end(), visible, screenWidth);
