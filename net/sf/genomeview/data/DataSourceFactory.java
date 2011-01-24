@@ -3,6 +3,7 @@
  */
 package net.sf.genomeview.data;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -313,7 +314,7 @@ public class DataSourceFactory {
 					it.close();
 
 					/*
-					 * This is not supposed to happend, except with badly
+					 * This is not supposed to happen, except with badly
 					 * configured CMS that take over
 					 */
 					if (line.startsWith("<!DOCTYPE"))
@@ -326,7 +327,7 @@ public class DataSourceFactory {
 					 * This case is a proper block compressed file, with non 0
 					 * zero length, but LineIterator can't handle it properly
 					 */
-					if (ze.getCause() instanceof ZipException) {
+					if (ze.getCause() instanceof ZipException||ze.getCause() instanceof EOFException) {
 						return true;
 
 					}
@@ -341,3 +342,4 @@ public class DataSourceFactory {
 		return false;
 	}
 }
+
