@@ -15,9 +15,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.annotation.track.StructureTrack;
-import net.sf.genomeview.gui.annotation.track.TickmarkTrack;
-import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.gui.menu.edit.CloneFeatureAction;
 import net.sf.genomeview.gui.menu.edit.CreateNewFeatureAction;
 import net.sf.genomeview.gui.menu.edit.EditStructureAction;
@@ -27,6 +24,9 @@ import net.sf.genomeview.gui.menu.edit.SplitFeatureAction;
 import net.sf.genomeview.gui.menu.selection.ClearFeatureSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ClearRegionSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ShowSequenceWindowAction;
+import net.sf.genomeview.gui.viztracks.TickmarkTrack;
+import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Qualifier;
 

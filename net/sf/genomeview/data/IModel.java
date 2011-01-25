@@ -6,7 +6,7 @@ package net.sf.genomeview.data;
 import java.awt.Frame;
 import java.util.Observer;
 
-import net.sf.genomeview.gui.annotation.track.Track;
+import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.plugin.GUIManager;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;

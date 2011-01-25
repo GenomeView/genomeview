@@ -17,7 +17,7 @@ import be.abeel.gui.GridBagPanel;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
-import net.sf.genomeview.gui.annotation.track.StructureTrack.StructureTrackModel;
+import net.sf.genomeview.gui.viztracks.annotation.StructureTrack.StructureTrackModel;
 import net.sf.jannot.Type;
 
 /**

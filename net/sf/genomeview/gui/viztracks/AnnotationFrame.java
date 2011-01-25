@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.annotation;
+package net.sf.genomeview.gui.viztracks;
 
 import java.awt.BorderLayout;
 import java.awt.event.MouseWheelListener;

@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.annotation.track;
+package net.sf.genomeview.gui.viztracks.comparative;
 
 import java.awt.Color;
 import java.awt.GradientPaint;
@@ -17,6 +17,7 @@ import javax.swing.JViewport;
 import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;

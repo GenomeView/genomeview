@@ -11,9 +11,9 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.annotation.track.FeatureTrack;
-import net.sf.genomeview.gui.annotation.track.StructureTrack;
-import net.sf.genomeview.gui.annotation.track.Track;
+import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.genomeview.gui.viztracks.annotation.FeatureTrack;
+import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.Type;
 
 /**

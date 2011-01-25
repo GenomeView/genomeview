@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.annotation.track;
+package net.sf.genomeview.gui.viztracks.annotation;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -32,8 +32,9 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
-import net.sf.genomeview.gui.annotation.GeneEvidenceLabel.FillMode;
 import net.sf.genomeview.gui.components.CollisionMap;
+import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel.FillMode;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;

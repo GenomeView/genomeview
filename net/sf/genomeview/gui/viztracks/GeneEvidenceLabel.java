@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.annotation;
+package net.sf.genomeview.gui.viztracks;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -20,9 +20,8 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.AbstractGeneLabel;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
-import net.sf.genomeview.gui.annotation.track.StructureTrack;
-import net.sf.genomeview.gui.annotation.track.Track;
 import net.sf.genomeview.gui.menu.PopUpMenu;
+import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 /**

@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.annotation.track;
+package net.sf.genomeview.gui.viztracks.comparative;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -29,6 +29,7 @@ import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.genomeview.gui.dialog.MultipleAlignmentOrderingDialog;
+import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;

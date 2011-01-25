@@ -12,7 +12,7 @@ import javax.swing.Action;
 import javax.swing.JMenu;
 
 import net.sf.genomeview.gui.StatusBar;
-import net.sf.genomeview.gui.annotation.GeneEvidenceLabel;
+import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel;
 
 /**
  * Manages GUI components that are accessible for plugins.

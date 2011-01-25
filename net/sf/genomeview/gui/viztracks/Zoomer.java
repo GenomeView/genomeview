@@ -1,4 +1,4 @@
-package net.sf.genomeview.gui.annotation;
+package net.sf.genomeview.gui.viztracks;
 
 import java.awt.Color;
 import java.awt.Cursor;

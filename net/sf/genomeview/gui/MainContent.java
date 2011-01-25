@@ -14,8 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.annotation.AnnotationFrame;
 import net.sf.genomeview.gui.information.InformationFrame;
+import net.sf.genomeview.gui.viztracks.AnnotationFrame;
 /**
  * 
  * @author Thomas Abeel

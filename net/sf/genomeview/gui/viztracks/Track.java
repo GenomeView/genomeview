@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.annotation.track;
+package net.sf.genomeview.gui.viztracks;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -17,6 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JViewport;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 
