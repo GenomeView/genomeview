@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
@@ -66,7 +68,7 @@ public class Model extends Observable implements IModel {
 	}
 
 	public Model(Frame parent) {
-		guimanager=new GUIManager(parent);
+		guimanager = new GUIManager(parent);
 		/* Scheduler booster thread */
 		new Thread(new Runnable() {
 
@@ -88,7 +90,7 @@ public class Model extends Observable implements IModel {
 
 		selectionModel.addObserver(this);
 		this.trackList = new TrackList(this);
-		//entries.addObserver(this);
+		// entries.addObserver(this);
 
 		Configuration.getTypeSet("visibleTypes");
 		updateTracks();
@@ -156,8 +158,6 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	
-
 	private boolean silent;
 
 	/**
@@ -194,7 +194,7 @@ public class Model extends Observable implements IModel {
 
 	public void exit() {
 		this.exitRequested = true;
-		
+
 		loadedSources.clear();
 		refresh();
 
@@ -231,9 +231,9 @@ public class Model extends Observable implements IModel {
 		}
 		if (newZoom.length() != annotationEnd - annotationStart + 1 && newZoom.length() < 50)
 			return;
-//		if (newZoom.length() != annotationEnd - annotationStart + 1
-//				&& newZoom.length() > Configuration.getInt("general:zoomout"))
-//			return;
+		// if (newZoom.length() != annotationEnd - annotationStart + 1
+		// && newZoom.length() > Configuration.getInt("general:zoomout"))
+		// return;
 		if (newZoom.start < 1 || newZoom.end < 1)
 			return;
 
@@ -369,7 +369,7 @@ public class Model extends Observable implements IModel {
 			loadedSources.add(f);
 		updateTracks();
 		refresh(NotificationTypes.GENERAL);
-		
+
 	}
 
 	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(
@@ -394,10 +394,10 @@ public class Model extends Observable implements IModel {
 
 	private final TrackList trackList;
 
-//	public void addTrack(Track track) {
-//		trackList.add(track);
-//		refresh();
-//	}
+	// public void addTrack(Track track) {
+	// trackList.add(track);
+	// refresh();
+	// }
 
 	public class TrackList implements Iterable<Track> {
 		private Model model;
@@ -467,15 +467,13 @@ public class Model extends Observable implements IModel {
 			mapping.remove(key);
 		}
 
-		
-
 		public boolean containsTrack(DataKey key) {
 			return mapping.keySet().contains(key);
 		}
 
-//		public boolean containsTrack(String string) {
-//			return containsTrack(new StringKey(string));
-//		}
+		// public boolean containsTrack(String string) {
+		// return containsTrack(new StringKey(string));
+		// }
 
 		public int size() {
 			return order.size();
@@ -530,63 +528,56 @@ public class Model extends Observable implements IModel {
 	 * All types and graphs loaded should have a corresponding track.
 	 */
 	public synchronized void updateTracks() {
-		int startSize = trackList.size();
+		try {
+			int startSize = trackList.size();
 
-		// for (Entry e : entries) {
-		Entry e = this.getSelectedEntry();
-		System.out.println("Updating tracks for " + e);
-		/* Graph tracks */
-		for (DataKey key : e) {
-			Data<?> data = e.get(key);
-			if (data instanceof MemoryFeatureAnnotation) {
-				if (!trackList.containsTrack(key)&&((MemoryFeatureAnnotation)data).cachedCount()>0)
-					trackList.add(new FeatureTrack(this, (Type) key));
+			// for (Entry e : entries) {
+			Entry e = this.getSelectedEntry();
+			System.out.println("Updating tracks for " + e);
+			/* Graph tracks */
+			for (DataKey key : e) {
+				Data<?> data = e.get(key);
+				if (data instanceof MemoryFeatureAnnotation) {
+					if (!trackList.containsTrack(key) && ((MemoryFeatureAnnotation) data).cachedCount() > 0)
+						trackList.add(new FeatureTrack(this, (Type) key));
 
-			}
-			if (data instanceof GFFWrapper || data instanceof BEDWrapper) {
-				if (!trackList.containsTrack(key))
-					trackList.add(new FeatureTrack(this, (Type) key));
+				}
+				if (data instanceof GFFWrapper || data instanceof BEDWrapper) {
+					if (!trackList.containsTrack(key))
+						trackList.add(new FeatureTrack(this, (Type) key));
 
-			}
+				}
 
-			if (data instanceof PileupWrapper) {
+				if (data instanceof PileupWrapper) {
+					if (!trackList.containsTrack(key))
+						trackList.add(new PileupTrack(key, this));
+				}
 
-				// trackList.printDebug();
-
-				if (!trackList.containsTrack(key))
-					trackList.add(new PileupTrack(key, this));
-			}
-
-			// if (data instanceof GFFWrapper) {
-			// if (!trackList.containsTrack(key))
-			// trackList.add(new FeatureTrack(this,key));
-			// }
-
-			if (data instanceof Graph) {
-				if (!trackList.containsTrack(key))
-					trackList.add(new WiggleTrack(key, this, true));
-			}
-			if (data instanceof AlignmentAnnotation) {
-				if (!trackList.containsTrack(key))
-					trackList.add(new MultipleAlignmentTrack(this, key));
-				// if (!trackList.containsTrack(key))
-				// trackList.add(new SequenceLogoTrack(this, key));
-
-			}
-			if (data instanceof ReadGroup) {
-				if (!trackList.containsTrack(key)) {
-					trackList.add(new ShortReadTrack(key, this));
+				if (data instanceof Graph) {
+					if (!trackList.containsTrack(key))
+						trackList.add(new WiggleTrack(key, this, true));
+				}
+				if (data instanceof AlignmentAnnotation) {
+					if (!trackList.containsTrack(key))
+						trackList.add(new MultipleAlignmentTrack(this, key));
+				}
+				if (data instanceof ReadGroup) {
+					if (!trackList.containsTrack(key)) {
+						trackList.add(new ShortReadTrack(key, this));
+					}
+				}
+				if (data instanceof MAFMultipleAlignment) {
+					if (!trackList.containsTrack(key)) {
+						trackList.add(new MultipleAlignmentTrack2(this, key));
+						// logger.info("Added multiple alignment track " + ma);
+					}
 				}
 			}
-			if (data instanceof MAFMultipleAlignment) {
-				if (!trackList.containsTrack(key)) {
-					trackList.add(new MultipleAlignmentTrack2(this, key));
-					// logger.info("Added multiple alignment track " + ma);
-				}
-			}
+			if (trackList.size() != startSize)
+				refresh(NotificationTypes.UPDATETRACKS);
+		} catch (ConcurrentModificationException e) {
+			logger.log(Level.INFO, "Update tracks interrupted, tracks already changed", e);
 		}
-		if (trackList.size() != startSize)
-			refresh(NotificationTypes.UPDATETRACKS);
 
 	}
 
@@ -655,7 +646,7 @@ public class Model extends Observable implements IModel {
 	 * -2 -> AA
 	 * -3 -> AA
 	 * -4 -> AA
-     * </code>
+	 * </code>
 	 * 
 	 * @param pressTrack
 	 */
@@ -711,7 +702,7 @@ public class Model extends Observable implements IModel {
 
 	public void change(ChangeEvent change) {
 		undoStack.push(change);
-		
+
 	}
 
 }
