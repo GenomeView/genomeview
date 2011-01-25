@@ -15,11 +15,11 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.source.DataSource;
+import net.sf.jannot.source.DataSourceFactory;
 import be.abeel.io.LineIterator;
 
 /**

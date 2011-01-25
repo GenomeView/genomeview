@@ -14,11 +14,11 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
-import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
+import net.sf.jannot.source.DataSourceFactory;
 
 /**
  * 

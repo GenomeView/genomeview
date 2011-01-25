@@ -6,8 +6,7 @@ import java.net.MalformedURLException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.Assert;
-
-import net.sf.genomeview.data.das.DSN;
+import net.sf.jannot.source.das.DSN;
 
 import org.junit.Test;
 import org.xml.sax.SAXException;

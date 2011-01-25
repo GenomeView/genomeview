@@ -7,12 +7,10 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.Assert;
-import net.sf.genomeview.data.das.DAS;
-import net.sf.genomeview.data.das.DSN;
-import net.sf.genomeview.data.das.DAS.EntryPoint;
-import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
+import net.sf.jannot.source.das.DAS;
+import net.sf.jannot.source.das.DAS.EntryPoint;
 
 import org.junit.Test;
 import org.xml.sax.SAXException;

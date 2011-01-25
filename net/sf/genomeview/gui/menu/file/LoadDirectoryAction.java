@@ -9,9 +9,8 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import net.sf.genomeview.data.DataSourceFactory;
+import net.sf.genomeview.data.DataMenu;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.data.DataSourceFactory.Sources;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.source.DataSource;
 
@@ -31,8 +30,8 @@ public class LoadDirectoryAction extends AbstractAction {
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
-		DataSource[] data = DataSourceFactory.create(
-				Sources.DIRECTORY, model,null);
+		DataSource[] data = DataMenu.create(
+				net.sf.jannot.source.DataSourceFactory.Sources.DIRECTORY, model,null);
 
 		if (data != null) {
 			logger.info("Datasources=" + data.length);

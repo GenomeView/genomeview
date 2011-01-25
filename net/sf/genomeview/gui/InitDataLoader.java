@@ -12,12 +12,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.data.DataSourceFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
-import net.sf.jannot.source.FileSource;
+import net.sf.jannot.source.DataSourceFactory;
+import net.sf.jannot.source.cache.SourceCache;
 
 public class InitDataLoader {
 
@@ -33,7 +33,9 @@ public class InitDataLoader {
 	public void init(String config, String cmdUrl, String cmdFile, String[] remArgs, String position)
 					throws InterruptedException, ExecutionException{
 		
-		
+
+		SourceCache.cacheDir=new File(Configuration.getDirectory(),"cache");
+		DataSourceFactory.disableURLCaching=Configuration.getBoolean("general:disableURLCaching");
 		/* Load the additional configuration */
 		if (config != null) {
 			try {
