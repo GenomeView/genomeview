@@ -39,7 +39,6 @@ import net.sf.jannot.EntrySet;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
-import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
 import net.sf.jannot.alignment.maf.MAFMultipleAlignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
@@ -51,6 +50,7 @@ import net.sf.jannot.source.MultiFileSource;
 import net.sf.jannot.tabix.BEDWrapper;
 import net.sf.jannot.tabix.GFFWrapper;
 import net.sf.jannot.tabix.PileupWrapper;
+import net.sf.jannot.tabix.SWigWrapper;
 import net.sf.jannot.wiggle.Graph;
 import be.abeel.util.DefaultHashMap;
 
@@ -548,7 +548,7 @@ public class Model extends Observable implements IModel {
 
 				}
 
-				if (data instanceof PileupWrapper) {
+				if (data instanceof PileupWrapper || data instanceof SWigWrapper) {
 					if (!trackList.containsTrack(key))
 						trackList.add(new PileupTrack(key, this));
 				}

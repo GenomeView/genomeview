@@ -5,7 +5,6 @@ package net.sf.genomeview.gui.annotation.track;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
@@ -34,6 +33,7 @@ import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.scheduler.GenomeViewScheduler;
 import net.sf.genomeview.scheduler.Task;
+import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
@@ -48,6 +48,9 @@ import net.sf.jannot.tabix.PileupWrapper;
 public class PileupTrack extends Track {
 
 	class PileupTrackModel {
+
+		private boolean dynamicScaling = false;
+
 		private boolean logscaling = false;
 
 		public boolean isLogscaling() {
@@ -56,6 +59,14 @@ public class PileupTrack extends Track {
 
 		public void setLogscaling(boolean logscaling) {
 			this.logscaling = logscaling;
+		}
+
+		public void setDynamicScaling(boolean dynamicScaling) {
+			this.dynamicScaling = dynamicScaling;
+		}
+
+		public boolean isDynamicScaling() {
+			return dynamicScaling;
 		}
 
 		public Location lastQuery = null;
@@ -109,16 +120,19 @@ public class PileupTrack extends Track {
 				text.append("<strong>Matches:</strong> " + format(ptm.nc.getCount('.', effectivePosition), total)
 						+ "<br/>");
 
-				text.append("<strong>Mismatches:</strong><br/>");
-				text.append("A: " + format(ptm.nc.getCount('A', effectivePosition), total));
-				text.append("<br/>");
-				text.append("T: " + format(ptm.nc.getCount('T', effectivePosition), total));
-				text.append("<br/>");
-				text.append("G: " + format(ptm.nc.getCount('G', effectivePosition), total));
-				text.append("<br/>");
-				text.append("C: " + format(ptm.nc.getCount('C', effectivePosition), total));
-				text.append("<br/>");
-				text.append("<strong>Coverage:</strong><br/>");
+				if (ptm.nc.hasData()) {
+					text.append("<strong>Mismatches:</strong><br/>");
+					text.append("A: " + format(ptm.nc.getCount('A', effectivePosition), total));
+					text.append("<br/>");
+					text.append("T: " + format(ptm.nc.getCount('T', effectivePosition), total));
+					text.append("<br/>");
+					text.append("G: " + format(ptm.nc.getCount('G', effectivePosition), total));
+					text.append("<br/>");
+					text.append("C: " + format(ptm.nc.getCount('C', effectivePosition), total));
+					text.append("<br/>");
+				}
+				text.append("<strong>Coverage:</strong> "
+						+ (ptm.detailedRects[0][effectivePosition] + ptm.detailedRects[1][effectivePosition]) + "<br/>");
 				text.append("Forward: " + ptm.detailedRects[0][effectivePosition] + "<br/>");
 				text.append("Reverse: " + ptm.detailedRects[1][effectivePosition] + "<br/>");
 
@@ -136,10 +150,10 @@ public class PileupTrack extends Track {
 		}
 
 		private String format(int count, int total) {
-			if(total>0)
+			if (total > 0)
 				return count + " (" + nf.format(count / (double) total) + ")";
 			else
-				return ""+count;
+				return "" + count;
 		}
 	}
 
@@ -169,7 +183,14 @@ public class PileupTrack extends Track {
 	private BitSet ready = null;
 	private BitSet running = null;
 	private int[] summary;
+	/* Keeps track of the maximum value in detailed mode */
 	private double maxPile = 0;
+	/*
+	 * Keeps track of the maximum value in detailed mode per data query, this
+	 * value will be reset each time we retrieve new data.
+	 */
+	private double localMaxPile = 0;
+
 	private int maxSummary = 0;
 
 	private static final int CHUNK = 32000;
@@ -185,9 +206,9 @@ public class PileupTrack extends Track {
 
 	class PileupTask extends Task {
 		private int idx;
-		private PileupWrapper pw;
+		private Data<Pile> pw;
 
-		public PileupTask(PileupWrapper pw, int idx) {
+		public PileupTask(Data<Pile> pw, int idx) {
 			super(new Location(idx * CHUNK, (idx + 1) * CHUNK));
 			this.pw = pw;
 			this.idx = idx;
@@ -236,19 +257,14 @@ public class PileupTrack extends Track {
 	class NucCounter {
 		int[][] counter;
 
-		public NucCounter() {
-			// TODO Auto-generated constructor stub
+		private boolean didCount = false;
+
+		public NucCounter(int len) {
+			counter = new int[6][len];
 		}
 
 		public boolean hasData() {
-			return counter != null;
-		}
-
-		public void init(int len) {
-			if (counter == null)
-				/* 4 nucleotides and N and other symbols */
-				counter = new int[6][len];
-
+			return counter != null && didCount;
 		}
 
 		public int getCount(char nuc, int pos) {
@@ -285,6 +301,7 @@ public class PileupTrack extends Track {
 		}
 
 		public void count(char nuc, int pos) {
+			didCount = true;
 			// System.out.println("P:"+pos);
 			// System.out.println("Miss: "+nuc+"\t"+pos);
 			int ix = ix(nuc);
@@ -304,10 +321,9 @@ public class PileupTrack extends Track {
 		}
 		Location visible = model.getAnnotationLocationVisible();
 		/* Only retrieve data when location changed */
-
 		if (ptm.lastQuery == null || !ptm.lastQuery.equals(model.getAnnotationLocationVisible())) {
-
-			final PileupWrapper pw = (PileupWrapper) entry.get(super.dataKey);
+			localMaxPile = 0;
+			final Data<Pile> pw = (Data<Pile>) entry.get(super.dataKey);
 			/* Data for detailed panel */
 			if (pw != null)
 				ptm.lastQuery = model.getAnnotationLocationVisible();
@@ -317,13 +333,16 @@ public class PileupTrack extends Track {
 				Iterable<Pile> piles = pw.get(visible.start, visible.end);
 				ptm.detailedRects = new int[2][visible.length()];
 				/* Variables for SNP track */
-				ptm.nc = new NucCounter();
-				ptm.nc.init(visible.length());
+				ptm.nc = new NucCounter(visible.length());
 				g.setColor(Color.GRAY);
 				for (Pile p : piles) {
 					if (p.getPos() < visible.start || p.getPos() > visible.end)
 						continue;
-					count(ptm.nc, p, visible);
+					if (p.getBases() != null) {
+						count(ptm.nc, p, visible);
+
+					}
+
 					int pos = p.getLocation().start;
 
 					int fcov = p.getFCoverage();
@@ -335,6 +354,8 @@ public class PileupTrack extends Track {
 					double coverage = fcov + rcov;
 					if (coverage > maxPile)
 						maxPile = coverage;
+					if (coverage > localMaxPile)
+						localMaxPile = coverage;
 
 				}
 			} else {
@@ -366,10 +387,14 @@ public class PileupTrack extends Track {
 		int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
 
 		this.screenWidth = screenWidth;
-
+		/**
+		 * Draw detailed coverage plot
+		 */
 		if (isDetailed()) {
 			int lastX = -1;
 			double div = maxPile;
+			if (ptm.isDynamicScaling())
+				div = localMaxPile;
 			int width = (int) Math.ceil(screenWidth / visible.length());
 			for (int i = 0; i < ptm.detailedRects[0].length; i++) {
 				// int snpOffset = yOffset;
@@ -397,7 +422,7 @@ public class PileupTrack extends Track {
 				int screenX = Convert.translateGenomeToScreen(i + visible.start, visible, screenWidth);
 
 				if (screenX > lastX) {
-					lastX=screenX;
+					lastX = screenX;
 					g.setColor(Color.ORANGE);
 					g.fillRect(screenX, yOffset + graphLineHeigh - size, width, 2 * size);
 
@@ -447,8 +472,8 @@ public class PileupTrack extends Track {
 				g.setColor(Color.BLACK);
 				g.drawString("SNPs", 5, yOffset + snpTrackHeight - 4);
 				// System.out.println("Drawing snps: "+visible);
-//				int skipped = 0;
-//				int totl=0;
+				// int skipped = 0;
+				// int totl=0;
 				for (int i = visible.start; i <= visible.end; i++) {
 					int x1 = Convert.translateGenomeToScreen(i, visible, screenWidth);
 					double total = ptm.nc.getTotalCount(i - visible.start);
@@ -461,22 +486,22 @@ public class PileupTrack extends Track {
 							if (nucs[j] != refNt) {
 								double fraction = ptm.nc.getCount(nucs[j], i - visible.start) / total;
 								fraction *= snpTrackHeight;
-								//totl++;
+								// totl++;
 								if (fraction > 0.05) {
 									g.setColor(color[j]);
 									g.fillRect(x1, (int) (yOffset + snpTrackHeight - fraction - done), nucWidth,
 											(int) (Math.ceil(fraction)));
-								} 
-//								else {
-//									skipped++;
-//								}
+								}
+								// else {
+								// skipped++;
+								// }
 								done += fraction;
 							}
 						}
 					}
 
 				}
-				//System.out.println("Skipped: "+skipped +"/"+totl);
+				// System.out.println("Skipped: "+skipped +"/"+totl);
 			}
 			/* Draw tick labels on coverage plot */
 			g.setColor(Color.BLACK);
@@ -635,23 +660,22 @@ public class PileupTrack extends Track {
 		// System.out.print("P: "+p.getPos());
 		byte[] reads = p.getBases();
 		for (int i = 0; i < reads.length; i++) {
-			try{
-			char c = (char) reads[i];
-			if (c == '^'){
-				i++;
-				continue;
-			}
-			else if (c == '-' || c == '+') {
-				int jump = reads[++i];
-				i += Integer.parseInt("" + (char) jump);
-				continue;
-			}
-			/* Might have jumped past the end */
-			if (i < reads.length)
-				nc.count((char) reads[i], p.getPos() - visible.start);
-			}catch(NumberFormatException ne){
-				log.log(Level.WARNING, "Pileup parser failed on line: "+new String(reads), ne);
-				System.err.println("Pileup parser failed on line: "+new String(reads));
+			try {
+				char c = (char) reads[i];
+				if (c == '^') {
+					i++;
+					continue;
+				} else if (c == '-' || c == '+') {
+					int jump = reads[++i];
+					i += Integer.parseInt("" + (char) jump);
+					continue;
+				}
+				/* Might have jumped past the end */
+				if (i < reads.length)
+					nc.count((char) reads[i], p.getPos() - visible.start);
+			} catch (NumberFormatException ne) {
+				log.log(Level.WARNING, "Pileup parser failed on line: " + new String(reads), ne);
+				System.err.println("Pileup parser failed on line: " + new String(reads));
 			}
 		}
 		// .out.println();
@@ -686,6 +710,19 @@ public class PileupTrack extends Track {
 
 		});
 		out.add(item);
+
+		/* Dynamic scaling for both plots */
+		final JCheckBoxMenuItem item3 = new JCheckBoxMenuItem();
+		item3.setSelected(ptm.isDynamicScaling());
+		item3.setAction(new AbstractAction("Use dynamic scaling for plots") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ptm.setDynamicScaling(item3.isSelected());
+
+			}
+
+		});
+		out.add(item3);
 
 		/* Maximum value */
 		final JMenuItem item2 = new JMenuItem(new AbstractAction("Set maximum value") {
