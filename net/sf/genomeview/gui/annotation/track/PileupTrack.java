@@ -190,8 +190,9 @@ public class PileupTrack extends Track {
 	 * value will be reset each time we retrieve new data.
 	 */
 	private double localMaxPile = 0;
-
-	private int maxSummary = 0;
+	/* Keeps track of the maximum value in summary graph mode */
+	private double maxSummary = 0;
+	
 
 	private static final int CHUNK = 32000;
 	private static final int SUMMARYSIZE = 100;
