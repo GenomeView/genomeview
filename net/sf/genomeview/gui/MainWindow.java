@@ -56,20 +56,24 @@ public class MainWindow implements WindowListener, Observer {
 		model.addObserver(o);
 	}
 
-	public MainWindow(String args[],Splash splash) throws InterruptedException, ExecutionException {
+	public MainWindow(String args[], Splash splash) throws InterruptedException, ExecutionException {
 		running++;
 		logger.info("Started running instance" + running);
-		init(args,splash);
+		init(args, splash);
 	}
 
-	private void parse(AutoHelpCmdLineParser parser, String[] args) {
+	private boolean parse(AutoHelpCmdLineParser parser, String[] args) {
 		try {
 			parser.parse(args);
+			return true;
 		} catch (IllegalOptionValueException e) {
-			logger.log(Level.SEVERE, "parsing command line options", e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			CrashHandler.showErrorMessage("Error while parsing command line arguments: "+e.getMessage()+"\n\nWill continue without command line arguments.", e);
 		} catch (UnknownOptionException e) {
-			logger.log(Level.SEVERE, "", e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			CrashHandler.showErrorMessage("Error while parsing command line arguments: "+e.getMessage()+"\n\nWill continue without command line arguments.", e);
 		}
+		return false;
 
 	}
 
@@ -82,13 +86,13 @@ public class MainWindow implements WindowListener, Observer {
 
 	@Override
 	public void windowActivated(WindowEvent e) {
-		// TODO Auto-generated method stub
+		// Nothing to do here
 
 	}
 
 	@Override
 	public void windowClosed(WindowEvent e) {
-		// TODO Auto-generated method stub
+		// Nothing to do here
 
 	}
 
@@ -103,25 +107,25 @@ public class MainWindow implements WindowListener, Observer {
 
 	@Override
 	public void windowDeactivated(WindowEvent e) {
-		// TODO Auto-generated method stub
+		// Nothing to do here
 
 	}
 
 	@Override
 	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
+		// Nothing to do here
 
 	}
 
 	@Override
 	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
+		// Nothing to do here
 
 	}
 
 	@Override
 	public void windowOpened(WindowEvent e) {
-		// TODO Auto-generated method stub
+		// Nothing to do here
 
 	}
 
@@ -172,13 +176,12 @@ public class MainWindow implements WindowListener, Observer {
 		Option positionO = parser.addHelp(parser.addStringOption("position"),
 				"Provide the initial region that should be visible.");
 
-		parse(parser, args);
+		boolean goodParse = parse(parser, args);
 
 		if (parser.checkHelp()) {
 			System.exit(0);
 		}
 
-		
 		splash.setText("Creating windows...");
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice[] gs = ge.getScreenDevices();
@@ -206,11 +209,11 @@ public class MainWindow implements WindowListener, Observer {
 			JPanel[] content = MainContent.createContent(model, Configuration.getBoolean("dualscreen") ? gs.length : 1);
 			window.setContentPane(content[0]);
 			window.setJMenuBar(new MainMenu(model));
-			
+
 			window.pack();
 			Rectangle rec = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 			window.setSize(rec.width, rec.height);
-			
+
 			if (content.length > 1) {
 				for (int i = 1; i < content.length; i++) {
 					helper = new JFrame("GenomeView :: " + Configuration.version(), gs[i].getDefaultConfiguration());
@@ -228,17 +231,18 @@ public class MainWindow implements WindowListener, Observer {
 		}
 		splash.setText("Loading data...");
 		/* Data specified on command line */
-		String cmdUrl = (String) parser.getOptionValue(urlO);
-		String cmdFile = (String) parser.getOptionValue(fileO);
-		String[] remArgs = parser.getRemainingArgs();
-		String initialLocation = (String) parser.getOptionValue(positionO);
-		/* Load the additional configuration */
-		String config = (String) parser.getOptionValue(configurationO);
-		
-		InitDataLoader idl=new InitDataLoader(model);
-		idl.init(config, cmdUrl, cmdFile, remArgs, initialLocation);
-		
-		
+		InitDataLoader idl = new InitDataLoader(model);
+		if (goodParse) {
+			String cmdUrl = (String) parser.getOptionValue(urlO);
+			String cmdFile = (String) parser.getOptionValue(fileO);
+			String[] remArgs = parser.getRemainingArgs();
+			String initialLocation = (String) parser.getOptionValue(positionO);
+			/* Load the additional configuration */
+			String config = (String) parser.getOptionValue(configurationO);
+			idl.init(config, cmdUrl, cmdFile, remArgs, initialLocation);
+		}else{
+			idl.init(null,null,null,new String[0],null);
+		}
 
 		/* Start acting */
 		model.setSilent(false);

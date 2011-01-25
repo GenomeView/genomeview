@@ -32,10 +32,17 @@ public class CrashHandler {
 	public static void main(String[] args) {
 		new CrashHandler();
 	}
+	public static void showErrorMessage(String message,Throwable cause){
+		JOptionPane.showMessageDialog(null, message, "GenomeView error!", JOptionPane.ERROR_MESSAGE );
+		
+	}
+	
 
 	private CrashHandler() {
 
 		final JFrame window = new JFrame("GenomeView ERROR!");
+		window.setAlwaysOnTop(true);
+		window.setResizable(false);
 		JTextArea ll = new JTextArea(10, 30);
 		ll
 				.setText("GenomeView has encountered an error from which it cannot recover and will be terminated.\n\nPlease report this problem.\n\nWhen reporting this issue, make sure to include the a description of what you were doing. Please also include the most recent log file. You can find error logs in the .genomeview folder in your home directory.");
@@ -74,7 +81,7 @@ public class CrashHandler {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Desktop.getDesktop().browse(new URI("https://sourceforge.net/tracker/?func=browse&group_id=208107&atid=1004368"));
+					Desktop.getDesktop().browse(new URI("https://sourceforge.net/tracker/?func=add&group_id=208107&atid=1004368"));
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(window, "Could not open bugtracker website");
 				}
@@ -101,8 +108,8 @@ public class CrashHandler {
 	}
 	private static Logger log=Logger.getLogger(CrashHandler.class.getCanonicalName());
 
-	public static void crash(Level severe, String string, Throwable ex) {
-		log.log(severe, string, ex);
+	public static void crash(Level logLevel, String logMessage, Throwable ex) {
+		log.log(logLevel, logMessage, ex);
 		log.severe("GenomeView is dead, initializing post-mortem.");
 		new CrashHandler();
 		

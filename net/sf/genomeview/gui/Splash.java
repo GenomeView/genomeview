@@ -32,7 +32,7 @@ public class Splash extends JWindow {
 		text=new JLabel("Starting GenomeView...");
 		Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 		
-		this.setAlwaysOnTop(true);
+		//this.setAlwaysOnTop(true);
 		Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 		Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
 		content.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
