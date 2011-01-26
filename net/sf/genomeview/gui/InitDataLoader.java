@@ -23,19 +23,17 @@ public class InitDataLoader {
 
 	private Model model;
 	private Logger logger;
-	
-	public InitDataLoader(Model model){
+
+	public InitDataLoader(Model model) {
 		this.model = model;
 		logger = Logger.getLogger(InitDataLoader.class.getCanonicalName());
 	}
-	
-	
-	public void init(String config, String cmdUrl, String cmdFile, String[] remArgs, String position)
-					throws InterruptedException, ExecutionException{
-		
 
-		SourceCache.cacheDir=new File(Configuration.getDirectory(),"cache");
-		DataSourceFactory.disableURLCaching=Configuration.getBoolean("general:disableURLCaching");
+	public void init(String config, String cmdUrl, String cmdFile, String[] remArgs, String position)
+			throws InterruptedException, ExecutionException {
+
+		SourceCache.cacheDir = new File(Configuration.getDirectory(), "cache");
+		DataSourceFactory.disableURLCaching = Configuration.getBoolean("general:disableURLCaching");
 		/* Load the additional configuration */
 		if (config != null) {
 			try {
@@ -45,15 +43,14 @@ public class InitDataLoader {
 					Configuration.loadExtra(new FileInputStream(config));
 				}
 			} catch (MalformedURLException e) {
-				logger.log(Level.SEVERE,"loading extra configuration", e);
+				logger.log(Level.SEVERE, "loading extra configuration", e);
 			} catch (IOException e) {
-				logger.log(Level.SEVERE,"loading extra configuration", e);
+				logger.log(Level.SEVERE, "loading extra configuration", e);
 			} catch (URISyntaxException e) {
-				logger.log(Level.SEVERE,"loading extra configuration", e);
+				logger.log(Level.SEVERE, "loading extra configuration", e);
 			}
 		}
-		
-		
+
 		/*
 		 * Select data source. If an URL or file are specified on the command
 		 * line, that is selected. In other cases a dialog pops-up to let the
@@ -65,7 +62,7 @@ public class InitDataLoader {
 		if (cmdFile == null && cmdUrl == null) {
 			logger.info("File and url options are null!");
 			// do nothing
-			
+
 		} else if (cmdUrl != null) {
 			logger.info("URL commandline option is set: " + cmdUrl);
 			try {
@@ -87,14 +84,14 @@ public class InitDataLoader {
 
 		/* Load the source, if one was constructed */
 		if (data != null) {
-			
+
 			assert (data.length == 1);
-			logger.info("Loading with priority: "+data[0]);
+			logger.info("Loading with priority: " + data[0]);
 			final ReadWorker rw = new ReadWorker(data[0], model);
 			rw.execute();
 			rw.get();
 		}
-		
+
 		/* Load additional files */
 		for (String s : remArgs) {
 			logger.info("loading additional from commandline: " + s);
@@ -125,18 +122,21 @@ public class InitDataLoader {
 		}
 
 		if (position != null) {
-			String[] arr = position.split(":");
-			assert arr.length==2||arr.length==3;
-			if(arr.length==3){
-				model.setSelectedEntry(model.entry(arr[0]));
-				model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[1]), Integer.parseInt(arr[2])));
-			}else if(arr.length==2){
-				model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[0]), Integer.parseInt(arr[1])));	
+			try {
+				String[] arr = position.split(":");
+				assert arr.length == 2 || arr.length == 3;
+				if (arr.length == 3) {
+					model.setSelectedEntry(model.entry(arr[0]));
+					model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[1]), Integer.parseInt(arr[2])));
+				} else if (arr.length == 2) {
+					model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[0]), Integer.parseInt(arr[1])));
+				}
+			} catch (NumberFormatException ne) {
+				CrashHandler.showErrorMessage("Could not parse location: " + position, ne);
 			}
-			
 
 		}
-		
+
 	}
-	
+
 }
