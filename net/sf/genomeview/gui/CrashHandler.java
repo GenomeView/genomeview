@@ -28,12 +28,11 @@ import javax.swing.JTextArea;
  */
 public class CrashHandler {
 
-	/* For testing purposes only */
-	public static void main(String[] args) {
-		new CrashHandler();
-	}
+	private static Logger log=Logger.getLogger(CrashHandler.class.getCanonicalName());
+
 	public static void showErrorMessage(String message,Throwable cause){
-		JOptionPane.showMessageDialog(null, message, "GenomeView error!", JOptionPane.ERROR_MESSAGE );
+		log.log(Level.SEVERE, message, cause);
+		JOptionPane.showMessageDialog(null, message+"\n\nThis error has been logged.", "GenomeView error!", JOptionPane.ERROR_MESSAGE );
 		
 	}
 	
@@ -106,8 +105,7 @@ public class CrashHandler {
 		window.setVisible(true);
 		window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	}
-	private static Logger log=Logger.getLogger(CrashHandler.class.getCanonicalName());
-
+	
 	public static void crash(Level logLevel, String logMessage, Throwable ex) {
 		log.log(logLevel, logMessage, ex);
 		log.severe("GenomeView is dead, initializing post-mortem.");
