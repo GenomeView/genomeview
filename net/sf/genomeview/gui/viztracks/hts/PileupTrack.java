@@ -48,121 +48,21 @@ import net.sf.jannot.tabix.PileupWrapper;
  */
 public class PileupTrack extends Track {
 
-	class PileupTrackModel {
-
-		private boolean dynamicScaling = false;
-
-		private boolean logscaling = false;
-
-		public boolean isLogscaling() {
-			return logscaling;
-		}
-
-		public void setLogscaling(boolean logscaling) {
-			this.logscaling = logscaling;
-		}
-
-		public void setDynamicScaling(boolean dynamicScaling) {
-			this.dynamicScaling = dynamicScaling;
-		}
-
-		public boolean isDynamicScaling() {
-			return dynamicScaling;
-		}
-
-		public Location lastQuery = null;
-		/* Data for detailed zoom */
-		public NucCounter nc;
-
-		/* Data for pileupgraph barchart */
-		public int[][] detailedRects = null;
-
-	}
-
 	private NumberFormat nf = NumberFormat.getInstance(Locale.US);
+	private PileupSummary summary = null;
 
 	public PileupTrack(DataKey key, Model model) {
 		super(key, model, true, false);
+		ptm = new PileupTrackModel(model);
+		tooltip = new PileupTooltip(ptm);
+		
 		nf.setMaximumFractionDigits(0);
+		summary = new PileupSummary(model);
 	}
 
-	private Tooltip tooltip = new Tooltip();
-	private PileupTrackModel ptm = new PileupTrackModel();
-
-	private class Tooltip extends JWindow {
-		private NumberFormat nf = NumberFormat.getPercentInstance(Locale.US);
-
-		private static final long serialVersionUID = -7416732151483650659L;
-
-		private JLabel floater = new JLabel();
-
-		public Tooltip() {
-			nf.setMaximumFractionDigits(1);
-			floater.setBackground(Color.GRAY);
-			floater.setForeground(Color.BLACK);
-			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
-			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
-			add(floater);
-			pack();
-		}
-
-		public void set(MouseEvent e) {
-			if (isDetailed() && ptm.nc != null) {
-				StringBuffer text = new StringBuffer();
-				text.append("<html>");
-
-				int start = model.getAnnotationLocationVisible().start;
-				int xGenome = Convert.translateScreenToGenome(e.getX(), model.getAnnotationLocationVisible(),
-						screenWidth);
-				int effectivePosition = xGenome - start;
-				int total = ptm.nc.getTotalCount(xGenome - start);
-
-				text.append("<strong>Matches:</strong> " + format(ptm.nc.getCount('.', effectivePosition), total)
-						+ "<br/>");
-
-				if (ptm.nc.hasData()) {
-					text.append("<strong>Mismatches:</strong><br/>");
-					text.append("A: " + format(ptm.nc.getCount('A', effectivePosition), total));
-					text.append("<br/>");
-					text.append("T: " + format(ptm.nc.getCount('T', effectivePosition), total));
-					text.append("<br/>");
-					text.append("G: " + format(ptm.nc.getCount('G', effectivePosition), total));
-					text.append("<br/>");
-					text.append("C: " + format(ptm.nc.getCount('C', effectivePosition), total));
-					text.append("<br/>");
-				}
-				text.append("<strong>Coverage:</strong> "
-						+ (ptm.detailedRects[0][effectivePosition] + ptm.detailedRects[1][effectivePosition]) + "<br/>");
-				text.append("Forward: " + ptm.detailedRects[0][effectivePosition] + "<br/>");
-				text.append("Reverse: " + ptm.detailedRects[1][effectivePosition] + "<br/>");
-
-				text.append("</html>");
-				if (!text.toString().equals(floater.getText())) {
-					floater.setText(text.toString());
-					this.pack();
-				}
-				setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
-
-				if (!isVisible()) {
-					setVisible(true);
-				}
-			}
-		}
-
-		private String format(int count, int total) {
-			if (total > 0)
-				return count + " (" + nf.format(count / (double) total) + ")";
-			else
-				return "" + count;
-		}
-	}
-
-	/*
-	 * Keeps track of the last screenwidht used for drawing, needed for
-	 * coordinate conversion
-	 */
-	private double screenWidth;
+	
+	private PileupTrackModel ptm ;
+	private PileupTooltip tooltip ;
 
 	@Override
 	public boolean mouseExited(int x, int y, MouseEvent source) {
@@ -170,33 +70,17 @@ public class PileupTrack extends Track {
 		return false;
 	}
 
-	// private int currentYOffset = 0;
-
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
 		tooltip.set(source);
 		return false;
 	}
 
-	/* Queue in blocks of CHUNK */
-	private BitSet queued = null;
-	/* Queue in blocks of CHUNK */
-	private BitSet ready = null;
-	private BitSet running = null;
-	private int[] summary;
-	/* Keeps track of the maximum value in detailed mode */
-	private double maxPile = 0;
 	/*
 	 * Keeps track of the maximum value in detailed mode per data query, this
 	 * value will be reset each time we retrieve new data.
 	 */
 	private double localMaxPile = 0;
-	/* Keeps track of the maximum value in summary graph mode */
-	private double maxSummary = 0;
-	
-
-	private static final int CHUNK = 32000;
-	private static final int SUMMARYSIZE = 100;
 
 	private static final double LOG2 = Math.log(2);
 
@@ -206,121 +90,18 @@ public class PileupTrack extends Track {
 
 	private Logger log = Logger.getLogger(PileupTrack.class.toString());
 
-	class PileupTask extends Task {
-		private int idx;
-		private Data<Pile> pw;
+	
 
-		public PileupTask(Data<Pile> pw, int idx) {
-			super(new Location(idx * CHUNK, (idx + 1) * CHUNK));
-			this.pw = pw;
-			this.idx = idx;
-
-		}
-
-		@Override
-		public void run() {
-			try {
-				running.set(idx);
-				Iterable<Pile> piles = pw.get(idx * CHUNK, (idx + 1) * CHUNK);
-				for (Pile p : piles) {
-					if (p.getPos() >= idx * CHUNK && p.getPos() < (idx + 1) * CHUNK) {
-						summary[(p.getPos() - 1) / SUMMARYSIZE] += p.getCoverage();
-						if (p.getCoverage() > maxPile) {
-							maxPile = p.getCoverage();
-						}
-						if (summary[(p.getPos() - 1) / SUMMARYSIZE] > maxSummary)
-							maxSummary = summary[(p.getPos() - 1) / SUMMARYSIZE];
-					}
-				}
-				// System.out.println("Pilerequest: " + idx + " completed " +
-				// maxSummary);
-				ready.set(idx);
-				if (!queued.get(idx + 1)) {
-					if ((idx + 1) * CHUNK < entry.getMaximumLength()) {
-						/* Only queue additional chunks in visible region */
-						if ((idx + 1) * CHUNK < model.getAnnotationLocationVisible().end
-								&& (idx + 2) * CHUNK > model.getAnnotationLocationVisible().start) {
-							queued.set(idx + 1);
-							GenomeViewScheduler.submit(new PileupTask(pw, idx + 1));
-						}
-					}
-				}
-				model.refresh();
-			} catch (Exception e) {
-				log.severe("Scheduler exception: " + pw + "\t" + idx + "\tpw.get(" + idx * CHUNK + ", " + (idx + 1)
-						* CHUNK + ")\n\t" + e);
-			} catch (Error er) {
-				log.severe("Scheduler error: " + pw + "\t" + idx + "\tpw.get(" + idx * CHUNK + ", " + (idx + 1) * CHUNK
-						+ ")\n\t" + er);
-			}
-		}
-	}
-
-	class NucCounter {
-		int[][] counter;
-
-		private boolean didCount = false;
-
-		public NucCounter(int len) {
-			counter = new int[6][len];
-		}
-
-		public boolean hasData() {
-			return counter != null && didCount;
-		}
-
-		public int getCount(char nuc, int pos) {
-			return counter[ix(nuc)][pos];
-		}
-
-		public int getTotalCount(int pos) {
-			return counter[0][pos] + counter[1][pos] + counter[2][pos] + counter[3][pos] + counter[5][pos];
-		}
-
-		private int ix(char nuc) {
-			switch (nuc) {
-			case 'a':
-			case 'A':
-				return 0;
-			case 'T':
-			case 't':
-				return 1;
-			case 'c':
-			case 'C':
-				return 2;
-			case 'g':
-			case 'G':
-				return 3;
-			case 'n':
-			case 'N':
-				return 4;
-			case '.':
-			case ',':
-				return 5;
-			default:
-				return -1;
-			}
-		}
-
-		public void count(char nuc, int pos) {
-			didCount = true;
-			// System.out.println("P:"+pos);
-			// System.out.println("Miss: "+nuc+"\t"+pos);
-			int ix = ix(nuc);
-			if (ix >= 0 && pos >= 0 && pos < counter[0].length)
-				counter[ix][pos]++;
-		}
-	}
-
-	private boolean isDetailed() {
-		return model.getAnnotationLocationVisible().length() < CHUNK;
-	}
+	
 
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
-		if (summary == null || summary.length <= 1) {
-			reset();
+		if (summary == null || summary.length() <= 1) {
+			summary.reset(entry);
 		}
+		
+		ptm.setScreenWidth(screenWidth);
+		
 		Location visible = model.getAnnotationLocationVisible();
 		/* Only retrieve data when location changed */
 		if (ptm.lastQuery == null || !ptm.lastQuery.equals(model.getAnnotationLocationVisible())) {
@@ -329,7 +110,7 @@ public class PileupTrack extends Track {
 			/* Data for detailed panel */
 			if (pw != null)
 				ptm.lastQuery = model.getAnnotationLocationVisible();
-			if (isDetailed()) {
+			if (ptm.isDetailed()) {
 				/* Draw individual piles */
 				// update data...
 				Iterable<Pile> piles = pw.get(visible.start, visible.end);
@@ -354,25 +135,23 @@ public class PileupTrack extends Track {
 					ptm.detailedRects[1][pos - visible.start] = rcov;
 
 					double coverage = fcov + rcov;
-					if (coverage > maxPile)
-						maxPile = coverage;
+					if (coverage > summary.getMaxPile())
+						summary.setMaxPile(coverage);
 					if (coverage > localMaxPile)
 						localMaxPile = coverage;
 
 				}
 			} else {
 				/* Queue data retrieval */
-				int startChunk = visible.start / CHUNK;
-				int endChunk = visible.end / CHUNK;
+				int startChunk = visible.start / PileupSummary.CHUNK;
+				int endChunk = visible.end / PileupSummary.CHUNK;
 				int stepChunk = (endChunk - startChunk) / 20 + 1;
 				// System.out.println(startChunk+"\t"+endChunk+"\t"+stepChunk);
-				for (int i = visible.start / CHUNK; i < visible.end / CHUNK + 1; i += stepChunk) {
+				for (int i = visible.start / PileupSummary.CHUNK; i < visible.end / PileupSummary.CHUNK + 1; i += stepChunk) {
 					final int idx = i;
-					if (!queued.get(idx)) {
-						queued.set(idx);
-						GenomeViewScheduler.submit(new PileupTask(pw, idx));
+					summary.conditionalQueue(pw, idx);
 
-					}
+					// }
 
 				}
 			}
@@ -388,13 +167,13 @@ public class PileupTrack extends Track {
 		int snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
 		int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
 
-		this.screenWidth = screenWidth;
+		
 		/**
 		 * Draw detailed coverage plot
 		 */
-		if (isDetailed()) {
+		if (ptm.isDetailed()) {
 			int lastX = -1;
-			double div = maxPile;
+			double div = summary.getMaxPile();
 			if (ptm.isDynamicScaling())
 				div = localMaxPile;
 			int width = (int) Math.ceil(screenWidth / visible.length());
@@ -521,15 +300,16 @@ public class PileupTrack extends Track {
 		} else {/* Draw coverage lines */
 
 			/* Draw status */
-			int chunkWidth = (int) Math.ceil(CHUNK * screenWidth / visible.length());
-			for (int i = visible.start; i < visible.end + CHUNK; i += CHUNK) {
-				int x = Convert.translateGenomeToScreen((i / CHUNK) * CHUNK, visible, screenWidth);
+			int chunkWidth = (int) Math.ceil(PileupSummary.CHUNK * screenWidth / visible.length());
+			for (int i = visible.start; i < visible.end + PileupSummary.CHUNK; i += PileupSummary.CHUNK) {
+				int x = Convert.translateGenomeToScreen((i / PileupSummary.CHUNK) * PileupSummary.CHUNK, visible,
+						screenWidth);
 				g.setColor(Color.red);
-				if (queued.get(i / CHUNK))
+				if (summary.isQueued(i / PileupSummary.CHUNK))
 					g.setColor(Color.ORANGE);
-				if (running.get(i / CHUNK))
+				if (summary.isRunning(i / PileupSummary.CHUNK))
 					g.setColor(Color.GREEN);
-				if (!ready.get(i / CHUNK))
+				if (!summary.isReady(i / PileupSummary.CHUNK))
 					g.fillRect(x, yOffset, chunkWidth, graphLineHeigh);
 			}
 
@@ -549,14 +329,15 @@ public class PileupTrack extends Track {
 
 			// double range = topValue - bottomValue;
 
-			int vs = visible.start / SUMMARYSIZE * SUMMARYSIZE + SUMMARYSIZE / 2;
-			double topValue = maxSummary;
+			int vs = visible.start / PileupSummary.SUMMARYSIZE * PileupSummary.SUMMARYSIZE + PileupSummary.SUMMARYSIZE
+					/ 2;
+			double topValue = summary.getMaxSummary();
 			// double range = topValue - bottomValue;
 
 			conservationGP.moveTo(-5, yOffset + graphLineHeigh);
 
-			for (int i = vs; i < visible.end + SUMMARYSIZE; i += SUMMARYSIZE) {
-				if (!ready.get(i / CHUNK))
+			for (int i = vs; i < visible.end + PileupSummary.SUMMARYSIZE; i += PileupSummary.SUMMARYSIZE) {
+				if (!summary.isReady(i / PileupSummary.CHUNK))
 					continue;
 				int x = Convert.translateGenomeToScreen(i, visible, screenWidth);
 
@@ -565,12 +346,12 @@ public class PileupTrack extends Track {
 				// System.out.println("P-" + (i / SUMMARYSIZE) + " " + summary[i
 				// / SUMMARYSIZE]);
 				// try {
-				int idx = i / SUMMARYSIZE;
-				if (idx >= summary.length) {
+				int idx = i / PileupSummary.SUMMARYSIZE;
+				if (idx >= summary.length()) {
 					// System.err.println(idx);
-					idx = summary.length - 1;
+					idx = summary.length() - 1;
 				}
-				double val = summary[idx];// /
+				double val = summary.getValue(idx);// /
 				// (double)maxSummary;//
 
 				// /f[i] +
@@ -597,10 +378,10 @@ public class PileupTrack extends Track {
 				/* Logaritmic scaling */
 				if (ptm.isLogscaling()) {
 					val = log2(val + 1);
-					val /= log2(maxSummary);
+					val /= log2(summary.getMaxSummary());
 					/* Regular scaling */
 				} else {
-					val /= maxSummary;
+					val /= summary.getMaxSummary();
 				}
 				// System.out.println("VAL: " + val);
 				/* Draw lines */
@@ -648,7 +429,7 @@ public class PileupTrack extends Track {
 			/* Draw tick labels */
 			g.drawLine(0, yOffset, 5, yOffset);
 
-			g.drawString("" + nf.format(maxSummary / (double) SUMMARYSIZE), 10, yOffset + 10);
+			g.drawString("" + nf.format(summary.getMaxSummary() / (double) PileupSummary.SUMMARYSIZE), 10, yOffset + 10);
 			g.drawString("0", 10, yOffset + graphLineHeigh);
 
 			g.drawString(StaticUtils.shortify(super.dataKey.toString()), 10, yOffset + 24 - 2);
@@ -684,17 +465,9 @@ public class PileupTrack extends Track {
 
 	}
 
-	private void reset() {
-		// System.out.println(entry);
-		summary = new int[entry.getMaximumLength() / SUMMARYSIZE + 1];
-		// System.out.println("Piluptrack: "+summary.length);
-		ready = new BitSet();
-		queued = new BitSet();
-		running = new BitSet();
-
-	}
-
 	/* User settable maximum value for charts, use negative for unlimited */
+	
+	// FIXME move to track model
 	private double maxValue = -1;
 
 	@Override
