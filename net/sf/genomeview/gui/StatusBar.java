@@ -11,43 +11,44 @@ import javax.swing.JLabel;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.MouseModel;
 import net.sf.genomeview.data.SelectionModel;
+import net.sf.jannot.Location;
 
 public class StatusBar extends JLabel implements Observer {
 
 	private static final long serialVersionUID = -4850784549623078528L;
-	private MouseModel model;
+	private MouseModel mouse;
 	private SelectionModel select;
 	private String message = new String("status");
+	private Model model;
 
 	public StatusBar(Model model) {
-		this.model = model.mouseModel();
+		this.mouse = model.mouseModel();
+		this.model=model;
 		this.select = model.selectionModel();
 		model.getGUIManager().registerStatusBar(this);
 		setText(message);
-		this.model.addObserver(this);
+		this.mouse.addObserver(this);
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
-		String selected = new String();
-		String coords = new String();
-
-		int currentCoord = model.getCurrentCoord();
+		StringBuffer msg=new StringBuffer();
+		Location viz=model.getAnnotationLocationVisible();
+		msg.append("Visible: "+viz.start+":"+viz.end+" ");
+		
+		int currentCoord = mouse.getCurrentCoord();
 		if (currentCoord == -1) {
-			coords = "--";
+			msg.append("mouse: -- ");
 		} else {
-			coords = "x: " + currentCoord;
+			msg.append("mouse: " + currentCoord+" ");
 		}
 
 		if (select.getNumberOfSelectedNucs() != 0) {
-			selected = "         Selected : ";
-			selected += select.getNumberOfSelectedNucs() + " nt / " + select.getNumberOfSelectedProts() + " aa";
-		} else {
-			selected = new String();
+			msg.append("Selected: ");
+			msg.append(select.getNumberOfSelectedNucs() + " nt / " + select.getNumberOfSelectedProts() + " aa ");
 		}
 
-		this.message = coords + selected;
-		setText(message);
+		setText(msg.toString());
 	}
 
 }
