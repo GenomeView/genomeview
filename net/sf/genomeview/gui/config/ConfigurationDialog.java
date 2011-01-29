@@ -1,42 +1,31 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.dialog;
+package net.sf.genomeview.gui.config;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 
-import net.sf.genomeview.core.ColorIcon;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
-import net.sf.genomeview.gui.config.ConfigBox;
+import net.sf.genomeview.gui.dialog.HelpButton;
 import net.sf.jannot.Type;
 import be.abeel.gui.GridBagPanel;
-import be.abeel.gui.JIntegerField;
 import be.abeel.gui.TitledComponent;
 
 public class ConfigurationDialog extends JDialog {
@@ -55,7 +44,20 @@ public class ConfigurationDialog extends JDialog {
 
 	
 
-	
+	class PileupConfigPanel extends GridBagPanel{
+		private Model model;
+
+		public PileupConfigPanel(Model model) {
+			this.model=model;
+			
+			this.add(ConfigBox.booleanInstance("pileup:dynamicRange", "Should all tracks use dynamic range?"), gc);
+			gc.gridy++;
+			this.add(ConfigBox.booleanInstance("pileup:logScale", "Should all tracks be log scaled?"), gc);
+			gc.gridy++;
+			this.add(ConfigBox.integerInstance("pileup:maxPile", "Maximum height of the pileup track"), gc);
+			
+		}
+	}
 
 	
 	static class AANucleotideColorsConfigPanel extends GridBagPanel {
@@ -314,6 +316,7 @@ public class ConfigurationDialog extends JDialog {
 		JPanel evidence = new AnnotationConfigPanel();
 		JPanel colors = new AANucleotideColorsConfigPanel(model);
 		JPanel miscPanel = new MiscellaneousPanel(model);
+		
 
 		jtp.add("Structure view", structure);
 		jtp.add("Evidence view", evidence);
@@ -321,6 +324,7 @@ public class ConfigurationDialog extends JDialog {
 		jtp.add("Feature track", new FeatureTrackConfigPanel(model));
 
 		jtp.add("Short reads", new ShortReadConfigPanel(model));
+		jtp.add("Pile up tracks", new PileupConfigPanel(model));
 
 		jtp.add("Miscellaneous", miscPanel);
 

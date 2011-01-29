@@ -3,6 +3,7 @@
  */
 package net.sf.genomeview.gui.viztracks.hts;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Location;
@@ -16,7 +17,7 @@ class PileupTrackModel {
 
 	private Model model;
 
-	public PileupTrackModel(Model model) {
+	PileupTrackModel(Model model) {
 		this.model = model;
 	}
 
@@ -24,48 +25,68 @@ class PileupTrackModel {
 		return model.getAnnotationLocationVisible().length() < PileupSummary.CHUNK;
 	}
 
-	private boolean dynamicScaling = false;
+	private boolean dynamicScaling = Configuration.getBoolean("pileup:dynamicScaling");
 
-	private boolean logscaling = false;
+	private boolean logscaling = Configuration.getBoolean("pileup:logScale");
 
-	public boolean isLogscaling() {
-		return logscaling;
+	/*
+	 * Flag to keep track whether we want to use the global settings for scaling
+	 * and so on.
+	 */
+	private boolean globalSettings = true;
+
+	boolean isLogscaling() {
+		if (globalSettings)
+			return Configuration.getBoolean("pileup:logScale");
+		else
+			return logscaling;
 	}
 
-	public void setLogscaling(boolean logscaling) {
+	void setLogscaling(boolean logscaling) {
 		this.logscaling = logscaling;
 	}
 
-	public void setDynamicScaling(boolean dynamicScaling) {
+	void setDynamicScaling(boolean dynamicScaling) {
 		this.dynamicScaling = dynamicScaling;
 	}
 
-	public boolean isDynamicScaling() {
-		return dynamicScaling;
+	boolean isDynamicScaling() {
+		if (globalSettings)
+			return Configuration.getBoolean("pileup:dynamicScaling");
+		else
+			return dynamicScaling;
 	}
 
-	public Location lastQuery = null;
+	Location lastQuery = null;
 	/* Data for detailed zoom */
-	public NucCounter nc;
+	NucCounter nc;
 
 	/* Data for pileupgraph barchart */
-	public int[][] detailedRects = null;
+	int[][] detailedRects = null;
 
 	private double screenWidth;
 
-	public double getScreenWidth() {
+	double getScreenWidth() {
 		return screenWidth;
 	}
 
-	public void setScreenWidth(double screenWidth) {
+	void setScreenWidth(double screenWidth) {
 		this.screenWidth = screenWidth;
 
 	}
 
-	public int translateFromMouse(int x) {
+	int translateFromMouse(int x) {
 		int start = model.getAnnotationLocationVisible().start;
 		int xGenome = Convert.translateScreenToGenome(x, model.getAnnotationLocationVisible(), screenWidth);
 		return xGenome - start;
+	}
+
+	void setGlobalSettings(boolean globalSettings) {
+		this.globalSettings = globalSettings;
+	}
+
+	boolean isGlobalSettings() {
+		return globalSettings;
 	}
 
 }

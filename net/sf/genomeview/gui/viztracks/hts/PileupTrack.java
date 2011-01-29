@@ -473,6 +473,20 @@ public class PileupTrack extends Track {
 	@Override
 	public List<JMenuItem> getMenuItems() {
 		ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
+		
+		/* Use global settings */
+		final JCheckBoxMenuItem itemGlobal = new JCheckBoxMenuItem();
+		itemGlobal.setSelected(ptm.isGlobalSettings());
+		itemGlobal.setAction(new AbstractAction("Use global settings for scaling") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ptm.setGlobalSettings(itemGlobal.isSelected());
+
+			}
+
+		});
+		out.add(itemGlobal);
+		
 		/* Log scaling of line graph */
 		final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
 		item.setSelected(ptm.isLogscaling());
