@@ -29,6 +29,10 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Cleaner;
+import net.sf.jannot.Data;
+import net.sf.jannot.DataKey;
+import net.sf.jannot.Entry;
+import net.sf.jannot.EntrySet;
 import be.abeel.jargs.AutoHelpCmdLineParser;
 
 /**
@@ -37,12 +41,12 @@ import be.abeel.jargs.AutoHelpCmdLineParser;
  * @author Thomas Abeel
  * 
  */
-public class MainWindow implements WindowListener, Observer {
-	private static Logger logger = Logger.getLogger(MainWindow.class.getCanonicalName());
+public class WindowManager implements WindowListener, Observer {
+	private static Logger logger = Logger.getLogger(WindowManager.class.getCanonicalName());
 
-	private JFrame window = null;
+	private GenomeViewWindow window = null;
 
-	private JFrame helper = null;
+	private GenomeViewWindow helper = null;
 
 	private Model model = null;
 
@@ -56,7 +60,7 @@ public class MainWindow implements WindowListener, Observer {
 		model.addObserver(o);
 	}
 
-	public MainWindow(String args[], Splash splash) throws InterruptedException, ExecutionException {
+	public WindowManager(String args[], Splash splash) throws InterruptedException, ExecutionException {
 		running++;
 		logger.info("Started running instance" + running);
 		init(args, splash);
@@ -68,10 +72,12 @@ public class MainWindow implements WindowListener, Observer {
 			return true;
 		} catch (IllegalOptionValueException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
-			CrashHandler.showErrorMessage("Error while parsing command line arguments: "+e.getMessage()+"\n\nWill continue without command line arguments.", e);
+			CrashHandler.showErrorMessage("Error while parsing command line arguments: " + e.getMessage()
+					+ "\n\nWill continue without command line arguments.", e);
 		} catch (UnknownOptionException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
-			CrashHandler.showErrorMessage("Error while parsing command line arguments: "+e.getMessage()+"\n\nWill continue without command line arguments.", e);
+			CrashHandler.showErrorMessage("Error while parsing command line arguments: " + e.getMessage()
+					+ "\n\nWill continue without command line arguments.", e);
 		}
 		return false;
 
@@ -132,7 +138,11 @@ public class MainWindow implements WindowListener, Observer {
 	private static int running = 0;
 
 	/**
-	 * Keeps an eye on the model (used to detect exitRequested)
+	 * Keeps an eye on the model (used to detect exitRequested) and to detect
+	 * whether the used has not loaded any data.
+	 * 
+	 * 
+	 * 
 	 * 
 	 * @param o
 	 * @param arg
@@ -157,6 +167,11 @@ public class MainWindow implements WindowListener, Observer {
 				System.exit(0);
 			}
 		}
+		
+		
+		
+		
+
 	}
 
 	public void init(String[] args, Splash splash) throws InterruptedException, ExecutionException {
@@ -175,9 +190,9 @@ public class MainWindow implements WindowListener, Observer {
 
 		Option positionO = parser.addHelp(parser.addStringOption("position"),
 				"Provide the initial region that should be visible.");
-		
+
 		Option sessionO = parser.addHelp(parser.addStringOption("session"),
-		"Provide a session file that contains all the files that have to be loaded.");
+				"Provide a session file that contains all the files that have to be loaded.");
 
 		boolean goodParse = parse(parser, args);
 
@@ -189,21 +204,25 @@ public class MainWindow implements WindowListener, Observer {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice[] gs = ge.getScreenDevices();
 		boolean freshwindow = false;
-		if (window == null) {
-			freshwindow = true;
-			logger.info("Creating new window");
-			window = new JFrame("GenomeView :: " + Configuration.version(), gs[0].getDefaultConfiguration());
-			window.setIconImage(new ImageIcon(this.getClass().getResource("/images/gv2.png")).getImage());
-			window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			window.addWindowListener(this);
-
-		}
+		
 		if (model == null) {
-			model = new Model(window);
-			window.getRootPane().setTransferHandler(new DropTransferHandler(model));
+			model = new Model();
 			model.addObserver(this);
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new Hotkeys(model));
 		}
+		
+		if (window == null) {
+			freshwindow = true;
+			logger.info("Creating new window");
+			window = new GenomeViewWindow(model,"GenomeView :: " + Configuration.version(), gs[0].getDefaultConfiguration());
+			model.getGUIManager().registerMainWindow(window);
+			window.setIconImage(new ImageIcon(this.getClass().getResource("/images/gv2.png")).getImage());
+			window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+			window.addWindowListener(this);
+			window.getRootPane().setTransferHandler(new DropTransferHandler(model));
+
+		}
+	
 		/* Make sure the model is empty */
 		model.setSilent(true);
 		model.clearEntries();
@@ -219,7 +238,7 @@ public class MainWindow implements WindowListener, Observer {
 
 			if (content.length > 1) {
 				for (int i = 1; i < content.length; i++) {
-					helper = new JFrame("GenomeView :: " + Configuration.version(), gs[i].getDefaultConfiguration());
+					helper = new GenomeViewWindow(model,"GenomeView :: " + Configuration.version(), gs[i].getDefaultConfiguration());
 					helper.setJMenuBar(new MainMenu(model));
 					helper.setIconImage(new ImageIcon(this.getClass().getResource("/images/gv2.png")).getImage());
 					helper.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -238,14 +257,14 @@ public class MainWindow implements WindowListener, Observer {
 		if (goodParse) {
 			String cmdUrl = (String) parser.getOptionValue(urlO);
 			String cmdFile = (String) parser.getOptionValue(fileO);
-			String session=(String)parser.getOptionValue(sessionO);
+			String session = (String) parser.getOptionValue(sessionO);
 			String[] remArgs = parser.getRemainingArgs();
 			String initialLocation = (String) parser.getOptionValue(positionO);
 			/* Load the additional configuration */
 			String config = (String) parser.getOptionValue(configurationO);
-			idl.init(config, cmdUrl, cmdFile, remArgs, initialLocation,session);
-		}else{
-			idl.init(null,null,null,new String[0],null,null);
+			idl.init(config, cmdUrl, cmdFile, remArgs, initialLocation, session);
+		} else {
+			idl.init(null, null, null, new String[0], null, null);
 		}
 
 		/* Start acting */

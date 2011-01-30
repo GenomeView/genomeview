@@ -24,6 +24,10 @@ public class Hider extends JWindow {
 	private JLabel floater = new JLabel();
 
 	public Hider(Model model,String text) {
+		this(model,text,Color.BLACK);
+	}
+
+	public Hider(Model model, String text, Color color) {
 		Rectangle bounds = model.getGUIManager().getParent().getBounds();
 		// this.setBounds(bounds);
 		this.setAlwaysOnTop(true);
@@ -35,10 +39,10 @@ public class Hider extends JWindow {
 		Color c = new Color(100, 100, 100, 50);
 		floater.setBackground(c);
 		floater.setOpaque(true);
-		floater.setText(text);
+		floater.setText("<html>"+text+"</html>");
 		floater.setForeground(Color.BLACK);
 		Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-		Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
+		Border colorBorder = BorderFactory.createLineBorder(color);
 		floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
 		add(floater);
 		pack();

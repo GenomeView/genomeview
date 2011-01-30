@@ -11,6 +11,7 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.JMenu;
 
+import net.sf.genomeview.gui.GenomeViewWindow;
 import net.sf.genomeview.gui.StatusBar;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel;
 
@@ -27,8 +28,8 @@ public class GUIManager {
 	 */
 	private Frame parent;
 
-	public GUIManager(Frame parent) {
-		this.parent = parent;
+	public GUIManager() {
+		
 	}
 
 	public Frame getParent() {
@@ -128,6 +129,11 @@ public class GUIManager {
 	public void registerStatusBar(StatusBar statusBar) {
 		this.statusBar = statusBar;
 
+	}
+
+	public void registerMainWindow(Frame parentFrame) {
+		this.parent = parentFrame;
+		
 	}
 
 }

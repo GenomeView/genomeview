@@ -18,7 +18,8 @@ public class GenomeViewAsComponent {
 
 	public static void main(String[] args) throws MalformedURLException, IOException, ReadFailedException {
 		JFrame frame = new JFrame("GenomeView as component demo");
-		Model model=new Model(frame);
+		Model model=new Model();
+		model.getGUIManager().registerMainWindow(frame);
 		JPanel[] content=MainContent.createContent(model,1);
 		frame.setContentPane(content[0]);
 		frame.pack();

@@ -20,7 +20,7 @@ import net.sf.genomeview.core.Configuration;
 public class GenomeView {
 	private static Logger logger;
 
-	private static MainWindow mw;
+	private static WindowManager mw;
 
 	/*
 	 * Rewrite args if started from file association
@@ -92,7 +92,7 @@ public class GenomeView {
 				Authenticator.setDefault(new MyAuthenticator());
 
 				try {
-					mw = new MainWindow(args,splash);
+					mw = new WindowManager(args,splash);
 					
 				} catch (InterruptedException e) {
 					logger.log(Level.SEVERE, "main window initialization", e);

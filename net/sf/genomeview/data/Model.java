@@ -67,8 +67,8 @@ public class Model extends Observable implements IModel {
 		return mouseModel;
 	}
 
-	public Model(Frame parent) {
-		guimanager = new GUIManager(parent);
+	public Model() {
+		guimanager = new GUIManager();
 		/* Scheduler booster thread */
 		new Thread(new Runnable() {
 

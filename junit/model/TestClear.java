@@ -1,20 +1,25 @@
+/**
+ * %HEADER%
+ */
 package junit.model;
 
 import net.sf.genomeview.data.Model;
-import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
-import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.source.DataSource;
 
 import org.junit.Assert;
 import org.junit.Test;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class TestClear {
 
 	@Test
 	public void testClearEntries() {
-		Model model = new Model(null);
+		Model model = new Model();
 		try {
 			model.addData(new TestDataSource());
 		} catch (ReadFailedException e) {

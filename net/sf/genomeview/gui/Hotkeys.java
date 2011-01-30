@@ -17,7 +17,11 @@ import net.sf.genomeview.gui.menu.navigation.AnnotationMoveRightAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationStartAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationZoomInAction;
 import net.sf.genomeview.gui.menu.navigation.AnnotationZoomOutAction;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class Hotkeys implements KeyEventDispatcher {
 
 	private Model model;

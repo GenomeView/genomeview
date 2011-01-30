@@ -1,3 +1,6 @@
+/**
+ * %HEADER%
+ */
 package net.sf.genomeview.gui;
 
 import java.awt.Component;
@@ -17,7 +20,11 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Cleaner;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class GVApplet extends JApplet {
 
 	private static final long serialVersionUID = 1L;
@@ -54,7 +61,8 @@ public class GVApplet extends JApplet {
 
 				@Override
 				public void run() {
-					model = new Model(parentFrame);
+					model = new Model();
+					model.getGUIManager().registerMainWindow(parentFrame);
 					model.setSilent(true);
 					model.clearEntries();
 
