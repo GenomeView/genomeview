@@ -4,7 +4,11 @@
 package net.sf.genomeview.gui;
 
 import java.awt.event.MouseEvent;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class Mouse {
 	public static boolean modifier(MouseEvent e) {
 		return e.isAltDown() || e.isShiftDown() || e.isControlDown();

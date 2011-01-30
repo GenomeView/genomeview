@@ -29,11 +29,22 @@ public class InitDataLoader {
 		logger = Logger.getLogger(InitDataLoader.class.getCanonicalName());
 	}
 
-	public void init(String config, String cmdUrl, String cmdFile, String[] remArgs, String position)
+	public void init(String config, String cmdUrl, String cmdFile, String[] remArgs, String position, String session)
 			throws InterruptedException, ExecutionException {
 
 		SourceCache.cacheDir = new File(Configuration.getDirectory(), "cache");
 		DataSourceFactory.disableURLCaching = Configuration.getBoolean("general:disableURLCaching");
+		
+		/*
+		 * Initialize session, all other arguments will override what the session does.
+		 */
+		try {
+			Session.loadSession(model,session);
+		} catch (IOException e1) {
+			CrashHandler.showErrorMessage("Failed to properly load requested session.", e1);
+		}
+		
+		
 		/* Load the additional configuration */
 		if (config != null) {
 			try {

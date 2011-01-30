@@ -175,6 +175,9 @@ public class MainWindow implements WindowListener, Observer {
 
 		Option positionO = parser.addHelp(parser.addStringOption("position"),
 				"Provide the initial region that should be visible.");
+		
+		Option sessionO = parser.addHelp(parser.addStringOption("session"),
+		"Provide a session file that contains all the files that have to be loaded.");
 
 		boolean goodParse = parse(parser, args);
 
@@ -235,13 +238,14 @@ public class MainWindow implements WindowListener, Observer {
 		if (goodParse) {
 			String cmdUrl = (String) parser.getOptionValue(urlO);
 			String cmdFile = (String) parser.getOptionValue(fileO);
+			String session=(String)parser.getOptionValue(sessionO);
 			String[] remArgs = parser.getRemainingArgs();
 			String initialLocation = (String) parser.getOptionValue(positionO);
 			/* Load the additional configuration */
 			String config = (String) parser.getOptionValue(configurationO);
-			idl.init(config, cmdUrl, cmdFile, remArgs, initialLocation);
+			idl.init(config, cmdUrl, cmdFile, remArgs, initialLocation,session);
 		}else{
-			idl.init(null,null,null,new String[0],null);
+			idl.init(null,null,null,new String[0],null,null);
 		}
 
 		/* Start acting */

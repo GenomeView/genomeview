@@ -1,3 +1,6 @@
+/**
+ * %HEADER%
+ */
 package net.sf.genomeview.gui;
 
 import java.awt.GridBagConstraints;
@@ -15,7 +18,11 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import be.abeel.gui.TitledComponent;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class MyAuthenticator extends Authenticator {
 	private String user = "";
 	private char[] pass = new char[0];

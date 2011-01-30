@@ -41,6 +41,9 @@ public class GVApplet extends JApplet {
 		logger.info("urlO: "+urlO);
 		final String positionO = getParameter("position");
 		logger.info("positionO: "+positionO);
+		final String sessionO = getParameter("session");
+		logger.info("sessionO: "+sessionO);
+		
 		final String extraO = getParameter("extra");
 		logger.info("extraO: "+extraO);
 
@@ -64,7 +67,7 @@ public class GVApplet extends JApplet {
 
 					InitDataLoader initLoader = new InitDataLoader(model);
 					try {
-						initLoader.init(configO, urlO, fileO, remArgs, positionO);
+						initLoader.init(configO, urlO, fileO, remArgs, positionO,sessionO);
 					} catch (InterruptedException e) {
 						logger.info(e.getMessage());
 					} catch (ExecutionException e) {
