@@ -46,7 +46,7 @@ public class GenomeExplorer extends JDialog {
 		this.model = model;
 	
 		//super.setUndecorated(true);
-		setResizable(false);
+		//setResizable(false);
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
 

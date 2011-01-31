@@ -29,6 +29,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.Session;
+import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import net.sf.jannot.wiggle.DiskArrayWiggle;
 import be.abeel.gui.GridBagPanel;
 
@@ -40,23 +41,6 @@ import be.abeel.gui.GridBagPanel;
 class Genome extends GridBagPanel {
 
 	private static final long serialVersionUID = -5738284884971849836L;
-
-	class Hyperactive implements HyperlinkListener {
-
-		public void hyperlinkUpdate(HyperlinkEvent e) {
-			if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-				try {
-					Desktop.getDesktop().browse(e.getURL().toURI());
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (URISyntaxException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		}
-	}
 
 	Genome(final Model model, String name, Icon image, String description, final URL url) {
 		setBackground(Color.WHITE);
@@ -78,18 +62,14 @@ class Genome extends GridBagPanel {
 		add(picture, gc);
 		gc.gridx++;
 		gc.weightx = 1;
-
-		JEditorPane text = new JEditorPane("text/html", "<html><h3>" + name + "</h3><p>" + description + "</p></html>");
-		
-		text.addHyperlinkListener(new Hyperactive());
-		StyleSheet css = ((HTMLEditorKit) text.getEditorKit()).getStyleSheet();
+		JEditorPaneLabel text=new JEditorPaneLabel();
+		StyleSheet css=text.getStyleSheet();
 		css.addRule("body {color:#000; margin-left: 4px; margin-right: 4px; }");
-
 		css.addRule("p {margin:0px;padding:0px;}");
 		css.addRule("h3 {font-size:115%;color: " + Colors.encode(Configuration.green) + ";margin:0px;padding:0px;}");
-
+		text.setText("<html><h3>" + name + "</h3><p>" + description + "</p></html>");
+		
 		text.setPreferredSize(new Dimension(100, 100));
-		text.setEditable(false);
 
 		// text.setVerticalAlignment(JLabel.TOP);
 		add(text, gc);

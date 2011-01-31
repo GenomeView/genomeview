@@ -17,6 +17,7 @@ import javax.swing.JScrollPane;
 
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import net.sf.genomeview.gui.dialog.OpenDialog;
 import be.abeel.gui.GridBagPanel;
 
@@ -110,8 +111,11 @@ class GenomesPanel extends GridBagPanel {
 			gc.gridwidth=2;
 			gc.weightx=1;
 			gc.weighty=0;
-			JLabel requestNewGenome=new JLabel("If your genome of interest is not in the list, ");
+			JEditorPaneLabel requestNewGenome=new JEditorPaneLabel();
+			requestNewGenome.getStyleSheet().addRule("body{ text-align: right;}");
+			requestNewGenome.setText("If your genome of interest is not in the list, <a href=\"mailto:genomeview-support@lists.sourceforge.net\">please e-mail us</a> your request. ");
 			requestNewGenome.setBackground(Color.WHITE);
+			add(requestNewGenome,gc);
 
 
 		}
