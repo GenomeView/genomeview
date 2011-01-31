@@ -29,8 +29,10 @@ public class ClearEntriesAction extends AbstractAction {
 		int result = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
 				"Do you really want to clear all loaded data?",
 				"Clear entries?", JOptionPane.YES_NO_OPTION);
-		if (result == JOptionPane.YES_OPTION)
+		if (result == JOptionPane.YES_OPTION){
 			model.clearEntries();
+			
+		}
 
 	}
 

@@ -1,5 +1,6 @@
 package net.sf.genomeview.gui;
 
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.explorer.GenomeExplorer;
+import net.sf.genomeview.gui.explorer.GenomeExplorerManager;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
@@ -35,16 +38,18 @@ public class InitDataLoader {
 		SourceCache.cacheDir = new File(Configuration.getDirectory(), "cache");
 		DataSourceFactory.disableURLCaching = Configuration.getBoolean("general:disableURLCaching");
 		
+
 		/*
-		 * Initialize session, all other arguments will override what the session does.
+		 * Initialize session, all other arguments will override what the
+		 * session does.
 		 */
 		try {
-			Session.loadSession(model,session);
+			if (session != null)
+				Session.loadSession(model, session);
 		} catch (IOException e1) {
 			CrashHandler.showErrorMessage("Failed to properly load requested session.", e1);
 		}
-		
-		
+
 		/* Load the additional configuration */
 		if (config != null) {
 			try {
@@ -147,6 +152,14 @@ public class InitDataLoader {
 			}
 
 		}
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new GenomeExplorerManager(model);
+				model.refresh(this);
+
+			}
+		});
 
 	}
 

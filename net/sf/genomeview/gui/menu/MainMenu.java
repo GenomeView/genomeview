@@ -28,6 +28,7 @@ import net.sf.genomeview.gui.menu.file.SaveAction;
 import net.sf.genomeview.gui.menu.file.SaveImage;
 import net.sf.genomeview.gui.menu.file.SaveSessionAction;
 import net.sf.genomeview.gui.menu.file.ShowConfigurationAction;
+import net.sf.genomeview.gui.menu.file.ShowGenomeExplorerAction;
 import net.sf.genomeview.gui.menu.help.ShowAboutDialogAction;
 import net.sf.genomeview.gui.menu.help.ShowInstalledModulesAction;
 import net.sf.genomeview.gui.menu.navigation.GotoPosition;
@@ -53,6 +54,7 @@ public class MainMenu extends JMenuBar {
 		file.add(i);
 		
 		file.addSeparator();
+		file.add(new ShowGenomeExplorerAction(model));
 		file.add(new SaveSessionAction(model));
 		file.add(new LoadSessionAction(model));
 		

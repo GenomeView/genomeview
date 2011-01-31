@@ -24,7 +24,11 @@ public class Colors {
      * @return a string representation for the color
      */
     public static String encode(Color c) {
-        return "RGB(" + c.getRed() +","+ c.getGreen()+"," + c.getBlue() + ")";
+        //return "RGB(" + c.getRed() +","+ c.getGreen()+"," + c.getBlue() + ")";
+    	String rgb = Integer.toHexString(c.getRGB());
+    	rgb = rgb.substring(2, rgb.length());
+    	return "#"+rgb;
+
     }
 
     private static Color checkedColor(int r, int g, int b) {

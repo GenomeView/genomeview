@@ -38,6 +38,7 @@ public class GenomeViewWindow extends JFrame implements Observer {
 
 	class ReferenceMissingWarning extends JWindow {
 
+		private static final long serialVersionUID = 566883531326807914L;
 		private JLabel floater = new JLabel();
 
 		public ReferenceMissingWarning(Model model, String text) {
@@ -54,11 +55,11 @@ public class GenomeViewWindow extends JFrame implements Observer {
 			floater.setVerticalAlignment(SwingConstants.CENTER);
 			floater.setAlignmentY(CENTER_ALIGNMENT);
 			this.setLocation(bounds.x + bounds.width / 5 * 2, bounds.y + bounds.height / 5);
-			
+
 			floater.setOpaque(true);
 			floater.setText(text);
 			floater.setForeground(Color.BLACK);
-			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+			Border emptyBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 			Border colorBorder = BorderFactory.createLineBorder(color);
 			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
 			floater.setBackground(new Color(255, 0, 0, 100));

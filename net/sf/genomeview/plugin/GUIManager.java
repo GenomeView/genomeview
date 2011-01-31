@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 
-import net.sf.genomeview.gui.GenomeViewWindow;
 import net.sf.genomeview.gui.StatusBar;
+import net.sf.genomeview.gui.dialog.OpenDialog;
+import net.sf.genomeview.gui.explorer.GenomeExplorerManager;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel;
 
 /**
@@ -29,7 +31,7 @@ public class GUIManager {
 	private Frame parent;
 
 	public GUIManager() {
-		
+
 	}
 
 	public Frame getParent() {
@@ -113,6 +115,8 @@ public class GUIManager {
 
 	private GeneEvidenceLabel gel = null;
 	private StatusBar statusBar;
+	private GenomeExplorerManager genomeExplorerManager;
+
 
 	public StatusBar getStatusBar() {
 		return statusBar;
@@ -133,7 +137,18 @@ public class GUIManager {
 
 	public void registerMainWindow(Frame parentFrame) {
 		this.parent = parentFrame;
-		
+
 	}
+
+	public void registerGenomeExplorer(GenomeExplorerManager genomeExplorerManager) {
+		this.genomeExplorerManager = genomeExplorerManager;
+
+	}
+
+	public GenomeExplorerManager getGenomeExplorer() {
+		return genomeExplorerManager;
+	}
+
+
 
 }

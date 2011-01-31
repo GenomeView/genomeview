@@ -1,0 +1,15 @@
+## Attribution list
+##
+## ----------
+##   Images
+## ----------
+images/instances/c_elegans.jpg
+	Bob Goldstein, UNC Chapel Hill http://www.bio.unc.edu/Faculty/Goldstein/lab/
+	
+images/instances/d_melanogaster.jpg
+	André Karwath aka Aka	
+	
+images/boxopen.png
+	Author: 	DryIcons
+	Homepage: 	http://dryicons.com
+	License: 	DryIcons Terms of Use: http://dryicons.com/terms/

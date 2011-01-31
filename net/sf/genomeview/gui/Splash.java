@@ -32,7 +32,9 @@ public class Splash extends JDialog {
 	public Splash() {
 		super(null, ModalityType.APPLICATION_MODAL);
 		this.setUndecorated(true);
+		
 		JPanel content = new JPanel();
+		content.setBackground(Color.WHITE);
 		content.setLayout(new BorderLayout());
 		floater = new JLabel(new ImageIcon(this.getClass().getResource("/images/splash.png")));
 		text = new JLabel("Starting GenomeView...");

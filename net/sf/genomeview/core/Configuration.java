@@ -30,6 +30,8 @@ import be.abeel.io.LineIterator;
  */
 public class Configuration {
 
+	public static final Color green=new Color(0,128,0);
+	
 	private static File confDir;
 
 	public static char[] getNucleotides() {

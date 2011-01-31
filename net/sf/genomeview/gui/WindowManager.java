@@ -7,10 +7,12 @@ import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 
+import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
@@ -25,6 +27,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.plugin.PluginLoader;
@@ -41,7 +44,7 @@ import be.abeel.jargs.AutoHelpCmdLineParser;
  * @author Thomas Abeel
  * 
  */
-public class WindowManager implements WindowListener, Observer {
+public class WindowManager extends WindowAdapter implements Observer {
 	private static Logger logger = Logger.getLogger(WindowManager.class.getCanonicalName());
 
 	private GenomeViewWindow window = null;
@@ -90,17 +93,6 @@ public class WindowManager implements WindowListener, Observer {
 
 	}
 
-	@Override
-	public void windowActivated(WindowEvent e) {
-		// Nothing to do here
-
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e) {
-		// Nothing to do here
-
-	}
 
 	/**
 	 * Just see if the user tries to close the window directly and tell the
@@ -109,30 +101,6 @@ public class WindowManager implements WindowListener, Observer {
 	@Override
 	public void windowClosing(WindowEvent e) {
 		this.model.exit();
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent e) {
-		// Nothing to do here
-
-	}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {
-		// Nothing to do here
-
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e) {
-		// Nothing to do here
-
-	}
-
-	@Override
-	public void windowOpened(WindowEvent e) {
-		// Nothing to do here
-
 	}
 
 	private static int running = 0;
@@ -164,6 +132,10 @@ public class WindowManager implements WindowListener, Observer {
 			if (running < 1) {
 				logger.info("No instances left, exiting VM");
 				Cleaner.exit();
+				for(Frame frame:Frame.getFrames()){
+					frame.dispose();
+				}
+				
 				System.exit(0);
 			}
 		}
@@ -216,7 +188,7 @@ public class WindowManager implements WindowListener, Observer {
 			logger.info("Creating new window");
 			window = new GenomeViewWindow(model,"GenomeView :: " + Configuration.version(), gs[0].getDefaultConfiguration());
 			model.getGUIManager().registerMainWindow(window);
-			window.setIconImage(new ImageIcon(this.getClass().getResource("/images/gv2.png")).getImage());
+			window.setIconImage(Icons.MINILOGO);
 			window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			window.addWindowListener(this);
 			window.getRootPane().setTransferHandler(new DropTransferHandler(model));

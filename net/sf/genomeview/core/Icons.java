@@ -3,13 +3,18 @@
  */
 package net.sf.genomeview.core;
 
+import java.awt.Image;
 import java.io.IOException;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class Icons {
-
+	//FIXME fix with get method
 	public static final Icon DELETE = new ImageIcon(Icons.class.getResource("/images/delete.png"));
 
 	public static final Icon YES = new ImageIcon(Icons.class.getResource("/images/yes.png"));
@@ -34,8 +39,18 @@ public class Icons {
 	public static Icon NCBI = new ImageIcon(Icons.class.getResource("/images/search/ncbi.png"));
 	public static Icon Ensembl = new ImageIcon(Icons.class.getResource("/images/search/ensembl.png"));
 
+	public static Icon LOGO = new ImageIcon(Icons.class.getResource("/images/logo.png"));
+
+	public static Icon LARGEOPEN=get("boxopen.png");
+	
+	public static Image MINILOGO=get("gv2.png").getImage();
+
 	private Icons() throws IOException {
 
+	}
+
+	public static ImageIcon get(String string) {
+		return new ImageIcon(Icons.class.getResource("/images/"+string));
 	}
 
 }

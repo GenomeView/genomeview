@@ -38,7 +38,12 @@ public enum NotificationTypes {
 	 * Indicates that a feature was edited, added or removed
 	 * 
 	 */
-	JANNOTCHANGE
+	JANNOTCHANGE, 
+	
+	/**
+	 * Indicates that there has been a change to a dialog window, either opened or closed.
+	 */
+	DIALOGCHANGE
 	;
 
 }
