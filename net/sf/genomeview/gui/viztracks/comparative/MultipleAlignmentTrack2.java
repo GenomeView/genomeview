@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.BitSet;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -133,8 +134,6 @@ public class MultipleAlignmentTrack2 extends Track {
 		public int x1;
 	}
 
-	
-
 	final private BiMap<String, Integer> ordering = new BiMap<String, Integer>();
 
 	class MAComparator implements Comparator<AlignmentSequence> {
@@ -157,7 +156,7 @@ public class MultipleAlignmentTrack2 extends Track {
 	private int currentYOffset;
 
 	@Override
-	public int paintTrack(Graphics2D g,  int yOffset, double screenWidth,JViewport view) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
 		// this.yOffset = yOffset;
 		currentYOffset = yOffset;
 		MAFMultipleAlignment ma = (MAFMultipleAlignment) entry.get(dataKey);
@@ -172,8 +171,14 @@ public class MultipleAlignmentTrack2 extends Track {
 		if (ordering.size() != ma.species().size()) {
 			ordering.clear();
 			int i = 0;
-			for (String e : ma.species()) {
-				ordering.putForward(e, i++);
+			try {
+				for (String e : ma.species()) {
+					ordering.putForward(e, i++);
+				}
+			} catch (ConcurrentModificationException e) {
+				// Something changed while we were compiling the ordering, we
+				// should repaint.
+				return 0;
 			}
 
 		}
@@ -182,13 +187,12 @@ public class MultipleAlignmentTrack2 extends Track {
 		g.setColor(Color.BLACK);
 		Location visible = model.getAnnotationLocationVisible();
 
-		double frac=model.getAnnotationLocationVisible().length() / (double) entry.getMaximumLength();
-//		System.out.println("Visible fraction: "+frac+"\t"+entry.getMaximumLength());
-		int estCount = (int) (frac * ma
-				.size());
-		
-//		System.out.println("Number of alignment blocks: "+ma.size());
-//		System.out.println("Est. count: "+estCount);
+		double frac = model.getAnnotationLocationVisible().length() / (double) entry.getMaximumLength();
+		// System.out.println("Visible fraction: "+frac+"\t"+entry.getMaximumLength());
+		int estCount = (int) (frac * ma.size());
+
+		// System.out.println("Number of alignment blocks: "+ma.size());
+		// System.out.println("Est. count: "+estCount);
 		if (estCount > 10000) {
 			g.drawString("Too many alignment blocks, zoom in to see multiple alignments", 10, yOffset + 10);
 			// System.out.println("estimated count="+estCount);
@@ -275,14 +279,18 @@ public class MultipleAlignmentTrack2 extends Track {
 								double width = screenWidth / (double) visible.length();
 								int translated = ab.translate(i - start);
 								char nt;
-//								if (as.strand() == Strand.FORWARD)
-//									nt = as.seq().getNucleotide(translated + 1);
-//								else
-//									nt = as.seq().getReverseNucleotide(as.seq().size() - translated);
+								// if (as.strand() == Strand.FORWARD)
+								// nt = as.seq().getNucleotide(translated + 1);
+								// else
+								// nt =
+								// as.seq().getReverseNucleotide(as.seq().size()
+								// - translated);
 								if (as.strand() == Strand.FORWARD)
-									nt = as.seq().get(translated+1,translated+2).iterator().next();
+									nt = as.seq().get(translated + 1, translated + 2).iterator().next();
 								else
-									nt = SequenceTools.complement(as.seq().get(as.seq().size() - translated,as.seq().size() - translated+1).iterator().next());
+									nt = SequenceTools.complement(as.seq()
+											.get(as.seq().size() - translated, as.seq().size() - translated + 1)
+											.iterator().next());
 								// System.out.println(nt + "\t" + ref[i -
 								// visible.start]);
 								if (ref[i - visible.start] != nt) {
@@ -298,8 +306,10 @@ public class MultipleAlignmentTrack2 extends Track {
 											g.setColor(Color.BLACK);
 										else
 											g.setColor(Configuration.getNucleotideColor(nt).brighter());
-										g.drawString("" + nt, (int) (((i - visible.start) * width - stringSize
-												.getWidth() / 2) + (width / 2)), rec.y + line * lineHeight - 2);
+										g.drawString(
+												"" + nt,
+												(int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)),
+												rec.y + line * lineHeight - 2);
 									}
 								}
 							}
