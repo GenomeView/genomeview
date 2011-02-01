@@ -537,6 +537,7 @@ public class Model extends Observable implements IModel {
 			/* Graph tracks */
 			for (DataKey key : e) {
 				Data<?> data = e.get(key);
+				//System.out.println("Update tracks:" +key+"\t"+data.getClass()+"\t"+data);
 				if (data instanceof MemoryFeatureAnnotation) {
 					if (!trackList.containsTrack(key) && ((MemoryFeatureAnnotation) data).cachedCount() > 0)
 						trackList.add(new FeatureTrack(this, (Type) key));
@@ -569,7 +570,7 @@ public class Model extends Observable implements IModel {
 				if (data instanceof MAFMultipleAlignment) {
 					if (!trackList.containsTrack(key)) {
 						trackList.add(new MultipleAlignmentTrack2(this, key));
-						// logger.info("Added multiple alignment track " + ma);
+						logger.info("Added multiple alignment track " + key);
 					}
 				}
 			}

@@ -35,7 +35,7 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.alignment.maf.AbstractAlignmentBlock;
-import net.sf.jannot.alignment.maf.AlignmentSequence;
+import net.sf.jannot.alignment.maf.AbstractAlignmentSequence;
 import net.sf.jannot.alignment.maf.MAFMultipleAlignment;
 import net.sf.jannot.utils.SequenceTools;
 
@@ -136,7 +136,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	final private BiMap<String, Integer> ordering = new BiMap<String, Integer>();
 
-	class MAComparator implements Comparator<AlignmentSequence> {
+	class MAComparator implements Comparator<AbstractAlignmentSequence> {
 		private BiMap<String, Integer> ordering;
 
 		public MAComparator(BiMap<String, Integer> ordering) {
@@ -144,7 +144,7 @@ public class MultipleAlignmentTrack2 extends Track {
 		}
 
 		@Override
-		public int compare(AlignmentSequence o1, AlignmentSequence o2) {
+		public int compare(AbstractAlignmentSequence o1, AbstractAlignmentSequence o2) {
 			return ordering.getForward(o1.getName()).compareTo(ordering.getForward(o2.getName()));
 		}
 	}
@@ -219,7 +219,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				int start = ab.getLocation().start;
 				int end = ab.getLocation().end;
 
-				for (AlignmentSequence as : ab) {
+				for (AbstractAlignmentSequence as : ab) {
 					abCount++;
 
 				}
@@ -245,8 +245,8 @@ public class MultipleAlignmentTrack2 extends Track {
 				/*
 				 * Reorder the alignment sequences to whatever the user wants
 				 */
-				TreeSet<AlignmentSequence> ab2 = new TreeSet<AlignmentSequence>(macomp);
-				for (AlignmentSequence as : ab) {
+				TreeSet<AbstractAlignmentSequence> ab2 = new TreeSet<AbstractAlignmentSequence>(macomp);
+				for (AbstractAlignmentSequence as : ab) {
 					assert as != null;
 					ab2.add(as);
 				}
@@ -264,7 +264,7 @@ public class MultipleAlignmentTrack2 extends Track {
 					}
 					// System.out.println("--block ");
 					int line = 1;
-					for (AlignmentSequence as : ab2) {
+					for (AbstractAlignmentSequence as : ab2) {
 						// System.out.println("\t" + start + "\t" + end + "\t" +
 						// as.strand());
 						// g.drawString(as.seq().toString(), x1,
@@ -320,7 +320,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				} else {/* Not very much zoomed in, but still close */
 					int line = 1;
 
-					for (AlignmentSequence as : ab2) {
+					for (AbstractAlignmentSequence as : ab2) {
 						if (showAll) {
 							line = ordering.getForward(as.getName()) + 1;
 							lines.set(line - 1);
@@ -370,7 +370,7 @@ public class MultipleAlignmentTrack2 extends Track {
 					// size = new Rectangle2D[mh.ab.size()];
 					// int index = 0;
 
-					for (AlignmentSequence as : mh.ab) {
+					for (AbstractAlignmentSequence as : mh.ab) {
 						// char addChar = as.strand() == Strand.FORWARD ? '>' :
 						// '<';
 						// String s = addChar + " " + as.entry().getID() + " " +
@@ -449,7 +449,7 @@ public class MultipleAlignmentTrack2 extends Track {
 		} else {/* More than 500 blocks on screen */
 			int[] counts = new int[(int) Math.ceil(screenWidth)];
 			for (AbstractAlignmentBlock ab : abs) {
-				AlignmentSequence as = ab.getAlignmentSequence(0);
+				AbstractAlignmentSequence as = ab.getAlignmentSequence(0);
 				int start = Convert.translateGenomeToScreen(as.start(), visible, screenWidth);
 				int end = Convert.translateGenomeToScreen(as.end(), visible, screenWidth);
 				for (int i = start; i < end; i++) {
