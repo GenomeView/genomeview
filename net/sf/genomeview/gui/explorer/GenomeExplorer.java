@@ -71,7 +71,7 @@ class GenomeExplorer extends JDialog {
 
 		System.out.println("instances: " + list);
 
-		String common = "<br><br>You can load any of the instances by clicking on the image of the organisms in the list to the right.<br><br>At the top of this dialog, there are tabs for more genomes.<br><br>You can immediately start working with your data by clicking the 'Work with my data' button above.</html>";
+		String common = "<br><br>You can load any of the instances by clicking on the image of one of the organisms in the list to the right.<br><br>At the top of this dialog, there are tabs for more genomes.<br><br>You can immediately start working with your data by clicking the 'Work with my data' button above.</html>";
 
 		tabs.addTab("Tutorial genomes", new GenomesPanel(model,
 				"<html>Welcome to the GenomeView Genome Explorer. This is your portal to preloaded GenomeView instances."
