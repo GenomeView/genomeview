@@ -67,7 +67,6 @@ public class SaveImage extends AbstractAction {
 
 			
 			final Hider h = new Hider(model,"Exporting image...");
-			h.setVisible(true);
 			SwingUtilities.invokeLater(new Runnable() {
 
 				@Override

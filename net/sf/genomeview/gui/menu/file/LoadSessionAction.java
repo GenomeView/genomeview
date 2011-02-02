@@ -19,7 +19,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.Session;
-import net.sf.genomeview.gui.task.ReadWorker;
+import net.sf.genomeview.scheduler.ReadWorker;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import be.abeel.io.LineIterator;

@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import javax.swing.JEditorPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
@@ -43,19 +44,14 @@ public class JEditorPaneLabel extends JEditorPane {
 		}
 	}
 
-	public JEditorPaneLabel(String text) {
-		super("text/html", text);
+	public JEditorPaneLabel() {
+		super("text/html",null);
 		setEditable(false);
 		super.addHyperlinkListener(new Hyperactive());
-			
-	}
-
-	public JEditorPaneLabel() {
-		this(null);
 	}
 
 	public StyleSheet getStyleSheet() {
-		StyleSheet css = ((HTMLEditorKit) super.getEditorKit()).getStyleSheet();
+		StyleSheet css =((HTMLDocument)this.getDocument()).getStyleSheet(); 
 		return css;
 
 	}

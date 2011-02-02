@@ -31,7 +31,7 @@ import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.NotificationTypes;
 import net.sf.genomeview.gui.StaticUtils;
-import net.sf.genomeview.gui.task.ReadWorker;
+import net.sf.genomeview.scheduler.ReadWorker;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;

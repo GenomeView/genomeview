@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.task;
+package net.sf.genomeview.scheduler;
 
 import javax.swing.SwingWorker;
 
@@ -23,19 +23,26 @@ import net.sf.jannot.source.DataSource;
  */
 public abstract class DataSourceWorker extends SwingWorker<Void, Void> {
 
-    protected DataSource source;
+	protected DataSource source;
 
-    protected Model model;
+	protected Model model;
 
-    protected GVProgressBar pb;
+	protected GVProgressBar pb;
 
-    public DataSourceWorker(DataSource source, Model model) {
-        this.source = source;
-        this.model = model;
-        this.pb= new GVProgressBar("Background task", "Doing background task", model.getGUIManager().getParent());
-    }
+	public DataSourceWorker(DataSource source, Model model) {
+		this.source = source;
+		this.model = model;
+		model.getWorkerManager().start(this);
+		this.pb = new GVProgressBar("Background task", "Doing background task", model.getGUIManager().getParent());
+	}
 
-    @Override
-    protected abstract Void doInBackground();
+	@Override
+	protected void done() {
+		pb.done();
+		model.getWorkerManager().done(this);
+	}
+
+	@Override
+	protected abstract Void doInBackground();
 
 }

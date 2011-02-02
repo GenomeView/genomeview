@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.task;
+package net.sf.genomeview.scheduler;
 
 import javax.swing.JOptionPane;
 

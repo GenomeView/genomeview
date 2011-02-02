@@ -239,6 +239,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 			idl.init(null, null, null, new String[0], null, null);
 		}
 
+		ReferenceMissingMonitor rmm=new ReferenceMissingMonitor(model);
 		/* Start acting */
 		model.setSilent(false);
 

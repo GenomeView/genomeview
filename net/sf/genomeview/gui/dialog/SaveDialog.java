@@ -118,7 +118,7 @@ public class SaveDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				final Hider h = new Hider(model, "Saving data...");
-				h.setVisible(true);
+				
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {

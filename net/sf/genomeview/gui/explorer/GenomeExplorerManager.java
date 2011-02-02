@@ -25,6 +25,7 @@ public class GenomeExplorerManager implements Observer {
 		this.model = model;
 		model.getGUIManager().registerGenomeExplorer(this);
 		model.addObserver(this);
+		model.getWorkerManager().addObserver(this);
 	}
 
 	public void setVisible(final boolean vis) {
@@ -62,7 +63,7 @@ public class GenomeExplorerManager implements Observer {
 		if (!autoMode)
 			return;
 
-		if (model.entries().size() > 0) {
+		if (model.getWorkerManager().runningJobs()>0||model.entries().size() > 0) {
 			if (bg.isVisible())
 				visi(false);
 		} else {

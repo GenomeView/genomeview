@@ -32,8 +32,7 @@ public class GVProgressBar extends JDialog {
 	private JProgressBar pb = new JProgressBar();
 
 	public GVProgressBar(String title, String initText, Frame parent) {
-		super(parent, title);
-		setAlwaysOnTop(true);
+		super(parent, title,ModalityType.MODELESS);
 		requestFocus();
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		setLayout(new GridBagLayout());

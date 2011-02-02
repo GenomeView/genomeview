@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.task;
+package net.sf.genomeview.scheduler;
 
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.source.DataSource;
@@ -22,11 +22,11 @@ public class ReadWorker extends DataSourceWorker {
 	protected Void doInBackground() {
 		try {
 			model.addData(source);
-			pb.done();
+		
 			
 		} catch (Throwable e) {
 			e.printStackTrace();
-			pb.done();
+			
 			
 		}
 		return null;

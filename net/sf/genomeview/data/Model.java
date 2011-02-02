@@ -31,6 +31,7 @@ import net.sf.genomeview.gui.viztracks.hts.PileupTrack;
 import net.sf.genomeview.gui.viztracks.hts.ShortReadTrack;
 import net.sf.genomeview.plugin.GUIManager;
 import net.sf.genomeview.scheduler.GenomeViewScheduler;
+import net.sf.genomeview.scheduler.WorkerManager;
 import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
@@ -537,7 +538,8 @@ public class Model extends Observable implements IModel {
 			/* Graph tracks */
 			for (DataKey key : e) {
 				Data<?> data = e.get(key);
-				//System.out.println("Update tracks:" +key+"\t"+data.getClass()+"\t"+data);
+				// System.out.println("Update tracks:"
+				// +key+"\t"+data.getClass()+"\t"+data);
 				if (data instanceof MemoryFeatureAnnotation) {
 					if (!trackList.containsTrack(key) && ((MemoryFeatureAnnotation) data).cachedCount() > 0)
 						trackList.add(new FeatureTrack(this, (Type) key));
@@ -706,4 +708,10 @@ public class Model extends Observable implements IModel {
 
 	}
 
+	private WorkerManager wm = new WorkerManager();
+
+	public WorkerManager getWorkerManager() {
+		return wm;
+		
+	}
 }
