@@ -4,24 +4,15 @@
 package net.sf.genomeview.gui.explorer;
 
 import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.border.Border;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 import javax.swing.text.html.StyleSheet;
 
 import net.sf.genomeview.core.Colors;
@@ -30,7 +21,6 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.Session;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
-import net.sf.jannot.wiggle.DiskArrayWiggle;
 import be.abeel.gui.GridBagPanel;
 
 /**
@@ -69,13 +59,10 @@ class Genome extends GridBagPanel {
 		css.addRule("h3 {font-size:115%;color: " + Colors.encode(Configuration.green) + ";margin:0px;padding:0px;}");
 		text.setText("<html><h3>" + name + "</h3><p>" + description + "</p></html>");
 		
-		text.setPreferredSize(new Dimension(100, 100));
-
-		// text.setVerticalAlignment(JLabel.TOP);
 		add(text, gc);
 		Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 		Border colorBorder = BorderFactory.createLineBorder(Configuration.green);
 		setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
-		// pack();
+
 	}
 }

@@ -5,10 +5,12 @@ package net.sf.genomeview.data;
 
 import java.awt.Desktop;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.jannot.utils.URIFactory;
 
 /**
  * 
@@ -34,8 +36,11 @@ public class Blast {
 
 	private static void go(String url) {
 		try {
-			StaticUtils.browse(new URI(url));
+			StaticUtils.browse(URIFactory.uri(url));
 		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 
 import net.sf.genomeview.core.Icons;
@@ -29,6 +30,7 @@ import be.abeel.gui.GridBagPanel;
 class GenomesPanel extends GridBagPanel {
 
 	private static final long serialVersionUID = 2022250811407852659L;
+	private JScrollPane jp;
 
 	public GenomesPanel(final Model model,String msg, ArrayList<Genome> list) {
 			Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -84,9 +86,24 @@ class GenomesPanel extends GridBagPanel {
 			gc.gridheight = 10;
 			gc.weightx = 1;
 			gc.weighty = 1;
-			GridBagPanel buttons = new GridBagPanel();
+			jp = new JScrollPane();
+			GridBagPanel buttons = new GridBagPanel(){
+				
+				private static final long serialVersionUID = 7455856822406470518L;
+
+				@Override
+				public Dimension getPreferredSize() {
+					Dimension dim=super.getPreferredSize();
+					JScrollBar jb=jp.getVerticalScrollBar();
+					int sx=0;
+					if(jb.isVisible()){
+						sx=jb.getWidth();
+					}
+					return new Dimension(jp.getWidth()-sx-gc.insets.right, dim.height);
+				}
+			};
 			buttons.setBackground(Color.WHITE);
-			
+			buttons.setSize(10, 100);
 			buttons.gc.fill = GridBagConstraints.HORIZONTAL;
 			buttons.gc.weightx = 1;
 			buttons.gc.weighty = 0;
@@ -102,9 +119,14 @@ class GenomesPanel extends GridBagPanel {
 			space.setBackground(Color.WHITE);
 			buttons.add(space, buttons.gc);
 
-			JScrollPane jp = new JScrollPane(buttons);
+			
+			jp.setViewportView(buttons);
 			jp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+			
 			add(jp, gc);
+			
+			
+			
 			
 			gc.gridx=0;
 			gc.gridy=20;
@@ -119,4 +141,9 @@ class GenomesPanel extends GridBagPanel {
 
 
 		}
+
+	public void scrollToTop() {
+		jp.getVerticalScrollBar().setValue(0);
+		
+	}
 }

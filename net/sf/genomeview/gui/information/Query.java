@@ -16,6 +16,7 @@ import javax.swing.Icon;
 
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.jannot.utils.URIFactory;
 
 /**
  * Class representing a website query.
@@ -61,7 +62,7 @@ public class Query {
 	public void query(String q) {
 		try {
 			String query = queryURL.replaceAll("%query%", URLEncoder.encode(q.trim(), "UTF-8"));
-			StaticUtils.browse(new URI(query));
+			StaticUtils.browse(URIFactory.uri(query));
 		} catch (IOException f) {
 			// TODO Auto-generated catch block
 			f.printStackTrace();

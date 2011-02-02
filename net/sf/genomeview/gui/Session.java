@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,6 +20,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
+import net.sf.jannot.utils.URIFactory;
 import be.abeel.io.LineIterator;
 /**
  * 
@@ -30,8 +32,11 @@ public class Session {
 	public static void loadSession(Model model, String in) throws IOException {
 		if (in.startsWith("http://") || in.startsWith("https://")) {
 			try {
-				loadSession(model, new URL(in));
+				loadSession(model, URIFactory.url(in));
 			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -68,7 +73,7 @@ public class Session {
 					DataSource ds = null;
 					switch (c) {
 					case 'U':
-						ds = DataSourceFactory.createURL(new URL(line));
+						ds = DataSourceFactory.createURL(URIFactory.url(line));
 						break;
 					case 'F':
 						ds = DataSourceFactory.createFile(new File(line));

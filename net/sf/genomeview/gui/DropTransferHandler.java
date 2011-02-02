@@ -8,6 +8,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -79,6 +80,9 @@ class DropTransferHandler extends TransferHandler {
 				System.err.println("Unsupported Flavor: " + e);
 			} catch (ReadFailedException ex) {
 				System.err.println("Readfailed exception getting data: " + ex);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		return false;

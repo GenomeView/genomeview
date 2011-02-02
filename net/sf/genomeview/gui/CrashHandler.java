@@ -19,6 +19,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
+import net.sf.jannot.utils.URIFactory;
+
 /**
  * Use this class to terminate GenomeView when an unexpected error has occured
  * from which it is impossible to recover.
@@ -80,7 +82,7 @@ public class CrashHandler {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Desktop.getDesktop().browse(new URI("https://sourceforge.net/tracker/?func=add&group_id=208107&atid=1004368"));
+					Desktop.getDesktop().browse(URIFactory.uri("https://sourceforge.net/tracker/?func=add&group_id=208107&atid=1004368"));
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(window, "Could not open bugtracker website");
 				}

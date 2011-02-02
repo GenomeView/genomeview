@@ -27,36 +27,50 @@ public class GenomeExplorerManager implements Observer {
 		model.addObserver(this);
 	}
 
-	public void setVisible(boolean vis) {
+	public void setVisible(final boolean vis) {
 		autoMode = vis;
-		bg.setVisible(vis);
-		if (bg.isVisible())
-			bg.requestFocus();
-		
-		
+		visi(vis);
+
+	}
+
+	private boolean firstUse = true;
+
+	private void visi(final boolean vis) {
+		EventQueue.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				bg.setVisible(vis);
+			}
+		});
+
+		if (vis && firstUse) {
+			firstUse = false;
+			EventQueue.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					bg.scollToTop();
+				}
+			});
+
+		}
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
 		if (!autoMode)
 			return;
-		EventQueue.invokeLater(new Runnable() {
 
-			@Override
-			public void run() {
-				if (model.entries().size() > 0) {
-					if (bg.isVisible())
-						bg.setVisible(false);
-				} else {
-					if (!bg.isVisible()) {
-						bg.setVisible(true);
-
-					}
-					bg.requestFocus();
-				}
+		if (model.entries().size() > 0) {
+			if (bg.isVisible())
+				visi(false);
+		} else {
+			if (!bg.isVisible()) {
+				visi(true);
 
 			}
-		});
+		}
 
 	}
 }

@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,6 +38,7 @@ import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.DataSourceFactory.Sources;
 import net.sf.jannot.source.das.DAS;
 import net.sf.jannot.source.das.DAS.EntryPoint;
+import net.sf.jannot.utils.URIFactory;
 
 import org.xml.sax.SAXException;
 
@@ -152,6 +154,9 @@ public class OpenDialog extends JDialog {
 					} catch (ReadFailedException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
+					} catch (URISyntaxException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
 				}
 
@@ -167,7 +172,7 @@ public class OpenDialog extends JDialog {
 					String input = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
 							"Give the URL of the data");
 					if (input != null && input.trim().length() > 0) {
-						URL url = new URL(input.trim());
+						URL url = URIFactory.url(input.trim());
 						load(new DataSource[] { DataSourceFactory.createURL(url) });
 					}
 
@@ -180,6 +185,9 @@ public class OpenDialog extends JDialog {
 				} catch (IOException e2) {
 					// TODO Auto-generated catch block
 					e2.printStackTrace();
+				} catch (URISyntaxException e3) {
+					// TODO Auto-generated catch block
+					e3.printStackTrace();
 				}
 
 			}
@@ -219,6 +227,9 @@ public class OpenDialog extends JDialog {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (URISyntaxException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}

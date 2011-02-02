@@ -14,13 +14,13 @@ import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.explorer.GenomeExplorer;
 import net.sf.genomeview.gui.explorer.GenomeExplorerManager;
 import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.cache.SourceCache;
+import net.sf.jannot.utils.URIFactory;
 
 public class InitDataLoader {
 
@@ -54,7 +54,7 @@ public class InitDataLoader {
 		if (config != null) {
 			try {
 				if (config.startsWith("http") || config.startsWith("ftp")) {
-					Configuration.loadExtra(new URI(config).toURL().openStream());
+					Configuration.loadExtra(URIFactory.url(config).openStream());
 				} else {
 					Configuration.loadExtra(new FileInputStream(config));
 				}
@@ -82,7 +82,7 @@ public class InitDataLoader {
 		} else if (cmdUrl != null) {
 			logger.info("URL commandline option is set: " + cmdUrl);
 			try {
-				data = new DataSource[] { DataSourceFactory.createURL(new URL(cmdUrl)) };
+				data = new DataSource[] { DataSourceFactory.createURL(URIFactory.url(cmdUrl)) };
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -119,7 +119,7 @@ public class InitDataLoader {
 					rf.execute();
 
 				} else {
-					DataSource ds = DataSourceFactory.createURL(new URL(s));
+					DataSource ds = DataSourceFactory.createURL(URIFactory.url(s));
 					ReadWorker rf = new ReadWorker(ds, model);
 					rf.execute();
 

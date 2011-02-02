@@ -2,6 +2,7 @@ package devtools.ascomponent;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.swing.JFrame;
@@ -13,10 +14,11 @@ import net.sf.genomeview.gui.task.ReadWorker;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
+import net.sf.jannot.utils.URIFactory;
 
 public class GenomeViewAsComponent {
 
-	public static void main(String[] args) throws MalformedURLException, IOException, ReadFailedException {
+	public static void main(String[] args) throws MalformedURLException, IOException, ReadFailedException, URISyntaxException {
 		JFrame frame = new JFrame("GenomeView as component demo");
 		Model model=new Model();
 		model.getGUIManager().registerMainWindow(frame);
@@ -25,15 +27,15 @@ public class GenomeViewAsComponent {
 		frame.pack();
 		frame.setVisible(true);
 		
-		DataSource ds = DataSourceFactory.createURL(new URL("http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.fasta.gz"));
+		DataSource ds = DataSourceFactory.createURL(URIFactory.url("http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.fasta.gz"));
 		ReadWorker rf = new ReadWorker(ds, model);
 		rf.execute();
 		
-		ds = DataSourceFactory.createURL(new URL("http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.gff.gz"));
+		ds = DataSourceFactory.createURL(URIFactory.url("http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.gff.gz"));
 		rf = new ReadWorker(ds, model);
 		rf.execute();
 		
-		ds = DataSourceFactory.createURL(new URL(" http://www.broadinstitute.org/software/genomeview/demo_c_elegans/uwgs-rw_L2_FC6218_3.CHROMOSOME_IV.sorted.bam.bai"));
+		ds = DataSourceFactory.createURL(URIFactory.url(" http://www.broadinstitute.org/software/genomeview/demo_c_elegans/uwgs-rw_L2_FC6218_3.CHROMOSOME_IV.sorted.bam.bai"));
 		rf = new ReadWorker(ds, model);
 		rf.execute();
 	    

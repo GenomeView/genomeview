@@ -8,12 +8,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+
+import net.sf.jannot.utils.URIFactory;
 
 /**
  * <p>
@@ -104,9 +107,10 @@ public class ClientHttpRequest {
      * @param urlString
      *            the string representation of the URL to send request to
      * @throws IOException
+     * @throws URISyntaxException 
      */
-    public ClientHttpRequest(String urlString) throws IOException {
-        this(new URL(urlString));
+    public ClientHttpRequest(String urlString) throws IOException, URISyntaxException {
+        this(URIFactory.url(urlString));
     }
 
     // private void postCookies() {

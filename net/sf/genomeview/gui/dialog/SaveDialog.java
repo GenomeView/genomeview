@@ -35,6 +35,7 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Entry;
 import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.parser.EMBLParser;
+import net.sf.jannot.utils.URIFactory;
 import be.abeel.io.ExtensionManager;
 import be.abeel.io.LineIterator;
 
@@ -152,9 +153,9 @@ public class SaveDialog extends JDialog {
 							setVisible(false);
 							if (defaultLocation.startsWith("http://") || defaultLocation.startsWith("https://")) {
 								try {
-									URL url = new URL(defaultLocation);
+									URL url = URIFactory.url(defaultLocation);
 									System.out.println(url.getProtocol() + "://" + url.getHost() + url.getPath());
-									url = new URL(url.getProtocol() + "://" + url.getHost() + url.getPath());
+									url = URIFactory.url(url.getProtocol() + "://" + url.getHost() + url.getPath());
 
 									LineIterator it = new LineIterator(tmp);
 									System.out.println("-------");

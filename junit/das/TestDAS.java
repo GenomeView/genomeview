@@ -2,6 +2,7 @@ package junit.das;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -61,6 +62,9 @@ public class TestDAS {
 			e.printStackTrace();
 			Assert.fail();
 		} catch (ReadFailedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

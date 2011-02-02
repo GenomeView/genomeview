@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.IModel;
+import net.sf.jannot.utils.URIFactory;
 
 import org.java.plugin.JpfException;
 import org.java.plugin.ObjectFactory;
@@ -48,7 +49,7 @@ public class PluginLoader {
             } else
                 // developer usage
                 jar = manifest.toString().substring(0, manifest.toString().lastIndexOf('/'));
-            URL context = new URI(jar).toURL();
+            URL context = URIFactory.url(jar);
             System.err.println("Core plugin context: " + context);
             coreLocation = new StandardPluginLocation(context, manifest);
             pluginManager.publishPlugins(new PluginLocation[] { coreLocation });
