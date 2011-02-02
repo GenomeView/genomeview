@@ -1,10 +1,10 @@
 GenomeView readme
 
-Documentation: http://genomeview.sourceforge.net/
+Documentation: http://genomeview.org/
 
 Download: http://downloads.sourceforge.net/genomeview/
 
-Webstart: http://genomeview.sourceforge.net/start.jnlp.php
+Webstart: http://genomeview.org/start/launch.jnlp
 
 
 Import in Eclipse:
