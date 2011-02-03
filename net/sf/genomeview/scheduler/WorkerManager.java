@@ -15,19 +15,19 @@ public class WorkerManager extends Observable{
 	private HashSet<DataSourceWorker> running = new HashSet<DataSourceWorker>();
 
 	
-	public void start(DataSourceWorker ds) {
+	public synchronized void start(DataSourceWorker ds) {
 		running.add(ds);
 		setChanged();
 		notifyObservers();
 	}
 
-	public void done(DataSourceWorker ds) {
+	public synchronized void done(DataSourceWorker ds) {
 		running.remove(ds);
 		setChanged();
 		notifyObservers();
 	}
 
-	public int runningJobs() {
+	public synchronized  int runningJobs() {
 		return running.size();
 	}
 }
