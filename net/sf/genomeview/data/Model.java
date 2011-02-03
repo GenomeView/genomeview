@@ -4,7 +4,6 @@
 package net.sf.genomeview.data;
 
 import java.awt.Color;
-import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
@@ -55,7 +54,12 @@ import net.sf.jannot.tabix.SWigWrapper;
 import net.sf.jannot.wiggle.Graph;
 import be.abeel.util.DefaultHashMap;
 
-//also test
+/**
+ * The Model.
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class Model extends Observable implements IModel {
 	private Logger logger = Logger.getLogger(Model.class.getCanonicalName());
 
