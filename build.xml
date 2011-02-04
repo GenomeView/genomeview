@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="1341" />
+	<property name="version" value="1370" />
 	<property name="src" value="." />
 	<property name="build" value="build" />
 	<property name="lib" value="lib" />
@@ -29,7 +29,7 @@
 		<mkdir dir="sourcebuild" />
 		<copy todir="sourcebuild">
 			<fileset dir="${src}">
-
+				<include name="**/*.txt" />
 				<include name="**/*.java" />
 				<include name="**/*.conf" />
 				<include name="**/*.png" />
@@ -37,7 +37,7 @@
 		</copy>
 		<replaceregexp match="%HEADER%" replace="This file is part of GenomeView, a genome browser and annotation curator${line.separator}
 * ${line.separator}
-* Copyright (C) 2007-2011 Thomas Abeel and Thomas Van Parys${line.separator}
+* Copyright (C) 2007-2011 Thomas Abeel and contributors${line.separator}
 * ${line.separator}
 * This program is free software: you can redistribute it and/or modify${line.separator}
 * it under the terms of the GNU General Public License as published by${line.separator}
@@ -52,7 +52,7 @@
 * You should have received a copy of the GNU General Public License${line.separator}
 * along with this program.  If not, see http://www.gnu.org/licenses/.${line.separator}
 *${line.separator}
-* Project: http://genomeview.sourceforge.net/">
+* Project: http://genomeview.org/">
 			<fileset dir="sourcebuild">
 				<include name="**/*.java" />
 			</fileset>
@@ -81,6 +81,7 @@
 		<copy todir="${build}">
 			<fileset dir="${src}">
 				<include name="**/*.conf" />
+				<include name="conf/*.txt" />
 				<include name="org/java/**/*.properties" />
 				<include name="org/java/**/*.dtd" />
 			</fileset>
