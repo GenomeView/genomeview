@@ -8,15 +8,17 @@ import java.awt.event.ActionEvent;
 import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.dialog.SearchDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
+import net.sf.genomeview.gui.search.SearchDialog;
 
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class SearchAction extends AbstractModelAction {
 
-    /**
-     * 
-     */
+    
     private static final long serialVersionUID = 8047658085913988768L;
 
     public SearchAction(Model model) {

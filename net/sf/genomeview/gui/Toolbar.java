@@ -3,13 +3,14 @@
  */
 package net.sf.genomeview.gui;
 
-import javax.swing.ImageIcon;
+import java.util.Observable;
+import java.util.Observer;
+
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.components.AAMappingChooser;
 import net.sf.genomeview.gui.menu.edit.RedoAction;
@@ -25,6 +26,9 @@ import net.sf.genomeview.gui.menu.navigation.AnnotationZoomOutAction;
  */
 public class Toolbar extends JToolBar {
 
+	
+	private static final long serialVersionUID = -3468536836400268783L;
+
 	public Toolbar(Model model) {
 
 		setFloatable(false);
@@ -38,12 +42,21 @@ public class Toolbar extends JToolBar {
 		add(new AnnotationMoveRightAction(model));
 		addSeparator();
 		add(new JLabel("Chromosome:"));
-		add(new JComboBox(new EntryListModel(model)));
+		final JComboBox cb=new JComboBox(new EntryListModel(model));
+		model.addObserver(new Observer() {
+			
+			@Override
+			public void update(Observable o, Object arg) {
+				cb.repaint();
+				
+			}
+		});
+		add(cb);
+		
 		if (Configuration.getBoolean("geneticCodeSelection")) {
 			add(new JLabel("Code:"));
 			add(new AAMappingChooser(model));
 		}
-		add(new JLabel(new ImageIcon(Icons.class.getResource("/images/vib.png"))));
-
+		
 	}
 }

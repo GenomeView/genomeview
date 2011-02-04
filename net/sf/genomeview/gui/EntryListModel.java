@@ -10,14 +10,12 @@ import java.util.Observer;
 import java.util.Set;
 
 import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import net.sf.genomeview.data.DummyEntry;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Entry;
-import net.sf.jannot.EntrySet;
 
 /**
  * 
@@ -80,6 +78,7 @@ final class EntryListModel implements Observer, ComboBoxModel {
 			}
 			lastSize = tmpList.size();
 		}
+		
 
 	}
 
