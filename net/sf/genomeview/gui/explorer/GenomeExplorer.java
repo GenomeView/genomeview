@@ -82,9 +82,9 @@ class GenomeExplorer extends JDialog {
 						model,
 						"<html>Welcome to the GenomeView plant genomes section. This is your portal to the GenomeView plant genomes.<br><br>These genomes are made available in collaboration with the Plaza platform."
 								+ common, list.get("plant")));
-		tabs.addTab("Animal genomes", new GenomesPanel(model,
-				"<html>Welcome to the GenomeView animal genomes section. This is your portal to the GenomeView animal genomes."
-						+ common, list.get("animal")));
+//		tabs.addTab("Animal genomes", new GenomesPanel(model,
+//				"<html>Welcome to the GenomeView animal genomes section. This is your portal to the GenomeView animal genomes."
+//						+ common, list.get("animal")));
 
 		Border emptyBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 		Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
