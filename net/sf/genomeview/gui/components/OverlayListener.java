@@ -4,7 +4,9 @@
 package net.sf.genomeview.gui.components;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -27,6 +29,8 @@ public class OverlayListener extends MouseAdapter implements ActionListener{
 
 	class Overlay extends JPanel {
 
+		
+		private static final long serialVersionUID = 4167311197324722126L;
 		private JLabel floater = new JLabel();
 
 		public Overlay(String message) {
@@ -73,6 +77,10 @@ public class OverlayListener extends MouseAdapter implements ActionListener{
 		overlay.setContentPane(new Overlay(message));
 		overlay.pack();
 		overlay.setLocation(x + 2, y - 5);
+		Toolkit tk=Toolkit.getDefaultToolkit();
+		Dimension screen=tk.getScreenSize();
+		if(x+overlay.getWidth()>screen.getWidth())
+			overlay.setLocation(p.x - 2-overlay.getWidth(), y - 5);
 		overlay.setVisible(true);
 	}
 
