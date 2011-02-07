@@ -43,6 +43,8 @@ public class Icons {
 
 	public static Icon LARGEOPEN=get("boxopen.png");
 	
+	public static Icon MINILOGO_ICON=get("gv2.png");
+	
 	public static Image MINILOGO=get("gv2.png").getImage();
 
 	private Icons() throws IOException {
