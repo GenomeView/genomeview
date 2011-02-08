@@ -58,8 +58,9 @@ class GenomesPanel extends GridBagPanel {
 			
 			gc.gridy++;
 			gc.weighty = 1;
-			JLabel msgLabel=new JLabel(msg);
-			msgLabel.setVerticalAlignment(JLabel.NORTH);
+			JEditorPaneLabel msgLabel=new JEditorPaneLabel();
+			msgLabel.setText(msg);
+			
 			msgLabel.setPreferredSize(new Dimension(Icons.LOGO.getIconWidth(),50));
 			add(msgLabel, gc);
 			

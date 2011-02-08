@@ -44,18 +44,11 @@ class GenomeExplorer extends JDialog {
 		setIconImage(Icons.MINILOGO);
 		this.model = model;
 
-		// super.setUndecorated(true);
-		// setResizable(false);
+		
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent
-			 * )
-			 */
+			
 			@Override
 			public void windowClosing(WindowEvent e) {
 				model.getGUIManager().getGenomeExplorer().setVisible(false);
@@ -80,11 +73,8 @@ class GenomeExplorer extends JDialog {
 				"Plant genomes",
 				new GenomesPanel(
 						model,
-						"<html>Welcome to the GenomeView plant genomes section. This is your portal to the GenomeView plant genomes.<br><br>These genomes are made available in collaboration with the Plaza platform."
+						"<html>Welcome to the GenomeView plant genomes section. This is your portal to the GenomeView plant genomes.<br><br>These genomes are made available in collaboration with the <a href='http://bioinformatics.psb.ugent.be/plaza/'>PLAZA platform</a> (<a href='http://bioinformatics.psb.ugent.be/plaza/credits/credits'>credits</a>)."
 								+ common, list.get("plant")));
-//		tabs.addTab("Animal genomes", new GenomesPanel(model,
-//				"<html>Welcome to the GenomeView animal genomes section. This is your portal to the GenomeView animal genomes."
-//						+ common, list.get("animal")));
 
 		Border emptyBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 		Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
