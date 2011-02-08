@@ -28,12 +28,12 @@ import javax.swing.border.Border;
 
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.Task;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.viztracks.Track;
-import net.sf.genomeview.scheduler.GenomeViewScheduler;
-import net.sf.genomeview.scheduler.Task;
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;

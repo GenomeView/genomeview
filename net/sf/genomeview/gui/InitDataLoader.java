@@ -14,8 +14,10 @@ import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.ReadWorker;
+import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.explorer.GenomeExplorerManager;
-import net.sf.genomeview.scheduler.ReadWorker;
+import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
@@ -138,18 +140,7 @@ public class InitDataLoader {
 		}
 
 		if (position != null) {
-			try {
-				String[] arr = position.split(":");
-				assert arr.length == 2 || arr.length == 3;
-				if (arr.length == 3) {
-					model.setSelectedEntry(model.entry(arr[0]));
-					model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[1]), Integer.parseInt(arr[2])));
-				} else if (arr.length == 2) {
-					model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[0]), Integer.parseInt(arr[1])));
-				}
-			} catch (NumberFormatException ne) {
-				CrashHandler.showErrorMessage("Could not parse location: " + position, ne);
-			}
+			ExternalHelper.setPosition(position,model);
 
 		}
 		EventQueue.invokeLater(new Runnable() {

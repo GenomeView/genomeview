@@ -1,11 +1,10 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.scheduler;
+package net.sf.genomeview.data;
 
 import javax.swing.SwingWorker;
 
-import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.GVProgressBar;
 import net.sf.jannot.source.DataSource;
 

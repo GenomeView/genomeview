@@ -1,9 +1,8 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui;
+package net.sf.genomeview.data;
 
-import java.awt.EventQueue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,9 +17,8 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.dialog.Hider;
-import net.sf.genomeview.scheduler.ReadWorker;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.utils.URIFactory;

@@ -21,8 +21,8 @@ import javax.swing.text.html.StyleSheet;
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.CrashHandler;
-import net.sf.genomeview.gui.Session;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import be.abeel.gui.GridBagPanel;
 
@@ -78,6 +78,14 @@ class Genome extends GridBagPanel {
 				((JLabel) e.getComponent()).setBorder(empty);
 				picture.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				repaint();
+			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					Session.loadSession(model, url);
+				} catch (IOException e1) {
+					CrashHandler.showErrorMessage("Could not load this session.", e1);
+				}
 			}
 		});
 

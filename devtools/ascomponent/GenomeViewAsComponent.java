@@ -3,19 +3,22 @@ package devtools.ascomponent;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.ReadWorker;
 import net.sf.genomeview.gui.MainContent;
-import net.sf.genomeview.scheduler.ReadWorker;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.utils.URIFactory;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class GenomeViewAsComponent {
 
 	public static void main(String[] args) throws MalformedURLException, IOException, ReadFailedException, URISyntaxException {

@@ -1,4 +1,4 @@
-package net.sf.genomeview.scheduler;
+package net.sf.genomeview.data;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;

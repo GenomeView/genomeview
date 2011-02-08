@@ -5,8 +5,8 @@ package net.sf.genomeview.gui.viztracks.hts;
 
 import java.util.BitSet;
 
+import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.scheduler.GenomeViewScheduler;
 import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
 import net.sf.jannot.pileup.Pile;

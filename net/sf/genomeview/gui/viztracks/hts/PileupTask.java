@@ -5,7 +5,7 @@ package net.sf.genomeview.gui.viztracks.hts;
 
 import java.util.logging.Logger;
 
-import net.sf.genomeview.scheduler.Task;
+import net.sf.genomeview.data.Task;
 import net.sf.jannot.Data;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;

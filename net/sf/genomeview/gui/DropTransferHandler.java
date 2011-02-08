@@ -16,7 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.scheduler.ReadWorker;
+import net.sf.genomeview.data.ReadWorker;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;

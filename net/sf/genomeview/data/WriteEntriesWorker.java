@@ -1,11 +1,10 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.scheduler;
+package net.sf.genomeview.data;
 
 import javax.swing.JOptionPane;
 
-import net.sf.genomeview.data.Model;
 import net.sf.jannot.Entry;
 import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.source.DataSource;

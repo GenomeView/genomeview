@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.gui.external.JavaScriptHandler;
 import net.sf.genomeview.gui.viztracks.TickmarkTrack;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.annotation.FeatureTrack;
@@ -29,8 +30,6 @@ import net.sf.genomeview.gui.viztracks.graph.WiggleTrack;
 import net.sf.genomeview.gui.viztracks.hts.PileupTrack;
 import net.sf.genomeview.gui.viztracks.hts.ShortReadTrack;
 import net.sf.genomeview.plugin.GUIManager;
-import net.sf.genomeview.scheduler.GenomeViewScheduler;
-import net.sf.genomeview.scheduler.WorkerManager;
 import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
@@ -74,6 +73,10 @@ public class Model extends Observable implements IModel {
 
 	public Model() {
 		guimanager = new GUIManager();
+		
+		/* JavaScriptInputHandler */
+		new JavaScriptHandler(this);
+		
 		/* Scheduler booster thread */
 		new Thread(new Runnable() {
 
@@ -355,11 +358,14 @@ public class Model extends Observable implements IModel {
 	/**
 	 * Load new entries from a data source.
 	 * 
+	 * 
+	 * This should only be done by a ReadWorker.
+	 * 
 	 * @param f
 	 *            data source to load data from
 	 * @throws ReadFailedException
 	 */
-	public void addData(DataSource f) throws ReadFailedException {
+	void addData(DataSource f) throws ReadFailedException {
 		if (entries.size() == 0)
 			setAnnotationLocationVisible(new Location(1, 51));
 		logger.info("Reading source:" + f);
