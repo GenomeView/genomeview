@@ -4,9 +4,12 @@
 package net.sf.genomeview.gui.external;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,11 +37,13 @@ class InstructionWorker implements Runnable {
 
 	private String id;
 
-	private static Logger log=Logger.getLogger(InstructionWorker.class.getCanonicalName());
-	
+	private static Logger log = Logger.getLogger(InstructionWorker.class.getCanonicalName());
+
+	private static ArrayList<Integer> otherPorts = new ArrayList<Integer>();
+
 	InstructionWorker(Model model, String id) {
-		this.model=model;
-		this.id=id;
+		this.model = model;
+		this.id = id;
 		s = null;
 	}
 
@@ -88,37 +93,61 @@ class InstructionWorker implements Runnable {
 		// InputStream is = new BufferedInputStream(s.getInputStream());
 		LineIterator it = new LineIterator(s.getInputStream());
 		String line = it.next();
-		System.out.println(line);
-		while (!line.startsWith("GET")){
-			System.out.println("Handler: GET: "+line);
-			line = it.next();
+		if (line.startsWith("GenomeViewJavaScriptHandler-")) {
+			otherPorts.add(Integer.parseInt(line.split("-")[1]));
+		} else {
 			System.out.println(line);
-			
-		}
-		if(line.startsWith("GET /genomeview-"+id+"/")){
-			System.out.println("Good to go...");
-			String[]arr=line.split(" ")[1].split("/",4);
-			if(arr[1].startsWith("genomeview")){
-				if(arr[2].toLowerCase().equals("position")){
-					doPosition(arr[3]);
-				}
-				if(arr[2].toLowerCase().equals("load")){
-					doLoad(arr[3]);
-					
-				}
-				if(arr[2].toLowerCase().equals("session")){
-					doSession(arr[3]);
-					
-				}
-				if(arr[2].toLowerCase().equals("unload")){
-					model.clearEntries();
-				}
-			}else{
-				log.log(Level.WARNING, "This instruction doesn't belong to GenomeView, I'll ignore it.");
+			while (!line.startsWith("GET")) {
+				System.out.println("Handler: GET: " + line);
+				line = it.next();
+				System.out.println(line);
+
 			}
-			
+			writeOther(line);
+			if (line.startsWith("GET /genomeview-" + id + "/")) {
+				System.out.println("Good to go...");
+				String[] arr = line.split(" ")[1].split("/", 4);
+				if (arr[1].startsWith("genomeview")) {
+					if (arr[2].toLowerCase().equals("position")) {
+						doPosition(arr[3]);
+					}
+					if (arr[2].toLowerCase().equals("load")) {
+						doLoad(arr[3]);
+
+					}
+					if (arr[2].toLowerCase().equals("session")) {
+						doSession(arr[3]);
+
+					}
+					if (arr[2].toLowerCase().equals("unload")) {
+						model.clearEntries();
+					}
+				} else {
+					log.log(Level.WARNING, "This instruction doesn't belong to GenomeView, I'll ignore it.");
+				}
+
+			}
 		}
 		s.close();
+
+	}
+
+	private void writeOther(String line) {
+		for (int port : otherPorts) {
+			try {
+				Socket clientSocket = new Socket(InetAddress.getLocalHost(), port);
+				PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
+				out.println(line);
+				out.close();
+				clientSocket.close();
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 	}
 
@@ -135,18 +164,18 @@ class InstructionWorker implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	private void doPosition(String string) {
 		ExternalHelper.setPosition(string, model);
-		
+
 	}
 
 	private void doLoad(String s) {
 		try {
-			DataSource ds=DataSourceFactory.createURL(URIFactory.url(s));
-			ReadWorker rw=new ReadWorker(ds, model);
+			DataSource ds = DataSourceFactory.createURL(URIFactory.url(s));
+			ReadWorker rw = new ReadWorker(ds, model);
 			rw.execute();
 		} catch (ReadFailedException e) {
 			// TODO Auto-generated catch block
@@ -161,6 +190,6 @@ class InstructionWorker implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 }
