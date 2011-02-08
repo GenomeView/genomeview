@@ -71,11 +71,15 @@ public class Model extends Observable implements IModel {
 		return mouseModel;
 	}
 
-	public Model() {
+	public Model(){
+		this(null);
+	}
+	
+	public Model(String id) {
 		guimanager = new GUIManager();
 		
 		/* JavaScriptInputHandler */
-		new JavaScriptHandler(this);
+		new JavaScriptHandler(this,id);
 		
 		/* Scheduler booster thread */
 		new Thread(new Runnable() {

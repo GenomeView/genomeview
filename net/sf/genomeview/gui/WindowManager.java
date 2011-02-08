@@ -166,6 +166,9 @@ public class WindowManager extends WindowAdapter implements Observer {
 		Option sessionO = parser.addHelp(parser.addStringOption("session"),
 				"Provide a session file that contains all the files that have to be loaded.");
 
+		Option idO = parser.addHelp(parser.addStringOption("id"),
+		"Instance ID for this GenomeView instance, useful to control multiple GVs at once.");
+				
 		boolean goodParse = parse(parser, args);
 
 		if (parser.checkHelp()) {
@@ -178,7 +181,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 		boolean freshwindow = false;
 		
 		if (model == null) {
-			model = new Model();
+			model = new Model((String) parser.getOptionValue(idO));
 			model.addObserver(this);
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new Hotkeys(model));
 		}

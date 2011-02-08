@@ -32,10 +32,13 @@ class InstructionWorker implements Runnable {
 
 	private Model model;
 
+	private String id;
+
 	private static Logger log=Logger.getLogger(InstructionWorker.class.getCanonicalName());
 	
-	InstructionWorker(Model model) {
+	InstructionWorker(Model model, String id) {
 		this.model=model;
+		this.id=id;
 		s = null;
 	}
 
@@ -92,10 +95,10 @@ class InstructionWorker implements Runnable {
 			System.out.println(line);
 			
 		}
-		if(line.startsWith("GET /genomeview/")){
+		if(line.startsWith("GET /genomeview-"+id+"/")){
 			System.out.println("Good to go...");
 			String[]arr=line.split(" ")[1].split("/",4);
-			if(arr[1].equals("genomeview")){
+			if(arr[1].startsWith("genomeview")){
 				if(arr[2].toLowerCase().equals("position")){
 					doPosition(arr[3]);
 				}

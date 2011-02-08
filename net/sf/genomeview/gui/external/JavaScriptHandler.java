@@ -22,7 +22,7 @@ public class JavaScriptHandler {
 	/* Where worker threads stand idle */
 	static ArrayList<InstructionWorker> threads = new ArrayList<InstructionWorker>();
 
-	public JavaScriptHandler(final Model model) {
+	public JavaScriptHandler(final Model model, final String id) {
 		new Thread(new Runnable() {
 
 			@Override
@@ -31,7 +31,7 @@ public class JavaScriptHandler {
 
 				/* start worker threads */
 				for (int i = 0; i < 1; ++i) {
-					InstructionWorker w = new InstructionWorker(model);
+					InstructionWorker w = new InstructionWorker(model,id);
 					(new Thread(w, "worker #" + i)).start();
 					threads.add(w);
 				}
@@ -45,7 +45,7 @@ public class JavaScriptHandler {
 							InstructionWorker w = null;
 							synchronized (threads) {
 								if (threads.isEmpty()) {
-									InstructionWorker ws = new InstructionWorker(model);
+									InstructionWorker ws = new InstructionWorker(model,id);
 									ws.setSocket(s);
 									(new Thread(ws, "additional worker")).start();
 								} else {

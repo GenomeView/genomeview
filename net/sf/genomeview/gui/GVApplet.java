@@ -51,6 +51,9 @@ public class GVApplet extends JApplet {
 		
 		final String extraO = getParameter("extra");
 		logger.info("extraO: "+extraO);
+		
+		final String idO = getParameter("id");
+		logger.info("idO: "+extraO);
 
 		final Frame parentFrame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, this);
 
@@ -59,7 +62,7 @@ public class GVApplet extends JApplet {
 
 				@Override
 				public void run() {
-					model = new Model();
+					model = new Model(idO);
 					model.getGUIManager().registerMainWindow(parentFrame);
 					model.setSilent(true);
 					model.clearEntries();
@@ -88,7 +91,7 @@ public class GVApplet extends JApplet {
 
 					PluginLoader.load(model);
 					model.setSilent(false);
-					
+					ReferenceMissingMonitor rmm=new ReferenceMissingMonitor(model);
 				}
 			});
 		} catch (InterruptedException e) {
