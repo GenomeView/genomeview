@@ -1,10 +1,17 @@
+/**
+ * %HEADER%
+ */
 package net.sf.genomeview.gui;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class LogConfigurator {
 	
 	static private Logger logger;
