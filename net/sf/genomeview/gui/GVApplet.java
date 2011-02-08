@@ -3,7 +3,6 @@
  */
 package net.sf.genomeview.gui;
 
-import java.awt.Component;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.lang.reflect.InvocationTargetException;
@@ -13,7 +12,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JApplet;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 
 import net.sf.genomeview.data.Model;
@@ -89,12 +87,6 @@ public class GVApplet extends JApplet {
 					KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new Hotkeys(model));
 
 					PluginLoader.load(model);
-					System.out.println(gvPanel.getPreferredSize());
-					System.out.println(getRootPane().getParent().getSize());
-					// final Frame parentFrame = (Frame)
-					// SwingUtilities.getAncestorOfClass(Frame.class, this);
-					// parentFrame.pack();
-					// gvPanel.validate();
 					model.setSilent(false);
 					
 				}
