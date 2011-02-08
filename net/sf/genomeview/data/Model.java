@@ -430,6 +430,11 @@ public class Model extends Observable implements IModel {
 			add(ticks);
 			StructureTrack strack = new StructureTrack(model);
 			add(strack);
+			if(!Configuration.getBoolean("track:showStructure")){
+				System.out.println("Not visisble");
+				strack.setVisible(false);
+				
+			}
 
 		}
 

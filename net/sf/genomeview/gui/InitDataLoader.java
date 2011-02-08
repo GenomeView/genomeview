@@ -41,16 +41,7 @@ public class InitDataLoader {
 		DataSourceFactory.disableURLCaching = Configuration.getBoolean("general:disableURLCaching");
 		
 
-		/*
-		 * Initialize session, all other arguments will override what the
-		 * session does.
-		 */
-		try {
-			if (session != null)
-				Session.loadSession(model, session);
-		} catch (IOException e1) {
-			CrashHandler.showErrorMessage("Failed to properly load requested session.", e1);
-		}
+		
 
 		/* Load the additional configuration */
 		if (config != null) {
@@ -69,6 +60,17 @@ public class InitDataLoader {
 			}
 		}
 
+		/*
+		 * Initialize session, all other arguments will override what the
+		 * session does.
+		 */
+		try {
+			if (session != null)
+				Session.loadSession(model, session);
+		} catch (IOException e1) {
+			CrashHandler.showErrorMessage("Failed to properly load requested session.", e1);
+		}
+		
 		/*
 		 * Select data source. If an URL or file are specified on the command
 		 * line, that is selected. In other cases a dialog pops-up to let the
