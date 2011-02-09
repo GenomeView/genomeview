@@ -69,6 +69,11 @@ class GenomeExplorer extends JDialog {
 		tabs.addTab("Tutorial genomes", new GenomesPanel(model,
 				"<html>Welcome to the GenomeView Genome Explorer. This is your portal to preloaded GenomeView instances."
 						+ common, list.get("demo")));
+		
+		tabs.addTab("Microbial genomes", new GenomesPanel(model,
+				"<html>Welcome to the GenomeView Genome Explorer. This is your portal to preloaded GenomeView instances for microbial genomes."
+						+ common, list.get("microbial")));
+		
 		tabs.addTab(
 				"Plant genomes",
 				new GenomesPanel(
