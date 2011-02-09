@@ -34,7 +34,7 @@ public class InitDataLoader {
 		logger = Logger.getLogger(InitDataLoader.class.getCanonicalName());
 	}
 
-	public void init(String config, String cmdUrl, String cmdFile, String[] remArgs, String position, String session)
+	public void init(String cmdUrl, String cmdFile, String[] remArgs, String position, String session)
 			throws InterruptedException, ExecutionException {
 
 		SourceCache.cacheDir = new File(Configuration.getDirectory(), "cache");
@@ -43,22 +43,7 @@ public class InitDataLoader {
 
 		
 
-		/* Load the additional configuration */
-		if (config != null) {
-			try {
-				if (config.startsWith("http") || config.startsWith("ftp")) {
-					Configuration.loadExtra(URIFactory.url(config).openStream());
-				} else {
-					Configuration.loadExtra(new FileInputStream(config));
-				}
-			} catch (MalformedURLException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
-			} catch (IOException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
-			} catch (URISyntaxException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
-			}
-		}
+		
 
 		/*
 		 * Initialize session, all other arguments will override what the

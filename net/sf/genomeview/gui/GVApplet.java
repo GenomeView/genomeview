@@ -62,7 +62,7 @@ public class GVApplet extends JApplet {
 
 				@Override
 				public void run() {
-					model = new Model(idO);
+					model = new Model(idO,configO);
 					model.getGUIManager().registerMainWindow(parentFrame);
 					model.setSilent(true);
 					model.clearEntries();
@@ -76,7 +76,7 @@ public class GVApplet extends JApplet {
 
 					InitDataLoader initLoader = new InitDataLoader(model);
 					try {
-						initLoader.init(configO, urlO, fileO, remArgs, positionO,sessionO);
+						initLoader.init( urlO, fileO, remArgs, positionO,sessionO);
 					} catch (InterruptedException e) {
 						logger.info(e.getMessage());
 					} catch (ExecutionException e) {

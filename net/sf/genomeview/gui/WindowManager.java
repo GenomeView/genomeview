@@ -168,7 +168,10 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 		Option idO = parser.addHelp(parser.addStringOption("id"),
 		"Instance ID for this GenomeView instance, useful to control multiple GVs at once.");
-				
+		
+		/* Load the additional configuration */
+		String config = (String) parser.getOptionValue(configurationO);
+		
 		boolean goodParse = parse(parser, args);
 
 		if (parser.checkHelp()) {
@@ -181,7 +184,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 		boolean freshwindow = false;
 		
 		if (model == null) {
-			model = new Model((String) parser.getOptionValue(idO));
+			model = new Model((String) parser.getOptionValue(idO),config);
 			model.addObserver(this);
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new Hotkeys(model));
 		}
@@ -235,11 +238,10 @@ public class WindowManager extends WindowAdapter implements Observer {
 			String session = (String) parser.getOptionValue(sessionO);
 			String[] remArgs = parser.getRemainingArgs();
 			String initialLocation = (String) parser.getOptionValue(positionO);
-			/* Load the additional configuration */
-			String config = (String) parser.getOptionValue(configurationO);
-			idl.init(config, cmdUrl, cmdFile, remArgs, initialLocation, session);
+			
+			idl.init(cmdUrl, cmdFile, remArgs, initialLocation, session);
 		} else {
-			idl.init(null, null, null, new String[0], null, null);
+			idl.init( null, null, new String[0], null, null);
 		}
 
 		ReferenceMissingMonitor rmm=new ReferenceMissingMonitor(model);

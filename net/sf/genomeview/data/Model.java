@@ -4,6 +4,10 @@
 package net.sf.genomeview.data;
 
 import java.awt.Color;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
@@ -50,6 +54,7 @@ import net.sf.jannot.tabix.BEDWrapper;
 import net.sf.jannot.tabix.GFFWrapper;
 import net.sf.jannot.tabix.PileupWrapper;
 import net.sf.jannot.tabix.SWigWrapper;
+import net.sf.jannot.utils.URIFactory;
 import net.sf.jannot.wiggle.Graph;
 import be.abeel.util.DefaultHashMap;
 
@@ -57,7 +62,7 @@ import be.abeel.util.DefaultHashMap;
  * The Model.
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 public class Model extends Observable implements IModel {
 	private Logger logger = Logger.getLogger(Model.class.getCanonicalName());
@@ -71,16 +76,34 @@ public class Model extends Observable implements IModel {
 		return mouseModel;
 	}
 
-	public Model(){
-		this(null);
+	public Model() {
+		this(null,null);
 	}
-	
-	public Model(String id) {
+
+	public Model(String id, String config) {
+
+		/* Load the additional configuration */
+		if (config != null) {
+			try {
+				if (config.startsWith("http") || config.startsWith("ftp")) {
+					Configuration.loadExtra(URIFactory.url(config).openStream());
+				} else {
+					Configuration.loadExtra(new FileInputStream(config));
+				}
+			} catch (MalformedURLException e) {
+				logger.log(Level.SEVERE, "loading extra configuration", e);
+			} catch (IOException e) {
+				logger.log(Level.SEVERE, "loading extra configuration", e);
+			} catch (URISyntaxException e) {
+				logger.log(Level.SEVERE, "loading extra configuration", e);
+			}
+		}
+
 		guimanager = new GUIManager();
-		
+
 		/* JavaScriptInputHandler */
-		new JavaScriptHandler(this,id);
-		
+		new JavaScriptHandler(this, id);
+
 		/* Scheduler booster thread */
 		new Thread(new Runnable() {
 
@@ -434,10 +457,10 @@ public class Model extends Observable implements IModel {
 			add(ticks);
 			StructureTrack strack = new StructureTrack(model);
 			add(strack);
-			if(!Configuration.getBoolean("track:showStructure")){
+			if (!Configuration.getBoolean("track:showStructure")) {
 				System.out.println("Not visisble");
 				strack.setVisible(false);
-				
+
 			}
 
 		}
@@ -731,6 +754,6 @@ public class Model extends Observable implements IModel {
 
 	public WorkerManager getWorkerManager() {
 		return wm;
-		
+
 	}
 }
