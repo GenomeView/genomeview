@@ -102,7 +102,12 @@ public class Model extends Observable implements IModel {
 		guimanager = new GUIManager();
 
 		/* JavaScriptInputHandler */
-		new JavaScriptHandler(this, id);
+		if(Configuration.getBoolean("integration:monitorJavaScript")){
+			new JavaScriptHandler(this, id);
+			logger.info("JavaScriptHandler started");
+		}else{
+			logger.info("JavaScriptHandler NOT started");
+		}
 
 		/* Scheduler booster thread */
 		new Thread(new Runnable() {
