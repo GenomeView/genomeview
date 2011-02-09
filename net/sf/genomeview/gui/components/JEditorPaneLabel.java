@@ -48,6 +48,24 @@ public class JEditorPaneLabel extends JEditorPane {
 		super("text/html",null);
 		setEditable(false);
 		super.addHyperlinkListener(new Hyperactive());
+		//## Fix for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6993691
+		setEditorKit(new HTMLEditorKit() {
+			
+			private static final long serialVersionUID = -8823280246213759957L;
+
+			protected Parser getParser() {
+				try {
+					@SuppressWarnings("rawtypes")
+					Class c = Class
+							.forName("javax.swing.text.html.parser.ParserDelegator");
+					Parser defaultParser = (Parser) c.newInstance();
+					return defaultParser;
+				} catch (Throwable e) {
+				}
+				return null;
+			}
+		});
+		
 	}
 
 	public StyleSheet getStyleSheet() {
