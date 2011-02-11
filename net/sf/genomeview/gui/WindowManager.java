@@ -14,7 +14,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
@@ -32,10 +31,6 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Cleaner;
-import net.sf.jannot.Data;
-import net.sf.jannot.DataKey;
-import net.sf.jannot.Entry;
-import net.sf.jannot.EntrySet;
 import be.abeel.jargs.AutoHelpCmdLineParser;
 
 /**
@@ -169,11 +164,10 @@ public class WindowManager extends WindowAdapter implements Observer {
 		Option idO = parser.addHelp(parser.addStringOption("id"),
 		"Instance ID for this GenomeView instance, useful to control multiple GVs at once.");
 		
-		/* Load the additional configuration */
-		String config = (String) parser.getOptionValue(configurationO);
+		
 		
 		boolean goodParse = parse(parser, args);
-
+	
 		if (parser.checkHelp()) {
 			System.exit(0);
 		}
@@ -184,7 +178,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 		boolean freshwindow = false;
 		
 		if (model == null) {
-			model = new Model((String) parser.getOptionValue(idO),config);
+			model = new Model((String) parser.getOptionValue(idO),(String) parser.getOptionValue(configurationO));
 			model.addObserver(this);
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new Hotkeys(model));
 		}

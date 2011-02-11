@@ -76,12 +76,7 @@ public class Model extends Observable implements IModel {
 		return mouseModel;
 	}
 
-	public Model() {
-		this(null,null);
-	}
-
 	public Model(String id, String config) {
-
 		/* Load the additional configuration */
 		if (config != null) {
 			try {

@@ -21,9 +21,14 @@ import org.junit.Test;
  */
 public class TestClear extends Model {
 
+	public TestClear(String id, String config) {
+		super(id, config);
+		// TODO Auto-generated constructor stub
+	}
+
 	@Test
 	public void testClearEntries() {
-		Model model = new Model();
+		Model model = new Model(null,null);
 		try {
 			TestDataSource ds = new TestDataSource();
 			ReadWorker rw = new ReadWorker(ds, model);

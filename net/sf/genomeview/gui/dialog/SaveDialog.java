@@ -77,8 +77,7 @@ public class SaveDialog extends JDialog {
 
 		final ArrayList<DataSourceCheckbox> dss = new ArrayList<DataSourceCheckbox>();
 		add(new JLabel("Select sources to save"), gc);
-		// Container all = new Container();
-		// all.setLayout(new GridLayout(0, 1));
+		
 		gc.gridy++;
 		Container cp = new Container();
 		cp.setLayout(new GridLayout(0, 1));
@@ -87,20 +86,10 @@ public class SaveDialog extends JDialog {
 			// int count = 0;
 			DataSourceCheckbox dsb = new DataSourceCheckbox(e);
 			dsb.setSelected(true);
-			// for (DataKey ds : e) {
-			// Data s = e.get(ds);
-			// if (s.canSave()) {
-			//					
+								
 			dss.add(dsb);
 			cp.add(dsb);
-			// count++;
-			//
-			// }
-			// }
-			// if (count > 0) {
-			// all.add(new TitledComponent(e.toString(), cp));
-			//
-			// }
+			
 		}
 		add(new JScrollPane(cp), gc);
 		gc.gridy++;
@@ -136,17 +125,12 @@ public class SaveDialog extends JDialog {
 							File tmp = File.createTempFile("GV_", ".save");
 							tmp.deleteOnExit();
 
-							// TODO Auto-generated method stub
-
 							FileOutputStream fos = new FileOutputStream(tmp);
 
 							for (DataSourceCheckbox dsb : dss) {
 								if (dsb.isSelected()) {
 									parser.write(fos, dsb.data);
-									// for (Feature f : (Iterable<Feature>)
-									// dsb.data.get()) {
-									// pw.println(parser.line(f));
-									// }
+									
 								}
 							}
 							fos.close();
