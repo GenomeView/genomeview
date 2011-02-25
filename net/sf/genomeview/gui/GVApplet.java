@@ -113,17 +113,17 @@ public class GVApplet extends JApplet {
 
 	@Override
 	public void start() {
-
+		System.out.println("Starting...");
 	}
 
 	@Override
 	public void stop() {
-
+		System.out.println("Stopping...");
 	}
 
 	@Override
 	public void destroy() {
-		logger.info("Destroying applet");
+		System.out.println("Destroying...");
 		model.exit();
 
 		logger.info("Disposing the window in GVApplet.update()");
@@ -135,7 +135,6 @@ public class GVApplet extends JApplet {
 		}
 
 		Cleaner.exit();
-
 		System.out.println("Applet should be exiting here, if it doesn't happen, we will need to do some work...");
 
 	}

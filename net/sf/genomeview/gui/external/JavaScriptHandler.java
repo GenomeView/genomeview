@@ -29,22 +29,22 @@ import net.sf.genomeview.gui.CrashHandler;
  * @author Thomas Abeel
  * 
  */
-public class JavaScriptHandler {
-	
+public class JavaScriptHandler  {
+
 	class DaemonThreadFactory implements ThreadFactory {
-	    public Thread newThread(Runnable r) {
-	        Thread thread = new Thread(r);
-	        thread.setDaemon(true);
-	        return thread;
-	    }
+		public Thread newThread(Runnable r) {
+			Thread thread = new Thread(r);
+			thread.setDaemon(true);
+			return thread;
+		}
 	}
 
 	private Logger log = Logger.getLogger(JavaScriptHandler.class.getCanonicalName());
-	
-	private ExecutorService es=Executors.newSingleThreadExecutor(new DaemonThreadFactory());
-	
+
+	private ExecutorService es = Executors.newSingleThreadExecutor(new DaemonThreadFactory());
+
 	public JavaScriptHandler(final Model model, final String id) {
-		
+
 		ServerSocket tmp = null;
 
 		int port = 2223;
@@ -59,8 +59,21 @@ public class JavaScriptHandler {
 		}
 
 		final ServerSocket ss = tmp;
-		
-		Thread handler=new Thread(new Runnable() {
+		model.addObserver(new Observer() {
+
+			@Override
+			public void update(Observable o, Object arg) {
+				if(model.isExitRequested())
+					try {
+						ss.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+			}
+		});
+		Thread handler = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -72,12 +85,11 @@ public class JavaScriptHandler {
 				while (true && !ss.isClosed()) {
 					try {
 						Socket s = ss.accept();
-						InstructionWorker ws = new InstructionWorker(model, id,s);
+						InstructionWorker ws = new InstructionWorker(model, id, s);
 						es.execute(ws);
-						
-						
+
 					} catch (SocketException e) {
-						log.log(Level.WARNING, "This is normal when closing the socket", e);
+						log.log(Level.INFO, "This is normal when closing the socket", e);
 
 					} catch (IOException e) {
 						CrashHandler.showErrorMessage("Failed to accept socket", e);
@@ -108,4 +120,6 @@ public class JavaScriptHandler {
 		handler.start();
 
 	}
+
+	
 }
