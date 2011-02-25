@@ -113,8 +113,9 @@ public class MiniApplet extends JApplet {
 	@Override
 	public void destroy() {
 		logger.info("Destroying applet");
+		model.exit();
 		Cleaner.exit();
-		System.exit(0);
+		//System.exit(0);
 	}
 
 }

@@ -112,7 +112,8 @@ public class GVApplet extends JApplet {
 	public void destroy() {
 		logger.info("Destroying applet");
 		Cleaner.exit();
-		System.exit(0);
+		model.exit();
+		//System.exit(0);
 	}
 
 }

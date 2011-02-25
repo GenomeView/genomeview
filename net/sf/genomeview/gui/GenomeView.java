@@ -70,7 +70,7 @@ public class GenomeView {
 					if (!ApplicationInstanceManager.registerInstance()) {
 						// instance already running.
 						System.out.println("Another instance of this application is already running.  Exiting.");
-						System.exit(0);
+						return;
 					}
 					ApplicationInstanceManager.setApplicationInstanceListener(new ApplicationInstanceListener() {
 						public void newInstanceCreated() {

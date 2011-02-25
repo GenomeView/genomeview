@@ -131,7 +131,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 					frame.dispose();
 				}
 				
-				System.exit(0);
+				//System.exit(0);
+				System.out.println("We should be exiting here, if it doesn't happen, we will need to do some work...");
 			}
 		}
 		

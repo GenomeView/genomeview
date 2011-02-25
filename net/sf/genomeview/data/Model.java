@@ -109,7 +109,7 @@ public class Model extends Observable implements IModel {
 
 			@Override
 			public void run() {
-				while (true) {
+				while (true&&!isExitRequested()) {
 					GenomeViewScheduler.boost(getAnnotationLocationVisible());
 					try {
 						Thread.sleep(500);
