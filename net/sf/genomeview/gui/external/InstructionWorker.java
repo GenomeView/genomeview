@@ -12,6 +12,8 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,55 +45,28 @@ class InstructionWorker implements Runnable {
 
 	private static ArrayList<Integer> otherPorts = new ArrayList<Integer>();
 
-	InstructionWorker(Model model, String id) {
+	InstructionWorker(Model model, String id, Socket s) {
 		this.model = model;
 		this.id = id;
-		s = null;
-	}
-
-	synchronized void setSocket(Socket s) {
 		this.s = s;
-		notify();
 	}
 
-	public synchronized void run() {
+	public void run() {
+
 		System.out.println("Running worker");
-		while (true) {
-			if (s == null) {
-				/* nothing to do */
-				try {
-					wait();
-				} catch (InterruptedException e) {
-					/* should not happen */
-					continue;
-				}
-			}
-			try {
-				handleClient();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			/*
-			 * go back in wait queue if there's fewer than numHandler
-			 * connections.
-			 */
-			s = null;
-			ArrayList<InstructionWorker> pool = JavaScriptHandler.threads;
-			synchronized (pool) {
-				if (pool.size() >= 1) {
-					/* too many threads, exit this one */
-					return;
-				} else {
-					pool.add(this);
-				}
-			}
+		try {
+			handleClient();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
-	private static Queue<String>q=new LinkedList<String>();
+	private static String lastLoad = null;
+
 	void handleClient() throws IOException {
-		if(q.size()>=3)
-			q.poll();
+		/* This happens when exiting */
+		if (s == null)
+			return;
 		s.setSoTimeout(5000);
 		s.setTcpNoDelay(true);
 		System.out.println("Handling client");
@@ -102,24 +77,27 @@ class InstructionWorker implements Runnable {
 			otherPorts.add(Integer.parseInt(line.split("-")[1]));
 		} else {
 			System.out.println(line);
-			if(!q.contains(line))
-				q.add(line);
+
 			while (!line.startsWith("GET")) {
-				System.out.println("Handler: GET: " + line);
+				// System.out.println("Handler: GET: " + line);
 				line = it.next();
-				System.out.println(line);
+				// System.out.println(line);
 
 			}
 			writeOther(line);
-			if (line.startsWith("GET /genomeview-" + id + "/")) {
-				System.out.println("Good to go...");
+
+			if (line.startsWith("GET /genomeview-" + id + "/") || line.startsWith("GET /genomeview-ALL/")) {
+
 				String[] arr = line.split(" ")[1].split("/", 4);
 				if (arr[1].startsWith("genomeview")) {
 					if (arr[2].toLowerCase().equals("position")) {
 						doPosition(arr[3]);
 					}
 					if (arr[2].toLowerCase().equals("load")) {
-						doLoad(arr[3]);
+						if (!arr[3].equals(lastLoad)) {
+							lastLoad = arr[3];
+							doLoad(arr[3]);
+						}
 
 					}
 					if (arr[2].toLowerCase().equals("session")) {
@@ -128,12 +106,14 @@ class InstructionWorker implements Runnable {
 					}
 					if (arr[2].toLowerCase().equals("unload")) {
 						model.clearEntries();
+						lastLoad = null;
 					}
 				} else {
 					log.log(Level.WARNING, "This instruction doesn't belong to GenomeView, I'll ignore it.");
 				}
 
 			}
+
 		}
 		s.close();
 
@@ -199,4 +179,5 @@ class InstructionWorker implements Runnable {
 		}
 
 	}
+
 }
