@@ -3,14 +3,11 @@
  */
 package net.sf.genomeview.data;
 
-import java.awt.Desktop;
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import net.sf.genomeview.gui.StaticUtils;
-import net.sf.jannot.utils.URIFactory;
+import be.abeel.net.URIFactory;
 
 /**
  * 

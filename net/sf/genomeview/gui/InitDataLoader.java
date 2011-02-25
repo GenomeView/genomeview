@@ -2,14 +2,9 @@ package net.sf.genomeview.gui;
 
 import java.awt.EventQueue;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
@@ -18,11 +13,10 @@ import net.sf.genomeview.data.ReadWorker;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.explorer.GenomeExplorerManager;
 import net.sf.genomeview.gui.external.ExternalHelper;
-import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.cache.SourceCache;
-import net.sf.jannot.utils.URIFactory;
+import be.abeel.net.URIFactory;
 
 public class InitDataLoader {
 

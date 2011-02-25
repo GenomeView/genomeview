@@ -5,15 +5,18 @@ package net.sf.genomeview.gui;
 
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Authenticator;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JApplet;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.gui.viztracks.AnnotationFrame;
@@ -114,8 +117,19 @@ public class MiniApplet extends JApplet {
 	public void destroy() {
 		logger.info("Destroying applet");
 		model.exit();
+
+		logger.info("Disposing the window in GVApplet.update()");
+
+		try {
+			Configuration.save();
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Problem saving configuration", e);
+		}
+
 		Cleaner.exit();
-		//System.exit(0);
+
+		System.out.println("Applet should be exiting here, if it doesn't happen, we will need to do some work...");
+
 	}
 
 }

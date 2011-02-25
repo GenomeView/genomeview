@@ -35,14 +35,13 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
-import net.sf.jannot.source.DataSourceFactory.Sources;
 import net.sf.jannot.source.das.DAS;
 import net.sf.jannot.source.das.DAS.EntryPoint;
-import net.sf.jannot.utils.URIFactory;
 
 import org.xml.sax.SAXException;
 
 import be.abeel.gui.GridBagPanel;
+import be.abeel.net.URIFactory;
 
 /**
  * 

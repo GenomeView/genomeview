@@ -11,6 +11,8 @@ import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,8 +22,8 @@ import net.sf.genomeview.data.Session;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
-import net.sf.jannot.utils.URIFactory;
 import be.abeel.io.LineIterator;
+import be.abeel.net.URIFactory;
 
 /**
  * 
@@ -86,7 +88,10 @@ class InstructionWorker implements Runnable {
 		}
 	}
 
+	private static Queue<String>q=new LinkedList<String>();
 	void handleClient() throws IOException {
+		if(q.size()>=3)
+			q.poll();
 		s.setSoTimeout(5000);
 		s.setTcpNoDelay(true);
 		System.out.println("Handling client");
@@ -97,6 +102,8 @@ class InstructionWorker implements Runnable {
 			otherPorts.add(Integer.parseInt(line.split("-")[1]));
 		} else {
 			System.out.println(line);
+			if(!q.contains(line))
+				q.add(line);
 			while (!line.startsWith("GET")) {
 				System.out.println("Handler: GET: " + line);
 				line = it.next();

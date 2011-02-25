@@ -5,23 +5,29 @@ package net.sf.genomeview.gui;
 
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Authenticator;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JApplet;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Cleaner;
+
 /**
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 public class GVApplet extends JApplet {
 
@@ -33,27 +39,29 @@ public class GVApplet extends JApplet {
 
 	@Override
 	public void init() {
+		System.out.println("Applet init");
+
 		LogConfigurator.config();
 
 		logger.info("Starting GenomeView Applet");
 		Authenticator.setDefault(new MyAuthenticator());
 
 		final String configO = getParameter("config");
-		logger.info("ConfigO: "+configO);
+		logger.info("ConfigO: " + configO);
 		final String fileO = getParameter("file");
-		logger.info("fileO: "+fileO);
+		logger.info("fileO: " + fileO);
 		final String urlO = getParameter("url");
-		logger.info("urlO: "+urlO);
+		logger.info("urlO: " + urlO);
 		final String positionO = getParameter("position");
-		logger.info("positionO: "+positionO);
+		logger.info("positionO: " + positionO);
 		final String sessionO = getParameter("session");
-		logger.info("sessionO: "+sessionO);
-		
+		logger.info("sessionO: " + sessionO);
+
 		final String extraO = getParameter("extra");
-		logger.info("extraO: "+extraO);
-		
+		logger.info("extraO: " + extraO);
+
 		final String idO = getParameter("id");
-		logger.info("idO: "+extraO);
+		logger.info("idO: " + extraO);
 
 		final Frame parentFrame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, this);
 
@@ -62,7 +70,7 @@ public class GVApplet extends JApplet {
 
 				@Override
 				public void run() {
-					model = new Model(idO,configO);
+					model = new Model(idO, configO);
 					model.getGUIManager().registerMainWindow(parentFrame);
 					model.setSilent(true);
 					model.clearEntries();
@@ -76,7 +84,7 @@ public class GVApplet extends JApplet {
 
 					InitDataLoader initLoader = new InitDataLoader(model);
 					try {
-						initLoader.init( urlO, fileO, remArgs, positionO,sessionO);
+						initLoader.init(urlO, fileO, remArgs, positionO, sessionO);
 					} catch (InterruptedException e) {
 						logger.info(e.getMessage());
 					} catch (ExecutionException e) {
@@ -91,7 +99,7 @@ public class GVApplet extends JApplet {
 
 					PluginLoader.load(model);
 					model.setSilent(false);
-					ReferenceMissingMonitor rmm=new ReferenceMissingMonitor(model);
+					ReferenceMissingMonitor rmm = new ReferenceMissingMonitor(model);
 				}
 			});
 		} catch (InterruptedException e) {
@@ -109,11 +117,27 @@ public class GVApplet extends JApplet {
 	}
 
 	@Override
+	public void stop() {
+
+	}
+
+	@Override
 	public void destroy() {
 		logger.info("Destroying applet");
-		Cleaner.exit();
 		model.exit();
-		//System.exit(0);
+
+		logger.info("Disposing the window in GVApplet.update()");
+
+		try {
+			Configuration.save();
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Problem saving configuration", e);
+		}
+
+		Cleaner.exit();
+
+		System.out.println("Applet should be exiting here, if it doesn't happen, we will need to do some work...");
+
 	}
 
 }

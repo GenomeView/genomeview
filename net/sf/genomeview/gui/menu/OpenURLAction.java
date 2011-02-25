@@ -3,17 +3,14 @@
  */
 package net.sf.genomeview.gui.menu;
 
-import java.awt.Desktop;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.swing.AbstractAction;
 
 import net.sf.genomeview.gui.StaticUtils;
-import net.sf.jannot.utils.URIFactory;
+import be.abeel.net.URIFactory;
 
 /**
  * Opens a URL in a browser window.

@@ -54,8 +54,8 @@ import net.sf.jannot.tabix.BEDWrapper;
 import net.sf.jannot.tabix.GFFWrapper;
 import net.sf.jannot.tabix.PileupWrapper;
 import net.sf.jannot.tabix.SWigWrapper;
-import net.sf.jannot.utils.URIFactory;
 import net.sf.jannot.wiggle.Graph;
+import be.abeel.net.URIFactory;
 import be.abeel.util.DefaultHashMap;
 
 /**
@@ -114,8 +114,7 @@ public class Model extends Observable implements IModel {
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						/* This happens when restarting the Applet */
 						return;
 					}
 				}

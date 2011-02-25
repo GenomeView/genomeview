@@ -13,7 +13,7 @@ import net.sf.genomeview.gui.MainContent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
-import net.sf.jannot.utils.URIFactory;
+import be.abeel.net.URIFactory;
 /**
  * 
  * @author Thomas Abeel

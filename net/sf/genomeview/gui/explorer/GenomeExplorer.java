@@ -24,8 +24,8 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
-import net.sf.jannot.utils.URIFactory;
 import be.abeel.io.LineIterator;
+import be.abeel.net.URIFactory;
 
 /**
  * 

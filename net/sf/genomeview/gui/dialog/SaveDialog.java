@@ -35,9 +35,9 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Entry;
 import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.parser.EMBLParser;
-import net.sf.jannot.utils.URIFactory;
 import be.abeel.io.ExtensionManager;
 import be.abeel.io.LineIterator;
+import be.abeel.net.URIFactory;
 
 /**
  * 

@@ -21,8 +21,8 @@ import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.dialog.Hider;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
-import net.sf.jannot.utils.URIFactory;
 import be.abeel.io.LineIterator;
+import be.abeel.net.URIFactory;
 
 /**
  * 

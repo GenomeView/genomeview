@@ -3,20 +3,15 @@
  */
 package net.sf.genomeview.gui.information;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Icon;
 
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.gui.StaticUtils;
-import net.sf.jannot.utils.URIFactory;
+import be.abeel.net.URIFactory;
 
 /**
  * Class representing a website query.
