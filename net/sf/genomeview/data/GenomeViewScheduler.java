@@ -5,6 +5,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import net.sf.genomeview.core.DaemonThreadFactory;
 import net.sf.jannot.Location;
 
 /**
@@ -19,7 +20,7 @@ public class GenomeViewScheduler {
 		gvs = new PriorityBlockingQueue<Runnable>();
 	}
 
-	private static ExecutorService worker = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, gvs);
+	private static ExecutorService worker = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, gvs,new DaemonThreadFactory());
 
 	public static void submit(Task t) {
 		worker.execute(t);

@@ -4,22 +4,20 @@
 package net.sf.genomeview.gui.external;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.genomeview.core.DaemonThreadFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 
@@ -31,13 +29,7 @@ import net.sf.genomeview.gui.CrashHandler;
  */
 public class JavaScriptHandler  {
 
-	class DaemonThreadFactory implements ThreadFactory {
-		public Thread newThread(Runnable r) {
-			Thread thread = new Thread(r);
-			thread.setDaemon(true);
-			return thread;
-		}
-	}
+	
 
 	private Logger log = Logger.getLogger(JavaScriptHandler.class.getCanonicalName());
 
