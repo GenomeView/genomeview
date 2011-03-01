@@ -43,7 +43,12 @@ public enum NotificationTypes {
 	/**
 	 * Indicates that there has been a change to a dialog window, either opened or closed.
 	 */
-	DIALOGCHANGE
+	DIALOGCHANGE,
+	
+	/**
+	 * Indicates an exception has occurred somewhere.
+	 */
+	EXCEPTION
 	;
 
 }

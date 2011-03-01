@@ -97,10 +97,10 @@ public class Model extends Observable implements IModel {
 		guimanager = new GUIManager();
 
 		/* JavaScriptInputHandler */
-		if(Configuration.getBoolean("integration:monitorJavaScript")){
+		if (Configuration.getBoolean("integration:monitorJavaScript")) {
 			new JavaScriptHandler(this, id);
 			logger.info("JavaScriptHandler started");
-		}else{
+		} else {
 			logger.info("JavaScriptHandler NOT started");
 		}
 
@@ -109,7 +109,7 @@ public class Model extends Observable implements IModel {
 
 			@Override
 			public void run() {
-				while (true&&!isExitRequested()) {
+				while (true && !isExitRequested()) {
 					GenomeViewScheduler.boost(getAnnotationLocationVisible());
 					try {
 						Thread.sleep(500);
@@ -390,12 +390,18 @@ public class Model extends Observable implements IModel {
 	 * @param f
 	 *            data source to load data from
 	 * @throws ReadFailedException
+	 * 
+	 * FIXME move to read worker
 	 */
 	void addData(DataSource f) throws ReadFailedException {
 		if (entries.size() == 0)
 			setAnnotationLocationVisible(new Location(1, 51));
 		logger.info("Reading source:" + f);
-		f.read(entries);
+		try {
+			f.read(entries);
+		} catch (Exception e) {
+			throw new ReadFailedException(e);
+		}
 		logger.info("Entries: " + entries.size());
 		logger.info("Model adding data done!");
 		if (f instanceof MultiFileSource)
@@ -754,5 +760,23 @@ public class Model extends Observable implements IModel {
 	public WorkerManager getWorkerManager() {
 		return wm;
 
+	}
+
+	public synchronized Throwable processException(){
+		if(!exceptionStack.isEmpty())
+			return exceptionStack.pop();
+		return null;
+	}
+	
+	private Stack<Throwable>exceptionStack=new Stack<Throwable>();
+	/**
+	 * Method to register daemon exceptions to the model.
+	 * @param e
+	 */
+	public synchronized void daemonException(Throwable e) {
+		exceptionStack.push(e);
+		setChanged();
+		notifyObservers(NotificationTypes.EXCEPTION);
+		
 	}
 }

@@ -21,11 +21,8 @@ public class ReadWorker extends DataSourceWorker {
 	protected Void doInBackground() {
 		try {
 			model.addData(source);
-		
-			
 		} catch (Throwable e) {
-			e.printStackTrace();
-			
+			model.daemonException(e);
 			
 		}
 		return null;
