@@ -63,6 +63,8 @@ class InstructionWorker implements Runnable {
 
 	private static String lastLoad = null;
 
+	private static String lastID = null;
+
 	void handleClient() throws IOException {
 		/* This happens when exiting */
 		if (s == null)
@@ -87,29 +89,34 @@ class InstructionWorker implements Runnable {
 			writeOther(line);
 
 			if (line.startsWith("GET /genomeview-" + id + "/") || line.startsWith("GET /genomeview-ALL/")) {
+				String[] id = line.split("\\$\\$");
+				if (id.length == 1 || !id[1].equals(lastID)) {
+					lastID = id[1];
 
-				String[] arr = line.split(" ")[1].split("/", 4);
-				if (arr[1].startsWith("genomeview")) {
-					if (arr[2].toLowerCase().equals("position")) {
-						doPosition(arr[3]);
-					}
-					if (arr[2].toLowerCase().equals("load")) {
-						if (!arr[3].equals(lastLoad)) {
-							lastLoad = arr[3];
-							doLoad(arr[3]);
+					line = id[0];
+					String[] arr = line.split(" ")[1].split("/", 4);
+					if (arr[1].startsWith("genomeview")) {
+						if (arr[2].toLowerCase().equals("position")) {
+							doPosition(arr[3]);
 						}
+						if (arr[2].toLowerCase().equals("load")) {
+							if (!arr[3].equals(lastLoad)) {
+								lastLoad = arr[3];
+								doLoad(arr[3]);
+							}
 
-					}
-					if (arr[2].toLowerCase().equals("session")) {
-						doSession(arr[3]);
+						}
+						if (arr[2].toLowerCase().equals("session")) {
+							doSession(arr[3]);
 
+						}
+						if (arr[2].toLowerCase().equals("unload")) {
+							model.clearEntries();
+							lastLoad = null;
+						}
+					} else {
+						log.log(Level.WARNING, "This instruction doesn't belong to GenomeView, I'll ignore it.");
 					}
-					if (arr[2].toLowerCase().equals("unload")) {
-						model.clearEntries();
-						lastLoad = null;
-					}
-				} else {
-					log.log(Level.WARNING, "This instruction doesn't belong to GenomeView, I'll ignore it.");
 				}
 
 			}
