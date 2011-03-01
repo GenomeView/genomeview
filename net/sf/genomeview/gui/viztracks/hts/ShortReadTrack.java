@@ -233,6 +233,7 @@ public class ShortReadTrack extends Track {
 		int maxReads = Configuration.getInt("shortread:maxReads");
 		int maxRegion = Configuration.getInt("shortread:maxRegion");
 		int maxStack = Configuration.getInt("shortread:maxStack");
+		
 		forwardColor = Configuration.getColor("shortread:forwardColor");
 		reverseColor = Configuration.getColor("shortread:reverseColor");
 		pairingColor = Configuration.getColor("shortread:pairingColor");
@@ -248,15 +249,6 @@ public class ShortReadTrack extends Track {
 		reverseGradient.addPoint(Color.WHITE);
 		reverseGradient.addPoint(reverseColor);
 		reverseGradient.createGradient(100);
-
-		// boolean logScaling =
-		// Configuration.getBoolean("shortread:logScaling");
-		// double bottomValue =
-		// Configuration.getDouble("shortread:bottomValue");
-		// double topValue = Configuration.getDouble("shortread:topValue");
-
-		// int graphLineHeigh =
-		// Configuration.getInt("shortread:graphLineHeight");
 
 		currentVisible = model.getAnnotationLocationVisible();
 
@@ -380,6 +372,10 @@ public class ShortReadTrack extends Track {
 
 									pos = two.getAlignmentStart() - currentVisible.start;
 									line = tilingCounter.getFreeLine(pos);
+									if(line>=maxStack){
+										stackExceeded=true;
+										continue;
+									}
 									clearStart = two.getAlignmentStart();
 								} else {
 									clearEnd = two.getAlignmentEnd();
