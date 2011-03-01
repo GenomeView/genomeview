@@ -91,7 +91,8 @@ class InstructionWorker implements Runnable {
 			if (line.startsWith("GET /genomeview-" + id + "/") || line.startsWith("GET /genomeview-ALL/")) {
 				String[] id = line.split("\\$\\$");
 				if (id.length == 1 || !id[1].equals(lastID)) {
-					lastID = id[1];
+					if(id.length>1)
+						lastID = id[1];
 
 					line = id[0];
 					String[] arr = line.split(" ")[1].split("/", 4);
