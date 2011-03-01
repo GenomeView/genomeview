@@ -7,6 +7,7 @@ import java.awt.EventQueue;
 import java.util.Observable;
 import java.util.Observer;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 
 /**
@@ -18,7 +19,7 @@ public class GenomeExplorerManager implements Observer {
 	GenomeExplorer bg;
 	private Model model;
 
-	private boolean autoMode = true;
+	private boolean autoMode = Configuration.getBoolean("general:enableGenomeExplorer");
 
 	public GenomeExplorerManager(Model model) {
 		bg = new GenomeExplorer(model);
