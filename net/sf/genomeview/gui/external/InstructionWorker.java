@@ -18,6 +18,7 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.genomeview.core.LRUSet;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.ReadWorker;
 import net.sf.genomeview.data.Session;
@@ -63,7 +64,7 @@ class InstructionWorker implements Runnable {
 
 	private static String lastLoad = null;
 
-	private static String lastID = null;
+	private static LRUSet<String> lastID = new LRUSet<String>(20);
 
 	void handleClient() throws IOException {
 		/* This happens when exiting */
@@ -90,9 +91,9 @@ class InstructionWorker implements Runnable {
 
 			if (line.startsWith("GET /genomeview-" + id + "/") || line.startsWith("GET /genomeview-ALL/")) {
 				String[] id = line.split("\\$\\$");
-				if (id.length == 1 || !id[1].equals(lastID)) {
+				if (id.length == 1 || !lastID.contains(id[1])) {
 					if(id.length>1)
-						lastID = id[1];
+						lastID.add(id[1]);
 
 					line = id[0];
 					String[] arr = line.split(" ")[1].split("/", 4);
