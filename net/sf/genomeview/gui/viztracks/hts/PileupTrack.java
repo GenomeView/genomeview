@@ -79,6 +79,8 @@ public class PileupTrack extends Track {
 	/*
 	 * Keeps track of the maximum value in detailed mode per data query, this
 	 * value will be reset each time we retrieve new data.
+	 * 
+	 * FIXME move to ptm
 	 */
 	private double localMaxPile = 0;
 
@@ -176,6 +178,7 @@ public class PileupTrack extends Track {
 			double div = summary.getMaxPile();
 			if (ptm.isDynamicScaling())
 				div = localMaxPile;
+			
 			int width = (int) Math.ceil(screenWidth / visible.length());
 			for (int i = 0; i < ptm.detailedRects[0].length; i++) {
 				// int snpOffset = yOffset;
@@ -184,14 +187,14 @@ public class PileupTrack extends Track {
 				double coverage = fcov + rcov;
 				/* Max value set, truncate */
 
-				if (maxValue > 0) {
-					div = maxValue;
-					if (coverage > maxValue)
-						coverage = maxValue;
-					if (rcov > maxValue)
-						rcov = maxValue;
-					if (fcov > maxValue)
-						fcov = maxValue;
+				if (ptm.maxValue() > 0) {
+					div = ptm.maxValue();
+					if (coverage > div)
+						coverage = div;
+					if (rcov > div)
+						rcov = div;
+					if (fcov > div)
+						fcov = div;
 
 				}
 				double frac = coverage / div;
@@ -467,8 +470,6 @@ public class PileupTrack extends Track {
 
 	/* User settable maximum value for charts, use negative for unlimited */
 	
-	// FIXME move to track model
-	private double maxValue = -1;
 
 	@Override
 	public List<JMenuItem> getMenuItems() {
@@ -524,7 +525,7 @@ public class PileupTrack extends Track {
 				if (in != null) {
 					try {
 						Double d = Double.parseDouble(in);
-						maxValue = d;
+						ptm.setMaxValue(d);
 					} catch (Exception ex) {
 						log.log(Level.WARNING, "Unparseble value for maximum in PileupTrack: " + in, ex);
 					}

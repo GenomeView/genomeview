@@ -89,4 +89,17 @@ class PileupTrackModel {
 		return globalSettings;
 	}
 
+	private double maxValue=-1;
+	public double maxValue() {
+		if (globalSettings)
+			return Configuration.getDouble("pileup:maxPile");
+		else
+			return maxValue;
+	}
+
+	public void setMaxValue(Double d) {
+		this.maxValue=d;
+		
+	}
+
 }

@@ -45,6 +45,10 @@ public class ConfigurationDialog extends JDialog {
 	
 
 	class PileupConfigPanel extends GridBagPanel{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 2077613517228432752L;
 		private Model model;
 
 		public PileupConfigPanel(Model model) {
@@ -54,7 +58,7 @@ public class ConfigurationDialog extends JDialog {
 			gc.gridy++;
 			this.add(ConfigBox.booleanInstance("pileup:logScale", "Should all tracks be log scaled?"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.integerInstance("pileup:maxPile", "Maximum height of the pileup track"), gc);
+			this.add(ConfigBox.doubleInstance("pileup:maxPile", "Maximum height of the pileup track"), gc);
 			
 		}
 	}
