@@ -11,6 +11,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,11 +21,15 @@ import java.util.SortedSet;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JViewport;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.core.Colors;
@@ -33,8 +38,9 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
-import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.genomeview.gui.components.DoubleJSlider;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel.FillMode;
+import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
@@ -46,6 +52,40 @@ public class FeatureTrack extends Track {
 
 	class FeatureTrackModel {
 		private boolean scoreColorGradient, colorQualifier;
+
+		private double minScore = Double.NEGATIVE_INFINITY;
+
+		private double maxScore = Double.POSITIVE_INFINITY;
+
+		/**
+		 * @return the minScore
+		 */
+		public double getMinScore() {
+			return minScore;
+		}
+
+		/**
+		 * @param minScore
+		 *            the minScore to set
+		 */
+		public void setMinScore(double minScore) {
+			this.minScore = minScore;
+		}
+
+		/**
+		 * @return the maxScore
+		 */
+		public double getMaxScore() {
+			return maxScore;
+		}
+
+		/**
+		 * @param maxScore
+		 *            the maxScore to set
+		 */
+		public void setMaxScore(double maxScore) {
+			this.maxScore = maxScore;
+		}
 
 		public boolean isColorQualifier() {
 			return colorQualifier;
@@ -70,6 +110,12 @@ public class FeatureTrack extends Track {
 
 		private Model model;
 		private boolean scoreColorGradientEnabled;
+
+		private double threshold=Double.NEGATIVE_INFINITY;
+		
+		public double getThreshold(){
+			return threshold;
+		}
 
 		private Color getColor(double normalizedScore) {
 			return ColorGradient.fourColorGradient.getColor(normalizedScore);
@@ -97,7 +143,12 @@ public class FeatureTrack extends Track {
 		}
 
 		public void setScoreColorGradientEnabled(boolean b) {
-			this.scoreColorGradientEnabled=true;
+			this.scoreColorGradientEnabled = true;
+
+		}
+
+		public void setThreshold(double inputValue) {
+			this.threshold=inputValue;
 			
 		}
 
@@ -138,9 +189,12 @@ public class FeatureTrack extends Track {
 		if (annot.qualifierKeys().contains("color") || annot.qualifierKeys().contains("colour"))
 			ftm.setColorQualifierEnabled(true);
 		/* If there are proper scores, enable color gradient */
-		if(annot.getMaxScore()-annot.getMinScore()>0.00001)
+		if (annot.getMaxScore() - annot.getMinScore() > 0.00001) {
 			ftm.setScoreColorGradientEnabled(true);
-		
+			ftm.setMaxScore(annot.getMaxScore());
+			ftm.setMinScore(annot.getMinScore());
+		}
+
 		/* Get feature estimate */
 		int estimate = annot.getEstimateCount(visible);
 		if (estimate > Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
@@ -150,21 +204,18 @@ public class FeatureTrack extends Track {
 			return 20 + 5;
 		}
 		Iterable<Feature> list = annot.get(visible.start, visible.end);
-		g.translate(0, yOffset+2);
+		g.translate(0, yOffset + 2);
 		CollisionMap fullBlockMap = new CollisionMap(model);
 
 		int lineThickness = Configuration.getInt("evidenceLineHeight");
-		// if (model.isShowTextOnStructure(type)) {
-		// lineThickness += 10;
-		// }
+		
 		int lines = 0;
-		// int paintedFeatures=0;
+		
 		for (Feature rf : list) {
 
-			// paintedFeatures++;
-			// if (!model.isSourceVisible(rf.getSource()))
-			// continue;
-			// the line on which to paint this feature
+			/* Skip feature that do not satisfy threshold filter */
+			if(rf.getScore()<=ftm.getThreshold())
+				continue;
 			int thisLine = 0;
 
 			Color c = Configuration.getColor("TYPE_" + rf.type());
@@ -242,16 +293,12 @@ public class FeatureTrack extends Track {
 				int trianglehalf = (lineThickness - 5) / 2;
 				switch (rf.strand()) {
 				case REVERSE:// reverse arrow
-					g
-							.drawLine(x1, thisLine * lineThickness, x1 - trianglehalf, thisLine * lineThickness
-									+ trianglehalf);
+					g.drawLine(x1, thisLine * lineThickness, x1 - trianglehalf, thisLine * lineThickness + trianglehalf);
 					g.drawLine(x1 - trianglehalf, thisLine * lineThickness + trianglehalf, x1, thisLine * lineThickness
 							+ lineThickness - 5);
 					break;
 				case FORWARD:// forward arrow
-					g
-							.drawLine(x2, thisLine * lineThickness, x2 + trianglehalf, thisLine * lineThickness
-									+ trianglehalf);
+					g.drawLine(x2, thisLine * lineThickness, x2 + trianglehalf, thisLine * lineThickness + trianglehalf);
 					g.drawLine(x2 + trianglehalf, thisLine * lineThickness + trianglehalf, x2, thisLine * lineThickness
 							+ lineThickness - 5);
 					break;
@@ -300,7 +347,7 @@ public class FeatureTrack extends Track {
 			g.setColor(Color.black);
 			g.drawString(type.toString(), 10, lineThickness);
 		}
-		g.translate(0, -yOffset-2);
+		g.translate(0, -yOffset - 2);
 		return (lines + 1) * lineThickness + 4;
 
 		// }
@@ -382,56 +429,25 @@ public class FeatureTrack extends Track {
 				StringBuffer text = new StringBuffer();
 				text.append("<html>");
 				for (Feature f : features) {
-					String name=f.toString();
-					if(name.length()>50)
-						name=name.substring(0,50);
+					String name = f.toString();
+					if (name.length() > 50)
+						name = name.substring(0, 50);
 					text.append("Name : " + name + "<br />");
 					text.append("Start : " + f.start() + "<br />");
 					text.append("End : " + f.end() + "<br />");
 					int aggregateLenght = agg(f.location());
 					if (aggregateLenght < Configuration.getInt("featuretrack:meanshortread")) {
-						// Collection<DataSource> sources =
-						// model.getSelectedEntry().shortReads.getSources();
-						//
-						// CountMap<Integer> cm = new CountMap<Integer>();
-						// for (DataSource source : sources) {
-						// cm.clear();
-						// ReadGroup rg =
-						// model.getSelectedEntry().shortReads.getReadGroup(source
-						// );
-						// ShortReadCoverage src = rg.getCoverage();
-						// for (Location l : f.location()) {
-						// for (int i = l.start(); i <= l.end(); i++) {
-						// cm.count((int) (src.get(Strand.FORWARD, i - 1) +
-						// src.get(Strand.REVERSE, i - 1)));
-						// }
-						// }
-						//
-						// text.append("Mean short read coverage (" +
-						// StaticUtils.shortify(source.toString()) + "): "
-						// + median(cm) + "<br />");
-						// }
+						
 						Iterable<ReadGroup> sources = model.getSelectedEntry().shortReads();
 
 						CountMap<Integer> cm = new CountMap<Integer>();
 						for (ReadGroup rg : sources) {
 							cm.clear();
 
-							// // ShortReadCoverage src = rg.getCoverage();
-							// for (Location l : f.location()) {
-							// for (int i = l.start(); i <= l.end(); i++) {
-							// cm.count((int) (src.get(Strand.FORWARD,
-							// i - 1) + src.get(Strand.REVERSE,
-							// i - 1)));
-							// }
-							// }
-
-							// text.append("Mean short read coverage ("
-							// + StaticUtils.shortify(rg.toString())
-							// + "): " + median(cm) + "<br />");
+						
 						}
 					}
-					// }
+				
 
 				}
 				text.append("</html>");
@@ -457,17 +473,7 @@ public class FeatureTrack extends Track {
 			return sum;
 		}
 
-		// private int median(CountMap<Integer> cm) {
-		// int total = cm.totalCount();
-		// int sum = 0;
-		// for (java.util.Map.Entry<Integer, Integer> e : cm.entrySet()) {
-		// sum += e.getValue();
-		// if (sum > total / 2)
-		// return e.getKey();
-		// }
-		// throw new RuntimeException(
-		// "This should not happen while calculating the median.");
-		// }
+		
 
 	}
 
@@ -531,7 +537,52 @@ public class FeatureTrack extends Track {
 
 			});
 			out.add(item);
+
+			/* Filter items based on score */
+			final JMenuItem filter = new JMenuItem();
+
+			filter.setAction(new AbstractAction("Filter items by score") {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					final JOptionPane optionPane = new JOptionPane();
+					final JLabel label = new JLabel();
+					final NumberFormat nf = NumberFormat.getInstance();
+					nf.setMaximumFractionDigits(2);
+					final DoubleJSlider slider = new DoubleJSlider(ftm.minScore, ftm.maxScore, ftm.getThreshold()>ftm.minScore?ftm.getThreshold():ftm.minScore,
+							(ftm.maxScore - ftm.minScore) / 100.0);
+					optionPane.setInputValue(slider.getDoubleValue());
+					label.setText(nf.format(slider.getDoubleValue()));
+					slider.setMajorTickSpacing((int)((ftm.maxScore-ftm.minScore)/10));
+					slider.setPaintTicks(true);
+					slider.setPaintLabels(true);
+
+					ChangeListener changeListener = new ChangeListener() {
+						public void stateChanged(ChangeEvent changeEvent) {
+							DoubleJSlider theSlider = (DoubleJSlider) changeEvent.getSource();
+							label.setText(nf.format(slider.getDoubleValue()));
+							if (!theSlider.getValueIsAdjusting()) {
+								optionPane.setInputValue(theSlider.getDoubleValue());
+								theSlider.setDoubleValue(theSlider.getDoubleValue());
+							}
+						}
+					};
+					slider.addChangeListener(changeListener);
+					optionPane.setMessage(new Object[] { "Select score threshold: ", slider, label });
+					optionPane.setMessageType(JOptionPane.QUESTION_MESSAGE);
+					optionPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+					JDialog dialog = optionPane.createDialog(model.getGUIManager().getParent(), "Score threshold");
+					// dialog.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
+					dialog.setVisible(true);
+					ftm.setThreshold((Double)optionPane.getInputValue());
+					System.out.println("Input: " + optionPane.getInputValue());
+
+				}
+
+			});
+			out.add(filter);
+
 		}
+
 		if (ftm.isColorQualifierEnabled()) {
 			final JCheckBoxMenuItem colorQualifier = new JCheckBoxMenuItem();
 			colorQualifier.setSelected(ftm.isColorQualifier());
