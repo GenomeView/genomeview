@@ -79,6 +79,8 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 	@Override
 	public Object getValueAt(int row, int col) {
 		Track track = model.getTrackList().get(row);
+		if(track==null)
+			System.err.println("Selected track is null, this shouldn't happen...");
 		switch (col) {
 
 		case 0:
