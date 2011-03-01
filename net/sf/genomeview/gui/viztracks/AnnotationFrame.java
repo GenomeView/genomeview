@@ -38,6 +38,7 @@ public class AnnotationFrame extends JPanel {
         evidenceLabel.setViewport(tmp.getViewport());
         tmp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tmp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        tmp.getVerticalScrollBar().setUnitIncrement(25);
         MouseWheelListener listener = tmp.getMouseWheelListeners()[0];
         evidenceLabel.setScrollPaneListener(listener);
         add(tmp, BorderLayout.CENTER);
