@@ -52,7 +52,7 @@ class PileupTrackModel {
 
 	boolean isDynamicScaling() {
 		if (globalSettings)
-			return Configuration.getBoolean("pileup:dynamicScaling");
+			return Configuration.getBoolean("pileup:dynamicRange");
 		else
 			return dynamicScaling;
 	}
