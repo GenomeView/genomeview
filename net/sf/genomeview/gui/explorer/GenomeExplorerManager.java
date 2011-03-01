@@ -30,7 +30,10 @@ public class GenomeExplorerManager implements Observer {
 	}
 
 	public void setVisible(final boolean vis) {
-		autoMode = vis;
+		if(vis)
+			autoMode = Configuration.getBoolean("general:enableGenomeExplorer");
+		else
+			autoMode = false;
 		visi(vis);
 
 	}
