@@ -89,6 +89,8 @@ public class Session {
 							case 'F':
 								ds = DataSourceFactory.createFile(new File(line));
 								break;
+							case 'C':
+								Configuration.loadExtra(URIFactory.url(line).openStream());
 							default:
 								// Do nothing
 								log.info("Could not load session line: " + line);
