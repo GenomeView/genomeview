@@ -139,6 +139,7 @@ public class EditFeatureWindow extends JDialog {
 						feature.setType(typeSelection.getTerm());
 						mf=model.getSelectedEntry().getMemoryAnnotation(typeSelection.getTerm());
 						mf.add(feature);
+						model.updateTracks();
 						
 						
 					}
