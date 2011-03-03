@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.viztracks.hts;
 
 import java.util.logging.Logger;
 
+import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Task;
 import net.sf.jannot.Data;
 import net.sf.jannot.Location;
@@ -22,8 +23,11 @@ class PileupTask extends Task {
 	private Data<Pile> pw;
 	private PileupSummary summary;
 
-	public PileupTask(Data<Pile> pw, int idx, PileupSummary summary) {
+	private Model model;
+
+	public PileupTask(Data<Pile> pw, int idx, PileupSummary summary,Model model) {
 		super(new Location(idx * PileupSummary.CHUNK, (idx + 1) * PileupSummary.CHUNK));
+		this.model=model;
 		this.pw = pw;
 		this.summary = summary;
 		this.idx = idx;
@@ -33,6 +37,8 @@ class PileupTask extends Task {
 	@Override
 	public void run() {
 		try {
+			if(model.isExitRequested())
+				return;
 			summary.setRunning(idx);
 			Iterable<Pile> piles = pw.get(idx * PileupSummary.CHUNK, (idx + 1) * PileupSummary.CHUNK);
 			for (Pile p : piles) {

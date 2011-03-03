@@ -52,7 +52,7 @@ class PileupSummary {
 						&& (idx + 1) * PileupSummary.CHUNK > model.getAnnotationLocationVisible().start) {
 
 					queued.set(idx);
-					GenomeViewScheduler.submit(new PileupTask(pw, idx, this));
+					GenomeViewScheduler.submit(new PileupTask(pw, idx, this,model));
 				}
 			}
 
