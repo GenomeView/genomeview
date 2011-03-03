@@ -75,10 +75,11 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 				if (popupMenu == null) {
 					popupMenu = new JPopupMenu();
 
+					popupMenu.add(wrapMenu(Query.google));
 					popupMenu.add(wrapMenu(Query.ncbiQuery));
 					popupMenu.add(wrapMenu(Query.ensemblQuery));
-					popupMenu.add(wrapMenu(Query.ebi));
-					popupMenu.add(wrapMenu(Query.google));
+					//popupMenu.add(wrapMenu(Query.ebi));
+					
 					popupMenu.add(wrapMenu(Query.plaza));
 
 					String extra = Configuration.get("extraqueries");
