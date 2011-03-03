@@ -26,6 +26,8 @@ class NucCounter {
 		}
 
 		public int getTotalCount(int pos) {
+			if(pos<0||pos>=counter.length)
+				return -1;
 			return counter[0][pos] + counter[1][pos] + counter[2][pos] + counter[3][pos] + counter[5][pos];
 		}
 
