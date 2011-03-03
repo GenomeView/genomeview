@@ -47,10 +47,9 @@ class PileupTooltip extends JWindow {
 
 			int total = track.nc.getTotalCount(effectivePosition);
 
-			text.append("<strong>Matches:</strong> " + format(track.nc.getCount('.', effectivePosition), total)
-					+ "<br/>");
-
 			if (track.nc.hasData()) {
+				text.append("<strong>Matches:</strong> " + format(track.nc.getCount('.', effectivePosition), total)
+						+ "<br/>");
 				text.append("<strong>Mismatches:</strong><br/>");
 				text.append("A: " + format(track.nc.getCount('A', effectivePosition), total));
 				text.append("<br/>");
