@@ -552,7 +552,7 @@ public class FeatureTrack extends Track {
 							(ftm.maxScore - ftm.minScore) / 100.0);
 					optionPane.setInputValue(slider.getDoubleValue());
 					label.setText(nf.format(slider.getDoubleValue()));
-					slider.setMajorTickSpacing((int)((ftm.maxScore-ftm.minScore)/10));
+					//slider.setMajorTickSpacing((int)((ftm.maxScore-ftm.minScore)/10));
 					slider.setPaintTicks(true);
 					slider.setPaintLabels(true);
 
