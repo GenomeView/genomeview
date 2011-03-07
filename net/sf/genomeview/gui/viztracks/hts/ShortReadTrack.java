@@ -30,7 +30,6 @@ import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
-import net.sf.jannot.Strand;
 import net.sf.jannot.shortread.BAMreads;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortReadTools;
@@ -72,12 +71,7 @@ public class ShortReadTrack extends Track {
 				return;
 			StringBuffer text = new StringBuffer();
 			text.append("<html>");
-			// text.append("Forward coverage : "
-			// + (forward < 0 ? "In progress..." : forward) + "<br />");
-			// text.append("Reverse coverage: "
-			// + (reverse < 0 ? "In progress..." : reverse) + "<br />");
-			// text.append("Total coverage : " + (d < 0 ? "In progress..." : d)
-			// + "<br />");
+
 			if (sri != null) {
 				text.append("Insertion: ");
 				byte[] bases = sri.esr.getReadBases();
@@ -114,13 +108,7 @@ public class ShortReadTrack extends Track {
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			if (!tooltip.isVisible())
 				tooltip.setVisible(true);
-			// ReadGroup rg = currentEntry.shortReads.getReadGroup(this.source);
-			// ReadGroup rg = (ReadGroup) currentEntry.get(dataKey);
-			// ShortReadCoverage currentBuffer = rg.getCoverage();
-			// int start = Convert.translateScreenToGenome(x, currentVisible,
-			// currentScreenWidth);
-			// int f = (int) currentBuffer.get(Strand.FORWARD, start - 1);
-			// int r = (int) currentBuffer.get(Strand.REVERSE, start - 1);
+			
 
 			ShortReadInsertion sri = null;
 			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : paintedBlocks.entrySet()) {
@@ -137,32 +125,11 @@ public class ShortReadTrack extends Track {
 		return false;
 	}
 
-	// private DataSource source;
-
-	// private int scale = 1;
-	// private int scaleIndex = 0;
-
 	private Location currentVisible;
 
 	private Color pairingColor;
 
-	private Color reverseColor;
-
-	private Color forwardColor;
-
-	// private Entry currentEntry;
-	//
-	// private double currentScreenWidth;
-	private ColorGradient forwardGradient;
-	private ColorGradient reverseGradient;
 	private JViewport view;
-
-	// private static final double LOG2 = Math.log(2);
-
-	// private double log2(double d) {
-	// return Math.log(d) / LOG2;
-	// }
-	// private boolean insertionsVisible = false;
 
 	/* Keep track of the last x-coordinate that has been used for painting */
 	private int lastX = 100;
@@ -219,6 +186,36 @@ public class ShortReadTrack extends Track {
 
 	}
 
+	enum ReadColor {
+		FORWARD_SENSE("shortread:forwardColor"), FORWARD_ANTISENSE("shortread:forwardAntiColor"), REVERSE_SENSE(
+				"shortread:reverseColor"), REVERSE_ANTISENSE("shortread:reverseAntiColor");
+
+		Color c;
+		ColorGradient cg;
+		private String cfg;
+
+		private ReadColor(String cfg) {
+			this.cfg = cfg;
+			reset();
+
+		}
+
+		static void resetAll() {
+			for (ReadColor rc : values())
+				rc.reset();
+		}
+
+		private void reset() {
+			c = Configuration.getColor(cfg);
+			cg = new ColorGradient();
+			cg.addPoint(Color.WHITE);
+			cg.addPoint(c);
+			cg.createGradient(100);
+
+		}
+
+	}
+
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
 		paintedBlocks.clear();
@@ -233,35 +230,12 @@ public class ShortReadTrack extends Track {
 		int maxReads = Configuration.getInt("shortread:maxReads");
 		int maxRegion = Configuration.getInt("shortread:maxRegion");
 		int maxStack = Configuration.getInt("shortread:maxStack");
-		
-		forwardColor = Configuration.getColor("shortread:forwardColor");
-		reverseColor = Configuration.getColor("shortread:reverseColor");
+
 		pairingColor = Configuration.getColor("shortread:pairingColor");
-
-		/* Create color gradient for forward reads */
-		forwardGradient = new ColorGradient();
-		forwardGradient.addPoint(Color.WHITE);
-		forwardGradient.addPoint(forwardColor);
-		forwardGradient.createGradient(100);
-
-		/* Create color gradient for reverse reads */
-		reverseGradient = new ColorGradient();
-		reverseGradient.addPoint(Color.WHITE);
-		reverseGradient.addPoint(reverseColor);
-		reverseGradient.createGradient(100);
 
 		currentVisible = model.getAnnotationLocationVisible();
 
 		int originalYOffset = yOffset;
-
-		// double width = screenWidth / (double) currentVisible.length() / 2.0;
-
-		// scale = 1;
-		// scaleIndex = 0;
-		// while (scale < (int) Math.ceil(1.0 / width)) {
-		// scale *= 2;
-		// scaleIndex++;
-		// }
 
 		ReadGroup rg = (ReadGroup) entry.get(dataKey);
 		if (rg == null)
@@ -284,25 +258,14 @@ public class ShortReadTrack extends Track {
 		} else if (!isCollapsed()) {
 			/* Access to BAMread is through buffer for performance! */
 			reads = rg.get(currentVisible.start, currentVisible.end);
-			// if (rg instanceof BAMreads) {
-			// /* Update readLength for paired reads */
-			// readLength = ((BAMreads) rg).getPairLength();
-			//
-			// }
+			
 		}
 
 		int lines = 0;
 		boolean stackExceeded = false;
 		boolean enablePairing = Configuration.getBoolean("shortread:enablepairing");
 
-		// /* Variables for SNP track */
-		// NucCounter nc = new NucCounter();
-		// int snpOffset = yOffset;
-		// int snpTrackHeight =
-		// Configuration.getInt("shortread:snpTrackHeight");
-		// int snpTrackMinimumCoverage =
-		// Configuration.getInt("shortread:snpTrackMinimumCoverage");
-
+	
 		int readLineHeight = 3;
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			/*
@@ -323,7 +286,7 @@ public class ShortReadTrack extends Track {
 			int visibleReadCount = 0;
 			try {
 				for (SAMRecord one : reads) {
-					
+
 					if (enablePairing && one.getReadPairedFlag() && ShortReadTools.isSecondInPair(one))
 						continue;
 
@@ -372,8 +335,8 @@ public class ShortReadTrack extends Track {
 
 									pos = two.getAlignmentStart() - currentVisible.start;
 									line = tilingCounter.getFreeLine(pos);
-									if(line>=maxStack){
-										stackExceeded=true;
+									if (line >= maxStack) {
+										stackExceeded = true;
 										continue;
 									}
 									clearStart = two.getAlignmentStart();
@@ -425,7 +388,8 @@ public class ShortReadTrack extends Track {
 						/* Carve space out of hitmap */
 						// FIXME this range set has to be done because this will
 						// determine the number of lines which will be used to
-						// determine the size of the track, which is needed to properly set the scrollbars.
+						// determine the size of the track, which is needed to
+						// properly set the scrollbars.
 						if (true || paintOne || paintTwo)
 							tilingCounter.rangeSet(clearStart - pairLength - currentVisible.start, clearEnd + 4
 									- currentVisible.start, line);
@@ -451,49 +415,7 @@ public class ShortReadTrack extends Track {
 				yOffset += 25;
 
 		}
-		// /*
-		// * Draw SNP track if possible. This depends on drawing the individual
-		// * reads first as during the iteration over all reads, we store the
-		// * polymorphisms.
-		// */
-		//
-		// char[] nucs = new char[] { 'A', 'T', 'G', 'C' };
-		// Color[] color = new Color[4];
-		// for (int i = 0; i < 4; i++)
-		// color[i] = Configuration.getNucleotideColor(nucs[i]);
-		// int nucWidth = (int) (Math.ceil(screenWidth /
-		// currentVisible.length()));
-		// if (true && nc.hasData() && seqBuffer != null) {
-		// g.setColor(Colors.LIGHEST_GRAY);
-		// g.fillRect(0, snpOffset, (int) screenWidth, snpTrackHeight);
-		// g.setColor(Color.LIGHT_GRAY);
-		// g.drawLine(0, snpOffset + snpTrackHeight / 2, (int) screenWidth,
-		// snpOffset + snpTrackHeight / 2);
-		// g.setColor(Color.BLACK);
-		// g.drawString("SNPs", 5, snpOffset + snpTrackHeight - 4);
-		// for (int i = currentVisible.start; i <= currentVisible.end; i++) {
-		// int x1 = Convert.translateGenomeToScreen(i, currentVisible,
-		// screenWidth);
-		// double total = nc.getTotalCount(i - currentVisible.start);
-		// char refNt = seqBuffer[i - currentVisible.start];
-		// double done = 0;// Fraction gone to previous nucs
-		// if (total > snpTrackMinimumCoverage) {
-		// for (int j = 0; j < 4; j++) {
-		// if (nucs[j] != refNt) {
-		// double fraction = nc.getCount(nucs[j], i - currentVisible.start) /
-		// total;
-		// fraction *= snpTrackHeight;
-		// g.setColor(color[j]);
-		// g.fillRect(x1, (int) (snpOffset + snpTrackHeight - fraction - done),
-		// nucWidth, (int) (Math
-		// .ceil(fraction)));
-		// done += fraction;
-		// }
-		// }
-		// }
-		//
-		// }
-		// }
+
 		/* Draw label */
 		String name = StaticUtils.shortify(super.dataKey.toString());
 		FontMetrics metrics = g.getFontMetrics();
@@ -533,12 +455,33 @@ public class ShortReadTrack extends Track {
 			return false;
 
 		lastX = subX2;
-		Color c = Color.GRAY;
-		if (ShortReadTools.strand(rf) == Strand.FORWARD) {
-			c = forwardColor;
-		} else
-			c = reverseColor;
-		g.setColor(c);
+		ReadColor c = null;
+		if (rf.getReadPairedFlag()) {
+			if (rf.getFirstOfPairFlag()) {
+				if (rf.getReadNegativeStrandFlag()) {
+					c = ReadColor.REVERSE_SENSE;
+				} else {
+					c = ReadColor.FORWARD_ANTISENSE;
+				}
+
+			} else {
+				if (rf.getReadNegativeStrandFlag()) {
+					c = ReadColor.REVERSE_ANTISENSE;
+				} else {
+					c = ReadColor.FORWARD_SENSE;
+
+				}
+			}
+		} else {
+			if (rf.getReadNegativeStrandFlag()) {
+				c = ReadColor.REVERSE_SENSE;
+			} else {
+				c = ReadColor.FORWARD_SENSE;
+
+			}
+		}
+
+		g.setColor(c.c);
 
 		if (subX2 < subX1) {
 			subX2 = subX1;
@@ -549,13 +492,10 @@ public class ShortReadTrack extends Track {
 		}
 
 		int qual = rf.getMappingQuality();
-		if (c == forwardColor)
-			g.setColor(forwardGradient.getColor(qual));
-		else
-			g.setColor(reverseGradient.getColor(qual));
+		g.setColor(c.cg.getColor(qual));
 
 		g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
-		g.setColor(c);
+		g.setColor(c.c);
 		g.drawRect(subX1, yRec, subX2 - subX1, readLineHeight - 2);
 
 		/* Check mismatches */
@@ -617,7 +557,7 @@ public class ShortReadTrack extends Track {
 						g.fillRect((int) tx1, yRec + 4, (int) (tx2 - tx1), readLineHeight - 8 - 1);
 					}
 					if (readNt != '_' && model.getAnnotationLocationVisible().length() < 100) {
-						g.setColor(c);
+						g.setColor(c.c);
 						Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
 						g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 - stringSize.getWidth() / 2)), yRec
 								+ readLineHeight - 3);
@@ -726,7 +666,5 @@ public class ShortReadTrack extends Track {
 		return "Short reads: " + super.dataKey;
 	}
 
-	// public DataSource source() {
-	// return source;
-	// }
+	
 }
