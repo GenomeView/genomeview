@@ -23,6 +23,7 @@ import javax.swing.border.Border;
 
 import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.LocationTools;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.StaticUtils;
@@ -375,12 +376,12 @@ public class ShortReadTrack extends Track {
 						if (line > lines)
 							lines = line;
 
-						boolean paintOne = paintRead(g, one, yRec, screenWidth, readLineHeight, entry);
+						boolean paintOne = paintRead(g, one, yRec, screenWidth, readLineHeight, entry,null);
 						boolean paintTwo = false;
 						if (paintOne)
 							visibleReadCount++;
 						if (two != null) {
-							paintTwo = paintRead(g, two, yRec, screenWidth, readLineHeight, entry);
+							paintTwo = paintRead(g, two, yRec, screenWidth, readLineHeight, entry,one);
 							if (paintTwo)
 								visibleReadCount++;
 						}
@@ -442,7 +443,7 @@ public class ShortReadTrack extends Track {
 	/*
 	 * Returns true if the read was actually painted.
 	 */
-	private boolean paintRead(Graphics2D g, SAMRecord rf, int yRec, double screenWidth, int readLineHeight, Entry entry) {
+	private boolean paintRead(Graphics2D g, SAMRecord rf, int yRec, double screenWidth, int readLineHeight, Entry entry, SAMRecord otherRead) {
 		/* If outside vertical view, return immediately */
 		if (yRec < view.getViewRect().y || yRec > view.getViewRect().y + view.getViewRect().height) {
 			return false;
@@ -494,10 +495,36 @@ public class ShortReadTrack extends Track {
 		int qual = rf.getMappingQuality();
 		g.setColor(c.cg.getColor(qual));
 
+		
 		g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
 		g.setColor(c.c);
 		g.drawRect(subX1, yRec, subX2 - subX1, readLineHeight - 2);
+		
+		if(otherRead!=null){
+			int subOtherX1 = Convert.translateGenomeToScreen(otherRead.getAlignmentStart(), currentVisible, screenWidth);
+			int subOtherX2 = Convert.translateGenomeToScreen(otherRead.getAlignmentEnd() + 1, currentVisible, screenWidth);
+			Location l1=new Location(subOtherX1, subOtherX2);
+			Location l2=new Location(subX1, subX2);
+			
+			if(l1.overlaps(l2)){
+//				System.out.println("L1: "+l1);
+//				System.out.println("L2: "+l2);
+				Location l=LocationTools.getOverlap(l1, l2);
+//				System.out.println("L="+l);
+//				int x1 = Convert.translateGenomeToScreen(l.start, currentVisible, screenWidth);
+//				int x2 = Convert.translateGenomeToScreen(l.end+ 1, currentVisible, screenWidth);
+				g.setColor(Color.BLACK);
+				g.fillRect(l.start, yRec, l.length(), readLineHeight - 1);
+				
+			}
+			
+					
+		}
+		
+		
 
+		
+		
 		/* Check mismatches */
 		if (entry.sequence().size() == 0)
 			return true;
