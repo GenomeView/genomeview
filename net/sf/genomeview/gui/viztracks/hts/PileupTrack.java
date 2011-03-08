@@ -11,6 +11,7 @@ import java.awt.geom.GeneralPath;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -36,6 +37,7 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
+import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.refseq.Sequence;
@@ -55,14 +57,13 @@ public class PileupTrack extends Track {
 		super(key, model, true, false);
 		ptm = new PileupTrackModel(model);
 		tooltip = new PileupTooltip(ptm);
-		
+
 		nf.setMaximumFractionDigits(0);
 		summary = new PileupSummary(model);
 	}
 
-	
-	private PileupTrackModel ptm ;
-	private PileupTooltip tooltip ;
+	private PileupTrackModel ptm;
+	private PileupTooltip tooltip;
 
 	@Override
 	public boolean mouseExited(int x, int y, MouseEvent source) {
@@ -93,29 +94,33 @@ public class PileupTrack extends Track {
 	private Logger log = Logger.getLogger(PileupTrack.class.toString());
 
 	
-
-	
-
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
 		if (summary == null || summary.length() <= 1) {
 			summary.reset(entry);
 		}
-		
+
 		ptm.setScreenWidth(screenWidth);
-		
+
 		Location visible = model.getAnnotationLocationVisible();
 		/* Only retrieve data when location changed */
 		if (ptm.lastQuery == null || !ptm.lastQuery.equals(model.getAnnotationLocationVisible())) {
 			localMaxPile = 0;
-			final Data<Pile> pw = (Data<Pile>) entry.get(super.dataKey);
+			final BufferedPiles bp = BufferedPiles.get(entry, super.dataKey);
+
 			/* Data for detailed panel */
-			if (pw != null)
+			if (bp != null)
 				ptm.lastQuery = model.getAnnotationLocationVisible();
+			
+			/* The actual data */
+			Iterable<Pile> piles = bp.get(visible.start, visible.end);
+			/* Status messages for data queuing an retrieval */
+			List<Status>status=bp.status(visible.start,visible.end);
+			
 			if (ptm.isDetailed()) {
 				/* Draw individual piles */
 				// update data...
-				Iterable<Pile> piles = pw.get(visible.start, visible.end);
+				
 				ptm.detailedRects = new int[2][visible.length()];
 				/* Variables for SNP track */
 				ptm.nc = new NucCounter(visible.length());
@@ -151,7 +156,7 @@ public class PileupTrack extends Track {
 				// System.out.println(startChunk+"\t"+endChunk+"\t"+stepChunk);
 				for (int i = visible.start / PileupSummary.CHUNK; i < visible.end / PileupSummary.CHUNK + 1; i += stepChunk) {
 					final int idx = i;
-					summary.conditionalQueue(pw, idx);
+					summary.conditionalQueue(bp, idx);
 
 					// }
 
@@ -169,7 +174,6 @@ public class PileupTrack extends Track {
 		int snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
 		int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
 
-		
 		/**
 		 * Draw detailed coverage plot
 		 */
@@ -178,7 +182,7 @@ public class PileupTrack extends Track {
 			double div = summary.getMaxPile();
 			if (ptm.isDynamicScaling())
 				div = localMaxPile;
-			
+
 			int width = (int) Math.ceil(screenWidth / visible.length());
 			for (int i = 0; i < ptm.detailedRects[0].length; i++) {
 				// int snpOffset = yOffset;
@@ -469,12 +473,11 @@ public class PileupTrack extends Track {
 	}
 
 	/* User settable maximum value for charts, use negative for unlimited */
-	
 
 	@Override
 	public List<JMenuItem> getMenuItems() {
 		ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
-		
+
 		/* Use global settings */
 		final JCheckBoxMenuItem itemGlobal = new JCheckBoxMenuItem();
 		itemGlobal.setSelected(ptm.isGlobalSettings());
@@ -487,7 +490,7 @@ public class PileupTrack extends Track {
 
 		});
 		out.add(itemGlobal);
-		
+
 		/* Log scaling of line graph */
 		final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
 		item.setSelected(ptm.isLogscaling());
@@ -541,4 +544,73 @@ public class PileupTrack extends Track {
 	public String displayName() {
 		return "Pileup: " + super.dataKey;
 	}
+}
+
+/**
+ * Buffer class for pile up stuff that does not support buffering natively.
+ * 
+ * @author Thomas Abeel
+ * 
+ */
+class BufferedPiles implements Data<Pile> {
+	private static Entry currentEntry = null;
+	private static HashMap<DataKey, BufferedPiles> source = new HashMap<DataKey, BufferedPiles>();
+	private Data<Pile> data;
+
+	public BufferedPiles(Data<Pile> data) {
+		this.data = data;
+
+	}
+
+	public List<Status> status(int start, int end) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Has to return immediately, but can miss some data
+	 */
+	@Override
+	public Iterable<Pile> get(int start, int end) {
+		return data.get(start, end);
+	}
+
+	@Override
+	public Iterable<Pile> get() {
+		return data.get();
+	}
+
+	@Override
+	public boolean canSave() {
+		return false;
+	}
+
+	/**
+	 * Can return null if this entry does not exists, or that entry does not
+	 * have the associated data key.
+	 * 
+	 * @param entry
+	 * @param dataKey
+	 * @return
+	 */
+	public static BufferedPiles get(Entry entry, DataKey dataKey) {
+		if (entry != currentEntry) {
+			source.clear();
+			currentEntry = entry;
+
+		}
+		if (!source.containsKey(dataKey)) {
+			if (entry.get(dataKey) != null)
+				source.put(dataKey, new BufferedPiles((Data<Pile>) entry.get(dataKey)));
+
+		}
+		return source.get(dataKey);
+	}
+
+}
+/*
+ * Reports on the status of data retrieval
+ */
+class Status{
+	
 }
