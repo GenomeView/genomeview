@@ -55,7 +55,7 @@ public class OpenDialog extends JDialog {
 	private Model model;
 
 	private final String[] exts = new String[] { "fasta", "fa", "fas", "embl", "fna", "gtf", "gff", "gff3", "maln",
-			"syn", "wig", "mfa", "bed", "mapview", "bai", "maf", "snp", "tbl", "gb", "gbk", "pileup", "con", "peaks" };
+			"syn", "wig", "mfa", "bed", "mapview", "bai", "maf", "snp", "tbl", "gb", "gbk", "pileup", "con", "peaks","tdf" };
 
 	private void load(DataSource[] data) {
 
