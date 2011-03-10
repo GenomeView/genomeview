@@ -10,6 +10,8 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,12 +35,28 @@ public class PileupTrack extends Track {
 
 	private NumberFormat nf = NumberFormat.getInstance(Locale.US);
 	private PileProvider provider;
+	//private String label;
 
-	public PileupTrack(PileProvider provider, Model model) {
-		super(null, model, true, false);
+	public PileupTrack(PileProvider provider, final Model model) {
+		super( model, true, false);
+		
+
 		ptm = new PileupTrackModel(model);
 		tooltip = new PileupTooltip(ptm);
 		this.provider = provider;
+
+		this.provider.addObserver(new Observer() {
+
+			@Override
+			public void update(Observable o, Object arg) {
+				//System.out.println("\tInvalidating track vizbuffers");
+				ptm.lastQuery = null;
+				/* Force repaint */
+				model.refresh();
+
+			}
+		});
+
 		nf.setMaximumFractionDigits(0);
 
 	}
@@ -59,45 +77,41 @@ public class PileupTrack extends Track {
 		return false;
 	}
 
-	
-
 	private Logger log = Logger.getLogger(PileupTrack.class.toString());
-
-	
-	
-
-	
 
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
 
 		ptm.setScreenWidth(screenWidth);
-
+		//System.out.println("- drawing track "+this);
 		Location visible = model.getAnnotationLocationVisible();
 		/* Status messages for data queuing an retrieval */
-//		Iterable<Status> status = provider.getStatus(visible.start, visible.end);
+		// Iterable<Status> status = provider.getStatus(visible.start,
+		// visible.end);
 
 		/* Only retrieve data when location changed */
 		if (ptm.lastQuery == null || !ptm.lastQuery.equals(model.getAnnotationLocationVisible())) {
+			//System.out.println("--Using fresh data from provider in track");
 			/* The actual data */
-//			Iterable<Pile> piles = provider.get(visible.start, visible.end);
+			// Iterable<Pile> piles = provider.get(visible.start, visible.end);
 
 			if (model.getAnnotationLocationVisible().length() < 32000) {
-		//		System.out.println("Track: "+this+"\t"+provider);
-				ptm.setVizBuffer(new BarChartBuffer(visible, provider,ptm));
+				// System.out.println("Track: "+this+"\t"+provider);
+				ptm.setVizBuffer(new BarChartBuffer(visible, provider, ptm));
 			} else
-				ptm.setVizBuffer(new LineChartBuffer(visible, provider,ptm));
+				ptm.setVizBuffer(new LineChartBuffer(visible, provider, ptm));
 
 			ptm.lastQuery = model.getAnnotationLocationVisible();
 		}
 
 		/* Do the actual painting */
 		int graphLineHeigh = ptm.getVizBuffer().draw(g, yOffset, screenWidth);
+		
+		g.drawString(displayName(), 10, yOffset + 24 - 2);
+		
 		return graphLineHeigh;
 
 	}
-
-	
 
 	/* User settable maximum value for charts, use negative for unlimited */
 
@@ -169,8 +183,7 @@ public class PileupTrack extends Track {
 
 	@Override
 	public String displayName() {
-		return "Pileup: " + super.dataKey;
+		return provider.getSourceData().label();
 	}
+
 }
-
-

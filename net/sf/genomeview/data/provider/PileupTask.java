@@ -44,7 +44,7 @@ class PileupTask extends Task {
 			for (Pile p : piles) {
 				if (p.getPos() >= idx * PileupSummary.CHUNK && p.getPos() < (idx + 1) * PileupSummary.CHUNK) {
 					int position = (p.getPos() - 1) / PileupSummary.SUMMARYSIZE;
-					summary.add(position, p.getCoverage());
+					summary.add(position, p.getFCoverage(),p.getRCoverage());
 
 				}
 			}

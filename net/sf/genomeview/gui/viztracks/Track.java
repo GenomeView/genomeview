@@ -31,11 +31,21 @@ public abstract class Track extends Observable {
 	protected DataKey dataKey;
 	protected Entry entry;
 
+
+	@Deprecated
 	public Track(DataKey key, Model model, boolean visible, boolean collapsible) {
 		this.model = model;
 		this.dataKey = key;
 		this.visible = visible;
-		this.entry=model.getSelectedEntry();
+		this.entry = model.getSelectedEntry();
+		this.collapsible = collapsible;
+		this.addObserver(model);
+	}
+
+	public Track(Model model, boolean visible, boolean collapsible) {
+		this.model = model;
+		this.visible = visible;
+		this.entry = model.getSelectedEntry();
 		this.collapsible = collapsible;
 		this.addObserver(model);
 	}
@@ -122,14 +132,14 @@ public abstract class Track extends Observable {
 	 * 
 	 * @param g
 	 *            graphics context to paint on
-	 * @param view 
+	 * @param view
 	 * @param model
 	 *            the entry that is currently displayed
 	 * @return the height that was painted
 	 */
 	public int paint(Graphics g, int yOffset, double width, int index, JViewport view) {
 
-		int used = paintTrack((Graphics2D) g, yOffset, width,view);
+		int used = paintTrack((Graphics2D) g, yOffset, width, view);
 
 		if (!(this instanceof StructureTrack)) {
 			Rectangle r = new Rectangle(0, yOffset, (int) width + 1, used);
@@ -152,7 +162,7 @@ public abstract class Track extends Observable {
 	 *            the yOffset that should be taken into account when painting
 	 * @param width
 	 *            the width of the track
-	 * @param view 
+	 * @param view
 	 * @return the height this track uses
 	 */
 	protected abstract int paintTrack(Graphics2D g, int yOffset, double width, JViewport view);
@@ -192,6 +202,7 @@ public abstract class Track extends Observable {
 		notifyObservers();
 	}
 
+	
 	public abstract String displayName();
 
 	@Deprecated

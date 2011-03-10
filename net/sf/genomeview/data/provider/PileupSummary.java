@@ -28,32 +28,34 @@ class PileupSummary extends Observable{
 	/* Queue in blocks of CHUNK */
 	private BitSet ready = null;
 	private BitSet running = null;
-	private int[] summary;
+	private int[] forwardSummary;
+	private int[] reverseSummary;
 
 	/* Keeps track of the maximum value in detailed mode */
 	private double maxPile = 0;
 
-	/* Keeps track of the maximum value in summary graph mode */
-	private double maxSummary = 0;
+//	/* Keeps track of the maximum value in summary graph mode */
+//	private double maxSummary = 0;
 	private Model model;
-	private Entry entry;
+//	private Entry entry;
 
 	public int length() {
-		if (summary == null)
+		if (forwardSummary == null)
 			return 0;
-		return summary.length;
+		return forwardSummary.length;
 	}
 
 	public PileupSummary(Model model,Entry e) {
 		this.model = model;
-		this.entry=e;
+		//this.entry=e;
 		reset(e);
 		// System.out.println(entry);
 	
 	}
 	
 	private void reset(Entry e){
-		summary = new int[e.getMaximumLength() / SUMMARYSIZE + 1];
+		forwardSummary = new int[e.getMaximumLength() / SUMMARYSIZE + 1];
+		reverseSummary = new int[e.getMaximumLength() / SUMMARYSIZE + 1];
 		ready = new BitSet();
 		queued = new BitSet();
 		running = new BitSet();
@@ -61,7 +63,7 @@ class PileupSummary extends Observable{
 
 	void conditionalQueue(Data<Pile> pw, int idx) {
 		if (!queued.get(idx)) {
-			if (idx < summary.length) {
+			if (idx < forwardSummary.length) {
 				/* Only queue additional chunks in visible region */
 				if ((idx) * PileupSummary.CHUNK < model.getAnnotationLocationVisible().end
 						&& (idx + 1) * PileupSummary.CHUNK > model.getAnnotationLocationVisible().start) {
@@ -88,10 +90,13 @@ class PileupSummary extends Observable{
 		return queued.get(i);
 	}
 
-	private double getValue(int idx) {
-		return summary[idx];
+	private double getFValue(int idx) {
+		return forwardSummary[idx];
 	}
-
+	private double getRValue(int idx) {
+		return reverseSummary[idx];
+	}
+	
 	void setRunning(int idx) {
 		running.set(idx);
 
@@ -101,22 +106,27 @@ class PileupSummary extends Observable{
 //		return maxPile;
 //	}
 
-	private double getMaxSummary() {
-		return maxSummary;
-	}
+//	private double getMaxSummary() {
+//		return maxSummary;
+//	}
 
-	void add(int idx, int coverage) {
-		summary[idx] += coverage;
-		if (coverage > maxPile)
-			maxPile = coverage;
-		if (summary[idx] > maxSummary)
-			maxSummary = summary[idx];
+	void add(int idx, float fcov,float rcov) {
+		forwardSummary[idx] += fcov;
+		reverseSummary[idx] += rcov;
+		if (fcov > maxPile)
+			maxPile = fcov;
+		if (rcov> maxPile)
+			maxPile = rcov;
+//		if (summary[idx] > maxPile)
+//			maxPile = summary[idx];
 
 	}
 
 	void setReady(int idx) {
 		ready.set(idx);
 		System.out.println("Completed "+idx);
+		lastStart=-1;
+		lastEnd=-1;
 		setChanged();
 		notifyObservers();
 
@@ -143,7 +153,7 @@ class PileupSummary extends Observable{
 
 		}
 		int vs = start / PileupSummary.SUMMARYSIZE * PileupSummary.SUMMARYSIZE;// + PileupSummary.SUMMARYSIZE / 2;
-		double topValue = getMaxSummary();
+		//double topValue = maxPile;
 		// double range = topValue - bottomValue;
 
 		//conservationGP.moveTo(-5, yOffset + graphLineHeigh);
@@ -164,8 +174,9 @@ class PileupSummary extends Observable{
 					// System.err.println(idx);
 					idx = length() - 1;
 				}
-				double val = getValue(idx);// /
-				Pile tmp=new Pile(i,(int)val,0,null);
+				float fval = (float)getFValue(idx)/SUMMARYSIZE;// /
+				float rval = (float)getRValue(idx)/SUMMARYSIZE;// /
+				Pile tmp=new Pile(i,fval,rval,null);
 				tmp.setLen(PileupSummary.SUMMARYSIZE);
 				buffer.add(tmp);
 			}

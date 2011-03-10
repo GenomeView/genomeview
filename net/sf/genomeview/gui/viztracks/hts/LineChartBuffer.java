@@ -41,11 +41,11 @@ class LineChartBuffer implements VizBuffer {
 	@Override
 	public int draw(Graphics2D g, int yOffset, double screenWidth) {
 		/* Get information from configuration */
-		Color forwardColor = Configuration.getColor("shortread:forwardColor");
-		Color reverseColor = Configuration.getColor("shortread:reverseColor");
+//		Color forwardColor = Configuration.getColor("shortread:forwardColor");
+//		Color reverseColor = Configuration.getColor("shortread:reverseColor");
 		int graphLineHeigh = Configuration.getInt("shortread:graphLineHeight");
-		int snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
-		int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
+//		int snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
+//		int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
 
 		/* Draw status */
 		// int chunkWidth = (int) Math.ceil(PileupSummary.CHUNK *
@@ -87,7 +87,7 @@ class LineChartBuffer implements VizBuffer {
 		// int vs = visible.start / PileupSummary.SUMMARYSIZE *
 		// PileupSummary.SUMMARYSIZE + PileupSummary.SUMMARYSIZE
 		// / 2;
-		double topValue = provider.getMaxSummary();
+	//	double topValue = provider.getMaxPile();
 		// double range = topValue - bottomValue;
 
 		conservationGP.moveTo(-5, yOffset + graphLineHeigh);
@@ -96,6 +96,17 @@ class LineChartBuffer implements VizBuffer {
 		// += PileupSummary.SUMMARYSIZE) {
 		// if (!summary.isReady(i / PileupSummary.CHUNK))
 		// continue;
+		
+		double div=provider.getMaxPile();
+		
+		/* Logaritmic scaling */
+		if (ptm.isLogscaling()) {
+//			val = log2(val + 1);
+			div=log2(provider.getMaxPile());
+//			val /= log2(provider.getMaxPile());
+			/* Regular scaling */
+		} 
+		
 		for (Pile p : provider.get(visible.start, visible.end)) {
 			//System.out.println("Pile: "+p.getPos()+"\t"+p.getLength()+"\t"+p.getCoverage());
 			int x1 = Convert.translateGenomeToScreen(p.getPos(), visible, screenWidth);
@@ -112,6 +123,9 @@ class LineChartBuffer implements VizBuffer {
 			// idx = summary.length() - 1;
 			// }
 			double val = p.getCoverage();// .getValue(idx);// /
+			if (ptm.isLogscaling()) {
+				val = log2(val + 1);
+			}
 			// (double)maxSummary;//
 
 			// /f[i] +
@@ -135,14 +149,10 @@ class LineChartBuffer implements VizBuffer {
 			// valF -= bottomValue;
 			// valR -= bottomValue;
 			// val -= bottomValue;
-			/* Logaritmic scaling */
-			if (ptm.isLogscaling()) {
-				val = log2(val + 1);
-				val /= log2(provider.getMaxSummary());
-				/* Regular scaling */
-			} else {
-				val /= provider.getMaxSummary();
-			}
+			
+			
+			
+			val /= div;
 			// System.out.println("VAL: " + val);
 			/* Draw lines */
 			// if (i == vs) {
@@ -189,7 +199,7 @@ class LineChartBuffer implements VizBuffer {
 		/* Draw tick labels */
 		g.drawLine(0, yOffset, 5, yOffset);
 
-		g.drawString("some value - fix", 10, yOffset + 10);// +
+		g.drawString(""+div, 10, yOffset + 10);// +
 															// nf.format(provider.getMaxSummary()
 															// / (double)
 															// PileupSummary.SUMMARYSIZE),
@@ -201,7 +211,7 @@ class LineChartBuffer implements VizBuffer {
 		// g.drawString(StaticUtils.shortify(dataKey.toString()), 10, yOffset +
 		// 24 - 2);
 		// else
-		g.drawString(StaticUtils.shortify("no name"), 10, yOffset - graphLineHeigh + 24 - 2);
+		
 		return graphLineHeigh;
 	}
 

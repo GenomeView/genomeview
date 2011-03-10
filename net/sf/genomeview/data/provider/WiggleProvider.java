@@ -8,7 +8,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.data.NotificationTypes;
 import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
 import net.sf.jannot.pileup.Pile;
@@ -21,11 +20,10 @@ import net.sf.jannot.pileup.Pile;
 public class WiggleProvider extends PileProvider implements Observer {
 	private PileupSummary summary = null;
 	private Data<Pile> source;
-	private Model model;
+//	private Model model;
 
 	public WiggleProvider(Entry e, Data<Pile> source, Model model) {
 		summary = new PileupSummary(model, e);
-		this.model=model;
 		summary.addObserver(this);
 		this.source = source;
 
@@ -35,8 +33,8 @@ public class WiggleProvider extends PileProvider implements Observer {
 
 	private int lastStart = -1;
 	private int lastEnd = -1;
-	private int maxSummary;
-	private int maxPile;
+//	private float maxSummary;
+	private float maxPile;
 
 	@Override
 	public Iterable<Pile> get(int start, int end) {
@@ -45,7 +43,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 			return buffer;
 
 		/* New request */
-
+		//System.out.println("\tServing new request from provider");
 		lastStart = start;
 		lastEnd = end;
 
@@ -59,11 +57,11 @@ public class WiggleProvider extends PileProvider implements Observer {
 
 		}
 		for (Pile p : fresh) {
-			int val = p.getCoverage();
-			int len = p.getLength();
-			if (len > 1 && val > maxSummary)
-				maxSummary = val;
-			if (len == 1 && val > maxPile)
+			float val = p.getCoverage();
+//			int len = p.getLength();
+//			if (len > 1 && val > maxSummary)
+//				maxSummary = val;
+			if (val > maxPile)
 				maxPile = val;
 
 			buffer.add(p);
@@ -77,10 +75,10 @@ public class WiggleProvider extends PileProvider implements Observer {
 		return maxPile;
 	}
 
-	@Override
-	public double getMaxSummary() {
-		return maxSummary;
-	}
+//	@Override
+//	public double getMaxSummary() {
+//		return maxSummary;
+//	}
 
 	public Iterable<Status> getStatus(int start, int end) {
 		return summary.getStatus(start, end);
@@ -90,9 +88,16 @@ public class WiggleProvider extends PileProvider implements Observer {
 	public void update(Observable o, Object arg) {
 		/* Indicates that the summary has been updated */
 		/* Invalidate buffers */
+		//System.out.println("\tInvalidating Wiggle Provider buffers ");
 		lastStart = -1;
 		lastEnd = -1;
 		buffer.clear();
-		model.refresh();
+		setChanged();
+		notifyObservers();
+	}
+
+	@Override
+	public Data<Pile> getSourceData() {
+		return source;
 	}
 }

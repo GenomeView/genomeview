@@ -18,29 +18,29 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.refseq.Sequence;
+
 /**
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 class BarChartBuffer implements VizBuffer {
 	/* Data for pileupgraph barchart */
-	private int[][] detailedRects = null;
+	private float[][] detailedRects = null;
 	private Location visible;
 	private double localMaxPile = 0;
 	private NucCounter nc;
 	private PileupTrackModel ptm;
 	private Logger log = Logger.getLogger(BarChartBuffer.class.toString());
 	private PileProvider provider;
-	
-	
+
+	private int pileWidth=1;
 	public BarChartBuffer(Location visible, PileProvider provider, PileupTrackModel ptm) {
 		this.visible = visible;
-		this.provider=provider;
-		this.ptm=ptm;
-		
-		
-		detailedRects = new int[2][visible.length()];
+		this.provider = provider;
+		this.ptm = ptm;
+
+		detailedRects = new float[2][visible.length()];
 		/* Variables for SNP track */
 		nc = new NucCounter(visible.length());
 		// g.setColor(Color.GRAY);
@@ -53,21 +53,24 @@ class BarChartBuffer implements VizBuffer {
 				count(nc, p, visible);
 
 			}
-			
 
-			int pos = p.getLocation().start;
+			pileWidth=p.getLength();
+			int startPos = p.getLocation().start;
+			int endPos = p.getLocation().end;
 
-			if (pos - visible.start >= 0) {
-				int fcov = p.getFCoverage();
-				int rcov = p.getRCoverage();
+			for (int i = startPos; i <= endPos; i++) {
+				if (i - visible.start >= 0 && i - visible.start < detailedRects[0].length) {
+					float fcov = p.getFCoverage();
+					float rcov = p.getRCoverage();
 
-				detailedRects[0][pos - visible.start] = fcov;
-				detailedRects[1][pos - visible.start] = rcov;
+					detailedRects[0][i - visible.start] = fcov;
+					detailedRects[1][i - visible.start] = rcov;
 
-				double coverage = fcov + rcov;
+					double coverage = fcov + rcov;
 
-				if (coverage > localMaxPile)
-					localMaxPile = coverage;
+					if (coverage > localMaxPile)
+						localMaxPile = coverage;
+				}
 			}
 
 		}
@@ -117,8 +120,9 @@ class BarChartBuffer implements VizBuffer {
 		double div = provider.getMaxPile();
 		if (ptm.isDynamicScaling())
 			div = localMaxPile;
-//		System.out.println("Using " + div + ", dynamic: " + ptm.isDynamicScaling());
-//		System.out.println("\tvalue 20: "+detailedRects[0][20]+"\t"+detailedRects[1][20]);
+		// System.out.println("Using " + div + ", dynamic: " +
+		// ptm.isDynamicScaling());
+		// System.out.println("\tvalue 20: "+detailedRects[0][20]+"\t"+detailedRects[1][20]);
 		int width = (int) Math.ceil(screenWidth / visible.length());
 		for (int i = 0; i < detailedRects[0].length; i++) {
 			// int snpOffset = yOffset;
@@ -236,10 +240,11 @@ class BarChartBuffer implements VizBuffer {
 		g.drawString("" + div, 10, yOffset);
 		g.drawString("0" + "", 10, yOffset - graphLineHeigh + 5);
 		g.drawString("" + div, 10, yOffset - 2 * graphLineHeigh + 10);
-//		if (dataKey != null)
-//			g.drawString(StaticUtils.shortify(dataKey.toString()), 10, yOffset - graphLineHeigh + 24 - 2);
-//		else
-			g.drawString(StaticUtils.shortify("no name"), 10, yOffset - graphLineHeigh + 24 - 2);
+		// if (dataKey != null)
+		// g.drawString(StaticUtils.shortify(dataKey.toString()), 10, yOffset -
+		// graphLineHeigh + 24 - 2);
+		// else
+	
 
 		return 2 * graphLineHeigh + snpTrackHeight;
 
@@ -263,7 +268,9 @@ class BarChartBuffer implements VizBuffer {
 		text.append("<html>");
 		int total = nc.getTotalCount(effectivePosition);
 
+		text.append("<strong>Window length: </strong>"+pileWidth+"<br/>");
 		if (nc.hasData()) {
+			
 			text.append("<strong>Matches:</strong> " + format(nc.getCount('.', effectivePosition), total) + "<br/>");
 			text.append("<strong>Mismatches:</strong><br/>");
 			text.append("A: " + format(nc.getCount('A', effectivePosition), total));
@@ -283,5 +290,4 @@ class BarChartBuffer implements VizBuffer {
 		text.append("</html>");
 		return text.toString();
 	}
-
 }

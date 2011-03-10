@@ -587,8 +587,7 @@ public class Model extends Observable implements IModel {
 			/* Graph tracks */
 			for (DataKey key : e) {
 				Data<?> data = e.get(key);
-				// System.out.println("Update tracks:"
-				// +key+"\t"+data.getClass()+"\t"+data);
+				
 				if (data instanceof MemoryFeatureAnnotation) {
 					if (!trackList.containsTrack(key) && ((MemoryFeatureAnnotation) data).cachedCount() > 0)
 						trackList.add(key,new FeatureTrack(this, (Type) key));

@@ -13,6 +13,8 @@ public abstract class PileProvider extends AbstractDataProvider<Pile> {
 
 	public abstract double getMaxPile();
 
-	public abstract double getMaxSummary();
+	
+
+//	public abstract double getMaxSummary();
 
 }

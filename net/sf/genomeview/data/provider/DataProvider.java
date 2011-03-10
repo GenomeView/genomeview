@@ -3,6 +3,8 @@
  */
 package net.sf.genomeview.data.provider;
 
+import net.sf.jannot.Data;
+
 /**
  * Data provides for visualization tracks. Methods should return immediately,
  * data fetching should be done in other threads.
@@ -28,5 +30,7 @@ public interface DataProvider<T> {
 	public Iterable<T> get(int start, int end);
 
 	public Iterable<Status> getStatus(int start, int end);
+	
+	public Data<T> getSourceData();
 
 }
