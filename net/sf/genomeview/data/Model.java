@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.provider.TDFProvider;
 import net.sf.genomeview.data.provider.WiggleProvider;
 import net.sf.genomeview.gui.external.JavaScriptHandler;
 import net.sf.genomeview.gui.viztracks.TickmarkTrack;
@@ -56,6 +57,7 @@ import net.sf.jannot.tabix.BEDWrapper;
 import net.sf.jannot.tabix.GFFWrapper;
 import net.sf.jannot.tabix.PileupWrapper;
 import net.sf.jannot.tabix.SWigWrapper;
+import net.sf.jannot.tdf.TDFData;
 import net.sf.jannot.wiggle.Graph;
 import be.abeel.net.URIFactory;
 import be.abeel.util.DefaultHashMap;
@@ -599,10 +601,16 @@ public class Model extends Observable implements IModel {
 
 				}
 
-				if (data instanceof PileupWrapper || data instanceof SWigWrapper) {
+				if (data instanceof PileupWrapper || data instanceof SWigWrapper ) {
 					if (!trackList.containsTrack(key))
 						trackList.add(key,new PileupTrack(new WiggleProvider(e, (Data<Pile>)data,this), this));
 				}
+				
+				if (data instanceof TDFData ) {
+					if (!trackList.containsTrack(key))
+						trackList.add(key,new PileupTrack(new TDFProvider(e, (TDFData)data,this), this));
+				}
+				
 
 				if (data instanceof Graph) {
 					if (!trackList.containsTrack(key))
