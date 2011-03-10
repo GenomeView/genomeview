@@ -5,8 +5,8 @@ package net.sf.genomeview.gui.viztracks.hts;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Location;
+import net.sf.jannot.refseq.Sequence;
 
 /**
  * 
@@ -16,14 +16,21 @@ import net.sf.jannot.Location;
 class PileupTrackModel {
 
 	private Model model;
-
+	private VizBuffer vizBuffer = null;
 	PileupTrackModel(Model model) {
 		this.model = model;
 	}
 
-	boolean isDetailed() {
-		return model.getAnnotationLocationVisible().length() < PileupSummary.CHUNK;
+	void setVizBuffer(VizBuffer vb){
+		vizBuffer=vb;
 	}
+	
+	VizBuffer getVizBuffer(){
+		return vizBuffer;
+	}
+	// boolean isDetailed() {
+	// return model.getAnnotationLocationVisible().length() < 16000;
+	// }
 
 	private boolean dynamicScaling = Configuration.getBoolean("pileup:dynamicScaling");
 
@@ -58,11 +65,10 @@ class PileupTrackModel {
 	}
 
 	Location lastQuery = null;
-	/* Data for detailed zoom */
-	NucCounter nc;
+//	/* Data for detailed zoom */
+//	NucCounter nc;
 
-	/* Data for pileupgraph barchart */
-	int[][] detailedRects = null;
+
 
 	private double screenWidth;
 
@@ -75,11 +81,7 @@ class PileupTrackModel {
 
 	}
 
-	int translateFromMouse(int x) {
-		int start = model.getAnnotationLocationVisible().start;
-		int xGenome = Convert.translateScreenToGenome(x, model.getAnnotationLocationVisible(), screenWidth);
-		return xGenome - start;
-	}
+	
 
 	void setGlobalSettings(boolean globalSettings) {
 		this.globalSettings = globalSettings;
@@ -89,7 +91,8 @@ class PileupTrackModel {
 		return globalSettings;
 	}
 
-	private double maxValue=-1;
+	private double maxValue = -1;
+
 	public double maxValue() {
 		if (globalSettings)
 			return Configuration.getDouble("pileup:maxPile");
@@ -98,8 +101,16 @@ class PileupTrackModel {
 	}
 
 	public void setMaxValue(Double d) {
-		this.maxValue=d;
-		
+		this.maxValue = d;
+
+	}
+
+	public boolean isBarchart() {
+		return true;
+	}
+
+	public Sequence sequence() {
+		return model.getSelectedEntry().sequence();
 	}
 
 }

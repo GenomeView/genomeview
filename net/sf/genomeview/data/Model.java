@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.provider.WiggleProvider;
 import net.sf.genomeview.gui.external.JavaScriptHandler;
 import net.sf.genomeview.gui.viztracks.TickmarkTrack;
 import net.sf.genomeview.gui.viztracks.Track;
@@ -47,6 +48,7 @@ import net.sf.jannot.alignment.maf.MAFMultipleAlignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
+import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.MultiFileSource;
@@ -459,9 +461,9 @@ public class Model extends Observable implements IModel {
 
 		private void init() {
 			TickmarkTrack ticks = new TickmarkTrack(model);
-			add(ticks);
+			add(ticks.getDataKey(),ticks);
 			StructureTrack strack = new StructureTrack(model);
-			add(strack);
+			add(ticks.getDataKey(),strack);
 			if (!Configuration.getBoolean("track:showStructure")) {
 				System.out.println("Not visisble");
 				strack.setVisible(false);
@@ -474,9 +476,9 @@ public class Model extends Observable implements IModel {
 			return (StructureTrack) mapping.get(StructureTrack.key);
 		}
 
-		private void add(Track track) {
-			mapping.put(track.getDataKey(), track);
-			order.add(track.getDataKey());
+		private void add(DataKey dk,Track track) {
+			mapping.put(dk, track);
+			order.add(dk);
 
 		}
 
@@ -589,36 +591,36 @@ public class Model extends Observable implements IModel {
 				// +key+"\t"+data.getClass()+"\t"+data);
 				if (data instanceof MemoryFeatureAnnotation) {
 					if (!trackList.containsTrack(key) && ((MemoryFeatureAnnotation) data).cachedCount() > 0)
-						trackList.add(new FeatureTrack(this, (Type) key));
+						trackList.add(key,new FeatureTrack(this, (Type) key));
 
 				}
 				if (data instanceof GFFWrapper || data instanceof BEDWrapper) {
 					if (!trackList.containsTrack(key))
-						trackList.add(new FeatureTrack(this, (Type) key));
+						trackList.add(key,new FeatureTrack(this, (Type) key));
 
 				}
 
 				if (data instanceof PileupWrapper || data instanceof SWigWrapper) {
 					if (!trackList.containsTrack(key))
-						trackList.add(new PileupTrack(key, this));
+						trackList.add(key,new PileupTrack(new WiggleProvider(e, (Data<Pile>)data,this), this));
 				}
 
 				if (data instanceof Graph) {
 					if (!trackList.containsTrack(key))
-						trackList.add(new WiggleTrack(key, this, true));
+						trackList.add(key,new WiggleTrack(key, this, true));
 				}
 				if (data instanceof AlignmentAnnotation) {
 					if (!trackList.containsTrack(key))
-						trackList.add(new MultipleAlignmentTrack(this, key));
+						trackList.add(key,new MultipleAlignmentTrack(this, key));
 				}
 				if (data instanceof ReadGroup) {
 					if (!trackList.containsTrack(key)) {
-						trackList.add(new ShortReadTrack(key, this));
+						trackList.add(key,new ShortReadTrack(key, this));
 					}
 				}
 				if (data instanceof MAFMultipleAlignment) {
 					if (!trackList.containsTrack(key)) {
-						trackList.add(new MultipleAlignmentTrack2(this, key));
+						trackList.add(key,new MultipleAlignmentTrack2(this, key));
 						logger.info("Added multiple alignment track " + key);
 					}
 				}

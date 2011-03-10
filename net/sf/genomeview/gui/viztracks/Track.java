@@ -27,6 +27,7 @@ import net.sf.jannot.Entry;
 public abstract class Track extends Observable {
 
 	protected Model model;
+	@Deprecated
 	protected DataKey dataKey;
 	protected Entry entry;
 
@@ -193,6 +194,7 @@ public abstract class Track extends Observable {
 
 	public abstract String displayName();
 
+	@Deprecated
 	public DataKey getDataKey() {
 		return dataKey;
 	}

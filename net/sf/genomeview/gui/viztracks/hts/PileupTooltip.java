@@ -5,8 +5,6 @@ package net.sf.genomeview.gui.viztracks.hts;
 
 import java.awt.Color;
 import java.awt.event.MouseEvent;
-import java.text.NumberFormat;
-import java.util.Locale;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -19,7 +17,6 @@ import javax.swing.border.Border;
  * 
  */
 class PileupTooltip extends JWindow {
-	private NumberFormat nf = NumberFormat.getPercentInstance(Locale.US);
 
 	private static final long serialVersionUID = -7416732151483650659L;
 
@@ -27,9 +24,9 @@ class PileupTooltip extends JWindow {
 
 	private PileupTrackModel track;
 
-	public PileupTooltip(PileupTrackModel track) {
-		this.track = track;
-		nf.setMaximumFractionDigits(1);
+	public PileupTooltip(PileupTrackModel ptm) {
+		this.track = ptm;
+
 		floater.setBackground(Color.GRAY);
 		floater.setForeground(Color.BLACK);
 		Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
@@ -40,48 +37,21 @@ class PileupTooltip extends JWindow {
 	}
 
 	public void set(MouseEvent e) {
-		if (track.isDetailed() && track.nc != null) {
-			StringBuffer text = new StringBuffer();
-			text.append("<html>");
-			int effectivePosition = track.translateFromMouse(e.getX());
-
-			int total = track.nc.getTotalCount(effectivePosition);
-
-			if (track.nc.hasData()) {
-				text.append("<strong>Matches:</strong> " + format(track.nc.getCount('.', effectivePosition), total)
-						+ "<br/>");
-				text.append("<strong>Mismatches:</strong><br/>");
-				text.append("A: " + format(track.nc.getCount('A', effectivePosition), total));
-				text.append("<br/>");
-				text.append("T: " + format(track.nc.getCount('T', effectivePosition), total));
-				text.append("<br/>");
-				text.append("G: " + format(track.nc.getCount('G', effectivePosition), total));
-				text.append("<br/>");
-				text.append("C: " + format(track.nc.getCount('C', effectivePosition), total));
-				text.append("<br/>");
-			}
-			text.append("<strong>Coverage:</strong> "
-					+ (track.detailedRects[0][effectivePosition] + track.detailedRects[1][effectivePosition]) + "<br/>");
-			text.append("Forward: " + track.detailedRects[0][effectivePosition] + "<br/>");
-			text.append("Reverse: " + track.detailedRects[1][effectivePosition] + "<br/>");
-
-			text.append("</html>");
-			if (!text.toString().equals(floater.getText())) {
-				floater.setText(text.toString());
-				this.pack();
-			}
-			setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
-
-			if (!isVisible()) {
-				setVisible(true);
-			}
+		
+		VizBuffer vb= track.getVizBuffer();
+		String text = vb.getTooltip(e.getX());
+		if(text==null){
+			setVisible(false);
+			return;
 		}
-	}
+		if (text!=null&&!text.toString().equals(floater.getText())) {
+			floater.setText(text.toString());
+			this.pack();
+		}
+		setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
 
-	private String format(int count, int total) {
-		if (total > 0)
-			return count + " (" + nf.format(count / (double) total) + ")";
-		else
-			return "" + count;
+		if (!isVisible()) {
+			setVisible(true);
+		}
 	}
 }

@@ -1,7 +1,7 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.gui.viztracks.hts;
+package net.sf.genomeview.data.provider;
 
 import java.util.logging.Logger;
 
