@@ -463,7 +463,7 @@ public class Model extends Observable implements IModel {
 			TickmarkTrack ticks = new TickmarkTrack(model);
 			add(ticks.getDataKey(),ticks);
 			StructureTrack strack = new StructureTrack(model);
-			add(ticks.getDataKey(),strack);
+			add(strack.getDataKey(),strack);
 			if (!Configuration.getBoolean("track:showStructure")) {
 				System.out.println("Not visisble");
 				strack.setVisible(false);
