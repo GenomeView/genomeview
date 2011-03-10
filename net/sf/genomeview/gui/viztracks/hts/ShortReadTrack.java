@@ -3,6 +3,7 @@
  */
 package net.sf.genomeview.gui.viztracks.hts;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -109,7 +110,6 @@ public class ShortReadTrack extends Track {
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			if (!tooltip.isVisible())
 				tooltip.setVisible(true);
-			
 
 			ShortReadInsertion sri = null;
 			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : paintedBlocks.entrySet()) {
@@ -259,14 +259,13 @@ public class ShortReadTrack extends Track {
 		} else if (!isCollapsed()) {
 			/* Access to BAMread is through buffer for performance! */
 			reads = rg.get(currentVisible.start, currentVisible.end);
-			
+
 		}
 
 		int lines = 0;
 		boolean stackExceeded = false;
 		boolean enablePairing = Configuration.getBoolean("shortread:enablepairing");
 
-	
 		int readLineHeight = 3;
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			/*
@@ -326,10 +325,16 @@ public class ShortReadTrack extends Track {
 						int clearEnd = one.getAlignmentEnd();
 						SAMRecord two = null;
 						/* Modify empty space finder for paired reads */
-						if (enablePairing) {
+						boolean mateMissing = one.getMateUnmappedFlag();
+						if (!mateMissing && enablePairing) {
 							// ShortReadTools esr = (ShortReadTools) one;
 							if (ShortReadTools.isPaired(one) && ShortReadTools.isFirstInPair(one)) {
 								two = rg.getSecondRead(one);
+								if (two == null) {
+									System.out.println("Pair not found " + one.getMateAlignmentStart() + "\t"
+											+ one.getMateUnmappedFlag() + "\t" + one.getMateReferenceIndex() + "("
+											+ one.getReferenceIndex() + ")");
+								}
 							}
 							if (two != null) {
 								if (two.getAlignmentStart() < one.getAlignmentStart()) {
@@ -376,12 +381,12 @@ public class ShortReadTrack extends Track {
 						if (line > lines)
 							lines = line;
 
-						boolean paintOne = paintRead(g, one, yRec, screenWidth, readLineHeight, entry,null);
+						boolean paintOne = paintRead(g, one, yRec, screenWidth, readLineHeight, entry, null);
 						boolean paintTwo = false;
 						if (paintOne)
 							visibleReadCount++;
 						if (two != null) {
-							paintTwo = paintRead(g, two, yRec, screenWidth, readLineHeight, entry,one);
+							paintTwo = paintRead(g, two, yRec, screenWidth, readLineHeight, entry, one);
 							if (paintTwo)
 								visibleReadCount++;
 						}
@@ -440,10 +445,22 @@ public class ShortReadTrack extends Track {
 	 */
 	private char[] seqBuffer = null;
 
-	/*
+	/**
 	 * Returns true if the read was actually painted.
+	 * 
+	 * @param g
+	 * @param rf
+	 * @param yRec
+	 * @param screenWidth
+	 * @param readLineHeight
+	 * @param entry
+	 * @param otherRead
+	 *            the other read in the pair, this should only be set for the
+	 *            second read, and should be null for the first read.
+	 * @return Returns true if the read was actually painted, false if it wasn't
 	 */
-	private boolean paintRead(Graphics2D g, SAMRecord rf, int yRec, double screenWidth, int readLineHeight, Entry entry, SAMRecord otherRead) {
+	private boolean paintRead(Graphics2D g, SAMRecord rf, int yRec, double screenWidth, int readLineHeight,
+			Entry entry, SAMRecord otherRead) {
 		/* If outside vertical view, return immediately */
 		if (yRec < view.getViewRect().y || yRec > view.getViewRect().y + view.getViewRect().height) {
 			return false;
@@ -495,36 +512,39 @@ public class ShortReadTrack extends Track {
 		int qual = rf.getMappingQuality();
 		g.setColor(c.cg.getColor(qual));
 
-		
 		g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
 		g.setColor(c.c);
-		g.drawRect(subX1, yRec, subX2 - subX1, readLineHeight - 2);
+		if(rf.getMateUnmappedFlag())
+			g.setColor(Color.RED);
+		g.setStroke(new BasicStroke(2));
+		g.drawRect(subX1, yRec+1, subX2 - subX1, readLineHeight -3);
+		g.setStroke(new BasicStroke(1));
+		g.setColor(c.c);
 		
-		if(otherRead!=null){
-			int subOtherX1 = Convert.translateGenomeToScreen(otherRead.getAlignmentStart(), currentVisible, screenWidth);
-			int subOtherX2 = Convert.translateGenomeToScreen(otherRead.getAlignmentEnd() + 1, currentVisible, screenWidth);
-			Location l1=new Location(subOtherX1, subOtherX2);
-			Location l2=new Location(subX1, subX2);
-			
-			if(l1.overlaps(l2)){
-//				System.out.println("L1: "+l1);
-//				System.out.println("L2: "+l2);
-				Location l=LocationTools.getOverlap(l1, l2);
-//				System.out.println("L="+l);
-//				int x1 = Convert.translateGenomeToScreen(l.start, currentVisible, screenWidth);
-//				int x2 = Convert.translateGenomeToScreen(l.end+ 1, currentVisible, screenWidth);
+		if (otherRead != null) {
+			int subOtherX1 = Convert
+					.translateGenomeToScreen(otherRead.getAlignmentStart(), currentVisible, screenWidth);
+			int subOtherX2 = Convert.translateGenomeToScreen(otherRead.getAlignmentEnd() + 1, currentVisible,
+					screenWidth);
+			Location l1 = new Location(subOtherX1, subOtherX2);
+			Location l2 = new Location(subX1, subX2);
+
+			if (l1.overlaps(l2)) {
+				// System.out.println("L1: "+l1);
+				// System.out.println("L2: "+l2);
+				Location l = LocationTools.getOverlap(l1, l2);
+				// System.out.println("L="+l);
+				// int x1 = Convert.translateGenomeToScreen(l.start,
+				// currentVisible, screenWidth);
+				// int x2 = Convert.translateGenomeToScreen(l.end+ 1,
+				// currentVisible, screenWidth);
 				g.setColor(Color.BLACK);
 				g.fillRect(l.start, yRec, l.length(), readLineHeight - 1);
-				
-			}
-			
-					
-		}
-		
-		
 
-		
-		
+			}
+
+		}
+
 		/* Check mismatches */
 		if (entry.sequence().size() == 0)
 			return true;
@@ -693,5 +713,4 @@ public class ShortReadTrack extends Track {
 		return "Short reads: " + super.dataKey;
 	}
 
-	
 }
