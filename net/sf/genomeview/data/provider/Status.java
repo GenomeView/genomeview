@@ -2,34 +2,44 @@
  * %HEADER%
  */
 package net.sf.genomeview.data.provider;
+
 /**
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 public class Status {
+	private int end;
+	private int start;
+	private boolean ready;
+	private boolean queued;
+	private boolean running;
+
+	public Status(boolean running, boolean queued, boolean ready, int i, int j) {
+		this.running = running;
+		this.queued = queued;
+		this.ready = ready;
+		this.start = i;
+		this.end = j;
+	}
+
 	public int start() {
-		// TODO Auto-generated method stub
-		return 0;
+		return start;
 	}
 
 	public boolean isQueued() {
-		// TODO Auto-generated method stub
-		return false;
+		return queued;
 	}
 
 	public boolean isReady() {
-		// TODO Auto-generated method stub
-		return false;
+		return ready;
 	}
 
 	public boolean isRunning() {
-		// TODO Auto-generated method stub
-		return false;
+		return running;
 	}
 
 	public int end() {
-		// TODO Auto-generated method stub
-		return 0;
+		return end;
 	}
 }

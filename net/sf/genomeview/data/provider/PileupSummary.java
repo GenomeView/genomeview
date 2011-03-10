@@ -5,6 +5,7 @@ package net.sf.genomeview.data.provider;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Observable;
 
 import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
@@ -17,7 +18,7 @@ import net.sf.jannot.pileup.Pile;
  * @author Thomas Abeel
  * 
  */
-class PileupSummary {
+class PileupSummary extends Observable{
 
 	static final int CHUNK = 32000;
 	static final int SUMMARYSIZE = 100;
@@ -95,10 +96,10 @@ class PileupSummary {
 		running.set(idx);
 
 	}
-
-	private double getMaxPile() {
-		return maxPile;
-	}
+//
+//	private double getMaxPile() {
+//		return maxPile;
+//	}
 
 	private double getMaxSummary() {
 		return maxSummary;
@@ -115,14 +116,16 @@ class PileupSummary {
 
 	void setReady(int idx) {
 		ready.set(idx);
-		model.refresh();
+		System.out.println("Completed "+idx);
+		setChanged();
+		notifyObservers();
 
 	}
 
-	private void setMaxPile(double coverage) {
-		this.maxPile = coverage;
-
-	}
+//	private void setMaxPile(double coverage) {
+//		this.maxPile = coverage;
+//
+//	}
 
 	private ArrayList<Pile>buffer=new ArrayList<Pile>();
 	private int lastEnd=0;
@@ -168,6 +171,23 @@ class PileupSummary {
 			}
 		}
 		return buffer;
+	}
+
+	public Iterable<Status> getStatus(int start, int end) {
+		ArrayList<Status>out=new ArrayList<Status>();
+		
+		int vs = start / PileupSummary.CHUNK * PileupSummary.CHUNK;// + PileupSummary.SUMMARYSIZE / 2;
+		
+		for (int i = vs; i < end + PileupSummary.CHUNK; i += PileupSummary.CHUNK) {
+			out.add(getStatus(i/PileupSummary.CHUNK));
+		}
+		return out;
+		
+	}
+
+	private Status getStatus(int i) {
+		return new Status(isRunning(i),isQueued(i),isReady(i),i*CHUNK,(i+1)*CHUNK);
+			
 	}
 
 }

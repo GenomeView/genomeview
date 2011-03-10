@@ -28,7 +28,7 @@ class LineChartBuffer implements VizBuffer {
 	private PileProvider provider;
 	private PileupTrackModel ptm;
 
-	public LineChartBuffer(Location visible2, PileProvider provider, PileupTrackModel ptm) {
+	public LineChartBuffer(Location visible, PileProvider provider, PileupTrackModel ptm) {
 		this.visible = visible;
 		this.provider = provider;
 		this.ptm = ptm;
@@ -97,8 +97,10 @@ class LineChartBuffer implements VizBuffer {
 		// if (!summary.isReady(i / PileupSummary.CHUNK))
 		// continue;
 		for (Pile p : provider.get(visible.start, visible.end)) {
+			//System.out.println("Pile: "+p.getPos()+"\t"+p.getLength()+"\t"+p.getCoverage());
 			int x1 = Convert.translateGenomeToScreen(p.getPos(), visible, screenWidth);
 			int x2 = Convert.translateGenomeToScreen(p.getPos() + p.getLength(), visible, screenWidth);
+			//System.out.println("\t"+x1+"\t"+x2);
 			// double valF = f[i] - 1;
 			// double valR = r[i] - 1;
 			// System.out.println("P-" + (i / SUMMARYSIZE) + " " + summary[i
@@ -152,7 +154,7 @@ class LineChartBuffer implements VizBuffer {
 			// // (graphLineHeigh - 4) + 2);
 			// }
 
-			conservationGP.lineTo((x2 - x1) / 2, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
+			conservationGP.lineTo((x2 + x1) / 2, yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
 			// conservationGPF.lineTo(x, yOffset + (1 - valF) *
 			// (graphLineHeigh - 4) + 2);
 			// conservationGPR.lineTo(x, yOffset + (1 - valR) *
