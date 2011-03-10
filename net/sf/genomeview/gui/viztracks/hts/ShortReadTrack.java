@@ -51,6 +51,7 @@ public class ShortReadTrack extends Track {
 	}
 
 	private Tooltip tooltip = new Tooltip();
+	private Tooltip readinfo = new Tooltip();
 
 	private class Tooltip extends JWindow {
 
@@ -100,25 +101,56 @@ public class ShortReadTrack extends Track {
 	@Override
 	public boolean mouseExited(int x, int y, MouseEvent source) {
 		tooltip.setVisible(false);
+		readinfo.setVisible(false);
 		return false;
 	}
 
-	private int currentYOffset = 0;
+	@Override
+	public boolean mouseClicked(int x, int y, MouseEvent source) {
+		System.out.println("Click: " + x + " " + y);
+		for (java.util.Map.Entry<Rectangle, SAMRecord> e : hitMap.entrySet()) {
+			if (e.getKey().contains(x, y)) {
+				System.out.println("Prijs: " + e.getValue());
+				model.selectionModel();
+			}
+		}
 
+		return false;
+	}
+
+	
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
-			if (!tooltip.isVisible())
-				tooltip.setVisible(true);
 
 			ShortReadInsertion sri = null;
 			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : paintedBlocks.entrySet()) {
-				if (e.getKey().contains(x, y + currentYOffset)) {
+				if (e.getKey().contains(x, y)) {
 					sri = e.getValue();
 					break;
 				}
 			}
-			tooltip.set(source, sri);
+			
+			if (sri != null) {
+				if(!tooltip.isVisible())
+					tooltip.setVisible(true);
+				tooltip.set(source, sri);
+			}else{
+				if (tooltip.isVisible())
+					tooltip.setVisible(false);
+			}
+
+			// System.out.println("Click: "+x+" "+y);
+			// for(java.util.Map.Entry<Rectangle,
+			// SAMRecord>e:hitMap.entrySet()){
+			// if(e.getKey().contains(x, y)){
+			// System.out.println("Prijs: "+e.getValue());
+			// model.selectionModel();
+			// }
+			// }
+
+			// return false;
+
 		} else {
 			if (tooltip.isVisible())
 				tooltip.setVisible(false);
@@ -217,16 +249,22 @@ public class ShortReadTrack extends Track {
 
 	}
 
+	/*
+	 * Mapping of all painted reads, at least in detailed mode
+	 */
+	private HashMap<Rectangle, SAMRecord> hitMap = new HashMap<Rectangle, SAMRecord>();
+
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
 		paintedBlocks.clear();
+		hitMap.clear();
 
 		this.view = view;
 		// /* Store information to be used in other methods */
 		// currentEntry = entry;
 		// currentScreenWidth = screenWidth;
 		seqBuffer = null;
-		this.currentYOffset = yOffset;
+//		this.currentYOffset = yOffset;
 		/* Configuration options */
 		int maxReads = Configuration.getInt("shortread:maxReads");
 		int maxRegion = Configuration.getInt("shortread:maxRegion");
@@ -325,15 +363,16 @@ public class ShortReadTrack extends Track {
 						int clearEnd = one.getAlignmentEnd();
 						SAMRecord two = null;
 						/* Modify empty space finder for paired reads */
-						boolean mateMissing = one.getMateUnmappedFlag();
-						if (!mateMissing && enablePairing) {
+						if (enablePairing) {
 							// ShortReadTools esr = (ShortReadTools) one;
 							if (ShortReadTools.isPaired(one) && ShortReadTools.isFirstInPair(one)) {
 								two = rg.getSecondRead(one);
 								if (two == null) {
-									System.out.println("Pair not found " + one.getMateAlignmentStart() + "\t"
-											+ one.getMateUnmappedFlag() + "\t" + one.getMateReferenceIndex() + "("
-											+ one.getReferenceIndex() + ")");
+									// System.out.println("Pair not found " +
+									// one.getMateAlignmentStart() + "\t"
+									// + one.getMateUnmappedFlag() + "\t" +
+									// one.getMateReferenceIndex() + "("
+									// + one.getReferenceIndex() + ")");
 								}
 							}
 							if (two != null) {
@@ -353,7 +392,7 @@ public class ShortReadTrack extends Track {
 
 						}
 						/* The y-coordinate of the read */
-						int yRec = line * readLineHeight + yOffset;
+						int yRec = line * readLineHeight;
 
 						/* paired read - calculate connection coordinates */
 						if (two != null) {
@@ -376,11 +415,12 @@ public class ShortReadTrack extends Track {
 							}
 
 							g.setColor(pairingColor);
-							g.drawLine(subX1, yRec + readLineHeight / 2, subX2, yRec + readLineHeight / 2);
+							g.drawLine(subX1, yRec + (readLineHeight / 2) + yOffset, subX2, yOffset + yRec
+									+ readLineHeight / 2);
 						}
 						if (line > lines)
 							lines = line;
-
+						g.translate(0, yOffset);
 						boolean paintOne = paintRead(g, one, yRec, screenWidth, readLineHeight, entry, null);
 						boolean paintTwo = false;
 						if (paintOne)
@@ -390,7 +430,7 @@ public class ShortReadTrack extends Track {
 							if (paintTwo)
 								visibleReadCount++;
 						}
-
+						g.translate(0, -yOffset);
 						/* Carve space out of hitmap */
 						// FIXME this range set has to be done because this will
 						// determine the number of lines which will be used to
@@ -512,15 +552,16 @@ public class ShortReadTrack extends Track {
 		int qual = rf.getMappingQuality();
 		g.setColor(c.cg.getColor(qual));
 
-		g.fillRect(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
+		Rectangle r = new Rectangle(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
+		g.fill(r);
 		g.setColor(c.c);
-		if(rf.getMateUnmappedFlag())
+		if (rf.getReadPairedFlag() && rf.getMateUnmappedFlag())
 			g.setColor(Color.RED);
 		g.setStroke(new BasicStroke(2));
-		g.drawRect(subX1, yRec+1, subX2 - subX1, readLineHeight -3);
+		g.drawRect(subX1, yRec + 1, subX2 - subX1, readLineHeight - 3);
 		g.setStroke(new BasicStroke(1));
 		g.setColor(c.c);
-		
+
 		if (otherRead != null) {
 			int subOtherX1 = Convert
 					.translateGenomeToScreen(otherRead.getAlignmentStart(), currentVisible, screenWidth);
@@ -548,7 +589,12 @@ public class ShortReadTrack extends Track {
 		/* Check mismatches */
 		if (entry.sequence().size() == 0)
 			return true;
+		/*
+		 * == Detailed mode ==
+		 */
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+
+			hitMap.put(r, rf);
 			/* If there is no sequence, return immediately */
 			if (entry.sequence().size() == 0)
 				return true;
