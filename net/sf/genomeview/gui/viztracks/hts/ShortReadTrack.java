@@ -126,12 +126,13 @@ public class ShortReadTrack extends Track {
 				text.append("Cigar: " + sr.getCigarString() + "<br/>");
 				text.append("Sequence: " + sr.getReadString() + "<br/>");
 				text.append("Paired: " + sr.getReadPairedFlag() + "<br/>");
-				if (sr.getReadPairedFlag())
+				if (sr.getReadPairedFlag()) {
 					if (!sr.getMateUnmappedFlag())
 						text.append("Mate: " + sr.getMateReferenceName() + ":" + sr.getMateAlignmentStart() + "<br/>");
 					else
 						text.append("Mate missing" + "<br/>");
-
+					text.append("Second: " + sr.getFirstOfPairFlag());
+				}
 				// text.append("<br/>");
 			}
 			text.append("</html>");
@@ -158,10 +159,10 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent source) {
-		System.out.println("Click: " + x + " " + y);
+		//System.out.println("Click: " + x + " " + y);
 		for (java.util.Map.Entry<Rectangle, SAMRecord> e : hitMap.entrySet()) {
 			if (e.getKey().contains(x, y)) {
-				System.out.println("Prijs: " + e.getValue());
+				System.out.println("Click: " + e.getValue());
 				model.selectionModel();
 			}
 		}
@@ -379,9 +380,17 @@ public class ShortReadTrack extends Track {
 			int visibleReadCount = 0;
 			try {
 				for (SAMRecord one : reads) {
+					
+					if (enablePairing && one.getReadPairedFlag() && ShortReadTools.isSecondInPair(one)) {
+						if (rg.getFirstRead(one) == null) {
+							// System.out.println("First read not found");
+						} else if (!one.getMateUnmappedFlag()) {
+							
+							continue;
+						}
 
-					if (enablePairing && one.getReadPairedFlag() && ShortReadTools.isSecondInPair(one))
-						continue;
+					}
+					
 
 					if (visibleReadCount > maxReads) {
 						String msg = "Too many short reads to display, only first " + maxReads + " are displayed ";
@@ -404,14 +413,14 @@ public class ShortReadTrack extends Track {
 
 						break;
 					}
-
+				
 					// int x2 = Convert.translateGenomeToScreen(one.end() + 1,
 					// currentVisible, screenWidth);
 					// if (x2 > 0) {
 					/* Find empty line */
 					int pos = one.getAlignmentStart() - currentVisible.start;
 					int line = tilingCounter.getFreeLine(pos);
-
+					
 					/* Paint read or read pair */
 					if (line < maxStack) {
 						int clearStart = one.getAlignmentStart();
@@ -476,13 +485,13 @@ public class ShortReadTrack extends Track {
 						if (line > lines)
 							lines = line;
 						g.translate(0, yOffset);
-						
-						boolean paintOne = paintRead(g, one, yRec, screenWidth, readLineHeight, entry, null,yOffset);
+
+						boolean paintOne = paintRead(g, one, yRec, screenWidth, readLineHeight, entry, null, yOffset);
 						boolean paintTwo = false;
 						if (paintOne)
 							visibleReadCount++;
 						if (two != null) {
-							paintTwo = paintRead(g, two, yRec, screenWidth, readLineHeight, entry, one,yOffset);
+							paintTwo = paintRead(g, two, yRec, screenWidth, readLineHeight, entry, one, yOffset);
 							if (paintTwo)
 								visibleReadCount++;
 						}
@@ -556,19 +565,18 @@ public class ShortReadTrack extends Track {
 	 * @return Returns true if the read was actually painted, false if it wasn't
 	 */
 	private boolean paintRead(Graphics2D g, SAMRecord rf, int yRec, double screenWidth, int readLineHeight,
-			Entry entry, SAMRecord otherRead,double yOff) {
+			Entry entry, SAMRecord otherRead, double yOff) {
 		/* If outside vertical view, return immediately */
-		
-	
-		if (yRec+yOff > view.getViewRect().y+view.getViewRect().height ) {
+
+		if (yRec + yOff > view.getViewRect().y + view.getViewRect().height) {
 			return false;
 		}
-		if(yRec+yOff < view.getViewRect().y -10){
-			double startY=view.getViewRect().y-yOff;
-			System.out.println("\t"+yRec+"\t"+yOff+")\t"+view.getViewRect().y+"\t"+startY);
+		if (yRec + yOff < view.getViewRect().y - 10) {
+			double startY = view.getViewRect().y - yOff;
+			//System.out.println("\t" + yRec + "\t" + yOff + ")\t" + view.getViewRect().y + "\t" + startY);
 			return false;
 		}
-		
+
 		// System.out.print(",");
 		int subX1 = Convert.translateGenomeToScreen(rf.getAlignmentStart(), currentVisible, screenWidth);
 		int subX2 = Convert.translateGenomeToScreen(rf.getAlignmentEnd() + 1, currentVisible, screenWidth);
