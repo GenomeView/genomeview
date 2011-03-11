@@ -132,7 +132,7 @@ public class ShortReadTrack extends Track {
 					else
 						text.append("Mate missing" + "<br/>");
 
-			//	text.append("<br/>");
+				// text.append("<br/>");
 			}
 			text.append("</html>");
 			if (!text.toString().equals(floater.getText())) {
@@ -169,12 +169,13 @@ public class ShortReadTrack extends Track {
 		return false;
 	}
 
-	public boolean mouseDragged(int x,int y, MouseEvent source){
+	public boolean mouseDragged(int x, int y, MouseEvent source) {
 		tooltip.setVisible(false);
 		readinfo.setVisible(false);
 		return false;
-		
+
 	}
+
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
@@ -194,11 +195,11 @@ public class ShortReadTrack extends Track {
 				if (tooltip.isVisible())
 					tooltip.setVisible(false);
 			}
-//
-//			System.out.println("Moved: " + x + " " + y);
+			//
+			// System.out.println("Moved: " + x + " " + y);
 			for (java.util.Map.Entry<Rectangle, SAMRecord> e : hitMap.entrySet()) {
 				if (e.getKey().contains(x, y)) {
-//					System.out.println("Prijs: " + e.getValue());
+					// System.out.println("Prijs: " + e.getValue());
 					readinfo.set(source, e.getValue());
 				}
 			}
@@ -475,12 +476,13 @@ public class ShortReadTrack extends Track {
 						if (line > lines)
 							lines = line;
 						g.translate(0, yOffset);
-						boolean paintOne = paintRead(g, one, yRec, screenWidth, readLineHeight, entry, null);
+						
+						boolean paintOne = paintRead(g, one, yRec, screenWidth, readLineHeight, entry, null,yOffset);
 						boolean paintTwo = false;
 						if (paintOne)
 							visibleReadCount++;
 						if (two != null) {
-							paintTwo = paintRead(g, two, yRec, screenWidth, readLineHeight, entry, one);
+							paintTwo = paintRead(g, two, yRec, screenWidth, readLineHeight, entry, one,yOffset);
 							if (paintTwo)
 								visibleReadCount++;
 						}
@@ -554,11 +556,20 @@ public class ShortReadTrack extends Track {
 	 * @return Returns true if the read was actually painted, false if it wasn't
 	 */
 	private boolean paintRead(Graphics2D g, SAMRecord rf, int yRec, double screenWidth, int readLineHeight,
-			Entry entry, SAMRecord otherRead) {
+			Entry entry, SAMRecord otherRead,double yOff) {
 		/* If outside vertical view, return immediately */
-		if (yRec < view.getViewRect().y || yRec > view.getViewRect().y + view.getViewRect().height) {
+		
+	
+		if (yRec+yOff > view.getViewRect().y+view.getViewRect().height ) {
 			return false;
 		}
+		if(yRec+yOff < view.getViewRect().y -10){
+			double startY=view.getViewRect().y-yOff;
+			System.out.println("\t"+yRec+"\t"+yOff+")\t"+view.getViewRect().y+"\t"+startY);
+			return false;
+		}
+		
+		// System.out.print(",");
 		int subX1 = Convert.translateGenomeToScreen(rf.getAlignmentStart(), currentVisible, screenWidth);
 		int subX2 = Convert.translateGenomeToScreen(rf.getAlignmentEnd() + 1, currentVisible, screenWidth);
 
