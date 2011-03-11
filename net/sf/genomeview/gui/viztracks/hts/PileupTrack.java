@@ -21,6 +21,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JViewport;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
 import net.sf.genomeview.gui.viztracks.Track;
@@ -95,7 +96,7 @@ public class PileupTrack extends Track {
 			/* The actual data */
 			// Iterable<Pile> piles = provider.get(visible.start, visible.end);
 
-			if (model.getAnnotationLocationVisible().length() < 32000) {
+			if (model.getAnnotationLocationVisible().length() < Configuration.getInt("pileup:switchBarLine")) {
 				// System.out.println("Track: "+this+"\t"+provider);
 				ptm.setVizBuffer(new BarChartBuffer(visible, provider, ptm));
 			} else

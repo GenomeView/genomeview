@@ -50,16 +50,16 @@ public class ShortReadTrack extends Track {
 		super(key, model, true, false);
 	}
 
-	private Tooltip tooltip = new Tooltip();
-	private Tooltip readinfo = new Tooltip();
+	private InsertionTooltip tooltip = new InsertionTooltip();
+	private ReadInfo readinfo = new ReadInfo();
 
-	private class Tooltip extends JWindow {
+	private class InsertionTooltip extends JWindow {
 
 		private static final long serialVersionUID = -7416732151483650659L;
 
 		private JLabel floater = new JLabel();
 
-		public Tooltip() {
+		public InsertionTooltip() {
 			floater.setBackground(Color.GRAY);
 			floater.setForeground(Color.BLACK);
 			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
@@ -98,6 +98,57 @@ public class ShortReadTrack extends Track {
 
 	}
 
+	private class ReadInfo extends JWindow {
+
+		private static final long serialVersionUID = -7416732151483650659L;
+
+		private JLabel floater = new JLabel();
+
+		public ReadInfo() {
+			floater.setBackground(Color.GRAY);
+			floater.setForeground(Color.BLACK);
+			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
+			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+			add(floater);
+			pack();
+		}
+
+		public void set(MouseEvent e, SAMRecord sr) {
+			if (sr == null)
+				return;
+			StringBuffer text = new StringBuffer();
+			text.append("<html>");
+
+			if (sr != null) {
+				text.append("Name: " + sr.getReadName() + "<br/>");
+				text.append("Len: " + sr.getReadLength() + "<br/>");
+				text.append("Cigar: " + sr.getCigarString() + "<br/>");
+				text.append("Sequence: " + sr.getReadString() + "<br/>");
+				text.append("Paired: " + sr.getReadPairedFlag() + "<br/>");
+				if (sr.getReadPairedFlag())
+					if (!sr.getMateUnmappedFlag())
+						text.append("Mate: " + sr.getMateReferenceName() + ":" + sr.getMateAlignmentStart() + "<br/>");
+					else
+						text.append("Mate missing" + "<br/>");
+
+			//	text.append("<br/>");
+			}
+			text.append("</html>");
+			if (!text.toString().equals(floater.getText())) {
+				floater.setText(text.toString());
+				this.pack();
+			}
+			setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
+
+			if (!isVisible()) {
+				setVisible(true);
+			}
+
+		}
+
+	}
+
 	@Override
 	public boolean mouseExited(int x, int y, MouseEvent source) {
 		tooltip.setVisible(false);
@@ -118,11 +169,15 @@ public class ShortReadTrack extends Track {
 		return false;
 	}
 
-	
+	public boolean mouseDragged(int x,int y, MouseEvent source){
+		tooltip.setVisible(false);
+		readinfo.setVisible(false);
+		return false;
+		
+	}
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
 		if (currentVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
-
 			ShortReadInsertion sri = null;
 			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : paintedBlocks.entrySet()) {
 				if (e.getKey().contains(x, y)) {
@@ -130,26 +185,25 @@ public class ShortReadTrack extends Track {
 					break;
 				}
 			}
-			
+
 			if (sri != null) {
-				if(!tooltip.isVisible())
+				if (!tooltip.isVisible())
 					tooltip.setVisible(true);
 				tooltip.set(source, sri);
-			}else{
+			} else {
 				if (tooltip.isVisible())
 					tooltip.setVisible(false);
 			}
-
-			// System.out.println("Click: "+x+" "+y);
-			// for(java.util.Map.Entry<Rectangle,
-			// SAMRecord>e:hitMap.entrySet()){
-			// if(e.getKey().contains(x, y)){
-			// System.out.println("Prijs: "+e.getValue());
-			// model.selectionModel();
-			// }
-			// }
-
-			// return false;
+//
+//			System.out.println("Moved: " + x + " " + y);
+			for (java.util.Map.Entry<Rectangle, SAMRecord> e : hitMap.entrySet()) {
+				if (e.getKey().contains(x, y)) {
+//					System.out.println("Prijs: " + e.getValue());
+					readinfo.set(source, e.getValue());
+				}
+			}
+			//
+			return false;
 
 		} else {
 			if (tooltip.isVisible())
@@ -264,7 +318,7 @@ public class ShortReadTrack extends Track {
 		// currentEntry = entry;
 		// currentScreenWidth = screenWidth;
 		seqBuffer = null;
-//		this.currentYOffset = yOffset;
+		// this.currentYOffset = yOffset;
 		/* Configuration options */
 		int maxReads = Configuration.getInt("shortread:maxReads");
 		int maxRegion = Configuration.getInt("shortread:maxRegion");
