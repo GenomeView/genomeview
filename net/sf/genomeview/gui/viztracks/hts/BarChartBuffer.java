@@ -34,37 +34,50 @@ class BarChartBuffer implements VizBuffer {
 	private Logger log = Logger.getLogger(BarChartBuffer.class.toString());
 	private PileProvider provider;
 
-	private int pileWidth=1;
+	private int pileWidth = 1;
+
+	private double MAX_WIDTH = 2000;
+
 	public BarChartBuffer(Location visible, PileProvider provider, PileupTrackModel ptm) {
 		this.visible = visible;
 		this.provider = provider;
 		this.ptm = ptm;
 
-		detailedRects = new float[2][visible.length()];
+		double factor = MAX_WIDTH / visible.length();
+		// System.out.println("Factor: "+factor);
+		detailedRects = new float[2][(int) MAX_WIDTH];
 		/* Variables for SNP track */
-		nc = new NucCounter(visible.length());
+		if (visible.length() < MAX_WIDTH)
+			nc = new NucCounter(visible.length());
+		else
+			nc = null;
 		// g.setColor(Color.GRAY);
 		// System.out.println("Building rects.");
 		for (Pile p : provider.get(visible.start, visible.end)) {
 			if (p.getPos() + p.getLength() < visible.start || p.getPos() > visible.end)
 				continue;
 
-			if (p.getBases() != null) {
+			if (nc != null && p.getBases() != null) {
 				count(nc, p, visible);
 
 			}
 
-			pileWidth=p.getLength();
+			pileWidth = p.getLength();
 			int startPos = p.getLocation().start;
 			int endPos = p.getLocation().end;
 
-			for (int i = startPos; i <= endPos; i++) {
-				if (i - visible.start >= 0 && i - visible.start < detailedRects[0].length) {
+			int startIdx = (int) ((startPos - visible.start) * factor);
+			int endIdx = (int) ((endPos - visible.start) * factor);
+			// System.out.println("Idex: "+startPos+"\t"+startIdx);
+			// System.out.println("\t"+endPos+"\t"+endIdx);
+			for (int i = startIdx; i <= endIdx; i++) {
+				if (i >= 0 && i < detailedRects[0].length) {
 					float fcov = p.getFCoverage();
 					float rcov = p.getRCoverage();
+					// int pos=i - visible.start;
 
-					detailedRects[0][i - visible.start] = fcov;
-					detailedRects[1][i - visible.start] = rcov;
+					detailedRects[0][i] = fcov;
+					detailedRects[1][i] = rcov;
 
 					double coverage = fcov + rcov;
 
@@ -123,7 +136,8 @@ class BarChartBuffer implements VizBuffer {
 		// System.out.println("Using " + div + ", dynamic: " +
 		// ptm.isDynamicScaling());
 		// System.out.println("\tvalue 20: "+detailedRects[0][20]+"\t"+detailedRects[1][20]);
-		int width = (int) Math.ceil(screenWidth / visible.length());
+		// int width = (int) Math.ceil(screenWidth / detailedRects[0].length);
+		// System.out.println("Draw width:"+width);
 		for (int i = 0; i < detailedRects[0].length; i++) {
 			// int snpOffset = yOffset;
 			double fcov = detailedRects[0][i];
@@ -147,18 +161,24 @@ class BarChartBuffer implements VizBuffer {
 			int fsize = (int) (ffrac * graphLineHeigh);
 			double rfrac = rcov / div;
 			int rsize = (int) (rfrac * graphLineHeigh);
-			int screenX = Convert.translateGenomeToScreen(i + visible.start, visible, screenWidth);
+			double factor = MAX_WIDTH / visible.length();
+			int sLoc = (int) ((i / factor) + visible.start);
+			int eLoc = (int) (((i + 1) / factor) + 1 + visible.start);
+			// System.out.println("LOC: "+sLoc+"\t"+eLoc);
+			int screenX1 = Convert.translateGenomeToScreen(sLoc, visible, screenWidth);
+			int screenX2 = Convert.translateGenomeToScreen(eLoc, visible, screenWidth);
+			// System.out.println("Screen: "+screenX1+"\t"+screenX2);
 			// System.out.println(frac+"\t"+ffrac+"\t"+rfrac);
-			if (screenX > lastX) {
-				lastX = screenX;
+			if (screenX1 > lastX) {
+				lastX = screenX1;
 				g.setColor(Color.ORANGE);
-				g.fillRect(screenX, yOffset + graphLineHeigh - size, width, 2 * size);
+				g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 - screenX1 + 1, 2 * size);
 
 				g.setColor(forwardColor);
-				g.fillRect(screenX, yOffset + graphLineHeigh - fsize, width, fsize);
+				g.fillRect(screenX1, yOffset + graphLineHeigh - fsize, screenX2 - screenX1 + 1, fsize);
 
 				g.setColor(reverseColor);
-				g.fillRect(screenX, yOffset + graphLineHeigh, width, rsize);
+				g.fillRect(screenX1, yOffset + graphLineHeigh, screenX2 - screenX1 + 1, rsize);
 			}
 			// System.out.println("Show individual");
 
@@ -177,59 +197,60 @@ class BarChartBuffer implements VizBuffer {
 		 * reads first as during the iteration over all reads, we store the
 		 * polymorphisms.
 		 */
+		if (visible.length() < MAX_WIDTH) {
+			Sequence sb = ptm.sequence().subsequence(visible.start, visible.end + 1);
+			char[] seqBuffer = new char[visible.length()];
+			int idx = 0;
+			for (char cc : sb.get()) {
+				seqBuffer[idx++] = cc;
+			}
+			// System.out.println("Array: "+Arrays.toString(seqBuffer));
 
-		Sequence sb = ptm.sequence().subsequence(visible.start, visible.end + 1);
-		char[] seqBuffer = new char[visible.length()];
-		int idx = 0;
-		for (char cc : sb.get()) {
-			seqBuffer[idx++] = cc;
-		}
-		// System.out.println("Array: "+Arrays.toString(seqBuffer));
+			char[] nucs = new char[] { 'A', 'T', 'G', 'C' };
+			Color[] color = new Color[4];
+			for (int i = 0; i < 4; i++)
+				color[i] = Configuration.getNucleotideColor(nucs[i]);
+			int nucWidth = (int) (Math.ceil(screenWidth / detailedRects[0].length));
+			if (nc != null && nc.hasData() && seqBuffer != null) {
 
-		char[] nucs = new char[] { 'A', 'T', 'G', 'C' };
-		Color[] color = new Color[4];
-		for (int i = 0; i < 4; i++)
-			color[i] = Configuration.getNucleotideColor(nucs[i]);
-		int nucWidth = (int) (Math.ceil(screenWidth / visible.length()));
-		if (nc.hasData() && seqBuffer != null) {
-
-			g.setColor(Colors.LIGHEST_GRAY);
-			g.fillRect(0, yOffset, (int) screenWidth, snpTrackHeight);
-			g.setColor(Color.LIGHT_GRAY);
-			g.drawLine(0, yOffset + snpTrackHeight / 2, (int) screenWidth, yOffset + snpTrackHeight / 2);
-			g.setColor(Color.BLACK);
-			g.drawString("SNPs", 5, yOffset + snpTrackHeight - 4);
-			// System.out.println("Drawing snps: "+visible);
-			// int skipped = 0;
-			// int totl=0;
-			for (int i = visible.start; i <= visible.end; i++) {
-				int x1 = Convert.translateGenomeToScreen(i, visible, screenWidth);
-				double total = nc.getTotalCount(i - visible.start);
-				char refNt = seqBuffer[i - visible.start];
-				double done = 0;// Fraction gone to previous nucs
-				// System.out.println(seqBuffer[i -
-				// visible.start]+" "+total);
-				if (total > snpTrackMinimumCoverage) {
-					for (int j = 0; j < 4; j++) {
-						if (nucs[j] != refNt) {
-							double fraction = nc.getCount(nucs[j], i - visible.start) / total;
-							fraction *= snpTrackHeight;
-							// totl++;
-							if (fraction > 0.05) {
-								g.setColor(color[j]);
-								g.fillRect(x1, (int) (yOffset + snpTrackHeight - fraction - done), nucWidth,
-										(int) (Math.ceil(fraction)));
+				g.setColor(Colors.LIGHEST_GRAY);
+				g.fillRect(0, yOffset, (int) screenWidth, snpTrackHeight);
+				g.setColor(Color.LIGHT_GRAY);
+				g.drawLine(0, yOffset + snpTrackHeight / 2, (int) screenWidth, yOffset + snpTrackHeight / 2);
+				g.setColor(Color.BLACK);
+				g.drawString("SNPs", 5, yOffset + snpTrackHeight - 4);
+				// System.out.println("Drawing snps: "+visible);
+				// int skipped = 0;
+				// int totl=0;
+				for (int i = visible.start; i <= visible.end; i++) {
+					int x1 = Convert.translateGenomeToScreen(i, visible, screenWidth);
+					double total = nc.getTotalCount(i - visible.start);
+					char refNt = seqBuffer[i - visible.start];
+					double done = 0;// Fraction gone to previous nucs
+					// System.out.println(seqBuffer[i -
+					// visible.start]+" "+total);
+					if (total > snpTrackMinimumCoverage) {
+						for (int j = 0; j < 4; j++) {
+							if (nucs[j] != refNt) {
+								double fraction = nc.getCount(nucs[j], i - visible.start) / total;
+								fraction *= snpTrackHeight;
+								// totl++;
+								if (fraction > 0.05) {
+									g.setColor(color[j]);
+									g.fillRect(x1, (int) (yOffset + snpTrackHeight - fraction - done), nucWidth,
+											(int) (Math.ceil(fraction)));
+								}
+								// else {
+								// skipped++;
+								// }
+								done += fraction;
 							}
-							// else {
-							// skipped++;
-							// }
-							done += fraction;
 						}
 					}
-				}
 
+				}
+				// System.out.println("Skipped: "+skipped +"/"+totl);
 			}
-			// System.out.println("Skipped: "+skipped +"/"+totl);
 		}
 		/* Draw tick labels on coverage plot */
 		g.setColor(Color.BLACK);
@@ -244,7 +265,6 @@ class BarChartBuffer implements VizBuffer {
 		// g.drawString(StaticUtils.shortify(dataKey.toString()), 10, yOffset -
 		// graphLineHeigh + 24 - 2);
 		// else
-	
 
 		return 2 * graphLineHeigh + snpTrackHeight;
 
@@ -261,6 +281,8 @@ class BarChartBuffer implements VizBuffer {
 
 	@Override
 	public String getTooltip(int mouseX) {
+		if (nc == null)
+			return "Not available";
 		nf.setMaximumFractionDigits(1);
 		StringBuffer text = new StringBuffer();
 
@@ -268,9 +290,9 @@ class BarChartBuffer implements VizBuffer {
 		text.append("<html>");
 		int total = nc.getTotalCount(effectivePosition);
 
-		text.append("<strong>Window length: </strong>"+pileWidth+"<br/>");
+		text.append("<strong>Window length: </strong>" + pileWidth + "<br/>");
 		if (nc.hasData()) {
-			
+
 			text.append("<strong>Matches:</strong> " + format(nc.getCount('.', effectivePosition), total) + "<br/>");
 			text.append("<strong>Mismatches:</strong><br/>");
 			text.append("A: " + format(nc.getCount('A', effectivePosition), total));
