@@ -752,7 +752,9 @@ public class Model extends Observable implements IModel {
 	 */
 	public void remove(Track track) {
 		if (!(track instanceof StructureTrack) && !(track instanceof TickmarkTrack)) {
-			getSelectedEntry().remove(track.getDataKey());
+			for(Entry e:entries){
+				e.remove(track.getDataKey());
+			}
 			trackList.remove(track.getDataKey());
 		}
 		setChanged();
