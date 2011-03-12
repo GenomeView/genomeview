@@ -159,7 +159,7 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent source) {
-		//System.out.println("Click: " + x + " " + y);
+		// System.out.println("Click: " + x + " " + y);
 		for (java.util.Map.Entry<Rectangle, SAMRecord> e : hitMap.entrySet()) {
 			if (e.getKey().contains(x, y)) {
 				System.out.println("Click: " + e.getValue());
@@ -380,17 +380,16 @@ public class ShortReadTrack extends Track {
 			int visibleReadCount = 0;
 			try {
 				for (SAMRecord one : reads) {
-					
+
 					if (enablePairing && one.getReadPairedFlag() && ShortReadTools.isSecondInPair(one)) {
 						if (rg.getFirstRead(one) == null) {
 							// System.out.println("First read not found");
 						} else if (!one.getMateUnmappedFlag()) {
-							
+
 							continue;
 						}
 
 					}
-					
 
 					if (visibleReadCount > maxReads) {
 						String msg = "Too many short reads to display, only first " + maxReads + " are displayed ";
@@ -413,14 +412,14 @@ public class ShortReadTrack extends Track {
 
 						break;
 					}
-				
+
 					// int x2 = Convert.translateGenomeToScreen(one.end() + 1,
 					// currentVisible, screenWidth);
 					// if (x2 > 0) {
 					/* Find empty line */
 					int pos = one.getAlignmentStart() - currentVisible.start;
 					int line = tilingCounter.getFreeLine(pos);
-					
+
 					/* Paint read or read pair */
 					if (line < maxStack) {
 						int clearStart = one.getAlignmentStart();
@@ -431,12 +430,9 @@ public class ShortReadTrack extends Track {
 							// ShortReadTools esr = (ShortReadTools) one;
 							if (ShortReadTools.isPaired(one) && ShortReadTools.isFirstInPair(one)) {
 								two = rg.getSecondRead(one);
-								if (two == null) {
-									// System.out.println("Pair not found " +
-									// one.getMateAlignmentStart() + "\t"
-									// + one.getMateUnmappedFlag() + "\t" +
-									// one.getMateReferenceIndex() + "("
-									// + one.getReferenceIndex() + ")");
+								if (two !=null&& one.getReferenceIndex() != two.getReferenceIndex()) {
+									System.out.println("Different indices: "+one.getReadName()+"\t"+two.getReferenceName());
+									
 								}
 							}
 							if (two != null) {
@@ -573,7 +569,8 @@ public class ShortReadTrack extends Track {
 		}
 		if (yRec + yOff < view.getViewRect().y - 10) {
 			double startY = view.getViewRect().y - yOff;
-			//System.out.println("\t" + yRec + "\t" + yOff + ")\t" + view.getViewRect().y + "\t" + startY);
+			// System.out.println("\t" + yRec + "\t" + yOff + ")\t" +
+			// view.getViewRect().y + "\t" + startY);
 			return false;
 		}
 
