@@ -26,7 +26,9 @@ import net.sf.jannot.refseq.Sequence;
  */
 class BarChartBuffer implements VizBuffer {
 	/* Data for pileupgraph barchart */
-	private float[][] detailedRects = null;
+	private double[][] detailedRects = null;
+	/* Actual coverage values for barchart */
+	//private double[][] covValues = null;
 	private Location visible;
 	private double localMaxPile = 0;
 	private NucCounter nc;
@@ -45,7 +47,8 @@ class BarChartBuffer implements VizBuffer {
 
 		double factor = MAX_WIDTH / visible.length();
 		// System.out.println("Factor: "+factor);
-		detailedRects = new float[2][(int) MAX_WIDTH];
+		detailedRects = new double[2][(int) MAX_WIDTH];
+		//covValues = new double[2][(int) MAX_WIDTH];
 		/* Variables for SNP track */
 		if (visible.length() < MAX_WIDTH)
 			nc = new NucCounter(visible.length());
@@ -78,6 +81,8 @@ class BarChartBuffer implements VizBuffer {
 
 					detailedRects[0][i] = fcov;
 					detailedRects[1][i] = rcov;
+//					covValues[0][i] = fcov;
+//					covValues[1][i] = rcov;
 
 					double coverage = fcov + rcov;
 
@@ -278,37 +283,42 @@ class BarChartBuffer implements VizBuffer {
 	}
 
 	private NumberFormat nf = NumberFormat.getPercentInstance(Locale.US);
-
+	private NumberFormat nrReg=NumberFormat.getInstance(Locale.US);
 	@Override
 	public String getTooltip(int mouseX) {
-		if (nc == null)
-			return "Not available";
+		double factor = MAX_WIDTH / visible.length();
+
 		nf.setMaximumFractionDigits(1);
+		nrReg.setMaximumFractionDigits(1);
 		StringBuffer text = new StringBuffer();
 
-		int effectivePosition = Convert.translateScreenToGenome(mouseX, visible, ptm.getScreenWidth()) - visible.start;// track.translateFromMouse(e.getX());
+		int effectivePosition = (int) (factor * (Convert.translateScreenToGenome(mouseX, visible, ptm.getScreenWidth()) - visible.start));// track.translateFromMouse(e.getX());
 		text.append("<html>");
-		int total = nc.getTotalCount(effectivePosition);
-
 		text.append("<strong>Window length: </strong>" + pileWidth + "<br/>");
-		if (nc.hasData()) {
 
-			text.append("<strong>Matches:</strong> " + format(nc.getCount('.', effectivePosition), total) + "<br/>");
-			text.append("<strong>Mismatches:</strong><br/>");
-			text.append("A: " + format(nc.getCount('A', effectivePosition), total));
-			text.append("<br/>");
-			text.append("T: " + format(nc.getCount('T', effectivePosition), total));
-			text.append("<br/>");
-			text.append("G: " + format(nc.getCount('G', effectivePosition), total));
-			text.append("<br/>");
-			text.append("C: " + format(nc.getCount('C', effectivePosition), total));
-			text.append("<br/>");
+		if (nc != null) {
+
+			int total = nc.getTotalCount(effectivePosition);
+
+			if (nc.hasData()) {
+
+				text.append("<strong>Matches:</strong> " + format(nc.getCount('.', effectivePosition), total) + "<br/>");
+				text.append("<strong>Mismatches:</strong><br/>");
+				text.append("A: " + format(nc.getCount('A', effectivePosition), total));
+				text.append("<br/>");
+				text.append("T: " + format(nc.getCount('T', effectivePosition), total));
+				text.append("<br/>");
+				text.append("G: " + format(nc.getCount('G', effectivePosition), total));
+				text.append("<br/>");
+				text.append("C: " + format(nc.getCount('C', effectivePosition), total));
+				text.append("<br/>");
+			}
+			
 		}
 		text.append("<strong>Coverage:</strong> "
-				+ (detailedRects[0][effectivePosition] + detailedRects[1][effectivePosition]) + "<br/>");
-		text.append("Forward: " + detailedRects[0][effectivePosition] + "<br/>");
-		text.append("Reverse: " + detailedRects[1][effectivePosition] + "<br/>");
-
+				+  nf.format(detailedRects[0][effectivePosition] + detailedRects[1][effectivePosition]) + "<br/>");
+		text.append("Forward: " + nrReg.format(detailedRects[0][effectivePosition]) + "<br/>");
+		text.append("Reverse: " + nrReg.format(detailedRects[1][effectivePosition]) + "<br/>");
 		text.append("</html>");
 		return text.toString();
 	}
