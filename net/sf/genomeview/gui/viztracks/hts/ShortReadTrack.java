@@ -430,10 +430,14 @@ public class ShortReadTrack extends Track {
 							// ShortReadTools esr = (ShortReadTools) one;
 							if (ShortReadTools.isPaired(one) && ShortReadTools.isFirstInPair(one)) {
 								two = rg.getSecondRead(one);
-								if (two !=null&& one.getReferenceIndex() != two.getReferenceIndex()) {
-									System.out.println("Different indices: "+one.getReadName()+"\t"+two.getReferenceName());
-									
+								if(!one.getMateUnmappedFlag()&&one.getReferenceIndex()!=one.getMateReferenceIndex()){
+									System.out.println("Different indices: "+one.getReferenceIndex()+"\t"+one.getMateReferenceIndex());
 								}
+							
+//								if (two !=null&& one.getReferenceIndex() != two.getReferenceIndex()) {
+//									System.out.println("Different indices: "+one.getReadName()+"\t"+two.getReferenceName());
+//									
+//								}
 							}
 							if (two != null) {
 								if (two.getAlignmentStart() < one.getAlignmentStart()) {
