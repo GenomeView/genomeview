@@ -160,10 +160,12 @@ public class ShortReadTrack extends Track {
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent source) {
 		// System.out.println("Click: " + x + " " + y);
-		for (java.util.Map.Entry<Rectangle, SAMRecord> e : hitMap.entrySet()) {
-			if (e.getKey().contains(x, y)) {
-				System.out.println("Click: " + e.getValue());
-				model.selectionModel();
+		if (source.getClickCount() > 1) {
+			for (java.util.Map.Entry<Rectangle, SAMRecord> e : hitMap.entrySet()) {
+				if (e.getKey().contains(x, y)) {
+					System.out.println("2*Click: " + e.getValue());
+					model.center(e.getValue().getMateAlignmentStart());
+				}
 			}
 		}
 
@@ -430,14 +432,17 @@ public class ShortReadTrack extends Track {
 							// ShortReadTools esr = (ShortReadTools) one;
 							if (ShortReadTools.isPaired(one) && ShortReadTools.isFirstInPair(one)) {
 								two = rg.getSecondRead(one);
-								if(!one.getMateUnmappedFlag()&&one.getReferenceIndex()!=one.getMateReferenceIndex()){
-									System.out.println("Different indices: "+one.getReferenceIndex()+"\t"+one.getMateReferenceIndex());
+								if (!one.getMateUnmappedFlag()
+										&& one.getReferenceIndex() != one.getMateReferenceIndex()&&one.getMateReferenceIndex()!=-1) {
+									System.out.println("Different indices: " + one.getReferenceIndex() + "\t"
+											+ one.getMateReferenceIndex());
 								}
-							
-//								if (two !=null&& one.getReferenceIndex() != two.getReferenceIndex()) {
-//									System.out.println("Different indices: "+one.getReadName()+"\t"+two.getReferenceName());
-//									
-//								}
+
+								// if (two !=null&& one.getReferenceIndex() !=
+								// two.getReferenceIndex()) {
+								// System.out.println("Different indices: "+one.getReadName()+"\t"+two.getReferenceName());
+								//
+								// }
 							}
 							if (two != null) {
 								if (two.getAlignmentStart() < one.getAlignmentStart()) {
