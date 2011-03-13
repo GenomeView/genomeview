@@ -164,7 +164,8 @@ public class ShortReadTrack extends Track {
 			for (java.util.Map.Entry<Rectangle, SAMRecord> e : hitMap.entrySet()) {
 				if (e.getKey().contains(x, y)) {
 					System.out.println("2*Click: " + e.getValue());
-					model.center(e.getValue().getMateAlignmentStart());
+					if(e.getValue().getReadPairedFlag()&&!e.getValue().getMateUnmappedFlag())
+						model.center(e.getValue().getMateAlignmentStart());
 				}
 			}
 		}
