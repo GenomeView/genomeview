@@ -315,7 +315,7 @@ class BarChartBuffer implements VizBuffer {
 			}
 			
 		}
-		text.append("<strong>Coverage:</strong> "
+		text.append("<strong>"+(pileWidth>1?"Average":"")+"Coverage:</strong> "
 				+  nrReg.format(detailedRects[0][effectivePosition] + detailedRects[1][effectivePosition]) + "<br/>");
 		text.append("Forward: " + nrReg.format(detailedRects[0][effectivePosition]) + "<br/>");
 		text.append("Reverse: " + nrReg.format(detailedRects[1][effectivePosition]) + "<br/>");
