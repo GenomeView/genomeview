@@ -5,6 +5,8 @@ package net.sf.genomeview.data.provider;
 
 import java.util.ArrayList;
 
+import org.broad.igv.track.WindowFunction;
+
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
@@ -18,10 +20,7 @@ import net.sf.jannot.tdf.TDFData;
  */
 public class TDFProvider extends PileProvider {
 	
-	//FIXME this class may expose the window functions and so on
-	
 	private TDFData source;
-//	private Model model;
 
 	public TDFProvider(Entry e, TDFData source, Model model) {
 		this.source = source;
@@ -32,8 +31,9 @@ public class TDFProvider extends PileProvider {
 
 	private int lastStart = -1;
 	private int lastEnd = -1;
-//	private float maxSummary;
+//	privFate float maxSummary;
 	private float maxPile;
+
 
 	@Override
 	public Iterable<Pile> get(int start, int end) {
@@ -47,7 +47,7 @@ public class TDFProvider extends PileProvider {
 		lastEnd = end;
 
 		buffer.clear();
-
+		
 		Iterable<Pile> fresh = source.get(start, end);
 		
 		for (Pile p : fresh) {
@@ -77,6 +77,33 @@ public class TDFProvider extends PileProvider {
 	@Override
 	public Data<Pile> getSourceData() {
 		return source;
+	}
+
+	@Override
+	public WindowFunction[] getWindowFunctions() {
+		return source.availableWindowFunctions().toArray(new WindowFunction[0]);
+	}
+
+	@Override
+	public void requestWindowFunction(WindowFunction wf) {
+		//System.out.println("WF in TDF: "+wf);
+		if(source.availableWindowFunctions().contains(wf)){
+			//System.out.println("\tWe are nwo using WF: "+wf);
+			source.requestWindowFunction(wf);
+			lastStart = -1;
+			lastEnd = -1;
+			maxPile=0;
+			buffer.clear();
+			setChanged();
+			notifyObservers();
+		}
+		
+		
+	}
+
+	@Override
+	public boolean isCurrentWindowFunction(WindowFunction wf) {
+		return source.isCurrentWindowFunction(wf);
 	}
 
 	

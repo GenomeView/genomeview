@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.viztracks.hts;
 
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -16,10 +17,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JViewport;
+
+import org.broad.igv.track.WindowFunction;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
@@ -179,6 +185,26 @@ public class PileupTrack extends Track {
 			}
 		});
 		out.add(item2);
+		
+		
+		ButtonGroup bg=new ButtonGroup();
+		for(final WindowFunction wf:provider.getWindowFunctions()){
+			final JRadioButtonMenuItem jbm=new JRadioButtonMenuItem();
+			jbm.setAction(new AbstractAction(wf.toString()) {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					jbm.setSelected(true);
+					//System.out.println("Requesting "+wf.toString());
+					provider.requestWindowFunction(wf);	
+				}
+			});
+			if(provider.isCurrentWindowFunction(wf))
+				jbm.setSelected(true);
+			bg.add(jbm);
+			out.add(jbm);
+		}
+		
 		return out;
 	}
 

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.broad.igv.track.WindowFunction;
+
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
@@ -99,5 +101,22 @@ public class WiggleProvider extends PileProvider implements Observer {
 	@Override
 	public Data<Pile> getSourceData() {
 		return source;
+	}
+
+	@Override
+	public WindowFunction[] getWindowFunctions() {
+		return new WindowFunction[]{WindowFunction.mean};
+	}
+
+	@Override
+	public void requestWindowFunction(WindowFunction wf) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isCurrentWindowFunction(WindowFunction wf) {
+		// TODO Auto-generated method stub
+		return true;
 	}
 }
