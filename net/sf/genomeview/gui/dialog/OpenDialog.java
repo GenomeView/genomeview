@@ -55,7 +55,8 @@ public class OpenDialog extends JDialog {
 	private Model model;
 
 	private final String[] exts = new String[] { "fasta", "fa", "fas", "embl", "fna", "gtf", "gff", "gff3", "maln",
-			"syn", "wig", "mfa", "bed", "mapview", "bai", "maf", "snp", "tbl", "gb", "gbk", "pileup", "con", "peaks","tdf" };
+			"syn", "wig", "mfa", "bed", "mapview", "bai", "maf", "snp", "tbl", "gb", "gbk", "pileup", "con", "peaks",
+			"tdf" };
 
 	private void load(DataSource[] data) {
 
@@ -110,7 +111,30 @@ public class OpenDialog extends JDialog {
 				_self.dispose();
 				JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
 				chooser.resetChoosableFileFilters();
+				for (final String ext : exts) {
+					chooser.addChoosableFileFilter(new FileFilter() {
 
+						@Override
+						public boolean accept(File f) {
+							if (f.isDirectory())
+								return true;
+
+							if (f.getName().toLowerCase().endsWith(ext)
+									|| f.getName().toLowerCase().endsWith(ext + ".gz")
+									|| f.getName().toLowerCase().endsWith(ext + ".bgz")) {
+								return true;
+							}
+
+							return false;
+						}
+
+						@Override
+						public String getDescription() {
+							return ext;
+						}
+
+					});
+				}
 				chooser.addChoosableFileFilter(new FileFilter() {
 
 					@Override
@@ -198,8 +222,8 @@ public class OpenDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
 				try {
-					String url = JOptionPane.showInputDialog(model.getGUIManager().getParent(), "Give the URL of the data")
-							.trim();
+					String url = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+							"Give the URL of the data").trim();
 					DAS das = new DAS(url);
 					List<String> refs = das.getReferences();
 					Collections.sort(refs);
@@ -251,22 +275,26 @@ public class OpenDialog extends JDialog {
 
 	}
 
-//	public void doSomething() {
-//		Sources source = (Sources) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-//				"Select feature source", "Data selection", JOptionPane.INFORMATION_MESSAGE, null, Sources.values(),
-//				Sources.values()[0]);
-//		if (source != null) {
-//			DataSource[] data = DataMenu.create(source, model, new String[] { "fasta", "fa", "fas", "embl", "fna",
-//					"gtf", "gff", "gff3", "maln", "syn", "wig", "mfa", "bed", "mapview", "bai", "maf", "snp", "tbl",
-//					"gb", "gbk", "pileup", "con", "peaks" });
-//			if (data != null) {
-//				for (DataSource ds : data) {
-//					final ReadWorker rw = new ReadWorker(ds, model);
-//					rw.execute();
-//				}
-//
-//			}
-//		}
-//	}
+	// public void doSomething() {
+	// Sources source = (Sources)
+	// JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+	// "Select feature source", "Data selection",
+	// JOptionPane.INFORMATION_MESSAGE, null, Sources.values(),
+	// Sources.values()[0]);
+	// if (source != null) {
+	// DataSource[] data = DataMenu.create(source, model, new String[] {
+	// "fasta", "fa", "fas", "embl", "fna",
+	// "gtf", "gff", "gff3", "maln", "syn", "wig", "mfa", "bed", "mapview",
+	// "bai", "maf", "snp", "tbl",
+	// "gb", "gbk", "pileup", "con", "peaks" });
+	// if (data != null) {
+	// for (DataSource ds : data) {
+	// final ReadWorker rw = new ReadWorker(ds, model);
+	// rw.execute();
+	// }
+	//
+	// }
+	// }
+	// }
 
 }
