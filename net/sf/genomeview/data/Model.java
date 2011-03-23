@@ -573,6 +573,7 @@ public class Model extends Observable implements IModel {
 		return trackList;
 	}
 
+	
 	/**
 	 * This method keeps the track list up to date when adding new data to the
 	 * entry from outside the model.
@@ -603,12 +604,12 @@ public class Model extends Observable implements IModel {
 
 				if (data instanceof PileupWrapper || data instanceof SWigWrapper ) {
 					if (!trackList.containsTrack(key))
-						trackList.add(key,new PileupTrack(new WiggleProvider(e, (Data<Pile>)data,this), this));
+						trackList.add(key,new PileupTrack(key,new WiggleProvider(e, (Data<Pile>)data,this), this));
 				}
 				
 				if (data instanceof TDFData ) {
 					if (!trackList.containsTrack(key))
-						trackList.add(key,new PileupTrack(new TDFProvider(e, (TDFData)data,this), this));
+						trackList.add(key,new PileupTrack(key,new TDFProvider(e, (TDFData)data,this), this));
 				}
 				
 

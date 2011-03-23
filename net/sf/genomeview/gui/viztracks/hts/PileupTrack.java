@@ -31,6 +31,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
 import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;
 
 /**
@@ -44,8 +45,8 @@ public class PileupTrack extends Track {
 	private PileProvider provider;
 	//private String label;
 
-	public PileupTrack(PileProvider provider, final Model model) {
-		super( model, true, false);
+	public PileupTrack(DataKey key,PileProvider provider, final Model model) {
+		super(key, model, true, false);
 		
 
 		ptm = new PileupTrackModel(model);

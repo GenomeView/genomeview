@@ -27,12 +27,12 @@ import net.sf.jannot.Entry;
 public abstract class Track extends Observable {
 
 	protected Model model;
-	@Deprecated
+
 	protected DataKey dataKey;
 	protected Entry entry;
 
 
-	@Deprecated
+	
 	public Track(DataKey key, Model model, boolean visible, boolean collapsible) {
 		this.model = model;
 		this.dataKey = key;
@@ -42,13 +42,13 @@ public abstract class Track extends Observable {
 		this.addObserver(model);
 	}
 
-	public Track(Model model, boolean visible, boolean collapsible) {
-		this.model = model;
-		this.visible = visible;
-		this.entry = model.getSelectedEntry();
-		this.collapsible = collapsible;
-		this.addObserver(model);
-	}
+//	public Track(Model model, boolean visible, boolean collapsible) {
+//		this.model = model;
+//		this.visible = visible;
+//		this.entry = model.getSelectedEntry();
+//		this.collapsible = collapsible;
+//		this.addObserver(model);
+//	}
 
 	private boolean visible;
 	private static final Logger log = Logger.getLogger(Track.class.getCanonicalName());
