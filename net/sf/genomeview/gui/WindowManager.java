@@ -15,6 +15,9 @@ import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutionException;
@@ -88,7 +91,6 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 	}
 
-
 	/**
 	 * Just see if the user tries to close the window directly and tell the
 	 * model if this would happen.
@@ -127,19 +129,66 @@ public class WindowManager extends WindowAdapter implements Observer {
 			if (running < 1) {
 				logger.info("No instances left, exiting VM");
 				Cleaner.exit();
-				for(Frame frame:Frame.getFrames()){
-					frame.dispose();
-				}
-				
-				//System.exit(0);
+
+				// System.exit(0);
 				System.out.println("We should be exiting here, if it doesn't happen, we will need to do some work...");
+
+				for (Frame f : Frame.getFrames()) {
+					System.out.println("Disposing loose frame: " + f);
+					f.dispose();
+				}
+				// Dumping all running threads that are holding up the show
+				System.out.println("Dumping all running threads");
+				Thread[] threads = getAllThreads();
+				for (Thread id : threads) {
+					System.out.println(id.getName() + "\t" + id.isDaemon() + "\t" + id.isAlive());
+
+				}
+
+				/*
+				 * Due to some bugs in AWT, Swing and some other stuff, we need
+				 * to force webstart applications to shut down
+				 * 
+				 * http://stackoverflow.com/questions/212009/do-i-have-to-explicitly
+				 * -call-system-exit-in-a-webstart-application
+				 * 
+				 * http://stackoverflow.com/questions/216315/what-is-the-best-way
+				 * -to-detect-whether-an-application-is-launched-by-webstart
+				 */
+				if (Environment.isWebstart() && !Environment.isMac()) {
+					// This will make sure the application exits.
+					// We don't want to do this on Mac because it will exit the
+					// browser as well if running as an Applet.
+					System.exit(0);
+				}
+
 			}
 		}
-		
-		
-		
-		
 
+	}
+
+	private ThreadGroup getRootThreadGroup() {
+		// if ( rootThreadGroup != null )
+		// return rootThreadGroup;
+		ThreadGroup tg = Thread.currentThread().getThreadGroup();
+		ThreadGroup ptg;
+		while ((ptg = tg.getParent()) != null)
+			tg = ptg;
+		return tg;
+	}
+
+	private Thread[] getAllThreads() {
+		final ThreadGroup root = getRootThreadGroup();
+		final ThreadMXBean thbean = ManagementFactory.getThreadMXBean();
+		int nAlloc = thbean.getThreadCount();
+		int n = 0;
+		Thread[] threads;
+		do {
+			nAlloc *= 2;
+			threads = new Thread[nAlloc];
+			n = root.enumerate(threads, true);
+		} while (n == nAlloc);
+		return java.util.Arrays.copyOf(threads, n);
 	}
 
 	public void init(String[] args, Splash splash) throws InterruptedException, ExecutionException {
@@ -163,12 +212,10 @@ public class WindowManager extends WindowAdapter implements Observer {
 				"Provide a session file that contains all the files that have to be loaded.");
 
 		Option idO = parser.addHelp(parser.addStringOption("id"),
-		"Instance ID for this GenomeView instance, useful to control multiple GVs at once.");
-		
-		
-		
+				"Instance ID for this GenomeView instance, useful to control multiple GVs at once.");
+
 		boolean goodParse = parse(parser, args);
-	
+
 		if (parser.checkHelp()) {
 			System.exit(0);
 		}
@@ -177,17 +224,18 @@ public class WindowManager extends WindowAdapter implements Observer {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice[] gs = ge.getScreenDevices();
 		boolean freshwindow = false;
-		
+
 		if (model == null) {
-			model = new Model((String) parser.getOptionValue(idO),(String) parser.getOptionValue(configurationO));
+			model = new Model((String) parser.getOptionValue(idO), (String) parser.getOptionValue(configurationO));
 			model.addObserver(this);
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new Hotkeys(model));
 		}
-		
+
 		if (window == null) {
 			freshwindow = true;
 			logger.info("Creating new window");
-			window = new GenomeViewWindow(model,"GenomeView :: " + Configuration.version(), gs[0].getDefaultConfiguration());
+			window = new GenomeViewWindow(model, "GenomeView :: " + Configuration.version(),
+					gs[0].getDefaultConfiguration());
 			model.getGUIManager().registerMainWindow(window);
 			window.setIconImage(Icons.MINILOGO);
 			window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -195,7 +243,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 			window.getRootPane().setTransferHandler(new DropTransferHandler(model));
 
 		}
-	
+
 		/* Make sure the model is empty */
 		model.setSilent(true);
 		model.clearEntries();
@@ -211,7 +259,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 			if (content.length > 1) {
 				for (int i = 1; i < content.length; i++) {
-					helper = new GenomeViewWindow(model,"GenomeView :: " + Configuration.version(), gs[i].getDefaultConfiguration());
+					helper = new GenomeViewWindow(model, "GenomeView :: " + Configuration.version(),
+							gs[i].getDefaultConfiguration());
 					helper.setJMenuBar(new MainMenu(model));
 					helper.setIconImage(new ImageIcon(this.getClass().getResource("/images/gv2.png")).getImage());
 					helper.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -233,15 +282,48 @@ public class WindowManager extends WindowAdapter implements Observer {
 			String session = (String) parser.getOptionValue(sessionO);
 			String[] remArgs = parser.getRemainingArgs();
 			String initialLocation = (String) parser.getOptionValue(positionO);
-			
+
 			idl.init(cmdUrl, cmdFile, remArgs, initialLocation, session);
 		} else {
-			idl.init( null, null, new String[0], null, null);
+			idl.init(null, null, new String[0], null, null);
 		}
 
-		ReferenceMissingMonitor rmm=new ReferenceMissingMonitor(model);
+		ReferenceMissingMonitor rmm = new ReferenceMissingMonitor(model);
 		/* Start acting */
 		model.setSilent(false);
+
+	}
+
+}
+
+/**
+ * Information about the environment that the application is running in.
+ * 
+ * @author Thomas Abeel
+ * 
+ */
+class Environment {
+	public static boolean isWebstart() {
+		/* While this may not work 100%, it is better than nothing :-/ */
+		return System.getProperty("javawebstart.version", null) != null;
+
+	}
+
+	public static boolean isWindows() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return (os.indexOf("win") >= 0);
+
+	}
+
+	public static boolean isNix() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0);
+
+	}
+
+	public static boolean isMac() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return (os.indexOf("mac") >= 0);
 
 	}
 
