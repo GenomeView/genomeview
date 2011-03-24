@@ -1,2 +1,2 @@
 Main-Class: net.sf.genomeview.gui.GenomeView
-Class-path: lib/jannot-1473.jar lib/sam-1.35.jar lib/jargs.jar lib/ajt-2.7.jar lib/commons-logging.jar lib/collections-1.0.jar
+Class-path: lib/jannot-1488.jar lib/sam-1.35.jar lib/jargs.jar lib/ajt-2.7.jar lib/commons-logging.jar lib/collections-1.0.jar
