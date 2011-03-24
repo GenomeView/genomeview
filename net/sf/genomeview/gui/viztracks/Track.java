@@ -205,7 +205,7 @@ public abstract class Track extends Observable {
 	
 	public abstract String displayName();
 
-	@Deprecated
+
 	public DataKey getDataKey() {
 		return dataKey;
 	}
