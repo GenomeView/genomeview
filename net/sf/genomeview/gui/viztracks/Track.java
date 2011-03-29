@@ -42,14 +42,6 @@ public abstract class Track extends Observable {
 		this.addObserver(model);
 	}
 
-//	public Track(Model model, boolean visible, boolean collapsible) {
-//		this.model = model;
-//		this.visible = visible;
-//		this.entry = model.getSelectedEntry();
-//		this.collapsible = collapsible;
-//		this.addObserver(model);
-//	}
-
 	private boolean visible;
 	private static final Logger log = Logger.getLogger(Track.class.getCanonicalName());
 
@@ -170,7 +162,7 @@ public abstract class Track extends Observable {
 	/* Keeps track of whether a track is collapsible */
 	private boolean collapsible = false;
 	/* Keeps track of the actual collapse state of the track */
-	private boolean collapsed = false;
+	private boolean collapsed = true;
 
 	protected void setCollapsible(boolean collapsible) {
 		this.collapsible = collapsible;
