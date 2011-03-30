@@ -129,7 +129,7 @@ class BarChartBuffer implements VizBuffer {
 		Color forwardColor = Configuration.getColor("shortread:forwardColor");
 		Color reverseColor = Configuration.getColor("shortread:reverseColor");
 		int graphLineHeigh = Configuration.getInt("shortread:graphLineHeight");
-		int snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
+//		int snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
 		int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
 
 		// System.out.println("Drawing bar charts with " + pCount +
@@ -202,6 +202,7 @@ class BarChartBuffer implements VizBuffer {
 		 * reads first as during the iteration over all reads, we store the
 		 * polymorphisms.
 		 */
+		int snpTrackHeight=0;
 		if (visible.length() < MAX_WIDTH) {
 			Sequence sb = ptm.sequence().subsequence(visible.start, visible.end + 1);
 			char[] seqBuffer = new char[visible.length()];
@@ -217,7 +218,7 @@ class BarChartBuffer implements VizBuffer {
 				color[i] = Configuration.getNucleotideColor(nucs[i]);
 			int nucWidth = (int) (Math.ceil(screenWidth / detailedRects[0].length));
 			if (nc != null && nc.hasData() && seqBuffer != null) {
-
+				snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
 				g.setColor(Colors.LIGHEST_GRAY);
 				g.fillRect(0, yOffset, (int) screenWidth, snpTrackHeight);
 				g.setColor(Color.LIGHT_GRAY);
@@ -257,6 +258,7 @@ class BarChartBuffer implements VizBuffer {
 				// System.out.println("Skipped: "+skipped +"/"+totl);
 			}
 		}
+			
 		/* Draw tick labels on coverage plot */
 		g.setColor(Color.BLACK);
 		g.drawLine(0, yOffset, 5, yOffset);
