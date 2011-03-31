@@ -349,11 +349,11 @@ public class ShortReadTrack extends Track {
 		if (entry.get(dataKey) instanceof BAMreads)
 			pairLength = ((BAMreads) entry.get(dataKey)).getPairLength();
 
-		if (!isCollapsed() && (currentVisible.length() > maxRegion)) {
+		if (currentVisible.length() > maxRegion) {
 			g.setColor(Color.BLACK);
 			g.drawString("Region too big (max " + maxRegion + " nt), zoom in", (int) (screenWidth / 2), yOffset + 10);
 			yOffset += 20 + 5;
-		} else if (!isCollapsed()) {
+		} else {
 			/* Access to BAMread is through buffer for performance! */
 			reads = rg.get(currentVisible.start, currentVisible.end);
 
