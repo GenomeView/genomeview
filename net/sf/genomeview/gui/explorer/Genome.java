@@ -60,9 +60,13 @@ class Genome extends GridBagPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
+					picture.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					repaint();
 					Session.loadSession(model, url);
 				} catch (IOException e1) {
 					CrashHandler.showErrorMessage("Could not load this session.", e1);
+				}finally{
+					picture.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				}
 			}
 
