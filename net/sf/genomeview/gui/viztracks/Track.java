@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import javax.swing.JViewport;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.DataKey;
@@ -162,7 +163,7 @@ public abstract class Track extends Observable {
 	/* Keeps track of whether a track is collapsible */
 	private boolean collapsible = false;
 	/* Keeps track of the actual collapse state of the track */
-	private boolean collapsed = true;
+	private boolean collapsed = Configuration.getBoolean("track:defaultCollapse");
 
 	protected void setCollapsible(boolean collapsible) {
 		this.collapsible = collapsible;
