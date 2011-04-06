@@ -7,9 +7,27 @@ images/instances/c_elegans.jpg
 	Bob Goldstein, UNC Chapel Hill http://www.bio.unc.edu/Faculty/Goldstein/lab/
 	
 images/instances/d_melanogaster.jpg
-	Andr� Karwath aka Aka	
-	
+	André Karwath aka Aka	
+
 images/boxopen.png
 	Author: 	DryIcons
 	Homepage: 	http://dryicons.com
 	License: 	DryIcons Terms of Use: http://dryicons.com/terms/
+
+images/instances/mouse.jpg
+	Description 	Мышь 2.jpg
+	Русский: Мышь домовая, 	Mus musculus
+	Date 24 November 2008(2008-11-24)
+	Source: Own work
+	Author: George Shuklin
+	This file is licensed under the Creative Commons Attribution-Share Alike 1.0 Generic license. 	
+
+    You are free:
+
+        * to share – to copy, distribute and transmit the work
+        * to remix – to adapt the work
+
+    Under the following conditions:
+
+        * attribution – You must attribute the work in the manner specified by the author or licensor (but not in any way that suggests that they endorse you or your use of the work).
+        * share alike – If you alter, transform, or build upon this work, you may distribute the resulting work only under the same or similar license to this one.
