@@ -3,9 +3,9 @@
  */
 package net.sf.genomeview.gui.viztracks.hts;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -18,21 +18,21 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JViewport;
 
-import org.broad.igv.track.WindowFunction;
-
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
+import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;
+
+import org.broad.igv.track.WindowFunction;
 
 /**
  * 
@@ -96,13 +96,15 @@ public class PileupTrack extends Track {
 		/* Status messages for data queuing an retrieval */
 		// Iterable<Status> status = provider.getStatus(visible.start,
 		// visible.end);
-
+		Iterable<Status>status=provider.getStatus(visible.start, visible.end);
 		/* Only retrieve data when location changed */
-		if (ptm.lastQuery == null || !ptm.lastQuery.equals(model.getAnnotationLocationVisible())) {
+		if (ptm.lastQuery == null || !ptm.lastQuery.equals(visible)) {
 			//System.out.println("--Using fresh data from provider in track");
 			/* The actual data */
 			// Iterable<Pile> piles = provider.get(visible.start, visible.end);
 
+			
+			
 			if (model.getAnnotationLocationVisible().length() < Configuration.getInt("pileup:switchBarLine")) {
 				// System.out.println("Track: "+this+"\t"+provider);
 				ptm.setVizBuffer(new BarChartBuffer(visible, provider, ptm));
@@ -114,6 +116,8 @@ public class PileupTrack extends Track {
 
 		/* Do the actual painting */
 		int graphLineHeigh = ptm.getVizBuffer().draw(g, yOffset, screenWidth);
+		
+		g.setColor(Color.BLACK);
 		
 		g.drawString(displayName(), 10, yOffset + 24 - 2);
 		

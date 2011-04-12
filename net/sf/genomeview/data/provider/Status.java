@@ -42,4 +42,14 @@ public class Status {
 	public int end() {
 		return end;
 	}
+
+	public void setRunning() {
+		this.running=true;
+		
+		
+	}
+
+	public void setFinished() {
+this.ready=true;		
+	}
 }

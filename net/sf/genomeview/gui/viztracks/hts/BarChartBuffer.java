@@ -13,8 +13,8 @@ import java.util.logging.Logger;
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.provider.PileProvider;
+import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.refseq.Sequence;
@@ -39,6 +39,7 @@ class BarChartBuffer implements VizBuffer {
 	private int pileWidth = 1;
 
 	private double MAX_WIDTH = 2000;
+	private Iterable<Status> status;
 
 	public BarChartBuffer(Location visible, PileProvider provider, PileupTrackModel ptm) {
 		this.visible = visible;
@@ -54,6 +55,9 @@ class BarChartBuffer implements VizBuffer {
 			nc = new NucCounter(visible.length());
 		else
 			nc = null;
+		status=provider.getStatus(visible.start, visible.end);
+		
+		
 		// g.setColor(Color.GRAY);
 		// System.out.println("Building rects.");
 		for (Pile p : provider.get(visible.start, visible.end)) {
@@ -125,6 +129,7 @@ class BarChartBuffer implements VizBuffer {
 											 * FIXME remove, should be done with
 											 * g.translate
 											 */, double screenWidth) {
+		
 		/* Get information from configuration */
 		Color forwardColor = Configuration.getColor("shortread:forwardColor");
 		Color reverseColor = Configuration.getColor("shortread:reverseColor");
@@ -132,6 +137,9 @@ class BarChartBuffer implements VizBuffer {
 //		int snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
 		int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
 
+		
+		
+		
 		// System.out.println("Drawing bar charts with " + pCount +
 		// " piles.");
 		int lastX = -1;
@@ -273,7 +281,28 @@ class BarChartBuffer implements VizBuffer {
 		// graphLineHeigh + 24 - 2);
 		// else
 
-		return 2 * graphLineHeigh + snpTrackHeight;
+		
+		int returnTrackHeight=2 * graphLineHeigh + snpTrackHeight;
+			for(Status st:status){
+				//System.out.println("Not ready "+st.start()+"\t"+st.end());
+				if(!st.isReady()){
+					int x1=Convert.translateGenomeToScreen(st.start(), visible, screenWidth);
+					int x2=Convert.translateGenomeToScreen(st.end(), visible, screenWidth);
+					g.setColor(new Color(0,255,0,100));
+					
+					g.fillRect(x1, yOffset-2*graphLineHeigh, x2-x1+1, returnTrackHeight);
+					
+					g.setColor(new Color(0,255,0,255));
+					g.drawString("Retrieving data...", 100, yOffset+returnTrackHeight/2);
+					
+				}
+			}
+			
+			
+			
+		
+		
+		return returnTrackHeight;
 
 	}
 
