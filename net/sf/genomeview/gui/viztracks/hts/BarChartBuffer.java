@@ -293,7 +293,7 @@ class BarChartBuffer implements VizBuffer {
 					g.fillRect(x1, yOffset-2*graphLineHeigh, x2-x1+1, returnTrackHeight);
 					
 					g.setColor(new Color(0,255,0,255));
-					g.drawString("Retrieving data...", 100, yOffset+returnTrackHeight/2);
+					g.drawString("Retrieving data...", 100, yOffset-2*graphLineHeigh+returnTrackHeight/2);
 					
 				}
 			}
