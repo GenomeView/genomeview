@@ -5,6 +5,7 @@ package net.sf.genomeview.data.provider;
 
 import java.util.ArrayList;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Task;
@@ -29,6 +30,11 @@ public class TDFProvider extends PileProvider {
 
 	public TDFProvider(Entry e, TDFData source, Model model) {
 		this.source = source;
+		/* Select default window function */
+		WindowFunction wf=WindowFunction.getWindowFunction(Configuration.get("pileup:defaultWindowFunction"));
+		System.out.println("requesting: "+Configuration.get("pileup:defaultWindowFunction")+"\t"+wf);
+		if(source.availableWindowFunctions().contains(wf))
+			source.requestWindowFunction(wf);
 		this.model = model;
 	}
 
