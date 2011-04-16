@@ -126,13 +126,14 @@ public abstract class Track extends Observable {
 	 * @param g
 	 *            graphics context to paint on
 	 * @param view
+	 * @param tcm 
 	 * @param model
 	 *            the entry that is currently displayed
 	 * @return the height that was painted
 	 */
-	public int paint(Graphics g, int yOffset, double width, int index, JViewport view) {
+	public int paint(Graphics g, int yOffset, double width, int index, JViewport view, TrackCommunicationModel tcm) {
 
-		int used = paintTrack((Graphics2D) g, yOffset, width, view);
+		int used = paintTrack((Graphics2D) g, yOffset, width, view,tcm);
 
 		if (!(this instanceof StructureTrack)) {
 			Rectangle r = new Rectangle(0, yOffset, (int) width + 1, used);
@@ -156,9 +157,10 @@ public abstract class Track extends Observable {
 	 * @param width
 	 *            the width of the track
 	 * @param view
+	 * @param tcm 
 	 * @return the height this track uses
 	 */
-	protected abstract int paintTrack(Graphics2D g, int yOffset, double width, JViewport view);
+	protected abstract int paintTrack(Graphics2D g, int yOffset, double width, JViewport view, TrackCommunicationModel tcm);
 
 	/* Keeps track of whether a track is collapsible */
 	private boolean collapsible = false;

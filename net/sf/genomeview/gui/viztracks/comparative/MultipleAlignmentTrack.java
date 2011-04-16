@@ -25,6 +25,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
@@ -219,7 +220,7 @@ public class MultipleAlignmentTrack extends Track {
 
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,
-			JViewport view) {
+			JViewport view,TrackCommunicationModel tcm) {
 		Location r = model.getAnnotationLocationVisible();
 		int lineHeigh = 20;
 

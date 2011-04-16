@@ -29,6 +29,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
@@ -314,7 +315,7 @@ public class ShortReadTrack extends Track {
 	private HashMap<Rectangle, SAMRecord> hitMap = new HashMap<Rectangle, SAMRecord>();
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view,TrackCommunicationModel tcm) {
 		paintedBlocks.clear();
 		hitMap.clear();
 

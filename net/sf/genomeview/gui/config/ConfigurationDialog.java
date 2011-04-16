@@ -56,12 +56,15 @@ public class ConfigurationDialog extends JDialog {
 			
 			this.add(ConfigBox.booleanInstance("pileup:dynamicRange", "Should all tracks use dynamic range?"), gc);
 			gc.gridy++;
+			this.add(ConfigBox.booleanInstance("pileup:crossTrackScaling", "Cross connect the track scaling."), gc);
+			gc.gridy++;
+			
+			
 			this.add(ConfigBox.booleanInstance("pileup:logScale", "Should all tracks be log scaled?"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.doubleInstance("pileup:maxPile", "Maximum height of the pileup track"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("pileup:switchBarLine", "Switch from bar chart to line graph at N nt"), gc);
-			
 			
 		}
 	}

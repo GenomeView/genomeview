@@ -4,23 +4,19 @@
 package net.sf.genomeview.gui.viztracks.comparative;
 
 import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.swing.JViewport;
 
 import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
-import net.sf.jannot.Location;
 import net.sf.jannot.SyntenicBlock;
 
 /**
@@ -88,7 +84,7 @@ public class SyntenicTrack extends Track {
 	private HashMap<Rectangle, SyntenicBlock> hitmap = new HashMap<Rectangle, SyntenicBlock>();
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double width,JViewport view) {
+	public int paintTrack(Graphics2D g, int yOffset, double width,JViewport view,TrackCommunicationModel tcm) {
 		return 25;
 		// hitmap.clear();
 		//

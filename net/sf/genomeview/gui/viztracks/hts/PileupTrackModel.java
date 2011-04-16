@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.viztracks.hts;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.Location;
 import net.sf.jannot.refseq.Sequence;
 
@@ -92,6 +93,7 @@ class PileupTrackModel {
 	}
 
 	private double maxValue = -1;
+	private TrackCommunicationModel tcm;
 
 	public double maxValue() {
 		if (globalSettings)
@@ -111,6 +113,18 @@ class PileupTrackModel {
 
 	public Sequence sequence() {
 		return model.getSelectedEntry().sequence();
+	}
+	public TrackCommunicationModel getTrackCommunication() {
+		return tcm;
+		
+	}
+	public void setTrackCommunication(TrackCommunicationModel tcm) {
+		this.tcm=tcm;
+		
+	}
+
+	public boolean isCrossTrackScaling() {
+		return Configuration.getBoolean("pileup:crossTrackScaling");
 	}
 
 }

@@ -24,14 +24,20 @@ import net.sf.genomeview.gui.menu.PopUpMenu;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
+
 /**
  * 
  * @author Thomas Abeel
- *
+ * 
  */
-public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListener, MouseMotionListener {
+public class GeneEvidenceLabel extends AbstractGeneLabel implements
+		MouseListener, MouseMotionListener {
 
 	private static final long serialVersionUID = -8338383664013028337L;
+
+	
+
+	private TrackCommunicationModel tcm = new TrackCommunicationModel();
 
 	public GeneEvidenceLabel(Model model) {
 		super(model);
@@ -41,7 +47,8 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 		this.addMouseMotionListener(this);
 		model.addObserver(this);
 		model.getGUIManager().registerEvidenceLabel(this);
-		//this.setPreferredSize(new Dimension(this.getPreferredSize().width, 200));
+		// this.setPreferredSize(new Dimension(this.getPreferredSize().width,
+		// 200));
 
 	}
 
@@ -55,23 +62,27 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	}
 
-	public void actualPaint(Graphics g,JViewport view) {
+	public void actualPaint(Graphics g, JViewport view) {
 		tracks.clear();
 		framePixelsUsed = 0;
 		screenWidth = this.getSize().width + 1;
-		if(view==null){
-			view=new JViewport(){
-				public Rectangle getViewRect(){
-					return new Rectangle(0,0,(int)screenWidth,Integer.MAX_VALUE);
+		if (view == null) {
+			view = new JViewport() {
+				public Rectangle getViewRect() {
+					return new Rectangle(0, 0, (int) screenWidth,
+							Integer.MAX_VALUE);
 				}
 			};
 		}
-		
+
 		super.paintComponent(g);
 		int index = 0;
+		
 		for (Track track : model.getTrackList()) {
 			if (track.isVisible()) {
-				int height = track.paint(g, framePixelsUsed, screenWidth, index++,view);
+				int height = track.paint(g, framePixelsUsed, screenWidth,
+						index++, view,tcm);
+				
 				// FIXME we shouldn't give each paint method the yOffset. We
 				// should use the Graphics translate function to make sure we
 				// are positioned correctly.
@@ -80,16 +91,21 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 				framePixelsUsed += height;
 			}
 		}
+		if(tcm.isChanged()){
+			tcm.resetChanged();
+			repaint();
+		}
 	}
 
 	@Override
-	public void paintComponent(Graphics g) {		
-		actualPaint(g,viewport);
+	public void paintComponent(Graphics g) {
+		actualPaint(g, viewport);
 
 		// FIXME paintSelectedLocation(g, model.getAnnotationLocationVisible());
 
 		if (this.getPreferredSize().height != framePixelsUsed) {
-			this.setPreferredSize(new Dimension(this.getPreferredSize().width, framePixelsUsed));
+			this.setPreferredSize(new Dimension(this.getPreferredSize().width,
+					framePixelsUsed));
 			revalidate();
 
 		}
@@ -105,14 +121,18 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			highlight(model.getSelectedRegion(), g);
 
 		g.setColor(new Color(120, 120, 120, 120));
-		//draw guide line.
-		g.drawLine(currentMouseX, 0, currentMouseX, this.getPreferredSize().height);
+		// draw guide line.
+		g.drawLine(currentMouseX, 0, currentMouseX,
+				this.getPreferredSize().height);
+		
 	}
 
 	private void highlight(Location l, Graphics g) {
-		int x1 = Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), screenWidth);
-		int x2 = Convert.translateGenomeToScreen(l.end() + 1, model.getAnnotationLocationVisible(), screenWidth);
-		g.drawLine(x1-1, 0, x1-1, this.getPreferredSize().height);
+		int x1 = Convert.translateGenomeToScreen(l.start(),
+				model.getAnnotationLocationVisible(), screenWidth);
+		int x2 = Convert.translateGenomeToScreen(l.end() + 1,
+				model.getAnnotationLocationVisible(), screenWidth);
+		g.drawLine(x1 - 1, 0, x1 - 1, this.getPreferredSize().height);
 		g.drawLine(x2, 0, x2, this.getPreferredSize().height);
 		g.setColor(new Color(180, 180, 255, 50));
 		g.fillRect(x1, 0, x2 - x1, this.getPreferredSize().height);
@@ -222,62 +242,69 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		currentMouseX = e.getX();
-		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX, model.getAnnotationLocationVisible(), screenWidth);
-		
+		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX,
+				model.getAnnotationLocationVisible(), screenWidth);
+
 		/* Transfer MouseEvent to corresponding track */
 		Track mouseTrack = tracks.get(e);
 		boolean consumed = false;
 		if (mouseTrack != null)
 			consumed = mouseTrack.mouseDragged(e.getX(), e.getY(), e);
-		if (consumed){
-			//even when consumed, update the mouse position before returning
+		if (consumed) {
+			// even when consumed, update the mouse position before returning
 			model.mouseModel().setCurrentCoord(currentGenomeX);
 			return;
 		}
-		
-		
+
 		/* Specific mouse code for this label */
-		
+
 		if (pressLoc != null) {
-			//shift-drag always selects
-			if (e.isShiftDown()){
+			// shift-drag always selects
+			if (e.isShiftDown()) {
 				model.selectionModel().clearLocationSelection();
-			
+
 				int selectionStart = 0;
 				int selectionEnd = 0;
-				
-//				int currentGenomeX = Convert.translateScreenToGenome(currentMouseX, model.getAnnotationLocationVisible(), screenWidth);
-				int pressGenomeX = Convert.translateScreenToGenome(pressX, model.getAnnotationLocationVisible(), screenWidth);
-				
-				int start = pressGenomeX < currentGenomeX ? pressGenomeX : currentGenomeX;
-				int end = pressGenomeX < currentGenomeX ? currentGenomeX : pressGenomeX;
-				
+
+				// int currentGenomeX =
+				// Convert.translateScreenToGenome(currentMouseX,
+				// model.getAnnotationLocationVisible(), screenWidth);
+				int pressGenomeX = Convert.translateScreenToGenome(pressX,
+						model.getAnnotationLocationVisible(), screenWidth);
+
+				int start = pressGenomeX < currentGenomeX ? pressGenomeX
+						: currentGenomeX;
+				int end = pressGenomeX < currentGenomeX ? currentGenomeX
+						: pressGenomeX;
+
 				selectionStart = start;
 				selectionEnd = end + 1;
-				
-				model.selectionModel().setSelectedRegion(new Location(selectionStart, selectionEnd));
-				//when selecting: update the mouse position
+
+				model.selectionModel().setSelectedRegion(
+						new Location(selectionStart, selectionEnd));
+				// when selecting: update the mouse position
 				model.mouseModel().setCurrentCoord(currentGenomeX);
-				
+
 			} else {
-				//drag always pans
+				// drag always pans
 				double move = (e.getX() - pressX) / screenWidth;
 
 				int start = (int) (pressLoc.start() - pressLoc.length() * move);
 				int end = (int) (pressLoc.end() - pressLoc.length() * move);
 
-				if (start<1){
-					start=1;
+				if (start < 1) {
+					start = 1;
 					end = pressLoc.length();
 				}
-				if (end>model.getSelectedEntry().getMaximumLength()){
+				if (end > model.getSelectedEntry().getMaximumLength()) {
 					end = model.getSelectedEntry().getMaximumLength();
 					start = end - pressLoc.length();
 				}
 				model.setAnnotationLocationVisible(new Location(start, end));
-				
-				//when panning, don't update the mouse position until done. It should stay the same while panning anyway (but in reality,
-				//it will slightly lag behind the pointer)
+
+				// when panning, don't update the mouse position until done. It
+				// should stay the same while panning anyway (but in reality,
+				// it will slightly lag behind the pointer)
 			}
 
 		}
@@ -290,8 +317,9 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		currentMouseX = e.getX();		
-		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX, model.getAnnotationLocationVisible(), screenWidth);
+		currentMouseX = e.getX();
+		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX,
+				model.getAnnotationLocationVisible(), screenWidth);
 		model.mouseModel().setCurrentCoord(currentGenomeX);
 
 		/* Transfer MouseEvent to corresponding track */
@@ -310,7 +338,10 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			}
 			consumed = mouseTrack.mouseMoved(e.getX(), e.getY(), e);
 			if (!(mouseTrack instanceof StructureTrack))
-				model.getGUIManager().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				model.getGUIManager()
+						.getParent()
+						.setCursor(
+								Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
 		if (consumed)
 			return;
@@ -328,17 +359,16 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements MouseListene
 			consumed = mouseTrack.mouseClicked(e.getX(), e.getY(), e);
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
-			new PopUpMenu(model,mouseTrack).show(this, e.getX(), y);
-		} else if (!consumed){
+			new PopUpMenu(model, mouseTrack).show(this, e.getX(), y);
+		} else if (!consumed) {
 			model.selectionModel().setSelectedRegion(null);
 			model.selectionModel().clearLocationSelection();
 		}
-		
+
 	}
 
-	
 	public void setViewport(JViewport viewport) {
-		this.viewport=viewport;
-		
+		this.viewport = viewport;
+
 	}
 }

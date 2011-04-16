@@ -41,6 +41,7 @@ import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.genomeview.gui.components.DoubleJSlider;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel.FillMode;
 import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
@@ -178,7 +179,7 @@ public class FeatureTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view) {
+	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view,TrackCommunicationModel tcm) {
 
 		boolean collision = false;
 		hitmap.clear();

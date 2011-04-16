@@ -24,6 +24,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;
 import net.sf.jannot.wiggle.Graph;
@@ -186,7 +187,7 @@ public class WiggleTrack extends Track {
 
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,
-			JViewport view) {
+			JViewport view,TrackCommunicationModel tcm) {
 		this.currentVisible = model.getAnnotationLocationVisible();
 		this.currentYOffset = yOffset;
 		this.screenWidth = screenWidth;

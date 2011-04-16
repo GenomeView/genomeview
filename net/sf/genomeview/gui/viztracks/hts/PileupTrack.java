@@ -29,6 +29,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
 import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;
 
@@ -88,9 +89,10 @@ public class PileupTrack extends Track {
 	private Logger log = Logger.getLogger(PileupTrack.class.toString());
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view,TrackCommunicationModel tcm) {
 
 		ptm.setScreenWidth(screenWidth);
+		ptm.setTrackCommunication(tcm);
 		//System.out.println("- drawing track "+this);
 		Location visible = model.getAnnotationLocationVisible();
 		/* Status messages for data queuing an retrieval */

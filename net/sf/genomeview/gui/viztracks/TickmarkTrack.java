@@ -22,7 +22,7 @@ public class TickmarkTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,JViewport view) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,JViewport view,TrackCommunicationModel tcm) {
 		Location r = model.getAnnotationLocationVisible();
 		g.setColor(Color.BLACK);
 		g.drawLine(0, yOffset + 15, (int) screenWidth + 1, yOffset + 15);

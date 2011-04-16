@@ -20,7 +20,6 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
 
 import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.core.Colors;
@@ -33,6 +32,7 @@ import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.genomeview.gui.dialog.StructureTrackConfig;
 import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
@@ -913,7 +913,7 @@ public class StructureTrack extends Track {
 	private BufferSeq bs;
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view) {
+	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view,TrackCommunicationModel tcm) {
 		if (entry instanceof DummyEntry)
 			entry = model.getSelectedEntry();
 		bs = null;
