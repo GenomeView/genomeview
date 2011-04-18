@@ -22,7 +22,8 @@ import net.sf.jannot.pileup.Pile;
 public class WiggleProvider extends PileProvider implements Observer {
 	private PileupSummary summary = null;
 	private Data<Pile> source;
-//	private Model model;
+
+	// private Model model;
 
 	public WiggleProvider(Entry e, Data<Pile> source, Model model) {
 		summary = new PileupSummary(model, e);
@@ -35,7 +36,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 
 	private int lastStart = -1;
 	private int lastEnd = -1;
-//	private float maxSummary;
+	// private float maxSummary;
 	private float maxPile;
 
 	@Override
@@ -45,14 +46,14 @@ public class WiggleProvider extends PileProvider implements Observer {
 			return buffer;
 
 		/* New request */
-		//System.out.println("\tServing new request from provider");
+		// System.out.println("\tServing new request from provider");
 		lastStart = start;
 		lastEnd = end;
 
 		buffer.clear();
 		// FIXME hard coded arbitrary value
 		Iterable<Pile> fresh = null;
-		if (end - start + 1 < 32000) {
+		if (end - start + 1 < PileupSummary.CHUNK) {
 			fresh = source.get(start, end);
 		} else {
 			fresh = summary.get(source, start, end);
@@ -60,9 +61,9 @@ public class WiggleProvider extends PileProvider implements Observer {
 		}
 		for (Pile p : fresh) {
 			float val = p.getCoverage();
-//			int len = p.getLength();
-//			if (len > 1 && val > maxSummary)
-//				maxSummary = val;
+			// int len = p.getLength();
+			// if (len > 1 && val > maxSummary)
+			// maxSummary = val;
 			if (val > maxPile)
 				maxPile = val;
 
@@ -77,12 +78,18 @@ public class WiggleProvider extends PileProvider implements Observer {
 		return maxPile;
 	}
 
-//	@Override
-//	public double getMaxSummary() {
-//		return maxSummary;
-//	}
+	// @Override
+	// public double getMaxSummary() {
+	// return maxSummary;
+	// }
 
 	public Iterable<Status> getStatus(int start, int end) {
+		if (end - start < PileupSummary.CHUNK) {
+			Status t=new Status(false,false,true,start,end);
+			ArrayList<Status>out=new ArrayList<Status>();
+			out.add(t);
+			return out; 
+		}
 		return summary.getStatus(start, end);
 	}
 
@@ -90,7 +97,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 	public void update(Observable o, Object arg) {
 		/* Indicates that the summary has been updated */
 		/* Invalidate buffers */
-		//System.out.println("\tInvalidating Wiggle Provider buffers ");
+		// System.out.println("\tInvalidating Wiggle Provider buffers ");
 		lastStart = -1;
 		lastEnd = -1;
 		buffer.clear();
@@ -105,13 +112,13 @@ public class WiggleProvider extends PileProvider implements Observer {
 
 	@Override
 	public WindowFunction[] getWindowFunctions() {
-		return new WindowFunction[]{WindowFunction.mean};
+		return new WindowFunction[] { WindowFunction.mean };
 	}
 
 	@Override
 	public void requestWindowFunction(WindowFunction wf) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
