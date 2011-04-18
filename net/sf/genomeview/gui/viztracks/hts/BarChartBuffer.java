@@ -10,8 +10,6 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.sun.org.apache.bcel.internal.generic.LCONST;
-
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.provider.PileProvider;
