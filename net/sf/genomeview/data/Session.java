@@ -67,7 +67,7 @@ public class Session {
 
 			@Override
 			public void run() {
-				LineIterator it = new LineIterator(is);
+				LineIterator it = new LineIterator(is,false,true);
 
 				try {
 					String key = it.next();
