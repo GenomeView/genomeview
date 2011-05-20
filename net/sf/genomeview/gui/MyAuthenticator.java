@@ -30,11 +30,13 @@ public class MyAuthenticator extends Authenticator {
 
 	private static HashMap<String, PasswordAuthentication> mapping = new HashMap<String, PasswordAuthentication>();
 
-	public static void addURL(URL url) {
+	private static void addURL(URL url) {
 		System.out.println(url.getUserInfo());
-		String[]arr=url.getUserInfo().split(":");
-		mapping.put(url.toString(), new PasswordAuthentication(arr[0], arr[1].toCharArray()));
-		System.out.println(mapping);
+		if (url.getUserInfo() != null) {
+			String[] arr = url.getUserInfo().split(":");
+			mapping.put(url.toString(), new PasswordAuthentication(arr[0], arr[1].toCharArray()));
+			System.out.println(mapping);
+		}
 	}
 
 	protected PasswordAuthentication getPasswordAuthentication() {
@@ -46,13 +48,16 @@ public class MyAuthenticator extends Authenticator {
 		logger.info("Requesting Protocol: " + getRequestingProtocol());
 		logger.info("Requesting Scheme : " + getRequestingScheme());
 		logger.info("Requesting Site  : " + getRequestingSite());
-		
-		String reqURL=getRequestingURL().toString();
-		String shortReq=reqURL.substring(0,reqURL.lastIndexOf('.'));
+
+		URL ru = getRequestingURL();
+		addURL(ru);
+
+		String reqURL = getRequestingURL().toString();
+		String shortReq = reqURL.substring(0, reqURL.lastIndexOf('.'));
 		logger.info("Requesting URL : " + reqURL);
-		if(mapping.containsKey(reqURL))
+		if (mapping.containsKey(reqURL))
 			return mapping.get(reqURL);
-		if(mapping.containsKey(shortReq))
+		if (mapping.containsKey(shortReq))
 			return mapping.get(shortReq);
 
 		final JDialog jd = new JDialog();
@@ -92,7 +97,7 @@ public class MyAuthenticator extends Authenticator {
 		jd.pack();
 		StaticUtils.center(jd);
 		jd.setVisible(true);
-		if(username.getText().length()>0||password.getPassword().length>0)
+		if (username.getText().length() > 0 || password.getPassword().length > 0)
 			return new PasswordAuthentication(username.getText(), password.getPassword());
 		else
 			return null;
