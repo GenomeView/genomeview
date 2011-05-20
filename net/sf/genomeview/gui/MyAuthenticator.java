@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -18,16 +20,41 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import be.abeel.gui.TitledComponent;
+
 /**
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 public class MyAuthenticator extends Authenticator {
-	private String user = "";
-	private char[] pass = new char[0];
+
+	private static HashMap<String, PasswordAuthentication> mapping = new HashMap<String, PasswordAuthentication>();
+
+	public static void addURL(URL url) {
+		System.out.println(url.getUserInfo());
+		String[]arr=url.getUserInfo().split(":");
+		mapping.put(url.toString(), new PasswordAuthentication(arr[0], arr[1].toCharArray()));
+		System.out.println(mapping);
+	}
 
 	protected PasswordAuthentication getPasswordAuthentication() {
+
+		Logger logger = Logger.getLogger(MyAuthenticator.class.getCanonicalName());
+		logger.info("Requesting Host  : " + getRequestingHost());
+		logger.info("Requesting Port  : " + getRequestingPort());
+		logger.info("Requesting Prompt : " + getRequestingPrompt());
+		logger.info("Requesting Protocol: " + getRequestingProtocol());
+		logger.info("Requesting Scheme : " + getRequestingScheme());
+		logger.info("Requesting Site  : " + getRequestingSite());
+		
+		String reqURL=getRequestingURL().toString();
+		String shortReq=reqURL.substring(0,reqURL.lastIndexOf('.'));
+		logger.info("Requesting URL : " + reqURL);
+		if(mapping.containsKey(reqURL))
+			return mapping.get(reqURL);
+		if(mapping.containsKey(shortReq))
+			return mapping.get(shortReq);
+
 		final JDialog jd = new JDialog();
 		ActionListener dps = new ActionListener() {
 
@@ -50,11 +77,11 @@ public class MyAuthenticator extends Authenticator {
 				+ getRequestingHost());
 		jd.add(jl, gc);
 		gc.gridy++;
-		JTextField username = new JTextField(user);
+		JTextField username = new JTextField();
 		username.addActionListener(dps);
 		jd.add(new TitledComponent("User name", username), gc);
 		gc.gridy++;
-		JPasswordField password = new JPasswordField(new String(pass));
+		JPasswordField password = new JPasswordField();
 		password.addActionListener(dps);
 		jd.add(new TitledComponent("Password", password), gc);
 		gc.gridy++;
@@ -65,16 +92,9 @@ public class MyAuthenticator extends Authenticator {
 		jd.pack();
 		StaticUtils.center(jd);
 		jd.setVisible(true);
-		
-		Logger logger = Logger.getLogger(MyAuthenticator.class.getCanonicalName());
-		logger.info("Requesting Host  : " + getRequestingHost());
-		logger.info("Requesting Port  : " + getRequestingPort());
-		logger.info("Requesting Prompt : " + getRequestingPrompt());
-		logger.info("Requesting Protocol: " + getRequestingProtocol());
-		logger.info("Requesting Scheme : " + getRequestingScheme());
-		logger.info("Requesting Site  : " + getRequestingSite());
-		this.user = username.getText();
-		this.pass = password.getPassword();
-		return new PasswordAuthentication(this.user, this.pass);
+		if(username.getText().length()>0||password.getPassword().length>0)
+			return new PasswordAuthentication(username.getText(), password.getPassword());
+		else
+			return null;
 	}
 }
