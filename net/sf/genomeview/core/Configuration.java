@@ -138,7 +138,10 @@ public class Configuration {
 				logger
 						.warning("Cannot create your personal configuration file sure GenomeView has write access to you home directory!");
 			}
-		} else {
+		}else if(configFile.length()==0){
+			//Empty config file, don't load it.
+			logger.warning("Config file has size zero!");
+		}else {
 			it = new LineIterator(new GZIPInputStream(new FileInputStream(configFile)));
 			it.setSkipBlanks(true);
 			it.setSkipComments(true);
