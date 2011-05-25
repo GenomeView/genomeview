@@ -168,7 +168,11 @@ public class ColorGradient {
 	 * @return the <code>Color</code> value in the gradient.
 	 */
 	public Color getColor(int i) {
-		return i >= crGradient.size() ? crGradient.get(crGradient.size() - 1) : crGradient.get(i);
+		if(i<0)
+			i=0;
+		if(i>=crGradient.size())
+			i=crGradient.size()-1;
+		return crGradient.get(i);
 	}
 	public Color getColor(double s) {
 		return getColor((int)(s*crGradient.size()));
