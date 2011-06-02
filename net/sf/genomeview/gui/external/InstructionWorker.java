@@ -11,10 +11,6 @@ import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +31,52 @@ import be.abeel.net.URIFactory;
  */
 class InstructionWorker implements Runnable {
 
+	class Port{
+		private int port;
+
+		
+		public String toString(){
+			return ""+port;
+		}
+		public Port(int port) {
+			this.port=port;
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + port;
+			return result;
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Port other = (Port) obj;
+			if (port != other.port)
+				return false;
+			return true;
+		}
+
+		public int getPort() {
+			return port;
+		}
+
+		
+		
+	}
 	/* Socket to client we're handling */
 	private Socket s;
 
@@ -44,7 +86,7 @@ class InstructionWorker implements Runnable {
 
 	private static Logger log = Logger.getLogger(InstructionWorker.class.getCanonicalName());
 
-	private static ArrayList<Integer> otherPorts = new ArrayList<Integer>();
+	private static ArrayList<Port> otherPorts = new ArrayList<Port>();
 
 	InstructionWorker(Model model, String id, Socket s) {
 		this.model = model;
@@ -77,7 +119,7 @@ class InstructionWorker implements Runnable {
 		LineIterator it = new LineIterator(s.getInputStream());
 		String line = it.next();
 		if (line.startsWith("GenomeViewJavaScriptHandler-")) {
-			otherPorts.add(Integer.parseInt(line.split("-")[1]));
+			otherPorts.add(new Port(Integer.parseInt(line.split("-")[1])));
 		} else {
 			System.out.println(line);
 
@@ -129,9 +171,9 @@ class InstructionWorker implements Runnable {
 	}
 
 	private void writeOther(String line) {
-		for (int port : otherPorts) {
+		for (Port port : otherPorts) {
 			try {
-				Socket clientSocket = new Socket(InetAddress.getLocalHost(), port);
+				Socket clientSocket = new Socket(InetAddress.getLocalHost(), port.getPort());
 				PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
 				out.println(line);
 				out.close();
@@ -139,9 +181,14 @@ class InstructionWorker implements Runnable {
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.err.println("Removing port: "+port);
+				otherPorts.remove(port);
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.err.println("Removing port: "+port);
+				otherPorts.remove(port);
 			}
 		}
 
