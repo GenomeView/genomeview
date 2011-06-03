@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JMenuItem;
@@ -37,7 +38,7 @@ public abstract class Track extends Observable {
 	public Track(DataKey key, Model model, boolean visible, boolean collapsible) {
 		this.model = model;
 		this.dataKey = key;
-		
+		log.log(Level.INFO, "Creating track\t"+key+"\t"+visible+"\t"+collapsible);
 		this.entry = model.getSelectedEntry();
 		this.collapsible = collapsible;
 		this.addObserver(model);
