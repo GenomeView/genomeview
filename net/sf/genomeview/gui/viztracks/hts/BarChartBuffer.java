@@ -30,6 +30,7 @@ import net.sf.jannot.refseq.Sequence;
 class BarChartBuffer implements VizBuffer {
 	/* Data for pileupgraph barchart */
 	private double[][] detailedRects = null;
+	
 	/* Actual coverage values for barchart */
 	// private double[][] covValues = null;
 	private Location visible;
@@ -281,10 +282,10 @@ class BarChartBuffer implements VizBuffer {
 		g.drawLine(0, yOffset, 5, yOffset);
 		g.drawLine(0, yOffset - graphLineHeigh, 5, yOffset - graphLineHeigh);
 		g.drawLine(0, yOffset - 2 * graphLineHeigh, 5, yOffset - 2 * graphLineHeigh);
-
-		g.drawString("" + div, 10, yOffset);
+		
+		g.drawString("" + nrReg.format(div), 10, yOffset);
 		g.drawString("0" + "", 10, yOffset - graphLineHeigh + 5);
-		g.drawString("" + div, 10, yOffset - 2 * graphLineHeigh + 10);
+		g.drawString("" + nrReg.format(div), 10, yOffset - 2 * graphLineHeigh + 10);
 		// if (dataKey != null)
 		// g.drawString(StaticUtils.shortify(dataKey.toString()), 10, yOffset -
 		// graphLineHeigh + 24 - 2);
