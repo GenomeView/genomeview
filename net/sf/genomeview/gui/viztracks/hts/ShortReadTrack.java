@@ -319,7 +319,7 @@ public class ShortReadTrack extends Track {
 	private HashMap<Rectangle, SAMRecord> hitMap = new HashMap<Rectangle, SAMRecord>();
 
 	@Override
-	public synchronized int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
 		paintedBlocks.clear();
 		hitMap.clear();
 
@@ -341,9 +341,7 @@ public class ShortReadTrack extends Track {
 
 		int originalYOffset = yOffset;
 
-		// //FIXME should be provider
-		// ReadGroup rg = (ReadGroup) entry.get(dataKey);
-		// if (rg == null)
+		
 		if (provider == null)
 			return 0;
 
@@ -527,6 +525,7 @@ public class ShortReadTrack extends Track {
 					// }
 				}
 			} catch (ConcurrentModificationException e) {
+				System.err.println("CME!!");
 				// Ignore
 			}
 			if (stackExceeded) {
