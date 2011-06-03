@@ -6,6 +6,7 @@ package net.sf.genomeview.gui.viztracks.hts;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.text.NumberFormat;
+import java.util.ConcurrentModificationException;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,7 +60,10 @@ class BarChartBuffer implements VizBuffer {
 
 		// g.setColor(Color.GRAY);
 		// System.out.println("Building rects.");
-		for (Pile p : provider.get(visible.start, visible.end)) {
+		//System.err.println(provider);
+		Iterable<Pile>itt=provider.get(visible.start, visible.end);
+//		System.out.println(itt);
+		for (Pile p : itt) {
 			if (p.getPos() + p.getLength() < visible.start || p.getPos() > visible.end)
 				continue;
 
@@ -145,7 +149,7 @@ class BarChartBuffer implements VizBuffer {
 		if (ptm.isDynamicScaling())
 			div = localMaxPile;
 		if (ptm.isCrossTrackScaling()) {
-			System.out.println("Using TCM.. " + ptm.getTrackCommunication().getLocalPileupMax());
+			//System.out.println("Using TCM.. " + ptm.getTrackCommunication().getLocalPileupMax());
 			div = ptm.getTrackCommunication().getLocalPileupMax();
 		}
 		// System.out.println("Using " + div + ", dynamic: " +
@@ -288,7 +292,7 @@ class BarChartBuffer implements VizBuffer {
 			// System.out.println("Not ready "+st.start()+"\t"+st.end());
 			if (!st.isReady()) {
 				int x1 = Convert.translateGenomeToScreen(st.start(), visible, screenWidth);
-				int x2 = Convert.translateGenomeToScreen(st.end(), visible, screenWidth);
+				int x2 = Convert.translateGenomeToScreen(st.end()+1, visible, screenWidth);
 				g.setColor(new Color(0, 255, 0, 100));
 
 				g.fillRect(x1, yOffset - 2 * graphLineHeigh, x2 - x1 + 1, returnTrackHeight);
@@ -322,29 +326,31 @@ class BarChartBuffer implements VizBuffer {
 		nrReg.setMaximumFractionDigits(1);
 		StringBuffer text = new StringBuffer();
 
-		int effectivePosition = (int) (factor * (Convert.translateScreenToGenome(mouseX, visible, ptm.getScreenWidth()) - visible.start));// track.translateFromMouse(e.getX());
 		text.append("<html>");
 		text.append("<strong>Window length: </strong>" + pileWidth + "<br/>");
-
+		int ntPosition = Convert.translateScreenToGenome(mouseX, visible, ptm.getScreenWidth()) - visible.start;// track.translateFromMouse(e.getX());
+		
 		if (nc != null) {
 
-			int total = nc.getTotalCount(effectivePosition);
+			int total = nc.getTotalCount(ntPosition);
 
 			if (nc.hasData()) {
 
-				text.append("<strong>Matches:</strong> " + format(nc.getCount('.', effectivePosition), total) + "<br/>");
+				text.append("<strong>Matches:</strong> " + format(nc.getCount('.', ntPosition), total) + "<br/>");
 				text.append("<strong>Mismatches:</strong><br/>");
-				text.append("A: " + format(nc.getCount('A', effectivePosition), total));
+				text.append("A: " + format(nc.getCount('A', ntPosition), total));
 				text.append("<br/>");
-				text.append("T: " + format(nc.getCount('T', effectivePosition), total));
+				text.append("T: " + format(nc.getCount('T', ntPosition), total));
 				text.append("<br/>");
-				text.append("G: " + format(nc.getCount('G', effectivePosition), total));
+				text.append("G: " + format(nc.getCount('G', ntPosition), total));
 				text.append("<br/>");
-				text.append("C: " + format(nc.getCount('C', effectivePosition), total));
+				text.append("C: " + format(nc.getCount('C', ntPosition), total));
 				text.append("<br/>");
 			}
 
 		}
+		int effectivePosition = (int) (factor * (Convert.translateScreenToGenome(mouseX, visible, ptm.getScreenWidth()) - visible.start));// track.translateFromMouse(e.getX());
+		
 		text.append("<strong>" + (pileWidth > 1 ? "Average" : "") + "Coverage:</strong> "
 				+ nrReg.format(detailedRects[0][effectivePosition] + detailedRects[1][effectivePosition]) + "<br/>");
 		text.append("Forward: " + nrReg.format(detailedRects[0][effectivePosition]) + "<br/>");

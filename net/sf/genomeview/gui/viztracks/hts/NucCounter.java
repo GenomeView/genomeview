@@ -22,7 +22,14 @@ class NucCounter {
 		}
 
 		public int getCount(char nuc, int pos) {
+			try{
 			return counter[ix(nuc)][pos];
+			}catch(IndexOutOfBoundsException io){
+				
+				System.err.println("Len: "+counter[ix(nuc)].length+"\t"+pos);
+				io.printStackTrace();
+			}
+			return 0;
 		}
 
 		public int getTotalCount(int pos) {

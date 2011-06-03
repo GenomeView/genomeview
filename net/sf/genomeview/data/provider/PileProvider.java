@@ -12,7 +12,10 @@ import net.sf.jannot.pileup.Pile;
  *
  */
 public abstract class PileProvider extends AbstractDataProvider<Pile> {
-
+	protected void notifyListeners(){
+		setChanged();
+		notifyObservers();
+	}
 	public abstract double getMaxPile();
 
 	public abstract WindowFunction[] getWindowFunctions();

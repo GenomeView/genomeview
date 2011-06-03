@@ -6,6 +6,7 @@ package net.sf.genomeview.data.provider;
 import java.util.ArrayList;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.NoFailIterable;
 import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Task;
@@ -50,7 +51,7 @@ public class TDFProvider extends PileProvider {
 		/* Check whether request can be fulfilled by buffer */
 		if (start >= lastStart && end <= lastEnd
 				&& (lastEnd - lastStart) <= 2 * (end - start))
-			return buffer;
+			return new NoFailIterable<Pile>(buffer);
 
 		/* New request */
 
@@ -61,6 +62,7 @@ public class TDFProvider extends PileProvider {
 		buffer.clear();
 		status.clear();
 		status.add(new Status(false, true, false, start, end));
+		final Status thisJob=status.get(0);
 		// queue up retrieval
 		Task t = new Task(new Location(start, end)) {
 
@@ -70,7 +72,7 @@ public class TDFProvider extends PileProvider {
 				// this data
 				if (!(start >= lastStart && end <= lastEnd && (lastEnd - lastStart) <= 2 * (end - start)))
 					return;
-				status.get(0).setRunning();
+				thisJob.setRunning();
 				Iterable<Pile> fresh = source.get(start, end);
 
 				for (Pile p : fresh) {
@@ -81,7 +83,7 @@ public class TDFProvider extends PileProvider {
 
 					buffer.add(p);
 				}
-				status.get(0).setFinished();
+				thisJob.setFinished();
 				notifyListeners();
 			}
 
@@ -90,15 +92,12 @@ public class TDFProvider extends PileProvider {
 
 		// System.out.println("\tServing new request from provider");
 
-		return buffer;
+		return new NoFailIterable<Pile>(buffer);
 
 	}
 
 	
-	private void notifyListeners(){
-		setChanged();
-		notifyObservers();
-	}
+	
 	@Override
 	public double getMaxPile() {
 		return maxPile;
