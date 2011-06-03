@@ -53,7 +53,7 @@ public class ShortReadProvider extends AbstractDataProvider<SAMRecord> {
 		/* Check whether request can be fulfilled by buffer */
 		if (start >= lastStart && end <= lastEnd
 				&& (lastEnd - lastStart) <= 2 * (end - start))
-			return new NoFailIterable<SAMRecord>(buffer);
+			return buffer;
 
 		/* New request */
 
@@ -61,7 +61,7 @@ public class ShortReadProvider extends AbstractDataProvider<SAMRecord> {
 		lastStart = start;
 		lastEnd = end;
 
-		buffer.clear();
+//		buffer.clear();
 		status.clear();
 		status.add(new Status(false, true, false, start, end));
 		final Status thisJob=status.get(0);
@@ -76,13 +76,14 @@ public class ShortReadProvider extends AbstractDataProvider<SAMRecord> {
 					return;
 				thisJob.setRunning();
 				Iterable<SAMRecord> fresh = source.get(start, end);
-
+				ArrayList<SAMRecord>tmp=new ArrayList<SAMRecord>();
 				for (SAMRecord p : fresh) {
 					
 
-					buffer.add(p);
+					tmp.add(p);
 				}
 				thisJob.setFinished();
+				buffer=tmp;
 				notifyListeners();
 			}
 
@@ -90,8 +91,8 @@ public class ShortReadProvider extends AbstractDataProvider<SAMRecord> {
 		GenomeViewScheduler.submit(t);
 
 		// System.out.println("\tServing new request from provider");
-
-		return new NoFailIterable<SAMRecord>(buffer);
+		return buffer;
+//		return new NoFailIterable<SAMRecord>(buffer);
 
 	}
 
