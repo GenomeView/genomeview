@@ -103,7 +103,6 @@ class BarChartBuffer implements VizBuffer {
 	}
 
 	private void count(NucCounter nc, Pile p, Location visible) {
-		// System.out.print("P: "+p.getPos());
 		byte[] reads = p.getBases();
 		for (int i = 0; i < reads.length; i++) {
 			try {
@@ -117,15 +116,15 @@ class BarChartBuffer implements VizBuffer {
 					continue;
 				}
 				/* Might have jumped past the end */
-				if (i < reads.length)
+				if (i < reads.length){
 					nc.count((char) reads[i], p.getPos() - visible.start);
+				}
 			} catch (NumberFormatException ne) {
 				log.log(Level.WARNING, "Pileup parser failed on line: " + new String(reads), ne);
 				System.err.println("Pileup parser failed on line: " + new String(reads));
 			}
 		}
-		// .out.println();
-
+		
 	}
 
 	@Override
@@ -209,13 +208,8 @@ class BarChartBuffer implements VizBuffer {
 
 		yOffset += 2 * graphLineHeigh;
 
-		// System.out.println("DD:"+Arrays.deepToString(nc.counter));
-
-		/*
-		 * Draw SNP track if possible. This depends on drawing the individual
-		 * reads first as during the iteration over all reads, we store the
-		 * polymorphisms.
-		 */
+		
+		
 		int snpTrackHeight = 0;
 		if (visible.length() < MAX_WIDTH) {
 			Sequence sb = ptm.sequence().subsequence(visible.start, visible.end + 1);
@@ -230,7 +224,7 @@ class BarChartBuffer implements VizBuffer {
 			Color[] color = new Color[4];
 			for (int i = 0; i < 4; i++)
 				color[i] = Configuration.getNucleotideColor(nucs[i]);
-			int nucWidth = (int) (Math.ceil(screenWidth / detailedRects[0].length));
+			int nucWidth = (int) (Math.ceil(screenWidth / visible.length()));
 			if (nc != null && nc.hasData() && seqBuffer != null) {
 				snpTrackHeight = Configuration.getInt("shortread:snpTrackHeight");
 				g.setColor(Colors.LIGHEST_GRAY);
@@ -243,23 +237,26 @@ class BarChartBuffer implements VizBuffer {
 				// int skipped = 0;
 				// int totl=0;
 				for (int i = visible.start; i <= visible.end; i++) {
+					//System.out.println("it: "+i);
 					int x1 = Convert.translateGenomeToScreen(i, visible, screenWidth);
 					double total = nc.getTotalCount(i - visible.start);
 					char refNt = seqBuffer[i - visible.start];
 					double done = 0;// Fraction gone to previous nucs
 					// System.out.println(seqBuffer[i -
 					// visible.start]+" "+total);
+					//System.out.println("total: "+(i - visible.start)+"\t"+total);
 					if (total > snpTrackMinimumCoverage) {
 						for (int j = 0; j < 4; j++) {
 							if (nucs[j] != refNt) {
 								double fraction = nc.getCount(nucs[j], i - visible.start) / total;
 								fraction *= snpTrackHeight;
 								// totl++;
-								if (fraction > 0.05) {
+								//if (fraction > 0.05) {
 									g.setColor(color[j]);
+									//System.out.println("filling: "+x1+"\t"+(int) (yOffset + snpTrackHeight - fraction - done));
 									g.fillRect(x1, (int) (yOffset + snpTrackHeight - fraction - done), nucWidth,
 											(int) (Math.ceil(fraction)));
-								}
+								//}
 								// else {
 								// skipped++;
 								// }

@@ -33,8 +33,10 @@ class NucCounter {
 		}
 
 		public int getTotalCount(int pos) {
-			if(pos<0||pos>=counter.length)
+			if(pos<0||pos>=counter[0].length){
 				return -1;
+				
+			}
 			return counter[0][pos] + counter[1][pos] + counter[2][pos] + counter[3][pos] + counter[5][pos];
 		}
 
@@ -65,10 +67,9 @@ class NucCounter {
 
 		public void count(char nuc, int pos) {
 			didCount = true;
-			// System.out.println("P:"+pos);
-			// System.out.println("Miss: "+nuc+"\t"+pos);
 			int ix = ix(nuc);
-			if (ix >= 0 && pos >= 0 && pos < counter[0].length)
+			if (ix >= 0 && pos >= 0 && pos < counter[0].length){
 				counter[ix][pos]++;
+			}
 		}
 	}
