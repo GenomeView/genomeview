@@ -50,9 +50,9 @@ public class ShortReadTrack extends Track {
 
 	private ShortReadProvider provider;
 
-	public ShortReadTrack(DataKey key,ShortReadProvider provider, Model model) {
+	public ShortReadTrack(DataKey key, ShortReadProvider provider, Model model) {
 		super(key, model, true, false);
-		this.provider=provider;
+		this.provider = provider;
 	}
 
 	private InsertionTooltip tooltip = new InsertionTooltip();
@@ -169,7 +169,7 @@ public class ShortReadTrack extends Track {
 			for (java.util.Map.Entry<Rectangle, SAMRecord> e : hitMap.entrySet()) {
 				if (e.getKey().contains(x, y)) {
 					System.out.println("2*Click: " + e.getValue());
-					if(e.getValue().getReadPairedFlag()&&!e.getValue().getMateUnmappedFlag())
+					if (e.getValue().getReadPairedFlag() && !e.getValue().getMateUnmappedFlag())
 						model.center(e.getValue().getMateAlignmentStart());
 				}
 			}
@@ -226,7 +226,7 @@ public class ShortReadTrack extends Track {
 
 	private Color pairingColor;
 
-	private JViewport view;
+	private Rectangle viewRectangle;
 
 	/* Keep track of the last x-coordinate that has been used for painting */
 	private int lastX = 100;
@@ -319,11 +319,12 @@ public class ShortReadTrack extends Track {
 	private HashMap<Rectangle, SAMRecord> hitMap = new HashMap<Rectangle, SAMRecord>();
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view,TrackCommunicationModel tcm) {
+	public synchronized int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
 		paintedBlocks.clear();
 		hitMap.clear();
 
-		this.view = view;
+		// this.view = view;
+		this.viewRectangle = view.getViewRect();
 		// /* Store information to be used in other methods */
 		// currentEntry = entry;
 		// currentScreenWidth = screenWidth;
@@ -340,13 +341,13 @@ public class ShortReadTrack extends Track {
 
 		int originalYOffset = yOffset;
 
-//		//FIXME should be provider
-//		ReadGroup rg = (ReadGroup) entry.get(dataKey);
-//		if (rg == null)
-			if(provider==null)
+		// //FIXME should be provider
+		// ReadGroup rg = (ReadGroup) entry.get(dataKey);
+		// if (rg == null)
+		if (provider == null)
 			return 0;
 
-		Iterable<Status>status=provider.getStatus(currentVisible.start, currentVisible.end);
+		Iterable<Status> status = provider.getStatus(currentVisible.start, currentVisible.end);
 		/*
 		 * Draw individual reads when possible
 		 */
@@ -381,7 +382,7 @@ public class ShortReadTrack extends Track {
 			// yOffset += snpTrackHeight;
 			// nc.init(currentVisible.length());
 		}
-/* Paint reads */
+		/* Paint reads */
 		if (reads != null) {
 
 			lines = 0;
@@ -442,7 +443,8 @@ public class ShortReadTrack extends Track {
 							if (ShortReadTools.isPaired(one) && ShortReadTools.isFirstInPair(one)) {
 								two = provider.getSecondRead(one);
 								if (!one.getMateUnmappedFlag()
-										&& one.getReferenceIndex() != one.getMateReferenceIndex()&&one.getMateReferenceIndex()!=-1) {
+										&& one.getReferenceIndex() != one.getMateReferenceIndex()
+										&& one.getMateReferenceIndex() != -1) {
 									System.out.println("Different indices: " + one.getReferenceIndex() + "\t"
 											+ one.getMateReferenceIndex());
 								}
@@ -542,8 +544,8 @@ public class ShortReadTrack extends Track {
 		}
 
 		/* Draw status */
-		Track.paintStatus(g,status,originalYOffset,yOffset-originalYOffset,currentVisible,screenWidth);
-		
+		Track.paintStatus(g, status, originalYOffset, yOffset - originalYOffset, currentVisible, screenWidth);
+
 		/* Draw label */
 		String name = StaticUtils.shortify(super.dataKey.toString());
 		FontMetrics metrics = g.getFontMetrics();
@@ -585,11 +587,11 @@ public class ShortReadTrack extends Track {
 			Entry entry, SAMRecord otherRead, double yOff) {
 		/* If outside vertical view, return immediately */
 
-		if (yRec + yOff > view.getViewRect().y + view.getViewRect().height) {
+		if (yRec + yOff > viewRectangle.y + viewRectangle.height) {
 			return false;
 		}
-		if (yRec + yOff < view.getViewRect().y - 10) {
-			double startY = view.getViewRect().y - yOff;
+		if (yRec + yOff < viewRectangle.y - 10) {
+			double startY = viewRectangle.y - yOff;
 			// System.out.println("\t" + yRec + "\t" + yOff + ")\t" +
 			// view.getViewRect().y + "\t" + startY);
 			return false;

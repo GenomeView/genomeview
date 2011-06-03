@@ -158,6 +158,11 @@ class BarChartBuffer implements VizBuffer {
 			//System.out.println("Using TCM.. " + ptm.getTrackCommunication().getLocalPileupMax());
 			div = ptm.getTrackCommunication().getLocalPileupMax();
 		}
+		
+		if (ptm.maxValue() > 0) {
+			div = ptm.maxValue();
+		}
+			
 		// System.out.println("Using " + div + ", dynamic: " +
 		// ptm.isDynamicScaling());
 		// System.out.println("\tvalue 20: "+detailedRects[0][20]+"\t"+detailedRects[1][20]);
@@ -169,9 +174,9 @@ class BarChartBuffer implements VizBuffer {
 			double rcov = detailedRects[1][i];
 			double coverage = fcov + rcov;
 			/* Max value set, truncate */
-
-			if (ptm.maxValue() > 0) {
-				div = ptm.maxValue();
+//
+//			if (ptm.maxValue() > 0) {
+//				div = ptm.maxValue();
 				if (coverage > div)
 					coverage = div;
 				if (rcov > div)
@@ -179,7 +184,7 @@ class BarChartBuffer implements VizBuffer {
 				if (fcov > div)
 					fcov = div;
 
-			}
+//			}
 			double frac = coverage / div;
 			int size = (int) (frac * graphLineHeigh);
 			double ffrac = fcov / div;

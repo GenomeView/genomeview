@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -359,11 +360,10 @@ public class StructureTrack extends Track {
 			if (model.getAnnotationLocationVisible().length() < 100) {
 				Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
 				g.setColor(Color.black);
-				g
-						.drawString(
-								"" + nt,
-								(int) (((i - r.start()) * width - stringSize.getWidth() / 2) + (width / 2)),
-								(int) (3 * lineHeight + (forward ? 0 : tickHeight + lineHeight) + lineHeight + yOffset - letterSpacing));
+				g.drawString(
+						"" + nt,
+						(int) (((i - r.start()) * width - stringSize.getWidth() / 2) + (width / 2)),
+						(int) (3 * lineHeight + (forward ? 0 : tickHeight + lineHeight) + lineHeight + yOffset - letterSpacing));
 			}
 		}
 
@@ -468,7 +468,8 @@ public class StructureTrack extends Track {
 
 			if (Configuration.getBoolean("colorStartCodons") && model.getAAMapping().isStart(codon)) {
 				g.setColor(Configuration.getAminoAcidColor('M'));
-				if (!Configuration.getBoolean("general:onlyMethionineAsStart") || model.getAAMapping().get(codon) == 'M')
+				if (!Configuration.getBoolean("general:onlyMethionineAsStart")
+						|| model.getAAMapping().get(codon) == 'M')
 					g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width, lineHeight);
 			}
 
@@ -485,10 +486,11 @@ public class StructureTrack extends Track {
 			 */
 			if (model.getAnnotationLocationVisible().length() < Configuration
 					.getInt("geneStructureAminoAcidWindowLetters")) {
-				Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + aa, g);
-
+				if(!aaStringBoundsCache.containsKey(aa))
+					aaStringBoundsCache.put(aa,g.getFontMetrics().getStringBounds("" + aa, g));
+				Rectangle2D sb=aaStringBoundsCache.get(aa);
 				/* draw amino acid letter */
-				x = (int) (((i - r.start()) * width - stringSize.getWidth() / 2) + (width * 3 / 2));
+				x = (int) (((i - r.start()) * width - sb.getWidth() / 2) + (width * 3 / 2));
 				y += lineHeight;
 				g.setColor(Color.BLACK);
 				g.drawString("" + aa, x, (int) (y + yOffset - letterSpacing));
@@ -498,6 +500,8 @@ public class StructureTrack extends Track {
 		}
 
 	}
+
+	private HashMap<Character, Rectangle2D> aaStringBoundsCache = new HashMap<Character, Rectangle2D>();
 
 	private void paintLines(Graphics g, int yOffset) {
 		g.setColor(Color.LIGHT_GRAY);
@@ -562,7 +566,7 @@ public class StructureTrack extends Track {
 	 * +-----------------------+
 	 * | reverse frame 2       |
 	 * +-----------------------+
-     * </code>
+	 * </code>
 	 */
 	private void renderCDS(Graphics2D g, Feature rf, int yOffset) {
 		int middle = 4 * lineHeight + tickHeight / 2;
@@ -913,7 +917,7 @@ public class StructureTrack extends Track {
 	private BufferSeq bs;
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view,TrackCommunicationModel tcm) {
+	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view, TrackCommunicationModel tcm) {
 		if (entry instanceof DummyEntry)
 			entry = model.getSelectedEntry();
 		bs = null;
