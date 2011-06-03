@@ -64,6 +64,10 @@ class BarChartBuffer implements VizBuffer {
 		Iterable<Pile>itt=provider.get(visible.start, visible.end);
 //		System.out.println(itt);
 		for (Pile p : itt) {
+			if(p==null){
+				System.out.println("Null pile");
+				continue;
+			}
 			if (p.getPos() + p.getLength() < visible.start || p.getPos() > visible.end)
 				continue;
 

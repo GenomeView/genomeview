@@ -35,7 +35,7 @@ public class GenomeViewScheduler {
 			if (t.getLocation().overlaps(visible)) {
 				t.boost();
 			} else
-				t.zero();
+				t.cancel();
 			gvs.add(t);
 
 		}

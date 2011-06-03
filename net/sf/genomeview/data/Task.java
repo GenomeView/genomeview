@@ -29,7 +29,13 @@ public abstract class Task implements Runnable, Comparable<Task> {
 			return 1;
 	}
 
-	public void zero() {
+	/**
+	 * Try to cancel this task. 
+	 * 
+	 * Default implementation will not cancel the task, but reduce it's priority to zero.
+	 * 
+	 */
+	public void cancel() {
 		id=0;
 		
 

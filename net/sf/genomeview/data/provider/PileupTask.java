@@ -34,11 +34,23 @@ class PileupTask extends Task {
 
 	}
 
+	
+	private boolean cancelled=false;
+	@Override
+	public void cancel(){
+		super.cancel();
+		this.cancelled=true;
+	}
+	
 	@Override
 	public void run() {
 		try {
 			if(model.isExitRequested())
 				return;
+			if(cancelled){
+				summary.complyCancel(idx);
+				return;
+			}
 			summary.setRunning(idx);
 			Iterable<Pile> piles = pw.get(idx * PileupSummary.CHUNK, (idx + 1) * PileupSummary.CHUNK);
 			for (Pile p : piles) {

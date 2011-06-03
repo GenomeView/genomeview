@@ -37,7 +37,7 @@ class PileupSummary extends Observable{
 //	/* Keeps track of the maximum value in summary graph mode */
 //	private double maxSummary = 0;
 	private Model model;
-//	private Entry entry;
+
 
 	public int length() {
 		if (forwardSummary == null)
@@ -59,6 +59,7 @@ class PileupSummary extends Observable{
 		ready = new BitSet();
 		queued = new BitSet();
 		running = new BitSet();
+		
 	}
 
 	void conditionalQueue(Data<Pile> pw, int idx) {
@@ -122,6 +123,22 @@ class PileupSummary extends Observable{
 
 	}
 
+
+	
+	
+	public void complyCancel(int idx) {
+		
+		ready.set(idx,false);
+		queued.set(idx,false);
+		running.set(idx,false);
+		lastStart=-1;
+		lastEnd=-1;
+		setChanged();
+		notifyObservers();
+		
+	}
+
+	
 	void setReady(int idx) {
 		ready.set(idx);
 		System.out.println("Completed "+idx);
@@ -201,4 +218,5 @@ class PileupSummary extends Observable{
 			
 	}
 
+	
 }
