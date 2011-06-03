@@ -217,7 +217,7 @@ public class PileupTrack extends Track {
 
 	@Override
 	public String displayName() {
-		return provider.getSourceData().label();
+		return provider.label();
 	}
 
 }

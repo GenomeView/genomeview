@@ -3,11 +3,16 @@
  */
 package net.sf.genomeview.data.provider;
 
-import net.sf.jannot.Data;
+import net.sf.genomeview.data.GenomeViewScheduler;
+
 
 /**
- * Data provides for visualization tracks. Methods should return immediately,
- * data fetching should be done in other threads.
+ * Data provider for visualization tracks. 
+ * 
+ * Methods should return immediately,
+ * data fetching should be done in background threads.
+ * 
+ * @see GenomeViewScheduler
  * 
  * @author Thomas Abeel
  * 
@@ -16,7 +21,7 @@ import net.sf.jannot.Data;
 public interface DataProvider<T> {
 
 	/**
-	 * Gets data. The selected data should cover [start,end[. The coordinates
+	 * Get data. The selected data should cover [start,end[. The coordinates
 	 * are one based.
 	 * 
 	 * @param start
@@ -30,7 +35,12 @@ public interface DataProvider<T> {
 	public Iterable<T> get(int start, int end);
 
 	public Iterable<Status> getStatus(int start, int end);
-	
-	public Data<T> getSourceData();
+
+	/**
+	 * Display label used to inform the user what kind of data this is.
+	 * 
+	 * @return
+	 */
+	public String label();
 
 }

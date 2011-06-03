@@ -163,8 +163,8 @@ public class WiggleProvider extends PileProvider implements Observer {
 	}
 
 	@Override
-	public Data<Pile> getSourceData() {
-		return source;
+	public String label() {
+		return source.label();
 	}
 
 	@Override

@@ -107,10 +107,10 @@ public class TDFProvider extends PileProvider {
 		return status;
 	}
 
-	@Override
-	public Data<Pile> getSourceData() {
-		return source;
-	}
+//	@Override
+//	public Data<Pile> getSourceData() {
+//		return source;
+//	}
 
 	@Override
 	public WindowFunction[] getWindowFunctions() {
@@ -136,6 +136,13 @@ public class TDFProvider extends PileProvider {
 	@Override
 	public boolean isCurrentWindowFunction(WindowFunction wf) {
 		return source.isCurrentWindowFunction(wf);
+	}
+
+
+
+	@Override
+	public String label() {
+		return source.label();
 	}
 
 }

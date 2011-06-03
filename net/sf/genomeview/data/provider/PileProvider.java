@@ -24,6 +24,7 @@ public abstract class PileProvider extends AbstractDataProvider<Pile> {
 
 	public abstract boolean isCurrentWindowFunction(WindowFunction wf);
 
+
 //	public abstract double getMaxSummary();
 
 }
