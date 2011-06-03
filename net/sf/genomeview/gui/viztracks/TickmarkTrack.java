@@ -14,7 +14,7 @@ import net.sf.jannot.Location;
 import net.sf.jannot.StringKey;
 
 public class TickmarkTrack extends Track {
-	public static final StringKey key = new StringKey("TICK&*(#%&*(@#%&*(@%(*TICK");
+	public static final StringKey key = new StringKey("GV::TICKMARK");
 
 	public TickmarkTrack(Model model) {
 

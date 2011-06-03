@@ -464,58 +464,11 @@ public class Model extends Observable implements IModel {
 	 */
 	public synchronized void updateTracks() {
 		try {
-			int startSize = trackList.size();
-
-			// for (Entry e : entries) {
+			
 			Entry e = this.getSelectedEntry();
-			System.out.println("Updating tracks for " + e);
-			/* Graph tracks */
-			for (DataKey key : e) {
-				Data<?> data = e.get(key);
-				
-				if (data instanceof MemoryFeatureAnnotation) {
-					if (!trackList.containsTrack(key) && ((MemoryFeatureAnnotation) data).cachedCount() > 0)
-						trackList.add(key,new FeatureTrack(this, (Type) key));
-
-				}
-				if (data instanceof GFFWrapper || data instanceof BEDWrapper) {
-					if (!trackList.containsTrack(key))
-						trackList.add(key,new FeatureTrack(this, (Type) key));
-
-				}
-
-				if (data instanceof PileupWrapper || data instanceof SWigWrapper ) {
-					if (!trackList.containsTrack(key))
-						trackList.add(key,new PileupTrack(key,new WiggleProvider(e, (Data<Pile>)data,this), this));
-				}
-				
-				if (data instanceof TDFData ) {
-					if (!trackList.containsTrack(key))
-						trackList.add(key,new PileupTrack(key,new TDFProvider(e, (TDFData)data,this), this));
-				}
-				
-
-				if (data instanceof Graph) {
-					if (!trackList.containsTrack(key))
-						trackList.add(key,new WiggleTrack(key, this, true));
-				}
-				if (data instanceof AlignmentAnnotation) {
-					if (!trackList.containsTrack(key))
-						trackList.add(key,new MultipleAlignmentTrack(this, key));
-				}
-				if (data instanceof ReadGroup) {
-					if (!trackList.containsTrack(key)) {
-						trackList.add(key,new ShortReadTrack(key, this));
-					}
-				}
-				if (data instanceof MAFMultipleAlignment) {
-					if (!trackList.containsTrack(key)) {
-						trackList.add(key,new MultipleAlignmentTrack2(this, key));
-						logger.info("Added multiple alignment track " + key);
-					}
-				}
-			}
-			if (trackList.size() != startSize)
+			boolean changed=trackList.update(e);
+			
+			if(changed)
 				refresh(NotificationTypes.UPDATETRACKS);
 		} catch (ConcurrentModificationException e) {
 			logger.log(Level.INFO, "Update tracks interrupted, tracks already changed", e);

@@ -5,17 +5,37 @@ package net.sf.genomeview.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.provider.TDFProvider;
+import net.sf.genomeview.data.provider.WiggleProvider;
 import net.sf.genomeview.gui.viztracks.TickmarkTrack;
 import net.sf.genomeview.gui.viztracks.Track;
+import net.sf.genomeview.gui.viztracks.annotation.FeatureTrack;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
+import net.sf.genomeview.gui.viztracks.comparative.MultipleAlignmentTrack;
+import net.sf.genomeview.gui.viztracks.comparative.MultipleAlignmentTrack2;
+import net.sf.genomeview.gui.viztracks.graph.WiggleTrack;
+import net.sf.genomeview.gui.viztracks.hts.PileupTrack;
+import net.sf.genomeview.gui.viztracks.hts.ShortReadTrack;
+import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
+import net.sf.jannot.Entry;
+import net.sf.jannot.MemoryFeatureAnnotation;
+import net.sf.jannot.Type;
+import net.sf.jannot.alignment.maf.MAFMultipleAlignment;
+import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
+import net.sf.jannot.pileup.Pile;
+import net.sf.jannot.shortread.ReadGroup;
+import net.sf.jannot.tabix.BEDWrapper;
+import net.sf.jannot.tabix.GFFWrapper;
+import net.sf.jannot.tabix.PileupWrapper;
+import net.sf.jannot.tabix.SWigWrapper;
+import net.sf.jannot.tdf.TDFData;
+import net.sf.jannot.wiggle.Graph;
 
 /***
  * 
@@ -23,52 +43,14 @@ import net.sf.jannot.DataKey;
  * 
  */
 public class TrackList implements Iterable<Track> {
-//	class WeightedDataKey implements Comparable<WeightedDataKey> {
-//		private int weight = 0;
-//		private DataKey dk = null;
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see java.lang.Object#hashCode()
-//		 */
-//		@Override
-//		public int hashCode() {
-//			return dk.hashCode() + 37 * weight;
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see java.lang.Object#equals(java.lang.Object)
-//		 */
-//		@Override
-//		public boolean equals(Object obj) {
-//			return dk.equals(((WeightedDataKey) obj).dk) && ((WeightedDataKey) obj).weight == weight;
-//		}
-//
-//		/**
-//		 * @param weight
-//		 * @param dk
-//		 */
-//		public WeightedDataKey(int weight, DataKey dk) {
-//			super();
-//			this.weight = weight;
-//			this.dk = dk;
-//		}
-//
-//		@Override
-//		public int compareTo(WeightedDataKey o) {
-//			return Double.compare(weight, o.weight);
-//		}
-//
-//	}
+
+	private Logger log = Logger.getLogger(TrackList.class.getCanonicalName());
 
 	private Model model;
 
 	private ArrayList<DataKey> order = new ArrayList<DataKey>();
 	private Map<DataKey, Track> mapping = new HashMap<DataKey, Track>();
-	
+
 	// private List<DataKey> order = new ArrayList<DataKey>();
 
 	public TrackList(Model model) {
@@ -97,11 +79,23 @@ public class TrackList implements Iterable<Track> {
 		return (StructureTrack) mapping.get(StructureTrack.key);
 	}
 
-	void add(DataKey dk, Track track) {
-//		WeightedDataKey wdk = new WeightedDataKey(order.size(), dk);
+	private void add(DataKey dk, Track track) {
 		mapping.put(dk, track);
-		order.add(dk);
-//		rawKeys.add(dk);
+		int x = findIndex(dk);
+		order.add(x, dk);
+
+	}
+
+	private int findIndex(DataKey dk) {
+		int w = Configuration.getWeight(dk);
+		
+		int count = 0;
+		while (count < order.size()
+				&& Configuration.getWeight(order.get(count)) <= w) {
+			count++;
+		}
+
+		return count;
 
 	}
 
@@ -117,8 +111,14 @@ public class TrackList implements Iterable<Track> {
 	public void down(int row) {
 		if (row < order.size() - 1) {
 			DataKey tmp = order.get(row);
+
+			int tmpWeight = Configuration.getWeight(order.get(row));
+			Configuration.setWeight(order.get(row),tmpWeight+1);
+			Configuration.setWeight(order.get(row + 1), tmpWeight);
+
 			order.set(row, order.get(row + 1));
 			order.set(row + 1, tmp);
+
 			model.refresh();
 
 		}
@@ -128,6 +128,12 @@ public class TrackList implements Iterable<Track> {
 	public void up(int row) {
 		if (row > 0) {
 			DataKey tmp = order.get(row);
+
+			//int tmpWeight = Configuration.getWeight(order.get(row));
+			Configuration.setWeight(order.get(row),
+					Configuration.getWeight(order.get(row - 1)));
+			Configuration.setWeight(order.get(row - 1), Configuration.getWeight(order.get(row - 1))+1);
+
 			order.set(row, order.get(row - 1));
 			order.set(row - 1, tmp);
 			model.refresh();
@@ -140,7 +146,7 @@ public class TrackList implements Iterable<Track> {
 		mapping.remove(key);
 	}
 
-	public boolean containsTrack(DataKey key) {
+	private boolean containsTrack(DataKey key) {
 		return mapping.keySet().contains(key);
 	}
 
@@ -180,6 +186,74 @@ public class TrackList implements Iterable<Track> {
 		System.out.println("Tracklist debug:");
 		System.out.println("Order:" + order);
 		System.out.println("Mapping: " + mapping);
+
+	}
+
+	public boolean update(Entry e) {
+		System.out.println("Updating tracks for " + e);
+		int startSize = this.size();
+		/* Graph tracks */
+		for (DataKey key : e) {
+			Data<?> data = e.get(key);
+
+			if (data instanceof MemoryFeatureAnnotation) {
+				if (!this.containsTrack(key)
+						&& ((MemoryFeatureAnnotation) data).cachedCount() > 0)
+					this.add(key, new FeatureTrack(model, (Type) key));
+
+			}
+			if (data instanceof GFFWrapper || data instanceof BEDWrapper) {
+				if (!this.containsTrack(key))
+					this.add(key, new FeatureTrack(model, (Type) key));
+
+			}
+
+			if (data instanceof PileupWrapper || data instanceof SWigWrapper) {
+				if (!this.containsTrack(key))
+					this.add(key, new PileupTrack(key, new WiggleProvider(e,
+							(Data<Pile>) data, model), model));
+			}
+
+			if (data instanceof TDFData) {
+				if (!this.containsTrack(key))
+					this.add(key, new PileupTrack(key, new TDFProvider(e,
+							(TDFData) data, model), model));
+			}
+
+			if (data instanceof Graph) {
+				if (!this.containsTrack(key))
+					this.add(key, new WiggleTrack(key, model, true));
+			}
+			if (data instanceof AlignmentAnnotation) {
+				if (!this.containsTrack(key))
+					this.add(key, new MultipleAlignmentTrack(model, key));
+			}
+			if (data instanceof ReadGroup) {
+				if (!this.containsTrack(key)) {
+					this.add(key, new ShortReadTrack(key, model));
+				}
+			}
+			if (data instanceof MAFMultipleAlignment) {
+				if (!this.containsTrack(key)) {
+					this.add(key, new MultipleAlignmentTrack2(model, key));
+					log.info("Added multiple alignment track " + key);
+				}
+			}
+		}
+		/* Fix weight to make sure they are different */
+		for (int i = 1; i < order.size(); i++) {
+//			if (Configuration.getWeight(order.get(i - 1)) < Configuration
+//					.getWeight(order.get(i))) {
+//				System.err
+//						.println("This is not supposed to happen, why are we sorting?!!?");
+//			}
+			if (Configuration.getWeight(order.get(i - 1)) >= Configuration
+					.getWeight(order.get(i))) {
+				Configuration.setWeight(order.get(i), Configuration.getWeight(order.get(i - 1))+1);
+
+			}
+		}
+		return this.size() != startSize;
 
 	}
 }

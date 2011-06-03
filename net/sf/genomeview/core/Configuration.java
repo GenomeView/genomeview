@@ -18,6 +18,7 @@ import java.util.zip.GZIPInputStream;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
+import net.sf.jannot.DataKey;
 import net.sf.jannot.Type;
 import be.abeel.io.GZIPPrintWriter;
 import be.abeel.io.LineIterator;
@@ -193,7 +194,10 @@ public class Configuration {
 	}
 
 	public static int getInt(String string) {
-		return Integer.parseInt(get(string));
+		String s=get(string);
+		if(s==null)
+			return 0;
+		return Integer.parseInt(s);
 	}
 
 	public static boolean getBoolean(String string) {
@@ -320,5 +324,18 @@ public class Configuration {
 
 	public static double getDouble(String string) {
 		return Double.parseDouble(get(string));
+	}
+
+	public static int getWeight(DataKey dk) {
+		System.out.println("Getting track weight: "+dk);
+		if(get("track:weight:"+dk)==null)
+			return 1000;
+		return getInt("track:weight:"+dk);
+		
+	}
+
+	public static void setWeight(DataKey dk, int weight) {
+		set("track:weight:"+dk,weight);
+		
 	}
 }

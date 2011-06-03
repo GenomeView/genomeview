@@ -87,7 +87,7 @@ public class StructureTrack extends Track {
 
 	private double letterSpacing;
 	private StructureTrackModel stm;
-	public static final StringKey key = new StringKey("STRUC&*(#%&*(@#%&*(@%(*STRUC");
+	public static final StringKey key = new StringKey("GV::STRUCTURE");
 
 	public StructureTrack(Model model) {
 		super(key, model, Configuration.getBoolean("track:showStructure"), false);
