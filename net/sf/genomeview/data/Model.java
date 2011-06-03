@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Set;
@@ -23,42 +22,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.data.provider.TDFProvider;
-import net.sf.genomeview.data.provider.WiggleProvider;
 import net.sf.genomeview.gui.external.JavaScriptHandler;
 import net.sf.genomeview.gui.viztracks.TickmarkTrack;
 import net.sf.genomeview.gui.viztracks.Track;
-import net.sf.genomeview.gui.viztracks.annotation.FeatureTrack;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
-import net.sf.genomeview.gui.viztracks.comparative.MultipleAlignmentTrack;
-import net.sf.genomeview.gui.viztracks.comparative.MultipleAlignmentTrack2;
-import net.sf.genomeview.gui.viztracks.graph.WiggleTrack;
-import net.sf.genomeview.gui.viztracks.hts.PileupTrack;
-import net.sf.genomeview.gui.viztracks.hts.ShortReadTrack;
 import net.sf.genomeview.plugin.GUIManager;
 import net.sf.jannot.AminoAcidMapping;
-import net.sf.jannot.Data;
-import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.Location;
-import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
-import net.sf.jannot.Type;
-import net.sf.jannot.alignment.maf.MAFMultipleAlignment;
-import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
-import net.sf.jannot.pileup.Pile;
-import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.MultiFileSource;
-import net.sf.jannot.tabix.BEDWrapper;
-import net.sf.jannot.tabix.GFFWrapper;
-import net.sf.jannot.tabix.PileupWrapper;
-import net.sf.jannot.tabix.SWigWrapper;
-import net.sf.jannot.tdf.TDFData;
-import net.sf.jannot.wiggle.Graph;
 import be.abeel.net.URIFactory;
 import be.abeel.util.DefaultHashMap;
 
@@ -168,8 +145,7 @@ public class Model extends Observable implements IModel {
 
 	public void clearEntries() {
 		selectionModel.clear();
-		annotationStart = 0;
-		annotationEnd = 0;
+		visible=new Location(0,0);
 		loadedSources.clear();
 		entries.clear();
 		undoStack.clear();
@@ -239,10 +215,11 @@ public class Model extends Observable implements IModel {
 	}
 
 	public Location getAnnotationLocationVisible() {
-		return new Location(annotationStart, annotationEnd);
+		return visible;
 	}
 
-	private int annotationStart = 0, annotationEnd = 0;
+	private Location visible=new Location(0,0);
+	//private int annotationStart = 0, annotationEnd = 0;
 
 	public void setAnnotationLocationVisible(Location r, boolean mayExpand) {
 		int modStart = -1;
@@ -267,7 +244,7 @@ public class Model extends Observable implements IModel {
 		if (newZoom.length() < 50 && mayExpand) {
 			setAnnotationLocationVisible(new Location(modStart - 25, modEnd + 25));
 		}
-		if (newZoom.length() != annotationEnd - annotationStart + 1 && newZoom.length() < 50)
+		if (newZoom.length() != visible.end - visible.start+ 1 && newZoom.length() < 50)
 			return;
 		// if (newZoom.length() != annotationEnd - annotationStart + 1
 		// && newZoom.length() > Configuration.getInt("general:zoomout"))
@@ -275,7 +252,7 @@ public class Model extends Observable implements IModel {
 		if (newZoom.start < 1 || newZoom.end < 1)
 			return;
 
-		ZoomChange zc = new ZoomChange(new Location(annotationStart, annotationEnd), newZoom);
+		ZoomChange zc = new ZoomChange(visible, newZoom);
 		zc.doChange();
 		refresh();
 
@@ -316,17 +293,18 @@ public class Model extends Observable implements IModel {
 
 		@Override
 		public void doChange() {
-			annotationStart = neww.start();
-			annotationEnd = neww.end();
+//			annotationStart = neww.start();
+//			annotationEnd = neww.end();
+			visible=neww;
 
 		}
 
 		@Override
 		public void undoChange() {
-			assert (annotationStart == neww.start());
-			assert (annotationEnd == neww.end());
-			annotationStart = orig.start();
-			annotationEnd = orig.end();
+			assert (visible.start == neww.start());
+			assert (visible.end == neww.end());
+			visible=orig;
+			
 
 		}
 
@@ -380,7 +358,7 @@ public class Model extends Observable implements IModel {
 	 *            the position to center on
 	 */
 	public void center(int genomePosition) {
-		int length = (annotationEnd - annotationStart) / 2;
+		int length = (visible.end - visible.start) / 2;
 		setAnnotationLocationVisible(new Location(genomePosition - length, genomePosition + length));
 
 	}
