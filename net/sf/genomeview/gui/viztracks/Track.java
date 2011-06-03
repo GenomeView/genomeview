@@ -19,9 +19,12 @@ import javax.swing.JViewport;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.provider.Status;
+import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
+import net.sf.jannot.Location;
 
 /**
  * Abstract class for visualization tracks.
@@ -33,7 +36,24 @@ public abstract class Track extends Observable {
 	protected DataKey dataKey;
 	protected Entry entry;
 
+	public static void paintStatus(Graphics g,Iterable<Status> status, int y, int returnTrackHeight,Location visible,double screenWidth) {
+		for (Status st : status) {
+			// System.out.println("Not ready "+st.start()+"\t"+st.end());
+			if (!st.isReady()) {
+				int x1 = Convert.translateGenomeToScreen(st.start(), visible, screenWidth);
+				int x2 = Convert.translateGenomeToScreen(st.end()+1, visible, screenWidth);
+				g.setColor(new Color(0, 255, 0, 100));
 
+				g.fillRect(x1,y, x2 - x1 + 1, returnTrackHeight);
+				if (visible.overlaps(new Location(st.start(), st.end()))) {
+					g.setColor(Color.BLACK);
+					g.drawString("Retrieving data...", 100,y + returnTrackHeight / 2);
+				}
+
+			}
+		}
+		
+	}
 	
 	public Track(DataKey key, Model model, boolean visible, boolean collapsible) {
 		this.model = model;

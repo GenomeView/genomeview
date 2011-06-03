@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.provider.ShortReadProvider;
 import net.sf.genomeview.data.provider.TDFProvider;
 import net.sf.genomeview.data.provider.WiggleProvider;
 import net.sf.genomeview.gui.viztracks.TickmarkTrack;
@@ -230,7 +231,7 @@ public class TrackList implements Iterable<Track> {
 			}
 			if (data instanceof ReadGroup) {
 				if (!this.containsTrack(key)) {
-					this.add(key, new ShortReadTrack(key, model));
+					this.add(key, new ShortReadTrack(key,new ShortReadProvider(e, (ReadGroup)data, model), model));
 				}
 			}
 			if (data instanceof MAFMultipleAlignment) {

@@ -4,6 +4,7 @@
 package net.sf.genomeview.gui.viztracks.hts;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.text.NumberFormat;
 import java.util.ConcurrentModificationException;
@@ -16,6 +17,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.provider.PileProvider;
 import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.refseq.Sequence;
@@ -289,25 +291,14 @@ class BarChartBuffer implements VizBuffer {
 		// else
 
 		int returnTrackHeight = 2 * graphLineHeigh + snpTrackHeight;
-		for (Status st : status) {
-			// System.out.println("Not ready "+st.start()+"\t"+st.end());
-			if (!st.isReady()) {
-				int x1 = Convert.translateGenomeToScreen(st.start(), visible, screenWidth);
-				int x2 = Convert.translateGenomeToScreen(st.end()+1, visible, screenWidth);
-				g.setColor(new Color(0, 255, 0, 100));
-
-				g.fillRect(x1, yOffset - 2 * graphLineHeigh, x2 - x1 + 1, returnTrackHeight);
-				if (visible.overlaps(new Location(st.start(), st.end()))) {
-					g.setColor(Color.BLACK);
-					g.drawString("Retrieving data...", 100, yOffset - 2 * graphLineHeigh + returnTrackHeight / 2);
-				}
-
-			}
-		}
+		Track.paintStatus(g,status,yOffset - 2 * graphLineHeigh,returnTrackHeight,visible,screenWidth);
+		
 
 		return returnTrackHeight;
 
 	}
+
+	
 
 	private String format(int count, int total) {
 		if (total > 0)

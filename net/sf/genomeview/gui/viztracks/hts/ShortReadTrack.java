@@ -26,6 +26,8 @@ import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.LocationTools;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.provider.ShortReadProvider;
+import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.viztracks.Track;
@@ -34,7 +36,6 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.shortread.BAMreads;
-import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.shortread.ShortReadTools;
 import net.sf.samtools.CigarElement;
 import net.sf.samtools.CigarOperator;
@@ -47,8 +48,11 @@ import net.sf.samtools.SAMRecord;
  */
 public class ShortReadTrack extends Track {
 
-	public ShortReadTrack(DataKey key, Model model) {
+	private ShortReadProvider provider;
+
+	public ShortReadTrack(DataKey key,ShortReadProvider provider, Model model) {
 		super(key, model, true, false);
+		this.provider=provider;
 	}
 
 	private InsertionTooltip tooltip = new InsertionTooltip();
@@ -336,16 +340,19 @@ public class ShortReadTrack extends Track {
 
 		int originalYOffset = yOffset;
 
-		ReadGroup rg = (ReadGroup) entry.get(dataKey);
-		if (rg == null)
+//		//FIXME should be provider
+//		ReadGroup rg = (ReadGroup) entry.get(dataKey);
+//		if (rg == null)
+			if(provider==null)
 			return 0;
 
+		Iterable<Status>status=provider.getStatus(currentVisible.start, currentVisible.end);
 		/*
 		 * Draw individual reads when possible
 		 */
 		Iterable<SAMRecord> reads = null;
 
-		int readLength = ((ReadGroup) entry.get(dataKey)).readLength();
+		int readLength = provider.readLength();
 		int pairLength = readLength;
 		if (entry.get(dataKey) instanceof BAMreads)
 			pairLength = ((BAMreads) entry.get(dataKey)).getPairLength();
@@ -356,7 +363,7 @@ public class ShortReadTrack extends Track {
 			yOffset += 20 + 5;
 		} else {
 			/* Access to BAMread is through buffer for performance! */
-			reads = rg.get(currentVisible.start, currentVisible.end);
+			reads = provider.get(currentVisible.start, currentVisible.end);
 
 		}
 
@@ -374,7 +381,7 @@ public class ShortReadTrack extends Track {
 			// yOffset += snpTrackHeight;
 			// nc.init(currentVisible.length());
 		}
-
+/* Paint reads */
 		if (reads != null) {
 
 			lines = 0;
@@ -386,7 +393,7 @@ public class ShortReadTrack extends Track {
 				for (SAMRecord one : reads) {
 
 					if (enablePairing && one.getReadPairedFlag() && ShortReadTools.isSecondInPair(one)) {
-						if (rg.getFirstRead(one) == null) {
+						if (provider.getFirstRead(one) == null) {
 							// System.out.println("First read not found");
 						} else if (!one.getMateUnmappedFlag()) {
 
@@ -433,7 +440,7 @@ public class ShortReadTrack extends Track {
 						if (enablePairing) {
 							// ShortReadTools esr = (ShortReadTools) one;
 							if (ShortReadTools.isPaired(one) && ShortReadTools.isFirstInPair(one)) {
-								two = rg.getSecondRead(one);
+								two = provider.getSecondRead(one);
 								if (!one.getMateUnmappedFlag()
 										&& one.getReferenceIndex() != one.getMateReferenceIndex()&&one.getMateReferenceIndex()!=-1) {
 									System.out.println("Different indices: " + one.getReferenceIndex() + "\t"
@@ -534,6 +541,9 @@ public class ShortReadTrack extends Track {
 
 		}
 
+		/* Draw status */
+		Track.paintStatus(g,status,originalYOffset,yOffset-originalYOffset,currentVisible,screenWidth);
+		
 		/* Draw label */
 		String name = StaticUtils.shortify(super.dataKey.toString());
 		FontMetrics metrics = g.getFontMetrics();
