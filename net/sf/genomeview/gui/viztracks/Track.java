@@ -37,13 +37,13 @@ public abstract class Track extends Observable {
 	public Track(DataKey key, Model model, boolean visible, boolean collapsible) {
 		this.model = model;
 		this.dataKey = key;
-		this.visible = visible;
+		
 		this.entry = model.getSelectedEntry();
 		this.collapsible = collapsible;
 		this.addObserver(model);
 	}
 
-	private boolean visible;
+	//private boolean visible;
 	private static final Logger log = Logger.getLogger(Track.class.getCanonicalName());
 
 	/**
@@ -188,11 +188,11 @@ public abstract class Track extends Observable {
 	}
 
 	public boolean isVisible() {
-		return visible;
+		return Configuration.getVisible(dataKey);
 	}
 
 	public void setVisible(boolean visible) {
-		this.visible = visible;
+		Configuration.setVisible(dataKey,visible);
 		setChanged();
 		notifyObservers();
 	}
