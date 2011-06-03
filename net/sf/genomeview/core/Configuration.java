@@ -332,7 +332,6 @@ public class Configuration {
 	}
 
 	public static int getWeight(DataKey dk) {
-		System.out.println("Getting track weight: " + dk);
 		if (get("track:weight:" + dk) == null)
 			return 1000;
 		return getInt("track:weight:" + dk);
