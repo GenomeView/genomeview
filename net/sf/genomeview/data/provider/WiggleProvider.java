@@ -4,14 +4,8 @@
 package net.sf.genomeview.data.provider;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
-
-import org.broad.igv.track.WindowFunction;
-
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 import net.sf.genomeview.core.NoFailIterable;
 import net.sf.genomeview.data.GenomeViewScheduler;
@@ -21,6 +15,8 @@ import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
+
+import org.broad.igv.track.WindowFunction;
 
 /**
  * 
