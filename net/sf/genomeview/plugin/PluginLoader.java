@@ -24,6 +24,7 @@ import org.java.plugin.PluginManager.PluginLocation;
 import org.java.plugin.registry.Extension;
 import org.java.plugin.registry.PluginDescriptor;
 import org.java.plugin.standard.StandardPluginLocation;
+import org.java.plugin.util.ExtendedProperties;
 
 import be.abeel.net.URIFactory;
 
@@ -34,7 +35,21 @@ public class PluginLoader {
 	public static PluginManager pluginManager = null;
 
 	public static void load(IModel model) {
-		pluginManager = ObjectFactory.newInstance().createManager();
+		
+		log.info("Shadow folder: "+System.getProperty("java.io.tmpdir") + "/.jpf-shadow");
+		
+		ExtendedProperties ep = new ExtendedProperties ();
+
+		ep.put ( "org.java.plugin.PathResolver", "org.java.plugin.standard.ShadingPathResolver" );
+		ep.put ( "unpackMode", "always" );
+		ep.put ( "org.java.plugin.standard.ShadingPathResolver.unpackMode", "always" );
+
+		pluginManager = ObjectFactory.newInstance ( ep ).createManager (
+		ObjectFactory.newInstance ( ep ).createRegistry (),
+		ObjectFactory.newInstance ( ep ).createPathResolver () );
+		
+		
+		
 		try {
 
 			/* Load core plugin */

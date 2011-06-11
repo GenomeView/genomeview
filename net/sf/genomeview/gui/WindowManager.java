@@ -270,6 +270,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 				}
 			}
 			window.setVisible(true);
+			splash.setText("Installing plugins...");
 			PluginLoader.load(model);
 
 		}

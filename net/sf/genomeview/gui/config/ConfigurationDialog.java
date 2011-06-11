@@ -213,7 +213,12 @@ public class ConfigurationDialog extends JDialog {
 		private static final long serialVersionUID = 7503579007314777946L;
 
 		public FeatureTrackConfigPanel(Model model) {
-			setLayout(new BorderLayout());
+			gc.gridwidth = 2;
+			gc.weightx=1;
+			gc.weighty=0;
+			this.add(ConfigBox.booleanInstance("track:forceFeatureLabels", "Force labels on features"), gc);
+			gc.gridy++;
+			gc.weighty=1;
 			Container typeContainer = new Container();
 			typeContainer.setLayout(new GridLayout(0, 4));
 
@@ -222,7 +227,7 @@ public class ConfigurationDialog extends JDialog {
 
 			}
 
-			this.add(new TitledComponent("Feature types", typeContainer), BorderLayout.CENTER);
+			this.add(new TitledComponent("Feature types", typeContainer), gc);
 
 		}
 	}

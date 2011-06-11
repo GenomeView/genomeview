@@ -180,7 +180,8 @@ public class FeatureTrack extends Track {
 
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view,TrackCommunicationModel tcm) {
-
+		boolean forceLabels=Configuration.getBoolean("track:forceFeatureLabels");
+		System.out.println("forced labels: "+forceLabels);
 		boolean collision = false;
 		hitmap.clear();
 		Location visible = model.getAnnotationLocationVisible();
@@ -327,12 +328,12 @@ public class FeatureTrack extends Track {
 				 * If the first location takes more than 50 px, we draw name of
 				 * the feature in it
 				 */
-				if (x2 - x1 > 100) {
+				if (forceLabels||x2 - x1 > 100) {
 					int a = Convert.translateGenomeToScreen(loc.first().start(), model.getAnnotationLocationVisible(),
 							width);
 					int b = Convert.translateGenomeToScreen(loc.first().end() + 1,
 							model.getAnnotationLocationVisible(), width);
-					if (b - a > 100) {
+					if (forceLabels||b - a > 100) {
 						Font resetFont = g.getFont();
 						g.setColor(c.darker().darker().darker());
 						g.setFont(new Font("SansSerif", Font.PLAIN, 10));
