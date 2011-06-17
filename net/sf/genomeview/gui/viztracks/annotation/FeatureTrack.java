@@ -181,7 +181,6 @@ public class FeatureTrack extends Track {
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view,TrackCommunicationModel tcm) {
 		boolean forceLabels=Configuration.getBoolean("track:forceFeatureLabels");
-		System.out.println("forced labels: "+forceLabels);
 		boolean collision = false;
 		hitmap.clear();
 		Location visible = model.getAnnotationLocationVisible();
