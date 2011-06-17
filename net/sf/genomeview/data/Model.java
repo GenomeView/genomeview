@@ -35,7 +35,6 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
-import net.sf.jannot.source.MultiFileSource;
 import be.abeel.net.URIFactory;
 import be.abeel.util.DefaultHashMap;
 
@@ -386,11 +385,11 @@ public class Model extends Observable implements IModel {
 		}
 		logger.info("Entries: " + entries.size());
 		logger.info("Model adding data done!");
-		if (f instanceof MultiFileSource)
-			for (DataSource ds : ((MultiFileSource) f).getFileSources()) {
-				loadedSources.add(ds);
-			}
-		else
+//		if (f instanceof MultiFileSource)
+//			for (DataSource ds : ((MultiFileSource) f).getFileSources()) {
+//				loadedSources.add(ds);
+//			}
+//		else
 			loadedSources.add(f);
 		updateTracks();
 		refresh(NotificationTypes.GENERAL);

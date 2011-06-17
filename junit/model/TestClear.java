@@ -62,5 +62,17 @@ public class TestClear extends Model {
 
 		}
 
+		@Override
+		public boolean isIndexed() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public long size() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
 	}
 }
