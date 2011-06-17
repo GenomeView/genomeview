@@ -21,6 +21,7 @@ import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.dialog.Hider;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
+import net.sf.jannot.source.Locator;
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
 
@@ -84,10 +85,12 @@ public class Session {
 							DataSource ds = null;
 							switch (c) {
 							case 'U':
-								ds = DataSourceFactory.createURL(URIFactory.url(line));
-								break;
 							case 'F':
-								ds = DataSourceFactory.createFile(new File(line));
+								try{
+								ds = DataSourceFactory.create(new Locator(line));
+								}catch(RuntimeException re){
+									log.log(Level.SEVERE,"Something went wrong while loading line: "+line+"\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.",re);
+								}
 								break;
 							case 'C':
 								Configuration.loadExtra(URIFactory.url(line).openStream());

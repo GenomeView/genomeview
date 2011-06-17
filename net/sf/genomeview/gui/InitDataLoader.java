@@ -15,6 +15,8 @@ import net.sf.genomeview.gui.explorer.GenomeExplorerManager;
 import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
+import net.sf.jannot.source.IndexManager;
+import net.sf.jannot.source.Locator;
 import net.sf.jannot.source.cache.SourceCache;
 import be.abeel.net.URIFactory;
 
@@ -32,6 +34,7 @@ public class InitDataLoader {
 			throws InterruptedException, ExecutionException {
 
 		SourceCache.cacheDir = new File(Configuration.getDirectory(), "cache");
+		IndexManager.cacheDir=new File(Configuration.getDirectory(),"index");
 		DataSourceFactory.disableURLCaching = Configuration.getBoolean("general:disableURLCaching");
 		
 
@@ -65,7 +68,7 @@ public class InitDataLoader {
 		} else if (cmdUrl != null) {
 			logger.info("URL commandline option is set: " + cmdUrl);
 			try {
-				data = new DataSource[] { DataSourceFactory.createURL(URIFactory.url(cmdUrl)) };
+				data = new DataSource[] { DataSourceFactory.create(new Locator(cmdUrl)) };
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -74,7 +77,7 @@ public class InitDataLoader {
 		} else if (cmdFile != null) {
 			logger.info("File commandline option is set: " + cmdFile);
 			try {
-				data = new DataSource[] { DataSourceFactory.createFile(new File(cmdFile)) };
+				data = new DataSource[] { DataSourceFactory.create(new Locator(cmdFile)) };
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -96,13 +99,13 @@ public class InitDataLoader {
 			logger.info("loading additional from commandline: " + s);
 			try {
 				if (!s.startsWith("http:") && !s.startsWith("ftp:") && !s.startsWith("https:")) {
-					DataSource ds = DataSourceFactory.createFile(new File(s));
+					DataSource ds = DataSourceFactory.create(new Locator(s));
 
 					ReadWorker rf = new ReadWorker(ds, model);
 					rf.execute();
 
 				} else {
-					DataSource ds = DataSourceFactory.createURL(URIFactory.url(s));
+					DataSource ds = DataSourceFactory.create(new Locator(s));
 					ReadWorker rf = new ReadWorker(ds, model);
 					rf.execute();
 

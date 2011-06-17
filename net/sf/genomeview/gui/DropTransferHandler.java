@@ -20,6 +20,7 @@ import net.sf.genomeview.data.ReadWorker;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
+import net.sf.jannot.source.Locator;
 
 /**
  * 
@@ -63,7 +64,7 @@ class DropTransferHandler extends TransferHandler {
 						File file = (File) iter.next();
 						System.out.println("File dropped: " + file.getCanonicalPath());
 
-						DataSource ds = DataSourceFactory.createFile(file);
+						DataSource ds = DataSourceFactory.create(new Locator(file.toString()));
 						ReadWorker rf = new ReadWorker(ds, model);
 						rf.execute();
 
@@ -78,9 +79,10 @@ class DropTransferHandler extends TransferHandler {
 				System.err.println("IOError getting data: " + ex);
 			} catch (UnsupportedFlavorException e) {
 				System.err.println("Unsupported Flavor: " + e);
-			} catch (ReadFailedException ex) {
-				System.err.println("Readfailed exception getting data: " + ex);
 			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ReadFailedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

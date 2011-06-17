@@ -35,6 +35,7 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
+import net.sf.jannot.source.Locator;
 import net.sf.jannot.source.das.DAS;
 import net.sf.jannot.source.das.DAS.EntryPoint;
 
@@ -166,7 +167,7 @@ public class OpenDialog extends JDialog {
 					DataSource[] out = new DataSource[files.length];
 					try {
 						for (int i = 0; i < files.length; i++) {
-							out[i] = DataSourceFactory.createFile(files[i]);
+							out[i] = DataSourceFactory.create(new Locator(files[i].toString()));
 
 						}
 						Configuration.set("lastDirectory", files[0].getParentFile());
@@ -174,12 +175,12 @@ public class OpenDialog extends JDialog {
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					} catch (ReadFailedException e1) {
+					}  catch (URISyntaxException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					} catch (URISyntaxException e1) {
+					} catch (ReadFailedException e2) {
 						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						e2.printStackTrace();
 					}
 				}
 
@@ -195,14 +196,11 @@ public class OpenDialog extends JDialog {
 					String input = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
 							"Give the URL of the data");
 					if (input != null && input.trim().length() > 0) {
-						URL url = URIFactory.url(input.trim());
-						load(new DataSource[] { DataSourceFactory.createURL(url) });
+						
+						load(new DataSource[] { DataSourceFactory.create(new Locator(input.trim()) )});
 					}
 
-				} catch (ReadFailedException re) {
-					JOptionPane.showMessageDialog(model.getGUIManager().getParent(),
-							"Could not read data from source: " + re.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
-				} catch (MalformedURLException e2) {
+				}  catch (MalformedURLException e2) {
 					// TODO Auto-generated catch block
 					e2.printStackTrace();
 				} catch (IOException e2) {
@@ -211,6 +209,9 @@ public class OpenDialog extends JDialog {
 				} catch (URISyntaxException e3) {
 					// TODO Auto-generated catch block
 					e3.printStackTrace();
+				} catch (ReadFailedException e4) {
+					// TODO Auto-generated catch block
+					e4.printStackTrace();
 				}
 
 			}

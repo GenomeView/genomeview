@@ -21,6 +21,7 @@ import net.sf.genomeview.data.Session;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
+import net.sf.jannot.source.Locator;
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
 
@@ -217,12 +218,9 @@ class InstructionWorker implements Runnable {
 
 	private void doLoad(String s) {
 		try {
-			DataSource ds = DataSourceFactory.createURL(URIFactory.url(s));
+			DataSource ds = DataSourceFactory.create(new Locator(s));
 			ReadWorker rw = new ReadWorker(ds, model);
 			rw.execute();
-		} catch (ReadFailedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -230,6 +228,9 @@ class InstructionWorker implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ReadFailedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

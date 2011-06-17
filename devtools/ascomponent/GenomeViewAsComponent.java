@@ -13,7 +13,7 @@ import net.sf.genomeview.gui.MainContent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
-import be.abeel.net.URIFactory;
+import net.sf.jannot.source.Locator;
 /**
  * 
  * @author Thomas Abeel
@@ -30,15 +30,15 @@ public class GenomeViewAsComponent {
 		frame.pack();
 		frame.setVisible(true);
 		
-		DataSource ds = DataSourceFactory.createURL(URIFactory.url("http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.fasta.gz"));
+		DataSource ds = DataSourceFactory.create(new Locator("http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.fasta.gz"));
 		ReadWorker rf = new ReadWorker(ds, model);
 		rf.execute();
 		
-		ds = DataSourceFactory.createURL(URIFactory.url("http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.gff.gz"));
+		ds = DataSourceFactory.create(new Locator("http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.gff.gz "));
 		rf = new ReadWorker(ds, model);
 		rf.execute();
 		
-		ds = DataSourceFactory.createURL(URIFactory.url(" http://www.broadinstitute.org/software/genomeview/demo_c_elegans/uwgs-rw_L2_FC6218_3.CHROMOSOME_IV.sorted.bam.bai"));
+		ds = DataSourceFactory.create(new Locator(" http://www.broadinstitute.org/software/genomeview/demo_c_elegans/uwgs-rw_L2_FC6218_3.CHROMOSOME_IV.sorted.bam"));
 		rf = new ReadWorker(ds, model);
 		rf.execute();
 	    
