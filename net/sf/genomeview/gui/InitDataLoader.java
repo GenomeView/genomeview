@@ -4,15 +4,18 @@ import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.ReadWorker;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.explorer.GenomeExplorerManager;
 import net.sf.genomeview.gui.external.ExternalHelper;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.IndexManager;
@@ -34,13 +37,8 @@ public class InitDataLoader {
 			throws InterruptedException, ExecutionException {
 
 		SourceCache.cacheDir = new File(Configuration.getDirectory(), "cache");
-		IndexManager.cacheDir=new File(Configuration.getDirectory(),"index");
+		IndexManager.cacheDir = new File(Configuration.getDirectory(), "index");
 		DataSourceFactory.disableURLCaching = Configuration.getBoolean("general:disableURLCaching");
-		
-
-		
-
-		
 
 		/*
 		 * Initialize session, all other arguments will override what the
@@ -52,7 +50,7 @@ public class InitDataLoader {
 		} catch (IOException e1) {
 			CrashHandler.showErrorMessage("Failed to properly load requested session.", e1);
 		}
-		
+
 		/*
 		 * Select data source. If an URL or file are specified on the command
 		 * line, that is selected. In other cases a dialog pops-up to let the
@@ -60,54 +58,61 @@ public class InitDataLoader {
 		 * 
 		 * If both file and url are specified, the URL is loaded.
 		 */
-		DataSource[] data = null;
+		// DataSource[] data = null;
 		if (cmdFile == null && cmdUrl == null) {
 			logger.info("File and url options are null!");
 			// do nothing
 
 		} else if (cmdUrl != null) {
 			logger.info("URL commandline option is set: " + cmdUrl);
+
 			try {
-				data = new DataSource[] { DataSourceFactory.create(new Locator(cmdUrl)) };
-			} catch (Exception e) {
+				DataSourceHelper.load(model, new Locator(cmdUrl), true);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ReadFailedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 		} else if (cmdFile != null) {
 			logger.info("File commandline option is set: " + cmdFile);
-			try {
-				data = new DataSource[] { DataSourceFactory.create(new Locator(cmdFile)) };
 
-			} catch (Exception e) {
+			try {
+				DataSourceHelper.load(model, new Locator(cmdFile), true);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ReadFailedException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
 		}
 
-		/* Load the source, if one was constructed */
-		if (data != null) {
-
-			assert (data.length == 1);
-			logger.info("Loading with priority: " + data[0]);
-			final ReadWorker rw = new ReadWorker(data[0], model);
-			rw.execute();
-			rw.get();
-		}
+		
 
 		/* Load additional files */
 		for (String s : remArgs) {
 			logger.info("loading additional from commandline: " + s);
 			try {
 				if (!s.startsWith("http:") && !s.startsWith("ftp:") && !s.startsWith("https:")) {
-					DataSource ds = DataSourceFactory.create(new Locator(s));
-
-					ReadWorker rf = new ReadWorker(ds, model);
-					rf.execute();
+					DataSourceHelper.load(model, new Locator(s));
+					//
+					// ReadWorker rf = new ReadWorker(ds, model);
+					// rf.execute();
 
 				} else {
-					DataSource ds = DataSourceFactory.create(new Locator(s));
-					ReadWorker rf = new ReadWorker(ds, model);
-					rf.execute();
+					DataSourceHelper.load(model, new Locator(s));
+					// ReadWorker rf = new ReadWorker(ds, model);
+					// rf.execute();
 
 				}
 			} catch (MalformedURLException e) {
@@ -124,7 +129,7 @@ public class InitDataLoader {
 		}
 
 		if (position != null) {
-			ExternalHelper.setPosition(position,model);
+			ExternalHelper.setPosition(position, model);
 
 		}
 		EventQueue.invokeLater(new Runnable() {

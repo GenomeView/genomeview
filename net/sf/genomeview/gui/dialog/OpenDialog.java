@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
+import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.NotificationTypes;
 import net.sf.genomeview.data.ReadWorker;
@@ -59,17 +60,6 @@ public class OpenDialog extends JDialog {
 			"syn", "wig", "mfa", "bed", "mapview", "bai", "maf", "snp", "tbl", "gb", "gbk", "pileup", "con", "peaks",
 			"tdf" };
 
-	private void load(DataSource[] data) {
-
-		if (data != null) {
-			for (DataSource ds : data) {
-				final ReadWorker rw = new ReadWorker(ds, model);
-				rw.execute();
-			}
-
-		}
-
-	}
 
 	public OpenDialog(Window parent, final Model model) {
 		super(parent, "Load data", ModalityType.APPLICATION_MODAL);
@@ -100,9 +90,9 @@ public class OpenDialog extends JDialog {
 		configButton(url);
 		gp.add(url, gp.gc);
 		gp.gc.gridx++;
-		JButton das = new JButton("DAS(exp)", Icons.get("das.png"));
-		configButton(das);
-		gp.add(das, gp.gc);
+//		JButton das = new JButton("DAS(exp)", Icons.get("das.png"));
+//		configButton(das);
+//		gp.add(das, gp.gc);
 
 		/** Add logic to buttons */
 		file.addActionListener(new ActionListener() {
@@ -164,14 +154,14 @@ public class OpenDialog extends JDialog {
 				int returnVal = chooser.showOpenDialog(model.getGUIManager().getParent());
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					File[] files = chooser.getSelectedFiles();
-					DataSource[] out = new DataSource[files.length];
+//					DataSource[] out = new DataSource[files.length];
 					try {
 						for (int i = 0; i < files.length; i++) {
-							out[i] = DataSourceFactory.create(new Locator(files[i].toString()));
+						DataSourceHelper.load(model,new Locator(files[i].toString()));
 
 						}
 						Configuration.set("lastDirectory", files[0].getParentFile());
-						load(out);
+//						load(out);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -197,7 +187,7 @@ public class OpenDialog extends JDialog {
 							"Give the URL of the data");
 					if (input != null && input.trim().length() > 0) {
 						
-						load(new DataSource[] { DataSourceFactory.create(new Locator(input.trim()) )});
+						DataSourceHelper.load(model,new Locator(input.trim()));
 					}
 
 				}  catch (MalformedURLException e2) {
@@ -217,49 +207,50 @@ public class OpenDialog extends JDialog {
 			}
 		});
 
-		das.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				_self.dispose();
-				try {
-					String url = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-							"Give the URL of the data").trim();
-					DAS das = new DAS(url);
-					List<String> refs = das.getReferences();
-					Collections.sort(refs);
-					String ref = (String) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-							"Select reference genome", "Reference selection", JOptionPane.INFORMATION_MESSAGE, null,
-							refs.toArray(), refs.get(0));
-					List<EntryPoint> eps = das.getEntryPoints(ref);
-					EntryPoint ep = (EntryPoint) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-							"Select entry point", "Entry point selection", JOptionPane.INFORMATION_MESSAGE, null,
-							eps.toArray(), eps.get(0));
-					das.setEntryPoint(ep);
-					das.setReference(ref);
-					load(new DataSource[] { das });
-				} catch (HeadlessException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (MalformedURLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (ParserConfigurationException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (SAXException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (URISyntaxException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
-			}
-		});
+//		das.addActionListener(new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				_self.dispose();
+//				try {
+//					String url = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+//							"Give the URL of the data").trim();
+//					DAS das = new DAS(url);
+//					List<String> refs = das.getReferences();
+//					Collections.sort(refs);
+//					String ref = (String) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+//							"Select reference genome", "Reference selection", JOptionPane.INFORMATION_MESSAGE, null,
+//							refs.toArray(), refs.get(0));
+//					List<EntryPoint> eps = das.getEntryPoints(ref);
+//					EntryPoint ep = (EntryPoint) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+//							"Select entry point", "Entry point selection", JOptionPane.INFORMATION_MESSAGE, null,
+//							eps.toArray(), eps.get(0));
+//					das.setEntryPoint(ep);
+//					das.setReference(ref);
+//					das.
+////					load(new DataSource[] { das });
+//				} catch (HeadlessException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				} catch (MalformedURLException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				} catch (ParserConfigurationException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				} catch (SAXException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				} catch (URISyntaxException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//
+//			}
+//		});
 
 		pack();
 		StaticUtils.center(_self);

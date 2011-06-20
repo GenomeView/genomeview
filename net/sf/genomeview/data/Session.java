@@ -60,15 +60,14 @@ public class Session {
 	private static Logger log = Logger.getLogger(Session.class.getCanonicalName());
 
 	private static void loadSession(final Model model, final InputStream is) {
-		final Hider hid = new Hider(model, "Preparing to load session",Configuration.green,(int)(model.getGUIManager().getParent().getWidth()*0.8),150);
-		
-		
+		final Hider hid = new Hider(model, "Preparing to load session", Configuration.green, (int) (model
+				.getGUIManager().getParent().getWidth() * 0.8), 150);
 
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				LineIterator it = new LineIterator(is,false,true);
+				LineIterator it = new LineIterator(is, false, true);
 
 				try {
 					String key = it.next();
@@ -81,15 +80,17 @@ public class Session {
 						for (String line : it) {
 							char c = line.charAt(0);
 							line = line.substring(2);
-							hid.setText("<html><h1>Loading session</h1>Current file: "+line+"...</html>");
-							DataSource ds = null;
+							hid.setText("<html><h1>Loading session</h1>Current file: " + line + "...</html>");
+							//DataSource ds = null;
 							switch (c) {
 							case 'U':
 							case 'F':
-								try{
-								ds = DataSourceFactory.create(new Locator(line));
-								}catch(RuntimeException re){
-									log.log(Level.SEVERE,"Something went wrong while loading line: "+line+"\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.",re);
+								try {
+									DataSourceHelper.load(model,new Locator(line));
+								} catch (RuntimeException re) {
+									log.log(Level.SEVERE, "Something went wrong while loading line: " + line
+											+ "\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.",
+											re);
 								}
 								break;
 							case 'C':
@@ -100,8 +101,7 @@ public class Session {
 								break;
 
 							}
-							final ReadWorker rw = new ReadWorker(ds, model);
-							rw.execute();
+
 						}
 					}
 				} catch (Exception ex) {

@@ -12,6 +12,10 @@ public abstract class Task implements Runnable, Comparable<Task> {
 		this.location = l;
 	}
 
+	public Task() {
+		this(null);
+	}
+
 	public Location getLocation() {
 		return location;
 	}

@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.LRUSet;
+import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.ReadWorker;
 import net.sf.genomeview.data.Session;
@@ -218,9 +219,8 @@ class InstructionWorker implements Runnable {
 
 	private void doLoad(String s) {
 		try {
-			DataSource ds = DataSourceFactory.create(new Locator(s));
-			ReadWorker rw = new ReadWorker(ds, model);
-			rw.execute();
+			DataSourceHelper.load(model,new Locator(s));
+			
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

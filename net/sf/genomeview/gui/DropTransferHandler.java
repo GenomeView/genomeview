@@ -15,6 +15,7 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
+import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.ReadWorker;
 import net.sf.jannot.exception.ReadFailedException;
@@ -64,9 +65,9 @@ class DropTransferHandler extends TransferHandler {
 						File file = (File) iter.next();
 						System.out.println("File dropped: " + file.getCanonicalPath());
 
-						DataSource ds = DataSourceFactory.create(new Locator(file.toString()));
-						ReadWorker rf = new ReadWorker(ds, model);
-						rf.execute();
+						DataSourceHelper.load(model,new Locator(file.toString()));
+//						ReadWorker rf = new ReadWorker(ds, model);
+//						rf.execute();
 
 					
 					}

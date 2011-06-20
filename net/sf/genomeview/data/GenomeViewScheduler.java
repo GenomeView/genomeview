@@ -32,7 +32,8 @@ public class GenomeViewScheduler {
 		for (Runnable r : gvs) {
 			Task t = (Task) r;
 			gvs.remove(t);
-			if (t.getLocation().overlaps(visible)) {
+			Location l=t.getLocation();
+			if (l!=null&&l.overlaps(visible)) {
 				t.boost();
 			} else
 				t.cancel();
