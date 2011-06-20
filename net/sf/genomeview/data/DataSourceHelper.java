@@ -50,33 +50,8 @@ public class DataSourceHelper {
 						"Index is required and missing. Do you want to create the index?", "Index required",
 						JOptionPane.YES_NO_OPTION);
 				if (res == JOptionPane.YES_OPTION) {
-					final Locator prep = data;
-					GenomeViewScheduler.submit(new Task() {
-
-						@Override
-						public void run() {
-							try {
-								if (IndexManager.createIndex(prep))
-									load(model, prep);
-							} catch (MalformedURLException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (URISyntaxException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (ReadFailedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-
-						}
-
-					});
+					index(model, data);
 				}
-
 				return;
 
 			} else {
@@ -101,15 +76,24 @@ public class DataSourceHelper {
 			}
 		}
 
-		if (index == null && data.supportsIndex() && data.length() > 10 * 1024 * 1024) {
-			JOptionPane.showMessageDialog(null, "File is rather large and has no index.\n " + data
-					+ "\nTo improve performance you may want to build an index.", "Index missing",
-					JOptionPane.WARNING_MESSAGE);
+		if (index == null && data.supportsIndex() && data.length() > 5 * 1024 * 1024) {
 
-		} else if (data.recommendedIndex() && index == null && data.length() > 5 * 1024 * 1024) {
-			JOptionPane.showMessageDialog(null, "Could not locate index for " + data
-					+ "\nIt is recommended to have an index for this file type.", "Index missing",
-					JOptionPane.WARNING_MESSAGE);
+			if (IndexManager.canBuildIndex(data)) {
+				int res = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
+						"Performance would benefit from indexing this file.\n" + data
+								+ "\nDo you want to create the index?", "Index missing", JOptionPane.YES_NO_OPTION);
+				if (res == JOptionPane.YES_OPTION) {
+					index(model, data);
+				}
+				return;
+
+			} else {
+				JOptionPane.showMessageDialog(null, "File is rather large and has no index.\n " + data
+						+ "\nTo improve performance you may want to build an index.", "Index missing",
+						JOptionPane.WARNING_MESSAGE);
+
+			}
+
 		} else if (index == null && data.length() > 50000000) {
 			JOptionPane
 					.showMessageDialog(
@@ -132,6 +116,36 @@ public class DataSourceHelper {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
+	}
+
+	private static void index(final Model model, final Locator prep) {
+
+		// final Locator prep = data;
+		GenomeViewScheduler.submit(new Task() {
+
+			@Override
+			public void run() {
+				try {
+					if (IndexManager.createIndex(prep))
+						load(model, prep);
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ReadFailedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+
+		});
 
 	}
 
