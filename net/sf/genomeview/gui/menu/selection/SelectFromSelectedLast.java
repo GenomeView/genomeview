@@ -9,6 +9,7 @@ import java.util.Observable;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
+import net.sf.jannot.Location;
 
 public class SelectFromSelectedLast extends AbstractModelAction {
 
@@ -34,8 +35,9 @@ public class SelectFromSelectedLast extends AbstractModelAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         Feature rf=model.selectionModel().getFeatureSelection().iterator().next();
-        model.selectionModel().setLocationSelection(rf.location().last());
-        model.center(rf.location().last().start() / 2 + rf.location().last().end() / 2);
+        Location[]loc=rf.location();
+        model.selectionModel().setLocationSelection(loc[loc.length-1]);
+        model.center(loc[loc.length-1].start() / 2 + loc[loc.length-1].end() / 2);
     }
 
 }

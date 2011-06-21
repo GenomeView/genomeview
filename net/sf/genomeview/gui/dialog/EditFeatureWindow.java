@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -237,8 +238,8 @@ public class EditFeatureWindow extends JDialog {
 		super.setVisible(b);
 	}
 
-	private String format(SortedSet<Location> loc) {
-		StringBuffer tmp = new StringBuffer(loc.toString());
+	private String format(Location[] loc) {
+		StringBuffer tmp = new StringBuffer(Arrays.toString(loc));
 		return tmp.substring(1, tmp.length() - 1);
 	}
 

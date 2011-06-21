@@ -38,7 +38,7 @@ public class RemoveLocationAction extends AbstractModelAction implements Observe
 		for (Location rf : toRemove) {
 			Feature f = rf.getParent();
 			/* If there are more locations, remove the selected one */
-			if (f.location().size() > 1)
+			if (f.location().length > 1)
 				f.removeLocation(rf);
 			/* If this is the last location of the feature, remove the feature instead*/
 			else {

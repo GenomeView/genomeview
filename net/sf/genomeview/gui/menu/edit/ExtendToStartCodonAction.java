@@ -64,7 +64,7 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 			while (!hasStart(start)&&start>1) {
 				start--;
 			}
-			rf.location().first().setStart(start);
+			rf.location()[0].setStart(start);
 
 		} else if (rf.strand() == Strand.REVERSE) {
 			int start = rf.end();
@@ -72,7 +72,7 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 			while (!hasReverseStart(start)&&start<model.getSelectedEntry().getMaximumLength()) {
 				start++;
 			}
-			rf.location().last().setEnd(start+2);
+			rf.location()[rf.location().length-1].setEnd(start+2);
 
 		}
 

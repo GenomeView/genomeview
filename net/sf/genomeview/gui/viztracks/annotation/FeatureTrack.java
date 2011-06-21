@@ -269,7 +269,7 @@ public class FeatureTrack extends Track {
 				 * reproduce them on every drawing occasion. Make sure they are
 				 * ordered from left to right.
 				 */
-				SortedSet<Location> loc = rf.location();
+				Location[] loc = rf.location();
 
 				/* Draw rectangles that are the features */
 				ArrayList<Rectangle> rectList = new ArrayList<Rectangle>();
@@ -314,7 +314,9 @@ public class FeatureTrack extends Track {
 				g.setColor(backColor);
 
 				// Set<Feature> selected = model.getFeatureSelection();
-				Set<Location> intersection = new HashSet<Location>(loc);
+				Set<Location> intersection = new HashSet<Location>();
+				for(Location l:loc)
+					intersection.add(l);
 				intersection.retainAll(model.selectionModel().getLocationSelection());
 
 				if (intersection.size() > 0) {
@@ -328,9 +330,9 @@ public class FeatureTrack extends Track {
 				 * the feature in it
 				 */
 				if (forceLabels||x2 - x1 > 100) {
-					int a = Convert.translateGenomeToScreen(loc.first().start(), model.getAnnotationLocationVisible(),
+					int a = Convert.translateGenomeToScreen(loc[0].start(), model.getAnnotationLocationVisible(),
 							width);
-					int b = Convert.translateGenomeToScreen(loc.first().end() + 1,
+					int b = Convert.translateGenomeToScreen(loc[0].end() + 1,
 							model.getAnnotationLocationVisible(), width);
 					if (forceLabels||b - a > 100) {
 						Font resetFont = g.getFont();
@@ -467,7 +469,7 @@ public class FeatureTrack extends Track {
 		 * @param location
 		 * @return
 		 */
-		private int agg(SortedSet<Location> location) {
+		private int agg(Location[] location) {
 			int sum = 0;
 			for (Location l : location)
 				sum += l.length();

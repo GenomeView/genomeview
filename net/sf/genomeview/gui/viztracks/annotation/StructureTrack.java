@@ -573,8 +573,11 @@ public class StructureTrack extends Track {
 		boolean featureSelected = model.selectionModel().getFeatureSelection().contains(rf);
 		Location last = null;
 		int lastY = 0;
-		for (Location l : rf.location()) {
-			int drawFrame = getDrawFrame(l, rf);
+//		for (Location l : rf.location()) {
+		
+		for(int i=0;i<rf.location().length;i++){
+			Location l=rf.location()[i];
+			int drawFrame = getDrawFrame(i,l, rf);
 			/* Start of the block */
 			int lmin = Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), screenWidth);
 			/* End of the block */
@@ -638,7 +641,7 @@ public class StructureTrack extends Track {
 	 * @param rf
 	 * @return
 	 */
-	private int getDrawFrame(Location l, Feature rf) {
+	private int getDrawFrame(int idx,Location l, Feature rf) {
 		int locFrame;
 		if (rf.strand() == Strand.REVERSE)
 			locFrame = (l.end() + 1) % 3;
@@ -646,7 +649,7 @@ public class StructureTrack extends Track {
 			locFrame = (l.start()) % 3;
 		if (locFrame == 0)
 			locFrame = 3;
-		int phase = rf.getPhase(l);// 0,1 or 2
+		int phase = rf.getPhase(idx);// 0,1 or 2
 
 		int sum;
 		if (rf.strand() == Strand.REVERSE)

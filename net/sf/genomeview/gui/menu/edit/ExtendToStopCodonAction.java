@@ -65,7 +65,7 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
 				start += 3;
 			}
 			start += 2;
-			rf.location().last().setEnd(start);
+			rf.location()[rf.location().length-1].setEnd(start);
 
 		} else if (rf.strand() == Strand.REVERSE) {
 			int start = rf.start() + rest;
@@ -80,7 +80,7 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
 						model.getSelectedEntry().sequence().subsequence(start, start + 3))
 						.stringRepresentation();
 			}
-			rf.location().first().setStart(start);
+			rf.location()[0].setStart(start);
 
 		}
 

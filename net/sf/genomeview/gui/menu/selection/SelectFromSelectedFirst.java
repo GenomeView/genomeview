@@ -32,8 +32,8 @@ public class SelectFromSelectedFirst extends AbstractModelAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         Feature rf = model.selectionModel().getFeatureSelection().iterator().next();
-        model.selectionModel().setLocationSelection(rf.location().first());
-        model.center(rf.location().first().start() / 2 + rf.location().first().end() / 2);
+        model.selectionModel().setLocationSelection(rf.location()[0]);
+        model.center(rf.location()[0].start() / 2 + rf.location()[0].end() / 2);
     }
 
 }

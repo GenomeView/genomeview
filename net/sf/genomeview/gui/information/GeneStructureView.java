@@ -108,7 +108,7 @@ public class GeneStructureView extends JLabel implements Observer {
 	 *            the feature to which the location belongs
 	 * @return the drawing frame index, can be 1, 2 or 3
 	 */
-	private int getDrawFrame(Location l, Feature rf) {
+	private int getDrawFrame(int idx,Location l, Feature rf) {
 		int locFrame;
 		if (rf.strand() == Strand.REVERSE)
 			locFrame = (l.end() + 1) % 3;
@@ -116,7 +116,7 @@ public class GeneStructureView extends JLabel implements Observer {
 			locFrame = (l.start()) % 3;
 		if (locFrame == 0)
 			locFrame = 3;
-		int phase = rf.getPhase(l);// 0,1 or 2
+		int phase = rf.getPhase(idx);// 0,1 or 2
 
 		int sum;
 		if (rf.strand() == Strand.REVERSE)
@@ -180,8 +180,11 @@ public class GeneStructureView extends JLabel implements Observer {
 		int arrowDrawFrame = -1;
 		AnalyzedFeature af = new AnalyzedFeature(entry.sequence(), rf, model.getAAMapping());
 		HashMap<Location, Integer> drawFrameMapping = new HashMap<Location, Integer>();
-		for (Location l : rf.location()) {
-			int drawFrame = getDrawFrame(l, rf);
+		//for (Location l : rf.location()) {
+		Location[]arr=rf.location();
+		for(int i=0;i<arr.length;i++){
+			Location l=arr[i];
+			int drawFrame = getDrawFrame(i,l, rf);
 			drawFrameMapping.put(l, drawFrame);
 			/* Keep track of the frame we have to draw the arrow in */
 			if (rf.strand() == Strand.REVERSE && last == null)
@@ -228,21 +231,22 @@ public class GeneStructureView extends JLabel implements Observer {
 					g.drawLine(r.x, r.y, r.x, r.y + r.height);
 			}
 			g.setColor(Color.RED);
+			Location[]rfl=rf.location();
 			/* Draw missing start codon */
 			if (af.hasMissingStartCodon()) {
-				if (rf.strand() == Strand.FORWARD && l.equals(rf.location().first())) {
+				if (rf.strand() == Strand.FORWARD && l.equals(rfl[0])) {
 					g.drawLine(r.x, r.y, r.x, r.y + r.height);
 				}
-				if (rf.strand() == Strand.REVERSE && l.equals(rf.location().last())) {
+				if (rf.strand() == Strand.REVERSE && l.equals(rfl[rfl.length-1])) {
 					g.drawLine(r.x + r.width, r.y, r.x + r.width, r.y + r.height);
 				}
 			}
 			/* Draw missing stop codon */
 			if (af.hasMissingStopCodon()) {
-				if (rf.strand() == Strand.FORWARD && l.equals(rf.location().last())) {
+				if (rf.strand() == Strand.FORWARD && l.equals(rfl[rfl.length-1])) {
 					g.drawLine(r.x+ r.width, r.y, r.x+ r.width, r.y + r.height);
 				}
-				if (rf.strand() == Strand.REVERSE && l.equals(rf.location().first())) {
+				if (rf.strand() == Strand.REVERSE && l.equals(rfl[0])) {
 					g.drawLine(r.x , r.y, r.x , r.y + r.height);
 				}
 			}

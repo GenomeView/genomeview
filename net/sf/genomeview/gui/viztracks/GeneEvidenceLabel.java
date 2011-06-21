@@ -113,6 +113,8 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		/* Highlight current selection */
 		g.setColor(new Color(180, 180, 180, 120));
 		for (Feature f : model.selectionModel().getFeatureSelection()) {
+			assert f!=null;
+			assert f.location()!=null;
 			for (Location l : f.location()) {
 				highlight(l, g);
 			}

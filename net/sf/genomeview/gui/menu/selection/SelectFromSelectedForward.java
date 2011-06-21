@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.menu.selection;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Observable;
 
 import net.sf.genomeview.data.Model;
@@ -42,11 +43,13 @@ public class SelectFromSelectedForward extends AbstractModelAction {
     private Location getNext() {
         Feature rf = model.selectionModel().getFeatureSelection().first();
         Location rl = model.selectionModel().getLocationSelection().first();
-        ArrayList<Location> loc = new ArrayList<Location>();
-        loc.addAll(rf.location());
-        int index = loc.indexOf(rl);
-        if (index >= 0 && index < loc.size() - 1)
-            return loc.get(index + 1);
+//        ArrayList<Location> loc = new ArrayList<Location>();
+//        loc.addAll(rf.location());
+//        int index = loc.indexOf(rl);
+        Location[]loc=rf.location();
+        int index=Arrays.binarySearch(loc, rl);
+        if (index >= 0 && index < loc.length - 1)
+            return loc[index+1];//.get(index + 1);
         else
             return null;
 
