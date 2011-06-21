@@ -15,8 +15,8 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.QualifierCombo;
 import net.sf.jannot.Feature;
-import net.sf.jannot.Qualifier;
 import net.sf.jannot.Type;
+import be.abeel.util.Pair;
 
 public class NoteDialog extends JDialog {
 
@@ -49,8 +49,8 @@ public class NoteDialog extends JDialog {
               
                 Feature rf = model.selectionModel().getFeatureSelection().iterator().next();
                 if (currentNote != null) {
-                    currentNote.setKey(term.getQualifierKey());
-                    currentNote.setValue(value.getText());
+                	currentNote=new Pair(term.getQualifierKey(),value.getText());
+                    
                 } else {
                    
                     rf.addQualifier(term.getQualifierKey(), value.getText());
@@ -67,15 +67,15 @@ public class NoteDialog extends JDialog {
 
     private static NoteDialog dialog = null;
 
-    private static Qualifier currentNote;
+    private static Pair<String,String> currentNote;
 
-    public static void showDialog(Model model, Qualifier note) {
+    public static void showDialog(Model model, Pair<String,String> note) {
         if (dialog == null)
             dialog = new NoteDialog(model);
         currentNote = note;
         if (note != null) {
-            dialog.value.setText(note.getValue());
-            dialog.term.setSelectedItem(Type.valueOf(note.getKey()));
+            dialog.value.setText(note.y());
+            dialog.term.setSelectedItem(Type.valueOf(note.x()));
         }
         dialog.setVisible(true);
 

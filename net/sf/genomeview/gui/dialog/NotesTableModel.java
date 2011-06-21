@@ -4,7 +4,6 @@
 package net.sf.genomeview.gui.dialog;
 
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
@@ -12,12 +11,10 @@ import java.util.Vector;
 import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 
-import be.abeel.util.Pair;
-
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Feature;
-import net.sf.jannot.Qualifier;
+import be.abeel.util.Pair;
 
 class NotesTableModel extends AbstractTableModel implements Observer {
 

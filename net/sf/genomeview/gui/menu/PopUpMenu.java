@@ -24,11 +24,8 @@ import net.sf.genomeview.gui.menu.edit.SplitFeatureAction;
 import net.sf.genomeview.gui.menu.selection.ClearFeatureSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ClearRegionSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ShowSequenceWindowAction;
-import net.sf.genomeview.gui.viztracks.TickmarkTrack;
 import net.sf.genomeview.gui.viztracks.Track;
-import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.Feature;
-import net.sf.jannot.Qualifier;
 
 public class PopUpMenu extends JPopupMenu {
 

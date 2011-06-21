@@ -7,9 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -27,7 +25,6 @@ import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
-import net.sf.jannot.Qualifier;
 import be.abeel.gui.GridBagPanel;
 import be.abeel.gui.TitledComponent;
 import be.abeel.io.LineIterator;

@@ -14,7 +14,6 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -22,7 +21,6 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Feature;
-import net.sf.jannot.Qualifier;
 import be.abeel.gui.GridBagPanel;
 
 /**

@@ -12,7 +12,6 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
-import net.sf.jannot.Qualifier;
 
 /**
  * 
