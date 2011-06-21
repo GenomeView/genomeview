@@ -80,8 +80,8 @@ class BarChartBuffer implements VizBuffer {
 			}
 
 			pileWidth = p.getLength();
-			int startPos = p.getLocation().start;
-			int endPos = p.getLocation().end;
+			int startPos = p.start();
+			int endPos = p.end();
 
 			int startIdx = (int) ((startPos - visible.start) * factor);
 			int endIdx = (int) ((endPos - visible.start) * factor);

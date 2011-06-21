@@ -170,9 +170,9 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 				text += "Score: " + rf.getScore() + "\n";
 				Set<String> qks = rf.getQualifiersKeys();
 				for (String key : qks) {
-					for (Qualifier q : rf.qualifier(key)) {
-						text += q + "\n";
-					}
+					
+						text += key+"="+rf.qualifier(key) + "\n";
+					
 				}
 
 			}

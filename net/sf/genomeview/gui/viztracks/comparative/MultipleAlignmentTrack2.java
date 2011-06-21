@@ -217,8 +217,8 @@ public class MultipleAlignmentTrack2 extends Track {
 			for (AbstractAlignmentBlock ab : abs) {
 				int abCount = 0;
 
-				int start = ab.getLocation().start;
-				int end = ab.getLocation().end;
+				int start = ab.start();
+				int end = ab.end();
 
 				for (AbstractAlignmentSequence as : ab) {
 					abCount++;

@@ -52,8 +52,8 @@ public class NoteDialog extends JDialog {
                     currentNote.setKey(term.getQualifierKey());
                     currentNote.setValue(value.getText());
                 } else {
-                    Qualifier neww = new Qualifier(term.getQualifierKey(), value.getText());
-                    rf.addQualifier(neww);
+                   
+                    rf.addQualifier(term.getQualifierKey(), value.getText());
                 }
                 setVisible(false);
 

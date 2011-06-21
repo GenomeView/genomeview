@@ -4,12 +4,15 @@
 package net.sf.genomeview.gui.dialog;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
 
 import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
+
+import be.abeel.util.Pair;
 
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
@@ -23,7 +26,7 @@ class NotesTableModel extends AbstractTableModel implements Observer {
 	 */
     private static final long serialVersionUID = -3531717171399285615L;
 
-    private List<Qualifier> list = new Vector<Qualifier>();
+    private List<Pair<String, String>> list = new Vector<Pair<String, String>>();
 
     private Model model;
 
@@ -48,18 +51,18 @@ class NotesTableModel extends AbstractTableModel implements Observer {
         return list.size();
     }
 
-    public Qualifier getQualifier(int row) {
-        return list.get(row);
-    }
+//    public Qualifier getQualifier(int row) {
+//        return list.get(row);
+//    }
 
     @Override
     public Object getValueAt(int row, int col) {
 
         switch (col) {
         case 0:
-            return list.get(row).getKey();
+            return list.get(row).x();
         case 1:
-            return list.get(row).getValue();
+            return list.get(row).y();
         case 2:
             return Icons.DELETE;
         case 3:
@@ -73,9 +76,8 @@ class NotesTableModel extends AbstractTableModel implements Observer {
     private void refresh(Feature rf) {
 
         list.clear();
-
         for (String key : rf.getQualifiersKeys()) {
-            list.addAll(rf.qualifier(key));
+            list.add(new Pair<String,String>(key,rf.qualifier(key)));
         }
 
     }

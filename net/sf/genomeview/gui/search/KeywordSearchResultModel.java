@@ -77,9 +77,10 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 					for (Feature f : ((FeatureAnnotation) e.get(d)).get()) {
 						if (!featuresSet.contains(f)) {
 							for (String key : f.getQualifiersKeys()) {
-								for (Qualifier q : f.qualifier(key)) {
-									if ((q.getKey()!=null&&q.getKey().toLowerCase().contains(lowerCaseText))
-											|| (q.getValue()!=null&&q.getValue().toLowerCase().contains(lowerCaseText))) {
+								String value=f.qualifier(key);
+								
+									if ((key!=null&&key.toLowerCase().contains(lowerCaseText))
+											|| (value!=null&&value.toLowerCase().contains(lowerCaseText))) {
 										if (!featuresSet.contains(f)) {
 											features.add(f);
 											entries.add(e);
@@ -87,7 +88,6 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 										}
 									}
 
-								}
 							}
 						}
 					}

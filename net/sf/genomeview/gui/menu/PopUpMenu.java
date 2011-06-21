@@ -62,10 +62,9 @@ public class PopUpMenu extends JPopupMenu {
 		SortedSet<Feature> sf = model.selectionModel().getFeatureSelection();
 		List<Action> actions = new ArrayList<Action>();
 		for (Feature f : sf) {
-			List<Qualifier> lq = f.qualifier("url");
-			for (Qualifier q : lq) {
-				String name = q.getValue().split(":")[0];
-				String url = q.getValue().substring(q.getValue().indexOf(':') + 1);
+			for (String q : f.qualifier("url").split(",")) {
+				String name = q.split(":")[0];
+				String url = q.substring(q.indexOf(':') + 1);
 				actions.add(new OpenURLAction(name, url));
 			}
 		}

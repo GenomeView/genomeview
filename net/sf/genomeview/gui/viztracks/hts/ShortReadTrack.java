@@ -662,7 +662,7 @@ public class ShortReadTrack extends Track {
 			Location l1 = new Location(subOtherX1, subOtherX2);
 			Location l2 = new Location(subX1, subX2);
 
-			if (l1.overlaps(l2)) {
+			if (l1.overlaps(subX1,subX2)) {
 				// System.out.println("L1: "+l1);
 				// System.out.println("L2: "+l2);
 				Location l = LocationTools.getOverlap(l1, l2);

@@ -45,7 +45,7 @@ public abstract class Track extends Observable {
 				g.setColor(new Color(0, 255, 0, 100));
 
 				g.fillRect(x1,y, x2 - x1 + 1, returnTrackHeight);
-				if (visible.overlaps(new Location(st.start(), st.end()))) {
+				if (visible.overlaps(st.start(), st.end())) {
 					g.setColor(Color.BLACK);
 					g.drawString("Retrieving data...", 100,y + returnTrackHeight / 2);
 				}

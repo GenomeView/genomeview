@@ -146,28 +146,30 @@ public class EditFeatureWindow extends JDialog {
 
 					try {
 //						feature.setMute(true);
+						feature.clearQualifiers();
+						
 						/* Construct new qualifiers */
-						List<Qualifier> list = new ArrayList<Qualifier>();
+//						List<Qualifier> list = new ArrayList<Qualifier>();
 						for (String line : new LineIterator(new StringReader(notes.getText()))) {
 							if (line.trim().length() > 0) {
 								String[] arr = line.split("=");
-								list.add(new Qualifier(arr[0].trim(), arr[1].trim()));
+								feature.addQualifier(arr[0].trim(), arr[1].trim());
 							}
 						}
-						/* Remove all qualifiers */
-						List<Qualifier> remove = new ArrayList<Qualifier>();
-						for (String key : feature.getQualifiersKeys()) {
-							List<Qualifier> qs = feature.qualifier(key);
-							for (Qualifier q : qs) {
-								remove.add(q);
-							}
-						}
-						for (Qualifier q : remove) {
-							feature.removeQualifier(q);
-						}
-						for (Qualifier q : list) {
-							feature.addQualifier(q);
-						}
+//						/* Remove all qualifiers */
+//						List<Qualifier> remove = new ArrayList<Qualifier>();
+//						for (String key : feature.getQualifiersKeys()) {
+//							List<Qualifier> qs = feature.qualifier(key);
+//							for (Qualifier q : qs) {
+//								remove.add(q);
+//							}
+//						}
+//						for (Qualifier q : remove) {
+//							feature.removeQualifier(q);
+//						}
+//						for (Qualifier q : list) {
+//							feature.addQualifier(q);
+//						}
 //						feature.setMute(false);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -219,12 +221,12 @@ public class EditFeatureWindow extends JDialog {
 			StringBuffer text = new StringBuffer();
 			notes.setText("");
 			for (String key : feature.getQualifiersKeys()) {
-				List<Qualifier> qs = feature.qualifier(key);
-				for (Qualifier q : qs) {
-					text.append(q.getKey() + "=" + q.getValue() + "\n");
-				}
-				notes.setText(text.toString());
+				
+				text.append(key + "=" + feature.qualifier(key) + "\n");
+				
+				
 			}
+			notes.setText(text.toString());
 			/* Fill in combo boxes */
 			strandSelection.setSelectedItem(feature.strand());
 			typeSelection.setSelectedItem(feature.type());

@@ -296,7 +296,7 @@ public class GeneStructureView extends JLabel implements Observer {
 			// hor = middle + (drawFrame * lineHeight) + tickHeight / 2 + gap;
 			// else
 			for (java.util.Map.Entry<Location, Integer> en : drawFrameMapping.entrySet()) {
-				if (en.getKey().overlaps(l))
+				if (en.getKey().overlaps(l.start,l.end))
 					hor = ((en.getValue() - 1) * lineHeight);
 			}
 
