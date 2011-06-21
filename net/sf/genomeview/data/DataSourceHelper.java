@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JOptionPane;
+import javax.swing.ProgressMonitorInputStream;
 
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.parser.Parser;
@@ -74,6 +75,8 @@ public class DataSourceHelper {
 				} else
 					return;
 			}
+			asd.setIos(new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Reading file", asd.getIos()));
+			
 		}
 
 		if (index == null && data.supportsIndex() && data.length() > 5 * 1024 * 1024) {
