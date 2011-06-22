@@ -3,21 +3,27 @@
  */
 package net.sf.genomeview.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitorInputStream;
+import javax.swing.filechooser.FileFilter;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.jannot.exception.ReadFailedException;
+import net.sf.jannot.mafix.MafixFactory;
 import net.sf.jannot.parser.Parser;
 import net.sf.jannot.source.AbstractStreamDataSource;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
+import be.abeel.io.ExtensionManager;
 
 /**
  * 
@@ -53,6 +59,8 @@ public class DataSourceHelper {
 				if (res == JOptionPane.YES_OPTION) {
 					index(model, data);
 				}
+
+				// FIXME attempt automatic reload
 				return;
 
 			} else {
@@ -66,21 +74,7 @@ public class DataSourceHelper {
 
 		DataSource ds = DataSourceFactory.create(data, index);
 
-		if (ds instanceof AbstractStreamDataSource) {
-			AbstractStreamDataSource asd = ((AbstractStreamDataSource) ds);
-			if (asd.getParser() == null) {
-				Parser tmp = offerParserChoice(model);
-				if (tmp != null) {
-					asd.setParser(tmp);
-				} else
-					return;
-			}
-			asd.setIos(new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Reading file", asd.getIos()));
-			
-		}
-
 		if (index == null && data.supportsIndex() && data.length() > 5 * 1024 * 1024) {
-
 			if (IndexManager.canBuildIndex(data)) {
 				int res = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
 						"Performance would benefit from indexing this file.\n" + data
@@ -88,12 +82,31 @@ public class DataSourceHelper {
 				if (res == JOptionPane.YES_OPTION) {
 					index(model, data);
 				}
+				// FIXME try to load the data anyway
 				return;
 
 			} else {
-				JOptionPane.showMessageDialog(null, "File is rather large and has no index.\n " + data
-						+ "\nTo improve performance you may want to build an index.", "Index missing",
-						JOptionPane.WARNING_MESSAGE);
+				if (data.isMaf() && !data.isCompressed()) {
+					int res = JOptionPane
+							.showConfirmDialog(
+									model.getGUIManager().getParent(),
+									data
+											+ "\nThis multiple alignment file is not preprocessed.\nThis will increase performance drastically.\nDo you want to do it now?",
+									"Preprocessing available", JOptionPane.YES_NO_OPTION);
+					if (res == JOptionPane.YES_OPTION) {
+						mafprocess(model, data);
+						return;
+					}
+				} else {
+
+					JOptionPane
+							.showMessageDialog(
+									null,
+									"File is rather large and has no index.\n "
+											+ data
+											+ "\nTo improve performance you may want to build an index.\nPlease see documentation for more instructions.",
+									"Index missing", JOptionPane.WARNING_MESSAGE);
+				}
 
 			}
 
@@ -105,6 +118,19 @@ public class DataSourceHelper {
 									+ data
 									+ "It may take a while to load this file.\nIf GenomeView becomes unresponsive, please increase the amount of memory.",
 							"Large file!", JOptionPane.WARNING_MESSAGE);
+		}
+
+		if (ds instanceof AbstractStreamDataSource) {
+			AbstractStreamDataSource asd = ((AbstractStreamDataSource) ds);
+			if (asd.getParser() == null) {
+				Parser tmp = offerParserChoice(model);
+				if (tmp != null) {
+					asd.setParser(tmp);
+				} else
+					return;
+			}
+			asd.setIos(new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Reading file", asd.getIos()));
+
 		}
 
 		final ReadWorker rw = new ReadWorker(ds, model);
@@ -119,6 +145,69 @@ public class DataSourceHelper {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
+	}
+
+	private static void mafprocess(final Model model, final Locator data) {
+		GenomeViewScheduler.submit(new Task() {
+
+			@Override
+			public void run() {
+				try {
+					JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
+					chooser.resetChoosableFileFilters();
+
+					chooser.addChoosableFileFilter(new FileFilter() {
+
+						@Override
+						public boolean accept(File f) {
+							if (f.isDirectory())
+								return true;
+
+							if (f.getName().toLowerCase().endsWith("maf")
+									|| f.getName().toLowerCase().endsWith("maf.gz")
+									|| f.getName().toLowerCase().endsWith("maf.bgz")) {
+								return true;
+							}
+
+							return false;
+						}
+
+						@Override
+						public String getDescription() {
+							return "Multiple alignment files";
+						}
+
+					});
+
+					chooser.setMultiSelectionEnabled(false);
+					int returnVal = chooser.showSaveDialog(model.getGUIManager().getParent());
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						File files = chooser.getSelectedFile();
+						// DataSource[] out = new DataSource[files.length];
+						try {
+							Configuration.set("lastDirectory", files.getParentFile());
+							File file = ExtensionManager.extension(files, "maf.bgz");
+							MafixFactory.compressAndIndex(data, file);
+							Locator mafdata=new Locator(file.toString());
+							System.out.println("Load as: "+mafdata);
+							load(model, mafdata);
+							
+							// load(out);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (URISyntaxException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 
 	}
 
