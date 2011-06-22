@@ -570,6 +570,8 @@ public class Model extends Observable implements IModel {
 			}
 			trackList.remove(track.getDataKey());
 		}
+		
+		GenomeViewScheduler.submit(Task.GC);
 		setChanged();
 		notifyObservers(NotificationTypes.UPDATETRACKS);
 	}

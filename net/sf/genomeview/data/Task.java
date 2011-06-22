@@ -4,6 +4,14 @@ import net.sf.jannot.Location;
 
 public abstract class Task implements Runnable, Comparable<Task> {
 
+	public static Task GC = new Task() {
+
+		@Override
+		public void run() {
+			System.gc();
+
+		}
+	};
 	// static long IDCOUNTER = 0;
 	long id = 0;
 	private Location location;
@@ -34,14 +42,14 @@ public abstract class Task implements Runnable, Comparable<Task> {
 	}
 
 	/**
-	 * Try to cancel this task. 
+	 * Try to cancel this task.
 	 * 
-	 * Default implementation will not cancel the task, but reduce it's priority to zero.
+	 * Default implementation will not cancel the task, but reduce it's priority
+	 * to zero.
 	 * 
 	 */
 	public void cancel() {
-		id=0;
-		
+		id = 0;
 
 	}
 }
