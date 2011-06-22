@@ -27,7 +27,7 @@ import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
-import net.sf.jannot.alignment.maf.MAFMultipleAlignment;
+import net.sf.jannot.alignment.maf.AbstractMAFMultipleAlignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.shortread.ReadGroup;
@@ -234,7 +234,7 @@ public class TrackList implements Iterable<Track> {
 					this.add(key, new ShortReadTrack(key,new ShortReadProvider(e, (ReadGroup)data, model), model));
 				}
 			}
-			if (data instanceof MAFMultipleAlignment) {
+			if (data instanceof AbstractMAFMultipleAlignment) {
 				if (!this.containsTrack(key)) {
 					this.add(key, new MultipleAlignmentTrack2(model, key));
 					log.info("Added multiple alignment track " + key);

@@ -37,7 +37,7 @@ import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.alignment.maf.AbstractAlignmentBlock;
 import net.sf.jannot.alignment.maf.AbstractAlignmentSequence;
-import net.sf.jannot.alignment.maf.MAFMultipleAlignment;
+import net.sf.jannot.alignment.maf.AbstractMAFMultipleAlignment;
 import net.sf.jannot.utils.SequenceTools;
 
 /**
@@ -156,11 +156,14 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	private int currentYOffset;
 
+	
+	private Location lastBuffer=null;
+	private MAFVizBuffer mvb=null;
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view,TrackCommunicationModel tcm) {
 		// this.yOffset = yOffset;
 		currentYOffset = yOffset;
-		MAFMultipleAlignment ma = (MAFMultipleAlignment) entry.get(dataKey);
+		AbstractMAFMultipleAlignment ma = (AbstractMAFMultipleAlignment) entry.get(dataKey);
 		if (ma == null) {
 			g.drawString("No multiple alignment loaded for this entry", 10, yOffset + 10);
 			return 20 + 5;
@@ -190,15 +193,15 @@ public class MultipleAlignmentTrack2 extends Track {
 
 		double frac = model.getAnnotationLocationVisible().length() / (double) entry.getMaximumLength();
 		// System.out.println("Visible fraction: "+frac+"\t"+entry.getMaximumLength());
-		int estCount = (int) (frac * ma.size());
+		int estCount = (int) (frac * ma.noAlignmentBlocks());
 
 		// System.out.println("Number of alignment blocks: "+ma.size());
 		// System.out.println("Est. count: "+estCount);
-		if (estCount > 10000) {
-			g.drawString("Too many alignment blocks, zoom in to see multiple alignments", 10, yOffset + 10);
-			// System.out.println("estimated count="+estCount);
-			return 20 + 5;
-		}
+//		if (estCount > 10000) {
+//			g.drawString("Too many alignment blocks, zoom in to see multiple alignments", 10, yOffset + 10);
+//			// System.out.println("estimated count="+estCount);
+//			return 20 + 5;
+//		}
 		// TreeSet<AlignmentBlock> abs = ma.get(entry, visible);
 		// System.out.println("Querying location: "+visible);
 		Iterable<AbstractAlignmentBlock> abs = ma.get(visible.start, visible.end);
@@ -209,7 +212,7 @@ public class MultipleAlignmentTrack2 extends Track {
 			g.drawString("No alignment blocks in this region", 10, yOffset + 10);
 			return 20 + 5;
 		}
-
+		//System.out.println("estCount="+estCount);
 		if (estCount < 500) {
 			int yMax = 0;
 			CollisionMap hitmap = new CollisionMap(model);
@@ -448,24 +451,12 @@ public class MultipleAlignmentTrack2 extends Track {
 			}
 			return yMax - yOffset;
 		} else {/* More than 500 blocks on screen */
-			int[] counts = new int[(int) Math.ceil(screenWidth)];
-			for (AbstractAlignmentBlock ab : abs) {
-				AbstractAlignmentSequence as = ab.getAlignmentSequence(0);
-				int start = Convert.translateGenomeToScreen(as.start(), visible, screenWidth);
-				int end = Convert.translateGenomeToScreen(as.end(), visible, screenWidth);
-				for (int i = start; i < end; i++) {
-					if (i >= 0 && i < counts.length)
-						counts[i] += ab.size();
-				}
+			
+			if(lastBuffer==null||mvb==null||!lastBuffer.equals(visible)){
+				mvb=new MAFVizBuffer(abs, screenWidth, visible);
 			}
-			int yMax = 0;
-			for (int i = 0; i < counts.length; i++) {
-				if (counts[i] > yMax)
-					yMax = counts[i];
-				g.drawLine(i, yOffset, i, yOffset + counts[i] * lineHeight);
-			}
-
-			return yMax * lineHeight;
+			return mvb.draw(g, yOffset, lineHeight);
+			
 		}
 	}
 
