@@ -4,6 +4,7 @@
 package net.sf.genomeview.data;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -24,6 +25,7 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
+import net.sf.samtools.util.SeekableFileStream;
 import be.abeel.io.ExtensionManager;
 
 /**
@@ -85,7 +87,7 @@ public class DataSourceHelper {
 				return;
 
 			} else {
-				if (data.isMaf() && !data.isCompressed()) {
+				if (data.isMaf() && !data.isBlockCompressed()) {
 					int res = JOptionPane
 							.showConfirmDialog(
 									model.getGUIManager().getParent(),
@@ -197,7 +199,14 @@ public class DataSourceHelper {
 						try {
 							Configuration.set("lastDirectory", files.getParentFile());
 							File file = ExtensionManager.extension(files, "maf.bgz");
-							MafixFactory.compressAndIndex(data, file);
+							
+							ProgressMonitorInputStream pmis=new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Compressing MAF file.\nThis will take a while depending on the file size.",data.stream());
+							pmis.getProgressMonitor().setMaximum((int)data.length());
+							MafixFactory.generateBlockZippedFile(pmis,file);
+						
+//							pmis=new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Indexing MAF file.\nThis will take a while depending on the file size.",new SeekableFileStream(file));
+//							pmis.getProgressMonitor().setMaximum((int)file.length());
+							MafixFactory.generateIndex(new SeekableFileStream(file), new File(file+".mfi"));
 							Locator mafdata = new Locator(file.toString());
 							System.out.println("Load as: " + mafdata);
 							load(model, mafdata);
