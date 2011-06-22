@@ -17,11 +17,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.components.MemoryWidget;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.genomeview.gui.dialog.HelpButton;
 import net.sf.jannot.Type;
 import be.abeel.gui.GridBagPanel;
-import be.abeel.gui.MemoryWidget;
 
 /**
  * Panel with an overview of all available tracks and where they should be
