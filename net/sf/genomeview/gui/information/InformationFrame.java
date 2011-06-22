@@ -21,6 +21,7 @@ import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.genomeview.gui.dialog.HelpButton;
 import net.sf.jannot.Type;
 import be.abeel.gui.GridBagPanel;
+import be.abeel.gui.MemoryWidget;
 
 /**
  * Panel with an overview of all available tracks and where they should be
@@ -112,6 +113,10 @@ public class InformationFrame extends GridBagPanel {
 
 		add(new GeneStructureView(model), gc);
 
+		gc.gridy++;
+		gc.weighty = 0.1;
+		this.add(new MemoryWidget(),gc);
+		
 		setPreferredSize(new Dimension(180,50));
 
 
