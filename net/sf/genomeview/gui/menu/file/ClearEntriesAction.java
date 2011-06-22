@@ -8,7 +8,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
+import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.Task;
 /**
  * 
  * @author Thomas Abeel
@@ -31,8 +33,9 @@ public class ClearEntriesAction extends AbstractAction {
 				"Clear entries?", JOptionPane.YES_NO_OPTION);
 		if (result == JOptionPane.YES_OPTION){
 			model.clearEntries();
-			
+			GenomeViewScheduler.submit(Task.GC);
 		}
+		
 
 	}
 
