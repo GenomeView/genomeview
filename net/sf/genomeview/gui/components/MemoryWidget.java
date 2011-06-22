@@ -24,6 +24,12 @@ public class MemoryWidget extends JLabel {
 
 	private static final long serialVersionUID = -3984980155889057580L;
 
+	private static long available=-1;
+	static{
+		MemoryUsage mu = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+		available=mu.getMax()-mu.getUsed();
+	}
+	
 	public MemoryWidget() {
 
 		Thread t = new Thread(new Runnable() {
@@ -48,6 +54,7 @@ public class MemoryWidget extends JLabel {
 	@Override
 	public void paintComponent(Graphics g) {
 		MemoryUsage mu = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+		available=mu.getMax()-mu.getUsed();
 		int width = this.getSize().width;
 		int used = (int) ((mu.getUsed() / (double) mu.getMax()) * width);
 		int comm = (int) ((mu.getCommitted() / (double) mu.getMax()) * width);
@@ -84,6 +91,11 @@ public class MemoryWidget extends JLabel {
 		window.setPreferredSize(new Dimension(100, 50));
 		window.pack();
 		window.setVisible(true);
+	}
+
+	public static long getAvailable() {
+		return available;
+		
 	}
 
 }

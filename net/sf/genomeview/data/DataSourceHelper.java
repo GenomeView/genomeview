@@ -15,6 +15,7 @@ import javax.swing.ProgressMonitorInputStream;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.gui.components.MemoryWidget;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.mafix.MafixFactory;
 import net.sf.jannot.parser.Parser;
@@ -60,7 +61,6 @@ public class DataSourceHelper {
 					index(model, data);
 				}
 
-				// FIXME attempt automatic reload
 				return;
 
 			} else {
@@ -82,7 +82,6 @@ public class DataSourceHelper {
 				if (res == JOptionPane.YES_OPTION) {
 					index(model, data);
 				}
-				// FIXME try to load the data anyway
 				return;
 
 			} else {
@@ -131,6 +130,16 @@ public class DataSourceHelper {
 			}
 			asd.setIos(new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Reading file", asd.getIos()));
 
+		}
+		if (index == null && data.length() > (0.75*MemoryWidget.getAvailable())) {
+			System.out.println("Available mem: "+MemoryWidget.getAvailable());
+			JOptionPane
+			.showMessageDialog(
+					model.getGUIManager().getParent(),
+					data
+							+ "\nThis file is larger than the amount of available memory.\nEither increase the memory or index the file.\n\nFile will not be loaded.",
+					"Not enough memory", JOptionPane.ERROR_MESSAGE);
+			return;
 		}
 
 		final ReadWorker rw = new ReadWorker(ds, model);
@@ -189,10 +198,10 @@ public class DataSourceHelper {
 							Configuration.set("lastDirectory", files.getParentFile());
 							File file = ExtensionManager.extension(files, "maf.bgz");
 							MafixFactory.compressAndIndex(data, file);
-							Locator mafdata=new Locator(file.toString());
-							System.out.println("Load as: "+mafdata);
+							Locator mafdata = new Locator(file.toString());
+							System.out.println("Load as: " + mafdata);
 							load(model, mafdata);
-							
+
 							// load(out);
 						} catch (IOException e1) {
 							// TODO Auto-generated catch block
