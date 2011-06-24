@@ -57,7 +57,7 @@ public class ConnectionMonitor extends Observable {
 			}
 		});
 
-		Thread t = new Thread(new Runnable() {
+		Thread t1 = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -72,6 +72,25 @@ public class ConnectionMonitor extends Observable {
 					} catch (Exception e) {
 						// Failed, try again later;
 					}
+					setChanged();
+					notifyObservers();
+					try {
+						/* Check once every 5 minutes whether we can still get online */
+						Thread.sleep(5*60 * 1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}
+
+			}
+		});
+		Thread t2 = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				while (true) {
 					reposOnline = false;
 					try {
 						LineIterator it = new LineIterator(
@@ -85,7 +104,8 @@ public class ConnectionMonitor extends Observable {
 					setChanged();
 					notifyObservers();
 					try {
-						Thread.sleep(5 * 1000);
+						/* Check once every 15 seconds whether we can still access the main data repository*/
+						Thread.sleep(15 * 1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -94,8 +114,10 @@ public class ConnectionMonitor extends Observable {
 
 			}
 		});
-		t.setDaemon(true);
-		t.start();
+		t1.setDaemon(true);
+		t2.setDaemon(true);
+		t1.start();
+		t2.start();
 	}
 
 }
