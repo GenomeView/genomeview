@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.information;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Observable;
@@ -17,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.components.ConnectionMonitor;
 import net.sf.genomeview.gui.components.MemoryWidget;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.genomeview.gui.dialog.HelpButton;
@@ -43,7 +45,7 @@ public class InformationFrame extends GridBagPanel {
 		gc.fill = GridBagConstraints.BOTH;
 		gc.weightx = 1;
 		gc.weighty = 1;
-		gc.gridwidth = 3;
+		gc.gridwidth = 5;
 		
 		final TrackTable featureTrackList = new TrackTable(model);
 
@@ -53,12 +55,12 @@ public class InformationFrame extends GridBagPanel {
 		gc.weightx = 0;
 		add(new HelpButton(model.getGUIManager().getParent(), "Clicking the eye will hide that track.<br><br>Clicking the trash can will unload the data<br><br>You can drag tracks up and down to reorganize them."),gc);
 		gc.gridx++;
-		gc.gridwidth=2;
+		gc.gridwidth=4;
 		gc.weightx =1;
 		add(new JLabel("Track list"), gc);
 		
 	
-		gc.gridwidth=3;
+		gc.gridwidth=5;
 		gc.gridx=0;
 		gc.gridy++;
 		gc.weighty = 1;
@@ -77,10 +79,11 @@ public class InformationFrame extends GridBagPanel {
 		type.setSelectedItem(Type.get("CDS"));
 		type.addActionListener(annotationTrackList);
 		gc.gridx++;
+		gc.gridwidth = 3;
 		gc.weightx=1;
 		add(type, gc);
 
-		gc.gridwidth = 3;
+		gc.gridwidth = 5;
 		gc.gridx=0;
 		gc.gridy++;
 		gc.weighty = 1;
@@ -93,12 +96,12 @@ public class InformationFrame extends GridBagPanel {
 		gc.gridwidth=1;
 		add(new HelpButton(model.getGUIManager().getParent(), "If you select an item in the view panel, details on that item will be displayed here. <br><br>You can select any text in this window and directly query it at a number the knowledge repositories with the buttons above the text panel."),gc);
 		gc.gridx++;
-		gc.gridwidth=2;
+		gc.gridwidth=4;
 		add(new JLabel("Details on selected items:"), gc);
 		gc.gridy++;
 		gc.weightx = 0;
 		gc.gridx=0;
-		gc.gridwidth=3;
+		gc.gridwidth=5;
 		
 		add(new SearchButtons(), gc);
 		gc.weightx = 1;
@@ -114,14 +117,33 @@ public class InformationFrame extends GridBagPanel {
 		add(new GeneStructureView(model), gc);
 
 		gc.gridy++;
-		gc.weighty = 0.1;
-		this.add(new MemoryWidget(),gc);
+		gc.gridwidth=5;
+		gc.weighty = 0.01;
+		add(new MonitorPanel(),gc);
 		
-		setPreferredSize(new Dimension(180,50));
+		
+		
+		setPreferredSize(new Dimension(150,50));
 
 
 	}
 
+	class MonitorPanel extends GridBagPanel{
+		
+		private static final long serialVersionUID = 1226803679142353777L;
+
+		public MonitorPanel(){
+			gc.insets=new Insets(0,0,0,0);
+			gc.weightx=1;
+			this.add(new MemoryWidget(),gc);
+			gc.gridx++;
+			gc.weightx=0;
+			this.add(ConnectionMonitor.instance.reposLabel,gc);
+			gc.gridx++;
+			this.add(ConnectionMonitor.instance.webLabel,gc);
+		}
+	}
+	
 	class SearchButtons extends JToolBar {
 
 		/**
