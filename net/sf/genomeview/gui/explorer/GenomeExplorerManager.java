@@ -7,8 +7,11 @@ import java.awt.EventQueue;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.JOptionPane;
+
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.components.ConnectionMonitor;
 
 /**
  * 
@@ -45,7 +48,12 @@ public class GenomeExplorerManager implements Observer {
 
 			@Override
 			public void run() {
-				bg.setVisible(vis);
+				if(vis&&ConnectionMonitor.instance.offline()){
+					autoMode=false;
+					JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "GenomeView has no internet access!\nYou need network connectivity to load data online.","Offline",JOptionPane.WARNING_MESSAGE);
+				}else{
+					bg.setVisible(vis);
+				}
 			}
 		});
 

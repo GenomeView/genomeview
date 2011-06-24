@@ -246,6 +246,8 @@ public class ConfigurationDialog extends JDialog {
 			gc.weightx=1;
 			this.add(ConfigBox.integerInstance("general:zoomout", "Maximum zoom-out size"), gc);
 			gc.gridy++;
+			this.add(ConfigBox.booleanInstance("general:monitorConnection", "Monitor network connection"), gc);
+			gc.gridy++;
 			this.add(ConfigBox.booleanInstance("dualscreen", "Enable dual-screen mode? (Requires restart)"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.booleanInstance("general:singleInstance", "Allow only one instance of GenomeView"), gc);

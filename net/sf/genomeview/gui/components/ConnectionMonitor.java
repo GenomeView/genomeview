@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import be.abeel.io.LineIterator;
 
@@ -65,9 +66,12 @@ public class ConnectionMonitor extends Observable {
 					webstartOnline = false;
 
 					try {
-						LineIterator it = new LineIterator("http://genomeview.org/online.php");
-						log.info("Reply from web: " + it.next());
-						it.close();
+						if (Configuration.getBoolean("general:monitorConnection")) {
+							LineIterator it = new LineIterator("http://genomeview.org/online.php");
+							log.info("Reply from web: " + it.next());
+							it.close();
+							
+						}
 						webstartOnline = true;
 					} catch (Exception e) {
 						// Failed, try again later;
@@ -75,8 +79,11 @@ public class ConnectionMonitor extends Observable {
 					setChanged();
 					notifyObservers();
 					try {
-						/* Check once every 5 minutes whether we can still get online */
-						Thread.sleep(5*60 * 1000);
+						/*
+						 * Check once every 5 minutes whether we can still get
+						 * online
+						 */
+						Thread.sleep(5 * 60 * 1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -93,10 +100,12 @@ public class ConnectionMonitor extends Observable {
 				while (true) {
 					reposOnline = false;
 					try {
-						LineIterator it = new LineIterator(
-								"http://www.broadinstitute.org/software/genomeview/online.php");
-						log.info("Reply from repository: " + it.next());
-						it.close();
+						if (Configuration.getBoolean("general:monitorConnection")) {
+							LineIterator it = new LineIterator(
+									"http://www.broadinstitute.org/software/genomeview/online.php");
+							log.info("Reply from repository: " + it.next());
+							it.close();
+						}
 						reposOnline = true;
 					} catch (Exception e) {
 						// Failed, try again later;
@@ -104,7 +113,10 @@ public class ConnectionMonitor extends Observable {
 					setChanged();
 					notifyObservers();
 					try {
-						/* Check once every 15 seconds whether we can still access the main data repository*/
+						/*
+						 * Check once every 15 seconds whether we can still
+						 * access the main data repository
+						 */
 						Thread.sleep(15 * 1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -118,6 +130,10 @@ public class ConnectionMonitor extends Observable {
 		t2.setDaemon(true);
 		t1.start();
 		t2.start();
+	}
+
+	public boolean offline() {
+		return !reposOnline;
 	}
 
 }
