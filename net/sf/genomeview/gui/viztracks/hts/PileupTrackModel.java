@@ -126,5 +126,9 @@ class PileupTrackModel {
 	public boolean isCrossTrackScaling() {
 		return Configuration.getBoolean("pileup:crossTrackScaling");
 	}
+	
+	public void setCrossTrackScaling(boolean b){
+		Configuration.set("pileup:crossTrackScaling",""+b);
+	}
 
 }

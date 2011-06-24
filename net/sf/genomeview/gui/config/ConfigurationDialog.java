@@ -16,6 +16,7 @@ import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -53,13 +54,14 @@ public class ConfigurationDialog extends JDialog {
 
 		public PileupConfigPanel(Model model) {
 			this.model=model;
-			
-			this.add(ConfigBox.booleanInstance("pileup:dynamicRange", "Should all tracks use dynamic range?"), gc);
-			gc.gridy++;
+					
 			this.add(ConfigBox.booleanInstance("pileup:crossTrackScaling", "Cross connect the track scaling."), gc);
 			gc.gridy++;
 			
-			
+			this.add(new JLabel("Default configuration for tracks. Tracks can be configured individually from the context menu when right-clicking the track."),gc);
+			gc.gridy++;
+			this.add(ConfigBox.booleanInstance("pileup:dynamicRange", "Should all tracks use dynamic range?"), gc);
+			gc.gridy++;
 			this.add(ConfigBox.booleanInstance("pileup:logScale", "Should all tracks be log scaled?"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.doubleInstance("pileup:maxPile", "Maximum height of the pileup track"), gc);
