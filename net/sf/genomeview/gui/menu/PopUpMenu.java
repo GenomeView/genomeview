@@ -78,7 +78,9 @@ public class PopUpMenu extends JPopupMenu {
 		if (t != null) {
 			List<JMenuItem> list = t.getMenuItems();
 			for (JMenuItem a : list) {
-				if (a.isEnabled()) {
+				if(a==null)
+					addSeparator();
+				else if (a.isEnabled()) {
 					count++;
 					add(a);
 				}

@@ -131,7 +131,6 @@ public class PileupTrack extends Track {
 	public List<JMenuItem> getMenuItems() {
 		ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
 
-		
 		/* Use global settings */
 		final JCheckBoxMenuItem itemCrossTrack = new JCheckBoxMenuItem();
 		itemCrossTrack.setSelected(ptm.isCrossTrackScaling());
@@ -144,7 +143,7 @@ public class PileupTrack extends Track {
 
 		});
 		out.add(itemCrossTrack);
-		
+
 		/* Use global settings */
 		final JCheckBoxMenuItem itemGlobal = new JCheckBoxMenuItem();
 		itemGlobal.setSelected(ptm.isGlobalSettings());
@@ -156,24 +155,54 @@ public class PileupTrack extends Track {
 
 		});
 		out.add(itemGlobal);
-	
-		
 
-		if (!ptm.isGlobalSettings()) {
+		out.add(null);
+		JMenuItem item = new JMenuItem(new AbstractAction("Add threshold line") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String in = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+						"Input the height of the new threshold line", "Input value", JOptionPane.QUESTION_MESSAGE);
+				if (in != null) {
+					try {
+						Integer d = Integer.parseInt(in);
+						ptm.addLine(new Line(d));
+					} catch (Exception ex) {
+						log.log(Level.WARNING, "Unparseble value for maximum in PileupTrack: " + in, ex);
+					}
+				}
+
+			}
+
+		});
+		out.add(item);
+
+		item = new JMenuItem(new AbstractAction("Clear threshold lines") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ptm.clearLines();
 			
 
+			}
+
+		});
+		out.add(item);
+
+		if (!ptm.isGlobalSettings()) {
+
 			/* Log scaling of line graph */
-			final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
-			item.setSelected(ptm.isLogscaling());
-			item.setAction(new AbstractAction("Use log scaling for line graph") {
+			final JMenuItem item4 = new JCheckBoxMenuItem();
+			item4.setSelected(ptm.isLogscaling());
+			item4.setAction(new AbstractAction("Use log scaling for line graph") {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					ptm.setLogscaling(item.isSelected());
+					ptm.setLogscaling(item4.isSelected());
 
 				}
 
 			});
-			out.add(item);
+			out.add(item4);
 
 			/* Dynamic scaling for both plots */
 			final JCheckBoxMenuItem item3 = new JCheckBoxMenuItem();

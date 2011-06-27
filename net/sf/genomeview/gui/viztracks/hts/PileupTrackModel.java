@@ -3,6 +3,9 @@
  */
 package net.sf.genomeview.gui.viztracks.hts;
 
+import java.util.ArrayList;
+import java.util.Observable;
+
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
@@ -14,21 +17,23 @@ import net.sf.jannot.refseq.Sequence;
  * @author Thomas Abeel
  * 
  */
-class PileupTrackModel {
+class PileupTrackModel{
 
 	private Model model;
 	private VizBuffer vizBuffer = null;
+
 	PileupTrackModel(Model model) {
 		this.model = model;
 	}
 
-	void setVizBuffer(VizBuffer vb){
-		vizBuffer=vb;
+	void setVizBuffer(VizBuffer vb) {
+		vizBuffer = vb;
 	}
-	
-	VizBuffer getVizBuffer(){
+
+	VizBuffer getVizBuffer() {
 		return vizBuffer;
 	}
+
 	// boolean isDetailed() {
 	// return model.getAnnotationLocationVisible().length() < 16000;
 	// }
@@ -50,8 +55,15 @@ class PileupTrackModel {
 			return logscaling;
 	}
 
+	private ArrayList<Line> lines = new ArrayList<Line>();
+
+	ArrayList<Line> getLines() {
+		return lines;
+	}
+
 	void setLogscaling(boolean logscaling) {
 		this.logscaling = logscaling;
+		
 	}
 
 	void setDynamicScaling(boolean dynamicScaling) {
@@ -66,10 +78,8 @@ class PileupTrackModel {
 	}
 
 	Location lastQuery = null;
-//	/* Data for detailed zoom */
-//	NucCounter nc;
-
-
+	// /* Data for detailed zoom */
+	// NucCounter nc;
 
 	private double screenWidth;
 
@@ -81,8 +91,6 @@ class PileupTrackModel {
 		this.screenWidth = screenWidth;
 
 	}
-
-	
 
 	void setGlobalSettings(boolean globalSettings) {
 		this.globalSettings = globalSettings;
@@ -114,21 +122,47 @@ class PileupTrackModel {
 	public Sequence sequence() {
 		return model.getSelectedEntry().sequence();
 	}
+
 	public TrackCommunicationModel getTrackCommunication() {
 		return tcm;
-		
+
 	}
+
 	public void setTrackCommunication(TrackCommunicationModel tcm) {
-		this.tcm=tcm;
-		
+		this.tcm = tcm;
+
 	}
 
 	public boolean isCrossTrackScaling() {
 		return Configuration.getBoolean("pileup:crossTrackScaling");
 	}
-	
-	public void setCrossTrackScaling(boolean b){
-		Configuration.set("pileup:crossTrackScaling",""+b);
+
+	public void setCrossTrackScaling(boolean b) {
+		Configuration.set("pileup:crossTrackScaling", "" + b);
 	}
 
+	public void addLine(Line line) {
+		lines.add(line);
+		model.refresh();
+
+	}
+
+	public void clearLines() {
+		lines.clear();
+		model.refresh();
+
+	}
+
+}
+
+class Line {
+	public Line(int d) {
+		this.height = d;
+	}
+
+	private int height = 0;
+
+	public int value() {
+		return height;
+	}
 }
