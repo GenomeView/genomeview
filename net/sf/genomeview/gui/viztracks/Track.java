@@ -156,7 +156,7 @@ public abstract class Track extends Observable {
 
 		int used = paintTrack((Graphics2D) g, yOffset, width, view,tcm);
 
-		if (!(this instanceof StructureTrack)) {
+		if (index>=0&&!(this instanceof StructureTrack)) {
 			Rectangle r = new Rectangle(0, yOffset, (int) width + 1, used);
 			g.setColor(background[index % 2]);
 			g.fillRect(r.x, r.y, r.width, r.height);

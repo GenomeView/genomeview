@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.Model;
 /**
  * 
  * @author Thomas Abeel
@@ -32,6 +33,12 @@ public class GenomeView {
 	}
 	private static Splash splash=null;
 
+	
+	public static Model getModel(){
+		if(mw==null)
+			return null;
+		return mw.getModel();
+	}
 	public static void main(final String[] args) {
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {

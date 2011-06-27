@@ -50,6 +50,10 @@ public class WindowManager extends WindowAdapter implements Observer {
 	private GenomeViewWindow helper = null;
 
 	private Model model = null;
+	
+	Model getModel(){
+		return model;
+	}
 
 	/**
 	 * Adds an observer to the model, which will only check if the instance is
