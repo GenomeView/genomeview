@@ -17,6 +17,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
+import net.sf.jannot.source.Locator;
 import net.sf.jannot.source.URLSource;
 /**
  * Action that takes care of saving all loaded data into a session file.
@@ -65,11 +66,11 @@ public class SaveSessionAction extends AbstractAction {
 				out.println("##GenomeView session       ##");
 				out.println("##Do not remove header lines##");
 				for (DataSource ds : model.loadedSources()) {
-					if (ds instanceof FileSource) {
-						out.println("F:"+((FileSource) ds).getFile().toString());
-					}
-					if (ds instanceof URLSource) {
-						out.println("U:"+((URLSource) ds).getURL().toString());
+					Locator l=ds.getLocator();
+					if(l.isURL()){
+						out.println("U:"+l);
+					}else{
+						out.println("F:"+l);
 					}
 				}
 				Configuration.set("lastDirectory", f.getParentFile());

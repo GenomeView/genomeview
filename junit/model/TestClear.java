@@ -10,6 +10,7 @@ import net.sf.genomeview.data.ReadWorker;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
+import net.sf.jannot.source.Locator;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,6 +50,11 @@ public class TestClear extends Model {
 
 	class TestDataSource extends DataSource {
 
+		protected TestDataSource() {
+			super(null);
+			// TODO Auto-generated constructor stub
+		}
+
 		@Override
 		public EntrySet read(EntrySet add) throws ReadFailedException {
 			for (int i = 0; i < 5; i++)
@@ -73,6 +79,8 @@ public class TestClear extends Model {
 			// TODO Auto-generated method stub
 			return 0;
 		}
+
+	
 
 	}
 }
