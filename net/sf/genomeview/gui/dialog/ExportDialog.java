@@ -3,7 +3,6 @@
  */
 package net.sf.genomeview.gui.dialog;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -19,15 +18,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -35,28 +31,15 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.ProgressMonitorInputStream;
 import javax.swing.filechooser.FileFilter;
 
-import sun.util.logging.resources.logging;
-
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.data.ClientHttpUpload;
-import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
-import net.sf.jannot.Entry;
-import net.sf.jannot.exception.SaveFailedException;
-import net.sf.jannot.parser.EMBLParser;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
-import be.abeel.io.Copier;
-import be.abeel.io.DirectoryFilter;
-import be.abeel.io.ExtensionManager;
-import be.abeel.io.LineIterator;
-import be.abeel.net.URIFactory;
 
 /**
  * 
