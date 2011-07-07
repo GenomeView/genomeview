@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="1602" />
+	<property name="version" value="1682" />
 	<property name="src" value="." />
 	<property name="build" value="build" />
 	<property name="lib" value="lib" />
@@ -132,8 +132,6 @@
 
 
 		<zip destfile="${dist}.zip" basedir="${dist}" />
-		<tar tarfile="${dist}.tar" basedir="${dist}" excludes="${dist}.zip" />
-		<gzip zipfile="${dist}.tar.gz" src="${dist}.tar" />
 		<delete failonerror="false" file="${dist}.tar" />
 		<delete failonerror="false" dir="${dist}" />
 
