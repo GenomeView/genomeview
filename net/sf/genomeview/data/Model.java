@@ -385,12 +385,7 @@ public class Model extends Observable implements IModel {
 		}
 		logger.info("Entries: " + entries.size());
 		logger.info("Model adding data done!");
-//		if (f instanceof MultiFileSource)
-//			for (DataSource ds : ((MultiFileSource) f).getFileSources()) {
-//				loadedSources.add(ds);
-//			}
-//		else
-			loadedSources.add(f);
+		loadedSources.add(f);
 		updateTracks();
 		refresh(NotificationTypes.GENERAL);
 

@@ -48,7 +48,7 @@ public class SaveDialog extends JDialog {
 
 	private static final long serialVersionUID = -5209291628487502687L;
 
-	class DataSourceCheckbox extends JCheckBox {
+	private class DataSourceCheckbox extends JCheckBox {
 
 		private static final long serialVersionUID = -208816638301437642L;
 
@@ -61,7 +61,7 @@ public class SaveDialog extends JDialog {
 
 	}
 
-	private SaveDialog(final Model model) {
+	private SaveDialog(final Model model, final boolean useDefault) {
 		super(model.getGUIManager().getParent(), "Save dialog", true);
 		setLayout(new GridBagLayout());
 
@@ -114,7 +114,7 @@ public class SaveDialog extends JDialog {
 						try {
 							/* Default save locations? */
 							String defaultLocation = Configuration.get("save:defaultLocation");
-							if (defaultLocation.equals("null")) {
+							if (!useDefault||defaultLocation.equals("null")) {
 								defaultLocation = file();
 							}
 							if (defaultLocation == null) {
@@ -244,8 +244,8 @@ public class SaveDialog extends JDialog {
 		setVisible(true);
 	}
 
-	public static void display(Model model) {
-		new SaveDialog(model);
+	public static void display(Model model, boolean useDefault) {
+		new SaveDialog(model,useDefault);
 
 	}
 
