@@ -35,6 +35,8 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Entry;
 import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.parser.EMBLParser;
+import net.sf.jannot.parser.GFF3Parser;
+import net.sf.jannot.parser.Parser;
 import be.abeel.io.ExtensionManager;
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
@@ -77,7 +79,7 @@ public class SaveDialog extends JDialog {
 
 		final ArrayList<DataSourceCheckbox> dss = new ArrayList<DataSourceCheckbox>();
 		add(new JLabel("Select sources to save"), gc);
-		
+
 		gc.gridy++;
 		Container cp = new Container();
 		cp.setLayout(new GridLayout(0, 1));
@@ -86,10 +88,10 @@ public class SaveDialog extends JDialog {
 			// int count = 0;
 			DataSourceCheckbox dsb = new DataSourceCheckbox(e);
 			dsb.setSelected(true);
-								
+
 			dss.add(dsb);
 			cp.add(dsb);
-			
+
 		}
 		add(new JScrollPane(cp), gc);
 		gc.gridy++;
@@ -107,22 +109,37 @@ public class SaveDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				final Hider h = new Hider(model, "Saving data...");
-				
+
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						try {
 							/* Default save locations? */
 							String defaultLocation = Configuration.get("save:defaultLocation");
-							if (!useDefault||defaultLocation.equals("null")) {
+							if (!useDefault || defaultLocation.equals("null")) {
 								defaultLocation = file();
 							}
 							if (defaultLocation == null) {
 								h.dispose();
 								return;
 							}
-							EMBLParser parser = new EMBLParser();
-							parser.storeSequence = false;
+							Parser parser = Configuration.getParser("save:defaultParser");
+							if (parser == null) {
+
+								Parser[] arr = new Parser[] { new GFF3Parser(), new EMBLParser() };
+								parser = (Parser) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+										"Select an output format", "Output format", JOptionPane.QUESTION_MESSAGE, null,
+										arr, arr[0]);
+
+							}
+
+							if (parser == null) {
+								h.dispose();
+								return;
+							}
+
+							if (parser instanceof EMBLParser)
+								((EMBLParser) parser).storeSequence = false;
 							File tmp = File.createTempFile("GV_", ".save");
 							tmp.deleteOnExit();
 
@@ -131,7 +148,7 @@ public class SaveDialog extends JDialog {
 							for (DataSourceCheckbox dsb : dss) {
 								if (dsb.isSelected()) {
 									parser.write(fos, dsb.data);
-									
+
 								}
 							}
 							fos.close();
@@ -176,7 +193,13 @@ public class SaveDialog extends JDialog {
 								}
 							} else {
 								File out = new File(defaultLocation);
-								out = ExtensionManager.extension(out, "embl");
+								if(parser instanceof GFF3Parser)
+									out = ExtensionManager.extension(out, "gff");
+								
+								if(parser instanceof EMBLParser)
+									out = ExtensionManager.extension(out, "embl");
+								
+								
 								boolean succes = tmp.renameTo(out);
 								h.dispose();
 								if (!succes) {
@@ -207,11 +230,11 @@ public class SaveDialog extends JDialog {
 								diag.dispose();
 							}
 
-						}),BorderLayout.SOUTH);
+						}), BorderLayout.SOUTH);
 						diag.pack();
 						StaticUtils.center(diag);
 						diag.setVisible(true);
-						
+
 					}
 
 				});
@@ -246,7 +269,7 @@ public class SaveDialog extends JDialog {
 	}
 
 	public static void display(Model model, boolean useDefault) {
-		new SaveDialog(model,useDefault);
+		new SaveDialog(model, useDefault);
 
 	}
 

@@ -20,6 +20,9 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Type;
+import net.sf.jannot.parser.EMBLParser;
+import net.sf.jannot.parser.GFF3Parser;
+import net.sf.jannot.parser.Parser;
 import be.abeel.io.GZIPPrintWriter;
 import be.abeel.io.LineIterator;
 
@@ -352,5 +355,17 @@ public class Configuration {
 			return true;
 		return getBoolean("track:visible:"+dk);
 		
+	}
+
+	public static Parser getParser(String string) {
+		String pKey=Configuration.get(string);
+		if(pKey.equals("EMBL")){
+			return new EMBLParser();
+		}
+		if(pKey.equals("GFF")){
+			return new GFF3Parser();
+		}
+		
+		return null;
 	}
 }
