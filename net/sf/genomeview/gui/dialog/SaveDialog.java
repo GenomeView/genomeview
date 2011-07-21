@@ -118,6 +118,7 @@ public class SaveDialog extends JDialog {
 								defaultLocation = file();
 							}
 							if (defaultLocation == null) {
+								h.dispose();
 								return;
 							}
 							EMBLParser parser = new EMBLParser();
