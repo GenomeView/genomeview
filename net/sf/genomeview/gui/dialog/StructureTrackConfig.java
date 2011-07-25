@@ -57,7 +57,7 @@ public class StructureTrackConfig extends JDialog {
 			}
 		}),gc);
 		pack();
-		StaticUtils.center(this);
+		StaticUtils.center(model.getGUIManager().getParent(),this);
 		setVisible(true);
 
 	}

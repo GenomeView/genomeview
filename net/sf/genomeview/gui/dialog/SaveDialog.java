@@ -232,7 +232,7 @@ public class SaveDialog extends JDialog {
 
 						}), BorderLayout.SOUTH);
 						diag.pack();
-						StaticUtils.center(diag);
+						StaticUtils.center(model.getGUIManager().getParent(),diag);
 						diag.setVisible(true);
 
 					}
@@ -264,7 +264,7 @@ public class SaveDialog extends JDialog {
 		});
 
 		pack();
-		StaticUtils.center(this);
+		StaticUtils.center(model.getGUIManager().getParent(),this);
 		setVisible(true);
 	}
 

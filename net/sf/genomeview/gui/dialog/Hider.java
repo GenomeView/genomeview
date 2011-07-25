@@ -66,7 +66,7 @@ public class Hider extends JDialog {
 		floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
 		add(floater);
 		pack();
-		StaticUtils.center(this);
+		StaticUtils.center(model.getGUIManager().getParent(),this);
 		final Hider _self=this;
 		EventQueue.invokeLater(new Runnable() {
 

@@ -62,7 +62,7 @@ public class NoteDialog extends JDialog {
         });
         add(ok, BorderLayout.SOUTH);
         pack();
-        StaticUtils.center(this);
+        StaticUtils.center(model.getGUIManager().getParent(),this);
     }
 
     private static NoteDialog dialog = null;

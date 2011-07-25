@@ -130,7 +130,7 @@ public class SelectedSequenceDialog extends JDialog {
         gc.gridx++;
         add(close, gc);
         pack();
-        StaticUtils.center(this);
+        StaticUtils.center(model.getGUIManager().getParent(),this);
 
     }
 

@@ -91,7 +91,7 @@ public class NewFeatureDialog extends JDialog {
         c.add(cancel, gc);
         setContentPane(c);
         pack();
-        StaticUtils.center(this);
+        StaticUtils.center(model.getGUIManager().getParent(),this);
 
     }
 }

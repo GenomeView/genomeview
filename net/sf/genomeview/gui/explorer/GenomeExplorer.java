@@ -105,7 +105,7 @@ class GenomeExplorer extends JDialog {
 		setBackground(Color.WHITE);
 
 		pack();
-		StaticUtils.center(this);
+		StaticUtils.center(model.getGUIManager().getParent(),this);
 	}
 
 	private Logger log = Logger.getLogger(GenomeExplorer.class.getCanonicalName());

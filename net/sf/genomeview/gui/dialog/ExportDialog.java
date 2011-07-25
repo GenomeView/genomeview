@@ -312,7 +312,7 @@ public class ExportDialog extends JDialog {
 		});
 
 		pack();
-		StaticUtils.center(this);
+		StaticUtils.center(model.getGUIManager().getParent(),this);
 		setVisible(true);
 	}
 

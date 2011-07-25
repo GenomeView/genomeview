@@ -95,7 +95,7 @@ public class MyAuthenticator extends Authenticator {
 		jd.add(jb, gc);
 
 		jd.pack();
-		StaticUtils.center(jd);
+		StaticUtils.center(null,jd);
 		jd.setVisible(true);
 		if (username.getText().length() > 0 || password.getPassword().length > 0)
 			return new PasswordAuthentication(username.getText(), password.getPassword());

@@ -363,7 +363,7 @@ public class ConfigurationDialog extends JDialog {
 		});
 		add(ok, BorderLayout.SOUTH);
 		pack();
-		StaticUtils.center(this);
+		StaticUtils.center(model.getGUIManager().getParent(),this);
 
 	}
 }

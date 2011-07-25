@@ -102,7 +102,7 @@ public class CrashHandler {
 		window.add(close, gc);
 
 		window.pack();
-		StaticUtils.center(window);
+		StaticUtils.center(null,window);
 		window.setVisible(true);
 		window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	}

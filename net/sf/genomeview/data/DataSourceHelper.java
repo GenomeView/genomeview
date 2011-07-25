@@ -16,6 +16,7 @@ import javax.swing.ProgressMonitorInputStream;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.gui.components.JOptionPaneX;
 import net.sf.genomeview.gui.components.MemoryWidget;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.mafix.MafixFactory;
@@ -66,7 +67,7 @@ public class DataSourceHelper {
 				return;
 
 			} else {
-				JOptionPane.showMessageDialog(null, "Could not locate index for " + data + "\nSkipping this file...",
+				JOptionPaneX.showOkCancelDialog(model.getGUIManager().getParent(), "Could not locate index for " + data + "\nSkipping this file...",
 						"Index missing", JOptionPane.ERROR_MESSAGE);
 
 			}
@@ -100,13 +101,15 @@ public class DataSourceHelper {
 					}
 				} else {
 
-					JOptionPane
-							.showMessageDialog(
-									null,
-									"File is rather large and has no index.\n "
+					boolean ok=JOptionPaneX
+							.showOkCancelDialog(
+									model.getGUIManager().getParent(),
+									"<b>Trying to load a rather large file without index</b>.<br> "
 											+ data
-											+ "\nTo improve performance you may want to build an index.\nPlease see documentation for more instructions.",
+											+ "<br>To improve performance you may want to build an index.<br><a href='http://www.genomeview.org/content/preparing-feature-files'>Manual: Indexing annotation</a>.<br><br>GenomeView can try to load the file anyway.</html>",
 									"Index missing", JOptionPane.WARNING_MESSAGE);
+					if(!ok)
+						return;
 				}
 
 			}

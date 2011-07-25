@@ -253,7 +253,7 @@ public class OpenDialog extends JDialog {
 //		});
 
 		pack();
-		StaticUtils.center(_self);
+		StaticUtils.center(model.getGUIManager().getParent(),_self);
 		setVisible(true);
 
 		// }

@@ -47,7 +47,6 @@ public final class StaticUtils {
 		return editStructure;
 	}
 
-	
 	private static SplitFeatureDialog splitFeature;
 
 	/**
@@ -57,10 +56,15 @@ public final class StaticUtils {
 	 * @param window
 	 *            the window to center
 	 */
-	public static void center(Window window) {
-		Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-		window.setLocation(bounds.x + bounds.width / 2 - window.getWidth() / 2, bounds.y + bounds.height / 2
-				- window.getHeight() / 2);
+	public static void center(Frame parent, Window window) {
+		Rectangle bounds = null;
+		if (parent != null)
+			bounds = parent.getBounds();
+		else
+			bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+
+		window.setLocation(bounds.x + bounds.width / 2 - window.getWidth() / 2,
+				bounds.y + bounds.height / 2 - window.getHeight() / 2);
 
 	}
 
@@ -68,8 +72,6 @@ public final class StaticUtils {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		window.setLocation(screenSize.width / 4 * 3, 50);
 	}
-
-
 
 	public static SplitFeatureDialog splitFeature(Model model) {
 		if (splitFeature == null)
