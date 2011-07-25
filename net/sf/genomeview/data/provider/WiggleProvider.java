@@ -30,6 +30,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 	// private Model model;
 
 	public WiggleProvider(Entry e, Data<Pile> source, Model model) {
+		super(model);
 		summary = new PileupSummary(model, e);
 		summary.addObserver(this);
 		this.source = source;

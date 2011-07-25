@@ -32,6 +32,7 @@ public class ShortReadProvider extends AbstractDataProvider<SAMRecord> {
 	private Model model;
 
 	public ShortReadProvider(Entry e, ReadGroup source, Model model) {
+		super(model);
 		this.source = source;
 //		/* Select default window function */
 //		WindowFunction wf=WindowFunction.getWindowFunction(Configuration.get("pileup:defaultWindowFunction"));

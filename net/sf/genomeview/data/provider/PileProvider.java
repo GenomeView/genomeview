@@ -5,6 +5,7 @@ package net.sf.genomeview.data.provider;
 
 import org.broad.igv.track.WindowFunction;
 
+import net.sf.genomeview.data.Model;
 import net.sf.jannot.pileup.Pile;
 /**
  * 
@@ -13,6 +14,11 @@ import net.sf.jannot.pileup.Pile;
  */
 public abstract class PileProvider extends AbstractDataProvider<Pile> {
 	
+
+	public PileProvider(Model model) {
+		super(model);
+	}
+
 	public abstract double getMaxPile();
 
 	public abstract WindowFunction[] getWindowFunctions();

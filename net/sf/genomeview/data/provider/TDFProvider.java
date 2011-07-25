@@ -30,6 +30,7 @@ public class TDFProvider extends PileProvider {
 	private Model model;
 
 	public TDFProvider(Entry e, TDFData source, Model model) {
+		super(model);
 		this.source = source;
 		/* Select default window function */
 		WindowFunction wf=WindowFunction.getWindowFunction(Configuration.get("pileup:defaultWindowFunction"));
@@ -37,6 +38,7 @@ public class TDFProvider extends PileProvider {
 		if(source.availableWindowFunctions().contains(wf))
 			source.requestWindowFunction(wf);
 		this.model = model;
+
 	}
 
 	private ArrayList<Pile> buffer = new ArrayList<Pile>();
