@@ -97,6 +97,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 					MemoryFeatureAnnotation fa =model.getSelectedEntry().getMemoryAnnotation(f.type());
 					fa.add(f);
 					// model.setSelectedRegion(null);
+					model.updateTracks();
 					_self.dispose();
 				} catch (Exception ex) {
 					ex.printStackTrace();
