@@ -199,10 +199,6 @@ public class ConfigurationDialog extends JDialog {
 			this.add(ConfigBox.booleanInstance("showSpliceSiteColor", "Color splice sites (overrides nucleotide coloring)"), gc);
 			gc.gridy++;
 
-			this.add(ConfigBox.stringInstance("visibleTypesStructure", "Visible types on start-up"), gc);
-			gc.gridy++;
-			this.add(ConfigBox.stringInstance("geneStructures", "Types to be considered gene models"), gc);
-			gc.gridy++;
 			this.add(ConfigBox.integerInstance("structureview:maximumNoVisibleFeatures", "Maximum number of features to display on the structure view"), gc);
 
 		}
