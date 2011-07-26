@@ -75,7 +75,7 @@ public class TDFProvider extends PileProvider {
 				if (!(start >= lastStart && end <= lastEnd && (lastEnd - lastStart) <= 2 * (end - start)))
 					return;
 				thisJob.setRunning();
-				Iterable<Pile> fresh = source.get(start, end);
+				Iterable<Pile> fresh = source.get(start, end+1);
 
 				for (Pile p : fresh) {
 					float val = p.getCoverage();

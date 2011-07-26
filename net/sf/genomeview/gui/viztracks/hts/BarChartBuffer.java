@@ -62,9 +62,10 @@ class BarChartBuffer implements VizBuffer {
 		// g.setColor(Color.GRAY);
 		// System.out.println("Building rects.");
 		// System.err.println(provider);
-		Iterable<Pile> itt = provider.get(visible.start, visible.end);
+		Iterable<Pile> itt = provider.get(visible.start, visible.end+1);
 		// System.out.println(itt);
 		for (Pile p : itt) {
+			
 			if (p == null) {
 				System.out.println("Null pile");
 				continue;
