@@ -67,8 +67,8 @@ public class DataSourceHelper {
 				return;
 
 			} else {
-				JOptionPaneX.showOkCancelDialog(model.getGUIManager().getParent(), "Could not locate index for " + data + "\nSkipping this file...",
-						"Index missing", JOptionPane.ERROR_MESSAGE);
+				JOptionPaneX.showOkCancelDialog(model.getGUIManager().getParent(), "Could not locate index for " + data
+						+ "\nSkipping this file...", "Index missing", JOptionPane.ERROR_MESSAGE);
 
 			}
 
@@ -100,16 +100,18 @@ public class DataSourceHelper {
 						return;
 					}
 				} else {
-
-					boolean ok=JOptionPaneX
-							.showOkCancelDialog(
-									model.getGUIManager().getParent(),
-									"<b>Trying to load a rather large file without index</b>.<br> "
-											+ data
-											+ "<br>To improve performance you may want to build an index.<br><a href='http://www.genomeview.org/content/preparing-feature-files'>Manual: Indexing annotation</a>.<br><br>GenomeView can try to load the file anyway.</html>",
-									"Index missing", JOptionPane.WARNING_MESSAGE);
-					if(!ok)
-						return;
+					/* It will silently try to load files up to 40 Mb */
+					if (data.length() > 40 * 1024 * 1024) {
+						boolean ok = JOptionPaneX
+								.showOkCancelDialog(
+										model.getGUIManager().getParent(),
+										"<b>Trying to load a rather large file without index</b>.<br> "
+												+ data
+												+ "<br>To improve performance you may want to build an index.<br><a href='http://www.genomeview.org/content/preparing-feature-files'>Manual: Indexing annotation</a>.<br><br>GenomeView can try to load the file anyway.</html>",
+										"Index missing", JOptionPane.WARNING_MESSAGE);
+						if (!ok)
+							return;
+					}
 				}
 
 			}
@@ -136,14 +138,14 @@ public class DataSourceHelper {
 			asd.setIos(new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Reading file", asd.getIos()));
 
 		}
-		if (index == null && data.length() > (0.75*MemoryWidget.getAvailable())) {
-			System.out.println("Available mem: "+MemoryWidget.getAvailable());
+		if (index == null && data.length() > (0.75 * MemoryWidget.getAvailable())) {
+			System.out.println("Available mem: " + MemoryWidget.getAvailable());
 			JOptionPane
-			.showMessageDialog(
-					model.getGUIManager().getParent(),
-					data
-							+ "\nThis file is larger than the amount of available memory.\nEither increase the memory or index the file.\n\nFile will not be loaded.",
-					"Not enough memory", JOptionPane.ERROR_MESSAGE);
+					.showMessageDialog(
+							model.getGUIManager().getParent(),
+							data
+									+ "\nThis file is larger than the amount of available memory.\nEither increase the memory or index the file.\n\nFile will not be loaded.",
+							"Not enough memory", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -202,14 +204,20 @@ public class DataSourceHelper {
 						try {
 							Configuration.set("lastDirectory", files.getParentFile());
 							File file = ExtensionManager.extension(files, "maf.bgz");
-							
-							ProgressMonitorInputStream pmis=new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Compressing MAF file.\nThis will take a while depending on the file size.",data.stream());
-							pmis.getProgressMonitor().setMaximum((int)data.length());
-							MafixFactory.generateBlockZippedFile(pmis,file);
-						
-//							pmis=new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Indexing MAF file.\nThis will take a while depending on the file size.",new SeekableFileStream(file));
-//							pmis.getProgressMonitor().setMaximum((int)file.length());
-							MafixFactory.generateIndex(new SeekableFileStream(file), new File(file+".mfi"));
+
+							ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(model.getGUIManager()
+									.getParent(),
+									"Compressing MAF file.\nThis will take a while depending on the file size.", data
+											.stream());
+							pmis.getProgressMonitor().setMaximum((int) data.length());
+							MafixFactory.generateBlockZippedFile(pmis, file);
+
+							// pmis=new
+							// ProgressMonitorInputStream(model.getGUIManager().getParent(),
+							// "Indexing MAF file.\nThis will take a while depending on the file size.",new
+							// SeekableFileStream(file));
+							// pmis.getProgressMonitor().setMaximum((int)file.length());
+							MafixFactory.generateIndex(new SeekableFileStream(file), new File(file + ".mfi"));
 							Locator mafdata = new Locator(file.toString());
 							System.out.println("Load as: " + mafdata);
 							load(model, mafdata);
