@@ -116,7 +116,7 @@ public class DataSourceHelper {
 
 			}
 
-		} else if (index == null && data.length() > 50000000) {
+		} else if (index == null && data.length() > 50000000&&!data.isTDF()) {
 			JOptionPane
 					.showMessageDialog(
 							null,
