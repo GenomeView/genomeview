@@ -39,6 +39,7 @@ class BarChartBuffer implements VizBuffer {
 	private PileProvider provider;
 
 	private int pileWidth = 1;
+	private boolean exact = false;
 
 	private double MAX_WIDTH = 2000;
 	private Iterable<Status> status;
@@ -50,7 +51,12 @@ class BarChartBuffer implements VizBuffer {
 
 		double factor = MAX_WIDTH / visible.length();
 		// System.out.println("Factor: "+factor);
-		detailedRects = new double[2][(int) MAX_WIDTH];
+		if (visible.length() < MAX_WIDTH) {
+			detailedRects = new double[2][visible.length()];
+			exact = true;
+		} else {
+			detailedRects = new double[2][(int) MAX_WIDTH];
+		}
 		// covValues = new double[2][(int) MAX_WIDTH];
 		/* Variables for SNP track */
 		if (visible.length() < MAX_WIDTH)
@@ -62,10 +68,10 @@ class BarChartBuffer implements VizBuffer {
 		// g.setColor(Color.GRAY);
 		// System.out.println("Building rects.");
 		// System.err.println(provider);
-		Iterable<Pile> itt = provider.get(visible.start, visible.end+1);
+		Iterable<Pile> itt = provider.get(visible.start, visible.end + 1);
 		// System.out.println(itt);
 		for (Pile p : itt) {
-			
+
 			if (p == null) {
 				System.out.println("Null pile");
 				continue;
@@ -84,6 +90,10 @@ class BarChartBuffer implements VizBuffer {
 
 			int startIdx = (int) ((startPos - visible.start) * factor);
 			int endIdx = (int) ((endPos - visible.start) * factor);
+			if (exact) {
+				startIdx = startPos - visible.start;
+				endIdx = endPos - visible.start;
+			}
 			// System.out.println("Idex: "+startPos+"\t"+startIdx);
 			// System.out.println("\t"+endPos+"\t"+endIdx);
 			for (int i = startIdx; i <= endIdx; i++) {
@@ -194,6 +204,10 @@ class BarChartBuffer implements VizBuffer {
 			double factor = MAX_WIDTH / visible.length();
 			int sLoc = (int) ((i / factor) + visible.start);
 			int eLoc = (int) (((i + 1) / factor) + 1 + visible.start);
+			if(exact){
+				sLoc = (int) ((i) + visible.start);
+				eLoc = (int) (((i)) + 1 + visible.start);
+			}
 			// System.out.println("LOC: "+sLoc+"\t"+eLoc);
 			int screenX1 = Convert.translateGenomeToScreen(sLoc, visible, screenWidth);
 			int screenX2 = Convert.translateGenomeToScreen(eLoc, visible, screenWidth);
@@ -355,6 +369,8 @@ class BarChartBuffer implements VizBuffer {
 
 		}
 		int effectivePosition = (int) (factor * (Convert.translateScreenToGenome(mouseX, visible, ptm.getScreenWidth()) - visible.start));// track.translateFromMouse(e.getX());
+		if (exact)
+			effectivePosition = Convert.translateScreenToGenome(mouseX, visible, ptm.getScreenWidth()) - visible.start;
 
 		text.append("<strong>" + (pileWidth > 1 ? "Average" : "") + "Coverage:</strong> "
 				+ nrReg.format(detailedRects[0][effectivePosition] + detailedRects[1][effectivePosition]) + "<br/>");
