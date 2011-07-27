@@ -26,8 +26,7 @@ public class SaveAction extends AbstractModelAction {
     }
 
     public void actionPerformed(ActionEvent arg0) {
-        System.out.println("saving...");
-        SaveDialog.display(model,true);
+    	SaveDialog.display(model,true);
     }
 
 }
