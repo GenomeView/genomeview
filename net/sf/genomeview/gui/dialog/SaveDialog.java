@@ -33,6 +33,7 @@ import net.sf.genomeview.data.ClientHttpUpload;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Entry;
+import net.sf.jannot.Type;
 import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.parser.EMBLParser;
 import net.sf.jannot.parser.GFF3Parser;
@@ -66,7 +67,7 @@ public class SaveDialog extends JDialog {
 	private SaveDialog(final Model model, final boolean useDefault) {
 		super(model.getGUIManager().getParent(), "Save dialog", true);
 		setLayout(new GridBagLayout());
-
+		final JDialog _self=this;
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.insets = new Insets(3, 3, 3, 3);
 		gc.gridwidth = 2;
@@ -116,10 +117,16 @@ public class SaveDialog extends JDialog {
 						try {
 							/* Default save locations? */
 							String defaultLocation = Configuration.get("save:defaultLocation");
+							Type[] selectedTypes = Type.values();
 							if (!useDefault || defaultLocation.equals("null")) {
-								defaultLocation = file();
+								selectedTypes = new TypeSelection().ask(_self);
+								
+								if(selectedTypes.length>0)
+									defaultLocation = file();
+								
+
 							}
-							if (defaultLocation == null) {
+							if (defaultLocation == null || selectedTypes.length==0) {
 								h.dispose();
 								return;
 							}
@@ -147,7 +154,7 @@ public class SaveDialog extends JDialog {
 
 							for (DataSourceCheckbox dsb : dss) {
 								if (dsb.isSelected()) {
-									parser.write(fos, dsb.data);
+									parser.write(fos, dsb.data,selectedTypes);
 
 								}
 							}
@@ -193,13 +200,12 @@ public class SaveDialog extends JDialog {
 								}
 							} else {
 								File out = new File(defaultLocation);
-								if(parser instanceof GFF3Parser)
+								if (parser instanceof GFF3Parser)
 									out = ExtensionManager.extension(out, "gff");
-								
-								if(parser instanceof EMBLParser)
+
+								if (parser instanceof EMBLParser)
 									out = ExtensionManager.extension(out, "embl");
-								
-								
+
 								boolean succes = tmp.renameTo(out);
 								h.dispose();
 								if (!succes) {
@@ -232,7 +238,7 @@ public class SaveDialog extends JDialog {
 
 						}), BorderLayout.SOUTH);
 						diag.pack();
-						StaticUtils.center(model.getGUIManager().getParent(),diag);
+						StaticUtils.center(model.getGUIManager().getParent(), diag);
 						diag.setVisible(true);
 
 					}
@@ -264,13 +270,104 @@ public class SaveDialog extends JDialog {
 		});
 
 		pack();
-		StaticUtils.center(model.getGUIManager().getParent(),this);
+		StaticUtils.center(model.getGUIManager().getParent(), this);
 		setVisible(true);
 	}
 
 	public static void display(Model model, boolean useDefault) {
 		new SaveDialog(model, useDefault);
 
+	}
+
+}
+
+class TypeSelection {
+	private class TypeCheckbox extends JCheckBox {
+
+		private static final long serialVersionUID = -208816638301437642L;
+
+		private Type data;
+
+		public TypeCheckbox(Type e) {
+			super(e.toString());
+			this.data = e;
+		}
+
+	}
+
+	public Type[] ask(JDialog owner) {
+		final JDialog diag = new JDialog(owner, "Select types to save", true);
+		Container content = diag.getContentPane();
+
+		content.setLayout(new GridBagLayout());
+
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.insets = new Insets(3, 3, 3, 3);
+		gc.gridwidth = 2;
+		gc.gridheight = 1;
+		gc.gridx = 0;
+		gc.gridy = 0;
+		gc.weightx = 1;
+		gc.weighty = 1;
+		gc.fill = GridBagConstraints.BOTH;
+
+		final ArrayList<TypeCheckbox> dss = new ArrayList<TypeCheckbox>();
+		content.add(new JLabel("Select sources to save"), gc);
+
+		gc.gridy++;
+		Container cp = new Container();
+		cp.setLayout(new GridLayout(0, 1));
+		for (Type t : Type.values()) {
+
+			// int count = 0;
+			TypeCheckbox dsb = new TypeCheckbox(t);
+			dsb.setSelected(true);
+
+			dss.add(dsb);
+			cp.add(dsb);
+
+		}
+		content.add(new JScrollPane(cp), gc);
+		gc.gridy++;
+		JButton save = new JButton(new AbstractAction("Save"){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				diag.setVisible(false);
+				
+				
+			}
+			
+		});
+		JButton cancel = new JButton(new AbstractAction("Cancel"){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dss.clear();
+				diag.setVisible(false);
+				
+			}
+			
+		});
+
+		gc.gridwidth = 1;
+		gc.gridy++;
+		content.add(save, gc);
+		
+		gc.gridx++;
+		content.add(cancel, gc);
+		
+		diag.pack();
+		StaticUtils.center(owner, diag);
+		diag.setVisible(true);
+		diag.dispose();
+		
+		ArrayList<Type>sTypes=new ArrayList<Type>();
+		for(TypeCheckbox tc:dss){
+			if(tc.isSelected())
+				sTypes.add(tc.data);
+		}
+		return sTypes.toArray(new Type[0]);
 	}
 
 }

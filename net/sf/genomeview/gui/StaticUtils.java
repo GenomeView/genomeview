@@ -56,7 +56,7 @@ public final class StaticUtils {
 	 * @param window
 	 *            the window to center
 	 */
-	public static void center(Frame parent, Window window) {
+	public static void center(Window parent, Window window) {
 		Rectangle bounds = null;
 		if (parent != null)
 			bounds = parent.getBounds();
