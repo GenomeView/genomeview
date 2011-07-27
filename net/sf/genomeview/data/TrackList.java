@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.provider.BigWigProvider;
 import net.sf.genomeview.data.provider.ShortReadProvider;
 import net.sf.genomeview.data.provider.TDFProvider;
 import net.sf.genomeview.data.provider.WiggleProvider;
@@ -29,6 +30,7 @@ import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
 import net.sf.jannot.alignment.maf.AbstractMAFMultipleAlignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
+import net.sf.jannot.bigwig.BigWigData;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.tabix.BEDWrapper;
@@ -221,6 +223,12 @@ public class TrackList implements Iterable<Track> {
 							(TDFData) data, model), model));
 			}
 
+			if (data instanceof BigWigData) {
+				if (!this.containsTrack(key))
+					this.add(key, new PileupTrack(key, new BigWigProvider(e,
+							(BigWigData) data, model), model));
+			}
+			
 			if (data instanceof Graph) {
 				if (!this.containsTrack(key))
 					this.add(key, new WiggleTrack(key, model, true));

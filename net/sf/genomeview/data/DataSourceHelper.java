@@ -116,7 +116,7 @@ public class DataSourceHelper {
 
 			}
 
-		} else if (index == null && data.length() > 50000000&&!data.isTDF()) {
+		} else if (index == null && data.length() > 50000000&&!(data.isTDF()||data.isBigWig())) {
 			JOptionPane
 					.showMessageDialog(
 							null,
@@ -138,7 +138,7 @@ public class DataSourceHelper {
 			asd.setIos(new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Reading file", asd.getIos()));
 
 		}
-		if (index == null && data.length() > (0.75 * MemoryWidget.getAvailable())) {
+		if (index == null &&!data.isTDF()&&!data.isBigWig()&& data.length() > (0.75 * MemoryWidget.getAvailable())) {
 			System.out.println("Available mem: " + MemoryWidget.getAvailable());
 			JOptionPane
 					.showMessageDialog(
