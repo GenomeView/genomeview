@@ -88,6 +88,7 @@ class GenomesPanel extends GridBagPanel {
 			gc.weightx = 1;
 			gc.weighty = 1;
 			jp = new JScrollPane();
+			jp.getVerticalScrollBar().setUnitIncrement(25);
 			GridBagPanel buttons = new GridBagPanel(){
 				
 				private static final long serialVersionUID = 7455856822406470518L;
