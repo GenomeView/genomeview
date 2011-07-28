@@ -5,6 +5,7 @@ package net.sf.genomeview.data;
 
 import java.awt.Color;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -65,6 +66,8 @@ public class Model extends Observable implements IModel {
 				} else {
 					Configuration.loadExtra(new FileInputStream(config));
 				}
+			} catch (FileNotFoundException e) {
+				logger.log(Level.SEVERE, "loading extra configuration", e);
 			} catch (MalformedURLException e) {
 				logger.log(Level.SEVERE, "loading extra configuration", e);
 			} catch (IOException e) {
