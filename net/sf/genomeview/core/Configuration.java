@@ -43,21 +43,19 @@ public class Configuration {
 	}
 
 	public static char[] getAminoAcids() {
-		return new char[] { 'M', '*', 'X', 'Y', 'W', 'V', 'U', 'T', 'S', 'R',
-				'Q', 'P', 'N', 'L', 'K', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'A' };
+		return new char[] { 'M', '*', 'X', 'Y', 'W', 'V', 'U', 'T', 'S', 'R', 'Q', 'P', 'N', 'L', 'K', 'I', 'H', 'G',
+				'F', 'E', 'D', 'C', 'A' };
 
 	}
 
-	private static Logger logger = Logger.getLogger(Configuration.class
-			.getCanonicalName());
+	private static Logger logger = Logger.getLogger(Configuration.class.getCanonicalName());
 
 	static {
 		String s = System.getProperty("user.home");
 		confDir = new File(s + "/.genomeview");
 		if (!confDir.exists()) {
 			if (!confDir.mkdir())
-				logger.warning("Could not create configuration directory: "
-						+ confDir);
+				logger.warning("Could not create configuration directory: " + confDir);
 
 		}
 		logger.info("User config: " + confDir);
@@ -84,8 +82,7 @@ public class Configuration {
 			 */
 			save();
 		} catch (IOException e) {
-			CrashHandler.crash(Level.SEVERE,
-					"IOException while loading configuration", e);
+			CrashHandler.crash(Level.SEVERE, "IOException while loading configuration", e);
 
 		}
 	}
@@ -110,8 +107,7 @@ public class Configuration {
 	private static void load() throws IOException {
 		InputStream is = null;
 		try {
-			is = Configuration.class
-					.getResourceAsStream("/genomeview.properties");
+			is = Configuration.class.getResourceAsStream("/genomeview.properties");
 			gvProperties.load(is);
 		} catch (Exception e1) {
 			logger.warning("genomeview.properties file could not be loaded! GenomeView assumes your are a developer and know why you can ignore this.");
@@ -126,8 +122,7 @@ public class Configuration {
 		logger.info("Loading default configuration...");
 		LineIterator it;
 
-		it = new LineIterator(
-				Configuration.class.getResourceAsStream("/conf/default.conf"));
+		it = new LineIterator(Configuration.class.getResourceAsStream("/conf/default.conf"));
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
 		for (String line : it) {
@@ -149,8 +144,7 @@ public class Configuration {
 			// Empty config file, don't load it.
 			logger.warning("Config file has size zero!");
 		} else {
-			it = new LineIterator(new GZIPInputStream(new FileInputStream(
-					configFile)));
+			it = new LineIterator(new GZIPInputStream(new FileInputStream(configFile)));
 			it.setSkipBlanks(true);
 			it.setSkipComments(true);
 			for (String line : it) {
@@ -159,8 +153,7 @@ public class Configuration {
 					String value = line.substring(line.indexOf('=') + 1);
 					localMap.put(key.trim(), value.trim());
 				} else {
-					logger.warning("Invalid line in configuration file! '"
-							+ line + "'");
+					logger.warning("Invalid line in configuration file! '" + line + "'");
 				}
 
 			}
@@ -226,11 +219,14 @@ public class Configuration {
 	}
 
 	public static void set(String key, File value) {
-		localMap.put(key, value.toString());
+		set(key,value.toString());
 	}
 
-	public static void set(String string, String value) {
-		localMap.put(string, value);
+	public static void set(String key, String value) {
+		if (extraMap.containsKey(key))
+			extraMap.put(key, value);
+		else
+			localMap.put(key, value);
 
 	}
 
@@ -308,8 +304,7 @@ public class Configuration {
 		try {
 			load();
 		} catch (IOException e) {
-			CrashHandler.crash(Level.SEVERE,
-					"IOException while loading configuration", e);
+			CrashHandler.crash(Level.SEVERE, "IOException while loading configuration", e);
 		}
 		model.refresh();
 	}
@@ -346,26 +341,26 @@ public class Configuration {
 
 	}
 
-	public static void setVisible(DataKey dk,boolean b) {
-		set("track:visible:"+dk,b);
+	public static void setVisible(DataKey dk, boolean b) {
+		set("track:visible:" + dk, b);
 	}
-	
+
 	public static boolean getVisible(DataKey dk) {
 		if (get("track:visible:" + dk) == null)
 			return true;
-		return getBoolean("track:visible:"+dk);
-		
+		return getBoolean("track:visible:" + dk);
+
 	}
 
 	public static Parser getParser(String string) {
-		String pKey=Configuration.get(string);
-		if(pKey.equals("EMBL")){
+		String pKey = Configuration.get(string);
+		if (pKey.equals("EMBL")) {
 			return new EMBLParser();
 		}
-		if(pKey.equals("GFF")){
+		if (pKey.equals("GFF")) {
 			return new GFF3Parser();
 		}
-		
+
 		return null;
 	}
 }
