@@ -156,13 +156,13 @@ class PileupTrackModel{
 }
 
 class Line {
-	public Line(int d) {
+	public Line(double  d) {
 		this.height = d;
 	}
 
-	private int height = 0;
+	private double height = 0;
 
-	public int value() {
+	public double value() {
 		return height;
 	}
 }

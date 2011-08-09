@@ -165,7 +165,7 @@ public class PileupTrack extends Track {
 						"Input the height of the new threshold line", "Input value", JOptionPane.QUESTION_MESSAGE);
 				if (in != null) {
 					try {
-						Integer d = Integer.parseInt(in);
+						Double d = Double.parseDouble(in);
 						ptm.addLine(new Line(d));
 					} catch (Exception ex) {
 						log.log(Level.WARNING, "Unparseble value for maximum in PileupTrack: " + in, ex);

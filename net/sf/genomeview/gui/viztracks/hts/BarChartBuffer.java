@@ -201,16 +201,7 @@ class BarChartBuffer implements VizBuffer {
 
 		// }
 
-		g.setColor(Color.BLACK);
-		for (Line line : ptm.getLines()) {
-			// g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 -
-			// screenX1 + 1, 2 * size);
-			if (line.value() < div) {
-				int tY = (int) ((line.value() / div) * graphLineHeigh);
-				g.drawLine(0, yOffset + graphLineHeigh - tY, (int) screenWidth, yOffset + graphLineHeigh - tY);
-				g.drawLine(0, yOffset + graphLineHeigh + tY, (int) screenWidth, yOffset + graphLineHeigh + tY);
-			}
-		}
+		
 
 		yOffset += 2 * graphLineHeigh;
 
@@ -277,15 +268,6 @@ class BarChartBuffer implements VizBuffer {
 			}
 		}
 
-		/* Draw tick labels on coverage plot */
-		g.setColor(Color.BLACK);
-		g.drawLine(0, yOffset, 5, yOffset);
-		g.drawLine(0, yOffset - graphLineHeigh, 5, yOffset - graphLineHeigh);
-		g.drawLine(0, yOffset - 2 * graphLineHeigh, 5, yOffset - 2 * graphLineHeigh);
-
-		g.drawString("" + nrReg.format(div), 10, yOffset);
-		g.drawString("0" + "", 10, yOffset - graphLineHeigh + 5);
-		g.drawString("" + nrReg.format(div), 10, yOffset - 2 * graphLineHeigh + 10);
 		// if (dataKey != null)
 		// g.drawString(StaticUtils.shortify(dataKey.toString()), 10, yOffset -
 		// graphLineHeigh + 24 - 2);
@@ -348,7 +330,29 @@ class BarChartBuffer implements VizBuffer {
 
 			g.setColor(Color.GRAY);
 		}
+		
+		yOffset+=2*graphLineHeigh;
+		
+		g.setColor(Color.BLACK);
+		for (Line line : ptm.getLines()) {
+			// g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 -
+			// screenX1 + 1, 2 * size);
+			if (line.value() < div) {
+				int tY = (int) ((line.value() / div) * 2* graphLineHeigh);
+				g.drawLine(0, yOffset - tY, (int) screenWidth, yOffset - tY);
+//				g.drawLine(0, yOffset + graphLineHeigh + tY, (int) screenWidth, yOffset + graphLineHeigh + tY);
+			}
+		}
+		
+		
+		g.setColor(Color.BLACK);
+		g.drawLine(0, yOffset, 5, yOffset);
+		g.drawLine(0, yOffset - graphLineHeigh, 5, yOffset - graphLineHeigh);
+		g.drawLine(0, yOffset - 2 * graphLineHeigh, 5, yOffset - 2 * graphLineHeigh);
 
+		g.drawString("0", 10, yOffset);
+		// g.drawString("0" + "", 10, yOffset - graphLineHeigh + 5);
+		g.drawString(nrReg.format(div), 10, yOffset - 2 * graphLineHeigh + 10);
 	}
 
 	private void drawTwo(Graphics g, double div, int graphLineHeigh, double screenWidth, int yOffset) {
@@ -405,6 +409,40 @@ class BarChartBuffer implements VizBuffer {
 
 			g.setColor(Color.GRAY);
 		}
+		
+		
+		
+		
+		g.setColor(Color.BLACK);
+		for (Line line : ptm.getLines()) {
+			// g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 -
+			// screenX1 + 1, 2 * size);
+			if (line.value() < div) {
+				int tY = (int) ((line.value() / div) * graphLineHeigh);
+				g.drawLine(0, yOffset + graphLineHeigh - tY, (int) screenWidth, yOffset + graphLineHeigh - tY);
+				g.drawLine(0, yOffset + graphLineHeigh + tY, (int) screenWidth, yOffset + graphLineHeigh + tY);
+			}
+		}
+		
+		yOffset+=2*graphLineHeigh;
+		/* Draw tick labels on coverage plot */
+
+	
+				g.setColor(Color.BLACK);
+				g.drawLine(0, yOffset, 5, yOffset);
+				g.drawLine(0, yOffset - graphLineHeigh, 5, yOffset - graphLineHeigh);
+				g.drawLine(0, yOffset - 2 * graphLineHeigh, 5, yOffset - 2 * graphLineHeigh);
+
+				g.drawString("" + nrReg.format(div), 10, yOffset);
+				g.drawString("0" + "", 10, yOffset - graphLineHeigh + 5);
+				g.drawString("" + nrReg.format(div), 10, yOffset - 2 * graphLineHeigh + 10);
+				
+		
+			
+				
+
+			
+		
 
 	}
 
@@ -455,10 +493,11 @@ class BarChartBuffer implements VizBuffer {
 		if (detailedRects != null) {
 			text.append("<strong>" + (pileWidth > 1 ? "Average " : "") + "Coverage:</strong> ");
 			if (detailedRects.length == 2) {
-				text.append(nrReg.format(detailedRects[0][effectivePosition] + detailedRects[1][effectivePosition]) + "<br/>");
+				text.append(nrReg.format(detailedRects[0][effectivePosition] + detailedRects[1][effectivePosition])
+						+ "<br/>");
 				text.append("Forward: " + nrReg.format(detailedRects[0][effectivePosition]) + "<br/>");
 				text.append("Reverse: " + nrReg.format(detailedRects[1][effectivePosition]) + "<br/>");
-			}else{
+			} else {
 				double val = 0;
 				for (int j = 0; j < detailedRects.length; j++)
 					val += detailedRects[j][effectivePosition];
