@@ -18,7 +18,6 @@ import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.Location;
-import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.refseq.Sequence;
 
@@ -35,6 +34,7 @@ class BarChartBuffer implements VizBuffer {
 	// private double[][] covValues = null;
 	private Location visible;
 	private double localMaxPile = 0;
+	private double localMinPile = 0;
 	private NucCounter nc;
 	private PileupTrackModel ptm;
 	private Logger log = Logger.getLogger(BarChartBuffer.class.toString());
@@ -52,9 +52,9 @@ class BarChartBuffer implements VizBuffer {
 		this.ptm = ptm;
 
 		double factor = MAX_WIDTH / visible.length();
-		// System.out.println("Factor: "+factor);
-
-		// covValues = new double[2][(int) MAX_WIDTH];
+		if (exact)
+			factor = 1;
+	
 		/* Variables for SNP track */
 		if (visible.length() < MAX_WIDTH)
 			nc = new NucCounter(visible.length());
@@ -62,13 +62,8 @@ class BarChartBuffer implements VizBuffer {
 			nc = null;
 		status = provider.getStatus(visible.start, visible.end);
 
-		// g.setColor(Color.GRAY);
-		// System.out.println("Building rects.");
-		// System.err.println(provider);
 		Iterable<Pile> itt = provider.get(visible.start, visible.end + 1);
-		// System.out.println(itt);
 		for (Pile p : itt) {
-
 			if (p == null) {
 				System.out.println("Null pile");
 				continue;
@@ -76,8 +71,10 @@ class BarChartBuffer implements VizBuffer {
 			if (detailedRects == null)
 				initArray(p, visible.length());
 
-			if (p.start() + p.getLength() < visible.start || p.start() > visible.end)
+			if (p.start() + p.getLength() < visible.start || p.start() > visible.end) {
+			
 				continue;
+			}
 
 			if (nc != null && p.getBases() != null) {
 				count(nc, p, visible);
@@ -112,6 +109,8 @@ class BarChartBuffer implements VizBuffer {
 
 					if (coverage > localMaxPile)
 						localMaxPile = coverage;
+					if (coverage < localMinPile)
+						localMinPile = coverage;
 				}
 			}
 
@@ -165,43 +164,36 @@ class BarChartBuffer implements VizBuffer {
 		// Configuration.getInt("shortread:snpTrackHeight");
 		int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
 
-		// System.out.println("Drawing bar charts with " + pCount +
-		// " piles.");
-
-		double div = provider.getMaxPile();
+		double range = provider.getMaxPile() - localMinPile;
+		System.out.println("provider max="+provider.getMaxPile());
+		System.out.println("local minpile ="+localMinPile);
+		System.out.println("local maxpile="+localMaxPile);
+		System.out.println("DIV:"+range);
 		if (ptm.isDynamicScaling())
-			div = localMaxPile;
+			range = localMaxPile - localMinPile;
 		if (ptm.isCrossTrackScaling()) {
 			// System.out.println("Using TCM.. " +
 			// ptm.getTrackCommunication().getLocalPileupMax());
-			div = ptm.getTrackCommunication().getLocalPileupMax();
+			range = ptm.getTrackCommunication().getLocalPileupMax() - localMinPile;
 		}
 
 		if (ptm.maxValue() > 0) {
-			div = ptm.maxValue();
+			range = ptm.maxValue() - localMinPile;
 		}
-
-		// System.out.println("Using " + div + ", dynamic: " +
-		// ptm.isDynamicScaling());
-		// System.out.println("\tvalue 20: "+detailedRects[0][20]+"\t"+detailedRects[1][20]);
-		// int width = (int) Math.ceil(screenWidth / detailedRects[0].length);
-		// System.out.println("Draw width:"+width);
 
 		if (detailedRects != null) {
 			switch (detailedRects.length) {
 			case 2:
-				drawTwo(g, div, graphLineHeigh, screenWidth, yOffset);
+				drawTwo(g, range, graphLineHeigh, screenWidth, yOffset);
 				break;
 			default:
-				drawOne(g, div, graphLineHeigh, screenWidth, yOffset);
+				drawOne(g, range, graphLineHeigh, screenWidth, yOffset);
 				break;
 
 			}
 		}
 
 		// }
-
-		
 
 		yOffset += 2 * graphLineHeigh;
 
@@ -280,25 +272,20 @@ class BarChartBuffer implements VizBuffer {
 
 	}
 
-	private void drawOne(Graphics2D g, double div, int graphLineHeigh, double screenWidth, int yOffset) {
+	private void drawOne(Graphics2D g, double range, int graphLineHeigh, double screenWidth, int yOffset) {
 
-		int lastX = -1;
+		int lastX = -10;
 		for (int i = 0; detailedRects != null && i < detailedRects[0].length; i++) {
-			// int snpOffset = yOffset;
+
+			/* Val is normalized to baseline zero with localMinPile */
 			double val = 0;
 			for (int j = 0; j < detailedRects.length; j++)
-				val += detailedRects[j][i];
+				val += detailedRects[j][i] - localMinPile;
 
-			// double coverage = fcov + rcov;
-			/* Max value set, truncate */
-			//
-			// if (ptm.maxValue() > 0) {
-			// div = ptm.maxValue();
-			if (val > div)
-				val = div;
+			if (val > range)
+				val = range;
 
-			// }
-			double frac = val / div;
+			double frac = val /range;
 			int size = (int) (frac * graphLineHeigh);
 
 			double factor = MAX_WIDTH / visible.length();
@@ -311,76 +298,67 @@ class BarChartBuffer implements VizBuffer {
 			// System.out.println("LOC: "+sLoc+"\t"+eLoc);
 			int screenX1 = Convert.translateGenomeToScreen(sLoc, visible, screenWidth);
 			int screenX2 = Convert.translateGenomeToScreen(eLoc, visible, screenWidth);
-			// System.out.println("Screen: "+screenX1+"\t"+screenX2);
+			// System.out.println("Screen: "+screenX1+"\t"+screenX2+"\t"+frac);
 			// System.out.println(frac+"\t"+ffrac+"\t"+rfrac);
 			if (screenX1 > lastX) {
 				lastX = screenX1;
 				g.setColor(Color.ORANGE);
 				g.fillRect(screenX1, yOffset + 2 * graphLineHeigh - 2 * size, screenX2 - screenX1 + 1, 2 * size);
 
-				// g.setColor(forwardColor);
-				// g.fillRect(screenX1, yOffset + graphLineHeigh - fsize,
-				// screenX2 - screenX1 + 1, fsize);
-				//
-				// g.setColor(reverseColor);
-				// g.fillRect(screenX1, yOffset + graphLineHeigh, screenX2 -
-				// screenX1 + 1, rsize);
 			}
-			// System.out.println("Show individual");
-
 			g.setColor(Color.GRAY);
 		}
-		
-		yOffset+=2*graphLineHeigh;
-		
+
+		yOffset += 2 * graphLineHeigh;
+
 		g.setColor(Color.BLACK);
 		for (Line line : ptm.getLines()) {
 			// g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 -
 			// screenX1 + 1, 2 * size);
-			if (line.value() < div) {
-				int tY = (int) ((line.value() / div) * 2* graphLineHeigh);
+			if (line.value()-localMinPile < range) {
+				int tY = (int) (((line.value()-localMinPile) / range) * 2 * graphLineHeigh);
 				g.drawLine(0, yOffset - tY, (int) screenWidth, yOffset - tY);
-//				g.drawLine(0, yOffset + graphLineHeigh + tY, (int) screenWidth, yOffset + graphLineHeigh + tY);
+				// g.drawLine(0, yOffset + graphLineHeigh + tY, (int)
+				// screenWidth, yOffset + graphLineHeigh + tY);
 			}
 		}
-		
-		
+
 		g.setColor(Color.BLACK);
 		g.drawLine(0, yOffset, 5, yOffset);
 		g.drawLine(0, yOffset - graphLineHeigh, 5, yOffset - graphLineHeigh);
 		g.drawLine(0, yOffset - 2 * graphLineHeigh, 5, yOffset - 2 * graphLineHeigh);
 
-		g.drawString("0", 10, yOffset);
+		g.drawString(nrReg.format(localMinPile), 10, yOffset);
 		// g.drawString("0" + "", 10, yOffset - graphLineHeigh + 5);
-		g.drawString(nrReg.format(div), 10, yOffset - 2 * graphLineHeigh + 10);
+		g.drawString(nrReg.format(range+localMinPile), 10, yOffset - 2 * graphLineHeigh + 10);
 	}
 
-	private void drawTwo(Graphics g, double div, int graphLineHeigh, double screenWidth, int yOffset) {
+	private void drawTwo(Graphics g, double range, int graphLineHeigh, double screenWidth, int yOffset) {
 		Color forwardColor = Configuration.getColor("shortread:forwardColor");
 		Color reverseColor = Configuration.getColor("shortread:reverseColor");
-		int lastX = -1;
+		int lastX = -10;
 		for (int i = 0; detailedRects != null && i < detailedRects[0].length; i++) {
 			// int snpOffset = yOffset;
-			double fcov = detailedRects[0][i];
-			double rcov = detailedRects[1][i];
+			double fcov = detailedRects[0][i] - localMinPile;
+			double rcov = detailedRects[1][i] - localMinPile;
 			double coverage = fcov + rcov;
 			/* Max value set, truncate */
 			//
 			// if (ptm.maxValue() > 0) {
 			// div = ptm.maxValue();
-			if (coverage > div)
-				coverage = div;
-			if (rcov > div)
-				rcov = div;
-			if (fcov > div)
-				fcov = div;
+			if (coverage > range)
+				coverage = range;
+			if (rcov > range)
+				rcov = range;
+			if (fcov > range)
+				fcov = range;
 
 			// }
-			double frac = coverage / div;
+			double frac = coverage / range;
 			int size = (int) (frac * graphLineHeigh);
-			double ffrac = fcov / div;
+			double ffrac = fcov / range;
 			int fsize = (int) (ffrac * graphLineHeigh);
-			double rfrac = rcov / div;
+			double rfrac = rcov / range;
 			int rsize = (int) (rfrac * graphLineHeigh);
 			double factor = MAX_WIDTH / visible.length();
 			int sLoc = (int) ((i / factor) + visible.start);
@@ -409,40 +387,29 @@ class BarChartBuffer implements VizBuffer {
 
 			g.setColor(Color.GRAY);
 		}
-		
-		
-		
-		
+
 		g.setColor(Color.BLACK);
 		for (Line line : ptm.getLines()) {
 			// g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 -
 			// screenX1 + 1, 2 * size);
-			if (line.value() < div) {
-				int tY = (int) ((line.value() / div) * graphLineHeigh);
+			if (line.value()-localMinPile < range) {
+				int tY = (int) (((line.value()-localMinPile) / range) * graphLineHeigh);
 				g.drawLine(0, yOffset + graphLineHeigh - tY, (int) screenWidth, yOffset + graphLineHeigh - tY);
 				g.drawLine(0, yOffset + graphLineHeigh + tY, (int) screenWidth, yOffset + graphLineHeigh + tY);
 			}
 		}
-		
-		yOffset+=2*graphLineHeigh;
+
+		yOffset += 2 * graphLineHeigh;
 		/* Draw tick labels on coverage plot */
 
-	
-				g.setColor(Color.BLACK);
-				g.drawLine(0, yOffset, 5, yOffset);
-				g.drawLine(0, yOffset - graphLineHeigh, 5, yOffset - graphLineHeigh);
-				g.drawLine(0, yOffset - 2 * graphLineHeigh, 5, yOffset - 2 * graphLineHeigh);
+		g.setColor(Color.BLACK);
+		g.drawLine(0, yOffset, 5, yOffset);
+		g.drawLine(0, yOffset - graphLineHeigh, 5, yOffset - graphLineHeigh);
+		g.drawLine(0, yOffset - 2 * graphLineHeigh, 5, yOffset - 2 * graphLineHeigh);
 
-				g.drawString("" + nrReg.format(div), 10, yOffset);
-				g.drawString("0" + "", 10, yOffset - graphLineHeigh + 5);
-				g.drawString("" + nrReg.format(div), 10, yOffset - 2 * graphLineHeigh + 10);
-				
-		
-			
-				
-
-			
-		
+		g.drawString("" + nrReg.format(range + localMinPile), 10, yOffset);
+		g.drawString("" + nrReg.format(localMinPile), 10, yOffset - graphLineHeigh + 5);
+		g.drawString("" + nrReg.format(range + localMinPile), 10, yOffset - 2 * graphLineHeigh + 10);
 
 	}
 
