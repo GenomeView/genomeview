@@ -13,6 +13,7 @@ import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Location;
+import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.Pile;
 
 /**
@@ -109,8 +110,8 @@ class LineChartBuffer implements VizBuffer {
 		
 		for (Pile p : provider.get(visible.start, visible.end)) {
 			//System.out.println("Pile: "+p.getPos()+"\t"+p.getLength()+"\t"+p.getCoverage());
-			int x1 = Convert.translateGenomeToScreen(p.getPos(), visible, screenWidth);
-			int x2 = Convert.translateGenomeToScreen(p.getPos() + p.getLength(), visible, screenWidth);
+			int x1 = Convert.translateGenomeToScreen(p.start(), visible, screenWidth);
+			int x2 = Convert.translateGenomeToScreen(p.start() + p.getLength(), visible, screenWidth);
 			//System.out.println("\t"+x1+"\t"+x2);
 			// double valF = f[i] - 1;
 			// double valR = r[i] - 1;
@@ -122,7 +123,7 @@ class LineChartBuffer implements VizBuffer {
 			// // System.err.println(idx);
 			// idx = summary.length() - 1;
 			// }
-			double val = p.getCoverage();// .getValue(idx);// /
+			double val = p.getTotal();// .getValue(idx);// /
 			if (ptm.isLogscaling()) {
 				val = log2(val + 1);
 			}

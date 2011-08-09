@@ -14,6 +14,7 @@ import net.sf.genomeview.data.Task;
 import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
+import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.Pile;
 
 import org.broad.igv.track.WindowFunction;
@@ -84,7 +85,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 //
 //					}
 					for (Pile p : source.get(start, end)) {
-						float val = p.getCoverage();
+						float val = p.getTotal();//.getCoverage();
 						// int len = p.getLength();
 						// if (len > 1 && val > maxSummary)
 						// maxSummary = val;
@@ -103,7 +104,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 //			fresh = source.get(start, end);
 		} else {
 			for (Pile p : summary.get(source, start, end)) {
-				float val = p.getCoverage();
+				float val = p.getTotal();//p.getCoverage();
 				// int len = p.getLength();
 				// if (len > 1 && val > maxSummary)
 				// maxSummary = val;

@@ -11,7 +11,9 @@ import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
+import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.Pile;
+import net.sf.jannot.pileup.PileTools;
 
 /**
  * 
@@ -193,8 +195,8 @@ class PileupSummary extends Observable{
 				}
 				float fval = (float)getFValue(idx)/SUMMARYSIZE;// /
 				float rval = (float)getRValue(idx)/SUMMARYSIZE;// /
-				Pile tmp=new Pile(i,fval,rval,null);
-				tmp.setLen(PileupSummary.SUMMARYSIZE);
+				Pile tmp=PileTools.create(i, fval,rval);//new DoublePile(i,fval,rval,null);
+				tmp.setLength(PileupSummary.SUMMARYSIZE);
 				buffer.add(tmp);
 			}
 		}

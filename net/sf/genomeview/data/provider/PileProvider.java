@@ -6,6 +6,7 @@ package net.sf.genomeview.data.provider;
 import org.broad.igv.track.WindowFunction;
 
 import net.sf.genomeview.data.Model;
+import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.Pile;
 /**
  * 
@@ -27,7 +28,7 @@ public abstract class PileProvider extends AbstractDataProvider<Pile> {
 
 	public abstract boolean isCurrentWindowFunction(WindowFunction wf);
 
-
+	
 //	public abstract double getMaxSummary();
 
 }

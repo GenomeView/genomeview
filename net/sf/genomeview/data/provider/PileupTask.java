@@ -9,6 +9,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Task;
 import net.sf.jannot.Data;
 import net.sf.jannot.Location;
+import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.Pile;
 /**
  * 
@@ -54,9 +55,9 @@ class PileupTask extends Task {
 			summary.setRunning(idx);
 			Iterable<Pile> piles = pw.get(idx * PileupSummary.CHUNK, (idx + 1) * PileupSummary.CHUNK);
 			for (Pile p : piles) {
-				if (p.getPos() >= idx * PileupSummary.CHUNK && p.getPos() < (idx + 1) * PileupSummary.CHUNK) {
-					int position = (p.getPos() - 1) / PileupSummary.SUMMARYSIZE;
-					summary.add(position, p.getFCoverage(),p.getRCoverage());
+				if (p.start() >= idx * PileupSummary.CHUNK && p.start() < (idx + 1) * PileupSummary.CHUNK) {
+					int position = (p.start() - 1) / PileupSummary.SUMMARYSIZE;
+					summary.add(position, p.getValue(0),p.getValue(1));
 
 				}
 			}

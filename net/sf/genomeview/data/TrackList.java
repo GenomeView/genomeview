@@ -31,6 +31,7 @@ import net.sf.jannot.Type;
 import net.sf.jannot.alignment.maf.AbstractMAFMultipleAlignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 import net.sf.jannot.bigwig.BigWigData;
+import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.tabix.BEDWrapper;
