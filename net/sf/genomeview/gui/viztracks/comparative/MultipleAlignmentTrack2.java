@@ -41,6 +41,7 @@ import net.sf.jannot.alignment.maf.AbstractMAFMultipleAlignment;
 import net.sf.jannot.utils.SequenceTools;
 
 /**
+ * Multiple-alignment track for MAF files.
  * 
  * @author Thomas Abeel
  * 
@@ -71,8 +72,6 @@ public class MultipleAlignmentTrack2 extends Track {
 			});
 		}
 	}
-
-	// private MultipleAlignment ma;
 
 	private MouseEvent lastMouse;
 
@@ -106,28 +105,16 @@ public class MultipleAlignmentTrack2 extends Track {
 		return false;
 	}
 
-	//
-	// public MultipleAlignment getMA() {
-	// return ma;
-	// }
-
-	// public MultipleAlignmentTrack2(Model model, MultipleAlignment ma) {
-	// super(model, true, true);
-	// // model.addObserver(tooltip);
-	// this.ma = ma;
-	// }
+	
 
 	public MultipleAlignmentTrack2(Model model, DataKey key) {
 		super(key, model, true, true);
-		// model.addObserver(tooltip);
-
 	}
 
 	private int lineHeight = 15;
 
 	private Map<Rectangle, AbstractAlignmentBlock> paintedBlocks = new HashMap<Rectangle, AbstractAlignmentBlock>();
 
-	// private int queriedBlocks = 0;
 
 	class MouseHit {
 		AbstractAlignmentBlock ab;
@@ -156,11 +143,11 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	private int currentYOffset;
 
-	
-	private Location lastBuffer=null;
-	private MAFVizBuffer mvb=null;
+	private Location lastBuffer = null;
+	private MAFVizBuffer mvb = null;
+
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view,TrackCommunicationModel tcm) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
 		// this.yOffset = yOffset;
 		currentYOffset = yOffset;
 		AbstractMAFMultipleAlignment ma = (AbstractMAFMultipleAlignment) entry.get(dataKey);
@@ -194,25 +181,13 @@ public class MultipleAlignmentTrack2 extends Track {
 		double frac = model.getAnnotationLocationVisible().length() / (double) entry.getMaximumLength();
 		// System.out.println("Visible fraction: "+frac+"\t"+entry.getMaximumLength());
 		int estCount = (int) (frac * ma.noAlignmentBlocks());
-
-		// System.out.println("Number of alignment blocks: "+ma.size());
-		// System.out.println("Est. count: "+estCount);
-//		if (estCount > 10000) {
-//			g.drawString("Too many alignment blocks, zoom in to see multiple alignments", 10, yOffset + 10);
-//			// System.out.println("estimated count="+estCount);
-//			return 20 + 5;
-//		}
-		// TreeSet<AlignmentBlock> abs = ma.get(entry, visible);
-		// System.out.println("Querying location: "+visible);
 		Iterable<AbstractAlignmentBlock> abs = ma.get(visible.start, visible.end);
-
-		// queriedBlocks = ma.getEstimateCount(visible);
 
 		if (!abs.iterator().hasNext()) {
 			g.drawString("No alignment blocks in this region", 10, yOffset + 10);
 			return 20 + 5;
 		}
-		//System.out.println("estCount="+estCount);
+	
 		if (estCount < 500) {
 			int yMax = 0;
 			CollisionMap hitmap = new CollisionMap(model);
@@ -283,20 +258,14 @@ public class MultipleAlignmentTrack2 extends Track {
 								double width = screenWidth / (double) visible.length();
 								int translated = ab.translate(i - start);
 								char nt;
-								// if (as.strand() == Strand.FORWARD)
-								// nt = as.seq().getNucleotide(translated + 1);
-								// else
-								// nt =
-								// as.seq().getReverseNucleotide(as.seq().size()
-								// - translated);
+								
 								if (as.strand() == Strand.FORWARD)
 									nt = as.seq().get(translated + 1, translated + 2).iterator().next();
 								else
 									nt = SequenceTools.complement(as.seq()
 											.get(as.seq().size() - translated, as.seq().size() - translated + 1)
 											.iterator().next());
-								// System.out.println(nt + "\t" + ref[i -
-								// visible.start]);
+							
 								if (ref[i - visible.start] != nt) {
 									if (nt == '-')
 										g.setColor(Color.RED);
@@ -375,17 +344,6 @@ public class MultipleAlignmentTrack2 extends Track {
 					// int index = 0;
 
 					for (AbstractAlignmentSequence as : mh.ab) {
-						// char addChar = as.strand() == Strand.FORWARD ? '>' :
-						// '<';
-						// String s = addChar + " " + as.entry().getID() + " " +
-						// addChar;
-						// arr[index] = s;
-						// Rectangle2D stringSize =
-						// g.getFontMetrics().getStringBounds(s, g);
-						// size[index] = stringSize;
-						// index++;
-						// if (stringSize.getWidth() > maxWidth)
-						// maxWidth = (int) stringSize.getWidth();
 						shown.add(as.getName());
 
 					}
@@ -394,33 +352,7 @@ public class MultipleAlignmentTrack2 extends Track {
 					for (String e : ma.species())
 						shown.add(e);
 
-					// arr = new String[ordering.size()];
-					// size = new Rectangle2D[ordering.size()];
-					// for (AlignmentSequence as : mh.ab) {
-					// char addChar = as.strand() == Strand.FORWARD ? '>' : '<';
-					// String s = addChar + " " + as.entry().getID() + " " +
-					// addChar;
-					// int index = ordering.get(as.entry());
-					// arr[index] = s;
-					// Rectangle2D stringSize =
-					// g.getFontMetrics().getStringBounds(s, g);
-					// size[index] = stringSize;
-					// if (stringSize.getWidth() > maxWidth)
-					// maxWidth = (int) stringSize.getWidth();
-					//
-					// }
-					/* Fill in the blanks */
-					// for (Entry e : ordering.keySet()) {
-					// if (arr[ordering.get(e)] == null) {
-					// String s = e.getID();
-					// arr[ordering.get(e)] = s;
-					// Rectangle2D stringSize =
-					// g.getFontMetrics().getStringBounds(s, g);
-					// size[ordering.get(e)] = stringSize;
-					// if (stringSize.getWidth() > maxWidth)
-					// maxWidth = (int) stringSize.getWidth();
-					// }
-					// }
+					
 				}
 				String[] arr = new String[ma.species().size()];
 				Rectangle2D[] size = new Rectangle2D[ma.species().size()];
@@ -451,27 +383,16 @@ public class MultipleAlignmentTrack2 extends Track {
 			}
 			return yMax - yOffset;
 		} else {/* More than 500 blocks on screen */
-			
-			if(lastBuffer==null||mvb==null||!lastBuffer.equals(visible)){
-				mvb=new MAFVizBuffer(abs, screenWidth, visible);
+
+			if (lastBuffer == null || mvb == null || !lastBuffer.equals(visible)) {
+				mvb = new MAFVizBuffer(abs, screenWidth, visible);
 			}
 			return mvb.draw(g, yOffset, lineHeight);
-			
+
 		}
 	}
 
-	// private void updateOrdering(Entry entry) {
-	// MAFMultipleAlignment ma = (MAFMultipleAlignment) entry.get(dataKey);
-	// // TODO keep old ones, only add new ones.
-	// ordering.clear();
-	// int i = 0;
-	// for (String e : ma.species()) {
-	// ordering.put(e, i++);
-	// }
-	// // System.out.println(ordering);
-	//
-	// }
-
+	
 	@Override
 	public String displayName() {
 		return "Multiple alignment";
