@@ -234,7 +234,7 @@ public class MultipleAlignmentTrack2 extends Track {
 					// char[] ref =
 					// entry.sequence().getSubSequence(visible.start,
 					// visible.end + 1).toCharArray();
-					Iterable<Character> bufferedSeq = entry.sequence().get(visible.start, visible.end);
+					Iterable<Character> bufferedSeq = entry.sequence().get(visible.start, visible.end+1);
 
 					char[] ref = new char[visible.length()];
 					int idx = 0;
