@@ -4,6 +4,7 @@
 package net.sf.genomeview.gui.viztracks.comparative;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -318,6 +319,9 @@ public class MultipleAlignmentTrack2 extends Track {
 
 				/* Paint annotation if present */
 				int lineIdx=1;
+				Font font=g.getFont();
+				Font tmpFont=font.deriveFont(10f);
+				g.setFont(tmpFont);
 				for (AbstractAlignmentSequence as : ab2) {
 //					System.out
 //							.println(as.getName() + " " + as.start() + "\t" + as.end() + "\t" + (as.end() > as.start()));
@@ -331,6 +335,13 @@ public class MultipleAlignmentTrack2 extends Track {
 							double c=as.end();
 							double q=f.start();
 							double r=f.end();
+							if(as.strand()==Strand.REVERSE){
+								q=as.end()-f.end()+as.start();
+								r=as.end()-f.start()+as.start();
+//								System.out.println(f.start()+"\t"+f.end()+"\t"+q+"\t"+r);
+							}
+								
+							
 							double x=(((q-a)/(c-a))*(x2-x1))+x1;
 							double y=(((r-a)/(c-a))*(x2-x1))+x1;
 //							System.out.println("\t\t"+f+"\t"+f.location()[0]+"\t"+x+"\t"+y);
@@ -341,12 +352,17 @@ public class MultipleAlignmentTrack2 extends Track {
 								y=x2;
 							
 							g.fillRect((int)x, rec.y + (lineIdx - 1) * lineHeight+3, (int)(y-x), lineHeight-6);
+							
+							g.setColor(Color.CYAN.darker().darker());
+							g.drawString(f.toString(), (int)x, rec.y + (lineIdx) * lineHeight-4);
+							
 						}
 						
 					}
 					lineIdx++;
 					
 				}
+				g.setFont(font);
 
 				/* Fill in the blanks when showing all */
 				if (showAll) {
@@ -396,7 +412,7 @@ public class MultipleAlignmentTrack2 extends Track {
 					arr[ordering.getForward(e)] = e;
 					AbstractAlignmentSequence as = shown.get(e);
 					if (as != null)
-						arr[ordering.getForward(e)] += " - " + shown.get(e).toString();
+						arr[ordering.getForward(e)] = shown.get(e).toString();
 
 					Rectangle2D stringSize = g.getFontMetrics().getStringBounds(arr[ordering.getForward(e)], g);
 					size[ordering.getForward(e)] = stringSize;
