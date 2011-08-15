@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
@@ -237,10 +238,12 @@ public class MultipleAlignmentTrack2 extends Track {
 					Iterable<Character> bufferedSeq = entry.sequence().get(visible.start, visible.end+1);
 
 					char[] ref = new char[visible.length()];
+					
 					int idx = 0;
 					for (char c : bufferedSeq) {
 						ref[idx++] = c;
 					}
+//					System.out.println("REF: "+Arrays.toString(ref));
 					// System.out.println("--block ");
 					int line = 1;
 					for (AbstractAlignmentSequence as : ab2) {
@@ -256,16 +259,18 @@ public class MultipleAlignmentTrack2 extends Track {
 						for (int i = visible.start; i <= visible.end; i++) {
 							if (i >= start && i < end) {
 								double width = screenWidth / (double) visible.length();
-								int translated = ab.translate(i - start);
+								int translated = ab.translate(i - start+1);
+								
 								char nt;
 								
 								if (as.strand() == Strand.FORWARD)
-									nt = as.seq().get(translated + 1, translated + 2).iterator().next();
+									nt = as.seq().get(translated, translated + 1).iterator().next();
 								else
 									nt = SequenceTools.complement(as.seq()
-											.get(as.seq().size() - translated, as.seq().size() - translated + 1)
+											.get(as.seq().size() - translated+1, as.seq().size() - translated+2 )
 											.iterator().next());
-							
+								
+//								System.out.println("NT: "+translated+"\t"+nt);
 								if (ref[i - visible.start] != nt) {
 									if (nt == '-')
 										g.setColor(Color.RED);
@@ -336,31 +341,33 @@ public class MultipleAlignmentTrack2 extends Track {
 			}
 			/* Mouse is over a block and there is some information to display */
 			if (mh != null) {
-
-				Set<String> shown = new HashSet<String>();
-				if (!showAll) {
-					// arr = new String[mh.ab.size()];
-					// size = new Rectangle2D[mh.ab.size()];
-					// int index = 0;
+				
+				HashMap<String,AbstractAlignmentSequence> shown = new HashMap<String,AbstractAlignmentSequence>();
+				if(showAll){
+					for (String e : ma.species()){
+						shown.put(e,null);
+						
+					}
+				}
+				
 
 					for (AbstractAlignmentSequence as : mh.ab) {
-						shown.add(as.getName());
+						shown.put(as.getName(),as);
 
 					}
 
-				} else {
-					for (String e : ma.species())
-						shown.add(e);
-
-					
-				}
 				String[] arr = new String[ma.species().size()];
 				Rectangle2D[] size = new Rectangle2D[ma.species().size()];
 				int maxWidth = 0;
-				for (String e : shown) {
+				for (String e : shown.keySet()) {
 					// String s = e.getID();
 					arr[ordering.getForward(e)] = e;
-					Rectangle2D stringSize = g.getFontMetrics().getStringBounds(e, g);
+					AbstractAlignmentSequence as=shown.get(e);
+					if(as!=null)
+						arr[ordering.getForward(e)] +=" - "+shown.get(e).toString();
+					
+					
+					Rectangle2D stringSize = g.getFontMetrics().getStringBounds(arr[ordering.getForward(e)], g);
 					size[ordering.getForward(e)] = stringSize;
 					if (stringSize.getWidth() > maxWidth)
 						maxWidth = (int) stringSize.getWidth();

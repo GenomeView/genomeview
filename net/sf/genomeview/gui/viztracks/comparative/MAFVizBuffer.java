@@ -13,9 +13,9 @@ class MAFVizBuffer {
 	public MAFVizBuffer(Iterable<AbstractAlignmentBlock> abs, double screenWidth, Location visible) {
 		counts = new int[(int) Math.ceil(screenWidth)];
 		for (AbstractAlignmentBlock ab : abs) {
-			AbstractAlignmentSequence as = ab.getAlignmentSequence(0);
-			int start = Convert.translateGenomeToScreen(as.start(), visible, screenWidth);
-			int end = Convert.translateGenomeToScreen(as.end(), visible, screenWidth);
+//			AbstractAlignmentSequence as = ab.getAlignmentSequence(0);
+			int start = Convert.translateGenomeToScreen(ab.start(), visible, screenWidth);
+			int end = Convert.translateGenomeToScreen(ab.end(), visible, screenWidth);
 			for (int i = start; i < end; i++) {
 				if (i >= 0 && i < counts.length)
 					counts[i] += ab.size();
