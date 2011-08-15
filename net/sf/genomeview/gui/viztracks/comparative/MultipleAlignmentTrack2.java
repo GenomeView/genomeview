@@ -393,6 +393,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 			if (lastBuffer == null || mvb == null || !lastBuffer.equals(visible)) {
 				mvb = new MAFVizBuffer(abs, screenWidth, visible);
+				lastBuffer=visible;
 			}
 			return mvb.draw(g, yOffset, lineHeight);
 

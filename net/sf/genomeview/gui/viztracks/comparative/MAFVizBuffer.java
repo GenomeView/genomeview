@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Location;
 import net.sf.jannot.alignment.maf.AbstractAlignmentBlock;
-import net.sf.jannot.alignment.maf.AbstractAlignmentSequence;
 
 class MAFVizBuffer {
 	private int[] counts = null;
@@ -13,12 +12,14 @@ class MAFVizBuffer {
 	public MAFVizBuffer(Iterable<AbstractAlignmentBlock> abs, double screenWidth, Location visible) {
 		counts = new int[(int) Math.ceil(screenWidth)];
 		for (AbstractAlignmentBlock ab : abs) {
-//			AbstractAlignmentSequence as = ab.getAlignmentSequence(0);
-			int start = Convert.translateGenomeToScreen(ab.start(), visible, screenWidth);
-			int end = Convert.translateGenomeToScreen(ab.end(), visible, screenWidth);
-			for (int i = start; i < end; i++) {
-				if (i >= 0 && i < counts.length)
-					counts[i] += ab.size();
+			/* Skip very small blocks -> Good for performance */
+			if (ab.length() > 25) {
+				int start = Convert.translateGenomeToScreen(ab.start(), visible, screenWidth);
+				int end = Convert.translateGenomeToScreen(ab.end(), visible, screenWidth);
+				for (int i = start; i < end; i++) {
+					if (i >= 0 && i < counts.length)
+						counts[i] += ab.size();
+				}
 			}
 		}
 	}
