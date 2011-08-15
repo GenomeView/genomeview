@@ -9,14 +9,11 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
@@ -34,8 +31,12 @@ import net.sf.genomeview.gui.dialog.MultipleAlignmentOrderingDialog;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
+import net.sf.jannot.Entry;
+import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
+import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Strand;
+import net.sf.jannot.Type;
 import net.sf.jannot.alignment.maf.AbstractAlignmentBlock;
 import net.sf.jannot.alignment.maf.AbstractAlignmentSequence;
 import net.sf.jannot.alignment.maf.AbstractMAFMultipleAlignment;
@@ -106,8 +107,6 @@ public class MultipleAlignmentTrack2 extends Track {
 		return false;
 	}
 
-	
-
 	public MultipleAlignmentTrack2(Model model, DataKey key) {
 		super(key, model, true, true);
 	}
@@ -115,7 +114,6 @@ public class MultipleAlignmentTrack2 extends Track {
 	private int lineHeight = 15;
 
 	private Map<Rectangle, AbstractAlignmentBlock> paintedBlocks = new HashMap<Rectangle, AbstractAlignmentBlock>();
-
 
 	class MouseHit {
 		AbstractAlignmentBlock ab;
@@ -188,7 +186,7 @@ public class MultipleAlignmentTrack2 extends Track {
 			g.drawString("No alignment blocks in this region", 10, yOffset + 10);
 			return 20 + 5;
 		}
-	
+
 		if (estCount < 500) {
 			int yMax = 0;
 			CollisionMap hitmap = new CollisionMap(model);
@@ -231,19 +229,21 @@ public class MultipleAlignmentTrack2 extends Track {
 					ab2.add(as);
 				}
 				BitSet lines = new BitSet(ordering.size());
+
+				/* Very detailed view */
 				if (visible.length() < 1000) {
 					// char[] ref =
 					// entry.sequence().getSubSequence(visible.start,
 					// visible.end + 1).toCharArray();
-					Iterable<Character> bufferedSeq = entry.sequence().get(visible.start, visible.end+1);
+					Iterable<Character> bufferedSeq = entry.sequence().get(visible.start, visible.end + 1);
 
 					char[] ref = new char[visible.length()];
-					
+
 					int idx = 0;
 					for (char c : bufferedSeq) {
 						ref[idx++] = c;
 					}
-//					System.out.println("REF: "+Arrays.toString(ref));
+					// System.out.println("REF: "+Arrays.toString(ref));
 					// System.out.println("--block ");
 					int line = 1;
 					for (AbstractAlignmentSequence as : ab2) {
@@ -259,18 +259,18 @@ public class MultipleAlignmentTrack2 extends Track {
 						for (int i = visible.start; i <= visible.end; i++) {
 							if (i >= start && i < end) {
 								double width = screenWidth / (double) visible.length();
-								int translated = ab.translate(i - start+1);
-								
+								int translated = ab.translate(i - start + 1);
+
 								char nt;
-								
+
 								if (as.strand() == Strand.FORWARD)
 									nt = as.seq().get(translated, translated + 1).iterator().next();
 								else
 									nt = SequenceTools.complement(as.seq()
-											.get(as.seq().size() - translated+1, as.seq().size() - translated+2 )
+											.get(as.seq().size() - translated + 1, as.seq().size() - translated + 2)
 											.iterator().next());
-								
-//								System.out.println("NT: "+translated+"\t"+nt);
+
+								// System.out.println("NT: "+translated+"\t"+nt);
 								if (ref[i - visible.start] != nt) {
 									if (nt == '-')
 										g.setColor(Color.RED);
@@ -315,6 +315,39 @@ public class MultipleAlignmentTrack2 extends Track {
 					}
 
 				}
+
+				/* Paint annotation if present */
+				int lineIdx=1;
+				for (AbstractAlignmentSequence as : ab2) {
+//					System.out
+//							.println(as.getName() + " " + as.start() + "\t" + as.end() + "\t" + (as.end() > as.start()));
+					Entry e=model.entry(as.getName());
+					if(e!=null){
+//						System.out.println("\t"+e+"\t"+x1+"\t"+x2);
+						MemoryFeatureAnnotation mfa=e.getMemoryAnnotation(Type.get(Configuration.get("maf:annotationType")));
+						for(Feature f: mfa.get(as.start(), as.end())){
+//							System.out.println("\t\t"+f+"\t"+f.location()[0]);
+							double a=as.start();
+							double c=as.end();
+							double q=f.start();
+							double r=f.end();
+							double x=(((q-a)/(c-a))*(x2-x1))+x1;
+							double y=(((r-a)/(c-a))*(x2-x1))+x1;
+//							System.out.println("\t\t"+f+"\t"+f.location()[0]+"\t"+x+"\t"+y);
+							g.setColor(Color.CYAN);
+							if(x<x1)
+								x=x1;
+							if(y>x2)
+								y=x2;
+							
+							g.fillRect((int)x, rec.y + (lineIdx - 1) * lineHeight+3, (int)(y-x), lineHeight-6);
+						}
+						
+					}
+					lineIdx++;
+					
+				}
+
 				/* Fill in the blanks when showing all */
 				if (showAll) {
 					for (int i = 0; i < ordering.size(); i++) {
@@ -341,20 +374,19 @@ public class MultipleAlignmentTrack2 extends Track {
 			}
 			/* Mouse is over a block and there is some information to display */
 			if (mh != null) {
-				
-				HashMap<String,AbstractAlignmentSequence> shown = new HashMap<String,AbstractAlignmentSequence>();
-				if(showAll){
-					for (String e : ma.species()){
-						shown.put(e,null);
-						
+
+				HashMap<String, AbstractAlignmentSequence> shown = new HashMap<String, AbstractAlignmentSequence>();
+				if (showAll) {
+					for (String e : ma.species()) {
+						shown.put(e, null);
+
 					}
 				}
-				
 
-					for (AbstractAlignmentSequence as : mh.ab) {
-						shown.put(as.getName(),as);
+				for (AbstractAlignmentSequence as : mh.ab) {
+					shown.put(as.getName(), as);
 
-					}
+				}
 
 				String[] arr = new String[ma.species().size()];
 				Rectangle2D[] size = new Rectangle2D[ma.species().size()];
@@ -362,11 +394,10 @@ public class MultipleAlignmentTrack2 extends Track {
 				for (String e : shown.keySet()) {
 					// String s = e.getID();
 					arr[ordering.getForward(e)] = e;
-					AbstractAlignmentSequence as=shown.get(e);
-					if(as!=null)
-						arr[ordering.getForward(e)] +=" - "+shown.get(e).toString();
-					
-					
+					AbstractAlignmentSequence as = shown.get(e);
+					if (as != null)
+						arr[ordering.getForward(e)] += " - " + shown.get(e).toString();
+
 					Rectangle2D stringSize = g.getFontMetrics().getStringBounds(arr[ordering.getForward(e)], g);
 					size[ordering.getForward(e)] = stringSize;
 					if (stringSize.getWidth() > maxWidth)
@@ -393,14 +424,13 @@ public class MultipleAlignmentTrack2 extends Track {
 
 			if (lastBuffer == null || mvb == null || !lastBuffer.equals(visible)) {
 				mvb = new MAFVizBuffer(abs, screenWidth, visible);
-				lastBuffer=visible;
+				lastBuffer = visible;
 			}
 			return mvb.draw(g, yOffset, lineHeight);
 
 		}
 	}
 
-	
 	@Override
 	public String displayName() {
 		return "Multiple alignment";
