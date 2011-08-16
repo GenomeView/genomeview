@@ -3,6 +3,7 @@
  */
 package net.sf.genomeview.data;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -135,7 +136,7 @@ public class DataSourceHelper {
 				} else
 					return;
 			}
-			asd.setIos(new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Reading file", asd.getIos()));
+			asd.setIos(new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Reading file", new BufferedInputStream(asd.getIos(),512*1024)));
 
 		}
 		if (index == null &&!data.isTDF()&&!data.isBigWig()&& data.length() > (0.75 * MemoryWidget.getAvailable())) {
