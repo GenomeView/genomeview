@@ -230,7 +230,31 @@ public class ConfigurationDialog extends JDialog {
 		}
 	}
 
+	class ComparativePanel extends GridBagPanel {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 511805592898297604L;
+	
+		public ComparativePanel(final Model model) {
+			gc.gridwidth = 2;
+			gc.weightx=1;
+			this.add(ConfigBox.booleanInstance("maf:enableAnnotation", "Enable comparative annotations"), gc);
+			gc.gridy++;
+			this.add(ConfigBox.stringInstance("maf:annotationType", "Annotation type for comparative annotations"), gc);
+					
+			
+			
+			
+	
+		}
+	}
+	
+	
 	class MiscellaneousPanel extends GridBagPanel {
+
+		
 
 		/**
 		 * 
@@ -341,7 +365,11 @@ public class ConfigurationDialog extends JDialog {
 		jtp.add("Short reads", new ShortReadConfigPanel(model));
 		jtp.add("Pile up tracks", new PileupConfigPanel(model));
 
+		jtp.add("Comparative track", new ComparativePanel(model));
+		
 		jtp.add("Miscellaneous", miscPanel);
+		
+		
 
 		add(jtp, BorderLayout.CENTER);
 

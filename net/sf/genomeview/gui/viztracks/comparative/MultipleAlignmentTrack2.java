@@ -52,8 +52,18 @@ import net.sf.jannot.utils.SequenceTools;
 public class MultipleAlignmentTrack2 extends Track {
 
 	private class MultipleAlignmentPopUp extends JPopupMenu {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1103364926466070222L;
+
 		public MultipleAlignmentPopUp() {
 			add(new AbstractAction("Toggle all entries mode") {
+
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 3910281037023553159L;
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -63,6 +73,11 @@ public class MultipleAlignmentTrack2 extends Track {
 
 			});
 			add(new AbstractAction("Rearrange ordering") {
+
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 8906163594262830307L;
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -148,7 +163,9 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
-		// this.yOffset = yOffset;
+		boolean comparativeAnnotation = Configuration.getBoolean("maf:enableAnnotation");
+		Type comparativeAnnotationType = Type.get(Configuration.get("maf:annotationType"));
+
 		currentYOffset = yOffset;
 		AbstractMAFMultipleAlignment ma = (AbstractMAFMultipleAlignment) entry.get(dataKey);
 		if (ma == null) {
@@ -246,8 +263,7 @@ public class MultipleAlignmentTrack2 extends Track {
 						ref[idx++] = c;
 					}
 				}
-				// System.out.println("REF: "+Arrays.toString(ref));
-				// System.out.println("--block ");
+
 				int line = 1;
 				Font font = g.getFont();
 				Font tmpFont = font.deriveFont(10f);
@@ -311,47 +327,45 @@ public class MultipleAlignmentTrack2 extends Track {
 						}
 
 						g.fillRect(x1, rec.y + (line - 1) * lineHeight, x2 - x1, lineHeight);
-						
-						
-						
 
 					}
-					
-					Entry e = model.entry(as.getName());
-					if (e != null) {
-						// System.out.println("\t"+e+"\t"+x1+"\t"+x2);
-						MemoryFeatureAnnotation mfa = e.getMemoryAnnotation(Type.get(Configuration
-								.get("maf:annotationType")));
-						for (Feature f : mfa.get(as.start(), as.end())) {
-							// System.out.println("\t\t"+f+"\t"+f.location()[0]);
-							double a = as.start();
-							double c = as.end();
-							double q = f.start();
-							double r = f.end();
-							if (as.strand() == Strand.REVERSE) {
-								q = as.end() - f.end() + as.start();
-								r = as.end() - f.start() + as.start();
-								// System.out.println(f.start()+"\t"+f.end()+"\t"+q+"\t"+r);
+
+					if (comparativeAnnotation) {
+						Entry e = model.entry(as.getName());
+						if (e != null) {
+							MemoryFeatureAnnotation mfa = e.getMemoryAnnotation(comparativeAnnotationType);
+							for (Feature f : mfa.get(as.start(), as.end())) {
+								double a = as.start();
+								double c = as.end();
+								double q = f.start();
+								double r = f.end();
+								if (as.strand() == Strand.REVERSE) {
+									q = as.end() - f.end() + as.start();
+									r = as.end() - f.start() + as.start();
+
+								}
+								/*
+								 * These are only estimates of the right
+								 * coordinates
+								 */
+								double x = (((q - a) / (c - a)) * (x2 - x1)) + x1;
+								double y = (((r - a) / (c - a)) * (x2 - x1)) + x1;
+								g.setColor(Color.CYAN);
+								if (x < x1)
+									x = x1;
+								if (y > x2)
+									y = x2;
+
+								g.fillRect((int) x, rec.y + (line - 1) * lineHeight + 3, (int) (y - x), lineHeight - 6);
+
+								g.setColor(Color.CYAN.darker().darker());
+								g.drawString(f.toString(), (int) x, rec.y + (line) * lineHeight - 4);
+
 							}
-							/* These are only estimates of the right coordinates */
-							double x = (((q - a) / (c - a)) * (x2 - x1)) + x1;
-							double y = (((r - a) / (c - a)) * (x2 - x1)) + x1;
-							// System.out.println("\t\t"+f+"\t"+f.location()[0]+"\t"+x+"\t"+y);
-							g.setColor(Color.CYAN);
-							if (x < x1)
-								x = x1;
-							if (y > x2)
-								y = x2;
-
-							g.fillRect((int) x, rec.y + (line - 1) * lineHeight + 3, (int) (y - x), lineHeight - 6);
-
-							g.setColor(Color.CYAN.darker().darker());
-							g.drawString(f.toString(), (int) x, rec.y + (line) * lineHeight - 4);
 
 						}
-
 					}
-					
+
 					line++;
 				}
 
