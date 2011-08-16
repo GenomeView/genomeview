@@ -82,10 +82,17 @@ class GenomeExplorer extends JDialog {
 								+ common, list.get("plant")));
 		
 		tabs.addTab(
-				"Animal genomes",
+				"Insect genomes",
 				new GenomesPanel(
 						model,
-						"<html>Welcome to the GenomeView animal genomes section. This is your portal to the GenomeView animal genomes."
+						"<html>Welcome to the GenomeView insect genomes section. This is your portal to the GenomeView animal genomes."
+								+ common, list.get("insect")));
+		
+		tabs.addTab(
+				"Mammalian genomes",
+				new GenomesPanel(
+						model,
+						"<html>Welcome to the GenomeView mammalian genomes section. This is your portal to the GenomeView animal genomes."
 								+ common, list.get("animal")));
 		
 		tabs.addTab(
