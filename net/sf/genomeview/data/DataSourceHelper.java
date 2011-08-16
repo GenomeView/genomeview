@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -28,6 +29,7 @@ import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
 import net.sf.samtools.util.SeekableFileStream;
+import net.sf.samtools.util.SeekableStream;
 import be.abeel.io.ExtensionManager;
 
 /**
@@ -36,6 +38,8 @@ import be.abeel.io.ExtensionManager;
  * 
  */
 public class DataSourceHelper {
+
+	private static Logger log = Logger.getLogger(DataSourceHelper.class.getCanonicalName());
 
 	public static void load(Model model, Locator data) throws URISyntaxException, IOException, ReadFailedException {
 		load(model, data, false);
@@ -117,7 +121,7 @@ public class DataSourceHelper {
 
 			}
 
-		} else if (index == null && data.length() > 50000000&&!(data.isTDF()||data.isBigWig())) {
+		} else if (index == null && data.length() > 50000000 && !(data.isTDF() || data.isBigWig())) {
 			JOptionPane
 					.showMessageDialog(
 							null,
@@ -136,10 +140,11 @@ public class DataSourceHelper {
 				} else
 					return;
 			}
-			asd.setIos(new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Reading file", new BufferedInputStream(asd.getIos(),512*1024)));
+			asd.setIos(new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Reading file",
+					new BufferedInputStream(asd.getIos(), 512 * 1024)));
 
 		}
-		if (index == null &&!data.isTDF()&&!data.isBigWig()&& data.length() > (0.75 * MemoryWidget.getAvailable())) {
+		if (index == null && !data.isTDF() && !data.isBigWig() && data.length() > (0.75 * MemoryWidget.getAvailable())) {
 			System.out.println("Available mem: " + MemoryWidget.getAvailable());
 			JOptionPane
 					.showMessageDialog(
@@ -213,14 +218,13 @@ public class DataSourceHelper {
 							pmis.getProgressMonitor().setMaximum((int) data.length());
 							MafixFactory.generateBlockZippedFile(pmis, file);
 
-							// pmis=new
-							// ProgressMonitorInputStream(model.getGUIManager().getParent(),
-							// "Indexing MAF file.\nThis will take a while depending on the file size.",new
-							// SeekableFileStream(file));
-							// pmis.getProgressMonitor().setMaximum((int)file.length());
-							MafixFactory.generateIndex(new SeekableFileStream(file), new File(file + ".mfi"));
+							SeekableStream is = new SeekableFileStream(file);
+							SeekableProgressStream spmis = new SeekableProgressStream(model.getGUIManager().getParent(),
+									"Indexing MAF file.\nThis will take a while depending on the file size.", is);
+							spmis.getProgressMonitor().setMaximum((int) file.length());
+							MafixFactory.generateIndex(spmis, new File(file + ".mfi"));
 							Locator mafdata = new Locator(file.toString());
-							System.out.println("Load as: " + mafdata);
+							log.info("Load newly create mafix as: " + mafdata);
 							load(model, mafdata);
 
 							// load(out);
