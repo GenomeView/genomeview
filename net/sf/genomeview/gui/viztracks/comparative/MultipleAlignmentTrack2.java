@@ -282,7 +282,7 @@ public class MultipleAlignmentTrack2 extends Track {
 						for (int i = visible.start; i <= visible.end; i++) {
 							if (i >= start && i < end) {
 								double width = screenWidth / (double) visible.length();
-								int translated = ab.translate(i - start + 1);
+								int translated = ab.translate(i - start)+1;
 
 								char nt;
 
@@ -331,7 +331,7 @@ public class MultipleAlignmentTrack2 extends Track {
 					}
 
 					if (comparativeAnnotation) {
-						Entry e = model.entry(as.getName());
+						Entry e = model.entries().getEntry(as.getName());
 						if (e != null) {
 							MemoryFeatureAnnotation mfa = e.getMemoryAnnotation(comparativeAnnotationType);
 							for (Feature f : mfa.get(as.start(), as.end())) {
