@@ -137,7 +137,7 @@ class GenomesPanel extends GridBagPanel {
 			gc.weighty=0;
 			JEditorPaneLabel requestNewGenome=new JEditorPaneLabel();
 			requestNewGenome.getStyleSheet().addRule("body{ text-align: right;}");
-			requestNewGenome.setText("If your genome of interest is not in the list, <a href=\"mailto:genomeview-support@lists.sourceforge.net\">please e-mail us</a> your request.");
+			requestNewGenome.setText("If your genome of interest is not in the list, <a href=\"mailto:support@genomeview.org\">please e-mail us</a> your request.");
 			requestNewGenome.setBackground(Color.WHITE);
 			add(requestNewGenome,gc);
 			
