@@ -118,19 +118,7 @@ public class Model extends Observable implements IModel {
 		return entries.size();
 	}
 
-	/**
-	 * Get an entry by ID
-	 * 
-	 * @param id
-	 * @return
-	 */
-	public Entry entry(String id) {
-		for (Entry e : entries)
-			if (e.getID().equalsIgnoreCase(id))
-				return e;
-		logger.warning("Entry not found: " + id);
-		return null;
-	}
+
 
 	public void update(Observable arg0, Object arg) {
 		if (arg instanceof ChangeEvent) {

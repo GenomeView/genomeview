@@ -49,7 +49,7 @@ public class SyntenicTrack extends Track {
 			System.out.println("clickclick: " + r);
 			if (r != null && source.getClickCount() > 1) {
 				SyntenicBlock sb = hitmap.get(r);
-				Entry e = model.entry(sb.target());
+				Entry e = model.entries().getEntry(sb.target());
 				if (e != null) {
 					model.setSelectedEntry(e);
 					model.setAnnotationLocationVisible(sb.targetLocation());

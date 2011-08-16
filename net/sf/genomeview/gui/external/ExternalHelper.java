@@ -43,7 +43,7 @@ public class ExternalHelper {
 						if (hasEntry(arr)) {
 							if (inRange(arr)) {
 								if (arr.length == 3) {
-									model.setSelectedEntry(model.entry(arr[0]));
+									model.setSelectedEntry(model.entries().getEntry(arr[0]));
 									model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[1]), Integer
 											.parseInt(arr[2])));
 
