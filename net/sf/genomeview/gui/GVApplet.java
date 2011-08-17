@@ -8,13 +8,12 @@ import java.awt.KeyboardFocusManager;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Authenticator;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JApplet;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -91,10 +90,26 @@ public class GVApplet extends JApplet {
 						logger.info(e.getMessage());
 					}
 					gvPanel = MainContent.createContent(model, 1)[0];
-					getContentPane().add(gvPanel);
-					setJMenuBar(new MainMenu(model));
 
-					getRootPane().setTransferHandler(new DropTransferHandler(model));
+					if (System.getProperty("os.name").contains("Mac")
+							|| Configuration.getBoolean("debug:forceMacApplet")) {
+						logger.warning("GenomeView has detected Mac OS X, trying to escape!!!");
+						JFrame escape=new JFrame("GenomeView Mac OS X applet");
+						model.getGUIManager().registerMainWindow(escape);
+						escape.add(gvPanel);
+						escape.setJMenuBar(new MainMenu(model));	
+						escape.setTransferHandler(new DropTransferHandler(model));
+						escape.pack();
+						escape.setBounds(parentFrame.getBounds());
+						escape.setVisible(true);
+						escape.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+					}else{
+						getContentPane().add(gvPanel);
+						setJMenuBar(new MainMenu(model));
+						getRootPane().setTransferHandler(new DropTransferHandler(model));
+					}
+
+
 					KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new Hotkeys(model));
 
 					PluginLoader.load(model);
