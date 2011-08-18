@@ -80,7 +80,18 @@ public class DataSourceHelper {
 			return;
 		}
 
-		DataSource ds = DataSourceFactory.create(data, index);
+		if (data.isWig()) {
+			int res = JOptionPane
+					.showConfirmDialog(
+							model.getGUIManager().getParent(),
+							"Wig is not a recommended file format for GenomeView\n. " +
+							"Do you want to convert your file to the more efficient TDF format?",
+							"Wiggle format not recommended!", JOptionPane.YES_NO_OPTION);
+			if (res == JOptionPane.YES_OPTION) {
+				convertWig2TDF(model, data);
+				return;
+			}
+		}
 
 		if (index == null && data.supportsIndex() && data.length() > 5 * 1024 * 1024) {
 			if (IndexManager.canBuildIndex(data)) {
@@ -130,7 +141,7 @@ public class DataSourceHelper {
 									+ "It may take a while to load this file.\nIf GenomeView becomes unresponsive, please increase the amount of memory.",
 							"Large file!", JOptionPane.WARNING_MESSAGE);
 		}
-
+		DataSource ds = DataSourceFactory.create(data, index);
 		if (ds instanceof AbstractStreamDataSource) {
 			AbstractStreamDataSource asd = ((AbstractStreamDataSource) ds);
 			if (asd.getParser() == null) {
@@ -167,6 +178,49 @@ public class DataSourceHelper {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
+	}
+
+	private static void convertWig2TDF(Model model, Locator data) {
+		JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
+		chooser.resetChoosableFileFilters();
+
+		chooser.addChoosableFileFilter(new FileFilter() {
+
+			@Override
+			public boolean accept(File f) {
+				if (f.isDirectory())
+					return true;
+
+				if (f.getName().toLowerCase().endsWith("tdf")) {
+					return true;
+				}
+
+				return false;
+			}
+
+			@Override
+			public String getDescription() {
+				return "TDF files";
+			}
+
+		});
+		chooser.setMultiSelectionEnabled(false);
+		int returnVal = chooser.showSaveDialog(model.getGUIManager().getParent());
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File files = chooser.getSelectedFile();
+			// DataSource[] out = new DataSource[files.length];
+			try {
+				Configuration.set("lastDirectory", files.getParentFile());
+				files=ExtensionManager.extension(files, "tdf");
+				ConvertWig2TDF.convertWig2TDF(data,files );
+				Locator mafdata = new Locator(files.toString());
+				log.info("Load newly create tdf file as: " + mafdata);
+				load(model, mafdata);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
 	}
 
@@ -219,7 +273,8 @@ public class DataSourceHelper {
 							MafixFactory.generateBlockZippedFile(pmis, file);
 
 							SeekableStream is = new SeekableFileStream(file);
-							SeekableProgressStream spmis = new SeekableProgressStream(model.getGUIManager().getParent(),
+							SeekableProgressStream spmis = new SeekableProgressStream(
+									model.getGUIManager().getParent(),
 									"Indexing MAF file.\nThis will take a while depending on the file size.", is);
 							spmis.getProgressMonitor().setMaximum((int) file.length());
 							MafixFactory.generateIndex(spmis, new File(file + ".mfi"));
