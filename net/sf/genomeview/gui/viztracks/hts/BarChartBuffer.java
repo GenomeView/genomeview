@@ -54,7 +54,7 @@ class BarChartBuffer implements VizBuffer {
 		double factor = MAX_WIDTH / visible.length();
 		if (exact)
 			factor = 1;
-	
+
 		/* Variables for SNP track */
 		if (visible.length() < MAX_WIDTH)
 			nc = new NucCounter(visible.length());
@@ -72,7 +72,7 @@ class BarChartBuffer implements VizBuffer {
 				initArray(p, visible.length());
 
 			if (p.start() + p.getLength() < visible.start || p.start() > visible.end) {
-			
+
 				continue;
 			}
 
@@ -165,10 +165,10 @@ class BarChartBuffer implements VizBuffer {
 		int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
 
 		double range = provider.getMaxPile() - localMinPile;
-		System.out.println("provider max="+provider.getMaxPile());
-		System.out.println("local minpile ="+localMinPile);
-		System.out.println("local maxpile="+localMaxPile);
-		System.out.println("DIV:"+range);
+		// System.out.println("provider max="+provider.getMaxPile());
+		// System.out.println("local minpile ="+localMinPile);
+		// System.out.println("local maxpile="+localMaxPile);
+		// System.out.println("DIV:"+range);
 		if (ptm.isDynamicScaling())
 			range = localMaxPile - localMinPile;
 		if (ptm.isCrossTrackScaling()) {
@@ -205,7 +205,6 @@ class BarChartBuffer implements VizBuffer {
 			for (char cc : sb.get()) {
 				seqBuffer[idx++] = cc;
 			}
-			// System.out.println("Array: "+Arrays.toString(seqBuffer));
 
 			char[] nucs = new char[] { 'A', 'T', 'G', 'C' };
 			Color[] color = new Color[4];
@@ -220,50 +219,34 @@ class BarChartBuffer implements VizBuffer {
 				g.drawLine(0, yOffset + snpTrackHeight / 2, (int) screenWidth, yOffset + snpTrackHeight / 2);
 				g.setColor(Color.BLACK);
 				g.drawString("SNPs", 5, yOffset + snpTrackHeight - 4);
-				// System.out.println("Drawing snps: "+visible);
-				// int skipped = 0;
-				// int totl=0;
+
 				for (int i = visible.start; i <= visible.end; i++) {
 					// System.out.println("it: "+i);
 					int x1 = Convert.translateGenomeToScreen(i, visible, screenWidth);
 					double total = nc.getTotalCount(i - visible.start);
 					char refNt = seqBuffer[i - visible.start];
 					double done = 0;// Fraction gone to previous nucs
-					// System.out.println(seqBuffer[i -
-					// visible.start]+" "+total);
-					// System.out.println("total: "+(i -
-					// visible.start)+"\t"+total);
+
 					if (total > snpTrackMinimumCoverage) {
 						for (int j = 0; j < 4; j++) {
 							if (nucs[j] != refNt) {
 								double fraction = nc.getCount(nucs[j], i - visible.start) / total;
 								fraction *= snpTrackHeight;
-								// totl++;
-								// if (fraction > 0.05) {
+
 								g.setColor(color[j]);
-								// System.out.println("filling: "+x1+"\t"+(int)
-								// (yOffset + snpTrackHeight - fraction -
-								// done));
+
 								g.fillRect(x1, (int) (yOffset + snpTrackHeight - fraction - done), nucWidth,
 										(int) (Math.ceil(fraction)));
-								// }
-								// else {
-								// skipped++;
-								// }
+
 								done += fraction;
 							}
 						}
 					}
 
 				}
-				// System.out.println("Skipped: "+skipped +"/"+totl);
+
 			}
 		}
-
-		// if (dataKey != null)
-		// g.drawString(StaticUtils.shortify(dataKey.toString()), 10, yOffset -
-		// graphLineHeigh + 24 - 2);
-		// else
 
 		int returnTrackHeight = 2 * graphLineHeigh + snpTrackHeight;
 		Track.paintStatus(g, status, yOffset - 2 * graphLineHeigh, returnTrackHeight, visible, screenWidth);
@@ -285,7 +268,7 @@ class BarChartBuffer implements VizBuffer {
 			if (val > range)
 				val = range;
 
-			double frac = val /range;
+			double frac = val / range;
 			int size = (int) (frac * graphLineHeigh);
 
 			double factor = MAX_WIDTH / visible.length();
@@ -315,8 +298,8 @@ class BarChartBuffer implements VizBuffer {
 		for (Line line : ptm.getLines()) {
 			// g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 -
 			// screenX1 + 1, 2 * size);
-			if (line.value()-localMinPile < range) {
-				int tY = (int) (((line.value()-localMinPile) / range) * 2 * graphLineHeigh);
+			if (line.value() - localMinPile < range) {
+				int tY = (int) (((line.value() - localMinPile) / range) * 2 * graphLineHeigh);
 				g.drawLine(0, yOffset - tY, (int) screenWidth, yOffset - tY);
 				// g.drawLine(0, yOffset + graphLineHeigh + tY, (int)
 				// screenWidth, yOffset + graphLineHeigh + tY);
@@ -330,7 +313,7 @@ class BarChartBuffer implements VizBuffer {
 
 		g.drawString(nrReg.format(localMinPile), 10, yOffset);
 		// g.drawString("0" + "", 10, yOffset - graphLineHeigh + 5);
-		g.drawString(nrReg.format(range+localMinPile), 10, yOffset - 2 * graphLineHeigh + 10);
+		g.drawString(nrReg.format(range + localMinPile), 10, yOffset - 2 * graphLineHeigh + 10);
 	}
 
 	private void drawTwo(Graphics g, double range, int graphLineHeigh, double screenWidth, int yOffset) {
@@ -392,8 +375,8 @@ class BarChartBuffer implements VizBuffer {
 		for (Line line : ptm.getLines()) {
 			// g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 -
 			// screenX1 + 1, 2 * size);
-			if (line.value()-localMinPile < range) {
-				int tY = (int) (((line.value()-localMinPile) / range) * graphLineHeigh);
+			if (line.value() - localMinPile < range) {
+				int tY = (int) (((line.value() - localMinPile) / range) * graphLineHeigh);
 				g.drawLine(0, yOffset + graphLineHeigh - tY, (int) screenWidth, yOffset + graphLineHeigh - tY);
 				g.drawLine(0, yOffset + graphLineHeigh + tY, (int) screenWidth, yOffset + graphLineHeigh + tY);
 			}
