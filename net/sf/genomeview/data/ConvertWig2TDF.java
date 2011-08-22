@@ -61,7 +61,7 @@ import be.abeel.io.LineIterator;
  * @author jrobinso
  * @author Thomas Abeel
  */
-class ConvertWig2TDF {
+public class ConvertWig2TDF {
 
 	private static Logger log = Logger.getLogger(ConvertWig2TDF.class.toString());
 	private boolean compressed = true;
