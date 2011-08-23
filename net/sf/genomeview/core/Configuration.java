@@ -144,20 +144,24 @@ public class Configuration {
 			// Empty config file, don't load it.
 			logger.warning("Config file has size zero!");
 		} else {
-			it = new LineIterator(new GZIPInputStream(new FileInputStream(configFile)));
-			it.setSkipBlanks(true);
-			it.setSkipComments(true);
-			for (String line : it) {
-				if (line.indexOf('=') > 0) {
-					String key = line.substring(0, line.indexOf('='));
-					String value = line.substring(line.indexOf('=') + 1);
-					localMap.put(key.trim(), value.trim());
-				} else {
-					logger.warning("Invalid line in configuration file! '" + line + "'");
-				}
+			try {
+				it = new LineIterator(new GZIPInputStream(new FileInputStream(configFile)));
+				it.setSkipBlanks(true);
+				it.setSkipComments(true);
+				for (String line : it) {
+					if (line.indexOf('=') > 0) {
+						String key = line.substring(0, line.indexOf('='));
+						String value = line.substring(line.indexOf('=') + 1);
+						localMap.put(key.trim(), value.trim());
+					} else {
+						logger.warning("Invalid line in configuration file! '" + line + "'");
+					}
 
+				}
+				it.close();
+			} catch (Exception e) {
+				logger.log(Level.SEVERE,"Something went horribly wrong while loading the configuration.",e);
 			}
-			it.close();
 		}
 
 	}
@@ -219,7 +223,7 @@ public class Configuration {
 	}
 
 	public static void set(String key, File value) {
-		set(key,value.toString());
+		set(key, value.toString());
 	}
 
 	public static void set(String key, String value) {
