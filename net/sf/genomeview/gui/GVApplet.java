@@ -101,6 +101,7 @@ public class GVApplet extends JApplet {
 						escape.setTransferHandler(new DropTransferHandler(model));
 						escape.pack();
 						escape.setBounds(parentFrame.getBounds());
+						escape.setLocation(parentFrame.getLocationOnScreen());
 						escape.setVisible(true);
 						escape.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 					}else{
