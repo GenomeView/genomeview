@@ -17,7 +17,7 @@ import net.sf.jannot.refseq.Sequence;
  * @author Thomas Abeel
  * 
  */
-class PileupTrackModel{
+public class PileupTrackModel{
 
 	private Model model;
 	private VizBuffer vizBuffer = null;
@@ -92,7 +92,7 @@ class PileupTrackModel{
 
 	}
 
-	void setGlobalSettings(boolean globalSettings) {
+	public void setGlobalSettings(boolean globalSettings) {
 		this.globalSettings = globalSettings;
 	}
 
@@ -110,7 +110,7 @@ class PileupTrackModel{
 			return maxValue;
 	}
 
-	public void setMaxValue(Double d) {
+	public void setMaxValue(double d) {
 		this.maxValue = d;
 
 	}

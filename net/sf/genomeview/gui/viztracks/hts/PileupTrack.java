@@ -264,4 +264,9 @@ public class PileupTrack extends Track {
 		return provider.label();
 	}
 
+	public PileupTrackModel getTrackModel() {
+		return ptm;
+		
+	}
+
 }
