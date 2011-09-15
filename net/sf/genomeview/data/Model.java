@@ -574,6 +574,8 @@ public class Model extends Observable implements IModel {
 
 	}
 
+	
+	
 	public synchronized Throwable processException(){
 		if(!exceptionStack.isEmpty())
 			return exceptionStack.pop();
@@ -587,6 +589,7 @@ public class Model extends Observable implements IModel {
 	 */
 	public synchronized void daemonException(Throwable e) {
 		exceptionStack.push(e);
+		logger.log(Level.SEVERE,"Exception in daemon thread",e);
 		setChanged();
 		notifyObservers(NotificationTypes.EXCEPTION);
 		
