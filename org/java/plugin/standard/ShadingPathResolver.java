@@ -388,9 +388,10 @@ final class ShadingUtil {
             }
         }
         if (result == 0) {
-            throw new IOException(
-                    "can't retrieve modification date for resource " //$NON-NLS-1$
-                    + url);
+//            throw new IOException(
+//                    "can't retrieve modification date for resource " //$NON-NLS-1$
+//                    + url);
+        	result=System.currentTimeMillis();
         }
         // for some reason modification milliseconds for some files are unstable
         Calendar cldr = Calendar.getInstance(Locale.ENGLISH);
