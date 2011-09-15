@@ -24,6 +24,8 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.genomeview.gui.components.ConnectionMonitor;
+import net.sf.jannot.source.Locator;
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
 
@@ -44,11 +46,9 @@ class GenomeExplorer extends JDialog {
 		setIconImage(Icons.MINILOGO);
 		this.model = model;
 
-		
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
 
-			
 			@Override
 			public void windowClosing(WindowEvent e) {
 				model.getGUIManager().getGenomeExplorer().setVisible(false);
@@ -59,7 +59,16 @@ class GenomeExplorer extends JDialog {
 		tabs = new JTabbedPane();
 
 		HashMap<String, ArrayList<Genome>> list = new HashMap<String, ArrayList<Genome>>();
-		parse(list, GenomeExplorer.class.getResourceAsStream("/conf/instances.txt"));
+
+		LineIterator it = new LineIterator(GenomeExplorer.class.getResourceAsStream("/conf/repositories.txt"), true,
+				true);
+		for (String line : it)
+			try {
+				parse(list,new URL(line).openStream());
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Could not load instances from " + line, e);
+			}
+		it.close();
 		parse(list, GenomeExplorer.class.getResourceAsStream("/conf/plazainstances.txt"));
 
 		System.out.println("instances: " + list);
@@ -69,11 +78,14 @@ class GenomeExplorer extends JDialog {
 		tabs.addTab("Tutorial genomes", new GenomesPanel(model,
 				"<html>Welcome to the GenomeView Genome Explorer. This is your portal to preloaded GenomeView instances."
 						+ common, list.get("demo")));
-		
-		tabs.addTab("Microbial genomes", new GenomesPanel(model,
-				"<html>Welcome to the GenomeView Genome Explorer. This is your portal to preloaded GenomeView instances for microbial genomes."
-						+ common, list.get("microbial")));
-		
+
+		tabs.addTab(
+				"Microbial genomes",
+				new GenomesPanel(
+						model,
+						"<html>Welcome to the GenomeView Genome Explorer. This is your portal to preloaded GenomeView instances for microbial genomes."
+								+ common, list.get("microbial")));
+
 		tabs.addTab(
 				"Plant genomes",
 				new GenomesPanel(
@@ -82,26 +94,26 @@ class GenomeExplorer extends JDialog {
 								+ common, list.get("plant")));
 		
 		tabs.addTab(
-				"Insect genomes",
+				"Fungal genomes",
 				new GenomesPanel(
 						model,
-						"<html>Welcome to the GenomeView insect genomes section. This is your portal to the GenomeView animal genomes."
-								+ common, list.get("insect")));
-		
-		tabs.addTab(
-				"Mammalian genomes",
-				new GenomesPanel(
-						model,
-						"<html>Welcome to the GenomeView mammalian genomes section. This is your portal to the GenomeView animal genomes."
-								+ common, list.get("animal")));
-		
+						"<html>Welcome to the GenomeView fungal genomes section. This is your portal to the GenomeView fungal genomes."
+								+ common, list.get("fungi")));
+
+		tabs.addTab("Insect genomes", new GenomesPanel(model,
+				"<html>Welcome to the GenomeView insect genomes section. This is your portal to the GenomeView animal genomes."
+						+ common, list.get("insect")));
+
+		tabs.addTab("Mammalian genomes", new GenomesPanel(model,
+				"<html>Welcome to the GenomeView mammalian genomes section. This is your portal to the GenomeView animal genomes."
+						+ common, list.get("animal")));
+
 		tabs.addTab(
 				"Archived genomes",
 				new GenomesPanel(
 						model,
 						"<html>Welcome to the GenomeView archived genomes section. This section contains all previous releases of genomes in the main sections that have been archived."
 								+ common, list.get("archived")));
-		
 
 		Border emptyBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 		Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
@@ -112,15 +124,13 @@ class GenomeExplorer extends JDialog {
 		setBackground(Color.WHITE);
 
 		pack();
-		StaticUtils.center(model.getGUIManager().getParent(),this);
+		StaticUtils.center(model.getGUIManager().getParent(), this);
 	}
 
 	private Logger log = Logger.getLogger(GenomeExplorer.class.getCanonicalName());
 
 	private void parse(HashMap<String, ArrayList<Genome>> list, InputStream resourceAsStream) {
-		LineIterator it = new LineIterator(resourceAsStream);
-		it.setSkipBlanks(true);
-		it.setSkipComments(true);
+		LineIterator it = new LineIterator(resourceAsStream, true, true);
 		for (String line : it) {
 			String[] arr = line.split("\t");
 			if (!list.containsKey(arr[0])) {
@@ -139,14 +149,14 @@ class GenomeExplorer extends JDialog {
 	}
 
 	private Icon instanceImage(String path) {
-		URL url=Genome.class.getResource("/images/instances/" + path);
-		if(url==null)
-			url=Genome.class.getResource("/images/instances/nopicture.png");
+		URL url = Genome.class.getResource("/images/instances/" + path);
+		if (url == null)
+			url = Genome.class.getResource("/images/instances/nopicture.png");
 		return new ImageIcon(url);
 	}
 
 	void scollToTop() {
-		for (int i = 0;i< tabs.getTabCount(); i++) {
+		for (int i = 0; i < tabs.getTabCount(); i++) {
 			((GenomesPanel) tabs.getComponent(i)).scrollToTop();
 		}
 
