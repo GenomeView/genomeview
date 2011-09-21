@@ -5,6 +5,7 @@ package net.sf.genomeview.gui;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.Authenticator;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +41,7 @@ public class GenomeView {
 		return mw.getModel();
 	}
 	public static void main(final String[] args) {
+		logger.info("Command line instructions: "+Arrays.toString(args));
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 
