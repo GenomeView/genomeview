@@ -20,7 +20,7 @@ import net.sf.genomeview.data.Model;
  *
  */
 public class GenomeView {
-	private static Logger logger;
+	private static Logger logger=Logger.getLogger(GenomeView.class.getCanonicalName());
 
 	private static WindowManager mw;
 
