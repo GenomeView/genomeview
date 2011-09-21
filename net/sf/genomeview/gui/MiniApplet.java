@@ -18,8 +18,6 @@ import javax.swing.SwingUtilities;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.menu.MainMenu;
-import net.sf.genomeview.gui.viztracks.AnnotationFrame;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Cleaner;
 /**
@@ -95,7 +93,7 @@ public class MiniApplet extends JApplet {
 
 					PluginLoader.load(model);
 					model.setSilent(false);
-					ReferenceMissingMonitor rmm=new ReferenceMissingMonitor(model);
+					ReferenceMissingMonitor.init(model);
 					
 				}
 			});

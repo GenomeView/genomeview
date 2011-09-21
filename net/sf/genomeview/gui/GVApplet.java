@@ -115,7 +115,7 @@ public class GVApplet extends JApplet {
 
 					PluginLoader.load(model);
 					model.setSilent(false);
-					ReferenceMissingMonitor rmm = new ReferenceMissingMonitor(model);
+					ReferenceMissingMonitor.init(model);
 				}
 			});
 		} catch (InterruptedException e) {

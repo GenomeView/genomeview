@@ -41,7 +41,7 @@ public class GenomeView {
 		return mw.getModel();
 	}
 	public static void main(final String[] args) {
-		logger.info("Command line instructions: "+Arrays.toString(args));
+		
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -72,39 +72,40 @@ public class GenomeView {
 				
 
 				LogConfigurator.config();
-
+				logger.info("Command line instructions: "+Arrays.toString(args));
 				/* Single instance manager */
 				boolean singleInstance = Configuration.getBoolean("general:singleInstance");
 				if (singleInstance) {
-					if (!ApplicationInstanceManager.registerInstance()) {
+					if (!ApplicationInstanceManager.registerInstance(args)) {
 						// instance already running.
 						System.out.println("Another instance of this application is already running.  Exiting.");
 						splash.dispose();
 						StaticUtils.forceExit();
 						return;
 					}
-					ApplicationInstanceManager.setApplicationInstanceListener(new ApplicationInstanceListener() {
-						public void newInstanceCreated() {
-							System.out.println("New instance detected...");
-							try {
-								assert mw != null;
-								mw.init(args,splash);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (ExecutionException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-					});
+					
+//					ApplicationInstanceManager.setApplicationInstanceListener(new ApplicationInstanceListener() {
+//						public void newInstanceCreated(String[]args) {
+//							System.out.println("New instance detected...");
+//							try {
+//								assert mw != null;
+//								mw.init(args,splash);
+//							} catch (InterruptedException e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							} catch (ExecutionException e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							}
+//						}
+//					});
 				}
 
 				Authenticator.setDefault(new MyAuthenticator());
 
 				try {
 					mw = new WindowManager(args,splash);
-					
+					ApplicationInstanceManager.setCallback(mw);
 				} catch (InterruptedException e) {
 					logger.log(Level.SEVERE, "main window initialization", e);
 				} catch (ExecutionException e) {

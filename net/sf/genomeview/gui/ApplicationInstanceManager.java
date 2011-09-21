@@ -1,33 +1,40 @@
+/**
+ * %HEADER%
+ */
 package net.sf.genomeview.gui;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class ApplicationInstanceManager {
 
-	private static final Logger log = Logger.getLogger(ApplicationInstanceListener.class.getCanonicalName());
-	private static ApplicationInstanceListener subListener;
+	private static final Logger log = Logger.getLogger(ApplicationInstanceManager.class.getCanonicalName());
 
 	/** Randomly chosen, but static, high socket number */
 	public static final int SINGLE_INSTANCE_NETWORK_SOCKET = 15987;
 
 	/** Must end with newline */
-	public static final String SINGLE_INSTANCE_SHARED_KEY = "$$GenomeViewInstance$$\n";
+	public static final String SINGLE_INSTANCE_SHARED_KEY = "$$GenomeViewInstance$$";
 
 	/**
 	 * Registers this instance of the application.
 	 * 
 	 * @return true if first instance, false if not.
 	 */
-	public static boolean registerInstance() {
+	public static boolean registerInstance(final String[]args) {
 		// returnValueOnError should be true if lenient (allows app to run on
 		// network error) or false if strict.
 		boolean returnValueOnError = true;
@@ -51,29 +58,41 @@ public class ApplicationInstanceManager {
 								String message = in.readLine();
 								if (SINGLE_INSTANCE_SHARED_KEY.trim().equals(message.trim())) {
 									log.info("Shared key matched - new application instance found");
-									fireNewInstance();
+									String param=in.readLine();
+									log.info("Param line: "+param);
+									String s=param.split("=")[1];
+									System.out.println("Re-initializing with params: "+s);
+									wm.init(s.substring(1, s.length()-1).split(", "),null);
 								}
 								in.close();
 								client.close();
 							} catch (IOException e) {
+								log.log(Level.SEVERE,"Exception in ApplicationInstanceManager",e);
 								socketClosed = true;
-							}
+							} catch (Exception e) {
+								log.log(Level.SEVERE,"Exception in ApplicationInstanceManager",e);
+								
+							} 
 						}
 					}
 				}
 			});
 			instanceListenerThread.start();
+//			initialize(args);
 			// listen
 		} catch (UnknownHostException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			return returnValueOnError;
 		} catch (IOException e) {
-			log.severe("Port is already taken.  Notifying first instance.");
+			log.info("Port is already taken.  Notifying first instance.");
 			try {
 				Socket clientSocket = new Socket(InetAddress.getLocalHost(), SINGLE_INSTANCE_NETWORK_SOCKET);
-				OutputStream out = clientSocket.getOutputStream();
-				out.write(SINGLE_INSTANCE_SHARED_KEY.getBytes());
-				out.close();
+				PrintWriter pw = new PrintWriter(clientSocket.getOutputStream());
+				pw.println(SINGLE_INSTANCE_SHARED_KEY);
+				log.info("Writing parameters: "+Arrays.toString(args));
+				pw.println("PARAM="+Arrays.toString(args));
+				pw.flush();
+				pw.close();
 				clientSocket.close();
 				log.info("Successfully notified first instance.");
 				return false;
@@ -90,13 +109,11 @@ public class ApplicationInstanceManager {
 		return true;
 	}
 
-	public static void setApplicationInstanceListener(ApplicationInstanceListener listener) {
-		subListener = listener;
+	private static WindowManager wm;
+
+	public static void setCallback(WindowManager mw) {
+		wm=mw;
+		
 	}
 
-	private static void fireNewInstance() {
-		if (subListener != null) {
-			subListener.newInstanceCreated();
-		}
-	}
 }

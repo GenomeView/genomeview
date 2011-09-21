@@ -16,7 +16,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.Observable;
 import java.util.Observer;
@@ -183,8 +182,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 	public void init(String[] args, Splash splash) throws InterruptedException, ExecutionException {
 		// FIXME special handling if this is not the first time the application
 		// is initialized
-
-		splash.setText("Parsing parameters...");
+		if(splash!=null)
+			splash.setText("Parsing parameters...");
 		/* Initialize the command line options */
 		AutoHelpCmdLineParser parser = new AutoHelpCmdLineParser();
 		Option urlO = parser.addHelp(parser.addStringOption("url"), "Start GenomeView with data loaded from the URL");
@@ -208,7 +207,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 		if (parser.checkHelp()) {
 			System.exit(0);
 		}
-
+		if(splash!=null)
 		splash.setText("Creating windows...");
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice[] gs = ge.getScreenDevices();
@@ -259,10 +258,12 @@ public class WindowManager extends WindowAdapter implements Observer {
 				}
 			}
 			window.setVisible(true);
+			if(splash!=null)
 			splash.setText("Installing plugins...");
 			PluginLoader.load(model);
 
 		}
+		if(splash!=null)
 		splash.setText("Loading data...");
 		/* Data specified on command line */
 		InitDataLoader idl = new InitDataLoader(model);
@@ -278,7 +279,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 			idl.init(null, null, new String[0], null, null);
 		}
 
-		ReferenceMissingMonitor rmm = new ReferenceMissingMonitor(model);
+		ReferenceMissingMonitor.init(model);
 		/* Start acting */
 		model.setSilent(false);
 

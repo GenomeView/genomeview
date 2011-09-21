@@ -44,8 +44,14 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 	private Model model;
 	private boolean dismissed = false;
 	private JScrollPane jp;
-
-	public ReferenceMissingMonitor(Model model) {
+	private static ReferenceMissingMonitor rmm=null;
+	public static void init(Model model){
+		if(rmm==null)
+			rmm=new ReferenceMissingMonitor(model);
+		
+	}
+	
+	private ReferenceMissingMonitor(Model model) {
 		super(model.getGUIManager().getParent(), ModalityType.MODELESS);
 		setTitle("Reference sequence missing!!");
 		setIconImage(Icons.MINILOGO);
