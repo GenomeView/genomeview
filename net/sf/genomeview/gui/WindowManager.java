@@ -149,22 +149,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 				}
 
-				/*
-				 * Due to some bugs in AWT, Swing and some other stuff, we need
-				 * to force webstart applications to shut down
-				 * 
-				 * http://stackoverflow.com/questions/212009/do-i-have-to-explicitly
-				 * -call-system-exit-in-a-webstart-application
-				 * 
-				 * http://stackoverflow.com/questions/216315/what-is-the-best-way
-				 * -to-detect-whether-an-application-is-launched-by-webstart
-				 */
-				if (Environment.isWebstart() && !Environment.isMac()) {
-					// This will make sure the application exits.
-					// We don't want to do this on Mac because it will exit the
-					// browser as well if running as an Applet.
-					System.exit(0);
-				}
+				StaticUtils.forceExit();
 
 			}
 		}
