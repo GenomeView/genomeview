@@ -132,7 +132,7 @@ public final class StaticUtils {
 		 * http://stackoverflow.com/questions/216315/what-is-the-best-way
 		 * -to-detect-whether-an-application-is-launched-by-webstart
 		 */
-		if (Environment.isWebstart() && !Environment.isMac()) {
+		if (!Environment.isApplet() ||(Environment.isApplet()&& !Environment.isMac())) {
 			// This will make sure the application exits.
 			// We don't want to do this on Mac because it will exit the
 			// browser as well if running as an Applet.

@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.DaemonThread;
 import net.sf.genomeview.data.Model;
 /**
  * 
@@ -65,7 +66,7 @@ public class GenomeView {
 		 */
 		System.out.println("Starting GenomeView " + Configuration.version());
 		
-		new Thread(new Runnable() {
+		new DaemonThread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -73,6 +74,7 @@ public class GenomeView {
 
 				LogConfigurator.config();
 				logger.info("Command line instructions: "+Arrays.toString(args));
+				CommandLineOptions.init(args);
 				/* Single instance manager */
 				boolean singleInstance = Configuration.getBoolean("general:singleInstance");
 				if (singleInstance) {
@@ -84,21 +86,7 @@ public class GenomeView {
 						return;
 					}
 					
-//					ApplicationInstanceManager.setApplicationInstanceListener(new ApplicationInstanceListener() {
-//						public void newInstanceCreated(String[]args) {
-//							System.out.println("New instance detected...");
-//							try {
-//								assert mw != null;
-//								mw.init(args,splash);
-//							} catch (InterruptedException e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//							} catch (ExecutionException e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//							}
-//						}
-//					});
+
 				}
 
 				Authenticator.setDefault(new MyAuthenticator());

@@ -16,7 +16,7 @@ public class TestComplex {
 
 	@Test
 	public void testTooManyFeatures() {
-		Model model = new Model(null, null);
+		Model model = new Model(null);
 		try {
 			DataSource ds = DataSourceFactory.create(new Locator(
 					"http://www.broadinstitute.org/software/genomeview/demo/b_anthracis/bantracis.gff"), null);

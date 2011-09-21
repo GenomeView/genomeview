@@ -37,6 +37,7 @@ public class MiniApplet extends JApplet {
 
 	@Override
 	public void init() {
+		Environment.setApplet();
 		LogConfigurator.config();
 
 		logger.info("Starting GenomeView Mini Applet");
@@ -59,6 +60,8 @@ public class MiniApplet extends JApplet {
 		final String idO = getParameter("id");
 		logger.info("idO: "+extraO);
 		
+		CommandLineOptions.init(new String[]{"--config",configO});
+		
 		final Frame parentFrame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, this);
 
 		try {
@@ -66,7 +69,7 @@ public class MiniApplet extends JApplet {
 
 				@Override
 				public void run() {
-					model = new Model(idO,configO);
+					model = new Model(idO);
 					model.getGUIManager().registerMainWindow(parentFrame);
 					model.setSilent(true);
 					model.clearEntries();

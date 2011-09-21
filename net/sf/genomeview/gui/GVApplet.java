@@ -38,6 +38,7 @@ public class GVApplet extends JApplet {
 
 	@Override
 	public void init() {
+		Environment.setApplet();
 		System.out.println("Applet init");
 
 		LogConfigurator.config();
@@ -61,6 +62,10 @@ public class GVApplet extends JApplet {
 
 		final String idO = getParameter("id");
 		logger.info("idO: " + extraO);
+		
+		CommandLineOptions.init(new String[]{"--config",configO});
+		
+		
 
 		final Frame parentFrame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, this);
 
@@ -69,7 +74,7 @@ public class GVApplet extends JApplet {
 
 				@Override
 				public void run() {
-					model = new Model(idO, configO);
+					model = new Model(idO);
 					model.getGUIManager().registerMainWindow(parentFrame);
 					model.setSilent(true);
 					model.clearEntries();

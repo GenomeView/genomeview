@@ -14,6 +14,8 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.sf.genomeview.core.DaemonThread;
 /**
  * 
  * @author Thomas Abeel
@@ -45,7 +47,7 @@ public class ApplicationInstanceManager {
 		try {
 			final ServerSocket socket = new ServerSocket(SINGLE_INSTANCE_NETWORK_SOCKET, 10, InetAddress.getLocalHost());
 			log.info("Listening for application instances on socket " + SINGLE_INSTANCE_NETWORK_SOCKET);
-			Thread instanceListenerThread = new Thread(new Runnable() {
+			DaemonThread instanceListenerThread = new DaemonThread(new Runnable() {
 				public void run() {
 					boolean socketClosed = false;
 					while (!socketClosed) {

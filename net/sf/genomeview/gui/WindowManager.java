@@ -70,22 +70,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 		init(args, splash);
 	}
 
-	private boolean parse(AutoHelpCmdLineParser parser, String[] args) {
-		try {
-			parser.parse(args);
-			return true;
-		} catch (IllegalOptionValueException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
-			CrashHandler.showErrorMessage("Error while parsing command line arguments: " + e.getMessage()
-					+ "\n\nWill continue without command line arguments.", e);
-		} catch (UnknownOptionException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
-			CrashHandler.showErrorMessage("Error while parsing command line arguments: " + e.getMessage()
-					+ "\n\nWill continue without command line arguments.", e);
-		}
-		return false;
-
-	}
+	
 
 	public void dispose() {
 		window.dispose();
@@ -184,29 +169,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 		// is initialized
 		if(splash!=null)
 			splash.setText("Parsing parameters...");
-		/* Initialize the command line options */
-		AutoHelpCmdLineParser parser = new AutoHelpCmdLineParser();
-		Option urlO = parser.addHelp(parser.addStringOption("url"), "Start GenomeView with data loaded from the URL");
-
-		Option fileO = parser.addHelp(parser.addStringOption("file"), "Start GenomeView with data loaded from a file.");
-
-		Option configurationO = parser.addHelp(parser.addStringOption("config"),
-				"Provide additional configuration to load.");
-
-		Option positionO = parser.addHelp(parser.addStringOption("position"),
-				"Provide the initial region that should be visible.");
-
-		Option sessionO = parser.addHelp(parser.addStringOption("session"),
-				"Provide a session file that contains all the files that have to be loaded.");
-
-		Option idO = parser.addHelp(parser.addStringOption("id"),
-				"Instance ID for this GenomeView instance, useful to control multiple GVs at once.");
-
-		boolean goodParse = parse(parser, args);
-
-		if (parser.checkHelp()) {
-			System.exit(0);
-		}
+		CommandLineOptions.init(args);
+		
 		if(splash!=null)
 		splash.setText("Creating windows...");
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -214,7 +178,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 		boolean freshwindow = false;
 
 		if (model == null) {
-			model = new Model((String) parser.getOptionValue(idO), (String) parser.getOptionValue(configurationO));
+			model = new Model(CommandLineOptions.id());
 			model.addObserver(this);
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new Hotkeys(model));
 		}
@@ -267,12 +231,12 @@ public class WindowManager extends WindowAdapter implements Observer {
 		splash.setText("Loading data...");
 		/* Data specified on command line */
 		InitDataLoader idl = new InitDataLoader(model);
-		if (goodParse) {
-			String cmdUrl = (String) parser.getOptionValue(urlO);
-			String cmdFile = (String) parser.getOptionValue(fileO);
-			String session = (String) parser.getOptionValue(sessionO);
-			String[] remArgs = parser.getRemainingArgs();
-			String initialLocation = (String) parser.getOptionValue(positionO);
+		if (CommandLineOptions.goodParse()) {
+			String cmdUrl =CommandLineOptions.url();// (String) parser.getOptionValue(urlO);
+			String cmdFile = CommandLineOptions.file();//(String) parser.getOptionValue(fileO);
+			String session = CommandLineOptions.session();//(String) parser.getOptionValue(sessionO);
+			String[] remArgs = CommandLineOptions.remaining();//parser.getRemainingArgs();
+			String initialLocation = CommandLineOptions.position();//(String) parser.getOptionValue(positionO);
 
 			idl.init(cmdUrl, cmdFile, remArgs, initialLocation, session);
 		} else {
@@ -294,6 +258,12 @@ public class WindowManager extends WindowAdapter implements Observer {
  * 
  */
 class Environment {
+	private static boolean applet=false;
+
+	public static boolean isApplet(){
+		return applet;
+	}
+	
 	public static boolean isWebstart() {
 		/* While this may not work 100%, it is better than nothing :-/ */
 		return System.getProperty("javawebstart.version", null) != null;
@@ -316,6 +286,11 @@ class Environment {
 		String os = System.getProperty("os.name").toLowerCase();
 		return (os.indexOf("mac") >= 0);
 
+	}
+
+	public static void setApplet() {
+		applet=true;
+		
 	}
 
 }

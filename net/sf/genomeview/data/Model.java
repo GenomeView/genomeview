@@ -57,25 +57,8 @@ public class Model extends Observable implements IModel {
 		return mouseModel;
 	}
 
-	public Model(String id, String config) {
-		/* Load the additional configuration */
-		if (config != null) {
-			try {
-				if (config.startsWith("http") || config.startsWith("ftp")) {
-					Configuration.loadExtra(URIFactory.url(config).openStream());
-				} else {
-					Configuration.loadExtra(new FileInputStream(config));
-				}
-			} catch (FileNotFoundException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
-			} catch (MalformedURLException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
-			} catch (IOException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
-			} catch (URISyntaxException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
-			}
-		}
+	public Model(String id) {
+		
 
 		guimanager = new GUIManager();
 
