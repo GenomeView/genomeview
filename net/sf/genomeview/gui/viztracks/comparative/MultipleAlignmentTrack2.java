@@ -10,6 +10,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
@@ -41,7 +42,9 @@ import net.sf.jannot.Type;
 import net.sf.jannot.alignment.maf.AbstractAlignmentBlock;
 import net.sf.jannot.alignment.maf.AbstractAlignmentSequence;
 import net.sf.jannot.alignment.maf.AbstractMAFMultipleAlignment;
+import net.sf.jannot.alignment.maf.SequenceTranslator;
 import net.sf.jannot.utils.SequenceTools;
+import be.abeel.util.LRUCache;
 
 /**
  * Multiple-alignment track for MAF files.
@@ -210,6 +213,7 @@ public class MultipleAlignmentTrack2 extends Track {
 			CollisionMap hitmap = new CollisionMap(model);
 			MouseHit mh = null;
 			for (AbstractAlignmentBlock ab : abs) {
+				SequenceTranslator st = getSequenceTranslator(ab.getAlignmentSequence(0));
 				int abCount = 0;
 
 				int start = ab.start();
@@ -220,8 +224,8 @@ public class MultipleAlignmentTrack2 extends Track {
 
 				}
 
-				int x1 = Convert.translateGenomeToScreen(start, visible, screenWidth);
-				int x2 = Convert.translateGenomeToScreen(end, visible, screenWidth);
+				int blockScreenStart = Convert.translateGenomeToScreen(start, visible, screenWidth);
+				int blockScreenEnd = Convert.translateGenomeToScreen(end, visible, screenWidth);
 				if (showAll)
 					abCount = ordering.size();
 
@@ -232,11 +236,12 @@ public class MultipleAlignmentTrack2 extends Track {
 				if (rec.y + rec.height > yMax)
 					yMax = rec.y + rec.height;
 				hitmap.addLocation(rec, null);
-				paintedBlocks.put(new Rectangle(x1, rec.y - yOffset, x2 - x1, rec.height), ab);
+				paintedBlocks.put(new Rectangle(blockScreenStart, rec.y - yOffset, blockScreenEnd - blockScreenStart,
+						rec.height), ab);
 				// rec.x=x1;
 				// rec.width=x2-x1;
 				g.setColor(Color.BLACK);
-				g.drawRect(x1, rec.y, x2 - x1, rec.height);
+				g.drawRect(blockScreenStart, rec.y, blockScreenEnd - blockScreenStart, rec.height);
 
 				/*
 				 * Reorder the alignment sequences to whatever the user wants
@@ -282,7 +287,7 @@ public class MultipleAlignmentTrack2 extends Track {
 						for (int i = visible.start; i <= visible.end; i++) {
 							if (i >= start && i < end) {
 								double width = screenWidth / (double) visible.length();
-								int translated = ab.translate(i - start)+1;
+								int translated = st.translate(i - start) + 1;
 
 								char nt;
 
@@ -326,40 +331,70 @@ public class MultipleAlignmentTrack2 extends Track {
 							g.setColor(Configuration.getColor("ma:reverseColor"));
 						}
 
-						g.fillRect(x1, rec.y + (line - 1) * lineHeight, x2 - x1, lineHeight);
+						g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight,
+								blockScreenEnd - blockScreenStart, lineHeight);
 
 					}
 
 					if (comparativeAnnotation) {
+						SequenceTranslator localTranslator=getSequenceTranslator(as);
 						Entry e = model.entries().getEntry(as.getName());
 						if (e != null) {
 							MemoryFeatureAnnotation mfa = e.getMemoryAnnotation(comparativeAnnotationType);
 							for (Feature f : mfa.get(as.start(), as.end())) {
-								double a = as.start();
-								double c = as.end();
-								double q = f.start();
-								double r = f.end();
+//								System.out.println(f+"\t"+Arrays.toString(f.location())+" in block "+ab.start()+":"+ab.end()+" with seq "+as.start()+":"+as.end());
+//								double alignmentStart = as.start();
+//								double alignmentEnd = as.end();
+								int featureStart = f.start();
+								int featureEnd = f.end();
+								/* Reverse coordinates in reversed sections */
 								if (as.strand() == Strand.REVERSE) {
-									q = as.end() - f.end() + as.start();
-									r = as.end() - f.start() + as.start();
+									featureStart = as.end() - f.end() + as.start()-1;
+									featureEnd = as.end() - f.start() + as.start()-1;
 
 								}
 								/*
 								 * These are only estimates of the right
 								 * coordinates
 								 */
-								double x = (((q - a) / (c - a)) * (x2 - x1)) + x1;
-								double y = (((r - a) / (c - a)) * (x2 - x1)) + x1;
+//								double x = (((featureStart - alignmentStart) / (alignmentEnd - alignmentStart)) * (blockScreenEnd - blockScreenStart))
+//										+ blockScreenStart;
+//								double y = (((featureEnd - alignmentStart) / (alignmentEnd - alignmentStart)) * (blockScreenEnd - blockScreenStart))
+//										+ blockScreenStart;
+								
+								if(featureStart<as.start())
+									featureStart=as.start();
+								if(featureStart>as.end())
+									featureStart=as.end();
+								if(featureEnd>as.end())
+									featureEnd=as.end();
+								
+								if(featureEnd<as.start()){
+									featureEnd=as.start();
+								}
+								int fsx=localTranslator.translate(featureStart-as.start());
+								int fsy=localTranslator.translate(featureEnd-as.start());
+
+//								System.out.println("\ttranslated to "+fsx+":"+fsy);
+								
+								
+								int featureScreenStart = Convert.translateGenomeToScreen(fsx+ab.start(), visible, screenWidth);
+								int featureScreenEnd = Convert.translateGenomeToScreen(fsy+ab.start(), visible, screenWidth);
+//								x+=as.start();
+//								y+=as.start();
+
 								g.setColor(Color.CYAN);
-								if (x < x1)
-									x = x1;
-								if (y > x2)
-									y = x2;
+								if (featureScreenStart < blockScreenStart)
+									featureScreenStart = blockScreenStart;
+								if (featureScreenEnd > blockScreenEnd)
+									featureScreenEnd = blockScreenEnd;
 
-								g.fillRect((int) x, rec.y + (line - 1) * lineHeight + 3, (int) (y - x), lineHeight - 6);
+								g.fillRect((int) featureScreenStart, rec.y + (line - 1) * lineHeight + 3, (int) (featureScreenEnd - featureScreenStart), lineHeight - 6);
 
+								if(visible.length()<10000){
 								g.setColor(Color.CYAN.darker().darker());
-								g.drawString(f.toString(), (int) x, rec.y + (line) * lineHeight - 4);
+								g.drawString(f.toString(), (int) featureScreenStart, rec.y + (line) * lineHeight - 4);
+								}
 
 							}
 
@@ -376,7 +411,8 @@ public class MultipleAlignmentTrack2 extends Track {
 					for (int i = 0; i < ordering.size(); i++) {
 						if (!lines.get(i)) {
 							g.setColor(Color.YELLOW);
-							g.fillRect(x1, rec.y + i * lineHeight, x2 - x1, lineHeight);
+							g.fillRect(blockScreenStart, rec.y + i * lineHeight, blockScreenEnd - blockScreenStart,
+									lineHeight);
 						}
 					}
 				}
@@ -389,7 +425,7 @@ public class MultipleAlignmentTrack2 extends Track {
 						mh = new MouseHit();
 						mh.ab = ab;
 						mh.rec = rec;
-						mh.x1 = x1;
+						mh.x1 = blockScreenStart;
 
 					}
 				}
@@ -452,6 +488,19 @@ public class MultipleAlignmentTrack2 extends Track {
 			return mvb.draw(g, yOffset, lineHeight);
 
 		}
+	}
+
+	private LRUCache<AbstractAlignmentSequence, SequenceTranslator> stCache = new LRUCache<AbstractAlignmentSequence, SequenceTranslator>(
+			50, 60000);
+
+	private SequenceTranslator getSequenceTranslator(AbstractAlignmentSequence ab) {
+		
+		SequenceTranslator st = stCache.get(ab);
+		if (st == null) {
+			st = new SequenceTranslator(ab);
+			stCache.put(ab, st);
+		}
+		return st;
 	}
 
 	@Override

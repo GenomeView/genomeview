@@ -13,8 +13,8 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.DaemonThread;
 import net.sf.genomeview.data.Model;
+import be.abeel.concurrency.DaemonThread;
 /**
  * 
  * @author Thomas Abeel

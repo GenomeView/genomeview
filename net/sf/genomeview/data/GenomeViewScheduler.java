@@ -5,8 +5,8 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import net.sf.genomeview.core.DaemonThreadFactory;
 import net.sf.jannot.Location;
+import be.abeel.concurrency.DaemonThreadFactory;
 
 /**
  * 
