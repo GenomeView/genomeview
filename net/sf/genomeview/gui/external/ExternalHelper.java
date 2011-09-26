@@ -88,7 +88,7 @@ public class ExternalHelper {
 					e = model.entries().getEntry();
 				else
 					e = model.entries().getEntry(arr[0]);
-				return max < e.getMaximumLength();
+				return max <= e.getMaximumLength();
 
 			}
 		});
