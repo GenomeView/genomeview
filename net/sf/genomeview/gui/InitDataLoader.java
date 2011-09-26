@@ -129,6 +129,7 @@ public class InitDataLoader {
 		}
 
 		if (position != null) {
+			logger.info("Initial position requested to "+position);
 			ExternalHelper.setPosition(position, model);
 
 		}
