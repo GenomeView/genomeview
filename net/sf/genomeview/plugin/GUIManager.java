@@ -11,6 +11,7 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 import net.sf.genomeview.gui.StatusBar;
 import net.sf.genomeview.gui.dialog.OpenDialog;
@@ -38,6 +39,21 @@ public class GUIManager {
 		return parent;
 	}
 
+	public void startPluginLoading(){
+		for (JMenu menu : pluginMenu){
+			JMenuItem jmi=new JMenuItem("Loading plug-ins...\nThis may take a minute!");
+			jmi.setEnabled(false);
+			menu.add(jmi);
+			
+		}
+	}
+	
+	public void finishPluginLoading(){
+		for (JMenu menu : pluginMenu){
+			menu.remove(0);
+		}
+	}
+	
 	/* There can be multiple menus as there will be one for each screen */
 	private List<JMenu> pluginMenu = new ArrayList<JMenu>();
 	private List<JMenu> pluginDoc = new ArrayList<JMenu>();
