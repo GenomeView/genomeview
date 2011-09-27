@@ -70,23 +70,7 @@ public class Model extends Observable implements IModel {
 			logger.info("JavaScriptHandler NOT started");
 		}
 
-		/* Scheduler booster thread */
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				while (true && !isExitRequested()) {
-					GenomeViewScheduler.boost(getAnnotationLocationVisible());
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						/* This happens when restarting the Applet */
-						return;
-					}
-				}
-
-			}
-		}).start();
+		GenomeViewScheduler.start(this);
 
 		selectionModel.addObserver(this);
 		this.trackList = new TrackList(this);

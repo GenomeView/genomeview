@@ -40,7 +40,12 @@ class PileupTask extends Task {
 	@Override
 	public void cancel(){
 		super.cancel();
+		summary.complyCancel(idx);
 		this.cancelled=true;
+	}
+	
+	public boolean isCancelled(){
+		return cancelled;
 	}
 	
 	@Override

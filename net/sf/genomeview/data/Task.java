@@ -52,4 +52,8 @@ public abstract class Task implements Runnable, Comparable<Task> {
 		id = 0;
 
 	}
+
+	public boolean isCancelled() {
+		return false;
+	}
 }

@@ -10,12 +10,14 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
@@ -25,7 +27,9 @@ import javax.swing.JViewport;
 
 import net.sf.genomeview.core.BiMap;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.Task;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
@@ -213,7 +217,7 @@ public class MultipleAlignmentTrack2 extends Track {
 			CollisionMap hitmap = new CollisionMap(model);
 			MouseHit mh = null;
 			for (AbstractAlignmentBlock ab : abs) {
-				SequenceTranslator st = getSequenceTranslator(ab.getAlignmentSequence(0));
+
 				int abCount = 0;
 
 				int start = ab.start();
@@ -274,53 +278,61 @@ public class MultipleAlignmentTrack2 extends Track {
 				Font tmpFont = font.deriveFont(10f);
 				g.setFont(tmpFont);
 				for (AbstractAlignmentSequence as : ab2) {
-					// System.out.println("\t" + start + "\t" + end + "\t" +
-					// as.strand());
-					// g.drawString(as.seq().toString(), x1,
-					// rec.y+line*lineHeight);
+
 					if (showAll) {
 						line = ordering.getForward(as.getName()) + 1;
 						lines.set(line - 1);
 					}
-					// System.out.println(as+"\t"+line);
+
 					if (visible.length() < 1000) {
-						for (int i = visible.start; i <= visible.end; i++) {
-							if (i >= start && i < end) {
-								double width = screenWidth / (double) visible.length();
-								int translated = st.translate(i - start) + 1;
+						SequenceTranslator st = getSequenceTranslator(ab.getAlignmentSequence(0));
+						if (st != null) {
+							for (int i = visible.start; i <= visible.end; i++) {
+								if (i >= start && i < end) {
+									double width = screenWidth / (double) visible.length();
+									int translated = st.translate(i - start) + 1;
 
-								char nt;
+									char nt;
 
-								if (as.strand() == Strand.FORWARD)
-									nt = as.seq().get(translated, translated + 1).iterator().next();
-								else
-									nt = SequenceTools.complement(as.seq()
-											.get(as.seq().size() - translated + 1, as.seq().size() - translated + 2)
-											.iterator().next());
-
-								// System.out.println("NT: "+translated+"\t"+nt);
-								if (ref[i - visible.start] != nt) {
-									if (nt == '-')
-										g.setColor(Color.RED);
+									if (as.strand() == Strand.FORWARD)
+										nt = as.seq().get(translated, translated + 1).iterator().next();
 									else
-										g.setColor(Color.DARK_GRAY);
-									g.fillRect((int) ((i - visible.start) * width), rec.y + (line - 1) * lineHeight,
-											(int) Math.ceil(width), lineHeight);
-									if (visible.length() < 100) {
-										Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
+										nt = SequenceTools
+												.complement(as
+														.seq()
+														.get(as.seq().size() - translated + 1,
+																as.seq().size() - translated + 2).iterator().next());
+
+									// System.out.println("NT: "+translated+"\t"+nt);
+									if (ref[i - visible.start] != nt) {
 										if (nt == '-')
-											g.setColor(Color.BLACK);
+											g.setColor(Color.RED);
 										else
-											g.setColor(Configuration.getNucleotideColor(nt).brighter());
-										g.drawString(
-												"" + nt,
-												(int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)),
-												rec.y + line * lineHeight - 2);
+											g.setColor(Color.DARK_GRAY);
+										g.fillRect((int) ((i - visible.start) * width),
+												rec.y + (line - 1) * lineHeight, (int) Math.ceil(width), lineHeight);
+										if (visible.length() < 100) {
+											Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
+											if (nt == '-')
+												g.setColor(Color.BLACK);
+											else
+												g.setColor(Configuration.getNucleotideColor(nt).brighter());
+											g.drawString(
+													"" + nt,
+													(int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)),
+													rec.y + line * lineHeight - 2);
+										}
 									}
 								}
 							}
+						} else {
+							Color or = Color.orange;
+							g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(), 100));
+							g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight, blockScreenEnd
+									- blockScreenStart, lineHeight);
 						}
 					} else {
+						// FIXME redundant?
 						if (showAll) {
 							line = ordering.getForward(as.getName()) + 1;
 							lines.set(line - 1);
@@ -337,67 +349,71 @@ public class MultipleAlignmentTrack2 extends Track {
 					}
 
 					if (comparativeAnnotation) {
-						SequenceTranslator localTranslator=getSequenceTranslator(as);
-						Entry e = model.entries().getEntry(as.getName());
-						if (e != null) {
-							MemoryFeatureAnnotation mfa = e.getMemoryAnnotation(comparativeAnnotationType);
-							for (Feature f : mfa.get(as.start(), as.end())) {
-//								System.out.println(f+"\t"+Arrays.toString(f.location())+" in block "+ab.start()+":"+ab.end()+" with seq "+as.start()+":"+as.end());
-//								double alignmentStart = as.start();
-//								double alignmentEnd = as.end();
-								int featureStart = f.start();
-								int featureEnd = f.end();
-								/* Reverse coordinates in reversed sections */
-								if (as.strand() == Strand.REVERSE) {
-									featureStart = as.end() - f.end() + as.start()-1;
-									featureEnd = as.end() - f.start() + as.start()-1;
+						SequenceTranslator localTranslator = getSequenceTranslator(as);
+						if (localTranslator != null) {
+							Entry e = model.entries().getEntry(as.getName());
+							if (e != null) {
+								MemoryFeatureAnnotation mfa = e.getMemoryAnnotation(comparativeAnnotationType);
+								for (Feature f : mfa.get(as.start(), as.end())) {
 
-								}
-								/*
-								 * These are only estimates of the right
-								 * coordinates
-								 */
-//								double x = (((featureStart - alignmentStart) / (alignmentEnd - alignmentStart)) * (blockScreenEnd - blockScreenStart))
-//										+ blockScreenStart;
-//								double y = (((featureEnd - alignmentStart) / (alignmentEnd - alignmentStart)) * (blockScreenEnd - blockScreenStart))
-//										+ blockScreenStart;
-								
-								if(featureStart<as.start())
-									featureStart=as.start();
-								if(featureStart>as.end())
-									featureStart=as.end();
-								if(featureEnd>as.end())
-									featureEnd=as.end();
-								
-								if(featureEnd<as.start()){
-									featureEnd=as.start();
-								}
-								int fsx=localTranslator.translate(featureStart-as.start());
-								int fsy=localTranslator.translate(featureEnd-as.start());
+									int featureStart = f.start();
+									int featureEnd = f.end();
+									/* Reverse coordinates in reversed sections */
+									if (as.strand() == Strand.REVERSE) {
+										featureStart = as.end() - f.end() + as.start() - 1;
+										featureEnd = as.end() - f.start() + as.start() - 1;
 
-//								System.out.println("\ttranslated to "+fsx+":"+fsy);
-								
-								
-								int featureScreenStart = Convert.translateGenomeToScreen(fsx+ab.start(), visible, screenWidth);
-								int featureScreenEnd = Convert.translateGenomeToScreen(fsy+ab.start(), visible, screenWidth);
-//								x+=as.start();
-//								y+=as.start();
+									}
 
-								g.setColor(Color.CYAN);
-								if (featureScreenStart < blockScreenStart)
-									featureScreenStart = blockScreenStart;
-								if (featureScreenEnd > blockScreenEnd)
-									featureScreenEnd = blockScreenEnd;
+									if (featureStart < as.start())
+										featureStart = as.start();
+									if (featureStart > as.end())
+										featureStart = as.end();
 
-								g.fillRect((int) featureScreenStart, rec.y + (line - 1) * lineHeight + 3, (int) (featureScreenEnd - featureScreenStart), lineHeight - 6);
+									if (featureEnd > as.end())
+										featureEnd = as.end();
 
-								if(visible.length()<10000){
-								g.setColor(Color.CYAN.darker().darker());
-								g.drawString(f.toString(), (int) featureScreenStart, rec.y + (line) * lineHeight - 4);
+									if (featureEnd < as.start()) {
+										featureEnd = as.start();
+									}
+
+									featureStart = localTranslator.translate(featureStart - as.start());
+									featureEnd = localTranslator.translate(featureEnd - as.start());
+
+									int featureScreenStart = Convert.translateGenomeToScreen(featureStart + ab.start(),
+											visible, screenWidth);
+									int featureScreenEnd = Convert.translateGenomeToScreen(featureEnd + ab.start(),
+											visible, screenWidth);
+
+									g.setColor(Color.CYAN);
+
+									if (featureScreenStart < blockScreenStart) {
+										featureScreenStart = blockScreenStart;
+
+									}
+
+									if (featureScreenEnd > blockScreenEnd)
+										featureScreenEnd = blockScreenEnd;
+
+									if (featureScreenEnd > featureScreenStart && featureScreenEnd>=0&&featureScreenStart<=visible.end) {
+										g.fillRect(featureScreenStart, rec.y + (line - 1) * lineHeight + 3,
+												featureScreenEnd - featureScreenStart, lineHeight - 6);
+
+										if (visible.length() < 10000) {
+											g.setColor(Color.CYAN.darker().darker());
+											g.drawString(f.toString(), (int) featureScreenStart, rec.y + (line)
+													* lineHeight - 4);
+										}
+									}
+
 								}
 
 							}
-
+						} else {
+							Color or = Color.orange;
+							g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(), 100));
+							g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight, blockScreenEnd
+									- blockScreenStart, lineHeight);
 						}
 					}
 
@@ -490,15 +506,44 @@ public class MultipleAlignmentTrack2 extends Track {
 		}
 	}
 
-	private LRUCache<AbstractAlignmentSequence, SequenceTranslator> stCache = new LRUCache<AbstractAlignmentSequence, SequenceTranslator>(
-			50, 60000);
+	private LRUCache<String, SequenceTranslator> stCache = new LRUCache<String, SequenceTranslator>(20000, 5 * 60000);
 
-	private SequenceTranslator getSequenceTranslator(AbstractAlignmentSequence ab) {
-		
-		SequenceTranslator st = stCache.get(ab);
+	private Set<AbstractAlignmentSequence> translatorQueue = Collections
+			.synchronizedSet(new HashSet<AbstractAlignmentSequence>());
+
+	private SequenceTranslator getSequenceTranslator(final AbstractAlignmentSequence ab) {
+		final String key = ab.getName() + ":" + ab.start() + "-" + ab.end();
+		SequenceTranslator st = stCache.get(key);
 		if (st == null) {
-			st = new SequenceTranslator(ab);
-			stCache.put(ab, st);
+			GenomeViewScheduler.submit(new Task(new Location(ab.start(), ab.end())) {
+				private boolean cancelled = false;
+
+				public void cancel() {
+					cancelled = true;
+				}
+
+				public boolean isCancelled() {
+					return cancelled;
+				}
+
+				@Override
+				public void run() {
+					if (cancelled)
+						return;
+					if (!translatorQueue.contains(ab)) {
+						translatorQueue.add(ab);
+						// System.out.println("Calculating new translator " +
+						// stCache.size());
+						SequenceTranslator tmp = new SequenceTranslator(ab);
+						stCache.put(key, tmp);
+						translatorQueue.remove(ab);
+						model.refresh();
+					}
+
+				}
+			});
+			return null;
+
 		}
 		return st;
 	}

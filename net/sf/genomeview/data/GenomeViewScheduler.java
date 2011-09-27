@@ -6,6 +6,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import net.sf.jannot.Location;
+import be.abeel.concurrency.DaemonThread;
 import be.abeel.concurrency.DaemonThreadFactory;
 
 /**
@@ -28,7 +29,7 @@ public class GenomeViewScheduler {
 
 	}
 
-	public static void boost(Location visible) {
+	private static void boost(Location visible) {
 		for (Runnable r : gvs) {
 			Task t = (Task) r;
 			gvs.remove(t);
@@ -37,10 +38,31 @@ public class GenomeViewScheduler {
 				t.boost();
 			} else
 				t.cancel();
-			gvs.add(t);
+			if(!t.isCancelled())
+				gvs.add(t);
 
 		}
+	}
 
+	public static void start(final Model model) {
+		/* Scheduler booster thread */
+		new DaemonThread(new Runnable() {
+
+			@Override
+			public void run() {
+				while (true && !model.isExitRequested()) {
+					GenomeViewScheduler.boost(model.getAnnotationLocationVisible());
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						/* This happens when restarting the Applet */
+						return;
+					}
+				}
+
+			}
+		}).start();
+		
 	}
 
 }
