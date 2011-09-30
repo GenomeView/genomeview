@@ -217,7 +217,7 @@ public class MultipleAlignmentTrack2 extends Track {
 			CollisionMap hitmap = new CollisionMap(model);
 			MouseHit mh = null;
 			for (AbstractAlignmentBlock ab : abs) {
-
+				SequenceTranslator st = getSequenceTranslator(ab.getAlignmentSequence(0));
 				int abCount = 0;
 
 				int start = ab.start();
@@ -285,8 +285,10 @@ public class MultipleAlignmentTrack2 extends Track {
 					}
 
 					if (visible.length() < 1000) {
-						SequenceTranslator st = getSequenceTranslator(ab.getAlignmentSequence(0));
+						
+
 						if (st != null) {
+							
 							for (int i = visible.start; i <= visible.end; i++) {
 								if (i >= start && i < end) {
 									double width = screenWidth / (double) visible.length();
@@ -348,11 +350,13 @@ public class MultipleAlignmentTrack2 extends Track {
 
 					}
 
-					if (comparativeAnnotation) {
+					if (comparativeAnnotation&&st!=null) {
 						SequenceTranslator localTranslator = getSequenceTranslator(as);
+						
 						if (localTranslator != null) {
 							Entry e = model.entries().getEntry(as.getName());
 							if (e != null) {
+								int[] revtable=st.getReverseTranslationTable();
 								MemoryFeatureAnnotation mfa = e.getMemoryAnnotation(comparativeAnnotationType);
 								for (Feature f : mfa.get(as.start(), as.end())) {
 
@@ -380,6 +384,11 @@ public class MultipleAlignmentTrack2 extends Track {
 									featureStart = localTranslator.translate(featureStart - as.start());
 									featureEnd = localTranslator.translate(featureEnd - as.start());
 
+									/* Translate back to reference genome space */
+									featureStart=revtable[featureStart];
+									featureEnd=revtable[featureEnd]+1;
+									
+									
 									int featureScreenStart = Convert.translateGenomeToScreen(featureStart + ab.start(),
 											visible, screenWidth);
 									int featureScreenEnd = Convert.translateGenomeToScreen(featureEnd + ab.start(),
@@ -395,7 +404,8 @@ public class MultipleAlignmentTrack2 extends Track {
 									if (featureScreenEnd > blockScreenEnd)
 										featureScreenEnd = blockScreenEnd;
 
-									if (featureScreenEnd > featureScreenStart && featureScreenEnd>=0&&featureScreenStart<=visible.end) {
+									if (featureScreenEnd > featureScreenStart && featureScreenEnd >= 0
+											&& featureScreenStart <= visible.end) {
 										g.fillRect(featureScreenStart, rec.y + (line - 1) * lineHeight + 3,
 												featureScreenEnd - featureScreenStart, lineHeight - 6);
 
