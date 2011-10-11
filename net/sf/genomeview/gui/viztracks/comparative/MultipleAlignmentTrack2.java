@@ -405,7 +405,7 @@ public class MultipleAlignmentTrack2 extends Track {
 										featureScreenEnd = blockScreenEnd;
 
 									if (featureScreenEnd > featureScreenStart && featureScreenEnd >= 0
-											&& featureScreenStart <= visible.end) {
+											&& featureScreenStart <= screenWidth) {
 										g.fillRect(featureScreenStart, rec.y + (line - 1) * lineHeight + 3,
 												featureScreenEnd - featureScreenStart, lineHeight - 6);
 
