@@ -394,7 +394,7 @@ public class MultipleAlignmentTrack2 extends Track {
 									int featureScreenEnd = Convert.translateGenomeToScreen(featureEnd + ab.start(),
 											visible, screenWidth);
 
-									g.setColor(Color.CYAN);
+									
 
 									if (featureScreenStart < blockScreenStart) {
 										featureScreenStart = blockScreenStart;
@@ -406,6 +406,8 @@ public class MultipleAlignmentTrack2 extends Track {
 
 									if (featureScreenEnd > featureScreenStart && featureScreenEnd >= 0
 											&& featureScreenStart <= screenWidth) {
+										Color c=Color.CYAN;
+										g.setColor(new Color(c.getRed(),c.getGreen(),c.getBlue(),80));
 										g.fillRect(featureScreenStart, rec.y + (line - 1) * lineHeight + 3,
 												featureScreenEnd - featureScreenStart, lineHeight - 6);
 
