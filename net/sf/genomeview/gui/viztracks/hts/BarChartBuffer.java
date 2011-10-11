@@ -99,6 +99,7 @@ class BarChartBuffer implements VizBuffer {
 					// float rcov = p.getRCoverage();
 					// int pos=i - visible.start;
 					for (int j = 0; j < p.getValueCount(); j++)
+						if(p.getValue(j)>detailedRects[j][i])
 						detailedRects[j][i] = p.getValue(j);
 					// detailedRects[1][i] = rcov;
 					// covValues[0][i] = fcov;
@@ -258,6 +259,7 @@ class BarChartBuffer implements VizBuffer {
 	private void drawOne(Graphics2D g, double range, int graphLineHeigh, double screenWidth, int yOffset) {
 
 		int lastX = -10;
+		double lastFrac=0;
 		for (int i = 0; detailedRects != null && i < detailedRects[0].length; i++) {
 
 			/* Val is normalized to baseline zero with localMinPile */
@@ -275,18 +277,23 @@ class BarChartBuffer implements VizBuffer {
 			int sLoc = (int) ((i / factor) + visible.start);
 			int eLoc = (int) (((i + 1) / factor) + 1 + visible.start);
 			if (exact) {
+				//System.out.println("Exact!");
 				sLoc = (int) ((i) + visible.start);
 				eLoc = (int) (((i)) + 1 + visible.start);
 			}
 			// System.out.println("LOC: "+sLoc+"\t"+eLoc);
 			int screenX1 = Convert.translateGenomeToScreen(sLoc, visible, screenWidth);
 			int screenX2 = Convert.translateGenomeToScreen(eLoc, visible, screenWidth);
-			// System.out.println("Screen: "+screenX1+"\t"+screenX2+"\t"+frac);
+			if(screenX2==screenX1)
+				screenX2=screenX1+1;
+//			if(frac>0)
+//			System.out.println("Screen: "+screenX1+"\t"+screenX2+"\t"+frac);
 			// System.out.println(frac+"\t"+ffrac+"\t"+rfrac);
-			if (screenX1 > lastX) {
+			if (screenX1 > lastX||frac>lastFrac) {
 				lastX = screenX1;
+				lastFrac=frac;
 				g.setColor(Color.ORANGE);
-				g.fillRect(screenX1, yOffset + 2 * graphLineHeigh - 2 * size, screenX2 - screenX1 + 1, 2 * size);
+				g.fillRect(screenX1, yOffset + 2 * graphLineHeigh - 2 * size, screenX2 - screenX1+1, 2 * size);
 
 			}
 			g.setColor(Color.GRAY);
@@ -320,6 +327,7 @@ class BarChartBuffer implements VizBuffer {
 		Color forwardColor = Configuration.getColor("shortread:forwardColor");
 		Color reverseColor = Configuration.getColor("shortread:reverseColor");
 		int lastX = -10;
+		double lastFrac=0;
 		for (int i = 0; detailedRects != null && i < detailedRects[0].length; i++) {
 			// int snpOffset = yOffset;
 			double fcov = detailedRects[0][i] - localMinPile;
