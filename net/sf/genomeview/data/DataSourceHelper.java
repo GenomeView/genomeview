@@ -81,12 +81,10 @@ public class DataSourceHelper {
 		}
 
 		if (data.isWig()) {
-			int res = JOptionPane
-					.showConfirmDialog(
-							model.getGUIManager().getParent(),
-							"Wig is not a recommended file format for GenomeView\n. " +
-							"Do you want to convert your file to the more efficient TDF format?",
-							"Wiggle format not recommended!", JOptionPane.YES_NO_OPTION);
+			int res = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
+					"Wig is not a recommended file format for GenomeView.\n"
+							+ "Do you want to convert your file to the more efficient TDF format?",
+					"Wiggle format not recommended!", JOptionPane.YES_NO_OPTION);
 			if (res == JOptionPane.YES_OPTION) {
 				convertWig2TDF(model, data);
 				return;
@@ -181,7 +179,7 @@ public class DataSourceHelper {
 
 	}
 
-	private static void convertWig2TDF(Model model, Locator data) {
+	private static void convertWig2TDF(final Model model, final Locator data) {
 		JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
 		chooser.resetChoosableFileFilters();
 
@@ -208,18 +206,27 @@ public class DataSourceHelper {
 		chooser.setMultiSelectionEnabled(false);
 		int returnVal = chooser.showSaveDialog(model.getGUIManager().getParent());
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			File files = chooser.getSelectedFile();
+			final File files = chooser.getSelectedFile();
 			// DataSource[] out = new DataSource[files.length];
-			try {
-				Configuration.set("lastDirectory", files.getParentFile());
-				files=ExtensionManager.extension(files, "tdf");
-				ConvertWig2TDF.convertWig2TDF(data,files );
-				Locator mafdata = new Locator(files.toString());
-				log.info("Load newly create tdf file as: " + mafdata);
-				load(model, mafdata);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+
+			GenomeViewScheduler.submit(new Task() {
+
+				@Override
+				public void run() {
+					try {
+						Configuration.set("lastDirectory", files.getParentFile());
+						File extFile=ExtensionManager.extension(files, "tdf");
+						ConvertWig2TDF.convertWig2TDF(data, extFile);
+						Locator mafdata = new Locator(extFile.toString());
+						log.info("Load newly create tdf file as: " + mafdata);
+						load(model, mafdata);
+					} catch (Exception e) {
+						model.daemonException(e);
+					}
+				}
+
+			});
+
 		}
 
 	}
