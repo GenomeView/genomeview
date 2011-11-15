@@ -219,7 +219,14 @@ public abstract class Track extends Observable {
 	}
 
 	
-	public abstract String displayName();
+	final public String displayName(){
+		String alias=Configuration.get("track:alias:"+dataKey);
+		if(alias!=null)
+			return alias;
+		else
+			return ""+dataKey;
+		
+	}
 
 
 	public DataKey getDataKey() {

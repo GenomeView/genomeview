@@ -141,10 +141,10 @@ public class ShortReadProvider extends AbstractDataProvider<SAMRecord> {
 
 
 
-	@Override
-	public String label() {
-		return source.label();
-	}
+//	@Override
+//	public String label() {
+//		return source.label();
+//	}
 
 
 

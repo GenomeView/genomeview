@@ -143,9 +143,9 @@ public class TDFProvider extends PileProvider {
 
 
 
-	@Override
-	public String label() {
-		return source.label();
-	}
+//	@Override
+//	public String label() {
+//		return source.label();
+//	}
 
 }

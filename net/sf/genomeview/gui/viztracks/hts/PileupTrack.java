@@ -259,11 +259,7 @@ public class PileupTrack extends Track {
 		return out;
 	}
 
-	@Override
-	public String displayName() {
-		return provider.label();
-	}
-
+	
 	public PileupTrackModel getTrackModel() {
 		return ptm;
 		

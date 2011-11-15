@@ -170,10 +170,10 @@ public class WiggleTrack extends Track {
 	// // TODO Auto-generated constructor stub
 	// }
 
-	@Override
-	public String displayName() {
-		return dataKey.toString();
-	}
+//	@Override
+//	public String displayName() {
+//		return dataKey.toString();
+//	}
 
 	// private HashMap<Entry, Graph> graphs = new HashMap<Entry, Graph>();
 	private static final double LOG2 = Math.log(2);

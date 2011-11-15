@@ -560,9 +560,9 @@ public class MultipleAlignmentTrack2 extends Track {
 		return st;
 	}
 
-	@Override
-	public String displayName() {
-		return "Multiple alignment";
-	}
+//	@Override
+//	public String displayName() {
+//		return "Multiple alignment";
+//	}
 
 }

@@ -59,9 +59,5 @@ public class TickmarkTrack extends Track {
 		return 32;
 	}
 
-	@Override
-	public String displayName() {
-		return "Ruler";
-	}
 
 }

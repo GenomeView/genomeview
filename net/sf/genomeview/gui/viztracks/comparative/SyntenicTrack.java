@@ -76,10 +76,10 @@ public class SyntenicTrack extends Track {
 
 	}
 
-	@Override
-	public String displayName() {
-		return "Synteny " + "foo" + " - " + "bar";
-	}
+//	@Override
+//	public String displayName() {
+//		return "Synteny " + "foo" + " - " + "bar";
+//	}
 
 	private HashMap<Rectangle, SyntenicBlock> hitmap = new HashMap<Rectangle, SyntenicBlock>();
 

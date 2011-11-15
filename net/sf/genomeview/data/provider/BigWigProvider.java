@@ -144,10 +144,10 @@ public class BigWigProvider extends PileProvider {
 
 
 
-	@Override
-	public String label() {
-		return source.label();
-	}
+//	@Override
+//	public String label() {
+//		return source.label();
+//	}
 
 
 

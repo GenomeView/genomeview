@@ -519,10 +519,7 @@ public class FeatureTrack extends Track {
 
 	}
 
-	@Override
-	public String displayName() {
-		return "Feature: " + type.toString();
-	}
+	
 
 	@Override
 	public List<JMenuItem> getMenuItems() {

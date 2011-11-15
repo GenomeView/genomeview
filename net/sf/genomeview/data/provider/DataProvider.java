@@ -36,11 +36,5 @@ public interface DataProvider<T> {
 
 	public Iterable<Status> getStatus(int start, int end);
 
-	/**
-	 * Display label used to inform the user what kind of data this is.
-	 * 
-	 * @return
-	 */
-	public String label();
 
 }

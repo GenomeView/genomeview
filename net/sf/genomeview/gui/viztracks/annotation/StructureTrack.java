@@ -981,8 +981,5 @@ public class StructureTrack extends Track {
 		return 8 * lineHeight + tickHeight;
 	}
 
-	@Override
-	public String displayName() {
-		return "Gene structure";
-	}
+	
 }

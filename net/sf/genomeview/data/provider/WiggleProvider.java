@@ -160,10 +160,10 @@ public class WiggleProvider extends PileProvider implements Observer {
 		notifyObservers();
 	}
 
-	@Override
-	public String label() {
-		return source.label();
-	}
+//	@Override
+//	public String label() {
+//		return source.label();
+//	}
 
 	@Override
 	public WindowFunction[] getWindowFunctions() {

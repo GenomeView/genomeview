@@ -111,10 +111,10 @@ public class MultipleAlignmentTrack extends Track {
 
 	}
 
-	@Override
-	public String displayName() {
-		return "MA: " + name;
-	}
+//	@Override
+//	public String displayName() {
+//		return "MA: " + name;
+//	}
 
 	static class Cache {
 		private int cacheStart = -1;

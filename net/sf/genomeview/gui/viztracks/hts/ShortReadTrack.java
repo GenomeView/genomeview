@@ -546,7 +546,7 @@ public class ShortReadTrack extends Track {
 		Track.paintStatus(g, status, originalYOffset, yOffset - originalYOffset, currentVisible, screenWidth);
 
 		/* Draw label */
-		String name = StaticUtils.shortify(super.dataKey.toString());
+		String name = displayName();
 		FontMetrics metrics = g.getFontMetrics();
 		int hgt = metrics.getHeight();
 		int adv = metrics.stringWidth(name);
@@ -846,9 +846,6 @@ public class ShortReadTrack extends Track {
 		int start, len;
 	}
 
-	@Override
-	public String displayName() {
-		return "Short reads: " + super.dataKey;
-	}
+	
 
 }

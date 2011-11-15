@@ -9,12 +9,10 @@ import java.util.Observer;
 import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.viztracks.Track;
-import net.sf.genomeview.gui.viztracks.annotation.FeatureTrack;
-import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
-import net.sf.jannot.Type;
 
 /**
  * Wraps an instance of the Model interface and let it act like a tablemodel.
@@ -30,7 +28,6 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 
 		case 0:
 			return "Annotation visibility";
-
 		case 1:
 			return "Track name";
 		default:
@@ -90,7 +87,11 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 				return Icons.INVISIBLE;
 			}
 		case 1:
-			return track.displayName();
+			String alias=Configuration.get("track:alias:"+track.displayName());
+			if(alias!=null)
+				return alias;
+			else
+				return track.displayName();
 		default:
 			return Icons.DELETE;
 		}
