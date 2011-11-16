@@ -367,4 +367,10 @@ public class Configuration {
 
 		return null;
 	}
+
+	public static void unset(String string) {
+		extraMap.remove(string);
+		localMap.remove(string);
+		
+	}
 }
