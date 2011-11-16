@@ -10,18 +10,15 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.LRUSet;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.data.ReadWorker;
 import net.sf.genomeview.data.Session;
 import net.sf.jannot.exception.ReadFailedException;
-import net.sf.jannot.source.DataSource;
-import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
@@ -88,7 +85,7 @@ class InstructionWorker implements Runnable {
 
 	private static Logger log = Logger.getLogger(InstructionWorker.class.getCanonicalName());
 
-	private static ArrayList<Port> otherPorts = new ArrayList<Port>();
+	private static HashSet<Port> otherPorts = new HashSet<Port>();
 
 	InstructionWorker(Model model, String id, Socket s) {
 		this.model = model;
@@ -123,9 +120,7 @@ class InstructionWorker implements Runnable {
 		if (line.startsWith("GenomeViewJavaScriptHandler-")) {
 			otherPorts.add(new Port(Integer.parseInt(line.split("-")[1])));
 		} else {
-			System.out.println(line);
-
-			while (!line.startsWith("GET")) {
+			while (!line.startsWith("GET")&&it.hasNext()) {
 				// System.out.println("Handler: GET: " + line);
 				line = it.next();
 				// System.out.println(line);
