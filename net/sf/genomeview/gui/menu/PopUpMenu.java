@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -14,6 +16,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.edit.CloneFeatureAction;
 import net.sf.genomeview.gui.menu.edit.CreateNewFeatureAction;
@@ -26,9 +29,13 @@ import net.sf.genomeview.gui.menu.selection.ClearRegionSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ShowSequenceWindowAction;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.Feature;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class PopUpMenu extends JPopupMenu {
-
+	private Logger log = Logger.getLogger(PopUpMenu.class.toString());
 	private static final long serialVersionUID = 2573433669184123608L;
 
 	private int count = 0;
@@ -88,6 +95,30 @@ public class PopUpMenu extends JPopupMenu {
 			if (count > 0)
 				addSeparator();
 
+			JMenuItem alias = new JMenuItem(new AbstractAction("Alias track") {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String in = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+							"What name should this track have?", "Alias", JOptionPane.QUESTION_MESSAGE);
+					if (in != null) {
+						try {
+							if(in.length()==0){
+								Configuration.unset("track:alias:"+t.getDataKey().toString());
+							}else{
+								Configuration.set("track:alias:"+t.getDataKey().toString(),in);
+							}
+							model.refresh();
+						} catch (Exception ex) {
+							log.log(Level.WARNING, "Could not set alias for track "+t +" from " +t.getDataKey()+" to " + in, ex);
+						}
+					}
+
+				}
+
+			});
+			add(alias);
+			
 			JMenuItem clear = new JMenuItem(new AbstractAction("Unload track") {
 
 				@Override
