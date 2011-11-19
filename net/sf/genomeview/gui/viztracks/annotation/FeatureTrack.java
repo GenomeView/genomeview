@@ -42,6 +42,7 @@ import net.sf.genomeview.gui.components.DoubleJSlider;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel.FillMode;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
+import net.sf.genomeview.gui.viztracks.annotation.FeatureTrack.FeatureTrackModel;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
@@ -51,7 +52,10 @@ import be.abeel.util.CountMap;
 
 public class FeatureTrack extends Track {
 
-	class FeatureTrackModel {
+	static class FeatureTrackModel {
+		
+		private Type type;
+		
 		private boolean scoreColorGradient, colorQualifier;
 
 		private double minScore = Double.NEGATIVE_INFINITY;
@@ -122,10 +126,10 @@ public class FeatureTrack extends Track {
 			return ColorGradient.fourColorGradient.getColor(normalizedScore);
 		}
 
-		public FeatureTrackModel(Model model) {
+		public FeatureTrackModel(Model model,Type type) {
 			this.model = model;
+			this.type=type;
 			colorQualifier = Configuration.getBoolean("feature:useColorQualifierTag_" + type);
-
 			scoreColorGradient = Configuration.getBoolean("feature:scoreColorGradient_" + type);
 		}
 
@@ -155,8 +159,7 @@ public class FeatureTrack extends Track {
 
 	}
 
-	/* Type that is represented by this track */
-	private Type type;
+	
 	private CollisionMap hitmap;
 	private FeatureTrackModel ftm;
 
@@ -167,14 +170,14 @@ public class FeatureTrack extends Track {
 	 */
 	public Type getType() {
 
-		return Type.get(type.toString());
+		return ftm.type;
 	}
 
 	public FeatureTrack(Model model, Type key) {
 		super(key, model, true, true);
 		hitmap = new CollisionMap(model);
-		this.type = key;
-		ftm = new FeatureTrackModel(model);
+		ftm = new FeatureTrackModel(model,key);
+		floatingWindow=new FeatureInfoWindow(ftm);
 
 	}
 
@@ -186,7 +189,7 @@ public class FeatureTrack extends Track {
 		Location visible = model.getAnnotationLocationVisible();
 		// List<Feature> types = entry.annotation.getByType(type,);
 		// FeatureAnnotation annot = entry.getAnnotation(type);
-		FeatureAnnotation annot = (FeatureAnnotation) entry.get(type);
+		FeatureAnnotation annot = (FeatureAnnotation) entry.get(ftm.type);
 		if (annot.qualifierKeys().contains("color") || annot.qualifierKeys().contains("colour"))
 			ftm.setColorQualifierEnabled(true);
 		/* If there are proper scores, enable color gradient */
@@ -201,7 +204,7 @@ public class FeatureTrack extends Track {
 		if (estimate > Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
 
 			g.setColor(Color.BLACK);
-			g.drawString(type + ": Too many features to display, zoom in to see features", 10, yOffset + 10);
+			g.drawString(ftm.type + ": Too many features to display, zoom in to see features", 10, yOffset + 10);
 			return 20 + 5;
 		}
 		Iterable<Feature> list = annot.get(visible.start, visible.end);
@@ -348,7 +351,7 @@ public class FeatureTrack extends Track {
 		}
 		if (Configuration.getBoolean("showTrackName")) {
 			g.setColor(Color.black);
-			g.drawString(type.toString(), 10, lineThickness);
+			g.drawString(ftm.type.toString(), 10, lineThickness);
 		}
 		g.translate(0, -yOffset - 2);
 		return (lines + 1) * lineThickness + 4;
@@ -406,15 +409,18 @@ public class FeatureTrack extends Track {
 
 	}
 
-	private FeatureInfoWindow floatingWindow = new FeatureInfoWindow();
+	private FeatureInfoWindow floatingWindow =null;
 
-	private class FeatureInfoWindow extends JWindow {
+	private static class FeatureInfoWindow extends JWindow {
 
 		private static final long serialVersionUID = -7416732151483650659L;
 
 		private JLabel floater = new JLabel();
 
-		public FeatureInfoWindow() {
+		private FeatureTrackModel ftm;
+
+		public FeatureInfoWindow(FeatureTrackModel ftm) {
+			this.ftm=ftm;
 			floater.setBackground(Color.GRAY);
 			floater.setForeground(Color.BLACK);
 			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
@@ -441,7 +447,7 @@ public class FeatureTrack extends Track {
 					int aggregateLenght = agg(f.location());
 					if (aggregateLenght < Configuration.getInt("featuretrack:meanshortread")) {
 						
-						Iterable<ReadGroup> sources = model.getSelectedEntry().shortReads();
+						Iterable<ReadGroup> sources = ftm.model.getSelectedEntry().shortReads();
 
 						CountMap<Integer> cm = new CountMap<Integer>();
 						for (ReadGroup rg : sources) {

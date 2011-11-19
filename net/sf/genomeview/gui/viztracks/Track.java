@@ -36,35 +36,36 @@ public abstract class Track extends Observable {
 	protected DataKey dataKey;
 	protected Entry entry;
 
-	public static void paintStatus(Graphics g,Iterable<Status> status, int y, int returnTrackHeight,Location visible,double screenWidth) {
+	public static void paintStatus(Graphics g, Iterable<Status> status, int y, int returnTrackHeight, Location visible,
+			double screenWidth) {
 		for (Status st : status) {
 			// System.out.println("Not ready "+st.start()+"\t"+st.end());
 			if (!st.isReady()) {
 				int x1 = Convert.translateGenomeToScreen(st.start(), visible, screenWidth);
-				int x2 = Convert.translateGenomeToScreen(st.end()+1, visible, screenWidth);
+				int x2 = Convert.translateGenomeToScreen(st.end() + 1, visible, screenWidth);
 				g.setColor(new Color(0, 255, 0, 100));
 
-				g.fillRect(x1,y, x2 - x1 + 1, returnTrackHeight);
+				g.fillRect(x1, y, x2 - x1 + 1, returnTrackHeight);
 				if (visible.overlaps(st.start(), st.end())) {
 					g.setColor(Color.BLACK);
-					g.drawString("Retrieving data...", 100,y + returnTrackHeight / 2);
+					g.drawString("Retrieving data...", 100, y + returnTrackHeight / 2);
 				}
 
 			}
 		}
-		
+
 	}
-	
+
 	public Track(DataKey key, Model model, boolean visible, boolean collapsible) {
 		this.model = model;
 		this.dataKey = key;
-		log.log(Level.INFO, "Creating track\t"+key+"\t"+visible+"\t"+collapsible);
+		log.log(Level.INFO, "Creating track\t" + key + "\t" + visible + "\t" + collapsible);
 		this.entry = model.getSelectedEntry();
 		this.collapsible = collapsible;
 		this.addObserver(model);
 	}
 
-	//private boolean visible;
+	// private boolean visible;
 	private static final Logger log = Logger.getLogger(Track.class.getCanonicalName());
 
 	/**
@@ -147,16 +148,16 @@ public abstract class Track extends Observable {
 	 * @param g
 	 *            graphics context to paint on
 	 * @param view
-	 * @param tcm 
+	 * @param tcm
 	 * @param model
 	 *            the entry that is currently displayed
 	 * @return the height that was painted
 	 */
 	public int paint(Graphics g, int yOffset, double width, int index, JViewport view, TrackCommunicationModel tcm) {
 
-		int used = paintTrack((Graphics2D) g, yOffset, width, view,tcm);
+		int used = paintTrack((Graphics2D) g, yOffset, width, view, tcm);
 
-		if (index>=0&&!(this instanceof StructureTrack)) {
+		if (index >= 0 && !(this instanceof StructureTrack)) {
 			Rectangle r = new Rectangle(0, yOffset, (int) width + 1, used);
 			g.setColor(background[index % 2]);
 			g.fillRect(r.x, r.y, r.width, r.height);
@@ -178,10 +179,11 @@ public abstract class Track extends Observable {
 	 * @param width
 	 *            the width of the track
 	 * @param view
-	 * @param tcm 
+	 * @param tcm
 	 * @return the height this track uses
 	 */
-	protected abstract int paintTrack(Graphics2D g, int yOffset, double width, JViewport view, TrackCommunicationModel tcm);
+	protected abstract int paintTrack(Graphics2D g, int yOffset, double width, JViewport view,
+			TrackCommunicationModel tcm);
 
 	/* Keeps track of whether a track is collapsible */
 	private boolean collapsible = false;
@@ -213,21 +215,19 @@ public abstract class Track extends Observable {
 	}
 
 	public void setVisible(boolean visible) {
-		Configuration.setVisible(dataKey,visible);
+		Configuration.setVisible(dataKey, visible);
 		setChanged();
 		notifyObservers();
 	}
 
-	
-	final public String displayName(){
-		String alias=Configuration.get("track:alias:"+dataKey);
-		if(alias!=null)
+	final public String displayName() {
+		String alias = Configuration.get("track:alias:" + dataKey);
+		if (alias != null)
 			return alias;
 		else
-			return ""+dataKey;
-		
-	}
+			return "" + dataKey;
 
+	}
 
 	public DataKey getDataKey() {
 		return dataKey;
@@ -235,6 +235,15 @@ public abstract class Track extends Observable {
 
 	public List<JMenuItem> getMenuItems() {
 		return new ArrayList<JMenuItem>();
+	}
+
+	/**
+	 * Performs clean-up of caches and buffers. After this method is called, the
+	 * track is allowed to be in an inconsistent state.
+	 * 
+	 */
+	public void clear() {
+		
 	}
 
 }

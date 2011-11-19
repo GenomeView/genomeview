@@ -46,6 +46,25 @@ public class PileupTrack extends Track {
 	private PileProvider provider;
 
 	// private String label;
+	static class PTMObserver implements Observer {
+
+		private Model model;
+		private PileupTrackModel ptm;
+
+		private PTMObserver(PileupTrackModel ptm,Model model){
+			this.ptm=ptm;
+			this.model=model;
+		}
+		
+		@Override
+		public void update(Observable o, Object arg) {
+			// System.out.println("\tInvalidating track vizbuffers");
+			ptm.lastQuery = null;
+			/* Force repaint */
+			model.refresh();
+
+		}
+	}
 
 	public PileupTrack(DataKey key, PileProvider provider, final Model model) {
 		super(key, model, true, false);
@@ -53,18 +72,7 @@ public class PileupTrack extends Track {
 		ptm = new PileupTrackModel(model);
 		tooltip = new PileupTooltip(ptm);
 		this.provider = provider;
-
-		this.provider.addObserver(new Observer() {
-
-			@Override
-			public void update(Observable o, Object arg) {
-				// System.out.println("\tInvalidating track vizbuffers");
-				ptm.lastQuery = null;
-				/* Force repaint */
-				model.refresh();
-
-			}
-		});
+		this.provider.addObserver(new PTMObserver(ptm, model));
 
 		nf.setMaximumFractionDigits(0);
 
@@ -182,7 +190,6 @@ public class PileupTrack extends Track {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ptm.clearLines();
-			
 
 			}
 
@@ -259,10 +266,9 @@ public class PileupTrack extends Track {
 		return out;
 	}
 
-	
 	public PileupTrackModel getTrackModel() {
 		return ptm;
-		
+
 	}
 
 }

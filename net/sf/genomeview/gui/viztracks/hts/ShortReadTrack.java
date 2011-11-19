@@ -58,7 +58,7 @@ public class ShortReadTrack extends Track {
 	private InsertionTooltip tooltip = new InsertionTooltip();
 	private ReadInfo readinfo = new ReadInfo();
 
-	private class InsertionTooltip extends JWindow {
+	private static class InsertionTooltip extends JWindow {
 
 		private static final long serialVersionUID = -7416732151483650659L;
 
@@ -103,7 +103,7 @@ public class ShortReadTrack extends Track {
 
 	}
 
-	private class ReadInfo extends JWindow {
+	private static class ReadInfo extends JWindow {
 
 		private static final long serialVersionUID = -7416732151483650659L;
 
@@ -846,6 +846,12 @@ public class ShortReadTrack extends Track {
 		int start, len;
 	}
 
+	public void clear(){
+		paintedBlocks.clear();
+		hitMap.clear();	
+		provider=null;
+		
+	}
 	
 
 }
