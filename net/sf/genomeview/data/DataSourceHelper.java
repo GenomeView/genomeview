@@ -5,7 +5,6 @@ package net.sf.genomeview.data;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -19,7 +18,6 @@ import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.components.JOptionPaneX;
-import net.sf.genomeview.gui.components.MemoryWidget;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.mafix.MafixFactory;
 import net.sf.jannot.parser.Parser;
@@ -30,6 +28,7 @@ import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
 import net.sf.samtools.util.SeekableFileStream;
 import net.sf.samtools.util.SeekableStream;
+import be.abeel.gui.MemoryWidget;
 import be.abeel.io.ExtensionManager;
 
 /**
