@@ -163,8 +163,8 @@ public class SaveDialog extends JDialog {
 							if (defaultLocation.startsWith("http://") || defaultLocation.startsWith("https://")) {
 								try {
 									URL url = URIFactory.url(defaultLocation);
-									System.out.println(url.getProtocol() + "://" + url.getHost() + url.getPath());
-									url = URIFactory.url(url.getProtocol() + "://" + url.getHost() + url.getPath());
+									System.out.println(url.getProtocol() + "://" + url.getHost()+":"+url.getPort() + url.getPath());
+									url = URIFactory.url(url.getProtocol() + "://" + url.getHost()+":"+url.getPort() + url.getPath());
 
 									LineIterator it = new LineIterator(tmp);
 									System.out.println("-------");
