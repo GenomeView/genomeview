@@ -152,7 +152,7 @@ public class DataSourceHelper {
 					new BufferedInputStream(asd.getIos(), 512 * 1024)));
 
 		}
-		if (index == null && !data.isTDF() && !data.isBigWig() && data.length() > (0.75 * MemoryWidget.getAvailable())) {
+		if (MemoryWidget.getAvailable()>0&& index == null && !data.isTDF() && !data.isBigWig() && data.length() > (0.75 * MemoryWidget.getAvailable())) {
 			System.out.println("Available mem: " + MemoryWidget.getAvailable());
 			JOptionPane
 					.showMessageDialog(
