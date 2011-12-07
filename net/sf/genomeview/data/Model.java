@@ -350,7 +350,7 @@ public class Model extends Observable implements IModel {
 	}
 
 	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(
-			AminoAcidMapping.STANDARDCODE);
+			AminoAcidMapping.valueOf(Configuration.get("translationTable:default")));
 
 	// private Configuration trackMap;
 
