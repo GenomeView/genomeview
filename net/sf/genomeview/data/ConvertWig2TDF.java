@@ -634,8 +634,8 @@ public class ConvertWig2TDF {
 
 		int position = 0;
 		String chr = null;
-
-		boolean wiggleMode = false;
+		/* Assume Wiggle Mode */
+		boolean wiggleMode = true;
 		// boolean bedGraphMode = false;
 		boolean variableStep = false;
 		// boolean fixedSteps = false;
@@ -734,12 +734,12 @@ public class ConvertWig2TDF {
 		BufferedInputStream bis = new BufferedInputStream(data.stream(), 1024 * 1024);
 		LineIterator it = new LineIterator(bis, true, true);
 		int max = 0;
-		String trackName = null;
+		String trackName = "genome";
 
 		int pos = 0;
 		String chr = null;
-
-		boolean wiggleMode = false;
+		/* Assume wiggleMode */
+		boolean wiggleMode = true;
 		// boolean bedGraphMode = false;
 		boolean variableStep = false;
 		// boolean fixedSteps = false;
