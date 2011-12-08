@@ -160,7 +160,7 @@ public class Configuration {
 				}
 				it.close();
 			} catch (Exception e) {
-				logger.log(Level.SEVERE,"Something went horribly wrong while loading the configuration.",e);
+				logger.log(Level.SEVERE, "Something went horribly wrong while loading the configuration.", e);
 			}
 		}
 
@@ -262,10 +262,13 @@ public class Configuration {
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
 		for (String line : it) {
+
 			try {
-				String key = line.substring(0, line.indexOf('='));
-				String value = line.substring(line.indexOf('=') + 1);
-				extraMap.put(key.trim(), value.trim());
+				if (line.trim().length() > 0) {
+					String key = line.substring(0, line.indexOf('='));
+					String value = line.substring(line.indexOf('=') + 1);
+					extraMap.put(key.trim(), value.trim());
+				}
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, "Failed to parse line: " + line, e);
 			}
@@ -371,6 +374,6 @@ public class Configuration {
 	public static void unset(String string) {
 		extraMap.remove(string);
 		localMap.remove(string);
-		
+
 	}
 }
