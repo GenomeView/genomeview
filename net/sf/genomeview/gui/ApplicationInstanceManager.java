@@ -62,8 +62,8 @@ public class ApplicationInstanceManager {
 									log.info("Shared key matched - new application instance found");
 									String param=in.readLine();
 									log.info("Param line: "+param);
-									String s=param.split("=")[1];
-									System.out.println("Re-initializing with params: "+s);
+									String s=param.split("=",2)[1];
+									log.info("Re-initializing with params: "+s);
 									wm.init(s.substring(1, s.length()-1).split(", "),null);
 								}
 								in.close();
@@ -93,7 +93,9 @@ public class ApplicationInstanceManager {
 				pw.println(SINGLE_INSTANCE_SHARED_KEY);
 				log.info("Writing parameters: "+Arrays.toString(args));
 				pw.println("PARAM="+Arrays.toString(args));
+				pw.println();
 				pw.flush();
+				log.info("Writer error-check: "+pw.checkError());
 				pw.close();
 				clientSocket.close();
 				log.info("Successfully notified first instance.");
