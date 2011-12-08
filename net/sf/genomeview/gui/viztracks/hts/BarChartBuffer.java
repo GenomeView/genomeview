@@ -260,6 +260,12 @@ class BarChartBuffer implements VizBuffer {
 
 		int lastX = -10;
 		double lastFrac=0;
+		if (ptm.isLogscaling()) {
+//			val = log2(val + 1);
+			range=log2(range);
+//			val /= log2(provider.getMaxPile());
+			/* Regular scaling */
+		} 
 		for (int i = 0; detailedRects != null && i < detailedRects[0].length; i++) {
 
 			/* Val is normalized to baseline zero with localMinPile */
@@ -267,6 +273,9 @@ class BarChartBuffer implements VizBuffer {
 			for (int j = 0; j < detailedRects.length; j++)
 				val += detailedRects[j][i] - localMinPile;
 
+			if(ptm.isLogscaling())
+				val=log2(val);
+			
 			if (val > range)
 				val = range;
 
@@ -322,16 +331,30 @@ class BarChartBuffer implements VizBuffer {
 		// g.drawString("0" + "", 10, yOffset - graphLineHeigh + 5);
 		g.drawString(nrReg.format(range + localMinPile), 10, yOffset - 2 * graphLineHeigh + 10);
 	}
-
+	private static final double LOG2 = Math.log(2);
+	private double log2(double d) {
+		return Math.log(d) / LOG2;
+	}
 	private void drawTwo(Graphics g, double range, int graphLineHeigh, double screenWidth, int yOffset) {
 		Color forwardColor = Configuration.getColor("shortread:forwardColor");
 		Color reverseColor = Configuration.getColor("shortread:reverseColor");
 		int lastX = -10;
 		double lastFrac=0;
+		if (ptm.isLogscaling()) {
+//			val = log2(val + 1);
+			range=log2(range);
+//			val /= log2(provider.getMaxPile());
+			/* Regular scaling */
+		} 
 		for (int i = 0; detailedRects != null && i < detailedRects[0].length; i++) {
 			// int snpOffset = yOffset;
 			double fcov = detailedRects[0][i] - localMinPile;
 			double rcov = detailedRects[1][i] - localMinPile;
+			if(ptm.isLogscaling()){
+				fcov=log2(fcov);
+				rcov=log2(rcov);
+			}
+			
 			double coverage = fcov + rcov;
 			/* Max value set, truncate */
 			//
@@ -344,6 +367,9 @@ class BarChartBuffer implements VizBuffer {
 			if (fcov > range)
 				fcov = range;
 
+			
+			
+			
 			// }
 			double frac = coverage / range;
 			int size = (int) (frac * graphLineHeigh);
