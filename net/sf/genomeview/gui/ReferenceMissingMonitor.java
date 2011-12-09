@@ -25,6 +25,7 @@ import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
@@ -183,7 +184,8 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 
 				@Override
 				public void run() {
-					_self.setVisible(true);
+					if(!Configuration.getBoolean("general:ignoreMissingReferences"))
+						_self.setVisible(true);
 
 				}
 			});
