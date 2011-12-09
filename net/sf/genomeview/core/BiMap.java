@@ -49,4 +49,8 @@ public class BiMap<T, X> {
 
 	}
 
+	public boolean containsForward(String key) {
+		return forward.containsKey(key);
+	}
+
 }
