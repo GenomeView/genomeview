@@ -12,13 +12,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
@@ -31,6 +32,11 @@ import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
 
+/**
+ * 
+ * @author Thomas Abeel
+ * 
+ */
 public class NewFeatureFromCoordinatesDialog extends JDialog {
 
 	/**
@@ -38,11 +44,12 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
      */
 	private static final long serialVersionUID = -5266511180264863028L;
 
+	private static Logger log = Logger.getLogger(NewFeatureFromCoordinatesDialog.class.getCanonicalName());
+
 	public NewFeatureFromCoordinatesDialog(final Model model) {
 		super(model.getGUIManager().getParent(), "Create new feature");
 		final NewFeatureFromCoordinatesDialog _self = this;
 		setModal(true);
-		//setAlwaysOnTop(true);
 		Container c = new Container();
 		c.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -69,10 +76,9 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 		gc.gridwidth = 2;
 		c.add(coordinates, gc);
 		gc.gridx += 2;
-		c
-				.add(new HelpButton(
-						this,
-						"Fill in the coordinates of the feature you want to create.<br/><br/>One location is defined as two coordinates with two dots (..) between, multiple locations are separated with a comma (,).<br/><br/>For example: 100..200,300..400 creates a feature with two locations, one from 100 to 200 and the other from 300 to 400."));
+		c.add(new HelpButton(
+				this,
+				"Fill in the coordinates of the feature you want to create.<br/><br/>One location is defined as two coordinates with two dots (..) between, multiple locations are separated with a comma (,).<br/><br/>For example: 100..200,300..400 creates a feature with two locations, one from 100 to 200 and the other from 300 to 400."));
 
 		gc.gridx = 0;
 		gc.gridy++;
@@ -87,40 +93,43 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					SortedSet<Location> loc = parse(coordinates.getText());
-					filterLocation(loc,new Location(1,model.getSelectedEntry().getMaximumLength()));
+					filterLocation(loc, new Location(1, model.getSelectedEntry().getMaximumLength()));
 					Feature f = new Feature();
 					f.setLocation(loc);
 					f.setType(typeCombo.getTerm());
 					f.setStrand(strandSelection.getStrand());
 					// model.getSelectedEntry().annotation.add(f);
-//					MemoryFeatureAnnotation fa = (MemoryFeatureAnnotation) model.getSelectedEntry().get(f.type());
-					MemoryFeatureAnnotation fa =model.getSelectedEntry().getMemoryAnnotation(f.type());
+					// MemoryFeatureAnnotation fa = (MemoryFeatureAnnotation)
+					// model.getSelectedEntry().get(f.type());
+					MemoryFeatureAnnotation fa = model.getSelectedEntry().getMemoryAnnotation(f.type());
 					fa.add(f);
 					// model.setSelectedRegion(null);
 					model.updateTracks();
 					_self.dispose();
 				} catch (Exception ex) {
-					ex.printStackTrace();
-					JOptionPane.showMessageDialog(_self, "Could not create new feature!", "Error!",
-							JOptionPane.WARNING_MESSAGE);
+					JOptionPane
+							.showMessageDialog(
+									_self,
+									"Could not create new feature! \n\nGo with you mouse over the blue question mark icon\nto get instructions.",
+									"Error!", JOptionPane.WARNING_MESSAGE);
 				}
 
 			}
 
 			private void filterLocation(SortedSet<Location> loc, Location range) {
-				Iterator<Location>it=loc.iterator();
-				while(it.hasNext()){
-					Location l=it.next();
-					if(l.end<range.start)
+				Iterator<Location> it = loc.iterator();
+				while (it.hasNext()) {
+					Location l = it.next();
+					if (l.end < range.start)
 						it.remove();
-					else if(l.start<range.start)
+					else if (l.start < range.start)
 						l.setStart(range.start);
-					else if(l.start>range.end)
+					else if (l.start > range.end)
 						it.remove();
-					else if(l.end>range.end)
+					else if (l.end > range.end)
 						l.setEnd(range.end);
 				}
-				
+
 			}
 
 			private SortedSet<Location> parse(String text) {
@@ -128,7 +137,12 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 				String[] arr = text.split(",");
 				for (String l : arr) {
 					String[] a2 = l.trim().split("\\.\\.");
-					out.add(new Location(Integer.parseInt(a2[0].trim()), Integer.parseInt(a2[1].trim())));
+					try {
+						out.add(new Location(Integer.parseInt(a2[0].trim()), Integer.parseInt(a2[1].trim())));
+					} catch (NumberFormatException ne) {
+						log.warning("Error while parsing '" + l + "' in " + Arrays.toString(arr));
+						throw ne;
+					}
 
 				}
 				return out;
@@ -151,7 +165,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 		c.add(cancel, gc);
 		setContentPane(c);
 		pack();
-		StaticUtils.center(model.getGUIManager().getParent(),this);
+		StaticUtils.center(model.getGUIManager().getParent(), this);
 
 	}
 }
