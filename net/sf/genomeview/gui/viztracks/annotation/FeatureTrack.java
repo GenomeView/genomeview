@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -42,14 +41,21 @@ import net.sf.genomeview.gui.components.DoubleJSlider;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel.FillMode;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
-import net.sf.genomeview.gui.viztracks.annotation.FeatureTrack.FeatureTrackModel;
+import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 import net.sf.jannot.Type;
 import net.sf.jannot.shortread.ReadGroup;
 import be.abeel.util.CountMap;
-
+/**
+ * Visualization track for feature tracks.
+ * 
+ * 
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class FeatureTrack extends Track {
 
 	static class FeatureTrackModel {
@@ -200,12 +206,15 @@ public class FeatureTrack extends Track {
 		}
 
 		/* Get feature estimate */
+		boolean manyFeature=false;
 		int estimate = annot.getEstimateCount(visible);
-		if (estimate > Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
+		if (estimate > 25*Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
 
 			g.setColor(Color.BLACK);
 			g.drawString(ftm.type + ": Too many features to display, zoom in to see features", 10, yOffset + 10);
 			return 20 + 5;
+		}else if(estimate > Configuration.getInt("annotationview:maximumNoVisibleFeatures")){
+			manyFeature=true;
 		}
 		Iterable<Feature> list = annot.get(visible.start, visible.end);
 		g.translate(0, yOffset + 2);
@@ -251,12 +260,12 @@ public class FeatureTrack extends Track {
 				int closenessOverlap = Configuration.getInt("closenessOverlap");
 				Rectangle r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness, maxX - x1 + 2
 						* closenessOverlap, lineThickness);
-				// only when the blocks should be tiled, do we need to
-				// determine an empty place.
-				if (!collision)
-					collision = fullBlockMap.collision(r);
-				if (!isCollapsed()) {
-
+				
+				if (!isCollapsed()&&!manyFeature) {
+					// only when the blocks should be tiled, do we need to
+					// determine an empty place.
+					if (!collision)
+						collision = fullBlockMap.collision(r);
 					while (fullBlockMap.collision(r)) {
 						thisLine++;
 
