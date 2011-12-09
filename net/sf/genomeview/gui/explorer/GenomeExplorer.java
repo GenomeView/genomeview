@@ -6,10 +6,14 @@ package net.sf.genomeview.gui.explorer;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,12 +68,21 @@ class GenomeExplorer extends JDialog {
 				true);
 		for (String line : it)
 			try {
-				parse(list,new URL(line).openStream());
+				parse(list, new URL(line).openStream());
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Could not load instances from " + line, e);
 			}
 		it.close();
 		parse(list, GenomeExplorer.class.getResourceAsStream("/conf/plazainstances.txt"));
+
+		String externalRepo = Configuration.get("external:repository");
+		if (externalRepo != null) {
+			try {
+				parse(list, new URL(externalRepo).openStream());
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Something went wrong while loading the external repository: " + externalRepo, e);
+			}
+		}
 
 		System.out.println("instances: " + list);
 
@@ -92,13 +105,10 @@ class GenomeExplorer extends JDialog {
 						model,
 						"<html>Welcome to the GenomeView plant genomes section. This is your portal to the GenomeView plant genomes.<br><br>These genomes are made available in collaboration with the <a href='http://bioinformatics.psb.ugent.be/plaza/'>PLAZA platform</a> (<a href='http://bioinformatics.psb.ugent.be/plaza/credits/credits'>credits</a>)."
 								+ common, list.get("plant")));
-		
-		tabs.addTab(
-				"Fungal genomes",
-				new GenomesPanel(
-						model,
-						"<html>Welcome to the GenomeView fungal genomes section. This is your portal to the GenomeView fungal genomes."
-								+ common, list.get("fungi")));
+
+		tabs.addTab("Fungal genomes", new GenomesPanel(model,
+				"<html>Welcome to the GenomeView fungal genomes section. This is your portal to the GenomeView fungal genomes."
+						+ common, list.get("fungi")));
 
 		tabs.addTab("Insect genomes", new GenomesPanel(model,
 				"<html>Welcome to the GenomeView insect genomes section. This is your portal to the GenomeView animal genomes."
@@ -114,6 +124,21 @@ class GenomeExplorer extends JDialog {
 						model,
 						"<html>Welcome to the GenomeView archived genomes section. This section contains all previous releases of genomes in the main sections that have been archived."
 								+ common, list.get("archived")));
+
+		if (externalRepo != null) {
+			try {
+				Set<String> set = Configuration.getStringSet("external:repository:labels");
+				for (String s : set) {
+					String[] arr = s.split(":");
+					tabs.addTab(arr[1], new GenomesPanel(model, "<html>" + common, list.get(arr[0])));
+				}
+				tabs.setSelectedIndex(tabs.getTabCount()-1);
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "Something went wrong while loading the external repository: " + externalRepo, e);
+
+			}
+		}
+		
 
 		Border emptyBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 		Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
@@ -150,6 +175,13 @@ class GenomeExplorer extends JDialog {
 
 	private Icon instanceImage(String path) {
 		URL url = Genome.class.getResource("/images/instances/" + path);
+		if(path.startsWith("http"))
+			try {
+				url=new URL(path);
+			} catch (MalformedURLException e) {
+				log.log(Level.SEVERE,"Failed to load instance image",e);
+			}
+		
 		if (url == null)
 			url = Genome.class.getResource("/images/instances/nopicture.png");
 		return new ImageIcon(url);
