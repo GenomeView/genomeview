@@ -128,7 +128,7 @@ class GenomeExplorer extends JDialog {
 				for (String s : set) {
 					String[] arr = s.split(":");
 					String description = Configuration.get("external:repository:description:"+arr[0]);
-					tabs.addTab(arr[1], new GenomesPanel(model, "<html>"+(description==null?common:description), list.get(arr[0])));
+					tabs.addTab(arr[1], new GenomesPanel(model, "<html>"+(description==null?common:description+"</html>"), list.get(arr[0])));
 				}
 				tabs.setSelectedIndex(tabs.getTabCount()-1);
 			} catch (Exception e) {
