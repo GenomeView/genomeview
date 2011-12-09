@@ -69,6 +69,10 @@ public class PopUpMenu extends JPopupMenu {
 			for (String q : f.qualifier("url").split(",")) {
 				String name = q.split(":")[0];
 				String url = q.substring(q.indexOf(':') + 1);
+				if(name.startsWith("http")){
+					url=q;
+					name="Web query";
+				}
 				actions.add(new OpenURLAction(name, url));
 			}
 		}
