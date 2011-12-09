@@ -6,10 +6,8 @@ package net.sf.genomeview.gui.explorer;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,8 +26,6 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
-import net.sf.genomeview.gui.components.ConnectionMonitor;
-import net.sf.jannot.source.Locator;
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
 
@@ -76,7 +72,7 @@ class GenomeExplorer extends JDialog {
 		parse(list, GenomeExplorer.class.getResourceAsStream("/conf/plazainstances.txt"));
 
 		String externalRepo = Configuration.get("external:repository");
-		if (externalRepo != null) {
+		if (!externalRepo.equalsIgnoreCase("null")) {
 			try {
 				parse(list, new URL(externalRepo).openStream());
 			} catch (Exception e) {
@@ -125,7 +121,7 @@ class GenomeExplorer extends JDialog {
 						"<html>Welcome to the GenomeView archived genomes section. This section contains all previous releases of genomes in the main sections that have been archived."
 								+ common, list.get("archived")));
 
-		if (externalRepo != null) {
+		if (!externalRepo.equalsIgnoreCase("null")) {
 			try {
 				Set<String> set = Configuration.getStringSet("external:repository:labels");
 				for (String s : set) {
