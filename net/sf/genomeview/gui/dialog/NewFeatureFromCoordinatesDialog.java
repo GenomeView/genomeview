@@ -110,7 +110,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 					JOptionPane
 							.showMessageDialog(
 									_self,
-									"Could not create new feature! \n\nGo with you mouse over the blue question mark icon\nto get instructions.",
+									"Could not create new feature! \n\nGo with you mouse over the blue question mark\n in the previous dialog.\nThat will give you detailed instructions.",
 									"Error!", JOptionPane.WARNING_MESSAGE);
 				}
 
