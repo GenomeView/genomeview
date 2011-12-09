@@ -527,9 +527,9 @@ public class MultipleAlignmentTrack2 extends Track {
 				}
 
 				g.setColor(new Color(192, 192, 192, 175));
-				g.fillRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth, shown.size() * lineHeight);
+				g.fillRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth, ordering.size() * lineHeight);
 				g.setColor(Color.DARK_GRAY);
-				g.drawRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth, shown.size() * lineHeight);
+				g.drawRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth, ordering.size() * lineHeight);
 				g.setColor(Color.black);
 				int index = 0;
 				for (int i = 0; i < arr.length; i++) {
