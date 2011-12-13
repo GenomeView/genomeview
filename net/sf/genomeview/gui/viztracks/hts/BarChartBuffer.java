@@ -339,7 +339,7 @@ class BarChartBuffer implements VizBuffer {
 		Color forwardColor = Configuration.getColor("shortread:forwardColor");
 		Color reverseColor = Configuration.getColor("shortread:reverseColor");
 		int lastX = -10;
-		double lastFrac=0;
+		
 		if (ptm.isLogscaling()) {
 //			val = log2(val + 1);
 			range=log2(range);
@@ -351,7 +351,9 @@ class BarChartBuffer implements VizBuffer {
 			double fcov = detailedRects[0][i] - localMinPile;
 			double rcov = detailedRects[1][i] - localMinPile;
 			if(ptm.isLogscaling()){
+				if(fcov>0)
 				fcov=log2(fcov);
+				if(rcov>0)
 				rcov=log2(rcov);
 			}
 			
