@@ -443,9 +443,10 @@ class BarChartBuffer implements VizBuffer {
 	@Override
 	public String getTooltip(int mouseX) {
 		double factor = MAX_WIDTH / visible.length();
-
-		nf.setMaximumFractionDigits(1);
-		nrReg.setMaximumFractionDigits(1);
+		nf.setMinimumFractionDigits(0);
+		nf.setMaximumFractionDigits(3);
+		nrReg.setMinimumFractionDigits(0);
+		nrReg.setMaximumFractionDigits(3);
 		StringBuffer text = new StringBuffer();
 
 		text.append("<html>");
