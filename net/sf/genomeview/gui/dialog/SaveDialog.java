@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -32,6 +34,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.ClientHttpUpload;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Type;
 import net.sf.jannot.exception.SaveFailedException;
@@ -49,6 +52,8 @@ import be.abeel.net.URIFactory;
  */
 public class SaveDialog extends JDialog {
 
+	private static final Logger log=Logger.getLogger(SaveDialog.class.getCanonicalName());
+	
 	private static final long serialVersionUID = -5209291628487502687L;
 
 	private class DataSourceCheckbox extends JCheckBox {
@@ -166,22 +171,21 @@ public class SaveDialog extends JDialog {
 									System.out.println(url.getProtocol() + "://" + url.getHost()+":"+url.getPort() + url.getPath());
 									url = URIFactory.url(url.getProtocol() + "://" + url.getHost()+":"+url.getPort() + url.getPath());
 
-									LineIterator it = new LineIterator(tmp);
-									System.out.println("-------");
-									System.out.println("Uploaded file:");
-									for (String line : it)
-										System.out.println(line);
-									System.out.println("---EOF---");
-									it.close();
+//									LineIterator it = new LineIterator(tmp);
+//									System.out.println("-------");
+//									System.out.println("Uploaded file:");
+//									for (String line : it)
+//										System.out.println(line);
+//									System.out.println("---EOF---");
+//									it.close();
+									log.info("File size and location: "+tmp.length()+"\t"+tmp.getCanonicalPath());
 
 									String reply = ClientHttpUpload.upload(tmp, url);
-									System.out.println("SERVER REPLY: " + reply);
+									log.info("SERVER REPLY: " + reply);
 									// TODO add more checks on the reply.
 									h.dispose();
 									if (reply.equals("")) {
-
 										throw new SaveFailedException("Empty reply from server");
-
 									}
 
 									if (reply.toLowerCase().contains("error")) {
@@ -223,12 +227,13 @@ public class SaveDialog extends JDialog {
 
 					private void showServerMessage(String reply) {
 						final JDialog diag = new JDialog(model.getGUIManager().getParent());
-						JTextArea txt = new JTextArea(10, 20);
+						JEditorPaneLabel txt = new JEditorPaneLabel();
 						txt.setEditable(false);
 						txt.setText(reply);
+						txt.setPreferredSize(new Dimension(300, 200));
 						diag.setTitle("Server reply");
 						diag.getContentPane().setLayout(new BorderLayout());
-						diag.getContentPane().add(txt, BorderLayout.CENTER);
+						diag.getContentPane().add(new JScrollPane(txt), BorderLayout.CENTER);
 						diag.getContentPane().add(new JButton(new AbstractAction("OK") {
 
 							@Override
