@@ -89,10 +89,12 @@ public class ConvertWig2TDF {
 			WindowFunction.max);// ,
 	// WindowFunction.median,
 	// WindowFunction.min, WindowFunction.max);
-	private String genomeID;
+	private String trackName;
+	private int noDataColumns;
 
-	private ConvertWig2TDF(String gID, File output) {
-		this.genomeID = gID;
+	private ConvertWig2TDF(String gID, File output, int noDataColumns) {
+		this.noDataColumns = noDataColumns;
+		this.trackName = gID;
 		this.outputFile = output;
 		// this.genome = genome;
 		allDataStats = new Accumulator(windowFunctions);
@@ -110,11 +112,11 @@ public class ConvertWig2TDF {
 	private void setTrackParameters(String trackType, String trackLine, String[] trackNames) {
 
 		if (outputFile != null && writer == null) {
-			writer = new TDFWriter(outputFile, genomeID, trackType, trackLine, trackNames, windowFunctions, compressed);
+			writer = new TDFWriter(outputFile, trackName, trackType, trackLine, trackNames, windowFunctions, compressed);
 			nTracks = trackNames.length;
 
 			TDFGroup rootGroup = writer.getRootGroup();
-			rootGroup.setAttribute("genome", genomeID);
+			rootGroup.setAttribute("genome", trackName);
 			rootGroup.setAttribute("maxZoom", String.valueOf(nZoom));
 
 		}
@@ -254,7 +256,7 @@ public class ConvertWig2TDF {
 
 		if (rawData == null) {
 			// TODO -- delete .tdf file?
-			out.println("No features were found that matched chromosomes in genome: " + genomeID);
+			out.println("No features were found that matched chromosomes in genome: " + trackName);
 
 		} else {
 			rawData.close();
@@ -282,7 +284,7 @@ public class ConvertWig2TDF {
 		IntArrayList startArray;
 		IntArrayList endArray;
 		ArrayList<String> nameList;
-		FloatArrayList[] dataArray;
+		FloatArrayList[] dataArray = null;
 
 		RawTile(String dsName, int tileNumber, int start, int end) {
 			this.dsName = dsName;
@@ -291,13 +293,21 @@ public class ConvertWig2TDF {
 			this.tileEnd = end;
 			startArray = new IntArrayList();
 			endArray = new IntArrayList();
-			dataArray = new FloatArrayList[nTracks];
-			for (int i = 0; i < nTracks; i++) {
-				dataArray[i] = new FloatArrayList();
+
+		}
+
+		private void initDataArray(int trackCount) {
+			if (dataArray == null) {
+				dataArray = new FloatArrayList[trackCount];
+				for (int i = 0; i < trackCount; i++) {
+					dataArray[i] = new FloatArrayList();
+				}
 			}
 		}
 
 		void addData(int start, int end, float[] data, String name) {
+
+			initDataArray(data.length);
 
 			if (start > tileEnd) {
 				log.info("Warning: start position > tile end");
@@ -333,8 +343,13 @@ public class ConvertWig2TDF {
 					for (int i = 0; i < dataArray.length; i++) {
 						d[i] = dataArray[i].toArray();
 					}
-
+					if (nameList != null) {
+						while (nameList.size() < dataArray.length) {
+							nameList.add("anonymous");
+						}
+					}
 					String[] n = nameList == null ? null : nameList.toArray(new String[] {});
+
 					TDFBedTile tile = new TDFBedTile(tileStart, s, e, d, n);
 					writer.writeTile(dsName, tileNumber, tile);
 					startArray.clear();
@@ -601,7 +616,18 @@ public class ConvertWig2TDF {
 	private void count(int maxZoomValue, Locator data) throws IOException, URISyntaxException {
 		// setNZoom(maxZoomValue);
 		nZoom = maxZoomValue;
-		setTrackParameters(genomeID, genomeID, new String[] { "value" });
+		String[] labels = trackName.split(",");
+		if (labels.length < noDataColumns) {
+			String[] oldLabels = labels;
+			labels = new String[noDataColumns];
+			for (int i = 0; i < labels.length; i++) {
+				if (i < oldLabels.length)
+					labels[i] = oldLabels[i];
+				else
+					labels[i] = "noLabel";
+			}
+		}
+		setTrackParameters(trackName, trackName, labels);
 		// this.setSkipZeroes(true);
 
 		// int len = dnaproperty.length();
@@ -629,8 +655,8 @@ public class ConvertWig2TDF {
 
 		BufferedInputStream bis = new BufferedInputStream(data.stream(), 1024 * 1024);
 		LineIterator it = new LineIterator(bis, true, true);
-//		int max = 0;
-//		String trackName = null;
+		// int max = 0;
+		// String trackName = null;
 
 		int position = 0;
 		String chr = null;
@@ -646,10 +672,10 @@ public class ConvertWig2TDF {
 
 		for (String line : it) {
 			String[] arr = line.trim().split("\\s+");
-			if(line.startsWith("browser")){
+			if (line.startsWith("browser")) {
 				continue;
-			}else if (line.startsWith("track")) {
-//				trackName = get("name", arr);
+			} else if (line.startsWith("track")) {
+				// trackName = get("name", arr);
 
 				if (line.contains("wiggle_0")) {
 					wiggleMode = true;
@@ -671,60 +697,71 @@ public class ConvertWig2TDF {
 				chr = get("chrom", arr);
 
 			} else {
-
-				if (wiggleMode) {
-					if (variableStep) {
-						//String[] arr = line.split("\\s+");
-						position = Integer.parseInt(arr[0]);
-						double d = Double.parseDouble(arr[1]);
-						addData(chr, position, position+span-1, new float[] { (float) d }, null);
+				try {
+					if (wiggleMode) {
+						if (variableStep) {
+							// String[] arr = line.split("\\s+");
+							position = Integer.parseInt(arr[0]);
+							float[] d = parseValues(1, arr);
+							addData(chr, position, position + span - 1, d, null);
+						} else {
+							float[] d = parseValues(0, arr);
+							addData(chr, position, position + span - 1, d, null);
+							position += stepSize;
+						}
 					} else {
-						double d = Double.parseDouble(arr[0]);
-						addData(chr, position, position+span-1, new float[] { (float) d }, null);
-						position+=stepSize;
+						position = Integer.parseInt(arr[1]);
+						int endpos = Integer.parseInt(arr[2]);
+						float[] d = parseValues(3, arr);
+						addData(arr[0], position, endpos, d, null);
 					}
-				} else {
-					position = Integer.parseInt(arr[1]);
-					int endpos = Integer.parseInt(arr[2]);
-					double d = Double.parseDouble(arr[3]);
-					addData(arr[0], position, endpos, new float[] { (float) d }, null);
+				} catch (Exception e) {
+					log.log(Level.SEVERE, "Couldn't parse line: " + line + " -> " + Arrays.toString(arr), e);
 				}
-
-//				if (wiggleMode) {
-//					if (variableStep) {
-//						try {
-//							pos = Integer.parseInt(arr[0]);
-//							if (pos > max)
-//								max = pos;
-//						} catch (NumberFormatException e) {
-//							System.err.println("boom!");
-//							// Seems we couldn't parse the number after all.
-//						}
-//					} else {
-//						pos += stepSize;
-//						if (pos > max)
-//							max = pos;
-//
-//					}
-//				} else {
-//					try {
-//						if (!arr[0].equals(chr) && chr != null) {
-//							mapLength.put(chr, pos);
-//							System.out.println("putting: " + chr + "\t" + pos);
-//						}
-//						pos = Integer.parseInt(arr[2]);
-//						chr = arr[0];
-//						if (pos > max)
-//							max = pos;
-//					} catch (NumberFormatException e) {
-//						System.err.println("boom!");
-//						// Seems we couldn't parse the number after all.
-//					}
-//				}
+				// if (wiggleMode) {
+				// if (variableStep) {
+				// try {
+				// pos = Integer.parseInt(arr[0]);
+				// if (pos > max)
+				// max = pos;
+				// } catch (NumberFormatException e) {
+				// System.err.println("boom!");
+				// // Seems we couldn't parse the number after all.
+				// }
+				// } else {
+				// pos += stepSize;
+				// if (pos > max)
+				// max = pos;
+				//
+				// }
+				// } else {
+				// try {
+				// if (!arr[0].equals(chr) && chr != null) {
+				// mapLength.put(chr, pos);
+				// System.out.println("putting: " + chr + "\t" + pos);
+				// }
+				// pos = Integer.parseInt(arr[2]);
+				// chr = arr[0];
+				// if (pos > max)
+				// max = pos;
+				// } catch (NumberFormatException e) {
+				// System.err.println("boom!");
+				// // Seems we couldn't parse the number after all.
+				// }
+				// }
 			}
 
 		}
 
+	}
+
+	private float[] parseValues(int startIndex, String[] arr) {
+		float[] out = new float[arr.length - startIndex];
+		for (int i = startIndex; i < arr.length; i++) {
+			out[i - startIndex] = Float.parseFloat(arr[i]);
+		}
+		// System.out.println("Parsing number of values="+out.length);
+		return out;
 	}
 
 	private static HashMap<String, Integer> mapLength = new HashMap<String, Integer>();
@@ -748,11 +785,12 @@ public class ConvertWig2TDF {
 
 		int span = 1;
 
+		int maxColumns = 0;
 		for (String line : it) {
 			String[] arr = line.trim().split("\\s+");
-			if(line.startsWith("browser")){
+			if (line.startsWith("browser")) {
 				continue;
-			}else if (line.startsWith("track")) {
+			} else if (line.startsWith("track")) {
 				trackName = get("name", arr);
 
 				if (line.contains("wiggle_0")) {
@@ -785,6 +823,9 @@ public class ConvertWig2TDF {
 				chr = get("chrom", arr);
 
 			} else {
+				if (arr.length > maxColumns) {
+					maxColumns = arr.length;
+				}
 				if (wiggleMode) {
 					if (variableStep) {
 						try {
@@ -792,8 +833,8 @@ public class ConvertWig2TDF {
 							if (pos > max)
 								max = pos;
 						} catch (NumberFormatException e) {
-							System.err.println("boom NFE: "+line);
-							
+							System.err.println("boom NFE: " + line);
+
 							// Seems we couldn't parse the number after all.
 						}
 					} else {
@@ -813,7 +854,7 @@ public class ConvertWig2TDF {
 						if (pos > max)
 							max = pos;
 					} catch (NumberFormatException e) {
-						System.err.println("boom NFE: "+line);
+						System.err.println("boom NFE: " + line);
 						// Seems we couldn't parse the number after all.
 					}
 				}
@@ -829,8 +870,14 @@ public class ConvertWig2TDF {
 			zoom++;
 		}
 		System.out.println("Zoom levels needed: " + zoom);
-
-		ConvertWig2TDF cv = new ConvertWig2TDF(trackName, output);
+		if (wiggleMode && variableStep) {
+			maxColumns -= 1;
+		} else if (wiggleMode && !variableStep) {
+			// Do nothing, they are all data columns
+		} else if (!wiggleMode) {
+			maxColumns -= 3;
+		}
+		ConvertWig2TDF cv = new ConvertWig2TDF(trackName, output, maxColumns);
 		cv.count(zoom, data);
 		cv.finish();
 
