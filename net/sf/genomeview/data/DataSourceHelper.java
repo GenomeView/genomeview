@@ -46,6 +46,13 @@ public class DataSourceHelper {
 
 	public static void load(final Model model, Locator data, boolean wait) throws URISyntaxException, IOException,
 			ReadFailedException {
+		
+		/* Check whether data locator is session, if so, load as session and skip the rest */
+		if(data.getName().endsWith(".gvs")){
+			Session.loadSession(model, data.toString());
+			return;
+		}
+		
 		Locator index = null;
 
 		data.stripIndex();
