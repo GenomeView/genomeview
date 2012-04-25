@@ -18,9 +18,7 @@ import be.abeel.gui.GridBagPanel;
 public class StatusBar extends GridBagPanel implements Observer {
 
 	private static final long serialVersionUID = -4850784549623078528L;
-	private MouseModel mouse;
-	private SelectionModel select;
-	private String message = new String("status");
+//	private String message = new String("status");
 	private Model model;
 
 	private JLabel messages=new JLabel();
@@ -29,33 +27,19 @@ public class StatusBar extends GridBagPanel implements Observer {
 		gc.weightx=1;
 		gc.weighty=1;
 		this.add(messages,gc);
-		this.mouse = model.mouseModel();
 		this.model=model;
-		this.select = model.selectionModel();
+		model.addObserver(this);
+		model.mouseModel().addObserver(this);
 		model.getGUIManager().registerStatusBar(this);
-		messages.setText(message);
-		this.mouse.addObserver(this);
+//		messages.setText(message);
+		
+
 	}
 
+	
 	@Override
 	public void update(Observable o, Object arg) {
-		StringBuffer msg=new StringBuffer();
-		Location viz=model.getAnnotationLocationVisible();
-		msg.append("Visible: "+viz.start+":"+viz.end+" ");
-		
-		int currentCoord = mouse.getCurrentCoord();
-		if (currentCoord == -1) {
-			msg.append("mouse: -- ");
-		} else {
-			msg.append("mouse: " + currentCoord+" ");
-		}
-
-		if (select.getNumberOfSelectedNucs() != 0) {
-			msg.append("Selected: ");
-			msg.append(select.getNumberOfSelectedNucs() + " nt / " + select.getNumberOfSelectedProts() + " aa ");
-		}
-
-		messages.setText(msg.toString());
+		messages.setText(model.messageModel().getStatusBarMessage());
 	}
 
 }

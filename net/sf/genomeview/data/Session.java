@@ -60,8 +60,9 @@ public class Session {
 	private static Logger log = Logger.getLogger(Session.class.getCanonicalName());
 
 	private static void loadSession(final Model model, final InputStream is) {
-		final Hider hid = new Hider(model, "Preparing to load session", Configuration.green, (int) (model
-				.getGUIManager().getParent().getWidth() * 0.8), 150);
+		model.messageModel().setStatusBarMessage("Preparing to load session, retrieving session file.");
+//		final Hider hid = new Hider(model, "Preparing to load session", Configuration.green, (int) (model
+//				.getGUIManager().getParent().getWidth() * 0.8), 150);
 
 		new Thread(new Runnable() {
 
@@ -80,7 +81,8 @@ public class Session {
 						for (String line : it) {
 							char c = line.charAt(0);
 							line = line.substring(2);
-							hid.setText("<html><h1>Loading session</h1>Current file: " + line + "...</html>");
+//							hid.setText("<html><h1>Loading session</h1>Current file: " + line + "...</html>");
+							model.messageModel().setStatusBarMessage("Loading session, current file: " + line+"...");
 							//DataSource ds = null;
 							switch (c) {
 							case 'U':
@@ -108,7 +110,8 @@ public class Session {
 					CrashHandler.crash(Level.SEVERE, "Could not load session", ex);
 				}
 				it.close();
-				hid.dispose();
+				model.messageModel().setStatusBarMessage(null);
+//				hid.dispose();
 
 			}
 		}).start();

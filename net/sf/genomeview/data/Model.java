@@ -52,7 +52,12 @@ public class Model extends Observable implements IModel {
 
 	private SelectionModel selectionModel = new SelectionModel();
 	private MouseModel mouseModel = new MouseModel();
+	private MessageModel messageModel = new MessageModel(this);
 
+	public MessageModel messageModel(){
+		return messageModel;
+	}
+	
 	public MouseModel mouseModel() {
 		return mouseModel;
 	}
@@ -73,6 +78,7 @@ public class Model extends Observable implements IModel {
 		GenomeViewScheduler.start(this);
 
 		selectionModel.addObserver(this);
+		messageModel.addObserver(this);
 		this.trackList = new TrackList(this);
 		// entries.addObserver(this);
 
