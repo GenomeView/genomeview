@@ -51,7 +51,7 @@ public class DataSourceHelper {
 		data.stripIndex();
 
 		if (!data.exists()) {
-			JOptionPane.showMessageDialog(null, "Data file is missing " + data + "\nSkipping this file...",
+			JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Data file is missing " + data + "\nSkipping this file...",
 					"Data missing", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -97,10 +97,11 @@ public class DataSourceHelper {
 								+ "\nDo you want to create the index?", "Index missing", JOptionPane.YES_NO_OPTION);
 				if (res == JOptionPane.YES_OPTION) {
 					index(model, data);
+					return;
 				}
-				return;
 
-			} else {
+			} 
+			
 				if (data.isMaf() && !data.isBlockCompressed()) {
 					int res = JOptionPane
 							.showConfirmDialog(
@@ -127,7 +128,7 @@ public class DataSourceHelper {
 					}
 				}
 
-			}
+			
 
 		} else if (index == null && data.length() > 50000000 && !(data.isTDF() || data.isBigWig())) {
 			JOptionPane
