@@ -81,20 +81,6 @@ public class StructureTrackModel extends TrackConfig {
 		return out;
 	}
 
-	// @Override
-	// public List<JMenuItem> getMenuItems() {
-	// ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
-	// JMenuItem item = new JMenuItem();
-	// item.setAction(new AbstractAction("Configure visible types") {
-	//
-	// @Override
-	// public void actionPerformed(ActionEvent e) {
-	// StructureTrackConfig.display(model, stm);
-	//
-	// }
-	// });
-	// out.add(item);
-	// return out;
-	// }
+	
 
 }
