@@ -22,9 +22,9 @@ class PileupTooltip extends JWindow {
 
 	private JLabel floater = new JLabel();
 
-	private PileupTrackModel track;
+	private PileupTrackConfig track;
 
-	public PileupTooltip(PileupTrackModel ptm) {
+	public PileupTooltip(PileupTrackConfig ptm) {
 		this.track = ptm;
 
 		floater.setBackground(Color.GRAY);

@@ -43,15 +43,16 @@ import org.broad.igv.track.WindowFunction;
 public class PileupTrack extends Track {
 
 	private NumberFormat nf = NumberFormat.getInstance(Locale.US);
-	private PileProvider provider;
 
+	private PileProvider provider;
+	
 	// private String label;
 	static class PTMObserver implements Observer {
 
 		private Model model;
-		private PileupTrackModel ptm;
+		private PileupTrackConfig ptm;
 
-		private PTMObserver(PileupTrackModel ptm,Model model){
+		private PTMObserver(PileupTrackConfig ptm,Model model){
 			this.ptm=ptm;
 			this.model=model;
 		}
@@ -67,18 +68,16 @@ public class PileupTrack extends Track {
 	}
 
 	public PileupTrack(DataKey key, PileProvider provider, final Model model) {
-		super(key, model, true, false);
-
-		ptm = new PileupTrackModel(model);
+		super(key, model, true, false,new PileupTrackConfig(model,key,provider));
+		ptm = (PileupTrackConfig)config;
 		tooltip = new PileupTooltip(ptm);
-		this.provider = provider;
-		this.provider.addObserver(new PTMObserver(ptm, model));
-
+		this.provider=provider;
+		provider.addObserver(new PTMObserver(ptm, model));
 		nf.setMaximumFractionDigits(0);
 
 	}
 
-	private PileupTrackModel ptm;
+	private PileupTrackConfig ptm;
 
 	private PileupTooltip tooltip;
 
@@ -133,140 +132,9 @@ public class PileupTrack extends Track {
 
 	}
 
-	/* User settable maximum value for charts, use negative for unlimited */
+	
 
-	@Override
-	public List<JMenuItem> getMenuItems() {
-		ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
-
-		/* Use global settings */
-		final JCheckBoxMenuItem itemCrossTrack = new JCheckBoxMenuItem();
-		itemCrossTrack.setSelected(ptm.isCrossTrackScaling());
-		itemCrossTrack.setAction(new AbstractAction("Scale across tracks") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ptm.setCrossTrackScaling(itemCrossTrack.isSelected());
-
-			}
-
-		});
-		out.add(itemCrossTrack);
-
-		/* Use global settings */
-		final JCheckBoxMenuItem itemGlobal = new JCheckBoxMenuItem();
-		itemGlobal.setSelected(ptm.isGlobalSettings());
-		itemGlobal.setAction(new AbstractAction("Track uses defaults") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ptm.setGlobalSettings(itemGlobal.isSelected());
-			}
-
-		});
-		out.add(itemGlobal);
-
-		out.add(null);
-		JMenuItem item = new JMenuItem(new AbstractAction("Add threshold line") {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String in = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-						"Input the height of the new threshold line", "Input value", JOptionPane.QUESTION_MESSAGE);
-				if (in != null) {
-					try {
-						Double d = Double.parseDouble(in);
-						ptm.addLine(new Line(d));
-					} catch (Exception ex) {
-						log.log(Level.WARNING, "Unparseble value for maximum in PileupTrack: " + in, ex);
-					}
-				}
-
-			}
-
-		});
-		out.add(item);
-
-		item = new JMenuItem(new AbstractAction("Clear threshold lines") {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ptm.clearLines();
-
-			}
-
-		});
-		out.add(item);
-
-		if (!ptm.isGlobalSettings()) {
-
-			/* Log scaling of line graph */
-			final JMenuItem item4 = new JCheckBoxMenuItem();
-			item4.setSelected(ptm.isLogscaling());
-			item4.setAction(new AbstractAction("Use log scaling for line graph") {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					ptm.setLogscaling(item4.isSelected());
-
-				}
-
-			});
-			out.add(item4);
-
-			/* Dynamic scaling for both plots */
-			final JCheckBoxMenuItem item3 = new JCheckBoxMenuItem();
-			item3.setSelected(ptm.isDynamicScaling());
-			item3.setAction(new AbstractAction("Use dynamic scaling for plots") {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					ptm.setDynamicScaling(item3.isSelected());
-
-				}
-
-			});
-			out.add(item3);
-
-			/* Maximum value */
-			final JMenuItem item2 = new JMenuItem(new AbstractAction("Set maximum value") {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					String in = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-							"Input the maximum value, choose a negative number for unlimited", "Input maximum value",
-							JOptionPane.QUESTION_MESSAGE);
-					if (in != null) {
-						try {
-							Double d = Double.parseDouble(in);
-							ptm.setMaxValue(d);
-						} catch (Exception ex) {
-							log.log(Level.WARNING, "Unparseble value for maximum in PileupTrack: " + in, ex);
-						}
-					}
-
-				}
-			});
-			out.add(item2);
-
-			ButtonGroup bg = new ButtonGroup();
-			for (final WindowFunction wf : provider.getWindowFunctions()) {
-				final JRadioButtonMenuItem jbm = new JRadioButtonMenuItem();
-				jbm.setAction(new AbstractAction(wf.toString()) {
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						jbm.setSelected(true);
-						// System.out.println("Requesting "+wf.toString());
-						provider.requestWindowFunction(wf);
-					}
-				});
-				if (provider.isCurrentWindowFunction(wf))
-					jbm.setSelected(true);
-				bg.add(jbm);
-				out.add(jbm);
-			}
-		}
-		return out;
-	}
-
-	public PileupTrackModel getTrackModel() {
+	public PileupTrackConfig getTrackModel() {
 		return ptm;
 
 	}

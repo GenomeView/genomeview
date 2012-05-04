@@ -27,9 +27,9 @@ class LineChartBuffer implements VizBuffer {
 	// private Iterable<Pile> piles;
 	private Location visible;
 	private PileProvider provider;
-	private PileupTrackModel ptm;
+	private PileupTrackConfig ptm;
 
-	public LineChartBuffer(Location visible, PileProvider provider, PileupTrackModel ptm) {
+	public LineChartBuffer(Location visible, PileProvider provider, PileupTrackConfig ptm) {
 		this.visible = visible;
 		this.provider = provider;
 		this.ptm = ptm;

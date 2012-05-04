@@ -107,7 +107,6 @@ public abstract class Track {
 	public boolean mouseClicked(int x, int y, MouseEvent source) {
 		if (configCog != null && configCog.contains(x, y)) {
 			log.finest("Track consumes click");
-			config.setConfigOffset(source.getXOnScreen(),source.getYOnScreen());
 			config.setConfigVisible(true);
 //			this.setCollapsed(!this.isCollapsed());
 			source.consume();

@@ -29,6 +29,7 @@ import java.util.Observer;
 import javax.swing.JDialog;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.StaticUtils;
 
 /**
  * 
@@ -49,6 +50,7 @@ public class TrackConfigWindow implements Observer {
 		System.out.println(config);
 		window.add(config.getGUIContainer());
 		window.pack();
+		StaticUtils.center(model.getGUIManager().getParent(), window);
 		config.addObserver(this);
 		window.addWindowListener(new WindowAdapter() {
 
@@ -65,13 +67,16 @@ public class TrackConfigWindow implements Observer {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		Point nl=new Point(config.getConfigOffset().x-window.getWidth(),config.getConfigOffset().y);
-		if (!nl.equals(window.getLocation()))
-		 window.setLocation(nl);
+//		Point nl=new Point(config.getConfigOffset().x-window.getWidth(),config.getConfigOffset().y);
+//		if (!nl.equals(window.getLocation()))
+//		 window.setLocation(nl);
 //		if(config.getConfigOffset()!=window.getY())
 //			window.setY
-		if (config.isConfigVisible() != window.isVisible())
+		if (config.isConfigVisible() != window.isVisible()){
 			window.setVisible(config.isConfigVisible());
+			
+		}
+			
 		
 	}
 

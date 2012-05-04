@@ -36,7 +36,7 @@ class BarChartBuffer implements VizBuffer {
 	private double localMaxPile = 0;
 	private double localMinPile = 0;
 	private NucCounter nc;
-	private PileupTrackModel ptm;
+	private PileupTrackConfig ptm;
 	private Logger log = Logger.getLogger(BarChartBuffer.class.toString());
 	private PileProvider provider;
 
@@ -46,7 +46,7 @@ class BarChartBuffer implements VizBuffer {
 	private double MAX_WIDTH = 2000;
 	private Iterable<Status> status;
 
-	public BarChartBuffer(Location visible, PileProvider provider, PileupTrackModel ptm) {
+	public BarChartBuffer(Location visible, PileProvider provider, PileupTrackConfig ptm) {
 		this.visible = visible;
 		this.provider = provider;
 		this.ptm = ptm;
