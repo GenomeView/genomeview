@@ -41,10 +41,13 @@ import javax.swing.JRadioButton;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
+import net.sf.genomeview.gui.config.BooleanConfig;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.genomeview.gui.viztracks.TrackConfig;
+import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;
+import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.refseq.Sequence;
 
 import org.broad.igv.track.WindowFunction;
@@ -63,7 +66,7 @@ public class PileupTrackConfig extends TrackConfig {
 	@Override
 	protected GridBagPanel getGUIContainer() {
 		GridBagPanel out = super.getGUIContainer();
-	
+
 		/*
 		 * Scale across tracks
 		 */
@@ -131,7 +134,9 @@ public class PileupTrackConfig extends TrackConfig {
 		out.gc.gridy++;
 		out.add(item, out.gc);
 
-		// if (!isGlobalSettings()) {
+		final BooleanConfig normalize = new BooleanConfig("track:pile:normalize:" + dataKey, "Normalize by mean", model);
+		out.gc.gridy++;
+		out.add(normalize, out.gc);
 
 		/* Log scaling of line graph */
 		final JCheckBox item4 = new JCheckBox();
@@ -209,6 +214,7 @@ public class PileupTrackConfig extends TrackConfig {
 			@Override
 			public void update(Observable o, Object arg) {
 				item4.setEnabled(!isGlobalSettings());
+				normalize.setEnabled(!isGlobalSettings());
 				item3.setEnabled(!isGlobalSettings());
 				item2.setEnabled(!isGlobalSettings());
 				for (AbstractButton jb : Collections.list(bg.getElements())) {
@@ -224,7 +230,7 @@ public class PileupTrackConfig extends TrackConfig {
 
 	private VizBuffer vizBuffer = null;
 
-	private PileProvider provider;
+	final private PileProvider provider;
 
 	PileupTrackConfig(Model model, DataKey key, PileProvider provider) {
 		super(model, key);
@@ -300,6 +306,57 @@ public class PileupTrackConfig extends TrackConfig {
 		this.screenWidth = screenWidth;
 
 	}
+	public final Normalize normalize=new Normalize();
+	
+	
+
+	class Normalize {
+		private 	boolean calculating = false;
+		private boolean calculated = false;
+		private double[] value = null;
+
+		double[] value() {
+			if (!calculating) {
+				calculating = true;
+				new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						model.messageModel().setStatusBarMessage("Calculating normalization");
+						// model.getSelectedEntry().get(dataKey).get();
+						Data<Pile> dp = (Data<Pile>) model.getSelectedEntry().get(dataKey);
+						double[] sum = null;
+						int count = 0;
+						for (Pile p : dp.get()) {
+							if (sum == null) {
+								sum = new double[p.getValueCount()];
+							}
+							for (int i = 0; i < p.getValueCount(); i++)
+								sum[i] += p.getValue(i);
+							count++;
+
+						}
+						for (int i = 0; i < sum.length; i++)
+							sum[i]/=count;
+						value=sum;
+						calculated=true;
+						model.messageModel().setStatusBarMessage("Normalization calculated");
+						
+					}
+
+				}).start();
+				return null;
+			} else if (!calculated) {
+				return null;
+			} else
+				return value;
+		}
+
+	}
+
+	public boolean isNormalizeMean() {
+		return Configuration.getBoolean("track:pile:normalize:" + dataKey);
+	}
 
 	public void setGlobalSettings(boolean globalSettings) {
 		this.globalSettings = globalSettings;
@@ -313,7 +370,6 @@ public class PileupTrackConfig extends TrackConfig {
 
 	private double maxValue = -1;
 	private TrackCommunicationModel tcm;
-
 
 	public double maxValue() {
 		if (globalSettings)
@@ -344,7 +400,6 @@ public class PileupTrackConfig extends TrackConfig {
 
 	public void setTrackCommunication(TrackCommunicationModel tcm) {
 		this.tcm = tcm;
-		
 
 	}
 
@@ -371,8 +426,6 @@ public class PileupTrackConfig extends TrackConfig {
 		notifyObservers();
 
 	}
-
-	
 
 }
 
