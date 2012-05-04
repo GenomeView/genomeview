@@ -89,75 +89,18 @@ public class PopUpMenu extends JPopupMenu {
 			addSeparator();
 		count = 0;
 
-		/* Track specific actions, if there is a track */
-		if (t != null) {
-			List<JMenuItem> list = t.getMenuItems();
-			for (JMenuItem a : list) {
-				if (a == null)
-					addSeparator();
-				else if (a.isEnabled()) {
-					count++;
-					add(a);
-				}
+		
+		add(new AbstractAction("Configure track") {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				t.config().setConfigVisible(true);
+				
 			}
-			if (count > 0)
-				addSeparator();
-
-			JMenuItem alias = new JMenuItem(new AbstractAction("Alias track") {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					String in = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-							"What name should this track have?", "Alias", JOptionPane.QUESTION_MESSAGE);
-					if (in != null) {
-						try {
-							if (in.length() == 0) {
-								Configuration.unset("track:alias:" + t.getDataKey().toString());
-							} else {
-								Configuration.set("track:alias:" + t.getDataKey().toString(), in);
-							}
-							model.refresh();
-						} catch (Exception ex) {
-							log.log(Level.WARNING, "Could not set alias for track " + t + " from " + t.getDataKey()
-									+ " to " + in, ex);
-						}
-					}
-
-				}
-
-			});
-			add(alias);
-
-			JMenuItem clear = new JMenuItem(new AbstractAction("Unload track") {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					int result = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
-							"Are you sure you want to clear this track?");
-					if (result == JOptionPane.YES_OPTION) {
-						model.remove(t);
-					}
-				}
-
-			});
-			add(clear);
-
-		}
-
-		if (this.getComponentCount() == 0) {
-			add(new AbstractAction("No actions available") {
-
-				@Override
-				public boolean isEnabled() {
-					return false;
-				}
-
-				public void actionPerformed(ActionEvent e) {
-
-				}
-
-			});
-		}
+		});
+		
+		
+		
 
 	}
 
