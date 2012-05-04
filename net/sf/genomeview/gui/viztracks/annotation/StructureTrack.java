@@ -1,5 +1,22 @@
 /**
- * %HEADER%
+ * This file is part of GenomeView, a genome browser and annotation curator
+ * 
+ * Copyright (C) 2012 Thomas Abeel
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ *
+ * Project: http://genomeview.org/
  */
 package net.sf.genomeview.gui.viztracks.annotation;
 
@@ -9,17 +26,12 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.JMenuItem;
 import javax.swing.JViewport;
 
 import net.sf.genomeview.BufferSeq;
@@ -31,7 +43,6 @@ import net.sf.genomeview.data.Model.Highlight;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
-import net.sf.genomeview.gui.dialog.StructureTrackConfig;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.Feature;
@@ -42,59 +53,22 @@ import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.utils.SequenceTools;
-import be.abeel.util.DefaultHashMap;
-
+/**
+ * 
+ * @author Thomas Abeel
+ *
+ */
 public class StructureTrack extends Track {
-
-	@Override
-	public List<JMenuItem> getMenuItems() {
-		ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
-		JMenuItem item = new JMenuItem();
-		item.setAction(new AbstractAction("Configure visible types") {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				StructureTrackConfig.display(model, stm);
-
-			}
-		});
-		out.add(item);
-		return out;
-	}
-
-	public class StructureTrackModel {
-		private Model model;
-		private DefaultHashMap<Type, Boolean> visibleTypes = new DefaultHashMap<Type, Boolean>(Boolean.FALSE);
-
-		public StructureTrackModel(Model model) {
-			this.model = model;
-			Set<Type> tmp1 = Configuration.getTypeSet("visibleTypesStructure");
-			for (Type t : tmp1)
-				setTypeVisible(t, true);
-		}
-
-		public boolean isTypeVisible(Type ct) {
-			return visibleTypes.get(ct);
-		}
-
-		public void setTypeVisible(Type t, boolean b) {
-			visibleTypes.put(t, b);
-//			setChanged();
-//			notifyObservers();
-			model.refresh();
-
-		}
-
-	}
 
 	private double letterSpacing;
 	private StructureTrackModel stm;
 	public static final StringKey key = new StringKey("GV::STRUCTURE");
 
 	public StructureTrack(Model model) {
-		super(key, model, Configuration.getBoolean("track:showStructure"), false);
+		super(key, model, Configuration.getBoolean("track:showStructure"), false, new StructureTrackModel(model,key));
+
 		collisionMap = new CollisionMap(model);
-		stm = new StructureTrackModel(model);
+		stm = (StructureTrackModel) config;
 		// this.addMouseListener(this);
 		// this.addMouseMotionListener(this);
 		// model.addObserver(this);
@@ -487,9 +461,9 @@ public class StructureTrack extends Track {
 			 */
 			if (model.getAnnotationLocationVisible().length() < Configuration
 					.getInt("geneStructureAminoAcidWindowLetters")) {
-				if(!aaStringBoundsCache.containsKey(aa))
-					aaStringBoundsCache.put(aa,g.getFontMetrics().getStringBounds("" + aa, g));
-				Rectangle2D sb=aaStringBoundsCache.get(aa);
+				if (!aaStringBoundsCache.containsKey(aa))
+					aaStringBoundsCache.put(aa, g.getFontMetrics().getStringBounds("" + aa, g));
+				Rectangle2D sb = aaStringBoundsCache.get(aa);
 				/* draw amino acid letter */
 				x = (int) (((i - r.start()) * width - sb.getWidth() / 2) + (width * 3 / 2));
 				y += lineHeight;
@@ -574,11 +548,11 @@ public class StructureTrack extends Track {
 		boolean featureSelected = model.selectionModel().getFeatureSelection().contains(rf);
 		Location last = null;
 		int lastY = 0;
-//		for (Location l : rf.location()) {
-		
-		for(int i=0;i<rf.location().length;i++){
-			Location l=rf.location()[i];
-			int drawFrame = getDrawFrame(i,l, rf);
+		// for (Location l : rf.location()) {
+
+		for (int i = 0; i < rf.location().length; i++) {
+			Location l = rf.location()[i];
+			int drawFrame = getDrawFrame(i, l, rf);
 			/* Start of the block */
 			int lmin = Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), screenWidth);
 			/* End of the block */
@@ -642,7 +616,7 @@ public class StructureTrack extends Track {
 	 * @param rf
 	 * @return
 	 */
-	private int getDrawFrame(int idx,Location l, Feature rf) {
+	private int getDrawFrame(int idx, Location l, Feature rf) {
 		int locFrame;
 		if (rf.strand() == Strand.REVERSE)
 			locFrame = (l.end() + 1) % 3;
@@ -776,8 +750,8 @@ public class StructureTrack extends Track {
 
 		}
 
-//		setChanged();
-//		notifyObservers();
+		// setChanged();
+		// notifyObservers();
 		model.refresh();
 		return false;
 	}
@@ -833,8 +807,8 @@ public class StructureTrack extends Track {
 		pressTrack = -1;
 		dragging = false;
 		borderHit = null;
-//		setChanged();
-//		notifyObservers();
+		// setChanged();
+		// notifyObservers();
 		model.refresh();
 		return false;
 	}
@@ -901,8 +875,8 @@ public class StructureTrack extends Track {
 				updateSelectedRegion();
 			}
 			dragging = true;
-//			setChanged();
-//			notifyObservers();
+			// setChanged();
+			// notifyObservers();
 			model.refresh();
 			return true;
 		} else {
@@ -916,8 +890,8 @@ public class StructureTrack extends Track {
 			model.getGUIManager().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		else
 			model.getGUIManager().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-//		setChanged();
-//		notifyObservers();
+		// setChanged();
+		// notifyObservers();
 		model.refresh();
 		return false;
 	}
@@ -986,5 +960,4 @@ public class StructureTrack extends Track {
 		return 8 * lineHeight + tickHeight;
 	}
 
-	
 }
