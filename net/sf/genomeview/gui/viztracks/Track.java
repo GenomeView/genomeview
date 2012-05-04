@@ -34,16 +34,16 @@ public abstract class Track {
 
 	
 	
-	protected Model model;
+	final protected Model model;
 
-	protected DataKey dataKey;
+	final protected DataKey dataKey;
 	protected Entry entry;
 	
 	
 	/**
 	 * Model for track configuration
 	 */
-	protected TrackConfig config;
+	final protected TrackConfig config;
 
 	public static void paintStatus(Graphics g, Iterable<Status> status, int y, int returnTrackHeight, Location visible,
 			double screenWidth) {
@@ -92,6 +92,7 @@ public abstract class Track {
 	public boolean mouseClicked(int x, int y, MouseEvent source) {
 		if (configCog != null && configCog.contains(x, y)) {
 			log.finest("Track consumes click");
+			config.setConfigOffset(source.getXOnScreen(),source.getYOnScreen());
 			config.setConfigVisible(true);
 //			this.setCollapsed(!this.isCollapsed());
 			source.consume();
@@ -148,7 +149,7 @@ public abstract class Track {
 	private void paintConfigCog(Graphics2D g, int yOffset, double width) {
 //		config.setConfigOffset((int)width-15,yOffset+5);
 //		if (isCollapsible()) {
-		config.setConfigOffset((int)width,yOffset);
+		
 		g.translate(0, yOffset);
 		g.drawImage(Icons.COG, (int)width-15, 5, null);//Icons.COG
 		configCog = new Rectangle((int) width - 15, 5, 12, 12);

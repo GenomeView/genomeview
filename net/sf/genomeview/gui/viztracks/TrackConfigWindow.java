@@ -46,6 +46,7 @@ public class TrackConfigWindow implements Observer {
 		window.setModal(false);
 		window.setTitle("Configure track");
 		this.config = config;
+		System.out.println(config);
 		window.add(config.getGUIContainer());
 		window.pack();
 		config.addObserver(this);
@@ -64,7 +65,7 @@ public class TrackConfigWindow implements Observer {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		Point nl=new Point(config.getConfigOffset().x-window.getWidth(),config.getConfigOffset().y+window.getHeight());
+		Point nl=new Point(config.getConfigOffset().x-window.getWidth(),config.getConfigOffset().y);
 		if (!nl.equals(window.getLocation()))
 		 window.setLocation(nl);
 //		if(config.getConfigOffset()!=window.getY())

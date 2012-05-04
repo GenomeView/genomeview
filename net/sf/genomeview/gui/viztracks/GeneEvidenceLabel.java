@@ -361,6 +361,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 			consumed = mouseTrack.mouseClicked(e.getX(), e.getY(), e);
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
+			mouseTrack.config.setConfigOffset(e.getXOnScreen(),e.getYOnScreen());
 			new PopUpMenu(model, mouseTrack).show(this, e.getX(), y);
 		} else if (!consumed) {
 			model.selectionModel().setSelectedRegion(null);

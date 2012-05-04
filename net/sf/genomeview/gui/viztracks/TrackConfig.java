@@ -39,16 +39,19 @@ import be.abeel.gui.GridBagPanel;
  */
 public class TrackConfig extends Observable {
 
-	private DataKey dataKey;
+	protected DataKey dataKey;
+	protected Model model;
 	private boolean collapsible;
 
-	TrackConfig(Model model, DataKey dataKey) {
+	protected TrackConfig(Model model, DataKey dataKey) {
 		this.dataKey = dataKey;
+		this.model=model;
 		guicontainer.add(new JLabel("Track key: \n" + dataKey), guicontainer.gc);
 		guicontainer.gc.gridy++;
 
 		guicontainer.add(new StringConfig("track:alias:" + dataKey, "Track alias:", model), guicontainer.gc);
 		guicontainer.gc.gridy++;
+		Configuration.getVisible(dataKey);
 		guicontainer.add(new BooleanConfig("track:visible:" + dataKey, "Track visible", model), guicontainer.gc);
 		if (isCollapsible()) {
 			guicontainer.gc.gridy++;
@@ -74,7 +77,7 @@ public class TrackConfig extends Observable {
 	 * 
 	 * @return
 	 */
-	GridBagPanel getGUIContainer() {
+	protected GridBagPanel getGUIContainer() {
 		return guicontainer;
 
 	}

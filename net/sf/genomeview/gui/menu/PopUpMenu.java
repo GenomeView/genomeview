@@ -7,16 +7,13 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
+import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.edit.CloneFeatureAction;
 import net.sf.genomeview.gui.menu.edit.CreateNewFeatureAction;
@@ -94,6 +91,7 @@ public class PopUpMenu extends JPopupMenu {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				
 				t.config().setConfigVisible(true);
 				
 			}

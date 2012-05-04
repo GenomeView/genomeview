@@ -353,8 +353,10 @@ public class Configuration {
 	}
 
 	public static boolean getVisible(DataKey dk) {
-		if (get("track:visible:" + dk) == null)
+		if (get("track:visible:" + dk) == null){
+			set("track:visible:" + dk,true);
 			return true;
+		}
 		return getBoolean("track:visible:" + dk);
 
 	}

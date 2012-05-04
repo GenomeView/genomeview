@@ -15,11 +15,15 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -38,31 +42,151 @@ import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.genomeview.gui.components.DoubleJSlider;
+import net.sf.genomeview.gui.config.BooleanConfig;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel.FillMode;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
+import net.sf.genomeview.gui.viztracks.TrackConfig;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 import net.sf.jannot.Type;
 import net.sf.jannot.shortread.ReadGroup;
+import be.abeel.gui.GridBagPanel;
 import be.abeel.util.CountMap;
+
 /**
  * Visualization track for feature tracks.
  * 
  * 
  * 
  * @author Thomas Abeel
- *
+ * 
  */
-public class FeatureTrack extends Track {
+public class FeatureTrack extends Track  {
 
-	static class FeatureTrackModel {
-		
-		private Type type;
-		
-		private boolean scoreColorGradient, colorQualifier;
+	static class FeatureTrackConfig extends TrackConfig {
+
+		// private Type type;
+
+		@Override
+		protected GridBagPanel getGUIContainer() {
+			GridBagPanel out = super.getGUIContainer();
+			// System.out.println(isScoreColorGradientEnabled());
+			// if (isScoreColorGradientEnabled()) {
+
+			// colorQualifier =
+			// Configuration.getBoolean("feature:useColorQualifierTag_" +
+			// type);
+			// scoreColorGradient =
+			// Configuration.getBoolean("feature:scoreColorGradient_" +
+			// type);
+			out.gc.gridy++;
+			final JComponent colorGradient=new BooleanConfig("feature:scoreColorGradient_" + type(), "Use score color gradient", model);
+			out.add(colorGradient,out.gc);
+
+			// /* Color gradient coloring based on score */
+			// final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
+			// item.setSelected(ftm.isScoreColorGradient());
+			// item.setAction(new AbstractAction("Use score color gradient")
+			// {
+			// @Override
+			// public void actionPerformed(ActionEvent e) {
+			// ftm.setScoreColorGradient(item.isSelected());
+			//
+			// }
+			//
+			// });
+			// out.add(item);
+
+			/* Filter items based on score */
+			// final JMenuItem filter = new JMenuItem();
+			out.gc.gridy++;
+			
+			final JButton filter=new JButton(new AbstractAction("Filter items by score") {
+				// filter.setAction(new
+				// AbstractAction("Filter items by score") {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					final JOptionPane optionPane = new JOptionPane();
+					final JLabel label = new JLabel();
+					final NumberFormat nf = NumberFormat.getInstance();
+					nf.setMaximumFractionDigits(2);
+					final DoubleJSlider slider = new DoubleJSlider(minScore, maxScore,
+							getThreshold() > minScore ? getThreshold() : minScore, (maxScore - minScore) / 100.0);
+					optionPane.setInputValue(slider.getDoubleValue());
+					label.setText(nf.format(slider.getDoubleValue()));
+					// slider.setMajorTickSpacing((int)((ftm.maxScore-ftm.minScore)/10));
+					slider.setPaintTicks(true);
+					slider.setPaintLabels(true);
+
+					ChangeListener changeListener = new ChangeListener() {
+						public void stateChanged(ChangeEvent changeEvent) {
+							DoubleJSlider theSlider = (DoubleJSlider) changeEvent.getSource();
+							label.setText(nf.format(slider.getDoubleValue()));
+							if (!theSlider.getValueIsAdjusting()) {
+								optionPane.setInputValue(theSlider.getDoubleValue());
+								theSlider.setDoubleValue(theSlider.getDoubleValue());
+							}
+						}
+					};
+					slider.addChangeListener(changeListener);
+					optionPane.setMessage(new Object[] { "Select score threshold: ", slider, label });
+					optionPane.setMessageType(JOptionPane.QUESTION_MESSAGE);
+					optionPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+					JDialog dialog = optionPane.createDialog(model.getGUIManager().getParent(), "Score threshold");
+					// dialog.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
+					dialog.setVisible(true);
+					setThreshold((Double) optionPane.getInputValue());
+					System.out.println("Input: " + optionPane.getInputValue());
+
+				}
+
+			});
+			out.add(filter, out.gc);
+			// out.add(filter);
+			//
+			// }
+			//
+			// if (isColorQualifierEnabled()) {
+			out.gc.gridy++;
+			final JComponent colorQualifier=new BooleanConfig("feature:useColorQualifierTag_" + type(), "Use /color qualifier", model);
+			out.add(colorQualifier, out.gc);
+
+			// final JCheckBoxMenuItem colorQualifier = new
+			// JCheckBoxMenuItem();
+			// colorQualifier.setSelected(ftm.isColorQualifier());
+			// colorQualifier.setAction(new
+			// AbstractAction("Use /color qualifier") {
+			// @Override
+			// public void actionPerformed(ActionEvent e) {
+			// ftm.setColorQualifier(colorQualifier.isSelected());
+			//
+			// }
+			//
+			// });
+			// out.add(colorQualifier);
+			// }
+			
+			
+				
+			this.addObserver(new Observer(){
+
+				@Override
+				public void update(Observable o, Object arg) {
+					colorGradient.setEnabled(isScoreColorGradientEnabled());
+					colorQualifier.setEnabled(isColorQualifierEnabled());
+					filter.setEnabled(isScoreColorGradientEnabled());
+				}
+				
+			});
+			
+			return out;
+
+		}
+
+		// private boolean scoreColorGradient, colorQualifier;
 
 		private double minScore = Double.NEGATIVE_INFINITY;
 
@@ -99,32 +223,27 @@ public class FeatureTrack extends Track {
 		}
 
 		public boolean isColorQualifier() {
-			return colorQualifier;
+			return Configuration.getBoolean("feature:useColorQualifierTag_" + type());
+			// return colorQualifier;
 		}
 
-		/* Indicates whether any of the features in this track have a /color tag */
-		private boolean colorQualifierEnabled = false;
-
-		public boolean isColorQualifierEnabled() {
-			return colorQualifierEnabled;
-		}
-
-		public void setColorQualifierEnabled(boolean colorQualifierEnabled) {
-			this.colorQualifierEnabled = colorQualifierEnabled;
+		public Type type() {
+			return (Type) super.dataKey;
 		}
 
 		public void setColorQualifier(boolean colorQualifier) {
-			this.colorQualifier = colorQualifier;
-			Configuration.set("feature:useColorQualifierTag_" + type, colorQualifier);
+			// this.colorQualifier = colorQualifier;
+			Configuration.set("feature:useColorQualifierTag_" + type(), colorQualifier);
 			model.refresh(this);
 		}
 
-		private Model model;
 		private boolean scoreColorGradientEnabled;
 
-		private double threshold=Double.NEGATIVE_INFINITY;
-		
-		public double getThreshold(){
+		private double threshold = Double.NEGATIVE_INFINITY;
+
+		private boolean colorQualifierEnabled;
+
+		public double getThreshold() {
 			return threshold;
 		}
 
@@ -132,20 +251,23 @@ public class FeatureTrack extends Track {
 			return ColorGradient.fourColorGradient.getColor(normalizedScore);
 		}
 
-		public FeatureTrackModel(Model model,Type type) {
-			this.model = model;
-			this.type=type;
-			colorQualifier = Configuration.getBoolean("feature:useColorQualifierTag_" + type);
-			scoreColorGradient = Configuration.getBoolean("feature:scoreColorGradient_" + type);
+		public FeatureTrackConfig(Model model, Type type) {
+			super(model, type);
+
+			// colorQualifier =
+			// Configuration.getBoolean("feature:useColorQualifierTag_" + type);
+			// scoreColorGradient =
+			// Configuration.getBoolean("feature:scoreColorGradient_" + type);
 		}
 
 		public boolean isScoreColorGradient() {
-			return scoreColorGradient;
+			return Configuration.getBoolean("feature:scoreColorGradient_" + type());
+
 		}
 
 		public void setScoreColorGradient(boolean scoreColorGradient) {
-			this.scoreColorGradient = scoreColorGradient;
-			Configuration.set("feature:scoreColorGradient_" + type, scoreColorGradient);
+			// this.scoreColorGradient = scoreColorGradient;
+			Configuration.set("feature:scoreColorGradient_" + type(), scoreColorGradient);
 			model.refresh(this);
 		}
 
@@ -155,19 +277,31 @@ public class FeatureTrack extends Track {
 
 		public void setScoreColorGradientEnabled(boolean b) {
 			this.scoreColorGradientEnabled = true;
+			setChanged();
+			notifyObservers();
 
 		}
 
 		public void setThreshold(double inputValue) {
-			this.threshold=inputValue;
-			
+			this.threshold = inputValue;
+
+		}
+
+		public boolean isColorQualifierEnabled(){
+			return colorQualifierEnabled;
+		}
+		
+		public void setColorQualifierEnabled(boolean b) {
+			colorQualifierEnabled = b;
+			setChanged();
+			notifyObservers();
+
 		}
 
 	}
 
-	
 	private CollisionMap hitmap;
-	private FeatureTrackModel ftm;
+	final private FeatureTrackConfig ftm;
 
 	/**
 	 * Returns the type this track represents
@@ -176,26 +310,27 @@ public class FeatureTrack extends Track {
 	 */
 	public Type getType() {
 
-		return ftm.type;
+		return ftm.type();
 	}
 
 	public FeatureTrack(Model model, Type key) {
-		super(key, model, true, true);
+		super(key, model, true, true, new FeatureTrackConfig(model, key));
+		ftm = (FeatureTrackConfig) config;
 		hitmap = new CollisionMap(model);
-		ftm = new FeatureTrackModel(model,key);
-		floatingWindow=new FeatureInfoWindow(ftm);
+
+		floatingWindow = new FeatureInfoWindow(ftm);
 
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view,TrackCommunicationModel tcm) {
-		boolean forceLabels=Configuration.getBoolean("track:forceFeatureLabels");
+	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view, TrackCommunicationModel tcm) {
+		boolean forceLabels = Configuration.getBoolean("track:forceFeatureLabels");
 		boolean collision = false;
 		hitmap.clear();
 		Location visible = model.getAnnotationLocationVisible();
 		// List<Feature> types = entry.annotation.getByType(type,);
 		// FeatureAnnotation annot = entry.getAnnotation(type);
-		FeatureAnnotation annot = (FeatureAnnotation) entry.get(ftm.type);
+		FeatureAnnotation annot = (FeatureAnnotation) entry.get(ftm.type());
 		if (annot.qualifierKeys().contains("color") || annot.qualifierKeys().contains("colour"))
 			ftm.setColorQualifierEnabled(true);
 		/* If there are proper scores, enable color gradient */
@@ -206,33 +341,33 @@ public class FeatureTrack extends Track {
 		}
 
 		/* Get feature estimate */
-		boolean manyFeature=false;
+		boolean manyFeature = false;
 		int estimate = annot.getEstimateCount(visible);
-		if (estimate > 25*Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
+		if (estimate > 25 * Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
 
 			g.setColor(Color.BLACK);
-			g.drawString(ftm.type + ": Too many features to display, zoom in to see features", 10, yOffset + 10);
+			g.drawString(ftm.type() + ": Too many features to display, zoom in to see features", 10, yOffset + 10);
 			return 20 + 5;
-		}else if(estimate > Configuration.getInt("annotationview:maximumNoVisibleFeatures")){
-			manyFeature=true;
+		} else if (estimate > Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
+			manyFeature = true;
 		}
 		Iterable<Feature> list = annot.get(visible.start, visible.end);
 		g.translate(0, yOffset + 2);
 		CollisionMap fullBlockMap = new CollisionMap(model);
 
 		int lineThickness = Configuration.getInt("evidenceLineHeight");
-		
+
 		int lines = 0;
-		
+
 		for (Feature rf : list) {
 
 			/* Skip feature that do not satisfy threshold filter */
-			if(rf.getScore()<=ftm.getThreshold())
+			if (rf.getScore() <= ftm.getThreshold())
 				continue;
 			int thisLine = 0;
 
 			Color c = Configuration.getColor("TYPE_" + rf.type());
-			if (ftm.isColorQualifierEnabled() && ftm.isColorQualifier()) {
+			if (ftm.isColorQualifier() && rf.getColor() != null) {
 				String color = rf.getColor();
 				if (color != null) {
 					c = Colors.decodeColor(color);
@@ -260,8 +395,8 @@ public class FeatureTrack extends Track {
 				int closenessOverlap = Configuration.getInt("closenessOverlap");
 				Rectangle r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness, maxX - x1 + 2
 						* closenessOverlap, lineThickness);
-				
-				if (!config.isCollapsed()&&!manyFeature) {
+
+				if (!config.isCollapsed() && !manyFeature) {
 					// only when the blocks should be tiled, do we need to
 					// determine an empty place.
 					if (!collision)
@@ -327,7 +462,7 @@ public class FeatureTrack extends Track {
 
 				// Set<Feature> selected = model.getFeatureSelection();
 				Set<Location> intersection = new HashSet<Location>();
-				for(Location l:loc)
+				for (Location l : loc)
 					intersection.add(l);
 				intersection.retainAll(model.selectionModel().getLocationSelection());
 
@@ -341,12 +476,12 @@ public class FeatureTrack extends Track {
 				 * If the first location takes more than 50 px, we draw name of
 				 * the feature in it
 				 */
-				if (forceLabels||x2 - x1 > 100) {
-					int a = Convert.translateGenomeToScreen(loc[0].start(), model.getAnnotationLocationVisible(),
+				if (forceLabels || x2 - x1 > 100) {
+					int a = Convert
+							.translateGenomeToScreen(loc[0].start(), model.getAnnotationLocationVisible(), width);
+					int b = Convert.translateGenomeToScreen(loc[0].end() + 1, model.getAnnotationLocationVisible(),
 							width);
-					int b = Convert.translateGenomeToScreen(loc[0].end() + 1,
-							model.getAnnotationLocationVisible(), width);
-					if (forceLabels||b - a > 100) {
+					if (forceLabels || b - a > 100) {
 						Font resetFont = g.getFont();
 						g.setColor(c.darker().darker().darker());
 						g.setFont(new Font("SansSerif", Font.PLAIN, 10));
@@ -360,7 +495,8 @@ public class FeatureTrack extends Track {
 		}
 		if (Configuration.getBoolean("showTrackName")) {
 			g.setColor(Color.black);
-			g.drawString(ftm.type.toString(), 10, lineThickness);
+
+			g.drawString(ftm.displayName(), 10, lineThickness);
 		}
 		g.translate(0, -yOffset - 2);
 		return (lines + 1) * lineThickness + 4;
@@ -418,7 +554,7 @@ public class FeatureTrack extends Track {
 
 	}
 
-	private FeatureInfoWindow floatingWindow =null;
+	private FeatureInfoWindow floatingWindow = null;
 
 	private static class FeatureInfoWindow extends JWindow {
 
@@ -426,10 +562,10 @@ public class FeatureTrack extends Track {
 
 		private JLabel floater = new JLabel();
 
-		private FeatureTrackModel ftm;
+		private FeatureTrackConfig ftm;
 
-		public FeatureInfoWindow(FeatureTrackModel ftm) {
-			this.ftm=ftm;
+		public FeatureInfoWindow(FeatureTrackConfig ftm) {
+			this.ftm = ftm;
 			floater.setBackground(Color.GRAY);
 			floater.setForeground(Color.BLACK);
 			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
@@ -453,19 +589,20 @@ public class FeatureTrack extends Track {
 					text.append("Name : " + name + "<br />");
 					text.append("Start : " + f.start() + "<br />");
 					text.append("End : " + f.end() + "<br />");
-					int aggregateLenght = agg(f.location());
-					if (aggregateLenght < Configuration.getInt("featuretrack:meanshortread")) {
-						
-						Iterable<ReadGroup> sources = ftm.model.getSelectedEntry().shortReads();
-
-						CountMap<Integer> cm = new CountMap<Integer>();
-						for (ReadGroup rg : sources) {
-							cm.clear();
-
-						
-						}
-					}
-				
+					// int aggregateLenght = agg(f.location());
+					// if (aggregateLenght <
+					// Configuration.getInt("featuretrack:meanshortread")) {
+					//
+					// Iterable<ReadGroup> sources =
+					// ftm.model.getSelectedEntry().shortReads();
+					//
+					// CountMap<Integer> cm = new CountMap<Integer>();
+					// for (ReadGroup rg : sources) {
+					// cm.clear();
+					//
+					//
+					// }
+					// }
 
 				}
 				text.append("</html>");
@@ -490,8 +627,6 @@ public class FeatureTrack extends Track {
 				sum += l.length();
 			return sum;
 		}
-
-		
 
 	}
 
@@ -534,83 +669,87 @@ public class FeatureTrack extends Track {
 
 	}
 
-	
-
-	@Override
-	public List<JMenuItem> getMenuItems() {
-		ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
-		if (ftm.isScoreColorGradientEnabled()) {
-			/* Color gradient coloring based on score */
-			final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
-			item.setSelected(ftm.isScoreColorGradient());
-			item.setAction(new AbstractAction("Use score color gradient") {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					ftm.setScoreColorGradient(item.isSelected());
-
-				}
-
-			});
-			out.add(item);
-
-			/* Filter items based on score */
-			final JMenuItem filter = new JMenuItem();
-
-			filter.setAction(new AbstractAction("Filter items by score") {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					final JOptionPane optionPane = new JOptionPane();
-					final JLabel label = new JLabel();
-					final NumberFormat nf = NumberFormat.getInstance();
-					nf.setMaximumFractionDigits(2);
-					final DoubleJSlider slider = new DoubleJSlider(ftm.minScore, ftm.maxScore, ftm.getThreshold()>ftm.minScore?ftm.getThreshold():ftm.minScore,
-							(ftm.maxScore - ftm.minScore) / 100.0);
-					optionPane.setInputValue(slider.getDoubleValue());
-					label.setText(nf.format(slider.getDoubleValue()));
-					//slider.setMajorTickSpacing((int)((ftm.maxScore-ftm.minScore)/10));
-					slider.setPaintTicks(true);
-					slider.setPaintLabels(true);
-
-					ChangeListener changeListener = new ChangeListener() {
-						public void stateChanged(ChangeEvent changeEvent) {
-							DoubleJSlider theSlider = (DoubleJSlider) changeEvent.getSource();
-							label.setText(nf.format(slider.getDoubleValue()));
-							if (!theSlider.getValueIsAdjusting()) {
-								optionPane.setInputValue(theSlider.getDoubleValue());
-								theSlider.setDoubleValue(theSlider.getDoubleValue());
-							}
-						}
-					};
-					slider.addChangeListener(changeListener);
-					optionPane.setMessage(new Object[] { "Select score threshold: ", slider, label });
-					optionPane.setMessageType(JOptionPane.QUESTION_MESSAGE);
-					optionPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-					JDialog dialog = optionPane.createDialog(model.getGUIManager().getParent(), "Score threshold");
-					// dialog.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
-					dialog.setVisible(true);
-					ftm.setThreshold((Double)optionPane.getInputValue());
-					System.out.println("Input: " + optionPane.getInputValue());
-
-				}
-
-			});
-			out.add(filter);
-
-		}
-
-		if (ftm.isColorQualifierEnabled()) {
-			final JCheckBoxMenuItem colorQualifier = new JCheckBoxMenuItem();
-			colorQualifier.setSelected(ftm.isColorQualifier());
-			colorQualifier.setAction(new AbstractAction("Use /color qualifier") {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					ftm.setColorQualifier(colorQualifier.isSelected());
-
-				}
-
-			});
-			out.add(colorQualifier);
-		}
-		return out;
-	}
+	//
+	// @Override
+	// public List<JMenuItem> getMenuItems() {
+	// ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
+	// if (ftm.isScoreColorGradientEnabled()) {
+	// /* Color gradient coloring based on score */
+	// final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
+	// item.setSelected(ftm.isScoreColorGradient());
+	// item.setAction(new AbstractAction("Use score color gradient") {
+	// @Override
+	// public void actionPerformed(ActionEvent e) {
+	// ftm.setScoreColorGradient(item.isSelected());
+	//
+	// }
+	//
+	// });
+	// out.add(item);
+	//
+	// /* Filter items based on score */
+	// final JMenuItem filter = new JMenuItem();
+	//
+	// filter.setAction(new AbstractAction("Filter items by score") {
+	// @Override
+	// public void actionPerformed(ActionEvent e) {
+	// final JOptionPane optionPane = new JOptionPane();
+	// final JLabel label = new JLabel();
+	// final NumberFormat nf = NumberFormat.getInstance();
+	// nf.setMaximumFractionDigits(2);
+	// final DoubleJSlider slider = new DoubleJSlider(ftm.minScore,
+	// ftm.maxScore,
+	// ftm.getThreshold()>ftm.minScore?ftm.getThreshold():ftm.minScore,
+	// (ftm.maxScore - ftm.minScore) / 100.0);
+	// optionPane.setInputValue(slider.getDoubleValue());
+	// label.setText(nf.format(slider.getDoubleValue()));
+	// //slider.setMajorTickSpacing((int)((ftm.maxScore-ftm.minScore)/10));
+	// slider.setPaintTicks(true);
+	// slider.setPaintLabels(true);
+	//
+	// ChangeListener changeListener = new ChangeListener() {
+	// public void stateChanged(ChangeEvent changeEvent) {
+	// DoubleJSlider theSlider = (DoubleJSlider) changeEvent.getSource();
+	// label.setText(nf.format(slider.getDoubleValue()));
+	// if (!theSlider.getValueIsAdjusting()) {
+	// optionPane.setInputValue(theSlider.getDoubleValue());
+	// theSlider.setDoubleValue(theSlider.getDoubleValue());
+	// }
+	// }
+	// };
+	// slider.addChangeListener(changeListener);
+	// optionPane.setMessage(new Object[] { "Select score threshold: ", slider,
+	// label });
+	// optionPane.setMessageType(JOptionPane.QUESTION_MESSAGE);
+	// optionPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+	// JDialog dialog =
+	// optionPane.createDialog(model.getGUIManager().getParent(),
+	// "Score threshold");
+	// // dialog.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
+	// dialog.setVisible(true);
+	// ftm.setThreshold((Double)optionPane.getInputValue());
+	// System.out.println("Input: " + optionPane.getInputValue());
+	//
+	// }
+	//
+	// });
+	// out.add(filter);
+	//
+	// }
+	//
+	// if (ftm.isColorQualifierEnabled()) {
+	// final JCheckBoxMenuItem colorQualifier = new JCheckBoxMenuItem();
+	// colorQualifier.setSelected(ftm.isColorQualifier());
+	// colorQualifier.setAction(new AbstractAction("Use /color qualifier") {
+	// @Override
+	// public void actionPerformed(ActionEvent e) {
+	// ftm.setColorQualifier(colorQualifier.isSelected());
+	//
+	// }
+	//
+	// });
+	// out.add(colorQualifier);
+	// }
+	// return out;
+	// }
 }
