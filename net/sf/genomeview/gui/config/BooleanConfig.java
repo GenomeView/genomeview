@@ -35,7 +35,7 @@ public class BooleanConfig extends JCheckBox {
 
 	private static final long serialVersionUID = 9081788377933556296L;
 
-	BooleanConfig(final String key, final String title) {
+	public BooleanConfig(final String key, final String title) {
 		super(title);
 		this.setSelected(Configuration.getBoolean(key));
 
