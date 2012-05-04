@@ -79,8 +79,9 @@ public class StructureTrack extends Track {
 
 		public void setTypeVisible(Type t, boolean b) {
 			visibleTypes.put(t, b);
-			setChanged();
-			notifyObservers();
+//			setChanged();
+//			notifyObservers();
+			model.refresh();
 
 		}
 
@@ -775,8 +776,9 @@ public class StructureTrack extends Track {
 
 		}
 
-		setChanged();
-		notifyObservers();
+//		setChanged();
+//		notifyObservers();
+		model.refresh();
 		return false;
 	}
 
@@ -831,8 +833,9 @@ public class StructureTrack extends Track {
 		pressTrack = -1;
 		dragging = false;
 		borderHit = null;
-		setChanged();
-		notifyObservers();
+//		setChanged();
+//		notifyObservers();
+		model.refresh();
 		return false;
 	}
 
@@ -898,8 +901,9 @@ public class StructureTrack extends Track {
 				updateSelectedRegion();
 			}
 			dragging = true;
-			setChanged();
-			notifyObservers();
+//			setChanged();
+//			notifyObservers();
+			model.refresh();
 			return true;
 		} else {
 			return false;
@@ -912,8 +916,9 @@ public class StructureTrack extends Track {
 			model.getGUIManager().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		else
 			model.getGUIManager().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-		setChanged();
-		notifyObservers();
+//		setChanged();
+//		notifyObservers();
+		model.refresh();
 		return false;
 	}
 

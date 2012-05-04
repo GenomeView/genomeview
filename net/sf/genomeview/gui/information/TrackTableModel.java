@@ -81,17 +81,17 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 		switch (col) {
 
 		case 0:
-			if (model.getTrackList().get(row).isVisible()) {
+			if (model.getTrackList().get(row).config().isVisible()) {
 				return Icons.VISIBLE;
 			} else {
 				return Icons.INVISIBLE;
 			}
 		case 1:
-			String alias=Configuration.get("track:alias:"+track.displayName());
-			if(alias!=null)
+			String alias=Configuration.get("track:alias:"+track.config().displayName());
+			if(alias!=null&&alias.length()>0)
 				return alias;
 			else
-				return track.displayName();
+				return track.config().displayName();
 		default:
 			return Icons.DELETE;
 		}
@@ -120,7 +120,7 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 //		}
 
 		if (column == 0) {
-			model.getTrackList().get(row).setVisible(!model.getTrackList().get(row).isVisible());
+			model.getTrackList().get(row).config().setVisible(!model.getTrackList().get(row).config().isVisible());
 
 		}
 		

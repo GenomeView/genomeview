@@ -404,7 +404,7 @@ public class MultipleAlignmentTrack extends Track {
 				g.draw(conservationGP);
 				g.setColor(Color.RED);
 				g.draw(footprintGP);
-				g.drawString(this.displayName() + " (" + grouping + ")", 10,
+				g.drawString(this.config.displayName() + " (" + grouping + ")", 10,
 						yOffset + logoLineHeight - 2);
 				// return 3 * lineHeigh;
 			}

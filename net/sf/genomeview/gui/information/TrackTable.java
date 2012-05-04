@@ -6,6 +6,7 @@ package net.sf.genomeview.gui.information;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.logging.Logger;
 
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -14,13 +15,14 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.TrackList;
 /**
  * 
  * @author Thomas Abeel
  *
  */
 public class TrackTable extends JTable {
-
+	private Logger log = Logger.getLogger(TrackTable.class.getCanonicalName());
     private static final long serialVersionUID = 2680194422003453639L;
 
     public TrackTable(final Model model) {
@@ -45,10 +47,9 @@ public class TrackTable extends JTable {
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
-            	
-                int column = getSelectedColumn();
-                int row = getSelectedRow();
-                listModel.mouse(column,row);
+            	int column=columnAtPoint(e.getPoint());
+            	int row=rowAtPoint(e.getPoint());
+            	listModel.mouse(column,row);
                 
             }
         });

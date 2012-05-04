@@ -29,10 +29,11 @@ import net.sf.genomeview.gui.menu.selection.ClearRegionSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ShowSequenceWindowAction;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.Feature;
+
 /**
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 public class PopUpMenu extends JPopupMenu {
 	private Logger log = Logger.getLogger(PopUpMenu.class.toString());
@@ -66,14 +67,16 @@ public class PopUpMenu extends JPopupMenu {
 		SortedSet<Feature> sf = model.selectionModel().getFeatureSelection();
 		List<Action> actions = new ArrayList<Action>();
 		for (Feature f : sf) {
-			for (String q : f.qualifier("url").split(",")) {
-				String name = q.split(":")[0];
-				String url = q.substring(q.indexOf(':') + 1);
-				if(name.startsWith("http")){
-					url=q;
-					name="Web query";
+			if (f.qualifier("url") != null) {
+				for (String q : f.qualifier("url").split(",")) {
+					String name = q.split(":")[0];
+					String url = q.substring(q.indexOf(':') + 1);
+					if (name.startsWith("http")) {
+						url = q;
+						name = "Web query";
+					}
+					actions.add(new OpenURLAction(name, url));
 				}
-				actions.add(new OpenURLAction(name, url));
 			}
 		}
 		if (actions.size() > 0)
@@ -85,11 +88,12 @@ public class PopUpMenu extends JPopupMenu {
 		if (count > 0)
 			addSeparator();
 		count = 0;
+
 		/* Track specific actions, if there is a track */
 		if (t != null) {
 			List<JMenuItem> list = t.getMenuItems();
 			for (JMenuItem a : list) {
-				if(a==null)
+				if (a == null)
 					addSeparator();
 				else if (a.isEnabled()) {
 					count++;
@@ -107,14 +111,15 @@ public class PopUpMenu extends JPopupMenu {
 							"What name should this track have?", "Alias", JOptionPane.QUESTION_MESSAGE);
 					if (in != null) {
 						try {
-							if(in.length()==0){
-								Configuration.unset("track:alias:"+t.getDataKey().toString());
-							}else{
-								Configuration.set("track:alias:"+t.getDataKey().toString(),in);
+							if (in.length() == 0) {
+								Configuration.unset("track:alias:" + t.getDataKey().toString());
+							} else {
+								Configuration.set("track:alias:" + t.getDataKey().toString(), in);
 							}
 							model.refresh();
 						} catch (Exception ex) {
-							log.log(Level.WARNING, "Could not set alias for track "+t +" from " +t.getDataKey()+" to " + in, ex);
+							log.log(Level.WARNING, "Could not set alias for track " + t + " from " + t.getDataKey()
+									+ " to " + in, ex);
 						}
 					}
 
@@ -122,7 +127,7 @@ public class PopUpMenu extends JPopupMenu {
 
 			});
 			add(alias);
-			
+
 			JMenuItem clear = new JMenuItem(new AbstractAction("Unload track") {
 
 				@Override

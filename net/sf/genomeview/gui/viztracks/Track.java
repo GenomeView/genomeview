@@ -18,6 +18,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JViewport;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
@@ -29,12 +30,20 @@ import net.sf.jannot.Location;
 /**
  * Abstract class for visualization tracks.
  */
-public abstract class Track extends Observable {
+public abstract class Track {
 
+	
+	
 	protected Model model;
 
 	protected DataKey dataKey;
 	protected Entry entry;
+	
+	
+	/**
+	 * Model for track configuration
+	 */
+	protected TrackConfig config;
 
 	public static void paintStatus(Graphics g, Iterable<Status> status, int y, int returnTrackHeight, Location visible,
 			double screenWidth) {
@@ -55,14 +64,23 @@ public abstract class Track extends Observable {
 		}
 
 	}
-
-	public Track(DataKey key, Model model, boolean visible, boolean collapsible) {
+	@Deprecated
+	protected Track(DataKey key, Model model, boolean visible, boolean collapsible) {
+		this(key,model,visible,collapsible,new TrackConfig(model,key));
+	}
+//	private TrackConfigWindow tcw;
+	protected Track(DataKey key, Model model, boolean visible, boolean collapsible,TrackConfig config) {
 		this.model = model;
 		this.dataKey = key;
+		this.config=config;
+		TrackConfigWindow tcw=new TrackConfigWindow(model,config);
 		log.log(Level.INFO, "Creating track\t" + key + "\t" + visible + "\t" + collapsible);
 		this.entry = model.getSelectedEntry();
-		this.collapsible = collapsible;
-		this.addObserver(model);
+		config.setCollapsible(collapsible);
+//		this.collapsible = collapsible;
+		config.addObserver(model);
+		
+		
 	}
 
 	// private boolean visible;
@@ -72,9 +90,10 @@ public abstract class Track extends Observable {
 	 * To pass along mouse clicks from the original panel.
 	 */
 	public boolean mouseClicked(int x, int y, MouseEvent source) {
-		if (collapse != null && collapse.contains(x, y)) {
+		if (configCog != null && configCog.contains(x, y)) {
 			log.finest("Track consumes click");
-			this.setCollapsed(!this.isCollapsed());
+			config.setConfigVisible(true);
+//			this.setCollapsed(!this.isCollapsed());
 			source.consume();
 			return true;
 		}
@@ -123,22 +142,26 @@ public abstract class Track extends Observable {
 		return false;
 	}
 
-	private Rectangle collapse = null;
+	private Rectangle configCog = null;
 	private Color[] background = new Color[] { new Color(204, 238, 255, 75), new Color(255, 255, 204, 75) };
 
-	private void paintCollapse(Graphics2D g, int yOffset, double width) {
-		if (isCollapsible()) {
-			g.translate(0, yOffset);
-			collapse = new Rectangle((int) width - 15, 5, 10, 10);
-			g.setColor(Color.WHITE);
-			g.fill(collapse);
-			g.setColor(Color.BLACK);
-			g.draw(collapse);
-			g.drawLine(collapse.x + 2, 10, collapse.x + 8, 10);
-			if (isCollapsed())
-				g.drawLine(collapse.x + 5, 7, collapse.x + 5, 13);
+	private void paintConfigCog(Graphics2D g, int yOffset, double width) {
+//		config.setConfigOffset((int)width-15,yOffset+5);
+//		if (isCollapsible()) {
+		config.setConfigOffset((int)width,yOffset);
+		g.translate(0, yOffset);
+		g.drawImage(Icons.COG, (int)width-15, 5, null);//Icons.COG
+		configCog = new Rectangle((int) width - 15, 5, 12, 12);
+			
+//			g.setColor(Color.WHITE);
+//			g.fill(collapse);
+//			g.setColor(Color.BLACK);
+//			g.draw(collapse);
+//			g.drawLine(collapse.x + 2, 10, collapse.x + 8, 10);
+//			if (isCollapsed())
+//				g.drawLine(collapse.x + 5, 7, collapse.x + 5, 13);
 			g.translate(0, -yOffset);
-		}
+//		}
 	}
 
 	/**
@@ -154,7 +177,6 @@ public abstract class Track extends Observable {
 	 * @return the height that was painted
 	 */
 	public int paint(Graphics g, int yOffset, double width, int index, JViewport view, TrackCommunicationModel tcm) {
-
 		int used = paintTrack((Graphics2D) g, yOffset, width, view, tcm);
 
 		if (index >= 0 && !(this instanceof StructureTrack)) {
@@ -163,7 +185,7 @@ public abstract class Track extends Observable {
 			g.fillRect(r.x, r.y, r.width, r.height);
 		}
 
-		paintCollapse((Graphics2D) g, yOffset, width);
+		paintConfigCog((Graphics2D) g, yOffset, width);
 		return used;
 	}
 
@@ -185,54 +207,13 @@ public abstract class Track extends Observable {
 	protected abstract int paintTrack(Graphics2D g, int yOffset, double width, JViewport view,
 			TrackCommunicationModel tcm);
 
-	/* Keeps track of whether a track is collapsible */
-	private boolean collapsible = false;
-	/* Keeps track of the actual collapse state of the track */
-	private boolean collapsed = Configuration.getBoolean("track:defaultCollapse");
-
-	protected void setCollapsible(boolean collapsible) {
-		this.collapsible = collapsible;
-		setChanged();
-		notifyObservers();
-	}
-
-	public void setCollapsed(boolean collapsed) {
-		this.collapsed = collapsed;
-		setChanged();
-		notifyObservers();
-	}
-
-	public boolean isCollapsible() {
-		return collapsible;
-	}
-
-	public boolean isCollapsed() {
-		return collapsed;
-	}
-
-	public boolean isVisible() {
-		return Configuration.getVisible(dataKey);
-	}
-
-	public void setVisible(boolean visible) {
-		Configuration.setVisible(dataKey, visible);
-		setChanged();
-		notifyObservers();
-	}
-
-	final public String displayName() {
-		String alias = Configuration.get("track:alias:" + dataKey);
-		if (alias != null)
-			return alias;
-		else
-			return "" + dataKey;
-
-	}
+	
 
 	public DataKey getDataKey() {
 		return dataKey;
 	}
 
+	@Deprecated
 	public List<JMenuItem> getMenuItems() {
 		return new ArrayList<JMenuItem>();
 	}
@@ -244,6 +225,9 @@ public abstract class Track extends Observable {
 	 */
 	public void clear() {
 		
+	}
+	public TrackConfig config() {
+		return config;
 	}
 
 }

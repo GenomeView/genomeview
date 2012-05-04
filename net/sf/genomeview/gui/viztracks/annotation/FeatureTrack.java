@@ -261,7 +261,7 @@ public class FeatureTrack extends Track {
 				Rectangle r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness, maxX - x1 + 2
 						* closenessOverlap, lineThickness);
 				
-				if (!isCollapsed()&&!manyFeature) {
+				if (!config.isCollapsed()&&!manyFeature) {
 					// only when the blocks should be tiled, do we need to
 					// determine an empty place.
 					if (!collision)

@@ -64,6 +64,8 @@ public class TrackList implements Iterable<Track> {
 	}
 
 	public Track get(int index) {
+		if(index==-1)
+			return null;
 		return mapping.get(order.get(index));
 	}
 
@@ -73,7 +75,7 @@ public class TrackList implements Iterable<Track> {
 		StructureTrack strack = new StructureTrack(model);
 		add(strack.getDataKey(), strack);
 		if (!Configuration.getBoolean("track:showStructure")) {
-			strack.setVisible(false);
+			strack.config().setVisible(false);
 
 		}
 

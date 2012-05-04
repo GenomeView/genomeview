@@ -164,6 +164,9 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent source) {
+		super.mouseClicked(x, y, source);
+		if (source.isConsumed())
+			return true;
 		// System.out.println("Click: " + x + " " + y);
 		if (source.getClickCount() > 1) {
 			for (java.util.Map.Entry<Rectangle, SAMRecord> e : hitMap.entrySet()) {
@@ -546,7 +549,7 @@ public class ShortReadTrack extends Track {
 		Track.paintStatus(g, status, originalYOffset, yOffset - originalYOffset, currentVisible, screenWidth);
 
 		/* Draw label */
-		String name = displayName();
+		String name = config.displayName();
 		FontMetrics metrics = g.getFontMetrics();
 		int hgt = metrics.getHeight();
 		int adv = metrics.stringWidth(name);

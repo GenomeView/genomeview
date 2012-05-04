@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.Model;
 /**
  * 
  * @author Thomas Abeel
@@ -35,7 +36,12 @@ public class BooleanConfig extends JCheckBox {
 
 	private static final long serialVersionUID = 9081788377933556296L;
 
+	@Deprecated
 	public BooleanConfig(final String key, final String title) {
+		this(key,title,null);
+	}
+	
+	public BooleanConfig(final String key, final String title,final Model model) {
 		super(title);
 		this.setSelected(Configuration.getBoolean(key));
 
@@ -43,6 +49,7 @@ public class BooleanConfig extends JCheckBox {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Configuration.set(key, isSelected());
+				model.refresh();
 
 			}
 

@@ -51,6 +51,8 @@ public class Icons {
 	public static Icon MINILOGO_ICON = get("gv2.png");
 
 	public static Image MINILOGO = get("gv2.png").getImage();
+	
+	public static Image COG = get("cog.png").getImage();
 
 	private Icons() throws IOException {
 

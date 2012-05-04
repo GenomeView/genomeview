@@ -17,7 +17,6 @@ public class TickmarkTrack extends Track {
 	public static final StringKey key = new StringKey("GV::TICKMARK");
 
 	public TickmarkTrack(Model model) {
-
 		super(key, model, true, false);
 	}
 

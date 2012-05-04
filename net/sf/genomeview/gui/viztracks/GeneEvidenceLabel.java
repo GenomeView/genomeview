@@ -79,7 +79,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		int index = 0;
 		
 		for (Track track : model.getTrackList()) {
-			if (track.isVisible()) {
+			if (track.config.isVisible()) {
 				int height = track.paint(g, framePixelsUsed, screenWidth,
 						index++, view,tcm);
 				

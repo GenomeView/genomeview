@@ -193,7 +193,7 @@ public class WiggleTrack extends Track {
 		this.screenWidth = screenWidth;
 
 		int graphLineHeigh = 50;
-		if (isCollapsed())
+		if (config.isCollapsed())
 			graphLineHeigh = 10;
 
 		g.setColor(Color.BLACK);
@@ -248,7 +248,7 @@ public class WiggleTrack extends Track {
 					val /= range;
 				}
 
-				if (!isCollapsed()) {
+				if (!config.isCollapsed()) {
 					/* Draw lines */
 					if (plotType == 0) {
 						if (i == 0) {
@@ -273,15 +273,15 @@ public class WiggleTrack extends Track {
 
 			}
 
-			if (!isCollapsed()) {
+			if (!config.isCollapsed()) {
 				g.setColor(Color.BLACK);
 				g.draw(conservationGP);
 
 			}
 
 			g.setColor(Color.black);
-			if(displayName()!=null)
-				g.drawString(displayName(), 10, yOffset + 15);
+			if(config.displayName()!=null)
+				g.drawString(config.displayName(), 10, yOffset + 15);
 			else 
 				g.drawString("graph", 10, yOffset+15);
 		}

@@ -127,7 +127,7 @@ public class PileupTrack extends Track {
 
 		g.setColor(Color.BLACK);
 
-		g.drawString(displayName(), 10, yOffset + 24 - 2);
+		g.drawString(config.displayName(), 10, yOffset + 24 - 2);
 
 		return graphLineHeigh;
 
