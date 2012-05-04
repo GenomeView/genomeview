@@ -1,5 +1,22 @@
 /**
- * %HEADER%
+ * This file is part of GenomeView, a genome browser and annotation curator
+ * 
+ * Copyright (C) 2012 Thomas Abeel
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ *
+ * Project: http://genomeview.org/
  */
 package net.sf.genomeview.gui.viztracks.annotation;
 
@@ -14,7 +31,6 @@ import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -22,11 +38,9 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JViewport;
 import javax.swing.JWindow;
@@ -47,14 +61,11 @@ import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel.FillMode;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.genomeview.gui.viztracks.TrackConfig;
-import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
 import net.sf.jannot.Type;
-import net.sf.jannot.shortread.ReadGroup;
 import be.abeel.gui.GridBagPanel;
-import be.abeel.util.CountMap;
 
 /**
  * Visualization track for feature tracks.
@@ -64,47 +75,26 @@ import be.abeel.util.CountMap;
  * @author Thomas Abeel
  * 
  */
-public class FeatureTrack extends Track  {
+public class FeatureTrack extends Track {
 
 	static class FeatureTrackConfig extends TrackConfig {
-
-		// private Type type;
 
 		@Override
 		protected GridBagPanel getGUIContainer() {
 			GridBagPanel out = super.getGUIContainer();
-			// System.out.println(isScoreColorGradientEnabled());
-			// if (isScoreColorGradientEnabled()) {
-
-			// colorQualifier =
-			// Configuration.getBoolean("feature:useColorQualifierTag_" +
-			// type);
-			// scoreColorGradient =
-			// Configuration.getBoolean("feature:scoreColorGradient_" +
-			// type);
+			
 			out.gc.gridy++;
-			final JComponent colorGradient=new BooleanConfig("feature:scoreColorGradient_" + type(), "Use score color gradient", model);
-			out.add(colorGradient,out.gc);
+			final JComponent colorGradient = new BooleanConfig("feature:scoreColorGradient_" + type(),
+					"Use score color gradient", model);
+			out.add(colorGradient, out.gc);
 
-			// /* Color gradient coloring based on score */
-			// final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
-			// item.setSelected(ftm.isScoreColorGradient());
-			// item.setAction(new AbstractAction("Use score color gradient")
-			// {
-			// @Override
-			// public void actionPerformed(ActionEvent e) {
-			// ftm.setScoreColorGradient(item.isSelected());
-			//
-			// }
-			//
-			// });
-			// out.add(item);
+			
 
 			/* Filter items based on score */
-			// final JMenuItem filter = new JMenuItem();
+	
 			out.gc.gridy++;
-			
-			final JButton filter=new JButton(new AbstractAction("Filter items by score") {
+
+			final JButton filter = new JButton(new AbstractAction("Filter items by score") {
 				// filter.setAction(new
 				// AbstractAction("Filter items by score") {
 				@Override
@@ -145,33 +135,15 @@ public class FeatureTrack extends Track  {
 
 			});
 			out.add(filter, out.gc);
-			// out.add(filter);
-			//
-			// }
-			//
-			// if (isColorQualifierEnabled()) {
+			
 			out.gc.gridy++;
-			final JComponent colorQualifier=new BooleanConfig("feature:useColorQualifierTag_" + type(), "Use /color qualifier", model);
+			final JComponent colorQualifier = new BooleanConfig("feature:useColorQualifierTag_" + type(),
+					"Use /color qualifier", model);
 			out.add(colorQualifier, out.gc);
 
-			// final JCheckBoxMenuItem colorQualifier = new
-			// JCheckBoxMenuItem();
-			// colorQualifier.setSelected(ftm.isColorQualifier());
-			// colorQualifier.setAction(new
-			// AbstractAction("Use /color qualifier") {
-			// @Override
-			// public void actionPerformed(ActionEvent e) {
-			// ftm.setColorQualifier(colorQualifier.isSelected());
-			//
-			// }
-			//
-			// });
-			// out.add(colorQualifier);
-			// }
 			
-			
-				
-			this.addObserver(new Observer(){
+
+			this.addObserver(new Observer() {
 
 				@Override
 				public void update(Observable o, Object arg) {
@@ -179,9 +151,9 @@ public class FeatureTrack extends Track  {
 					colorQualifier.setEnabled(isColorQualifierEnabled());
 					filter.setEnabled(isScoreColorGradientEnabled());
 				}
-				
+
 			});
-			
+
 			return out;
 
 		}
@@ -254,10 +226,7 @@ public class FeatureTrack extends Track  {
 		public FeatureTrackConfig(Model model, Type type) {
 			super(model, type);
 
-			// colorQualifier =
-			// Configuration.getBoolean("feature:useColorQualifierTag_" + type);
-			// scoreColorGradient =
-			// Configuration.getBoolean("feature:scoreColorGradient_" + type);
+			
 		}
 
 		public boolean isScoreColorGradient() {
@@ -287,10 +256,10 @@ public class FeatureTrack extends Track  {
 
 		}
 
-		public boolean isColorQualifierEnabled(){
+		public boolean isColorQualifierEnabled() {
 			return colorQualifierEnabled;
 		}
-		
+
 		public void setColorQualifierEnabled(boolean b) {
 			colorQualifierEnabled = b;
 			setChanged();
@@ -454,10 +423,7 @@ public class FeatureTrack extends Track  {
 					break;
 
 				}
-				// if (model.isShowTextOnStructure(type) && name != null) {
-				// g.drawString(name.getValue(), x1, thisLine
-				// * lineThickness + yOffset + 20);
-				// }
+			
 				g.setColor(backColor);
 
 				// Set<Feature> selected = model.getFeatureSelection();
@@ -562,10 +528,7 @@ public class FeatureTrack extends Track  {
 
 		private JLabel floater = new JLabel();
 
-		private FeatureTrackConfig ftm;
-
 		public FeatureInfoWindow(FeatureTrackConfig ftm) {
-			this.ftm = ftm;
 			floater.setBackground(Color.GRAY);
 			floater.setForeground(Color.BLACK);
 			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
@@ -589,20 +552,6 @@ public class FeatureTrack extends Track  {
 					text.append("Name : " + name + "<br />");
 					text.append("Start : " + f.start() + "<br />");
 					text.append("End : " + f.end() + "<br />");
-					// int aggregateLenght = agg(f.location());
-					// if (aggregateLenght <
-					// Configuration.getInt("featuretrack:meanshortread")) {
-					//
-					// Iterable<ReadGroup> sources =
-					// ftm.model.getSelectedEntry().shortReads();
-					//
-					// CountMap<Integer> cm = new CountMap<Integer>();
-					// for (ReadGroup rg : sources) {
-					// cm.clear();
-					//
-					//
-					// }
-					// }
 
 				}
 				text.append("</html>");
@@ -613,19 +562,6 @@ public class FeatureTrack extends Track  {
 					setVisible(true);
 				}
 			}
-		}
-
-		/**
-		 * Calculates the sum of the lengths of the individual locations.
-		 * 
-		 * @param location
-		 * @return
-		 */
-		private int agg(Location[] location) {
-			int sum = 0;
-			for (Location l : location)
-				sum += l.length();
-			return sum;
 		}
 
 	}
@@ -669,87 +605,4 @@ public class FeatureTrack extends Track  {
 
 	}
 
-	//
-	// @Override
-	// public List<JMenuItem> getMenuItems() {
-	// ArrayList<JMenuItem> out = new ArrayList<JMenuItem>();
-	// if (ftm.isScoreColorGradientEnabled()) {
-	// /* Color gradient coloring based on score */
-	// final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
-	// item.setSelected(ftm.isScoreColorGradient());
-	// item.setAction(new AbstractAction("Use score color gradient") {
-	// @Override
-	// public void actionPerformed(ActionEvent e) {
-	// ftm.setScoreColorGradient(item.isSelected());
-	//
-	// }
-	//
-	// });
-	// out.add(item);
-	//
-	// /* Filter items based on score */
-	// final JMenuItem filter = new JMenuItem();
-	//
-	// filter.setAction(new AbstractAction("Filter items by score") {
-	// @Override
-	// public void actionPerformed(ActionEvent e) {
-	// final JOptionPane optionPane = new JOptionPane();
-	// final JLabel label = new JLabel();
-	// final NumberFormat nf = NumberFormat.getInstance();
-	// nf.setMaximumFractionDigits(2);
-	// final DoubleJSlider slider = new DoubleJSlider(ftm.minScore,
-	// ftm.maxScore,
-	// ftm.getThreshold()>ftm.minScore?ftm.getThreshold():ftm.minScore,
-	// (ftm.maxScore - ftm.minScore) / 100.0);
-	// optionPane.setInputValue(slider.getDoubleValue());
-	// label.setText(nf.format(slider.getDoubleValue()));
-	// //slider.setMajorTickSpacing((int)((ftm.maxScore-ftm.minScore)/10));
-	// slider.setPaintTicks(true);
-	// slider.setPaintLabels(true);
-	//
-	// ChangeListener changeListener = new ChangeListener() {
-	// public void stateChanged(ChangeEvent changeEvent) {
-	// DoubleJSlider theSlider = (DoubleJSlider) changeEvent.getSource();
-	// label.setText(nf.format(slider.getDoubleValue()));
-	// if (!theSlider.getValueIsAdjusting()) {
-	// optionPane.setInputValue(theSlider.getDoubleValue());
-	// theSlider.setDoubleValue(theSlider.getDoubleValue());
-	// }
-	// }
-	// };
-	// slider.addChangeListener(changeListener);
-	// optionPane.setMessage(new Object[] { "Select score threshold: ", slider,
-	// label });
-	// optionPane.setMessageType(JOptionPane.QUESTION_MESSAGE);
-	// optionPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-	// JDialog dialog =
-	// optionPane.createDialog(model.getGUIManager().getParent(),
-	// "Score threshold");
-	// // dialog.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
-	// dialog.setVisible(true);
-	// ftm.setThreshold((Double)optionPane.getInputValue());
-	// System.out.println("Input: " + optionPane.getInputValue());
-	//
-	// }
-	//
-	// });
-	// out.add(filter);
-	//
-	// }
-	//
-	// if (ftm.isColorQualifierEnabled()) {
-	// final JCheckBoxMenuItem colorQualifier = new JCheckBoxMenuItem();
-	// colorQualifier.setSelected(ftm.isColorQualifier());
-	// colorQualifier.setAction(new AbstractAction("Use /color qualifier") {
-	// @Override
-	// public void actionPerformed(ActionEvent e) {
-	// ftm.setColorQualifier(colorQualifier.isSelected());
-	//
-	// }
-	//
-	// });
-	// out.add(colorQualifier);
-	// }
-	// return out;
-	// }
 }
