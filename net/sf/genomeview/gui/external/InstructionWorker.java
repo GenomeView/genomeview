@@ -30,18 +30,20 @@ import be.abeel.net.URIFactory;
  */
 class InstructionWorker implements Runnable {
 
-	class Port{
+	class Port {
 		private int port;
 
-		
-		public String toString(){
-			return ""+port;
-		}
-		public Port(int port) {
-			this.port=port;
+		public String toString() {
+			return "" + port;
 		}
 
-		/* (non-Javadoc)
+		public Port(int port) {
+			this.port = port;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Object#hashCode()
 		 */
 		@Override
@@ -52,7 +54,9 @@ class InstructionWorker implements Runnable {
 			return result;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Object#equals(java.lang.Object)
 		 */
 		@Override
@@ -73,9 +77,8 @@ class InstructionWorker implements Runnable {
 			return port;
 		}
 
-		
-		
 	}
+
 	/* Socket to client we're handling */
 	private Socket s;
 
@@ -120,7 +123,7 @@ class InstructionWorker implements Runnable {
 		if (line.startsWith("GenomeViewJavaScriptHandler-")) {
 			otherPorts.add(new Port(Integer.parseInt(line.split("-")[1])));
 		} else {
-			while (!line.startsWith("GET")&&it.hasNext()) {
+			while (!line.startsWith("GET") && it.hasNext()) {
 				// System.out.println("Handler: GET: " + line);
 				line = it.next();
 				// System.out.println(line);
@@ -131,7 +134,7 @@ class InstructionWorker implements Runnable {
 			if (line.startsWith("GET /genomeview-" + id + "/") || line.startsWith("GET /genomeview-ALL/")) {
 				String[] id = line.split("\\$\\$");
 				if (id.length == 1 || !lastID.contains(id[1])) {
-					if(id.length>1)
+					if (id.length > 1)
 						lastID.add(id[1]);
 
 					line = id[0];
@@ -139,21 +142,30 @@ class InstructionWorker implements Runnable {
 					if (arr[1].startsWith("genomeview")) {
 						if (arr[2].toLowerCase().equals("position")) {
 							doPosition(arr[3]);
-						}
-						if (arr[2].toLowerCase().equals("load")) {
+						} else if (arr[2].toLowerCase().equals("load")) {
 							if (!arr[3].equals(lastLoad)) {
 								lastLoad = arr[3];
 								doLoad(arr[3]);
 							}
 
-						}
-						if (arr[2].toLowerCase().equals("session")) {
+						} else if (arr[2].toLowerCase().equals("session")) {
 							doSession(arr[3]);
 
-						}
-						if (arr[2].toLowerCase().equals("unload")) {
+						} else if (arr[2].toLowerCase().equals("unload")) {
 							model.clearEntries();
 							lastLoad = null;
+						}else if(arr[2].toLowerCase().equals("heartbeat")){
+							PrintWriter pw=new PrintWriter(s.getOutputStream());
+							pw.println("HTTP/1.1 200 OK");
+							pw.println("Content-Type: text/plain");
+							pw.println();
+							pw.println("isGenomeViewAlive=true;");
+							pw.flush();
+							pw.close();
+							
+						}else{
+							log.log(Level.WARNING,"Instruction "+line +" was not understood by GenomeView");
+							
 						}
 					} else {
 						log.log(Level.WARNING, "This instruction doesn't belong to GenomeView, I'll ignore it.");
@@ -178,13 +190,13 @@ class InstructionWorker implements Runnable {
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				System.err.println("Removing port: "+port);
+				System.err.println("Removing port: " + port);
 				otherPorts.remove(port);
-				
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				System.err.println("Removing port: "+port);
+				System.err.println("Removing port: " + port);
 				otherPorts.remove(port);
 			}
 		}
@@ -214,8 +226,8 @@ class InstructionWorker implements Runnable {
 
 	private void doLoad(String s) {
 		try {
-			DataSourceHelper.load(model,new Locator(s));
-			
+			DataSourceHelper.load(model, new Locator(s));
+
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
