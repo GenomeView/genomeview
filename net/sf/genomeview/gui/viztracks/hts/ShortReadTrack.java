@@ -457,44 +457,57 @@ public class ShortReadTrack extends Track {
 								//
 								// }
 							}
-							if (two != null) {
-								if (two.getAlignmentStart() < one.getAlignmentStart()) {
-
-									pos = two.getAlignmentStart() - currentVisible.start;
+//							if (two != null) {
+							if(!one.getMateUnmappedFlag()
+									&& one.getReferenceIndex() == one.getMateReferenceIndex()
+									&& one.getMateReferenceIndex() != -1){
+//								if (two.getAlignmentStart() < one.getAlignmentStart()) {
+								if (one.getMateAlignmentStart() < one.getAlignmentStart()) {
+									pos = one.getMateAlignmentStart() - currentVisible.start;
 									line = tilingCounter.getFreeLine(pos);
 									if (line >= maxStack) {
 										stackExceeded = true;
 										continue;
 									}
-									clearStart = two.getAlignmentStart();
+									clearStart = one.getMateAlignmentStart();
 								} else {
-									clearEnd = two.getAlignmentEnd();
+									clearEnd = one.getMateAlignmentStart()+one.getReadLength();
 								}
 							}
 
 						}
 						/* The y-coordinate of the read */
 						int yRec = line * readLineHeight;
-
+						
 						/* paired read - calculate connection coordinates */
-						if (two != null) {
-
+//						if (two != null) {
+						if(!one.getMateUnmappedFlag()
+										&& one.getReferenceIndex() == one.getMateReferenceIndex()
+										&& one.getMateReferenceIndex() != -1){
 							int subX1, subX2;
-							if (one.getAlignmentStart() < two.getAlignmentStart()) {
+//							if (one.getAlignmentStart() < two.getAlignmentStart()) {
 
 								subX1 = Convert.translateGenomeToScreen(one.getAlignmentEnd(), currentVisible,
 										screenWidth);
-								subX2 = Convert.translateGenomeToScreen(two.getAlignmentStart(), currentVisible,
+//								subX2 = Convert.translateGenomeToScreen(two.getAlignmentStart(), currentVisible,
+//										screenWidth);
+								subX2 = Convert.translateGenomeToScreen(one.getMateAlignmentStart(), currentVisible,
 										screenWidth);
-
-							} else {
-
-								subX1 = Convert.translateGenomeToScreen(one.getAlignmentStart(), currentVisible,
-										screenWidth);
-								subX2 = Convert.translateGenomeToScreen(two.getAlignmentEnd(), currentVisible,
-										screenWidth);
-
-							}
+//								clearStart = two.getAlignmentStart();
+//							} else {
+//
+//								subX1 = Convert.translateGenomeToScreen(one.getAlignmentStart(), currentVisible,
+//										screenWidth);
+//								subX2 = Convert.translateGenomeToScreen(two.getAlignmentEnd(), currentVisible,
+//										screenWidth);
+//
+//							}
+//							if (one.getMateAlignmentStart() < one.getAlignmentStart()) {
+//								clearStart = one.getMateAlignmentStart();
+//							} else {
+//								clearEnd = one.getMateAlignmentStart();
+//							}
+								
 
 							g.setColor(pairingColor);
 							g.drawLine(subX1, yRec + (readLineHeight / 2) + yOffset, subX2, yOffset + yRec
