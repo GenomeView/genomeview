@@ -10,8 +10,8 @@ import net.sf.genomeview.data.Model;
 
 public abstract class ConfigBox {
 
-	public static Container booleanInstance(String key, String title) {
-		return new BooleanConfig(key, title);
+	public static Container booleanInstance(Model model,String key, String title) {
+		return new BooleanConfig(key, title,model);
 
 	}
 

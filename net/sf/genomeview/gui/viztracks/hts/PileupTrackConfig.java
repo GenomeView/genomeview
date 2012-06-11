@@ -42,6 +42,8 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
 import net.sf.genomeview.gui.config.BooleanConfig;
+import net.sf.genomeview.gui.config.ConfigListener;
+
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.genomeview.gui.viztracks.TrackConfig;
 import net.sf.jannot.Data;
@@ -67,37 +69,24 @@ public class PileupTrackConfig extends TrackConfig {
 	protected GridBagPanel getGUIContainer() {
 		GridBagPanel out = super.getGUIContainer();
 
-		/*
-		 * Scale across tracks
-		 */
-		final JCheckBox itemCrossTrack = new JCheckBox();
-		itemCrossTrack.setSelected(isCrossTrackScaling());
-		itemCrossTrack.setAction(new AbstractAction("Scale across tracks") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setCrossTrackScaling(itemCrossTrack.isSelected());
+		// /*
+		// FIXME Find a proper way to embed global config options in local config. 
+		// Scale across tracks
+		// */
+		// final JCheckBox itemCrossTrack = new JCheckBox();
+		// itemCrossTrack.setSelected(isCrossTrackScaling());
+		// itemCrossTrack.setAction(new AbstractAction("Scale across tracks") {
+		// @Override
+		// public void actionPerformed(ActionEvent e) {
+		// setCrossTrackScaling(itemCrossTrack.isSelected());
+		//
+		// }
+		//
+		// });
+		// out.gc.gridy++;
+		// out.add(itemCrossTrack, out.gc);
 
-			}
-
-		});
-		out.gc.gridy++;
-		out.add(itemCrossTrack, out.gc);
-
-		/*
-		 * Use global settings
-		 */
-		final JCheckBox itemGlobal = new JCheckBox();
-		itemGlobal.setSelected(isGlobalSettings());
-		itemGlobal.setAction(new AbstractAction("Track uses defaults") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setGlobalSettings(itemGlobal.isSelected());
-			}
-
-		});
-		out.gc.gridy++;
-		out.add(itemGlobal, out.gc);
-
+	
 		/*
 		 * Threshold line
 		 */
@@ -134,14 +123,40 @@ public class PileupTrackConfig extends TrackConfig {
 		out.gc.gridy++;
 		out.add(item, out.gc);
 
+		/*
+		 * Use global settings
+		 */
+		final JCheckBox itemGlobal = new JCheckBox();
+		itemGlobal.setSelected(isGlobalSettings());
+		itemGlobal.setAction(new AbstractAction("Track uses defaults") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setGlobalSettings(itemGlobal.isSelected());
+			}
+
+		});
+		out.gc.gridy++;
+		out.add(itemGlobal, out.gc);
+
+		
+		
 		final BooleanConfig normalize = new BooleanConfig("track:pile:normalize:" + dataKey, "Normalize by mean", model);
+		normalize.addConfigListener(new ConfigListener() {
+
+			@Override
+			public void configurationChanged() {
+				setChanged();
+				notifyObservers();
+
+			}
+		});
 		out.gc.gridy++;
 		out.add(normalize, out.gc);
 
 		/* Log scaling of line graph */
 		final JCheckBox item4 = new JCheckBox();
 		item4.setSelected(isLogscaling());
-		item4.setAction(new AbstractAction("Use log scaling for line graph") {
+		item4.setAction(new AbstractAction("Use log scaling") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setLogscaling(item4.isSelected());
@@ -249,10 +264,12 @@ public class PileupTrackConfig extends TrackConfig {
 	// return model.getAnnotationLocationVisible().length() < 16000;
 	// }
 
-	private boolean dynamicScaling = Configuration.getBoolean("pileup:dynamicScaling");
+	private boolean dynamicScaling ;//= Configuration.getBoolean("pileup:dynamicScaling");
 
-	private boolean logscaling = Configuration.getBoolean("pileup:logScale");
+	private boolean logscaling;// = Configuration.getBoolean("pileup:logScale");
 
+	private boolean normalize;//=Configuration.getBoolean("pileup:normalize");
+	
 	/*
 	 * Flag to keep track whether we want to use the global settings for scaling
 	 * and so on.
@@ -306,12 +323,11 @@ public class PileupTrackConfig extends TrackConfig {
 		this.screenWidth = screenWidth;
 
 	}
-	public final Normalize normalize=new Normalize();
-	
-	
+
+	public final Normalize normalizationEngine = new Normalize();
 
 	class Normalize {
-		private 	boolean calculating = false;
+		private boolean calculating = false;
 		private boolean calculated = false;
 		private double[] value = null;
 
@@ -337,11 +353,11 @@ public class PileupTrackConfig extends TrackConfig {
 
 						}
 						for (int i = 0; i < sum.length; i++)
-							sum[i]/=count;
-						value=sum;
-						calculated=true;
+							sum[i] /= count;
+						value = sum;
+						calculated = true;
 						model.messageModel().setStatusBarMessage("Normalization calculated");
-						
+
 					}
 
 				}).start();
@@ -355,7 +371,11 @@ public class PileupTrackConfig extends TrackConfig {
 	}
 
 	public boolean isNormalizeMean() {
-		return Configuration.getBoolean("track:pile:normalize:" + dataKey);
+		if (isGlobalSettings()) {
+			return Configuration.getBoolean("pileup:dynamicRange");
+		} else {
+			return Configuration.getBoolean("track:pile:normalize:" + dataKey);
+		}
 	}
 
 	public void setGlobalSettings(boolean globalSettings) {

@@ -22,37 +22,50 @@ package net.sf.genomeview.gui.config;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JCheckBox;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+
 /**
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 public class BooleanConfig extends JCheckBox {
 
 	private static final long serialVersionUID = 9081788377933556296L;
 
-	@Deprecated
-	public BooleanConfig(final String key, final String title) {
-		this(key,title,null);
-	}
-	
-	public BooleanConfig(final String key, final String title,final Model model) {
+	// @Deprecated
+	// public BooleanConfig(final String key, final String title) {
+	// this(key,title,null);
+	// }
+
+	public BooleanConfig(final String key, final String title, final Model model) {
 		super(title);
 		this.setSelected(Configuration.getBoolean(key));
 
 		this.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				System.out.println("Setting: " + key + "\t" + isSelected());
 				Configuration.set(key, isSelected());
 				model.refresh();
+				for (ConfigListener cl : listenerList) {
+					cl.configurationChanged();
+				}
 
 			}
 
 		});
+	}
+
+	private ArrayList<ConfigListener> listenerList = new ArrayList<ConfigListener>();
+
+	public void addConfigListener(ConfigListener listener) {
+		listenerList.add(listener);
+
 	}
 }

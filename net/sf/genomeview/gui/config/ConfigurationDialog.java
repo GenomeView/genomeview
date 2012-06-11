@@ -55,14 +55,14 @@ public class ConfigurationDialog extends JDialog {
 		public PileupConfigPanel(Model model) {
 			this.model=model;
 					
-			this.add(ConfigBox.booleanInstance("pileup:crossTrackScaling", "Cross connect the track scaling."), gc);
+			this.add(ConfigBox.booleanInstance(model,"pileup:crossTrackScaling", "Cross connect the track scaling."), gc);
 			gc.gridy++;
 			
 			this.add(new JLabel("Default configuration for tracks. Tracks can be configured individually from the context menu when right-clicking the track."),gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("pileup:dynamicRange", "Should all tracks use dynamic range?"), gc);
+			this.add(ConfigBox.booleanInstance(model,"pileup:dynamicRange", "Should all tracks use dynamic range?"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("pileup:logScale", "Should all tracks be log scaled?"), gc);
+			this.add(ConfigBox.booleanInstance(model,"pileup:logScale", "Should all tracks be log scaled?"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.doubleInstance("pileup:maxPile", "Maximum height of the pileup track"), gc);
 			gc.gridy++;
@@ -134,7 +134,7 @@ public class ConfigurationDialog extends JDialog {
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("shortread:maxStack", "<html>Maximum display depth of stacked reads, <br/>deeper stacked reads will not be shown individually, <br/>but are included in the pile-up view</html>"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("shortread:enablepairing", "Draw a connection between paired reads"), gc);
+			this.add(ConfigBox.booleanInstance(model,"shortread:enablepairing", "Draw a connection between paired reads"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("shortread:maximumCache", "Maximum number of reads to cache"), gc);
 			gc.gridy++;
@@ -164,12 +164,12 @@ public class ConfigurationDialog extends JDialog {
          */
 		private static final long serialVersionUID = -628553625113038258L;
 
-		public AnnotationConfigPanel() {
+		public AnnotationConfigPanel(Model model) {
 			this.add(ConfigBox.integerInstance("evidenceLineHeight", "Height of a track in pixels"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("showTrackName", "Show evidence track names"), gc);
+			this.add(ConfigBox.booleanInstance(model,"showTrackName", "Show evidence track names"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("useColorQualifierTag", "Use the /color qualifier tag"), gc);
+			this.add(ConfigBox.booleanInstance(model,"useColorQualifierTag", "Use the /color qualifier tag"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.stringInstance("visibleTypes", "Visible types on start-up"), gc);
 			gc.gridy++;
@@ -183,20 +183,20 @@ public class ConfigurationDialog extends JDialog {
          */
 		private static final long serialVersionUID = 7503579007314777946L;
 
-		public StructureConfigPanel() {
-			this.add(ConfigBox.booleanInstance("general:onlyMethionineAsStart","Show only Methionine as start codon"),gc);
+		public StructureConfigPanel(Model model) {
+			this.add(ConfigBox.booleanInstance(model,"general:onlyMethionineAsStart","Show only Methionine as start codon"),gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("track:showStructure", "Show structure track on start-up"), gc);
+			this.add(ConfigBox.booleanInstance(model,"track:showStructure", "Show structure track on start-up"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("geneStructureLineHeight", "Height of a track in pixels"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("colorStartCodons", "Color start codons"), gc);
+			this.add(ConfigBox.booleanInstance(model,"colorStartCodons", "Color start codons"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("colorStopCodons", "Color stop codons"), gc);
+			this.add(ConfigBox.booleanInstance(model,"colorStopCodons", "Color stop codons"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("showNucleotideColor", "Color nucleotides"), gc);
+			this.add(ConfigBox.booleanInstance(model,"showNucleotideColor", "Color nucleotides"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("showSpliceSiteColor", "Color splice sites (overrides nucleotide coloring)"), gc);
+			this.add(ConfigBox.booleanInstance(model,"showSpliceSiteColor", "Color splice sites (overrides nucleotide coloring)"), gc);
 			gc.gridy++;
 
 			this.add(ConfigBox.integerInstance("structureview:maximumNoVisibleFeatures", "Maximum number of features to display on the structure view"), gc);
@@ -214,7 +214,7 @@ public class ConfigurationDialog extends JDialog {
 			gc.gridwidth = 2;
 			gc.weightx=1;
 			gc.weighty=0;
-			this.add(ConfigBox.booleanInstance("track:forceFeatureLabels", "Force labels on features"), gc);
+			this.add(ConfigBox.booleanInstance(model,"track:forceFeatureLabels", "Force labels on features"), gc);
 			gc.gridy++;
 			gc.weighty=1;
 			Container typeContainer = new Container();
@@ -240,7 +240,7 @@ public class ConfigurationDialog extends JDialog {
 		public ComparativePanel(final Model model) {
 			gc.gridwidth = 2;
 			gc.weightx=1;
-			this.add(ConfigBox.booleanInstance("maf:enableAnnotation", "Enable comparative annotations"), gc);
+			this.add(ConfigBox.booleanInstance(model,"maf:enableAnnotation", "Enable comparative annotations"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.stringInstance("maf:annotationType", "Annotation type for comparative annotations"), gc);
 					
@@ -266,13 +266,13 @@ public class ConfigurationDialog extends JDialog {
 			gc.weightx=1;
 			this.add(ConfigBox.integerInstance("general:zoomout", "Maximum zoom-out size"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("general:monitorConnection", "Monitor network connection"), gc);
+			this.add(ConfigBox.booleanInstance(model,"general:monitorConnection", "Monitor network connection"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("dualscreen", "Enable dual-screen mode? (Requires restart)"), gc);
+			this.add(ConfigBox.booleanInstance(model,"dualscreen", "Enable dual-screen mode? (Requires restart)"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("general:singleInstance", "Allow only one instance of GenomeView"), gc);
+			this.add(ConfigBox.booleanInstance(model,"general:singleInstance", "Allow only one instance of GenomeView"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance("geneticCodeSelection", "Enable genetic code selection? (Requires restart)"), gc);
+			this.add(ConfigBox.booleanInstance(model,"geneticCodeSelection", "Enable genetic code selection? (Requires restart)"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("general:exportMagnifyFactor", "Resolution increase factor for export images"), gc);
 			
@@ -283,7 +283,7 @@ public class ConfigurationDialog extends JDialog {
 		
 			
 			
-			this.add(ConfigBox.booleanInstance("general:disableURLCaching", "Disable URL caching?"), gc);
+			this.add(ConfigBox.booleanInstance(model,"general:disableURLCaching", "Disable URL caching?"), gc);
 			gc.weightx=0;
 			gc.gridx++;
 			this.add(new HelpButton(model.getGUIManager().getParent(), "URL caching needs to be disabled to be able to save to URLs."),gc);
@@ -351,8 +351,8 @@ public class ConfigurationDialog extends JDialog {
 		setLayout(new BorderLayout());
 		JTabbedPane jtp = new JTabbedPane();
 		// JPanel colorPanel = new ConfigureColorPanel();
-		JPanel structure = new StructureConfigPanel();
-		JPanel evidence = new AnnotationConfigPanel();
+		JPanel structure = new StructureConfigPanel(model);
+		JPanel evidence = new AnnotationConfigPanel(model);
 		JPanel colors = new AANucleotideColorsConfigPanel(model);
 		JPanel miscPanel = new MiscellaneousPanel(model);
 		

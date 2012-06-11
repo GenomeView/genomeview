@@ -5,23 +5,13 @@ package net.sf.genomeview.gui.viztracks.hts;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JViewport;
 
 import net.sf.genomeview.core.Configuration;
@@ -32,8 +22,6 @@ import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;
-
-import org.broad.igv.track.WindowFunction;
 
 /**
  * 
@@ -54,12 +42,13 @@ public class PileupTrack extends Track {
 
 		private PTMObserver(PileupTrackConfig ptm,Model model){
 			this.ptm=ptm;
+			ptm.addObserver(this);
 			this.model=model;
 		}
 		
 		@Override
 		public void update(Observable o, Object arg) {
-			// System.out.println("\tInvalidating track vizbuffers");
+			System.out.println("\tInvalidating track vizbuffers");
 			ptm.lastQuery = null;
 			/* Force repaint */
 			model.refresh();

@@ -127,16 +127,6 @@ public class TrackConfig extends Observable {
 
 	}
 
-//	private Point configOffset = new Point(0, 0);
-//
-//	public Point getConfigOffset() {
-//		return configOffset;
-//	}
-//
-//	public void setConfigOffset(int x, int y) {
-//		configOffset = new Point(x, y);
-//		
-//
-//	}
+
 
 }

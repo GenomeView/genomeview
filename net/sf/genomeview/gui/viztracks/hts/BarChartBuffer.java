@@ -63,6 +63,8 @@ class BarChartBuffer implements VizBuffer {
 		status = provider.getStatus(visible.start, visible.end);
 
 		Iterable<Pile> itt = provider.get(visible.start, visible.end + 1);
+		System.out.println("Normalize::: "+ptm.isNormalizeMean() +"\t"+ ptm.normalizationEngine.value() != null);
+		
 		for (Pile p : itt) {
 			if (p == null) {
 				System.out.println("Null pile");
@@ -91,7 +93,7 @@ class BarChartBuffer implements VizBuffer {
 				startIdx = startPos - visible.start;
 				endIdx = endPos - visible.start;
 			}
-			// System.out.println("Idex: "+startPos+"\t"+startIdx);
+			
 			// System.out.println("\t"+endPos+"\t"+endIdx);
 			for (int i = startIdx; i <= endIdx; i++) {
 				if (i >= 0 && i < detailedRects[0].length) {
@@ -100,8 +102,8 @@ class BarChartBuffer implements VizBuffer {
 					// int pos=i - visible.start;
 					for (int j = 0; j < p.getValueCount(); j++) {
 						double val = p.getValue(j);
-						if (ptm.isNormalizeMean() && ptm.normalize.value() != null) {
-							val /= ptm.normalize.value()[j];
+						if (ptm.isNormalizeMean() && ptm.normalizationEngine.value() != null) {
+							val /= ptm.normalizationEngine.value()[j];
 						}
 
 						if (val > detailedRects[j][i])
@@ -112,8 +114,8 @@ class BarChartBuffer implements VizBuffer {
 					// covValues[1][i] = rcov;
 
 					double coverage = p.getTotal();
-					if (ptm.isNormalizeMean() && ptm.normalize.value() != null) {
-						coverage/=ptm.normalize.value()[0];
+					if (ptm.isNormalizeMean() && ptm.normalizationEngine.value() != null) {
+						coverage/=ptm.normalizationEngine.value()[0];
 					}
 					ptm.getTrackCommunication().updateLocalPileupMax(coverage, visible);
 
