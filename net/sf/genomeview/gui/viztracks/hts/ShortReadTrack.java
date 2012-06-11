@@ -29,7 +29,6 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.ShortReadProvider;
 import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
@@ -288,7 +287,7 @@ public class ShortReadTrack extends Track {
 
 	enum ReadColor {
 		FORWARD_SENSE("shortread:forwardColor"), FORWARD_ANTISENSE("shortread:forwardAntiColor"), REVERSE_SENSE(
-				"shortread:reverseColor"), REVERSE_ANTISENSE("shortread:reverseAntiColor");
+				"shortread:reverseColor"), REVERSE_ANTISENSE("shortread:reverseAntiColor"),MATE_DIFFERENT_CHROMOSOME("shortread:mateDifferentChromosome");
 
 		Color c;
 		ColorGradient cg;
@@ -396,7 +395,7 @@ public class ShortReadTrack extends Track {
 
 					if (enablePairing && one.getReadPairedFlag() && ShortReadTools.isSecondInPair(one)) {
 						if (provider.getFirstRead(one) == null) {
-							// System.out.println("First read not found");
+							//System.out.println("First read not found");
 						} else if (!one.getMateUnmappedFlag()) {
 
 							continue;
@@ -434,6 +433,7 @@ public class ShortReadTrack extends Track {
 					int line = tilingCounter.getFreeLine(pos);
 
 					/* Paint read or read pair */
+//					boolean differentReference=true;
 					if (line < maxStack) {
 						int clearStart = one.getAlignmentStart();
 						int clearEnd = one.getAlignmentEnd();
@@ -443,12 +443,13 @@ public class ShortReadTrack extends Track {
 							// ShortReadTools esr = (ShortReadTools) one;
 							if (ShortReadTools.isPaired(one) && ShortReadTools.isFirstInPair(one)) {
 								two = provider.getSecondRead(one);
-								if (!one.getMateUnmappedFlag()
-										&& one.getReferenceIndex() != one.getMateReferenceIndex()
-										&& one.getMateReferenceIndex() != -1) {
-									System.out.println("Different indices: " + one.getReferenceIndex() + "\t"
-											+ one.getMateReferenceIndex());
-								}
+//								if (!one.getMateUnmappedFlag()
+//										&& one.getReferenceIndex() != one.getMateReferenceIndex()
+//										&& one.getMateReferenceIndex() != -1) {
+////									System.out.println("Different indices: " + one.getReferenceIndex() + "\t"
+////											+ one.getMateReferenceIndex());
+////									differentReference=true;
+//								}
 
 								// if (two !=null&& one.getReferenceIndex() !=
 								// two.getReferenceIndex()) {
@@ -508,6 +509,7 @@ public class ShortReadTrack extends Track {
 						if (paintOne)
 							visibleReadCount++;
 						if (two != null) {
+							
 							paintTwo = paintRead(g, two, yRec, screenWidth, readLineHeight, entry, one, yOffset);
 							if (paintTwo)
 								visibleReadCount++;
@@ -609,7 +611,13 @@ public class ShortReadTrack extends Track {
 
 		lastX = subX2;
 		ReadColor c = null;
-		if (rf.getReadPairedFlag()) {
+		if (!rf.getMateUnmappedFlag()
+				&& rf.getReferenceIndex() != rf.getMateReferenceIndex()
+				&& rf.getMateReferenceIndex() != -1) {
+			System.out.println("Different indices: " + rf.getReferenceIndex() + "\t"
+					+ rf.getMateReferenceIndex());
+			c=ReadColor.MATE_DIFFERENT_CHROMOSOME;
+		}else if (rf.getReadPairedFlag()) {
 			if (rf.getFirstOfPairFlag()) {
 				if (rf.getReadNegativeStrandFlag()) {
 					c = ReadColor.REVERSE_SENSE;
