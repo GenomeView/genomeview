@@ -268,7 +268,7 @@ public class PileupTrackConfig extends TrackConfig {
 
 	private boolean logscaling;// = Configuration.getBoolean("pileup:logScale");
 
-	private boolean normalize;//=Configuration.getBoolean("pileup:normalize");
+//	private boolean normalize;//=Configuration.getBoolean("pileup:normalize");
 	
 	/*
 	 * Flag to keep track whether we want to use the global settings for scaling
@@ -372,7 +372,7 @@ public class PileupTrackConfig extends TrackConfig {
 
 	public boolean isNormalizeMean() {
 		if (isGlobalSettings()) {
-			return Configuration.getBoolean("pileup:dynamicRange");
+			return Configuration.getBoolean("pileup:normalize");
 		} else {
 			return Configuration.getBoolean("track:pile:normalize:" + dataKey);
 		}
