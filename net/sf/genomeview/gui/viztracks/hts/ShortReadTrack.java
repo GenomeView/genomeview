@@ -458,7 +458,7 @@ public class ShortReadTrack extends Track {
 								// }
 							}
 //							if (two != null) {
-							if(!one.getMateUnmappedFlag()
+							if(ShortReadTools.isPaired(one)&&!one.getMateUnmappedFlag()
 									&& one.getReferenceIndex() == one.getMateReferenceIndex()
 									&& one.getMateReferenceIndex() != -1){
 //								if (two.getAlignmentStart() < one.getAlignmentStart()) {
@@ -481,7 +481,7 @@ public class ShortReadTrack extends Track {
 						
 						/* paired read - calculate connection coordinates */
 //						if (two != null) {
-						if(!one.getMateUnmappedFlag()
+						if(ShortReadTools.isPaired(one)&&!one.getMateUnmappedFlag()
 										&& one.getReferenceIndex() == one.getMateReferenceIndex()
 										&& one.getMateReferenceIndex() != -1){
 							int subX1, subX2;
@@ -624,7 +624,7 @@ public class ShortReadTrack extends Track {
 
 		lastX = subX2;
 		ReadColor c = null;
-		if (!rf.getMateUnmappedFlag()
+		if (ShortReadTools.isPaired(rf)&&!rf.getMateUnmappedFlag()
 				&& rf.getReferenceIndex() != rf.getMateReferenceIndex()
 				&& rf.getMateReferenceIndex() != -1) {
 			System.out.println("Different indices: " + rf.getReferenceIndex() + "\t"
