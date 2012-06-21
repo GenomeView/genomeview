@@ -50,6 +50,7 @@ import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
+import net.sf.jannot.pileup.PileNormalization;
 import net.sf.jannot.refseq.Sequence;
 
 import org.broad.igv.track.WindowFunction;
@@ -70,7 +71,8 @@ public class PileupTrackConfig extends TrackConfig {
 		GridBagPanel out = super.getGUIContainer();
 
 		// /*
-		// FIXME Find a proper way to embed global config options in local config. 
+		// FIXME Find a proper way to embed global config options in local
+		// config.
 		// Scale across tracks
 		// */
 		// final JCheckBox itemCrossTrack = new JCheckBox();
@@ -86,7 +88,6 @@ public class PileupTrackConfig extends TrackConfig {
 		// out.gc.gridy++;
 		// out.add(itemCrossTrack, out.gc);
 
-	
 		/*
 		 * Threshold line
 		 */
@@ -138,8 +139,6 @@ public class PileupTrackConfig extends TrackConfig {
 		out.gc.gridy++;
 		out.add(itemGlobal, out.gc);
 
-		
-		
 		final BooleanConfig normalize = new BooleanConfig("track:pile:normalize:" + dataKey, "Normalize by mean", model);
 		normalize.addConfigListener(new ConfigListener() {
 
@@ -264,12 +263,14 @@ public class PileupTrackConfig extends TrackConfig {
 	// return model.getAnnotationLocationVisible().length() < 16000;
 	// }
 
-	private boolean dynamicScaling ;//= Configuration.getBoolean("pileup:dynamicScaling");
+	private boolean dynamicScaling;// =
+									// Configuration.getBoolean("pileup:dynamicScaling");
 
 	private boolean logscaling;// = Configuration.getBoolean("pileup:logScale");
 
-//	private boolean normalize;//=Configuration.getBoolean("pileup:normalize");
-	
+	// private boolean
+	// normalize;//=Configuration.getBoolean("pileup:normalize");
+
 	/*
 	 * Flag to keep track whether we want to use the global settings for scaling
 	 * and so on.
@@ -300,6 +301,10 @@ public class PileupTrackConfig extends TrackConfig {
 		this.dynamicScaling = dynamicScaling;
 		setChanged();
 		notifyObservers();
+	}
+
+	boolean isNormalizationAvailable() {
+		return ((PileNormalization) model.getSelectedEntry().get(dataKey)).supportsNormalization();
 	}
 
 	boolean isDynamicScaling() {
@@ -338,8 +343,13 @@ public class PileupTrackConfig extends TrackConfig {
 
 					@Override
 					public void run() {
+						if (!isNormalizationAvailable()) {
+							throw new RuntimeException(
+									"Should not create normalization engine if the data format does not support it!");
+						}
 						model.messageModel().setStatusBarMessage("Calculating normalization");
 						// model.getSelectedEntry().get(dataKey).get();
+
 						Data<Pile> dp = (Data<Pile>) model.getSelectedEntry().get(dataKey);
 						double[] sum = null;
 						int count = 0;
