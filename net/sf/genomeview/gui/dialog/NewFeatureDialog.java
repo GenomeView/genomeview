@@ -49,7 +49,7 @@ public class NewFeatureDialog extends JDialog {
         gc.fill = GridBagConstraints.BOTH;
 
         final TypeCombo typeCombo = new TypeCombo(model);
-        typeCombo.setSelectedItem(Type.get("CDS"));
+        typeCombo.setSelectedItem(net.sf.jannot.Type.get("CDS"));
         final StrandCombo strandSelection = new StrandCombo();
 
         gc.gridwidth = 2;

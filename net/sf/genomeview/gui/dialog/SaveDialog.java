@@ -122,7 +122,7 @@ public class SaveDialog extends JDialog {
 						try {
 							/* Default save locations? */
 							String defaultLocation = Configuration.get("save:defaultLocation");
-							Type[] selectedTypes = Type.values();
+							net.sf.jannot.Type[] selectedTypes = net.sf.jannot.Type.values();
 							if (!useDefault || defaultLocation.equals("null")) {
 								selectedTypes = new TypeSelection().ask(_self);
 								
