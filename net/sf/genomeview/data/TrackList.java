@@ -38,6 +38,7 @@ import net.sf.jannot.tabix.BEDWrapper;
 import net.sf.jannot.tabix.GFFWrapper;
 import net.sf.jannot.tabix.PileupWrapper;
 import net.sf.jannot.tabix.SWigWrapper;
+import net.sf.jannot.tabix.VCFWrapper;
 import net.sf.jannot.tdf.TDFData;
 import net.sf.jannot.wiggle.Graph;
 
@@ -207,7 +208,7 @@ public class TrackList implements Iterable<Track> {
 					this.add(key, new FeatureTrack(model, (Type) key));
 
 			}
-			if (data instanceof GFFWrapper || data instanceof BEDWrapper) {
+			if (data instanceof VCFWrapper ||data instanceof GFFWrapper || data instanceof BEDWrapper) {
 				if (!this.containsTrack(key))
 					this.add(key, new FeatureTrack(model, (Type) key));
 
