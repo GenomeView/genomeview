@@ -46,8 +46,9 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 
 	}
 
+	
 	public void update(Observable o, Object arg) {
-
+		
 		fireTableDataChanged();
 
 	}
@@ -76,7 +77,7 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 	@Override
 	public Object getValueAt(int row, int col) {
 		Track track = model.getTrackList().get(row);
-		if(track==null)
+		if (track == null)
 			System.err.println("Selected track is null, this shouldn't happen...");
 		switch (col) {
 
@@ -87,8 +88,8 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 				return Icons.INVISIBLE;
 			}
 		case 1:
-			String alias=Configuration.get("track:alias:"+track.config().displayName());
-			if(alias!=null&&alias.length()>0)
+			String alias = Configuration.get("track:alias:" + track.config().displayName());
+			if (alias != null && alias.length() > 0)
 				return alias;
 			else
 				return track.config().displayName();
@@ -98,46 +99,27 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 
 	}
 
-//	private StructureTrack getStructureTrack() {
-//		for (Track track : model.getTrackList()) {
-//			if (track instanceof StructureTrack)
-//				return (StructureTrack) track;
-//		}
-//		return null;
-//	}
+	// private StructureTrack getStructureTrack() {
+	// for (Track track : model.getTrackList()) {
+	// if (track instanceof StructureTrack)
+	// return (StructureTrack) track;
+	// }
+	// return null;
+	// }
 
 	public void mouse(int column, int row) {
 		Track track = model.getTrackList().get(row);
-
-//		if (column == 0) {
-//			StructureTrack strack = getStructureTrack();
-//			if (track instanceof FeatureTrack) {
-//				Type type = ((FeatureTrack) track).getType();
-//				strack.setTypeVisible(type, !strack.isTypeVisible(type));
-//
-//			}
-//
-//		}
+		
 
 		if (column == 0) {
 			model.getTrackList().get(row).config().setVisible(!model.getTrackList().get(row).config().isVisible());
 
 		}
-		
-		if(column==2)
+
+		if (column == 2)
 			model.remove(track);
 
-//		if (column == 2) {
-//			if (track.isCollapsible()) {
-//				track.setCollapsed(!track.isCollapsed());
-//			}
-//		}
-//		if (column == 3) {
-//			model.getTrackList().up(row);
-//		}
-//		if (column == 4) {
-//			model.getTrackList().down(row);
-//		}
+		
 
 	}
 }

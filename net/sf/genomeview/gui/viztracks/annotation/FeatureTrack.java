@@ -82,16 +82,14 @@ public class FeatureTrack extends Track {
 		@Override
 		protected GridBagPanel getGUIContainer() {
 			GridBagPanel out = super.getGUIContainer();
-			
+
 			out.gc.gridy++;
 			final JComponent colorGradient = new BooleanConfig("feature:scoreColorGradient_" + type(),
 					"Use score color gradient", model);
 			out.add(colorGradient, out.gc);
 
-			
-
 			/* Filter items based on score */
-	
+
 			out.gc.gridy++;
 
 			final JButton filter = new JButton(new AbstractAction("Filter items by score") {
@@ -135,13 +133,11 @@ public class FeatureTrack extends Track {
 
 			});
 			out.add(filter, out.gc);
-			
+
 			out.gc.gridy++;
 			final JComponent colorQualifier = new BooleanConfig("feature:useColorQualifierTag_" + type(),
 					"Use /color qualifier", model);
 			out.add(colorQualifier, out.gc);
-
-			
 
 			this.addObserver(new Observer() {
 
@@ -205,8 +201,10 @@ public class FeatureTrack extends Track {
 
 		public void setColorQualifier(boolean colorQualifier) {
 			// this.colorQualifier = colorQualifier;
-			Configuration.set("feature:useColorQualifierTag_" + type(), colorQualifier);
-			model.refresh(this);
+			if (isColorQualifier() != colorQualifier) {
+				Configuration.set("feature:useColorQualifierTag_" + type(), colorQualifier);
+				model.refresh(this);
+			}
 		}
 
 		private boolean scoreColorGradientEnabled;
@@ -226,7 +224,6 @@ public class FeatureTrack extends Track {
 		public FeatureTrackConfig(Model model, Type type) {
 			super(model, type);
 
-			
 		}
 
 		public boolean isScoreColorGradient() {
@@ -236,8 +233,10 @@ public class FeatureTrack extends Track {
 
 		public void setScoreColorGradient(boolean scoreColorGradient) {
 			// this.scoreColorGradient = scoreColorGradient;
-			Configuration.set("feature:scoreColorGradient_" + type(), scoreColorGradient);
-			model.refresh(this);
+			if (isScoreColorGradient() != scoreColorGradient) {
+				Configuration.set("feature:scoreColorGradient_" + type(), scoreColorGradient);
+				model.refresh(this);
+			}
 		}
 
 		public boolean isScoreColorGradientEnabled() {
@@ -245,9 +244,11 @@ public class FeatureTrack extends Track {
 		}
 
 		public void setScoreColorGradientEnabled(boolean b) {
-			this.scoreColorGradientEnabled = true;
-			setChanged();
-			notifyObservers();
+			if (b != this.scoreColorGradientEnabled) {
+				this.scoreColorGradientEnabled = b;
+				setChanged();
+				notifyObservers();
+			}
 
 		}
 
@@ -261,9 +262,11 @@ public class FeatureTrack extends Track {
 		}
 
 		public void setColorQualifierEnabled(boolean b) {
-			colorQualifierEnabled = b;
-			setChanged();
-			notifyObservers();
+			if (b != colorQualifierEnabled) {
+				colorQualifierEnabled = b;
+				setChanged();
+				notifyObservers();
+			}
 
 		}
 
@@ -423,7 +426,7 @@ public class FeatureTrack extends Track {
 					break;
 
 				}
-			
+
 				g.setColor(backColor);
 
 				// Set<Feature> selected = model.getFeatureSelection();

@@ -64,7 +64,7 @@ public class TrackList implements Iterable<Track> {
 	}
 
 	public Track get(int index) {
-		if(index==-1)
+		if (index == -1)
 			return null;
 		return mapping.get(order.get(index));
 	}
@@ -94,10 +94,9 @@ public class TrackList implements Iterable<Track> {
 
 	private int findIndex(DataKey dk) {
 		int w = Configuration.getWeight(dk);
-		
+
 		int count = 0;
-		while (count < order.size()
-				&& Configuration.getWeight(order.get(count)) <= w) {
+		while (count < order.size() && Configuration.getWeight(order.get(count)) <= w) {
 			count++;
 		}
 
@@ -119,9 +118,10 @@ public class TrackList implements Iterable<Track> {
 			DataKey tmp = order.get(row);
 
 			int tmpWeight = Configuration.getWeight(order.get(row));
-			Configuration.setWeight(order.get(row),tmpWeight+1);
+			Configuration.setWeight(order.get(row), tmpWeight + 1);
 			Configuration.setWeight(order.get(row + 1), tmpWeight);
 
+			
 			order.set(row, order.get(row + 1));
 			order.set(row + 1, tmp);
 
@@ -131,17 +131,17 @@ public class TrackList implements Iterable<Track> {
 
 	}
 
-	public void up(int row) {
+	public synchronized void up(int row) {
 		if (row > 0) {
 			DataKey tmp = order.get(row);
 
-			//int tmpWeight = Configuration.getWeight(order.get(row));
-			Configuration.setWeight(order.get(row),
-					Configuration.getWeight(order.get(row - 1)));
-			Configuration.setWeight(order.get(row - 1), Configuration.getWeight(order.get(row - 1))+1);
+			// int tmpWeight = Configuration.getWeight(order.get(row));
+			Configuration.setWeight(order.get(row), Configuration.getWeight(order.get(row - 1)));
+			Configuration.setWeight(order.get(row - 1), Configuration.getWeight(order.get(row - 1)) + 1);
 
 			order.set(row, order.get(row - 1));
 			order.set(row - 1, tmp);
+			
 			model.refresh();
 		}
 
@@ -203,8 +203,7 @@ public class TrackList implements Iterable<Track> {
 			Data<?> data = e.get(key);
 
 			if (data instanceof MemoryFeatureAnnotation) {
-				if (!this.containsTrack(key)
-						&& ((MemoryFeatureAnnotation) data).cachedCount() > 0)
+				if (!this.containsTrack(key) && ((MemoryFeatureAnnotation) data).cachedCount() > 0)
 					this.add(key, new FeatureTrack(model, (Type) key));
 
 			}
@@ -216,22 +215,19 @@ public class TrackList implements Iterable<Track> {
 
 			if (data instanceof PileupWrapper || data instanceof SWigWrapper) {
 				if (!this.containsTrack(key))
-					this.add(key, new PileupTrack(key, new WiggleProvider(e,
-							(Data<Pile>) data, model), model));
+					this.add(key, new PileupTrack(key, new WiggleProvider(e, (Data<Pile>) data, model), model));
 			}
 
 			if (data instanceof TDFData) {
 				if (!this.containsTrack(key))
-					this.add(key, new PileupTrack(key, new TDFProvider(e,
-							(TDFData) data, model), model));
+					this.add(key, new PileupTrack(key, new TDFProvider(e, (TDFData) data, model), model));
 			}
 
 			if (data instanceof BigWigData) {
 				if (!this.containsTrack(key))
-					this.add(key, new PileupTrack(key, new BigWigProvider(e,
-							(BigWigData) data, model), model));
+					this.add(key, new PileupTrack(key, new BigWigProvider(e, (BigWigData) data, model), model));
 			}
-			
+
 			if (data instanceof Graph) {
 				if (!this.containsTrack(key))
 					this.add(key, new WiggleTrack(key, model, true));
@@ -242,7 +238,7 @@ public class TrackList implements Iterable<Track> {
 			}
 			if (data instanceof ReadGroup) {
 				if (!this.containsTrack(key)) {
-					this.add(key, new ShortReadTrack(key,new ShortReadProvider(e, (ReadGroup)data, model), model));
+					this.add(key, new ShortReadTrack(key, new ShortReadProvider(e, (ReadGroup) data, model), model));
 				}
 			}
 			if (data instanceof AbstractMAFMultipleAlignment) {
@@ -254,14 +250,13 @@ public class TrackList implements Iterable<Track> {
 		}
 		/* Fix weight to make sure they are different */
 		for (int i = 1; i < order.size(); i++) {
-//			if (Configuration.getWeight(order.get(i - 1)) < Configuration
-//					.getWeight(order.get(i))) {
-//				System.err
-//						.println("This is not supposed to happen, why are we sorting?!!?");
-//			}
-			if (Configuration.getWeight(order.get(i - 1)) >= Configuration
-					.getWeight(order.get(i))) {
-				Configuration.setWeight(order.get(i), Configuration.getWeight(order.get(i - 1))+1);
+			// if (Configuration.getWeight(order.get(i - 1)) < Configuration
+			// .getWeight(order.get(i))) {
+			// System.err
+			// .println("This is not supposed to happen, why are we sorting?!!?");
+			// }
+			if (Configuration.getWeight(order.get(i - 1)) >= Configuration.getWeight(order.get(i))) {
+				Configuration.setWeight(order.get(i), Configuration.getWeight(order.get(i - 1)) + 1);
 
 			}
 		}

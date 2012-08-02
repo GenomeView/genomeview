@@ -89,20 +89,20 @@ public class TrackConfig extends Observable {
 	public void setVisible(boolean visible) {
 		Configuration.setVisible(dataKey, visible);
 		setChanged();
-		notifyObservers();
+		notifyObservers("TrackConfig::setVisible");
 	}
 
 	protected void setCollapsible(boolean collapsible) {
 		this.collapsible = collapsible;
 		setChanged();
-		notifyObservers();
+		notifyObservers("TrackConfig::setCollapsible");
 	}
 
 	public void setCollapsed(boolean collapsed) {
 		// this.collapsed = collapsed;
 		Configuration.set("track:collapsed:" + dataKey, collapsed);
 		setChanged();
-		notifyObservers();
+		notifyObservers("TrackConfig::setCollapsed");
 	}
 
 	public boolean isCollapsible() {
@@ -118,7 +118,7 @@ public class TrackConfig extends Observable {
 	public void setConfigVisible(boolean b) {
 		configVisible = b;
 		setChanged();
-		notifyObservers();
+		notifyObservers("TrackConfig::setConfigVisible");
 
 	}
 
