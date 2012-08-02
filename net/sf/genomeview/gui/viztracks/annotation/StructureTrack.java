@@ -151,10 +151,9 @@ public class StructureTrack extends Track {
 		for (Highlight h : highlights) {
 			Color c = h.color;
 			g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 100));
-			int start = Convert.translateGenomeToScreen(h.location.start(), model.getAnnotationLocationVisible(),
-					screenWidth);
-			int end = Convert.translateGenomeToScreen(h.location.end(), model.getAnnotationLocationVisible(),
-					screenWidth);
+		
+			int startIdx=h.location.start();
+			int endIdx=h.location.end();
 			int top = 0;
 			int high = 0;
 			switch (h.strand) {
@@ -168,11 +167,17 @@ public class StructureTrack extends Track {
 
 				break;
 			case REVERSE:
+//				startIdx--;
+//				endIdx--;
 				top = 4 * lineHeight + tickHeight;
 				high = 4 * lineHeight;
 				break;
 			}
-
+			int start = Convert.translateGenomeToScreen(startIdx, model.getAnnotationLocationVisible(),
+					screenWidth);
+			int end = Convert.translateGenomeToScreen(endIdx, model.getAnnotationLocationVisible(),
+					screenWidth);
+			
 			g.fillRect(start, top + yOffset, end - start, high);
 		}
 
