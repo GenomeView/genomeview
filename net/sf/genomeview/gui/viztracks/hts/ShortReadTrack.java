@@ -31,6 +31,7 @@ import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
+import net.sf.genomeview.gui.viztracks.hts.ShortReadTrackConfig.ReadColor;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
@@ -48,9 +49,13 @@ import net.sf.samtools.SAMRecord;
 public class ShortReadTrack extends Track {
 
 	private ShortReadProvider provider;
+	private ShortReadTrackConfig srtc;
 
+	
+	
 	public ShortReadTrack(DataKey key, ShortReadProvider provider, Model model) {
-		super(key, model, true, false);
+		super(key, model, true, false,new ShortReadTrackConfig(model, key));
+		this.srtc=(ShortReadTrackConfig)config;
 		this.provider = provider;
 	}
 
@@ -226,7 +231,7 @@ public class ShortReadTrack extends Track {
 
 	private Location currentVisible;
 
-	private Color pairingColor;
+//	private Color pairingColor;
 
 	private Rectangle viewRectangle;
 
@@ -285,35 +290,9 @@ public class ShortReadTrack extends Track {
 
 	}
 
-	enum ReadColor {
-		FORWARD_SENSE("shortread:forwardColor"), FORWARD_ANTISENSE("shortread:forwardAntiColor"), REVERSE_SENSE(
-				"shortread:reverseColor"), REVERSE_ANTISENSE("shortread:reverseAntiColor"),MATE_DIFFERENT_CHROMOSOME("shortread:mateDifferentChromosome");
-
-		Color c;
-		ColorGradient cg;
-		private String cfg;
-
-		private ReadColor(String cfg) {
-			this.cfg = cfg;
-			reset();
-
-		}
-
-		static void resetAll() {
-			for (ReadColor rc : values())
-				rc.reset();
-		}
-
-		private void reset() {
-			c = Configuration.getColor(cfg);
-			cg = new ColorGradient();
-			cg.addPoint(Color.WHITE);
-			cg.addPoint(c);
-			cg.createGradient(100);
-
-		}
-
-	}
+	
+	
+	
 
 	/*
 	 * Mapping of all painted reads, at least in detailed mode
@@ -337,7 +316,7 @@ public class ShortReadTrack extends Track {
 		int maxRegion = Configuration.getInt("shortread:maxRegion");
 		int maxStack = Configuration.getInt("shortread:maxStack");
 
-		pairingColor = Configuration.getColor("shortread:pairingColor");
+//		pairingColor = Configuration.getColor();
 
 		currentVisible = model.getAnnotationLocationVisible();
 
@@ -509,7 +488,7 @@ public class ShortReadTrack extends Track {
 //							}
 								
 
-							g.setColor(pairingColor);
+							g.setColor(srtc.color(ReadColor.PAIRING));
 							g.drawLine(subX1, yRec + (readLineHeight / 2) + yOffset, subX2, yOffset + yRec
 									+ readLineHeight / 2);
 						}
@@ -655,7 +634,7 @@ public class ShortReadTrack extends Track {
 			}
 		}
 
-		g.setColor(c.c);
+		g.setColor(srtc.color(c));
 
 		if (subX2 < subX1) {
 			subX2 = subX1;
@@ -666,17 +645,17 @@ public class ShortReadTrack extends Track {
 		}
 
 		int qual = rf.getMappingQuality();
-		g.setColor(c.cg.getColor(qual));
+		g.setColor(srtc.gradient(c).getColor(qual));
 
 		Rectangle r = new Rectangle(subX1, yRec, subX2 - subX1 + 1, readLineHeight - 1);
 		g.fill(r);
-		g.setColor(c.c);
+		g.setColor(srtc.color(c));
 		if (rf.getReadPairedFlag() && rf.getMateUnmappedFlag())
-			g.setColor(Color.RED);
+			g.setColor(srtc.color(ReadColor.MISSING_MATE));
 		g.setStroke(new BasicStroke(2));
 		g.drawRect(subX1, yRec + 1, subX2 - subX1, readLineHeight - 3);
 		g.setStroke(new BasicStroke(1));
-		g.setColor(c.c);
+		g.setColor(srtc.color(c));
 
 		if (otherRead != null) {
 			int subOtherX1 = Convert
@@ -762,11 +741,11 @@ public class ShortReadTrack extends Track {
 					 * white box, now put some color back
 					 */
 					if (readNt == '_') {
-						g.setColor(pairingColor);
+						g.setColor(srtc.color(ReadColor.PAIRING));
 						g.fillRect((int) tx1, yRec + 4, (int) (tx2 - tx1), readLineHeight - 8 - 1);
 					}
 					if (readNt != '_' && model.getAnnotationLocationVisible().length() < 100) {
-						g.setColor(c.c);
+						g.setColor(srtc.color(c));
 						Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + readNt, g);
 						g.drawString("" + readNt, (int) (tx1 + ((tx2 - tx1) / 2 - stringSize.getWidth() / 2)), yRec
 								+ readLineHeight - 3);
@@ -811,7 +790,7 @@ public class ShortReadTrack extends Track {
 						screenWidth);
 				int lx2 = Convert.translateGenomeToScreen(rf.getAlignmentStart() + locs[1][i], currentVisible,
 						screenWidth);
-				g.setColor(pairingColor);
+				g.setColor(srtc.color(ReadColor.PAIRING));
 				g.fillRect(lx1, yRec, lx2 - lx1, readLineHeight - 1);
 			}
 		}
