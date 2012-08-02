@@ -93,6 +93,9 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		} else if (model.getSelectedRegion() != null) {
 			Location l = model.getSelectedRegion();
 			seq =model.getSelectedEntry().sequence().subsequence(l.start,l.end+1);
+			if(model.getPressTrack()<0){
+				seq=SequenceTools.reverseComplement(seq);
+			}
 
 		}
 		return seq;
