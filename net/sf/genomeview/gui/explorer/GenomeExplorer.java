@@ -137,6 +137,8 @@ class GenomeExplorer extends JDialog {
 			}
 		}
 		
+		//FIXME tabs.addTab("NCBI Bacterial", new NCBIPanel(model,"http://www.broadinstitute.org/software/genomeview/genomes/ncbi.tsv"));
+		
 
 		Border emptyBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 		Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
