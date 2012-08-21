@@ -27,7 +27,7 @@ import be.abeel.gui.GridBagPanel;
  * @author Thomas Abeel
  * 
  */
-class GenomesPanel extends GridBagPanel {
+class GenomesPanel extends GridBagPanel implements ScrollToTop {
 
 	private static final long serialVersionUID = 2022250811407852659L;
 	private JScrollPane jp;

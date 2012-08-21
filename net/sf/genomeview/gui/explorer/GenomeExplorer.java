@@ -114,6 +114,8 @@ class GenomeExplorer extends JDialog {
 				"<html>Welcome to the GenomeView mammalian genomes section. This is your portal to the GenomeView animal genomes."
 						+ common, list.get("animal")));
 
+		tabs.addTab("NCBI Bacterial", new NCBIPanel(model));
+
 		tabs.addTab(
 				"Archived genomes",
 				new GenomesPanel(
@@ -124,21 +126,19 @@ class GenomeExplorer extends JDialog {
 		if (!externalRepo.equalsIgnoreCase("null")) {
 			try {
 				Set<String> set = Configuration.getStringSet("external:repository:labels");
-				
+
 				for (String s : set) {
 					String[] arr = s.split(":");
-					String description = Configuration.get("external:repository:description:"+arr[0]);
-					tabs.addTab(arr[1], new GenomesPanel(model, "<html>"+(description==null?common:description+"</html>"), list.get(arr[0])));
+					String description = Configuration.get("external:repository:description:" + arr[0]);
+					tabs.addTab(arr[1], new GenomesPanel(model, "<html>"
+							+ (description == null ? common : description + "</html>"), list.get(arr[0])));
 				}
-				tabs.setSelectedIndex(tabs.getTabCount()-1);
+				tabs.setSelectedIndex(tabs.getTabCount() - 1);
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Something went wrong while loading the external repository: " + externalRepo, e);
 
 			}
 		}
-		
-		//FIXME tabs.addTab("NCBI Bacterial", new NCBIPanel(model,"http://www.broadinstitute.org/software/genomeview/genomes/ncbi.tsv"));
-		
 
 		Border emptyBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 		Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
@@ -175,13 +175,13 @@ class GenomeExplorer extends JDialog {
 
 	private Icon instanceImage(String path) {
 		URL url = Genome.class.getResource("/images/instances/" + path);
-		if(path.startsWith("http"))
+		if (path.startsWith("http"))
 			try {
-				url=new URL(path);
+				url = new URL(path);
 			} catch (MalformedURLException e) {
-				log.log(Level.SEVERE,"Failed to load instance image",e);
+				log.log(Level.SEVERE, "Failed to load instance image", e);
 			}
-		
+
 		if (url == null)
 			url = Genome.class.getResource("/images/instances/nopicture.png");
 		return new ImageIcon(url);
@@ -189,7 +189,7 @@ class GenomeExplorer extends JDialog {
 
 	void scollToTop() {
 		for (int i = 0; i < tabs.getTabCount(); i++) {
-			((GenomesPanel) tabs.getComponent(i)).scrollToTop();
+			((ScrollToTop) tabs.getComponent(i)).scrollToTop();
 		}
 
 	}
