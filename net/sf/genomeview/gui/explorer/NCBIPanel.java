@@ -1,3 +1,6 @@
+/**
+ * %HEADER%
+ */
 package net.sf.genomeview.gui.explorer;
 
 import java.awt.Color;
@@ -153,7 +156,7 @@ public class NCBIPanel extends GridBagPanel implements ScrollToTop {
 		gc.gridy++;
 		gc.weighty = 1;
 		JEditorPaneLabel msgLabel = new JEditorPaneLabel();
-		msgLabel.setText("All Bacterial genomes available from NCBI");
+		msgLabel.setText("All Bacterial genomes available from NCBI\n\nDouble click the name of any species to load chromosome and plasmid data.");
 
 		msgLabel.setPreferredSize(new Dimension(Icons.LOGO.getIconWidth(), 50));
 		add(msgLabel, gc);
