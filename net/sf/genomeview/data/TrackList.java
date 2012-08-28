@@ -23,6 +23,7 @@ import net.sf.genomeview.gui.viztracks.comparative.MultipleAlignmentTrack2;
 import net.sf.genomeview.gui.viztracks.graph.WiggleTrack;
 import net.sf.genomeview.gui.viztracks.hts.PileupTrack;
 import net.sf.genomeview.gui.viztracks.hts.ShortReadTrack;
+import net.sf.genomeview.gui.viztracks.variation.VariationTrack;
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
@@ -208,7 +209,11 @@ public class TrackList implements Iterable<Track> {
 					this.add(key, new FeatureTrack(model, (Type) key));
 
 			}
-			if (data instanceof VCFWrapper ||data instanceof GFFWrapper || data instanceof BEDWrapper) {
+			if(data instanceof VCFWrapper){
+				if (!this.containsTrack(key))
+					this.add(key, new VariationTrack(model, (Type) key));
+			}
+			if (data instanceof GFFWrapper || data instanceof BEDWrapper) {
 				if (!this.containsTrack(key))
 					this.add(key, new FeatureTrack(model, (Type) key));
 
