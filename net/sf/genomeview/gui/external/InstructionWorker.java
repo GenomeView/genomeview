@@ -3,7 +3,9 @@
  */
 package net.sf.genomeview.gui.external;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -20,7 +22,6 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
-import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
 
 /**
@@ -118,19 +119,25 @@ class InstructionWorker implements Runnable {
 		s.setTcpNoDelay(true);
 		System.out.println("Handling client");
 		// InputStream is = new BufferedInputStream(s.getInputStream());
-		LineIterator it = new LineIterator(s.getInputStream());
-		String line = it.next();
+		BufferedReader it=new BufferedReader(new InputStreamReader(s.getInputStream()));
+//		LineIterator it = new LineIterator(s.getInputStream());
+		String line = it.readLine();
 		if (line.startsWith("GenomeViewJavaScriptHandler-")) {
 			otherPorts.add(new Port(Integer.parseInt(line.split("-")[1])));
 		} else {
-			while (!line.startsWith("GET") && it.hasNext()) {
+			while (!line.startsWith("GET") && line!=null) {
 				// System.out.println("Handler: GET: " + line);
-				line = it.next();
+				line = it.readLine();
 				// System.out.println(line);
 
 			}
-			writeOther(line);
-
+			StringBuffer others = writeOther(line);
+			System.out.println("Reply from others: " + others);
+			if(others.length()>0){
+				PrintWriter pw = new PrintWriter(s.getOutputStream());
+				pw.print(others.toString());
+				pw.close();
+			}
 			if (line.startsWith("GET /genomeview-" + id + "/") || line.startsWith("GET /genomeview-ALL/")) {
 				String[] id = line.split("\\$\\$");
 				if (id.length == 1 || !lastID.contains(id[1])) {
@@ -154,18 +161,18 @@ class InstructionWorker implements Runnable {
 						} else if (arr[2].toLowerCase().equals("unload")) {
 							model.clearEntries();
 							lastLoad = null;
-						}else if(arr[2].toLowerCase().equals("heartbeat")){
-							PrintWriter pw=new PrintWriter(s.getOutputStream());
+						} else if (arr[2].toLowerCase().equals("heartbeat")) {
+							PrintWriter pw = new PrintWriter(s.getOutputStream());
 							pw.println("HTTP/1.1 200 OK");
 							pw.println("Content-Type: text/plain");
 							pw.println();
 							pw.println("isGenomeViewAlive=true;");
 							pw.flush();
 							pw.close();
-							
-						}else{
-							log.log(Level.WARNING,"Instruction "+line +" was not understood by GenomeView");
-							
+
+						} else {
+							log.log(Level.WARNING, "Instruction " + line + " was not understood by GenomeView");
+
 						}
 					} else {
 						log.log(Level.WARNING, "This instruction doesn't belong to GenomeView, I'll ignore it.");
@@ -179,13 +186,26 @@ class InstructionWorker implements Runnable {
 
 	}
 
-	private void writeOther(String line) {
+	private StringBuffer writeOther(String line) {
+		StringBuffer buffer = new StringBuffer();
 		for (Port port : otherPorts) {
 			try {
 				Socket clientSocket = new Socket(InetAddress.getLocalHost(), port.getPort());
+				clientSocket.setTcpNoDelay(true);
+				
+				BufferedReader bis = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 				PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
 				out.println(line);
+				out.flush();
+//				out.close();
+				
+				String l = bis.readLine();
+				while (l != null) {
+					buffer.append(l + "\n");
+					l = bis.readLine();
+				}
 				out.close();
+				bis.close();
 				clientSocket.close();
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
@@ -200,6 +220,7 @@ class InstructionWorker implements Runnable {
 				otherPorts.remove(port);
 			}
 		}
+		return buffer;
 
 	}
 

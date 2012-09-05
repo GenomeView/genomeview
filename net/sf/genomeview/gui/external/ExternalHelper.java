@@ -5,8 +5,6 @@ package net.sf.genomeview.gui.external;
 
 import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.jannot.Entry;
