@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="1912" />
+	<property name="version" value="1939" />
 	<property name="src" value="." />
 	<property name="build" value="build" />
 	<property name="lib" value="lib" />
@@ -33,6 +33,7 @@
 				<include name="**/*.java" />
 				<include name="**/*.conf" />
 				<include name="**/*.png" />
+				<include name="**/*.tsv" />
 			</fileset>
 		</copy>
 		<replaceregexp match="%HEADER%" replace="This file is part of GenomeView, a genome browser and annotation curator${line.separator}
@@ -68,6 +69,7 @@
 				<!-- <include name="**/*.conf" /> -->
 				<!-- <include name="**/*.txt" /> -->
 				<include name="*.txt" />
+				
 			</fileset>
 		</copy>
 		<copy todir="${dist}/lib">
@@ -82,6 +84,7 @@
 			<fileset dir="${src}">
 				<include name="**/*.conf" />
 				<include name="conf/*.txt" />
+				<include name="conf/*.tsv" />
 				<include name="org/java/**/*.properties" />
 				<include name="org/java/**/*.dtd" />
 			</fileset>
