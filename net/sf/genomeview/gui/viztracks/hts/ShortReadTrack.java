@@ -13,8 +13,10 @@ import java.awt.geom.Rectangle2D;
 import java.util.BitSet;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -133,7 +135,7 @@ public class ShortReadTrack extends Track {
 				text.append("Name: " + sr.getReadName() + "<br/>");
 				text.append("Len: " + sr.getReadLength() + "<br/>");
 				text.append("Cigar: " + sr.getCigarString() + "<br/>");
-				text.append("Sequence: " + sr.getReadString() + "<br/>");
+				text.append("Sequence: " + rerun(sr.getReadString()) + "<br/>");
 				text.append("Paired: " + sr.getReadPairedFlag() + "<br/>");
 				if (sr.getReadPairedFlag()) {
 					if (!sr.getMateUnmappedFlag())
@@ -157,6 +159,16 @@ public class ShortReadTrack extends Track {
 
 		}
 
+	}
+	
+	private static String rerun(String arg){
+		StringBuffer out=new StringBuffer();
+		int i=0;
+		for(;i<arg.length()-80;i+=80)
+			out.append(arg.substring(i, i+80)+"<br/>");
+		out.append(arg.substring(i, arg.length()));
+		return out.toString();
+		
 	}
 
 	@Override
@@ -596,7 +608,9 @@ public class ShortReadTrack extends Track {
 		// System.out.print(",");
 		int subX1 = Convert.translateGenomeToScreen(rf.getAlignmentStart(), currentVisible, screenWidth);
 		int subX2 = Convert.translateGenomeToScreen(rf.getAlignmentEnd() + 1, currentVisible, screenWidth);
-
+//		System.out.println(rf.getAlignmentBlocks().size());
+//		System.out.println(rf.getAlignmentBlocks().get(0).)
+//		System.out.println("Start-End: "+rf.getAlignmentStart()+" "+rf.getAlignmentEnd()+"\t"+rf.getUnclippedStart()+"\t"+rf.getUnclippedEnd());
 		/* If outside of screen, return immediately */
 		if (subX1 > screenWidth || subX2 < 0)
 			return false;
@@ -758,7 +772,12 @@ public class ShortReadTrack extends Track {
 			// if (rf instanceof ShortReadTools) {
 			// ShortReadTools esr = (ShortReadTools) rf;
 			int pos = 0;
-			int esrPos = 0;
+//			int esrPos = 0;
+			Set<CigarOperator>skip=new HashSet<CigarOperator>();
+			skip.add(CigarOperator.HARD_CLIP);
+			skip.add(CigarOperator.SOFT_CLIP);
+			skip.add(CigarOperator.H);
+			skip.add(CigarOperator.S);
 			for (CigarElement ce : rf.getCigar().getCigarElements()) {
 				if (ce.getOperator() == CigarOperator.I) {
 					double tx1 = Convert.translateGenomeToScreen(rf.getAlignmentStart() + pos, currentVisible,
@@ -774,13 +793,15 @@ public class ShortReadTrack extends Track {
 					rec.width += 2;
 					ShortReadInsertion in = new ShortReadInsertion();
 					in.esr = rf;
-					in.start = esrPos;
+					in.start = pos;
 					in.len = ce.getLength();
 					paintedBlocks.put(rec, in);
 				} else {
+					if(!skip.contains(ce.getOperator()))
 					pos += ce.getLength();
 				}
-				esrPos += ce.getLength();
+//				if(!skip.contains(ce.getOperator()))
+//					esrPos += ce.getLength();
 			}
 		} else {
 
