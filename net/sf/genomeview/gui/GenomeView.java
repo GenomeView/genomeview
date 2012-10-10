@@ -6,6 +6,7 @@ package net.sf.genomeview.gui;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Authenticator;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -73,6 +74,8 @@ public class GenomeView {
 				
 
 				LogConfigurator.config();
+				logger.info("GenomeView version "+Configuration.version());
+				logger.info("Current date and time: "+new Date());
 				logger.info("Command line instructions: "+Arrays.toString(args));
 				CommandLineOptions.init(args);
 				/* Single instance manager */
