@@ -142,9 +142,13 @@ public class ConfigurationDialog extends JDialog {
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("shortread:maximumPairing", "Maximum distance between paired reads"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.colorInstance(model, "shortread:forwardColor", "Color of the forward reads"), gc);
+			this.add(ConfigBox.colorInstance(model, "shortread:forwardColor", "Color reads mapping to the forward strand for sense transcripts"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.colorInstance(model, "shortread:reverseColor", "Color of the reverse reads"), gc);
+			this.add(ConfigBox.colorInstance(model, "shortread:reverseColor", "Color reads mapping to the reverse strand for sense transcripts"), gc);
+			gc.gridy++;
+			this.add(ConfigBox.colorInstance(model, "shortread:forwardAntiColor", "Color reads mapping to the forward strand for anti-sense transcripts"), gc);
+			gc.gridy++;
+			this.add(ConfigBox.colorInstance(model, "shortread:reverseAntiColor", "Color reads mapping to the reverse strand for anti-sense transcripts"), gc);
 			gc.gridy++;
 			this.add(ConfigBox.colorInstance(model, "shortread:pairingColor", "Color of the line between paired reads"), gc);
 
