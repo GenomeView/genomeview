@@ -346,17 +346,21 @@ class BarChartBuffer implements VizBuffer {
 				g.setColor(Color.ORANGE);
 				g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 - screenX1 + 1, 2 * size);
 
-				g.setColor(forwardColor);
-				g.fillRect(screenX1, yOffset + graphLineHeigh - f1size, screenX2 - screenX1 + 1, f1size);
-
 				g.setColor(forwardAntiColor);
-				g.fillRect(screenX1, yOffset + graphLineHeigh - f2size-f1size, screenX2 - screenX1 + 1, f2size);
-				
-				g.setColor(reverseColor);
-				g.fillRect(screenX1, yOffset + graphLineHeigh, screenX2 - screenX1 + 1, r1size);
-				
+				g.fillRect(screenX1, yOffset + graphLineHeigh, screenX2 - screenX1 + 1, f1size);
+						
 				g.setColor(reverseAntiColor);
-				g.fillRect(screenX1, yOffset + graphLineHeigh+r1size, screenX2 - screenX1 + 1, r2size);
+				g.fillRect(screenX1, yOffset + graphLineHeigh+f1size, screenX2 - screenX1 + 1, r2size);
+				
+				/* --- */
+				g.setColor(reverseColor);
+				g.fillRect(screenX1, yOffset + graphLineHeigh-r1size, screenX2 - screenX1 + 1, r1size);
+				
+				
+				g.setColor(forwardColor);
+				g.fillRect(screenX1, yOffset + graphLineHeigh-r1size-f2size, screenX2 - screenX1 + 1, f2size);
+				
+				
 			}
 			// System.out.println("Show individual");
 
