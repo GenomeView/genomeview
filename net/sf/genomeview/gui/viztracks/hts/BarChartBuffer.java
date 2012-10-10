@@ -20,6 +20,7 @@ import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.refseq.Sequence;
+import net.sf.jannot.tdf.ReadType;
 
 /**
  * 
@@ -63,7 +64,6 @@ class BarChartBuffer implements VizBuffer {
 		status = provider.getStatus(visible.start, visible.end);
 
 		Iterable<Pile> itt = provider.get(visible.start, visible.end + 1);
-//		System.out.println("Normalize::: "+ptm.isNormalizeMean() +"\t"+ ptm.normalizationEngine.value() != null);
 		
 		for (Pile p : itt) {
 			if (p == null) {
@@ -195,6 +195,9 @@ class BarChartBuffer implements VizBuffer {
 
 		if (detailedRects != null) {
 			switch (detailedRects.length) {
+			case 4:
+				drawFour(g,range,graphLineHeigh,screenWidth,yOffset);
+				break;
 			case 2:
 				drawTwo(g, range, graphLineHeigh, screenWidth, yOffset);
 				break;
@@ -265,6 +268,124 @@ class BarChartBuffer implements VizBuffer {
 
 		return returnTrackHeight;
 
+	}
+
+	private void drawFour(Graphics2D g, double range, int graphLineHeigh, double screenWidth, int yOffset) {
+		Color forwardColor = Configuration.getColor("shortread:forwardColor");
+		Color reverseColor = Configuration.getColor("shortread:reverseColor");
+		Color forwardAntiColor = Configuration.getColor("shortread:forwardAntiColor");
+		Color reverseAntiColor = Configuration.getColor("shortread:reverseAntiColor");
+		
+		
+		int lastX = -10;
+
+		if (ptm.isLogscaling()) {
+			range = log2(range);
+		
+		}
+		for (int i = 0; detailedRects != null && i < detailedRects[0].length; i++) {
+		
+			double f1cov = detailedRects[ReadType.FIRSTREADFORWARDMAP.ordinal()][i] - localMinPile;
+			double f2cov = detailedRects[ReadType.SECONDREADFORWARDMAP.ordinal()][i] - localMinPile;
+			double r1cov = detailedRects[ReadType.FIRSTREADREVERSEMAP.ordinal()][i] - localMinPile;
+			double r2cov = detailedRects[ReadType.SECONDREADREVERSEMAP.ordinal()][i] - localMinPile;
+			if (ptm.isLogscaling()) {
+				if (f1cov > 0)
+					f1cov = log2(f1cov);
+				if (f2cov > 0)
+					f2cov = log2(f2cov);
+				if (r1cov > 0)
+					r1cov = log2(r1cov);
+				if (r2cov > 0)
+					r2cov = log2(r2cov);
+			}
+
+			double coverage = f1cov + r1cov+f2cov + r2cov;
+			/* Max value set, truncate */
+			//
+			// if (ptm.maxValue() > 0) {
+			// div = ptm.maxValue();
+			if (coverage > range)
+				coverage = range;
+			if (r1cov > range)
+				r1cov = range;
+			if (f1cov > range)
+				f1cov = range;
+			if (r2cov > range)
+				r2cov = range;
+			if (f2cov > range)
+				f2cov = range;
+			// }
+			double frac = coverage / range;
+			int size = (int) (frac * graphLineHeigh);
+			
+			double f1frac = f1cov / range;
+			int f1size = (int) (f1frac * graphLineHeigh);
+			double r1frac = r1cov / range;
+			int r1size = (int) (r1frac * graphLineHeigh);
+			
+			double f2frac = f2cov / range;
+			int f2size = (int) (f2frac * graphLineHeigh);
+			double r2frac = r2cov / range;
+			int r2size = (int) (r2frac * graphLineHeigh);
+			
+			double factor = MAX_WIDTH / visible.length();
+			int sLoc = (int) ((i / factor) + visible.start);
+			int eLoc = (int) (((i + 1) / factor) + 1 + visible.start);
+			if (exact) {
+				sLoc = (int) ((i) + visible.start);
+				eLoc = (int) (((i)) + 1 + visible.start);
+			}
+			// System.out.println("LOC: "+sLoc+"\t"+eLoc);
+			int screenX1 = Convert.translateGenomeToScreen(sLoc, visible, screenWidth);
+			int screenX2 = Convert.translateGenomeToScreen(eLoc, visible, screenWidth);
+			// System.out.println("Screen: "+screenX1+"\t"+screenX2);
+			// System.out.println(frac+"\t"+ffrac+"\t"+rfrac);
+			if (screenX1 > lastX) {
+				lastX = screenX1;
+				g.setColor(Color.ORANGE);
+				g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 - screenX1 + 1, 2 * size);
+
+				g.setColor(forwardColor);
+				g.fillRect(screenX1, yOffset + graphLineHeigh - f1size, screenX2 - screenX1 + 1, f1size);
+
+				g.setColor(forwardAntiColor);
+				g.fillRect(screenX1, yOffset + graphLineHeigh - f2size-f1size, screenX2 - screenX1 + 1, f2size);
+				
+				g.setColor(reverseColor);
+				g.fillRect(screenX1, yOffset + graphLineHeigh, screenX2 - screenX1 + 1, r1size);
+				
+				g.setColor(reverseAntiColor);
+				g.fillRect(screenX1, yOffset + graphLineHeigh+r1size, screenX2 - screenX1 + 1, r2size);
+			}
+			// System.out.println("Show individual");
+
+			g.setColor(Color.GRAY);
+		}
+
+		g.setColor(Color.BLACK);
+		for (Line line : ptm.getLines()) {
+			// g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 -
+			// screenX1 + 1, 2 * size);
+			if (line.value() - localMinPile < range) {
+				int tY = (int) (((line.value() - localMinPile) / range) * graphLineHeigh);
+				g.drawLine(0, yOffset + graphLineHeigh - tY, (int) screenWidth, yOffset + graphLineHeigh - tY);
+				g.drawLine(0, yOffset + graphLineHeigh + tY, (int) screenWidth, yOffset + graphLineHeigh + tY);
+			}
+		}
+
+		yOffset += 2 * graphLineHeigh;
+		/* Draw tick labels on coverage plot */
+
+		g.setColor(Color.BLACK);
+		g.drawLine(0, yOffset, 5, yOffset);
+		g.drawLine(0, yOffset - graphLineHeigh, 5, yOffset - graphLineHeigh);
+		g.drawLine(0, yOffset - 2 * graphLineHeigh, 5, yOffset - 2 * graphLineHeigh);
+
+		g.drawString("" + nrReg.format(range + localMinPile), 10, yOffset);
+		g.drawString("" + nrReg.format(localMinPile), 10, yOffset - graphLineHeigh + 5);
+		g.drawString("" + nrReg.format(range + localMinPile), 10, yOffset - 2 * graphLineHeigh + 10);
+		
 	}
 
 	private void drawOne(Graphics2D g, double range, int graphLineHeigh, double screenWidth, int yOffset) {
