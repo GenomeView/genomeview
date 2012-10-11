@@ -121,6 +121,10 @@ public class EditFeatureWindow extends JDialog {
 							String[] as = s.split("\\.\\.");
 							int start = Integer.parseInt(as[0].trim());
 							int end = Integer.parseInt(as[1].trim());
+							if(start<1)
+								start=1;
+							if(end>model.getSelectedEntry().getMaximumLength())
+								end=model.getSelectedEntry().getMaximumLength();
 							loc.add(new Location(start, end));
 						}
 						feature.setLocation(loc);
