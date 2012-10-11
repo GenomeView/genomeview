@@ -73,7 +73,10 @@ public class StructureTrack extends Track {
 		// this.addMouseMotionListener(this);
 		// model.addObserver(this);
 	}
-
+	@Override
+	protected void paintDisplayName(Graphics2D g, int yOffset){
+		//Do nothing
+	}
 	private int lineHeight = Configuration.getInt("geneStructureLineHeight");
 
 	/* The height of the ticks and coordinate drawing */

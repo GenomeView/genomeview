@@ -113,10 +113,6 @@ public class PileupTrack extends Track {
 		/* Do the actual painting */
 		int graphLineHeigh = ptm.getVizBuffer().draw(g, yOffset, screenWidth);
 
-		g.setColor(Color.BLACK);
-
-		g.drawString(config.displayName(), 10, yOffset + 24 - 2);
-
 		return graphLineHeigh;
 
 	}

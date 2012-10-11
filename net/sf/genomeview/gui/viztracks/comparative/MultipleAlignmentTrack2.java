@@ -199,7 +199,10 @@ public class MultipleAlignmentTrack2 extends Track {
 	private MAFVizBuffer mvb = null;
 
 	private int speciesCount = -1;
-
+	@Override
+	protected void paintDisplayName(Graphics2D g, int yOffset){
+		//Do nothing
+	}
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
 		boolean comparativeAnnotation = Configuration.getBoolean("maf:enableAnnotation");

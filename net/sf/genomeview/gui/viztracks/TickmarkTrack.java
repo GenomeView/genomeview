@@ -19,7 +19,10 @@ public class TickmarkTrack extends Track {
 	public TickmarkTrack(Model model) {
 		super(key, model, true, false);
 	}
-
+	@Override
+	protected void paintDisplayName(Graphics2D g, int yOffset){
+		//Do nothing
+	}
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,JViewport view,TrackCommunicationModel tcm) {
 		Location r = model.getAnnotationLocationVisible();

@@ -169,15 +169,15 @@ public class ConfigurationDialog extends JDialog {
 		private static final long serialVersionUID = -628553625113038258L;
 
 		public AnnotationConfigPanel(Model model) {
-			this.add(ConfigBox.integerInstance("evidenceLineHeight", "Height of a track in pixels"), gc);
-			gc.gridy++;
-			this.add(ConfigBox.booleanInstance(model,"showTrackName", "Show evidence track names"), gc);
-			gc.gridy++;
+//			this.add(ConfigBox.integerInstance("evidenceLineHeight", "Height of a track in pixels"), gc);
+//			gc.gridy++;
+//			this.add(ConfigBox.booleanInstance(model,"showTrackName", "Show evidence track names"), gc);
+//			gc.gridy++;
 			this.add(ConfigBox.booleanInstance(model,"useColorQualifierTag", "Use the /color qualifier tag"), gc);
 			gc.gridy++;
-			this.add(ConfigBox.stringInstance("visibleTypes", "Visible types on start-up"), gc);
-			gc.gridy++;
-			this.add(ConfigBox.integerInstance("annotationview:maximumNoVisibleFeatures", "Maximum number of features of each type to display on the AnnotationView"), gc);
+//			this.add(ConfigBox.stringInstance("visibleTypes", "Visible types on start-up"), gc);
+//			gc.gridy++;
+//			this.add(ConfigBox.integerInstance("annotationview:maximumNoVisibleFeatures", "Maximum number of features of each type to display on the AnnotationView"), gc);
 		}
 	}
 

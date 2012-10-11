@@ -414,6 +414,11 @@ public class MultipleAlignmentTrack extends Track {
 		return 0;
 	}
 
+	@Override
+	protected void paintDisplayName(Graphics2D g, int yOffset){
+		//Do nothing
+	}
+	
 	private void draw(Map<Integer, String> map, Graphics2D g, int numAlign,
 			int position, int lineHeight, Model m, double width, int yOffset) {
 

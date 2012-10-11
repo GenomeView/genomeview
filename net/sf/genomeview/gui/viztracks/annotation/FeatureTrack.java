@@ -293,7 +293,10 @@ public class FeatureTrack extends Track {
 		floatingWindow = new FeatureInfoWindow(ftm);
 
 	}
-
+	@Override
+	protected void paintDisplayName(Graphics2D g, int yOffset){
+		//Do nothing
+	}
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view, TrackCommunicationModel tcm) {
 		boolean forceLabels = Configuration.getBoolean("track:forceFeatureLabels");
@@ -462,11 +465,7 @@ public class FeatureTrack extends Track {
 
 			}
 		}
-		if (Configuration.getBoolean("showTrackName")) {
-			g.setColor(Color.black);
-
-			g.drawString(ftm.displayName(), 10, lineThickness);
-		}
+		
 		g.translate(0, -yOffset - 2);
 		return (lines + 1) * lineThickness + 4;
 

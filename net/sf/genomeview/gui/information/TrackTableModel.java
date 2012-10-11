@@ -88,11 +88,7 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 				return Icons.INVISIBLE;
 			}
 		case 1:
-			String alias = Configuration.get("track:alias:" + track.config().displayName());
-			if (alias != null && alias.length() > 0)
-				return alias;
-			else
-				return track.config().displayName();
+			return track.config().shortDisplayName();
 		default:
 			return Icons.DELETE;
 		}

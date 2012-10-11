@@ -60,6 +60,25 @@ public class TrackConfig extends Observable {
 
 	}
 
+	final public String shortDisplayName(){
+		String alias = Configuration.get("track:alias:" + dataKey);
+		if (alias != null && alias.length() > 0)
+			return alias;
+		else{
+			String dn=""+dataKey;
+			int sepIdx=Math.max(dn.lastIndexOf('/'), dn.lastIndexOf('\\'))+1;
+			if(sepIdx<0)
+				sepIdx=0;
+			dn=dn.substring(sepIdx);
+			dn=dn.replaceAll("(\\.[a-zA-Z0-9]{3})+$", "");
+			return dn;
+		}
+			
+		
+	}
+	
+	
+	
 	final public String displayName() {
 		String alias = Configuration.get("track:alias:" + dataKey);
 		if (alias != null && alias.length() > 0)

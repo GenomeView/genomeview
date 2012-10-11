@@ -201,9 +201,31 @@ public abstract class Track {
 		}
 
 		paintConfigCog((Graphics2D) g, yOffset, width);
+		paintDisplayName((Graphics2D) g, yOffset);
 		return used;
 	}
 
+	protected void paintDisplayName(Graphics2D g, int yOffset) {
+//		if (Configuration.getBoolean("showTrackName")) {
+//			g.setColor(Color.black);
+//
+//			g.drawString(ftm.displayName(), 10, lineThickness);
+//		}
+//		/* Draw label */
+//		String name = config.displayName();
+//		FontMetrics metrics = g.getFontMetrics();
+//		int hgt = metrics.getHeight();
+//		int adv = metrics.stringWidth(name);
+//
+////		g.setColor(Color.WHITE);
+////		g.fillRect(10, originalYOffset, adv + 2, hgt + 2);
+////
+////		g.setColor(Color.BLUE);
+////		g.drawString(name, 10, originalYOffset + hgt - 2);
+		g.setColor(Color.BLACK);
+		g.drawString(config.shortDisplayName(), 10, yOffset + 24 - 2);
+		
+	}
 	/**
 	 * Paint the actual track
 	 * 

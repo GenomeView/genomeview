@@ -554,17 +554,7 @@ public class ShortReadTrack extends Track {
 		/* Draw status */
 		Track.paintStatus(g, status, originalYOffset, yOffset - originalYOffset, currentVisible, screenWidth);
 
-		/* Draw label */
-		String name = config.displayName();
-		FontMetrics metrics = g.getFontMetrics();
-		int hgt = metrics.getHeight();
-		int adv = metrics.stringWidth(name);
 
-		g.setColor(Color.WHITE);
-		g.fillRect(10, originalYOffset, adv + 2, hgt + 2);
-
-		g.setColor(Color.BLUE);
-		g.drawString(name, 10, originalYOffset + hgt - 2);
 
 		return yOffset - originalYOffset;
 	}
