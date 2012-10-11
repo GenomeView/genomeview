@@ -3,19 +3,26 @@
  */
 package net.sf.genomeview.core;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * 
- * @author Thomas
+ * Iterable that will go over a list and will keep going even if the lists gets
+ * modified while the iteration is in progress.
+ * 
+ * It will make a best effort to iterator over all elements, even ones that are
+ * included after the iterator has started, but makes no guarantee that all
+ * elements will be presented.
+ * 
+ * @author Thomas Abeel
  * 
  * @param <T>
  */
 public class NoFailIterable<T> implements Iterable<T> {
-	private ArrayList<T> list = null;
+	private List<T> list = null;
 
-	public NoFailIterable(ArrayList<T> list) {
+	public NoFailIterable(List<T> list) {
 		this.list = list;
 	}
 
