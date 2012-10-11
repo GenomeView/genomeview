@@ -26,7 +26,7 @@ public class NoFailIterable<T> implements Iterable<T> {
 
 			@Override
 			public boolean hasNext() {
-				return idx < list.size() - 1;
+				return idx <= list.size() - 1;
 			}
 
 			@Override

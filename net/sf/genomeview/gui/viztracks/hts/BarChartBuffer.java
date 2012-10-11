@@ -64,7 +64,7 @@ class BarChartBuffer implements VizBuffer {
 		status = provider.getStatus(visible.start, visible.end);
 
 		Iterable<Pile> itt = provider.get(visible.start, visible.end + 1);
-		
+
 		for (Pile p : itt) {
 			if (p == null) {
 				System.out.println("Null pile");
@@ -93,8 +93,9 @@ class BarChartBuffer implements VizBuffer {
 				startIdx = startPos - visible.start;
 				endIdx = endPos - visible.start;
 			}
-			
-			// System.out.println("\t"+endPos+"\t"+endIdx);
+
+//			if(p.getTotal()>0)
+//				System.out.println("Pile: \t"+startPos+"\t"+startIdx+"\t"+endPos+"\t"+endIdx+"\t"+p.getTotal());
 			for (int i = startIdx; i <= endIdx; i++) {
 				if (i >= 0 && i < detailedRects[0].length) {
 					// float fcov = p.getFCoverage();
@@ -102,7 +103,7 @@ class BarChartBuffer implements VizBuffer {
 					// int pos=i - visible.start;
 					for (int j = 0; j < p.getValueCount(); j++) {
 						double val = p.getValue(j);
-						if (ptm.isNormalizationAvailable()&&ptm.isNormalizeMean() && ptm.normalizationEngine.value() != null) {
+						if (ptm.isNormalizationAvailable() && ptm.isNormalizeMean() && ptm.normalizationEngine.value() != null) {
 							val /= ptm.normalizationEngine.value()[j];
 						}
 
@@ -114,8 +115,8 @@ class BarChartBuffer implements VizBuffer {
 					// covValues[1][i] = rcov;
 
 					double coverage = p.getTotal();
-					if (ptm.isNormalizationAvailable()&&ptm.isNormalizeMean() && ptm.normalizationEngine.value() != null) {
-						coverage/=ptm.normalizationEngine.value()[0];
+					if (ptm.isNormalizationAvailable() && ptm.isNormalizeMean() && ptm.normalizationEngine.value() != null) {
+						coverage /= ptm.normalizationEngine.value()[0];
 					}
 					ptm.getTrackCommunication().updateLocalPileupMax(coverage, visible);
 
@@ -125,8 +126,9 @@ class BarChartBuffer implements VizBuffer {
 						localMinPile = coverage;
 				}
 			}
-
+			
 		}
+	//	System.out.println("Halt!");
 	}
 
 	private void initArray(Pile p, int length) {
@@ -196,7 +198,8 @@ class BarChartBuffer implements VizBuffer {
 		if (detailedRects != null) {
 			switch (detailedRects.length) {
 			case 4:
-				drawFour(g,range,graphLineHeigh,screenWidth,yOffset);
+				// TODO should this be 2*range?
+				drawFour(g, range, graphLineHeigh, screenWidth, yOffset);
 				break;
 			case 2:
 				drawTwo(g, range, graphLineHeigh, screenWidth, yOffset);
@@ -250,8 +253,7 @@ class BarChartBuffer implements VizBuffer {
 
 								g.setColor(color[j]);
 
-								g.fillRect(x1, (int) (yOffset + snpTrackHeight - fraction - done), nucWidth,
-										(int) (Math.ceil(fraction)));
+								g.fillRect(x1, (int) (yOffset + snpTrackHeight - fraction - done), nucWidth, (int) (Math.ceil(fraction)));
 
 								done += fraction;
 							}
@@ -271,20 +273,20 @@ class BarChartBuffer implements VizBuffer {
 	}
 
 	private void drawFour(Graphics2D g, double range, int graphLineHeigh, double screenWidth, int yOffset) {
+		//range = 2 * range;
 		Color forwardColor = Configuration.getColor("shortread:forwardColor");
 		Color reverseColor = Configuration.getColor("shortread:reverseColor");
 		Color forwardAntiColor = Configuration.getColor("shortread:forwardAntiColor");
 		Color reverseAntiColor = Configuration.getColor("shortread:reverseAntiColor");
-		
-		
+
 		int lastX = -10;
 
 		if (ptm.isLogscaling()) {
 			range = log2(range);
-		
+
 		}
 		for (int i = 0; detailedRects != null && i < detailedRects[0].length; i++) {
-		
+
 			double f1cov = detailedRects[ReadType.FIRSTREADFORWARDMAP.ordinal()][i] - localMinPile;
 			double f2cov = detailedRects[ReadType.SECONDREADFORWARDMAP.ordinal()][i] - localMinPile;
 			double r1cov = detailedRects[ReadType.FIRSTREADREVERSEMAP.ordinal()][i] - localMinPile;
@@ -300,7 +302,7 @@ class BarChartBuffer implements VizBuffer {
 					r2cov = log2(r2cov);
 			}
 
-			double coverage = f1cov + r1cov+f2cov + r2cov;
+			double coverage = f1cov + r1cov + f2cov + r2cov;
 			/* Max value set, truncate */
 			//
 			// if (ptm.maxValue() > 0) {
@@ -318,17 +320,17 @@ class BarChartBuffer implements VizBuffer {
 			// }
 			double frac = coverage / range;
 			int size = (int) (frac * graphLineHeigh);
-			
+
 			double f1frac = f1cov / range;
 			int f1size = (int) (f1frac * graphLineHeigh);
 			double r1frac = r1cov / range;
 			int r1size = (int) (r1frac * graphLineHeigh);
-			
+
 			double f2frac = f2cov / range;
 			int f2size = (int) (f2frac * graphLineHeigh);
 			double r2frac = r2cov / range;
 			int r2size = (int) (r2frac * graphLineHeigh);
-			
+
 			double factor = MAX_WIDTH / visible.length();
 			int sLoc = (int) ((i / factor) + visible.start);
 			int eLoc = (int) (((i + 1) / factor) + 1 + visible.start);
@@ -336,7 +338,8 @@ class BarChartBuffer implements VizBuffer {
 				sLoc = (int) ((i) + visible.start);
 				eLoc = (int) (((i)) + 1 + visible.start);
 			}
-			// System.out.println("LOC: "+sLoc+"\t"+eLoc);
+//			if(f2cov+r1cov+(f1cov+r2cov)>0)
+//				System.out.println("LOC: "+sLoc+"\t"+eLoc+"\t"+(f2cov+r1cov)+"\t"+(f1cov+r2cov));
 			int screenX1 = Convert.translateGenomeToScreen(sLoc, visible, screenWidth);
 			int screenX2 = Convert.translateGenomeToScreen(eLoc, visible, screenWidth);
 			// System.out.println("Screen: "+screenX1+"\t"+screenX2);
@@ -346,21 +349,20 @@ class BarChartBuffer implements VizBuffer {
 				g.setColor(Color.ORANGE);
 				g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 - screenX1 + 1, 2 * size);
 
+				/* --- */
 				g.setColor(forwardAntiColor);
 				g.fillRect(screenX1, yOffset + graphLineHeigh, screenX2 - screenX1 + 1, f1size);
-						
+
 				g.setColor(reverseAntiColor);
-				g.fillRect(screenX1, yOffset + graphLineHeigh+f1size, screenX2 - screenX1 + 1, r2size);
-				
+				g.fillRect(screenX1, yOffset + graphLineHeigh + f1size, screenX2 - screenX1 + 1, r2size);
+
 				/* --- */
 				g.setColor(reverseColor);
-				g.fillRect(screenX1, yOffset + graphLineHeigh-r1size, screenX2 - screenX1 + 1, r1size);
-				
-				
+				g.fillRect(screenX1, yOffset + graphLineHeigh - r1size, screenX2 - screenX1 + 1, r1size);
+
 				g.setColor(forwardColor);
-				g.fillRect(screenX1, yOffset + graphLineHeigh-r1size-f2size, screenX2 - screenX1 + 1, f2size);
-				
-				
+				g.fillRect(screenX1, yOffset + graphLineHeigh - r1size - f2size, screenX2 - screenX1 + 1, f2size);
+
 			}
 			// System.out.println("Show individual");
 
@@ -389,7 +391,7 @@ class BarChartBuffer implements VizBuffer {
 		g.drawString("" + nrReg.format(range + localMinPile), 10, yOffset);
 		g.drawString("" + nrReg.format(localMinPile), 10, yOffset - graphLineHeigh + 5);
 		g.drawString("" + nrReg.format(range + localMinPile), 10, yOffset - 2 * graphLineHeigh + 10);
-		
+
 	}
 
 	private void drawOne(Graphics2D g, double range, int graphLineHeigh, double screenWidth, int yOffset) {
@@ -615,9 +617,24 @@ class BarChartBuffer implements VizBuffer {
 			effectivePosition = Convert.translateScreenToGenome(mouseX, visible, ptm.getScreenWidth()) - visible.start;
 		if (detailedRects != null) {
 			text.append("<strong>" + (pileWidth > 1 ? "Average " : "") + "Coverage:</strong> ");
-			if (detailedRects.length == 2) {
-				text.append(nrReg.format(detailedRects[0][effectivePosition] + detailedRects[1][effectivePosition])
-						+ "<br/>");
+			if (detailedRects.length == 4) {
+				double f1cov = detailedRects[ReadType.FIRSTREADFORWARDMAP.ordinal()][effectivePosition];
+				double f2cov = detailedRects[ReadType.SECONDREADFORWARDMAP.ordinal()][effectivePosition];
+				double r1cov = detailedRects[ReadType.FIRSTREADREVERSEMAP.ordinal()][effectivePosition];
+				double r2cov = detailedRects[ReadType.SECONDREADREVERSEMAP.ordinal()][effectivePosition];
+				double sense = f2cov + r1cov;
+				double antisense = r2cov + f1cov;
+				double reverse=r1cov+r2cov;
+				double forward=f1cov+f2cov;
+				text.append(nrReg.format(sense+antisense) + "<br/>");
+				text.append("Forward transcript: " + nrReg.format(sense) + "<br/>");
+				text.append("Reverse transcript: " + nrReg.format(antisense) + "<br/>");
+//				text.append("Forward mapping: " + nrReg.format(forward) + "<br/>");
+//				text.append("Reverse mapping: " + nrReg.format(reverse) + "<br/>");
+				
+
+			} else if (detailedRects.length == 2) {
+				text.append(nrReg.format(detailedRects[0][effectivePosition] + detailedRects[1][effectivePosition]) + "<br/>");
 				text.append("Forward: " + nrReg.format(detailedRects[0][effectivePosition]) + "<br/>");
 				text.append("Reverse: " + nrReg.format(detailedRects[1][effectivePosition]) + "<br/>");
 			} else {

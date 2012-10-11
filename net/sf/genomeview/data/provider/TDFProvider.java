@@ -10,10 +10,8 @@ import net.sf.genomeview.core.NoFailIterable;
 import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Task;
-import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
-import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.tdf.TDFData;
 
@@ -28,7 +26,6 @@ public class TDFProvider extends PileProvider {
 
 	private TDFData source;
 
-	private Model model;
 
 	public TDFProvider(Entry e, TDFData source, Model model) {
 		super(model);
@@ -38,7 +35,7 @@ public class TDFProvider extends PileProvider {
 		System.out.println("requesting: "+Configuration.get("pileup:defaultWindowFunction")+"\t"+wf);
 		if(source.availableWindowFunctions().contains(wf))
 			source.requestWindowFunction(wf);
-		this.model = model;
+		
 
 	}
 
@@ -77,7 +74,7 @@ public class TDFProvider extends PileProvider {
 					return;
 				thisJob.setRunning();
 				Iterable<Pile> fresh = source.get(start, end+1);
-
+				
 				for (Pile p : fresh) {
 					float val = p.getTotal();
 

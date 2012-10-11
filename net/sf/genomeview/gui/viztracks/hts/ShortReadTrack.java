@@ -610,8 +610,8 @@ public class ShortReadTrack extends Track {
 		if (ShortReadTools.isPaired(rf)&&!rf.getMateUnmappedFlag()
 				&& rf.getReferenceIndex() != rf.getMateReferenceIndex()
 				&& rf.getMateReferenceIndex() != -1) {
-			System.out.println("Different indices: " + rf.getReferenceIndex() + "\t"
-					+ rf.getMateReferenceIndex());
+//			System.out.println("Different indices: " + rf.getReferenceIndex() + "\t"
+//					+ rf.getMateReferenceIndex());
 			c=ReadColor.MATE_DIFFERENT_CHROMOSOME;
 		}else if (rf.getReadPairedFlag()) {
 			if (rf.getFirstOfPairFlag()) {
