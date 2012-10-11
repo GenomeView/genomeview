@@ -848,6 +848,10 @@ public class StructureTrack extends Track {
 		}
 
 		model.setSelectedTrack(pressTrack);
+		if(selectionStart<1)
+			selectionStart=1;
+		if(selectionEnd>model.getSelectedEntry().getMaximumLength())
+			selectionEnd=model.getSelectedEntry().getMaximumLength();
 		model.selectionModel().setSelectedRegion(new Location(selectionStart, selectionEnd));
 	}
 
