@@ -856,17 +856,27 @@ public class StructureTrack extends Track {
 	}
 
 	private ChangeEvent modifyCoordinate(Location y, int oldCoord, int newCoordinate) {
-
-		if (y.start() == oldCoord) {
+		int max=model.getSelectedEntry().getMaximumLength();
+		if(newCoordinate<1)
+			newCoordinate=1;
+		if(newCoordinate>max)
+			newCoordinate=max;
+		
+		if(y.start() == oldCoord&&y.end() == oldCoord){
+			if(newCoordinate<y.start())
+				return y.setStart(newCoordinate<max?newCoordinate + 1:newCoordinate);
+			else
+				return y.setEnd(newCoordinate>1?newCoordinate - 1:newCoordinate);
+		}else if (y.start() == oldCoord) {
 			if (oldCoord <= newCoordinate)
-				return y.setStart(newCoordinate + 1);
+				return y.setStart(newCoordinate<max?newCoordinate + 1:newCoordinate);
 			else
 				return y.setStart(newCoordinate);
 		} else if (y.end() == oldCoord) {
 			if (oldCoord < newCoordinate)
 				return y.setEnd(newCoordinate);
 			else
-				return y.setEnd(newCoordinate - 1);
+				return y.setEnd(newCoordinate>1?newCoordinate - 1:newCoordinate);
 		} else
 			throw new RuntimeException("This should not happen, sorry, I'm done!");
 		// borderHit = null;
