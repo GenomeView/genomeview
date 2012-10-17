@@ -297,11 +297,7 @@ public class FeatureTrack extends Track {
 
 	}
 
-	@Override
-	protected void paintDisplayName(Graphics2D g, int yOffset) {
-		// Do nothing
-	}
-
+	
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view, TrackCommunicationModel tcm) {
 		boolean forceLabels = Configuration.getBoolean("track:forceFeatureLabels");
