@@ -84,8 +84,7 @@ public class FeatureTrack extends Track {
 			GridBagPanel out = super.getGUIContainer();
 
 			out.gc.gridy++;
-			final JComponent colorGradient = new BooleanConfig("feature:scoreColorGradient_" + type(),
-					"Use score color gradient", model);
+			final JComponent colorGradient = new BooleanConfig("feature:scoreColorGradient_" + type(), "Use score color gradient", model);
 			out.add(colorGradient, out.gc);
 
 			/* Filter items based on score */
@@ -101,8 +100,8 @@ public class FeatureTrack extends Track {
 					final JLabel label = new JLabel();
 					final NumberFormat nf = NumberFormat.getInstance();
 					nf.setMaximumFractionDigits(2);
-					final DoubleJSlider slider = new DoubleJSlider(minScore, maxScore,
-							getThreshold() > minScore ? getThreshold() : minScore, (maxScore - minScore) / 100.0);
+					final DoubleJSlider slider = new DoubleJSlider(minScore, maxScore, getThreshold() > minScore ? getThreshold()
+							: minScore, (maxScore - minScore) / 100.0);
 					optionPane.setInputValue(slider.getDoubleValue());
 					label.setText(nf.format(slider.getDoubleValue()));
 					// slider.setMajorTickSpacing((int)((ftm.maxScore-ftm.minScore)/10));
@@ -135,8 +134,7 @@ public class FeatureTrack extends Track {
 			out.add(filter, out.gc);
 
 			out.gc.gridy++;
-			final JComponent colorQualifier = new BooleanConfig("feature:useColorQualifierTag_" + type(),
-					"Use /color qualifier", model);
+			final JComponent colorQualifier = new BooleanConfig("feature:useColorQualifierTag_" + type(), "Use /color qualifier", model);
 			out.add(colorQualifier, out.gc);
 
 			this.addObserver(new Observer() {
@@ -221,6 +219,11 @@ public class FeatureTrack extends Track {
 			return ColorGradient.fourColorGradient.getColor(normalizedScore);
 		}
 
+		@Override
+		public boolean isCollapsible() {
+			return true;
+		}
+
 		public FeatureTrackConfig(Model model, Type type) {
 			super(model, type);
 
@@ -286,17 +289,19 @@ public class FeatureTrack extends Track {
 	}
 
 	public FeatureTrack(Model model, Type key) {
-		super(key, model, true, true, new FeatureTrackConfig(model, key));
+		super(key, model, true, new FeatureTrackConfig(model, key));
 		ftm = (FeatureTrackConfig) config;
 		hitmap = new CollisionMap(model);
 
 		floatingWindow = new FeatureInfoWindow(ftm);
 
 	}
+
 	@Override
-	protected void paintDisplayName(Graphics2D g, int yOffset){
-		//Do nothing
+	protected void paintDisplayName(Graphics2D g, int yOffset) {
+		// Do nothing
 	}
+
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view, TrackCommunicationModel tcm) {
 		boolean forceLabels = Configuration.getBoolean("track:forceFeatureLabels");
@@ -368,8 +373,8 @@ public class FeatureTrack extends Track {
 				 * overlapping?
 				 */
 				int closenessOverlap = Configuration.getInt("closenessOverlap");
-				Rectangle r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness, maxX - x1 + 2
-						* closenessOverlap, lineThickness);
+				Rectangle r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness, maxX - x1 + 2 * closenessOverlap,
+						lineThickness);
 
 				if (!config.isCollapsed() && !manyFeature) {
 					// only when the blocks should be tiled, do we need to
@@ -381,8 +386,7 @@ public class FeatureTrack extends Track {
 
 						if (thisLine > lines)
 							lines = thisLine;
-						r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness, maxX - x1 + 2
-								* closenessOverlap, lineThickness);
+						r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness, maxX - x1 + 2 * closenessOverlap, lineThickness);
 					}
 				}
 				fullBlockMap.addLocation(r, null);
@@ -398,8 +402,7 @@ public class FeatureTrack extends Track {
 				for (Location l : loc) {
 
 					int subX1 = Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), width);
-					int subX2 = Convert.translateGenomeToScreen(l.end() + 1, model.getAnnotationLocationVisible(),
-							width);
+					int subX2 = Convert.translateGenomeToScreen(l.end() + 1, model.getAnnotationLocationVisible(), width);
 					Rectangle rec = new Rectangle(subX1, thisLine * lineThickness, subX2 - subX1, lineThickness - 5);
 					/* Add this rectangle to the location hits */
 					hitmap.addLocation(rec, l);
@@ -417,13 +420,11 @@ public class FeatureTrack extends Track {
 				switch (rf.strand()) {
 				case REVERSE:// reverse arrow
 					g.drawLine(x1, thisLine * lineThickness, x1 - trianglehalf, thisLine * lineThickness + trianglehalf);
-					g.drawLine(x1 - trianglehalf, thisLine * lineThickness + trianglehalf, x1, thisLine * lineThickness
-							+ lineThickness - 5);
+					g.drawLine(x1 - trianglehalf, thisLine * lineThickness + trianglehalf, x1, thisLine * lineThickness + lineThickness - 5);
 					break;
 				case FORWARD:// forward arrow
 					g.drawLine(x2, thisLine * lineThickness, x2 + trianglehalf, thisLine * lineThickness + trianglehalf);
-					g.drawLine(x2 + trianglehalf, thisLine * lineThickness + trianglehalf, x2, thisLine * lineThickness
-							+ lineThickness - 5);
+					g.drawLine(x2 + trianglehalf, thisLine * lineThickness + trianglehalf, x2, thisLine * lineThickness + lineThickness - 5);
 					break;
 				default:// do nothing
 					break;
@@ -449,10 +450,8 @@ public class FeatureTrack extends Track {
 				 * the feature in it
 				 */
 				if (forceLabels || x2 - x1 > 100) {
-					int a = Convert
-							.translateGenomeToScreen(loc[0].start(), model.getAnnotationLocationVisible(), width);
-					int b = Convert.translateGenomeToScreen(loc[0].end() + 1, model.getAnnotationLocationVisible(),
-							width);
+					int a = Convert.translateGenomeToScreen(loc[0].start(), model.getAnnotationLocationVisible(), width);
+					int b = Convert.translateGenomeToScreen(loc[0].end() + 1, model.getAnnotationLocationVisible(), width);
 					if (forceLabels || b - a > 100) {
 						Font resetFont = g.getFont();
 						g.setColor(c.darker().darker().darker());
@@ -465,7 +464,7 @@ public class FeatureTrack extends Track {
 
 			}
 		}
-		
+
 		g.translate(0, -yOffset - 2);
 		return (lines + 1) * lineThickness + 4;
 

@@ -20,7 +20,6 @@
  */
 package net.sf.genomeview.gui.viztracks;
 
-import java.awt.Point;
 import java.util.Observable;
 
 import javax.swing.JLabel;
@@ -41,7 +40,7 @@ public class TrackConfig extends Observable {
 
 	protected DataKey dataKey;
 	protected Model model;
-	private boolean collapsible;
+	
 
 	protected TrackConfig(Model model, DataKey dataKey) {
 		this.dataKey = dataKey;
@@ -55,7 +54,7 @@ public class TrackConfig extends Observable {
 		guicontainer.add(new BooleanConfig("track:visible:" + dataKey, "Track visible", model), guicontainer.gc);
 		if (isCollapsible()) {
 			guicontainer.gc.gridy++;
-			guicontainer.add(new BooleanConfig("track:collapse:" + dataKey, "Track collapsed", model), guicontainer.gc);
+			guicontainer.add(new BooleanConfig("track:collapsed:" + dataKey, "Track collapsed", model), guicontainer.gc);
 		}
 
 	}
@@ -111,21 +110,14 @@ public class TrackConfig extends Observable {
 		notifyObservers("TrackConfig::setVisible");
 	}
 
-	protected void setCollapsible(boolean collapsible) {
-		this.collapsible = collapsible;
-		setChanged();
-		notifyObservers("TrackConfig::setCollapsible");
-	}
-
 	public void setCollapsed(boolean collapsed) {
-		// this.collapsed = collapsed;
 		Configuration.set("track:collapsed:" + dataKey, collapsed);
 		setChanged();
 		notifyObservers("TrackConfig::setCollapsed");
 	}
 
 	public boolean isCollapsible() {
-		return collapsible;
+		return false;
 	}
 
 	public boolean isCollapsed() {

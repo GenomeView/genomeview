@@ -57,7 +57,7 @@ public class PileupTrack extends Track {
 	}
 
 	public PileupTrack(DataKey key, PileProvider provider, final Model model) {
-		super(key, model, true, false,new PileupTrackConfig(model,key,provider));
+		super(key, model, true, new PileupTrackConfig(model,key,provider));
 		ptm = (PileupTrackConfig)config;
 		tooltip = new PileupTooltip(ptm);
 		this.provider=provider;

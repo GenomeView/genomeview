@@ -65,7 +65,7 @@ public class StructureTrack extends Track {
 	public static final StringKey key = new StringKey("GV::STRUCTURE");
 
 	public StructureTrack(Model model) {
-		super(key, model, Configuration.getBoolean("track:showStructure"), false, new StructureTrackModel(model,key));
+		super(key, model, Configuration.getBoolean("track:showStructure"), new StructureTrackModel(model,key));
 
 		collisionMap = new CollisionMap(model);
 		stm = (StructureTrackModel) config;

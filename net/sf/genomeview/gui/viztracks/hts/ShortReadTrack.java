@@ -56,7 +56,7 @@ public class ShortReadTrack extends Track {
 	
 	
 	public ShortReadTrack(DataKey key, ShortReadProvider provider, Model model) {
-		super(key, model, true, false,new ShortReadTrackConfig(model, key));
+		super(key, model, true, new ShortReadTrackConfig(model, key));
 		this.srtc=(ShortReadTrackConfig)config;
 		this.provider = provider;
 	}

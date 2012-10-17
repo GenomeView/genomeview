@@ -81,17 +81,17 @@ public abstract class Track {
 	}
 	@Deprecated
 	protected Track(DataKey key, Model model, boolean visible, boolean collapsible) {
-		this(key,model,visible,collapsible,new TrackConfig(model,key));
+		this(key,model,visible,new TrackConfig(model,key));
 	}
 //	private TrackConfigWindow tcw;
-	protected Track(DataKey key, Model model, boolean visible, boolean collapsible,TrackConfig config) {
+	protected Track(DataKey key, Model model, boolean visible, TrackConfig config) {
 		this.model = model;
 		this.dataKey = key;
 		this.config=config;
 		TrackConfigWindow tcw=new TrackConfigWindow(model,config);
-		log.log(Level.INFO, "Creating track\t" + key + "\t" + visible + "\t" + collapsible);
+		log.log(Level.INFO, "Creating track\t" + key + "\t" + visible);
 		this.entry = model.getSelectedEntry();
-		config.setCollapsible(collapsible);
+//		config.setCollapsible(collapsible);
 //		this.collapsible = collapsible;
 		config.addObserver(model);
 		

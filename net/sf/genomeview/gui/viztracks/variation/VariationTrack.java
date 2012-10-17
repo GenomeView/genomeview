@@ -49,7 +49,7 @@ public class VariationTrack extends Track {
 	private VariationTrackConfig vtc;
 
 	public VariationTrack(Model model, Type key) {
-		super(key, model, true, false, new VariationTrackConfig(model, key));
+		super(key, model, true, new VariationTrackConfig(model, key));
 		vtc = (VariationTrackConfig) config;
 	}
 
