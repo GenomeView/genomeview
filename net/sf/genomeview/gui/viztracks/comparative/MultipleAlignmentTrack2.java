@@ -199,10 +199,12 @@ public class MultipleAlignmentTrack2 extends Track {
 	private MAFVizBuffer mvb = null;
 
 	private int speciesCount = -1;
+
 	@Override
-	protected void paintDisplayName(Graphics2D g, int yOffset){
-		//Do nothing
+	protected void paintDisplayName(Graphics2D g, int yOffset) {
+		// Do nothing
 	}
+
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
 		boolean comparativeAnnotation = Configuration.getBoolean("maf:enableAnnotation");
@@ -232,7 +234,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				// should repaint.
 				return 0;
 			}
-			speciesCount=ma.species().size();
+			speciesCount = ma.species().size();
 		}
 
 		paintedBlocks.clear();
@@ -269,7 +271,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				int blockScreenEnd = Convert.translateGenomeToScreen(end, visible, screenWidth);
 				if (showAll)
 					abCount = ordering.size();
-				
+
 				Rectangle rec = new Rectangle(start, yOffset, end - start - 1, abCount * lineHeight);
 				while (hitmap.collision(rec)) {
 					rec.y += lineHeight;
@@ -277,8 +279,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				if (rec.y + rec.height > yMax)
 					yMax = rec.y + rec.height;
 				hitmap.addLocation(rec, null);
-				paintedBlocks.put(new Rectangle(blockScreenStart, rec.y - yOffset, blockScreenEnd - blockScreenStart,
-						rec.height), ab);
+				paintedBlocks.put(new Rectangle(blockScreenStart, rec.y - yOffset, blockScreenEnd - blockScreenStart, rec.height), ab);
 				// rec.x=x1;
 				// rec.width=x2-x1;
 				g.setColor(Color.BLACK);
@@ -338,11 +339,8 @@ public class MultipleAlignmentTrack2 extends Track {
 									if (as.strand() == Strand.FORWARD)
 										nt = as.seq().get(translated, translated + 1).iterator().next();
 									else
-										nt = SequenceTools
-												.complement(as
-														.seq()
-														.get(as.seq().size() - translated + 1,
-																as.seq().size() - translated + 2).iterator().next());
+										nt = SequenceTools.complement(as.seq()
+												.get(as.seq().size() - translated + 1, as.seq().size() - translated + 2).iterator().next());
 
 									// System.out.println("NT: "+translated+"\t"+nt);
 									if (ref[i - visible.start] != nt) {
@@ -350,18 +348,17 @@ public class MultipleAlignmentTrack2 extends Track {
 											g.setColor(Color.RED);
 										else
 											g.setColor(Color.DARK_GRAY);
-										g.fillRect((int) ((i - visible.start) * width),
-												rec.y + (line - 1) * lineHeight, (int) Math.ceil(width), lineHeight);
+										g.fillRect((int) ((i - visible.start) * width), rec.y + (line - 1) * lineHeight,
+												(int) Math.ceil(width), lineHeight);
 										if (visible.length() < 100) {
 											Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
 											if (nt == '-')
 												g.setColor(Color.BLACK);
 											else
 												g.setColor(Configuration.getNucleotideColor(nt).brighter());
-											g.drawString(
-													"" + nt,
-													(int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)),
-													rec.y + line * lineHeight - 2);
+											g.drawString("" + nt,
+													(int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)), rec.y
+															+ line * lineHeight - 2);
 										}
 									}
 								}
@@ -369,8 +366,7 @@ public class MultipleAlignmentTrack2 extends Track {
 						} else {
 							Color or = Color.orange;
 							g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(), 100));
-							g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight, blockScreenEnd
-									- blockScreenStart, lineHeight);
+							g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight, blockScreenEnd - blockScreenStart, lineHeight);
 						}
 					} else {
 						// FIXME redundant?
@@ -384,8 +380,7 @@ public class MultipleAlignmentTrack2 extends Track {
 							g.setColor(Configuration.getColor("ma:reverseColor"));
 						}
 
-						g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight,
-								blockScreenEnd - blockScreenStart, lineHeight);
+						g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight, blockScreenEnd - blockScreenStart, lineHeight);
 
 					}
 
@@ -399,58 +394,80 @@ public class MultipleAlignmentTrack2 extends Track {
 								MemoryFeatureAnnotation mfa = e.getMemoryAnnotation(comparativeAnnotationType);
 								for (Feature f : mfa.get(as.start(), as.end())) {
 
-									int featureStart = f.start();
-									int featureEnd = f.end();
-									/* Reverse coordinates in reversed sections */
-									if (as.strand() == Strand.REVERSE) {
-										featureStart = as.end() - f.end() + as.start() - 1;
-										featureEnd = as.end() - f.start() + as.start() - 1;
+									Location[] larr = f.location();
+									for (int i = 0; i < 2 * larr.length - 1; i++) {
+										// for (Location l : f.location()) {
 
-									}
+										int featureStart, featureEnd;
 
-									if (featureStart < as.start())
-										featureStart = as.start();
-									if (featureStart > as.end())
-										featureStart = as.end();
+										if (i % 2 == 0) {/* feature */
+											featureStart = larr[i / 2].start();
+											featureEnd = larr[i / 2].end();
+										} else {/* connection */
+											featureStart = larr[i / 2].end();
+											featureEnd = larr[i / 2 + 1].start();
+										}
+										/*
+										 * Reverse coordinates in reversed
+										 * sections
+										 */
+										if (as.strand() == Strand.REVERSE) {
+											featureStart = as.end() - f.end() + as.start() - 1;
+											featureEnd = as.end() - f.start() + as.start() - 1;
 
-									if (featureEnd > as.end())
-										featureEnd = as.end();
+										}
 
-									if (featureEnd < as.start()) {
-										featureEnd = as.start();
-									}
+										if (featureStart < as.start())
+											featureStart = as.start();
+										if (featureStart > as.end())
+											featureStart = as.end();
 
-									featureStart = localTranslator.translate(featureStart - as.start());
-									featureEnd = localTranslator.translate(featureEnd - as.start());
+										if (featureEnd > as.end())
+											featureEnd = as.end();
 
-									/* Translate back to reference genome space */
-									featureStart = revtable[featureStart];
-									featureEnd = revtable[featureEnd] + 1;
+										if (featureEnd < as.start()) {
+											featureEnd = as.start();
+										}
 
-									int featureScreenStart = Convert.translateGenomeToScreen(featureStart + ab.start(),
-											visible, screenWidth);
-									int featureScreenEnd = Convert.translateGenomeToScreen(featureEnd + ab.start(),
-											visible, screenWidth);
+										featureStart = localTranslator.translate(featureStart - as.start());
+										featureEnd = localTranslator.translate(featureEnd - as.start());
 
-									if (featureScreenStart < blockScreenStart) {
-										featureScreenStart = blockScreenStart;
+										/*
+										 * Translate back to reference genome
+										 * space
+										 */
+										featureStart = revtable[featureStart];
+										featureEnd = revtable[featureEnd] + 1;
 
-									}
+										int featureScreenStart = Convert.translateGenomeToScreen(featureStart + ab.start(), visible,
+												screenWidth);
+										int featureScreenEnd = Convert.translateGenomeToScreen(featureEnd + ab.start(), visible,
+												screenWidth);
 
-									if (featureScreenEnd > blockScreenEnd)
-										featureScreenEnd = blockScreenEnd;
+										if (featureScreenStart < blockScreenStart) {
+											featureScreenStart = blockScreenStart;
 
-									if (featureScreenEnd > featureScreenStart && featureScreenEnd >= 0
-											&& featureScreenStart <= screenWidth) {
-										Color c = Color.CYAN;
-										g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 80));
-										g.fillRect(featureScreenStart, rec.y + (line - 1) * lineHeight + 3,
-												featureScreenEnd - featureScreenStart, lineHeight - 6);
+										}
 
-										if (visible.length() < 10000) {
-											g.setColor(Color.CYAN.darker().darker());
-											g.drawString(f.toString(), (int) featureScreenStart, rec.y + (line)
-													* lineHeight - 4);
+										if (featureScreenEnd > blockScreenEnd)
+											featureScreenEnd = blockScreenEnd;
+
+										if (featureScreenEnd > featureScreenStart && featureScreenEnd >= 0
+												&& featureScreenStart <= screenWidth) {
+											Color c = Color.CYAN;
+											g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 80));
+											if (i % 2 == 0) {
+												g.fillRect(featureScreenStart, rec.y + (line - 1) * lineHeight + 3, featureScreenEnd
+														- featureScreenStart, lineHeight - 6);
+												if (visible.length() < 10000) {
+													g.setColor(Color.CYAN.darker().darker());
+													g.drawString(f.toString(), (int) featureScreenStart, rec.y + (line) * lineHeight - 4);
+												}
+											} else {
+												g.drawLine(featureScreenStart, rec.y + (line - 1) * lineHeight + lineHeight/2, featureScreenEnd, rec.y
+														+ (line - 1) * lineHeight + lineHeight/2);
+											}
+
 										}
 									}
 
@@ -460,8 +477,7 @@ public class MultipleAlignmentTrack2 extends Track {
 						} else {
 							Color or = Color.orange;
 							g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(), 100));
-							g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight, blockScreenEnd
-									- blockScreenStart, lineHeight);
+							g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight, blockScreenEnd - blockScreenStart, lineHeight);
 						}
 					}
 
@@ -475,8 +491,7 @@ public class MultipleAlignmentTrack2 extends Track {
 					for (int i = 0; i < ordering.size(); i++) {
 						if (!lines.get(i)) {
 							g.setColor(new Color(255, 255, 0, 100));
-							g.fillRect(blockScreenStart, rec.y + i * lineHeight, blockScreenEnd - blockScreenStart,
-									lineHeight);
+							g.fillRect(blockScreenStart, rec.y + i * lineHeight, blockScreenEnd - blockScreenStart, lineHeight);
 						}
 					}
 				}
@@ -537,8 +552,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				int index = 0;
 				for (int i = 0; i < arr.length; i++) {
 					if (arr[i] != null) {
-						g.drawString(arr[i], (int) Math.max(mh.x1 - size[i].getWidth(), 5), mh.rec.y + (index + 1)
-								* lineHeight);
+						g.drawString(arr[i], (int) Math.max(mh.x1 - size[i].getWidth(), 5), mh.rec.y + (index + 1) * lineHeight);
 						index++;
 					}
 
@@ -558,8 +572,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	private LRUCache<String, SequenceTranslator> stCache = new LRUCache<String, SequenceTranslator>(20000, 5 * 60000);
 
-	private Set<AbstractAlignmentSequence> translatorQueue = Collections
-			.synchronizedSet(new HashSet<AbstractAlignmentSequence>());
+	private Set<AbstractAlignmentSequence> translatorQueue = Collections.synchronizedSet(new HashSet<AbstractAlignmentSequence>());
 
 	private SequenceTranslator getSequenceTranslator(final AbstractAlignmentSequence ab) {
 		final String key = ab.getName() + ":" + ab.start() + "-" + ab.end();
