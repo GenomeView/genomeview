@@ -283,6 +283,7 @@ class BarChartBuffer implements VizBuffer {
 
 		if (ptm.isLogscaling()) {
 			range = log2(range);
+			range*=2;
 
 		}
 		for (int i = 0; detailedRects != null && i < detailedRects[0].length; i++) {
@@ -292,14 +293,22 @@ class BarChartBuffer implements VizBuffer {
 			double r1cov = detailedRects[ReadType.FIRSTREADREVERSEMAP.ordinal()][i] - localMinPile;
 			double r2cov = detailedRects[ReadType.SECONDREADREVERSEMAP.ordinal()][i] - localMinPile;
 			if (ptm.isLogscaling()) {
-				if (f1cov > 0)
+				if (f1cov >= 1)
 					f1cov = log2(f1cov);
-				if (f2cov > 0)
+				else
+					f1cov=0;
+				if (f2cov >=1)
 					f2cov = log2(f2cov);
-				if (r1cov > 0)
+				else
+					f2cov=0;
+				if (r1cov >= 1)
 					r1cov = log2(r1cov);
-				if (r2cov > 0)
+				else
+					r1cov=0;
+				if (r2cov >= 1)
 					r2cov = log2(r2cov);
+				else
+					r2cov=0;
 			}
 
 			double coverage = f1cov + r1cov + f2cov + r2cov;
@@ -346,7 +355,7 @@ class BarChartBuffer implements VizBuffer {
 			// System.out.println(frac+"\t"+ffrac+"\t"+rfrac);
 			if (screenX1 > lastX) {
 				lastX = screenX1;
-				g.setColor(Color.ORANGE);
+				g.setColor(Colors.LIGHEST_GRAY);
 				g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 - screenX1 + 1, 2 * size);
 
 				/* --- */
@@ -627,8 +636,8 @@ class BarChartBuffer implements VizBuffer {
 				double reverse=r1cov+r2cov;
 				double forward=f1cov+f2cov;
 				text.append(nrReg.format(sense+antisense) + "<br/>");
-				text.append("Forward transcript: " + nrReg.format(sense) + "<br/>");
-				text.append("Reverse transcript: " + nrReg.format(antisense) + "<br/>");
+				text.append("Forward transcript: " + nrReg.format(sense)+" ("+nrReg.format(r1cov)+" - "+nrReg.format(f2cov)+")" + "<br/>");
+				text.append("Reverse transcript: " + nrReg.format(antisense) +" ("+nrReg.format(f1cov)+" - "+nrReg.format(r2cov)+")" + "<br/>");
 //				text.append("Forward mapping: " + nrReg.format(forward) + "<br/>");
 //				text.append("Reverse mapping: " + nrReg.format(reverse) + "<br/>");
 				
