@@ -165,8 +165,8 @@ public abstract class Track {
 //		if (isCollapsible()) {
 		
 		g.translate(0, yOffset);
-		g.drawImage(Icons.COG, (int)width-15, 5, null);//Icons.COG
-		configCog = new Rectangle((int) width - 15, 5, 12, 12);
+		g.drawImage(Icons.COG, 2, 2, null);//Icons.COG
+		configCog = new Rectangle(2, 2, 16, 16);
 			
 //			g.setColor(Color.WHITE);
 //			g.fill(collapse);

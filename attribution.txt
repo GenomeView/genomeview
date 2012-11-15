@@ -1,4 +1,4 @@
-## Attribution list
+﻿## Attribution list
 ##
 ## ----------
 ##   Images
@@ -34,3 +34,5 @@ images/instances/mouse.jpg
         
 Icons   
 http://www.visualpharm.com/
+
+settings.png - Designer:Everaldo (Everaldo Coelho) License: GPL
