@@ -36,6 +36,7 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
+import net.sf.nameservice.NameService;
 import be.abeel.net.URIFactory;
 import be.abeel.util.DefaultHashMap;
 
