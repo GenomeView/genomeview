@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -61,8 +62,9 @@ public class Session {
 
 	private static void loadSession(final Model model, final InputStream is) {
 		model.messageModel().setStatusBarMessage("Preparing to load session, retrieving session file.");
-//		final Hider hid = new Hider(model, "Preparing to load session", Configuration.green, (int) (model
-//				.getGUIManager().getParent().getWidth() * 0.8), 150);
+		// final Hider hid = new Hider(model, "Preparing to load session",
+		// Configuration.green, (int) (model
+		// .getGUIManager().getParent().getWidth() * 0.8), 150);
 
 		new Thread(new Runnable() {
 
@@ -73,26 +75,25 @@ public class Session {
 				try {
 					String key = it.next();
 					if (!key.startsWith("##GenomeView session")) {
-						JOptionPane.showMessageDialog(model.getGUIManager().getParent(),
-								"The selected file is not a GenomeView session");
+						JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "The selected file is not a GenomeView session");
 					} else {
 						// it.next();
 						model.clearEntries();
 						for (String line : it) {
 							char c = line.charAt(0);
 							line = line.substring(2);
-//							hid.setText("<html><h1>Loading session</h1>Current file: " + line + "...</html>");
-							model.messageModel().setStatusBarMessage("Loading session, current file: " + line+"...");
-							//DataSource ds = null;
+							// hid.setText("<html><h1>Loading session</h1>Current file: "
+							// + line + "...</html>");
+							model.messageModel().setStatusBarMessage("Loading session, current file: " + line + "...");
+							// DataSource ds = null;
 							switch (c) {
 							case 'U':
 							case 'F':
 								try {
-									DataSourceHelper.load(model,new Locator(line));
+									DataSourceHelper.load(model, new Locator(line));
 								} catch (RuntimeException re) {
 									log.log(Level.SEVERE, "Something went wrong while loading line: " + line
-											+ "\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.",
-											re);
+											+ "\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.", re);
 								}
 								break;
 							case 'C':
@@ -111,10 +112,28 @@ public class Session {
 				}
 				it.close();
 				model.messageModel().setStatusBarMessage(null);
-//				hid.dispose();
+				// hid.dispose();
 
 			}
 		}).start();
+
+	}
+
+	public static void save(File f,Model model) throws IOException {
+		PrintWriter out = new PrintWriter(f);
+		log.info("Saving session for:"+ model.loadedSources());
+		
+		out.println("##GenomeView session       ##");
+		out.println("##Do not remove header lines##");
+		for (DataSource ds : model.loadedSources()) {
+			Locator l = ds.getLocator();
+			if (l.isURL()) {
+				out.println("U:" + l);
+			} else {
+				out.println("F:" + l);
+			}
+		}
+		out.close();
 
 	}
 

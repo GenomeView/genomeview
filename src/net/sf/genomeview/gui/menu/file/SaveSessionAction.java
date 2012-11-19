@@ -14,6 +14,7 @@ import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
@@ -62,19 +63,11 @@ public class SaveSessionAction extends AbstractAction {
 				if(!f.getName().endsWith(".gvs")){
 					f=new File(f+".gvs");
 				}
-				PrintWriter out = new PrintWriter(f);
-				out.println("##GenomeView session       ##");
-				out.println("##Do not remove header lines##");
-				for (DataSource ds : model.loadedSources()) {
-					Locator l=ds.getLocator();
-					if(l.isURL()){
-						out.println("U:"+l);
-					}else{
-						out.println("F:"+l);
-					}
-				}
+				
+				Session.save(f,model);
+				
 				Configuration.set("lastDirectory", f.getParentFile());
-				out.close();
+				
 			} catch (Exception ex) {
 				CrashHandler.crash(Level.SEVERE, "Could not save session", ex);
 			}

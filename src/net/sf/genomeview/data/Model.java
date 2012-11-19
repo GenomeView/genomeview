@@ -4,6 +4,7 @@
 package net.sf.genomeview.data;
 
 import java.awt.Color;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -173,7 +174,11 @@ public class Model extends Observable implements IModel {
 
 	public void exit() {
 		this.exitRequested = true;
-
+		try {
+			Session.save(new File(Configuration.getDirectory(), "previous.gvs"), this);
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Problem saving last session", e);
+		}
 		loadedSources.clear();
 		refresh();
 

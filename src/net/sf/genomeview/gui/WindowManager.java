@@ -3,10 +3,6 @@
  */
 package net.sf.genomeview.gui;
 
-import jargs.gnu.CmdLineParser.IllegalOptionValueException;
-import jargs.gnu.CmdLineParser.Option;
-import jargs.gnu.CmdLineParser.UnknownOptionException;
-
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -14,6 +10,7 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -30,10 +27,10 @@ import javax.swing.JPanel;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Cleaner;
-import be.abeel.jargs.AutoHelpCmdLineParser;
 
 /**
  * MainWindow is the container for a single GenomeView instance.
@@ -49,8 +46,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 	private GenomeViewWindow helper = null;
 
 	private Model model = null;
-	
-	Model getModel(){
+
+	Model getModel() {
 		return model;
 	}
 
@@ -69,8 +66,6 @@ public class WindowManager extends WindowAdapter implements Observer {
 		logger.info("Started running instance" + running);
 		init(args, splash);
 	}
-
-	
 
 	public void dispose() {
 		window.dispose();
@@ -112,6 +107,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 			} catch (IOException e) {
 				logger.log(Level.SEVERE, "Problem saving configuration", e);
 			}
+
 			running--;
 			logger.info("Instances still running: " + running);
 			if (running < 1) {
@@ -167,12 +163,12 @@ public class WindowManager extends WindowAdapter implements Observer {
 	public void init(String[] args, Splash splash) throws InterruptedException, ExecutionException {
 		// FIXME special handling if this is not the first time the application
 		// is initialized
-		if(splash!=null)
+		if (splash != null)
 			splash.setText("Parsing parameters...");
 		CommandLineOptions.init(args);
-		
-		if(splash!=null)
-		splash.setText("Creating windows...");
+
+		if (splash != null)
+			splash.setText("Creating windows...");
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice[] gs = ge.getScreenDevices();
 		boolean freshwindow = false;
@@ -186,8 +182,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 		if (window == null) {
 			freshwindow = true;
 			logger.info("Creating new window");
-			window = new GenomeViewWindow(model, "GenomeView :: " + Configuration.version(),
-					gs[0].getDefaultConfiguration());
+			window = new GenomeViewWindow(model, "GenomeView :: " + Configuration.version(), gs[0].getDefaultConfiguration());
 			model.getGUIManager().registerMainWindow(window);
 			window.setIconImage(Icons.MINILOGO);
 			window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -211,8 +206,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 			if (content.length > 1) {
 				for (int i = 1; i < content.length; i++) {
-					helper = new GenomeViewWindow(model, "GenomeView :: " + Configuration.version(),
-							gs[i].getDefaultConfiguration());
+					helper = new GenomeViewWindow(model, "GenomeView :: " + Configuration.version(), gs[i].getDefaultConfiguration());
 					helper.setJMenuBar(new MainMenu(model));
 					helper.setIconImage(new ImageIcon(this.getClass().getResource("/images/gv2.png")).getImage());
 					helper.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -222,23 +216,33 @@ public class WindowManager extends WindowAdapter implements Observer {
 				}
 			}
 			window.setVisible(true);
-			if(splash!=null)
-			splash.setText("Installing plugins...");
+			if (splash != null)
+				splash.setText("Installing plugins...");
 			PluginLoader.load(model);
 
 		}
-		if(splash!=null)
-		splash.setText("Loading data...");
+		if (splash != null)
+			splash.setText("Loading data...");
 		/* Data specified on command line */
 		InitDataLoader idl = new InitDataLoader(model);
 		if (CommandLineOptions.goodParse()) {
-			String cmdUrl =CommandLineOptions.url();// (String) parser.getOptionValue(urlO);
-			String cmdFile = CommandLineOptions.file();//(String) parser.getOptionValue(fileO);
-			String session = CommandLineOptions.session();//(String) parser.getOptionValue(sessionO);
-			String[] remArgs = CommandLineOptions.remaining();//parser.getRemainingArgs();
-			String initialLocation = CommandLineOptions.position();//(String) parser.getOptionValue(positionO);
+			String cmdUrl = CommandLineOptions.url();// (String)
+														// parser.getOptionValue(urlO);
+			String cmdFile = CommandLineOptions.file();// (String)
+														// parser.getOptionValue(fileO);
+			String session = CommandLineOptions.session();// (String)
+															// parser.getOptionValue(sessionO);
+			String[] remArgs = CommandLineOptions.remaining();// parser.getRemainingArgs();
+			String initialLocation = CommandLineOptions.position();// (String)
+																	// parser.getOptionValue(positionO);
 
-			idl.init(cmdUrl, cmdFile, remArgs, initialLocation, session);
+			File prevSession = new File(Configuration.getDirectory(), "previous.gvs");
+			logger.info("Loading previous session: " + prevSession);
+			if (prevSession.exists() && prevSession.length() > 0 && cmdUrl == null && cmdFile == null && session == null
+					&& remArgs.length == 0)
+				idl.init(null, null, new String[0], null, prevSession.toString());
+			else
+				idl.init(cmdUrl, cmdFile, remArgs, initialLocation, session);
 		} else {
 			idl.init(null, null, new String[0], null, null);
 		}
@@ -258,12 +262,12 @@ public class WindowManager extends WindowAdapter implements Observer {
  * 
  */
 class Environment {
-	private static boolean applet=false;
+	private static boolean applet = false;
 
-	public static boolean isApplet(){
+	public static boolean isApplet() {
 		return applet;
 	}
-	
+
 	public static boolean isWebstart() {
 		/* While this may not work 100%, it is better than nothing :-/ */
 		return System.getProperty("javawebstart.version", null) != null;
@@ -289,8 +293,8 @@ class Environment {
 	}
 
 	public static void setApplet() {
-		applet=true;
-		
+		applet = true;
+
 	}
 
 }
