@@ -22,12 +22,12 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Cleaner;
@@ -80,7 +80,10 @@ public class WindowManager extends WindowAdapter implements Observer {
 	 */
 	@Override
 	public void windowClosing(WindowEvent e) {
-		this.model.exit();
+
+		int result=JOptionPane.showConfirmDialog(model.getGUIManager().getParent(), "Do you want to exit GenomeView?");
+		if(result==JOptionPane.YES_OPTION)
+			this.model.exit();
 	}
 
 	private static int running = 0;
