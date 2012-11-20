@@ -7,10 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -32,7 +29,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
@@ -48,7 +44,6 @@ import net.sf.jannot.parser.EMBLParser;
 import net.sf.jannot.parser.GFF3Parser;
 import net.sf.jannot.parser.Parser;
 import be.abeel.io.ExtensionManager;
-import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
 
 /**
@@ -73,9 +68,14 @@ public class SaveDialog extends JDialog {
 		}
 	}
 
-	class MultiSelectionArray<T> extends Container {
+	private class MultiSelectionArray<T> extends Container {
 
-		class TCheckBox extends JCheckBox {
+		private static final long serialVersionUID = -5487911457275295620L;
+
+		private class TCheckBox extends JCheckBox {
+			
+			private static final long serialVersionUID = -5606344815979542381L;
+			
 			private T data;
 
 			public TCheckBox(T e) {
@@ -86,11 +86,12 @@ public class SaveDialog extends JDialog {
 
 		private final ArrayList<TCheckBox> dss = new ArrayList<TCheckBox>();
 
-		public MultiSelectionArray(Iterable<T> arr) {
+		private MultiSelectionArray(Iterable<T> arr, boolean enabledFlag) {
 
 			setLayout(new GridLayout(0, 1));
 			for (T t : arr) {
 				TCheckBox dsb = new TCheckBox(t);
+				dsb.setEnabled(enabledFlag);
 				dsb.setSelected(true);
 
 				dss.add(dsb);
@@ -99,7 +100,7 @@ public class SaveDialog extends JDialog {
 			}
 		}
 
-		public Collection<T> selectedItems() {
+		private Collection<T> selectedItems() {
 			ArrayList<T> out = new ArrayList<T>();
 			for (TCheckBox item : dss) {
 				if (item.isSelected())
@@ -128,16 +129,16 @@ public class SaveDialog extends JDialog {
 
 		JButton browseButton = new JButton("Browse...");
 		browseButton.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String f=file(model);
-				if(f!=null)
+				String f = file(model);
+				if (f != null)
 					locationField.setText(f);
-				
+
 			}
 		});
-		
+
 		add(browseButton);
 
 		/*
@@ -176,7 +177,8 @@ public class SaveDialog extends JDialog {
 
 		/* Entries list */
 		addSeparator("Select entries to save");
-		final MultiSelectionArray<Entry> entriesList = new MultiSelectionArray<Entry>(model.entries());
+		boolean entrySelectionEnabledFlag = Configuration.getBoolean("save:enableEntrySelection");
+		final MultiSelectionArray<Entry> entriesList = new MultiSelectionArray<Entry>(model.entries(),entrySelectionEnabledFlag);
 		add(new JScrollPane(entriesList), "growx,growy,span 1 2");
 
 		JButton selectAllEntries = new JButton("Select all entries");
@@ -184,11 +186,17 @@ public class SaveDialog extends JDialog {
 
 		JButton selectNoneEntries = new JButton("Deselect all entries");
 		add(selectNoneEntries);
+
+	
+		entriesList.setEnabled(entrySelectionEnabledFlag);
+		selectAllEntries.setEnabled(entrySelectionEnabledFlag);
+		selectNoneEntries.setEnabled(entrySelectionEnabledFlag);
 		/*
 		 * Type selection
 		 */
 		addSeparator("Annotation types to save");
-		final MultiSelectionArray<Type> typesList = new MultiSelectionArray<Type>(Arrays.asList(Type.values()));
+		boolean typeSelectionEnabledFlag = Configuration.getBoolean("save:enableTypeSelection");
+		final MultiSelectionArray<Type> typesList = new MultiSelectionArray<Type>(Arrays.asList(Type.values()),typeSelectionEnabledFlag);
 		add(new JScrollPane(typesList), "growx,growy,span 1 2");
 
 		JButton selectAllTypes = new JButton("Select all types");
@@ -197,6 +205,11 @@ public class SaveDialog extends JDialog {
 		JButton selectNoneTypes = new JButton("Deselect all types");
 		add(selectNoneTypes);
 
+		
+		typesList.setEnabled(typeSelectionEnabledFlag);
+		selectAllTypes.setEnabled(typeSelectionEnabledFlag);
+		selectNoneTypes.setEnabled(typeSelectionEnabledFlag);
+		
 		/*
 		 * Actions
 		 */
@@ -216,17 +229,17 @@ public class SaveDialog extends JDialog {
 					@Override
 					public void run() {
 						try {
-						
+
 							Collection<Type> selectedTypes = Arrays.asList(Type.values());
-							if(typesList.selectedItems().size()>0)
+							if (typesList.selectedItems().size() > 0)
 								selectedTypes = typesList.selectedItems();
-							
+
 							Parser parser = (Parser) parserList.getSelectedItem();
-							if (parser instanceof EMBLParser){
+							if (parser instanceof EMBLParser) {
 								((EMBLParser) parser).storeSequence = false;
-								if(enableIncludeSequenceFlag && includeSequence.isSelected())
+								if (enableIncludeSequenceFlag && includeSequence.isSelected())
 									((EMBLParser) parser).storeSequence = true;
-								
+
 							}
 							File tmp = File.createTempFile("GV_", ".save");
 							tmp.deleteOnExit();
@@ -238,7 +251,7 @@ public class SaveDialog extends JDialog {
 							}
 							fos.close();
 							setVisible(false);
-							String location=locationField.getText().trim();
+							String location = locationField.getText().trim();
 							if (location.startsWith("http://") || location.startsWith("https://")) {
 								try {
 									URL url = URIFactory.url(location);
@@ -248,7 +261,7 @@ public class SaveDialog extends JDialog {
 									log.info("File size and location: " + tmp.length() + "\t" + tmp.getCanonicalPath());
 
 									String reply = ClientHttpUpload.upload(tmp, url);
-								
+
 									if (reply.equals("")) {
 										throw new SaveFailedException("Empty reply from server");
 									}
@@ -284,7 +297,7 @@ public class SaveDialog extends JDialog {
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
-//						h.dispose();
+						// h.dispose();
 					}
 
 					private void showServerMessage(String reply) {
@@ -329,5 +342,4 @@ public class SaveDialog extends JDialog {
 		StaticUtils.center(model.getGUIManager().getParent(), this);
 		setVisible(true);
 	}
-
 }
