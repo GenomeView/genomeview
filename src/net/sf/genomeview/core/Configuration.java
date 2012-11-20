@@ -364,10 +364,10 @@ public class Configuration {
 	public static Parser getParser(String string) {
 		String pKey = Configuration.get(string);
 		if (pKey.equals("EMBL")) {
-			return new EMBLParser();
+			return Parser.EMBL;
 		}
 		if (pKey.equals("GFF")) {
-			return new GFF3Parser();
+			return Parser.GFF3;
 		}
 
 		return null;
