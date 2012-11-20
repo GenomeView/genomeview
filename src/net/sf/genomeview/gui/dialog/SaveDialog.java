@@ -18,17 +18,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.ClientHttpUpload;
@@ -52,57 +55,174 @@ import be.abeel.net.URIFactory;
  */
 public class SaveDialog extends JDialog {
 
-	private static final Logger log=Logger.getLogger(SaveDialog.class.getCanonicalName());
-	
+	private static final Logger log = Logger.getLogger(SaveDialog.class.getCanonicalName());
+
 	private static final long serialVersionUID = -5209291628487502687L;
 
-	private class DataSourceCheckbox extends JCheckBox {
+	// private class DataSourceCheckbox extends JCheckBox {
+	//
+	// private static final long serialVersionUID = -208816638301437642L;
+	//
+	// private Entry data;
+	//
+	// public DataSourceCheckbox(Entry e) {
+	// super(e.toString());
+	// this.data = e;
+	// }
+	//
+	// }
 
-		private static final long serialVersionUID = -208816638301437642L;
+	class MultiSelectionArray<T> extends Container {
 
-		private Entry data;
+		class TCheckBox extends JCheckBox {
+			private T data;
 
-		public DataSourceCheckbox(Entry e) {
-			super(e.toString());
-			this.data = e;
+			public TCheckBox(T e) {
+				super(e.toString());
+				this.data = e;
+			}
 		}
 
+		private final ArrayList<TCheckBox> dss = new ArrayList<TCheckBox>();
+
+		public MultiSelectionArray(Iterable<T> arr) {
+
+			setLayout(new GridLayout(0, 1));
+			for (T t : arr) {
+
+				// int count = 0;
+				TCheckBox dsb = new TCheckBox(t);
+				dsb.setSelected(true);
+
+				dss.add(dsb);
+				add(dsb);
+
+			}
+		}
+
+		@SuppressWarnings("unchecked")
+		public T[] selectedItems() {
+			ArrayList<T>out=new ArrayList<T>();
+			for(TCheckBox item:dss){
+				if(item.isSelected())
+					out.add(item.data);
+			}
+			return (T[]) out.toArray();
+		}
 	}
 
-	private SaveDialog(final Model model, final boolean useDefault) {
+	public SaveDialog(final Model model) {
 		super(model.getGUIManager().getParent(), "Save dialog", true);
 		setLayout(new GridBagLayout());
-		final JDialog _self=this;
+		final JDialog _self = this;
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.insets = new Insets(3, 3, 3, 3);
-		gc.gridwidth = 2;
+		gc.gridwidth = 1;
 		gc.gridheight = 1;
 		gc.gridx = 0;
 		gc.gridy = 0;
 		gc.weightx = 1;
-		gc.weighty = 1;
+		gc.weighty=0;
 		gc.fill = GridBagConstraints.BOTH;
+		/*
+		 * Save location
+		 */
+		
+		
+		JTextField locationField = new JTextField();
+		add(locationField, gc);
 
-		final ArrayList<DataSourceCheckbox> dss = new ArrayList<DataSourceCheckbox>();
-		add(new JLabel("Select sources to save"), gc);
+		JButton browseButton = new JButton("Browse...");
+		gc.gridx++;
+		gc.weightx = 0;
+		add(browseButton, gc);
 
-		gc.gridy++;
-		Container cp = new Container();
-		cp.setLayout(new GridLayout(0, 1));
-		for (net.sf.jannot.Entry e : model.entries()) {
-
-			// int count = 0;
-			DataSourceCheckbox dsb = new DataSourceCheckbox(e);
-			dsb.setSelected(true);
-
-			dss.add(dsb);
-			cp.add(dsb);
-
+		/*
+		 * Handle default location
+		 */
+		String defaultLocation = Configuration.get("save:defaultLocation");
+		if (!defaultLocation.equals("null")) {
+			locationField.setText(defaultLocation);
+			locationField.setEditable(false);
+			locationField.setEnabled(false);
+			browseButton.setEnabled(false);
 		}
-		add(new JScrollPane(cp), gc);
+
+		/*
+		 * Parser selection
+		 */
+		Parser defaultParser = Configuration.getParser("save:defaultParser");
+		Parser[] arr = new Parser[] { new GFF3Parser(), new EMBLParser() };
+		
+
+		final JComboBox parserList = new JComboBox(arr);
+		if (defaultParser != null) {
+			parserList.setSelectedItem(defaultParser);
+			parserList.setEnabled(false);
+		}
+		gc.gridy++;
+		gc.gridx = 0;
+		gc.weightx = 1;
+
+		add(parserList, gc);
+
+		/*
+		 * Include sequence
+		 */
+		boolean includeSequenceFlag = Configuration.getBoolean("save:includeSequence");
+		JCheckBox includeSequence = new JCheckBox("Include sequence");
+		includeSequence.setSelected(includeSequenceFlag);
+		gc.gridx++;
+		add(includeSequence, gc);
+
+		/* Entries list */
+		// Container entriesList = new Container();
+		final MultiSelectionArray<Entry> entriesList = new MultiSelectionArray<Entry>(model.entries());
+
+		gc.weightx = 1;
+		gc.gridx = 0;
+		gc.gridy++;
+		gc.gridheight = 3;
+
+		add(new JScrollPane(entriesList), gc);
+
+		
+
+		JButton selectAllEntries = new JButton("Select all entries");
+		gc.gridx++;
+		gc.weightx = 0;
+		gc.gridheight = 1;
+		add(selectAllEntries, gc);
+
+		JButton selectNoneEntries = new JButton("Deselect all entries");
+		gc.gridy++;
+		add(selectNoneEntries, gc);
+		/*
+		 * Type selection
+		 */
+		final MultiSelectionArray<Type> typesList = new MultiSelectionArray<Type>(Arrays.asList(Type.values()));
+
+		gc.gridx = 0;
+		gc.gridy+=2;
+		gc.gridheight = 3;
+		gc.weightx = 1;
+		add(new JScrollPane(typesList), gc);
+
+		JButton selectAllTypes = new JButton("Select all types");
+		gc.gridx++;
+		
+		gc.gridheight = 1;
+		gc.weightx = 0;
+		add(selectAllTypes, gc);
+
+		JButton selectNoneTypes = new JButton("Deselect all types");
+		gc.gridy++;
+		add(selectNoneTypes, gc);
+
+		gc.gridx = 0;
 		gc.gridy++;
 		JButton save = new JButton("Save");
-		JButton close = new JButton("Close");
+		JButton close = new JButton("Cancel");
 
 		gc.gridwidth = 1;
 		gc.gridy++;
@@ -123,33 +243,38 @@ public class SaveDialog extends JDialog {
 							/* Default save locations? */
 							String defaultLocation = Configuration.get("save:defaultLocation");
 							net.sf.jannot.Type[] selectedTypes = net.sf.jannot.Type.values();
-							if (!useDefault || defaultLocation.equals("null")) {
-								selectedTypes = new TypeSelection().ask(_self);
-								
-								if(selectedTypes.length>0)
+							if (defaultLocation.equals("null")) {
+								selectedTypes = typesList.selectedItems();
+
+								if (selectedTypes.length > 0)
 									defaultLocation = file();
-								
 
 							}
-							if (defaultLocation == null || selectedTypes.length==0) {
-								h.dispose();
-								return;
-							}
-							Parser parser = Configuration.getParser("save:defaultParser");
-							if (parser == null) {
+							// if (defaultLocation == null ||
+							// selectedTypes.length == 0) {
+							// h.dispose();
+							// return;
+							// }
+							// Parser parser =
+							// Configuration.getParser("save:defaultParser");
+							// if (parser == null) {
+							//
+							// Parser[] arr = new Parser[] { new GFF3Parser(),
+							// new EMBLParser() };
+							// parser = (Parser)
+							// JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+							// "Select an output format", "Output format",
+							// JOptionPane.QUESTION_MESSAGE, null,
+							// arr, arr[0]);
+							//
+							// }
+							//
+							// if (parser == null) {
+							// h.dispose();
+							// return;
+							// }
 
-								Parser[] arr = new Parser[] { new GFF3Parser(), new EMBLParser() };
-								parser = (Parser) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-										"Select an output format", "Output format", JOptionPane.QUESTION_MESSAGE, null,
-										arr, arr[0]);
-
-							}
-
-							if (parser == null) {
-								h.dispose();
-								return;
-							}
-
+							Parser parser = (Parser) parserList.getSelectedItem();
 							if (parser instanceof EMBLParser)
 								((EMBLParser) parser).storeSequence = false;
 							File tmp = File.createTempFile("GV_", ".save");
@@ -157,28 +282,29 @@ public class SaveDialog extends JDialog {
 
 							FileOutputStream fos = new FileOutputStream(tmp);
 
-							for (DataSourceCheckbox dsb : dss) {
-								if (dsb.isSelected()) {
-									parser.write(fos, dsb.data,selectedTypes);
+							for (Entry e: entriesList.selectedItems()){
+//							for (DataSourceCheckbox dsb : dss) {
+//								if (dsb.isSelected()) {
+									parser.write(fos, e, selectedTypes);
 
-								}
+//								}
 							}
 							fos.close();
 							setVisible(false);
 							if (defaultLocation.startsWith("http://") || defaultLocation.startsWith("https://")) {
 								try {
 									URL url = URIFactory.url(defaultLocation);
-									System.out.println(url.getProtocol() + "://" + url.getHost()+":"+url.getPort() + url.getPath());
-									url = URIFactory.url(url.getProtocol() + "://" + url.getHost()+":"+url.getPort() + url.getPath());
+									System.out.println(url.getProtocol() + "://" + url.getHost() + ":" + url.getPort() + url.getPath());
+									url = URIFactory.url(url.getProtocol() + "://" + url.getHost() + ":" + url.getPort() + url.getPath());
 
-//									LineIterator it = new LineIterator(tmp);
-//									System.out.println("-------");
-//									System.out.println("Uploaded file:");
-//									for (String line : it)
-//										System.out.println(line);
-//									System.out.println("---EOF---");
-//									it.close();
-									log.info("File size and location: "+tmp.length()+"\t"+tmp.getCanonicalPath());
+									// LineIterator it = new LineIterator(tmp);
+									// System.out.println("-------");
+									// System.out.println("Uploaded file:");
+									// for (String line : it)
+									// System.out.println(line);
+									// System.out.println("---EOF---");
+									// it.close();
+									log.info("File size and location: " + tmp.length() + "\t" + tmp.getCanonicalPath());
 
 									String reply = ClientHttpUpload.upload(tmp, url);
 									log.info("SERVER REPLY: " + reply);
@@ -279,14 +405,10 @@ public class SaveDialog extends JDialog {
 		setVisible(true);
 	}
 
-	public static void display(Model model, boolean useDefault) {
-		new SaveDialog(model, useDefault);
-
-	}
-
-}
-
-class TypeSelection {
+	// public static void display(Model model, boolean useDefault) {
+	// new SaveDialog(model, useDefault);
+	//
+	// }
 	private class TypeCheckbox extends JCheckBox {
 
 		private static final long serialVersionUID = -208816638301437642L;
@@ -299,80 +421,57 @@ class TypeSelection {
 		}
 
 	}
-
-	public Type[] ask(JDialog owner) {
-		final JDialog diag = new JDialog(owner, "Select types to save", true);
-		Container content = diag.getContentPane();
-
-		content.setLayout(new GridBagLayout());
-
-		GridBagConstraints gc = new GridBagConstraints();
-		gc.insets = new Insets(3, 3, 3, 3);
-		gc.gridwidth = 2;
-		gc.gridheight = 1;
-		gc.gridx = 0;
-		gc.gridy = 0;
-		gc.weightx = 1;
-		gc.weighty = 1;
-		gc.fill = GridBagConstraints.BOTH;
-
-		final ArrayList<TypeCheckbox> dss = new ArrayList<TypeCheckbox>();
-		content.add(new JLabel("Select sources to save"), gc);
-
-		gc.gridy++;
-		Container cp = new Container();
-		cp.setLayout(new GridLayout(0, 1));
-		for (Type t : Type.values()) {
-
-			// int count = 0;
-			TypeCheckbox dsb = new TypeCheckbox(t);
-			dsb.setSelected(true);
-
-			dss.add(dsb);
-			cp.add(dsb);
-
-		}
-		content.add(new JScrollPane(cp), gc);
-		gc.gridy++;
-		JButton save = new JButton(new AbstractAction("Save"){
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				diag.setVisible(false);
-				
-				
-			}
-			
-		});
-		JButton cancel = new JButton(new AbstractAction("Cancel"){
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dss.clear();
-				diag.setVisible(false);
-				
-			}
-			
-		});
-
-		gc.gridwidth = 1;
-		gc.gridy++;
-		content.add(save, gc);
-		
-		gc.gridx++;
-		content.add(cancel, gc);
-		
-		diag.pack();
-		StaticUtils.center(owner, diag);
-		diag.setVisible(true);
-		diag.dispose();
-		
-		ArrayList<Type>sTypes=new ArrayList<Type>();
-		for(TypeCheckbox tc:dss){
-			if(tc.isSelected())
-				sTypes.add(tc.data);
-		}
-		return sTypes.toArray(new Type[0]);
-	}
-
 }
+
+/*
+ * class TypeSelection {
+ * 
+ * public Type[] ask(JDialog owner) { final JDialog diag = new JDialog(owner,
+ * "Select types to save", true); Container content = diag.getContentPane();
+ * 
+ * content.setLayout(new GridBagLayout());
+ * 
+ * GridBagConstraints gc = new GridBagConstraints(); gc.insets = new Insets(3,
+ * 3, 3, 3); gc.gridwidth = 2; gc.gridheight = 1; gc.gridx = 0; gc.gridy = 0;
+ * gc.weightx = 1; gc.weighty = 1; gc.fill = GridBagConstraints.BOTH;
+ * 
+ * content.add(new JLabel("Select sources to save"), gc);
+ * 
+ * gc.gridy++; Container cp = new Container(); cp.setLayout(new GridLayout(0,
+ * 1)); for (Type t : Type.values()) {
+ * 
+ * // int count = 0; TypeCheckbox dsb = new TypeCheckbox(t);
+ * dsb.setSelected(true);
+ * 
+ * dss.add(dsb); cp.add(dsb);
+ * 
+ * } content.add(new JScrollPane(cp), gc); gc.gridy++; JButton save = new
+ * JButton(new AbstractAction("Save") {
+ * 
+ * @Override public void actionPerformed(ActionEvent e) {
+ * diag.setVisible(false);
+ * 
+ * }
+ * 
+ * }); JButton cancel = new JButton(new AbstractAction("Cancel") {
+ * 
+ * @Override public void actionPerformed(ActionEvent e) { dss.clear();
+ * diag.setVisible(false);
+ * 
+ * }
+ * 
+ * });
+ * 
+ * gc.gridwidth = 1; gc.gridy++; content.add(save, gc);
+ * 
+ * gc.gridx++; content.add(cancel, gc);
+ * 
+ * diag.pack(); StaticUtils.center(owner, diag); diag.setVisible(true);
+ * diag.dispose();
+ * 
+ * ArrayList<Type> sTypes = new ArrayList<Type>(); for (TypeCheckbox tc : dss) {
+ * if (tc.isSelected()) sTypes.add(tc.data); } return sTypes.toArray(new
+ * Type[0]); }
+ * 
+ * }
+ */
