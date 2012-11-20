@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -30,9 +31,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.ClientHttpUpload;
 import net.sf.genomeview.data.Model;
@@ -59,18 +62,16 @@ public class SaveDialog extends JDialog {
 
 	private static final long serialVersionUID = -5209291628487502687L;
 
-	// private class DataSourceCheckbox extends JCheckBox {
-	//
-	// private static final long serialVersionUID = -208816638301437642L;
-	//
-	// private Entry data;
-	//
-	// public DataSourceCheckbox(Entry e) {
-	// super(e.toString());
-	// this.data = e;
-	// }
-	//
-	// }
+	private String file(Model model) {
+		JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
+		int returnVal = chooser.showSaveDialog(model.getGUIManager().getParent());
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File files = chooser.getSelectedFile();
+			return files.toString();
+		} else {
+			return null;
+		}
+	}
 
 	class MultiSelectionArray<T> extends Container {
 
@@ -89,8 +90,6 @@ public class SaveDialog extends JDialog {
 
 			setLayout(new GridLayout(0, 1));
 			for (T t : arr) {
-
-				// int count = 0;
 				TCheckBox dsb = new TCheckBox(t);
 				dsb.setSelected(true);
 
@@ -100,46 +99,51 @@ public class SaveDialog extends JDialog {
 			}
 		}
 
-		@SuppressWarnings("unchecked")
-		public T[] selectedItems() {
-			ArrayList<T>out=new ArrayList<T>();
-			for(TCheckBox item:dss){
-				if(item.isSelected())
+		public Collection<T> selectedItems() {
+			ArrayList<T> out = new ArrayList<T>();
+			for (TCheckBox item : dss) {
+				if (item.isSelected())
 					out.add(item.data);
 			}
-			return (T[]) out.toArray();
+			return out;
 		}
+	}
+
+	private void addSeparator(String text) {
+
+		add(new JLabel(text), "gapbottom 1, span, split 2, aligny center");
+		add(new JSeparator(), "gapleft rel, growx");
 	}
 
 	public SaveDialog(final Model model) {
 		super(model.getGUIManager().getParent(), "Save dialog", true);
-		setLayout(new GridBagLayout());
-		final JDialog _self = this;
-		GridBagConstraints gc = new GridBagConstraints();
-		gc.insets = new Insets(3, 3, 3, 3);
-		gc.gridwidth = 1;
-		gc.gridheight = 1;
-		gc.gridx = 0;
-		gc.gridy = 0;
-		gc.weightx = 1;
-		gc.weighty=0;
-		gc.fill = GridBagConstraints.BOTH;
+		setLayout(new MigLayout("wrap 2"));
+
 		/*
 		 * Save location
 		 */
-		
-		
-		JTextField locationField = new JTextField();
-		add(locationField, gc);
+		addSeparator("Location to save to");
+		final JTextField locationField = new JTextField();
+		add(locationField, "growx");
 
 		JButton browseButton = new JButton("Browse...");
-		gc.gridx++;
-		gc.weightx = 0;
-		add(browseButton, gc);
+		browseButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String f=file(model);
+				if(f!=null)
+					locationField.setText(f);
+				
+			}
+		});
+		
+		add(browseButton);
 
 		/*
 		 * Handle default location
 		 */
+
 		String defaultLocation = Configuration.get("save:defaultLocation");
 		if (!defaultLocation.equals("null")) {
 			locationField.setText(defaultLocation);
@@ -151,165 +155,100 @@ public class SaveDialog extends JDialog {
 		/*
 		 * Parser selection
 		 */
+		addSeparator("File format options");
 		Parser defaultParser = Configuration.getParser("save:defaultParser");
-		Parser[] arr = new Parser[] { new GFF3Parser(), new EMBLParser() };
-		
+		Parser[] arr = new Parser[] { Parser.GFF3, Parser.EMBL };
 
 		final JComboBox parserList = new JComboBox(arr);
 		if (defaultParser != null) {
 			parserList.setSelectedItem(defaultParser);
 			parserList.setEnabled(false);
 		}
-		gc.gridy++;
-		gc.gridx = 0;
-		gc.weightx = 1;
-
-		add(parserList, gc);
+		add(parserList);
 
 		/*
 		 * Include sequence
 		 */
-		boolean includeSequenceFlag = Configuration.getBoolean("save:includeSequence");
-		JCheckBox includeSequence = new JCheckBox("Include sequence");
-		includeSequence.setSelected(includeSequenceFlag);
-		gc.gridx++;
-		add(includeSequence, gc);
+		final boolean enableIncludeSequenceFlag = Configuration.getBoolean("save:enableIncludeSequence");
+		final JCheckBox includeSequence = new JCheckBox("Include sequence");
+		includeSequence.setEnabled(enableIncludeSequenceFlag);
+		add(includeSequence);
 
 		/* Entries list */
-		// Container entriesList = new Container();
+		addSeparator("Select entries to save");
 		final MultiSelectionArray<Entry> entriesList = new MultiSelectionArray<Entry>(model.entries());
-
-		gc.weightx = 1;
-		gc.gridx = 0;
-		gc.gridy++;
-		gc.gridheight = 3;
-
-		add(new JScrollPane(entriesList), gc);
-
-		
+		add(new JScrollPane(entriesList), "growx,growy,span 1 2");
 
 		JButton selectAllEntries = new JButton("Select all entries");
-		gc.gridx++;
-		gc.weightx = 0;
-		gc.gridheight = 1;
-		add(selectAllEntries, gc);
+		add(selectAllEntries);
 
 		JButton selectNoneEntries = new JButton("Deselect all entries");
-		gc.gridy++;
-		add(selectNoneEntries, gc);
+		add(selectNoneEntries);
 		/*
 		 * Type selection
 		 */
+		addSeparator("Annotation types to save");
 		final MultiSelectionArray<Type> typesList = new MultiSelectionArray<Type>(Arrays.asList(Type.values()));
-
-		gc.gridx = 0;
-		gc.gridy+=2;
-		gc.gridheight = 3;
-		gc.weightx = 1;
-		add(new JScrollPane(typesList), gc);
+		add(new JScrollPane(typesList), "growx,growy,span 1 2");
 
 		JButton selectAllTypes = new JButton("Select all types");
-		gc.gridx++;
-		
-		gc.gridheight = 1;
-		gc.weightx = 0;
-		add(selectAllTypes, gc);
+		add(selectAllTypes);
 
 		JButton selectNoneTypes = new JButton("Deselect all types");
-		gc.gridy++;
-		add(selectNoneTypes, gc);
+		add(selectNoneTypes);
 
-		gc.gridx = 0;
-		gc.gridy++;
+		/*
+		 * Actions
+		 */
+		addSeparator("");
 		JButton save = new JButton("Save");
 		JButton close = new JButton("Cancel");
 
-		gc.gridwidth = 1;
-		gc.gridy++;
-		add(save, gc);
-		gc.gridx++;
-		add(close, gc);
+		add(save, "center");
+		add(close, "center");
 
 		save.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				final Hider h = new Hider(model, "Saving data...");
-
+				model.messageModel().setStatusBarMessage("Saving data, you will be notified when complete...");
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						try {
-							/* Default save locations? */
-							String defaultLocation = Configuration.get("save:defaultLocation");
-							net.sf.jannot.Type[] selectedTypes = net.sf.jannot.Type.values();
-							if (defaultLocation.equals("null")) {
+						
+							Collection<Type> selectedTypes = Arrays.asList(Type.values());
+							if(typesList.selectedItems().size()>0)
 								selectedTypes = typesList.selectedItems();
-
-								if (selectedTypes.length > 0)
-									defaultLocation = file();
-
-							}
-							// if (defaultLocation == null ||
-							// selectedTypes.length == 0) {
-							// h.dispose();
-							// return;
-							// }
-							// Parser parser =
-							// Configuration.getParser("save:defaultParser");
-							// if (parser == null) {
-							//
-							// Parser[] arr = new Parser[] { new GFF3Parser(),
-							// new EMBLParser() };
-							// parser = (Parser)
-							// JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-							// "Select an output format", "Output format",
-							// JOptionPane.QUESTION_MESSAGE, null,
-							// arr, arr[0]);
-							//
-							// }
-							//
-							// if (parser == null) {
-							// h.dispose();
-							// return;
-							// }
-
+							
 							Parser parser = (Parser) parserList.getSelectedItem();
-							if (parser instanceof EMBLParser)
+							if (parser instanceof EMBLParser){
 								((EMBLParser) parser).storeSequence = false;
+								if(enableIncludeSequenceFlag && includeSequence.isSelected())
+									((EMBLParser) parser).storeSequence = true;
+								
+							}
 							File tmp = File.createTempFile("GV_", ".save");
 							tmp.deleteOnExit();
 
 							FileOutputStream fos = new FileOutputStream(tmp);
 
-							for (Entry e: entriesList.selectedItems()){
-//							for (DataSourceCheckbox dsb : dss) {
-//								if (dsb.isSelected()) {
-									parser.write(fos, e, selectedTypes);
-
-//								}
+							for (Entry e : entriesList.selectedItems()) {
+								parser.write(fos, e, selectedTypes.toArray(new Type[0]));
 							}
 							fos.close();
 							setVisible(false);
-							if (defaultLocation.startsWith("http://") || defaultLocation.startsWith("https://")) {
+							String location=locationField.getText().trim();
+							if (location.startsWith("http://") || location.startsWith("https://")) {
 								try {
-									URL url = URIFactory.url(defaultLocation);
+									URL url = URIFactory.url(location);
 									System.out.println(url.getProtocol() + "://" + url.getHost() + ":" + url.getPort() + url.getPath());
 									url = URIFactory.url(url.getProtocol() + "://" + url.getHost() + ":" + url.getPort() + url.getPath());
 
-									// LineIterator it = new LineIterator(tmp);
-									// System.out.println("-------");
-									// System.out.println("Uploaded file:");
-									// for (String line : it)
-									// System.out.println(line);
-									// System.out.println("---EOF---");
-									// it.close();
 									log.info("File size and location: " + tmp.length() + "\t" + tmp.getCanonicalPath());
 
 									String reply = ClientHttpUpload.upload(tmp, url);
-									log.info("SERVER REPLY: " + reply);
-									// TODO add more checks on the reply.
-									h.dispose();
+								
 									if (reply.equals("")) {
 										throw new SaveFailedException("Empty reply from server");
 									}
@@ -320,8 +259,6 @@ public class SaveDialog extends JDialog {
 
 									}
 									showServerMessage(reply);
-									// JOptionPane.showMessageDialog(model.getGUIManager().getParent(),
-									// reply);
 
 								} catch (IOException ex) {
 
@@ -329,7 +266,7 @@ public class SaveDialog extends JDialog {
 									throw new SaveFailedException("IOException");
 								}
 							} else {
-								File out = new File(defaultLocation);
+								File out = new File(location);
 								if (parser instanceof GFF3Parser)
 									out = ExtensionManager.extension(out, "gff");
 
@@ -337,7 +274,6 @@ public class SaveDialog extends JDialog {
 									out = ExtensionManager.extension(out, "embl");
 
 								boolean succes = tmp.renameTo(out);
-								h.dispose();
 								if (!succes) {
 									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Save failed!");
 								} else {
@@ -348,7 +284,7 @@ public class SaveDialog extends JDialog {
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
-						h.dispose();
+//						h.dispose();
 					}
 
 					private void showServerMessage(String reply) {
@@ -377,17 +313,6 @@ public class SaveDialog extends JDialog {
 				});
 			}
 
-			private String file() {
-				JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
-				int returnVal = chooser.showSaveDialog(model.getGUIManager().getParent());
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File files = chooser.getSelectedFile();
-					return files.toString();
-				} else {
-					return null;
-				}
-			}
-
 		});
 
 		close.addActionListener(new ActionListener() {
@@ -405,73 +330,4 @@ public class SaveDialog extends JDialog {
 		setVisible(true);
 	}
 
-	// public static void display(Model model, boolean useDefault) {
-	// new SaveDialog(model, useDefault);
-	//
-	// }
-	private class TypeCheckbox extends JCheckBox {
-
-		private static final long serialVersionUID = -208816638301437642L;
-
-		private Type data;
-
-		public TypeCheckbox(Type e) {
-			super(e.toString());
-			this.data = e;
-		}
-
-	}
 }
-
-/*
- * class TypeSelection {
- * 
- * public Type[] ask(JDialog owner) { final JDialog diag = new JDialog(owner,
- * "Select types to save", true); Container content = diag.getContentPane();
- * 
- * content.setLayout(new GridBagLayout());
- * 
- * GridBagConstraints gc = new GridBagConstraints(); gc.insets = new Insets(3,
- * 3, 3, 3); gc.gridwidth = 2; gc.gridheight = 1; gc.gridx = 0; gc.gridy = 0;
- * gc.weightx = 1; gc.weighty = 1; gc.fill = GridBagConstraints.BOTH;
- * 
- * content.add(new JLabel("Select sources to save"), gc);
- * 
- * gc.gridy++; Container cp = new Container(); cp.setLayout(new GridLayout(0,
- * 1)); for (Type t : Type.values()) {
- * 
- * // int count = 0; TypeCheckbox dsb = new TypeCheckbox(t);
- * dsb.setSelected(true);
- * 
- * dss.add(dsb); cp.add(dsb);
- * 
- * } content.add(new JScrollPane(cp), gc); gc.gridy++; JButton save = new
- * JButton(new AbstractAction("Save") {
- * 
- * @Override public void actionPerformed(ActionEvent e) {
- * diag.setVisible(false);
- * 
- * }
- * 
- * }); JButton cancel = new JButton(new AbstractAction("Cancel") {
- * 
- * @Override public void actionPerformed(ActionEvent e) { dss.clear();
- * diag.setVisible(false);
- * 
- * }
- * 
- * });
- * 
- * gc.gridwidth = 1; gc.gridy++; content.add(save, gc);
- * 
- * gc.gridx++; content.add(cancel, gc);
- * 
- * diag.pack(); StaticUtils.center(owner, diag); diag.setVisible(true);
- * diag.dispose();
- * 
- * ArrayList<Type> sTypes = new ArrayList<Type>(); for (TypeCheckbox tc : dss) {
- * if (tc.isSelected()) sTypes.add(tc.data); } return sTypes.toArray(new
- * Type[0]); }
- * 
- * }
- */
