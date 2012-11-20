@@ -175,7 +175,8 @@ public class Model extends Observable implements IModel {
 	public void exit() {
 		this.exitRequested = true;
 		try {
-			Session.save(new File(Configuration.getDirectory(), "previous.gvs"), this);
+			if(Configuration.getBoolean("session:enableRememberLast"))
+				Session.save(new File(Configuration.getDirectory(), "previous.gvs"), this);
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Problem saving last session", e);
 		}
