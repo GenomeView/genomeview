@@ -138,6 +138,8 @@ public class InformationFrame extends GridBagPanel {
 			this.add(new MemoryWidget(),gc);
 			gc.gridx++;
 			gc.weightx=0;
+			this.add(ConnectionMonitor.instance.networkLabel,gc);
+			gc.gridx++;
 			this.add(ConnectionMonitor.instance.reposLabel,gc);
 			gc.gridx++;
 			this.add(ConnectionMonitor.instance.webLabel,gc);
