@@ -2,8 +2,9 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="1983" />
-	<property name="src" value="." />
+	<property name="version" value="2020" />
+	<property name="src" value="src" />
+	<property name="res" value="resources" />
 	<property name="build" value="build" />
 	<property name="lib" value="lib" />
 
@@ -14,7 +15,7 @@
 
 	<property name="dist" value="genomeview-${version}" />
 	<property name="jar" value="genomeview-${version}.jar" />
-	<property name="srcjar" value="genomeview-${version}-src.jar" />
+	<property name="srcjar" value="genomeview-${version}-src.zip" />
 
 
 	
@@ -31,6 +32,10 @@
 			<fileset dir="${src}">
 				<include name="**/*.txt" />
 				<include name="**/*.java" />
+				<include name="**/*.tsv" />
+			</fileset>
+			<fileset dir="${res}">
+				<include name="**/*.txt" />
 				<include name="**/*.conf" />
 				<include name="**/*.png" />
 				<include name="**/*.tsv" />
@@ -59,8 +64,8 @@
 			</fileset>
 		</replaceregexp>
 
-		<jar destfile="${dist}/${srcjar}" basedir="sourcebuild">
-		</jar>
+		<zip destfile="${dist}/${srcjar}" basedir="sourcebuild">
+		</zip>
 		<delete failonerror="false" dir="sourcebuild" />
 
 		<copy todir="${dist}">
@@ -68,7 +73,7 @@
 			<fileset dir="${src}">
 				<!-- <include name="**/*.conf" /> -->
 				<!-- <include name="**/*.txt" /> -->
-				<include name="*.txt" />
+				<include name="**/*.txt" />
 				
 			</fileset>
 		</copy>
@@ -78,13 +83,16 @@
 		</copy>
 		<mkdir dir="${build}/images" />
 		<copy todir="${build}/images">
-			<fileset dir="images" />
+			<fileset dir="${res}/images" />
 		</copy>
 		<copy todir="${build}">
+		    <fileset dir="${res}">
+		        <include name="**/*.conf" />
+				<include name="/conf/*.txt" />
+				<include name="/conf/*.tsv" />
+		    </fileset>
 			<fileset dir="${src}">
-				<include name="**/*.conf" />
-				<include name="conf/*.txt" />
-				<include name="conf/*.tsv" />
+				
 				<include name="org/java/**/*.properties" />
 				<include name="org/java/**/*.dtd" />
 			</fileset>
@@ -93,7 +101,7 @@
 		
 
 		<copy file="genomeview.properties" todir="${build}" />
-		<copy file="plugin.xml" todir="${build}" />
+		<copy file="${res}/plugin.xml" todir="${build}" />
 
 
 	</target>
