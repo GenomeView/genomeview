@@ -9,6 +9,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
+import net.sf.samtools.util.StringUtil;
 
 /**
  * Utility methods for external input
@@ -30,7 +31,10 @@ public class ExternalHelper {
 				try {
 					boolean success = false;
 					while (!success) {
-						String[] arr = position.split(":");
+						String[] tmp = StringUtil.reverseString(position).split(":",3);
+						String[] arr=new String[3];
+						for(int i=0;i<arr.length;i++)
+							arr[i]=StringUtil.reverseString(tmp[(arr.length-1)-i]);
 						/* If the location is not 2 or 3 tokens long, just stop */
 						if (arr.length > 3 || arr.length < 2) {
 							CrashHandler.showErrorMessage("Could not parse location: " + position,
@@ -54,7 +58,7 @@ public class ExternalHelper {
 							}
 						}
 						try {
-							Thread.sleep(1000);
+							Thread.sleep(250);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
