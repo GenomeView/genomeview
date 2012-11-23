@@ -83,6 +83,12 @@ public class Session {
 						for (String line : it) {
 							if (line.startsWith("#") || line.isEmpty())
 								continue;
+							char firstchar=line.toUpperCase().charAt(0);
+							
+							/* Make sure split character is colon, to avoid ambiguous split because of previous implementation details */
+							if(firstchar=='C'||firstchar=='U'||firstchar=='F')
+								line=firstchar+":"+line.substring(2);
+							
 							String[] arr = line.split(":", 2);
 
 							model.messageModel().setStatusBarMessage("Loading session, current file: " + line + "...");
