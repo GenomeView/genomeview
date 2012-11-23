@@ -32,7 +32,7 @@ public class ExternalHelper {
 					boolean success = false;
 					while (!success) {
 						String[] tmp = StringUtil.reverseString(position).split(":",3);
-						String[] arr=new String[3];
+						String[] arr=new String[Math.min(tmp.length, 3)];
 						for(int i=0;i<arr.length;i++)
 							arr[i]=StringUtil.reverseString(tmp[(arr.length-1)-i]);
 						/* If the location is not 2 or 3 tokens long, just stop */
