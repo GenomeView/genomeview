@@ -70,12 +70,13 @@
 
 		<copy todir="${dist}">
 			
-			<fileset dir="${src}">
-				<!-- <include name="**/*.conf" /> -->
-				<!-- <include name="**/*.txt" /> -->
-				<include name="**/*.txt" />
-				
-			</fileset>
+		    <fileset dir=".">
+		        <include name="*.txt" />
+		    </fileset>
+		    <fileset dir="legal/">
+		        <include name="*.txt" />
+		    </fileset>    
+			
 		</copy>
 		<copy todir="${dist}/lib">
 			<fileset dir="${lib}" />
