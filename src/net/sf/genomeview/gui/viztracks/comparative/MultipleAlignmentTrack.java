@@ -28,7 +28,6 @@ import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
-import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.alignment.mfa.Alignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
@@ -37,124 +36,19 @@ import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
  * The multiple alignment visualization for multi-fasta files
  */
 public class MultipleAlignmentTrack extends Track {
-//	private String name;
-	
-	
-//	double LOG2 = Math.log(2);
-//	int bareScale = 32;
-//	int bareScaleIndex = 5;
-	private Map<Alignment, float[]> pips = new HashMap<Alignment, float[]>();
 
-//	class Buffer {
-//		private Alignment a;
-//
-//		Buffer(Alignment a) {
-//			this.a = a;
-//		}
-//
-//		private List<float[]> buffer = new ArrayList<float[]>();
-//
-//		public double get(int start, int scale) {
-//
-//			if (scale < bareScale) {
-//				double conservation = 0;
-//				for (int j = 0; j < scale; j++) {
-//					if (a.isAligned(start + j))
-//						conservation++;
-//				}
-//				return conservation / scale;
-//			}
-//			if (buffer.size() == 0)
-//				buffer.add(bare());
-//
-//			int index = (int) (Math.log(scale) / LOG2) - bareScaleIndex;
-//
-//			while (buffer.size() <= index + 1) {
-//				buffer.add(merge(buffer.get(buffer.size() - 1)));
-//			}
-//
-//			return buffer.get(index)[start / scale];
-//		}
-//
-//		private float[] merge(float[] ds) {
-//			float[] out = new float[(ds.length + 1) / 2];
-//			for (int i = 0; i < ds.length - 1; i += 2) {
-//				out[i / 2] = (ds[i] + ds[i + 1]) / 2;
-//			}
-//			out[out.length - 1] = ds[ds.length - 1];
-//			return out;
-//		}
-//
-//		private float[] bare() {
-//
-//			float[] out = new float[a.refLength() / bareScale + 1];
-//			for (int i = 0; i < a.refLength(); i += bareScale) {
-//				float conservation = 0;
-//				for (int j = 0; j < bareScale; j++) {
-//					if (a.isAligned(i + j))
-//						conservation++;
-//				}
-//				conservation /= bareScale;
-//				out[i / bareScale] = conservation;
-//
-//			}
-//			return out;
-//		}
-//
-//	}
+	private Map<Alignment, float[]> pips = new HashMap<Alignment, float[]>();
 
 	private MultipleAlignmentTrackModel mat = null;
 
 	public MultipleAlignmentTrack(Model model, DataKey key) {
 		super(key, model, true, false);
-//		this.name = key.toString();
 		AlignmentAnnotation entireAlignment = (AlignmentAnnotation) entry
 				.get(dataKey);
 		mat = new MultipleAlignmentTrackModel(entireAlignment);
 
 	}
 
-//	@Override
-//	public String displayName() {
-//		return "MA: " + name;
-//	}
-
-//	static class Cache {
-//		private int cacheStart = -1;
-//		private int cacheEnd = -1;
-//		private int cacheScale = 1;
-//		private double[] cacheValues = null;
-//
-//		public boolean hasData(int scale, int start, int end) {
-//			return scale == cacheScale && start >= cacheStart
-//					&& end <= cacheEnd;
-//		}
-//
-//		public void store(int scale, int start, int end, double[] cacheValues2) {
-//			this.cacheScale = scale;
-//			this.cacheStart = start;
-//			this.cacheEnd = end;
-//			this.cacheValues = cacheValues2;
-//
-//		}
-//
-//		public double[] get() {
-//			return cacheValues;
-//		}
-//
-//		public int start() {
-//			return cacheStart;
-//		}
-//
-//		public int end() {
-//			return cacheEnd;
-//		}
-//
-//		public int scale() {
-//			return cacheScale;
-//		}
-//
-//	}
 
 	class MultipleAlignmentTrackModel {
 
@@ -303,7 +197,6 @@ public class MultipleAlignmentTrack extends Track {
 					g.fillRect(10, yOffset + lineHeigh - hgt, adv + 2, hgt + 2);
 
 					g.setColor(Color.BLUE);
-					// if (model.getAnnotationLocationVisible().length() >= 100)
 					g.drawString(alignment.name(), 10, yOffset + lineHeigh - 2);
 					yOffset += lineHeigh;
 
@@ -312,19 +205,7 @@ public class MultipleAlignmentTrack extends Track {
 			} else {
 
 				for (Alignment alignment : mat.ordered()) {
-//					double width = screenWidth / (double) r.length() / 5.0;
-
-//					int scale = 1;
-//					while (scale < (int) Math.ceil(1.0 / width))
-//						scale *= 2;
-
-//					GeneralPath conservationGP = new GeneralPath();
-//					conservationGP.moveTo(0, yOffset);
-//
-//					int start = r.start() / scale * scale;
-//					int end = ((r.end() / scale) + 1) * scale;
-
-					// /* Plot whatever is in the cache */
+					/* Plot whatever is in the cache */
 					if (!pips.containsKey(alignment))
 						pips.put(alignment, percentIdentify(alignment));
 					float[] b = pips.get(alignment);
@@ -347,17 +228,10 @@ public class MultipleAlignmentTrack extends Track {
 						int height=(int)Math.max(1,lineHeigh*(max-min));
 						int y = (int)(max*lineHeigh);
 						g.setColor(Color.BLACK);
-//						System.out.println("Plotting pips: "+x+"\t"+y);
 						g.fillRect(x, yOffset+lineHeigh-y,width, height);
-//						conservationGP.lineTo(x,
-//								yOffset + (1 - b.get(start + i * scale, scale))
-//										* (lineHeigh - 4) + 2);
 					}
 					
-//					g.draw(conservationGP);
-//					g.setColor(Color.BLUE);
-//					g.drawString(alignment.name() + " (" + scale + ")", 10,
-//							yOffset + lineHeigh - 2);
+
 					yOffset += lineHeigh;
 				}
 
@@ -459,8 +333,7 @@ public class MultipleAlignmentTrack extends Track {
 			}
 			
 			out[i]=(float)(count/101.0);
-			if(count!=101)
-			System.out.println("calculate: "+count+"\t"+out[i]);
+			
 		}
 		return out;
 		
