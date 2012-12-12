@@ -1,12 +1,12 @@
 package net.sf.genomeview.gui.components;
 
 import java.awt.Dimension;
-import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -99,21 +99,21 @@ public class ConnectionMonitor extends Observable {
 					try {
 						if (Configuration.getBoolean("general:monitorConnection")) {
 							LineIterator it = new LineIterator("http://genomeview.org/online.php");
-							log.info("Reply from web: " + it.next());
+							//log.info("Reply from web: " + it.next());
 							it.close();
 
 						}
 						webstartOnline = true;
 					} catch (Exception e) {
 						// Failed, try again later;
+						log.log(Level.INFO, "Connection failed", e);
 					}
 					setChanged();
 					notifyObservers();
 					try {
 						Thread.sleep(10 * 1000);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						log.log(Level.INFO, "interrupted", e);
 					}
 
 				}
@@ -129,20 +129,20 @@ public class ConnectionMonitor extends Observable {
 					try {
 						if (Configuration.getBoolean("general:monitorConnection")) {
 							LineIterator it = new LineIterator("http://www.broadinstitute.org/software/genomeview/online.php");
-							log.info("Reply from repository: " + it.next());
+							//log.info("Reply from repository: " + it.next());
 							it.close();
 						}
 						reposOnline = true;
 					} catch (Exception e) {
 						// Failed, try again later;
+						log.log(Level.INFO, "Connection failed", e);
 					}
 					setChanged();
 					notifyObservers();
 					try {
 						Thread.sleep(10 * 1000);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						log.log(Level.INFO, "interrupted", e);
 					}
 				}
 
@@ -155,14 +155,14 @@ public class ConnectionMonitor extends Observable {
 				while (true) {
 					boolean previous = networkInterface;
 
-					networkInterface = true;
+					networkInterface = false;
 
 					try {
 						Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
 						for (NetworkInterface netint : Collections.list(nets))
 							if (!netint.isLoopback()) {
-								if (!netint.isUp())
-									networkInterface = false;
+								if (netint.isUp())
+									networkInterface = true;
 
 							}
 
@@ -177,8 +177,7 @@ public class ConnectionMonitor extends Observable {
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						log.log(Level.INFO, "interrupted", e);
 					}
 
 				}
