@@ -64,6 +64,10 @@ public class StructureTrack extends Track {
 	private StructureTrackModel stm;
 	public static final StringKey key = new StringKey("GV::STRUCTURE");
 
+	@Override
+	protected int cogOffset(){
+		return 4*lineHeight+tickHeight/2-2;
+	}
 	public StructureTrack(Model model) {
 		super(key, model, Configuration.getBoolean("track:showStructure"), new StructureTrackModel(model,key));
 

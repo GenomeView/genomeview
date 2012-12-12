@@ -161,24 +161,15 @@ public abstract class Track {
 	private Color[] background = new Color[] { new Color(204, 238, 255, 75), new Color(255, 255, 204, 75) };
 
 	private void paintConfigCog(Graphics2D g, int yOffset, double width) {
-//		config.setConfigOffset((int)width-15,yOffset+5);
-//		if (isCollapsible()) {
-		
-		g.translate(0, yOffset);
-		g.drawImage(Icons.COG, 2, 2, null);//Icons.COG
-		configCog = new Rectangle(2, 2, 16, 16);
-			
-//			g.setColor(Color.WHITE);
-//			g.fill(collapse);
-//			g.setColor(Color.BLACK);
-//			g.draw(collapse);
-//			g.drawLine(collapse.x + 2, 10, collapse.x + 8, 10);
-//			if (isCollapsed())
-//				g.drawLine(collapse.x + 5, 7, collapse.x + 5, 13);
-			g.translate(0, -yOffset);
-//		}
+		g.drawImage(Icons.COG, 2, 2+yOffset+cogOffset(), null);//Icons.COG
+		configCog = new Rectangle(2, 2+cogOffset(), 16, 16);
+
 	}
 
+	
+	protected int cogOffset() {
+		return 0;
+	}
 	/**
 	 * Paint this track in the annotation label and return the height it
 	 * occupies.
@@ -207,7 +198,7 @@ public abstract class Track {
 
 	protected void paintDisplayName(Graphics2D g, int yOffset) {
 		g.setColor(Color.BLACK);
-		g.drawString(config.shortDisplayName(), 10, yOffset + 24 - 2);
+		g.drawString(config.shortDisplayName(), 20, yOffset + 16);
 		
 	}
 	/**

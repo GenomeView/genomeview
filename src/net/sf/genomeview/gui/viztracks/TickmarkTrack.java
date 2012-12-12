@@ -23,6 +23,12 @@ public class TickmarkTrack extends Track {
 	protected void paintDisplayName(Graphics2D g, int yOffset){
 		//Do nothing
 	}
+	
+	@Override
+	protected int cogOffset(){
+		return 14;
+	}
+	
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,JViewport view,TrackCommunicationModel tcm) {
 		Location r = model.getAnnotationLocationVisible();
