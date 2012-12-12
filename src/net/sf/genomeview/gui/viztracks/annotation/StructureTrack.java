@@ -513,15 +513,12 @@ public class StructureTrack extends Track {
 					Iterable<Feature> trackData = annot.get(l.start, l.end);
 					if (annot.getEstimateCount(l) <= Configuration.getInt("structureview:maximumNoVisibleFeatures")) {
 						for (Feature rf : trackData) {
-							// if (!model.isSourceVisible(rf.getSource()))
-							// continue;
-
 							g.setColor(Color.BLACK);
 							renderCDS(g, rf, yOffset);
 
 						}
 					} else {
-						g.drawString(type + ": Too many structures to paint, please zoom in", 10, y);
+						g.drawString(type + ": Too many structures to paint, please zoom in", 2, yOffset+y+3*lineHeight);
 						y += lineHeight;
 					}
 				}
