@@ -89,8 +89,10 @@ public class TrackList implements Iterable<Track> {
 
 	private void add(DataKey dk, Track track) {
 		mapping.put(dk, track);
-		int x = findIndex(dk);
-		order.add(x, dk);
+		if(!order.contains(dk)){
+			int x = findIndex(dk);
+			order.add(x, dk);
+		}
 
 	}
 
