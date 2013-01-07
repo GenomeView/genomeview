@@ -36,26 +36,18 @@ public class TrackTable extends JTable {
 		super(new TrackTableModel(model));
 		this.model=model;
 		setSelectionModel(new TrackSelectionModel());
-		// final TrackTableModel listModel = ;
-		// getTableHeader().addMouseMotionListener(new
-		// ColumnHeaderToolTips(listModel));
-		// getTableHeader().setReorderingAllowed(false);
+		
 		setTableHeader(null);
 		setUI(new DragDropRowTableUI(model));
 		/* Set column widths */
-		// setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		// getColumnModel().getColumn(0).setPreferredWidth(150);
+	
 		getColumnModel().getColumn(0).setPreferredWidth(20);
 		getColumnModel().getColumn(0).setMaxWidth(50);
 		getColumnModel().getColumn(2).setPreferredWidth(20);
 		getColumnModel().getColumn(2).setMaxWidth(50);
 
 		ToolTipManager.sharedInstance().setInitialDelay(0);
-		// setCellSelectionEnabled(false);
-		// setRowSelectionAllowed(true);
-		// setColumnSelectionAllowed(false);
-		//
-		// setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
 
 	}
 
@@ -69,28 +61,6 @@ public class TrackTable extends JTable {
 		return c;
 	}
 
-	// class ColumnHeaderToolTips extends MouseMotionAdapter {
-	// private int index = -1;
-	//
-	// private TrackTableModel listModel;
-	//
-	// public ColumnHeaderToolTips(TrackTableModel listModel) {
-	// this.listModel = listModel;
-	//
-	// }
-	//
-	// public void mouseMoved(MouseEvent evt) {
-	//
-	// JTableHeader header = (JTableHeader) evt.getSource();
-	// JTable table = header.getTable();
-	// TableColumnModel colModel = table.getColumnModel();
-	// int vColIndex = colModel.getColumnIndexAtX(evt.getX());
-	// if (vColIndex != this.index && vColIndex >= 0) {
-	// header.setToolTipText(listModel.getColumnName(vColIndex));
-	// }
-	// this.index = vColIndex;
-	//
-	// }
-	// }
+	
 
 }
