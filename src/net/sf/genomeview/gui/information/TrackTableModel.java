@@ -77,12 +77,14 @@ public class TrackTableModel extends AbstractTableModel implements Observer {
 	@Override
 	public Object getValueAt(int row, int col) {
 		Track track = model.getTrackList().get(row);
-		if (track == null)
+		if (track == null){
 			System.err.println("Selected track is null, this shouldn't happen...");
+			return null;
+		}
 		switch (col) {
 
 		case 0:
-			if (model.getTrackList().get(row).config().isVisible()) {
+			if (track.config().isVisible()) {
 				return Icons.VISIBLE;
 			} else {
 				return Icons.INVISIBLE;
