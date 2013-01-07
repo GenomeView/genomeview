@@ -308,20 +308,18 @@ public class ShortReadTrack extends Track {
 
 	private Rectangle prevView = null;
 	private Location prevVisible = null;
+	private boolean prevReady=false;
 	private BufferedImage bi;
 
 	@Override
 	public int paintTrack(Graphics2D gGlobal, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
-
-		paintedBlocks.clear();
-		hitMap.clear();
 
 		// this.view = view;
 		this.viewRectangle = view.getViewRect();
 		// /* Store information to be used in other methods */
 		// currentEntry = entry;
 		// currentScreenWidth = screenWidth;
-		seqBuffer = null;
+	
 		// this.currentYOffset = yOffset;
 		/* Configuration options */
 		int maxReads = Configuration.getInt("shortread:maxReads");
@@ -349,13 +347,21 @@ public class ShortReadTrack extends Track {
 			return 0;
 
 		/* Also check that config options remained the same */
-		if (!same(currentVisible, viewRectangle)) {
+		Iterable<Status> status = provider.getStatus(currentVisible.start, currentVisible.end);
+		boolean ready=true;
+		for(Status s:status){
+			ready &=s.isReady();
+		}
+		if (!same(currentVisible, viewRectangle,ready)) {
+			paintedBlocks.clear();
+			hitMap.clear();
+			seqBuffer = null;
 			int height = maxStack * readLineHeight;
 			bi = new BufferedImage((int) screenWidth, height, BufferedImage.TYPE_INT_ARGB);
 			// BufferedImage bi = (BufferedImage) createImage();
 			Graphics2D g = bi.createGraphics();
 
-			Iterable<Status> status = provider.getStatus(currentVisible.start, currentVisible.end);
+			
 			/*
 			 * Draw individual reads when possible
 			 */
@@ -554,9 +560,10 @@ public class ShortReadTrack extends Track {
 		return bi.getHeight();
 	}
 
-	private boolean same(Location loc, Rectangle view) {
-		boolean same = view.equals(prevView) && loc.equals(prevVisible);
+	private boolean same(Location loc, Rectangle view, boolean ready) {
+		boolean same = view.equals(prevView) && loc.equals(prevVisible)&&prevReady==ready;
 		prevView = view;
+		prevReady=ready;
 		prevVisible = loc;
 		return same;
 	}
