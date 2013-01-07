@@ -19,7 +19,7 @@ public class ColorConfig extends GridBagPanel {
 
 		private static final long serialVersionUID = -2242613993844951737L;
 
-		ColorConfig(Model model, String key, String msg) {
+		public ColorConfig(Model model, String key, String msg) {
 			gc.weightx=0;
 			gc.weighty=0;
 			add(new JLabel(msg), gc);

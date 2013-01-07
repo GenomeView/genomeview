@@ -57,6 +57,7 @@ import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.genomeview.gui.components.DoubleJSlider;
 import net.sf.genomeview.gui.config.BooleanConfig;
+import net.sf.genomeview.gui.config.ColorConfig;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel.FillMode;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
@@ -147,6 +148,11 @@ public class FeatureTrack extends Track {
 				}
 
 			});
+			
+			
+			ColorConfig cc=new ColorConfig(model,"TYPE_" + type(),"Display color" );
+			out.gc.gridy++;
+			out.add(cc, out.gc);
 
 			return out;
 
