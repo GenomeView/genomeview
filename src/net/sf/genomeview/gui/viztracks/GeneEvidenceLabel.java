@@ -52,7 +52,7 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 
 	public GeneEvidenceLabel(final Model model) {
 		// super(model);
-
+		this.model = model;
 		this.addMouseWheelListener(new MouseWheelListener() {
 
 			@Override
@@ -172,9 +172,9 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 	//
 	// }
 
-//	public void update(Observable arg0, Object arg1) {
-//		repaint();
-//	}
+	// public void update(Observable arg0, Object arg1) {
+	// repaint();
+	// }
 
 	public void setScrollPaneListener(MouseWheelListener scrollPaneListener) {
 		this.scrollPaneListener = scrollPaneListener;
