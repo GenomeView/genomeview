@@ -55,14 +55,14 @@ public class VariationTrack extends Track {
 
 	@Override
 	protected int paintTrack(Graphics2D g, int yOffset, double width, JViewport view, TrackCommunicationModel tcm) {
-		Location visible = model.getAnnotationLocationVisible();
+		Location visible = model.vlm.getAnnotationLocationVisible();
 
 		Iterable<Variation> data = (Iterable<Variation>) entry.get(dataKey).get(visible.start, visible.end);
 		g.setColor(Color.BLUE);
 		for (Variation v : data) {
 			int coordinate = v.start();
-			int x1 = Convert.translateGenomeToScreen(coordinate, model.getAnnotationLocationVisible(), width);
-			int w = Convert.translateGenomeToScreen(coordinate + 1, model.getAnnotationLocationVisible(), width) - x1;
+			int x1 = Convert.translateGenomeToScreen(coordinate, model.vlm.getAnnotationLocationVisible(), width);
+			int w = Convert.translateGenomeToScreen(coordinate + 1, model.vlm.getAnnotationLocationVisible(), width) - x1;
 			if(w<1)
 				w=1;
 			for (Allele a : v.alleles()) {

@@ -66,7 +66,7 @@ public class SelectFromSelectedBack extends AbstractModelAction {
         Location prev = getPrev();
         if (prev != null) {
             model.selectionModel().setLocationSelection(prev);
-            model.center(prev.start() / 2 + prev.end() / 2);
+            model.vlm.center(prev.start() / 2 + prev.end() / 2);
         }
     }
 

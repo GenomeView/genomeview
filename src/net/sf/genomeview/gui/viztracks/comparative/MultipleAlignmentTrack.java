@@ -114,7 +114,7 @@ public class MultipleAlignmentTrack extends Track {
 
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
-		Location r = model.getAnnotationLocationVisible();
+		Location r = model.vlm.getAnnotationLocationVisible();
 		int lineHeigh = 20;
 
 		if (mat.hasData()) {
@@ -165,7 +165,7 @@ public class MultipleAlignmentTrack extends Track {
 							g.fillRect((int) ((i - r.start()) * width + width * 3 / 4), yOffset, (int) (width * grouping) / 2 + 1,
 									lineHeigh);
 						}
-						if (model.getAnnotationLocationVisible().length() < 100) {
+						if (model.vlm.getAnnotationLocationVisible().length() < 100) {
 							Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
 							if (conservation > 0.75) {
 								g.setColor(Color.WHITE);
@@ -226,7 +226,7 @@ public class MultipleAlignmentTrack extends Track {
 			}
 			int logoLineHeight = 40;
 
-			if (model.getAnnotationLocationVisible().length() < 100) {
+			if (model.vlm.getAnnotationLocationVisible().length() < 100) {
 				double width = screenWidth / (double) r.length();
 				int grouping = (int) Math.ceil(1.0 / width);
 				for (int i = r.start(); i <= r.end(); i += grouping) {
@@ -339,7 +339,7 @@ public class MultipleAlignmentTrack extends Track {
 				GlyphVector glyphvector = font2.createGlyphVector(g.getFontRenderContext(), "" + c);
 				//
 				Rectangle2D stringSize = font2.getStringBounds("" + c, g.getFontRenderContext());
-				int x = (int) (((position - model.getAnnotationLocationVisible().start()) * width) + (width - stringSize.getWidth()) / 2);
+				int x = (int) (((position - model.vlm.getAnnotationLocationVisible().start()) * width) + (width - stringSize.getWidth()) / 2);
 				int y = (int) (yOffset + left);
 				g.translate(x, y);
 				left -= fraction * lineHeight;

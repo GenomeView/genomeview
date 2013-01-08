@@ -35,7 +35,7 @@ public class ZoomToSelectedLocationAction extends AbstractModelAction implements
 
         }
         double margin = (max - min) * 0.05;
-        model.setAnnotationLocationVisible(new Location((int) (min - margin), (int) (max + margin)));
+        model.vlm.setAnnotationLocationVisible(new Location((int) (min - margin), (int) (max + margin)));
 
     }
 

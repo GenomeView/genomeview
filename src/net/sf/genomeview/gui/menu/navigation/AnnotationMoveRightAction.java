@@ -22,7 +22,7 @@ public class AnnotationMoveRightAction extends AbstractModelAction {
 
     @Override
     public void update(Observable o, Object obj) {
-        setEnabled(model.getAnnotationLocationVisible().end() < model.getSelectedEntry().getMaximumLength());
+        setEnabled(model.vlm.getAnnotationLocationVisible().end() < model.vlm.getSelectedEntry().getMaximumLength());
     }
 
     /**
@@ -37,10 +37,10 @@ public class AnnotationMoveRightAction extends AbstractModelAction {
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        Location r = model.getAnnotationLocationVisible();
+        Location r = model.vlm.getAnnotationLocationVisible();
         int halve = r.length() / 4;
         if(enabled)
-        	model.setAnnotationLocationVisible(new Location(r.start() + halve, r.end() + halve));
+        	model.vlm.setAnnotationLocationVisible(new Location(r.start() + halve, r.end() + halve));
 
     }
     

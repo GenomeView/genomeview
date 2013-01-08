@@ -39,7 +39,7 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
 	public void update(Observable o, Object obj) {
 		if (model.selectionModel().getFeatureSelection().size() == 1
 				&& model.selectionModel().getFeatureSelection().first().type() == Type.get("CDS")) {
-			AnalyzedFeature af = new AnalyzedFeature(model.getSelectedEntry().sequence(), model.selectionModel()
+			AnalyzedFeature af = new AnalyzedFeature(model.vlm.getSelectedEntry().sequence(), model.selectionModel()
 					.getFeatureSelection().first(), model.getAAMapping());
 
 			setEnabled(af.hasMissingStopCodon());
@@ -53,15 +53,15 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
 		assert (model.selectionModel().getFeatureSelection() != null);
 		assert (model.selectionModel().getFeatureSelection().size() == 1);
 		Feature rf = model.selectionModel().getFeatureSelection().iterator().next();
-		Sequence seq = model.getSelectedEntry().sequence();
+		Sequence seq = model.vlm.getSelectedEntry().sequence();
 		String nt = SequenceTools.extractSequence(seq, rf).stringRepresentation();
 		int rest = nt.length() % 3;
-		AnalyzedFeature af = new AnalyzedFeature(model.getSelectedEntry().sequence(), rf, model.getAAMapping());
+		AnalyzedFeature af = new AnalyzedFeature(model.vlm.getSelectedEntry().sequence(), rf, model.getAAMapping());
 		assert (af.hasMissingStopCodon());
 		if (rf.strand() == Strand.FORWARD) {
 			int start = rf.end() - rest + 1;
 			while (model.getAAMapping().get(
-					model.getSelectedEntry().sequence().subsequence(start, start + 3).stringRepresentation()) != '*') {
+					model.vlm.getSelectedEntry().sequence().subsequence(start, start + 3).stringRepresentation()) != '*') {
 				start += 3;
 			}
 			start += 2;
@@ -71,13 +71,13 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
 			int start = rf.start() + rest;
 			System.out.println(start);
 			String codon = SequenceTools.reverseComplement(
-					model.getSelectedEntry().sequence().subsequence(start, start + 3))
+					model.vlm.getSelectedEntry().sequence().subsequence(start, start + 3))
 					.stringRepresentation();
 			while (model.getAAMapping().get(codon) != '*') {
 
 				start -= 3;
 				codon = SequenceTools.reverseComplement(
-						model.getSelectedEntry().sequence().subsequence(start, start + 3))
+						model.vlm.getSelectedEntry().sequence().subsequence(start, start + 3))
 						.stringRepresentation();
 			}
 			rf.location()[0].setStart(start);

@@ -239,9 +239,9 @@ public class MultipleAlignmentTrack2 extends Track {
 
 		paintedBlocks.clear();
 		g.setColor(Color.BLACK);
-		Location visible = model.getAnnotationLocationVisible();
+		Location visible = model.vlm.getAnnotationLocationVisible();
 
-		double frac = model.getAnnotationLocationVisible().length() / (double) entry.getMaximumLength();
+		double frac = model.vlm.getAnnotationLocationVisible().length() / (double) entry.getMaximumLength();
 
 		int estCount = (int) (frac * ma.noAlignmentBlocks());
 		Iterable<AbstractAlignmentBlock> abs = ma.get(visible.start, visible.end);

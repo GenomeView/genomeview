@@ -37,11 +37,11 @@ public class CopySequenceAction extends AbstractModelAction {
 
         if (model.getSelectedRegion() != null) {
             Location l = model.getSelectedRegion();
-            Sequence seq = model.getSelectedEntry().sequence();
+            Sequence seq = model.vlm.getSelectedEntry().sequence();
             StringBuffer sb = new StringBuffer(l.length());
             int track = model.getPressTrack();
             
-            BufferSeq bs=new BufferSeq(model.getSelectedEntry().sequence(),l);
+            BufferSeq bs=new BufferSeq(model.vlm.getSelectedEntry().sequence(),l);
             
             switch (track) {
             case 0:

@@ -52,7 +52,7 @@ class SequenceSearchPane extends SearchPanel {
 				int row = results.getSelectedRow();
 				if (row >= 0) {
 					Location l = srm.getLocation(row);
-					model.center((l.start() + l.end()) / 2);
+					model.vlm.center((l.start() + l.end()) / 2);
 				}
 			}
 		});

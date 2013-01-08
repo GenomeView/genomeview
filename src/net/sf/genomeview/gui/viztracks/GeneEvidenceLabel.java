@@ -131,9 +131,9 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 	private void highlight(Location l, Graphics g) {
 		int x1 = Convert.translateGenomeToScreen(l.start(),
-				model.getAnnotationLocationVisible(), screenWidth);
+				model.vlm.getAnnotationLocationVisible(), screenWidth);
 		int x2 = Convert.translateGenomeToScreen(l.end() + 1,
-				model.getAnnotationLocationVisible(), screenWidth);
+				model.vlm.getAnnotationLocationVisible(), screenWidth);
 		g.drawLine(x1 - 1, 0, x1 - 1, this.getPreferredSize().height);
 		g.drawLine(x2, 0, x2, this.getPreferredSize().height);
 		g.setColor(new Color(180, 180, 255, 50));
@@ -221,7 +221,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		if (consumed)
 			return;
 		/* Specific mouse code for this label */
-		pressLoc = model.getAnnotationLocationVisible();
+		pressLoc = model.vlm.getAnnotationLocationVisible();
 		pressX = e.getX();
 
 	}
@@ -245,7 +245,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 	public void mouseDragged(MouseEvent e) {
 		currentMouseX = e.getX();
 		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX,
-				model.getAnnotationLocationVisible(), screenWidth);
+				model.vlm.getAnnotationLocationVisible(), screenWidth);
 
 		/* Transfer MouseEvent to corresponding track */
 		Track mouseTrack = tracks.get(e);
@@ -272,7 +272,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 				// Convert.translateScreenToGenome(currentMouseX,
 				// model.getAnnotationLocationVisible(), screenWidth);
 				int pressGenomeX = Convert.translateScreenToGenome(pressX,
-						model.getAnnotationLocationVisible(), screenWidth);
+						model.vlm.getAnnotationLocationVisible(), screenWidth);
 
 				int start = pressGenomeX < currentGenomeX ? pressGenomeX
 						: currentGenomeX;
@@ -298,11 +298,11 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 					start = 1;
 					end = pressLoc.length();
 				}
-				if (end > model.getSelectedEntry().getMaximumLength()) {
-					end = model.getSelectedEntry().getMaximumLength();
+				if (end > model.vlm.getSelectedEntry().getMaximumLength()) {
+					end = model.vlm.getSelectedEntry().getMaximumLength();
 					start = end - pressLoc.length();
 				}
-				model.setAnnotationLocationVisible(new Location(start, end));
+				model.vlm.setAnnotationLocationVisible(new Location(start, end));
 
 				// when panning, don't update the mouse position until done. It
 				// should stay the same while panning anyway (but in reality,
@@ -321,7 +321,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 	public void mouseMoved(MouseEvent e) {
 		currentMouseX = e.getX();
 		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX,
-				model.getAnnotationLocationVisible(), screenWidth);
+				model.vlm.getAnnotationLocationVisible(), screenWidth);
 		model.mouseModel().setCurrentCoord(currentGenomeX);
 
 		/* Transfer MouseEvent to corresponding track */

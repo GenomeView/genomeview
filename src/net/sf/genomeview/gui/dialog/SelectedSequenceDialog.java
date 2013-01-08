@@ -74,7 +74,7 @@ public class SelectedSequenceDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 StringBuffer tmp = new StringBuffer();
-                Sequence seq = model.getSelectedEntry().sequence();
+                Sequence seq = model.vlm.getSelectedEntry().sequence();
                 
                
                 

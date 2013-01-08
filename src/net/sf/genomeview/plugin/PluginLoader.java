@@ -10,11 +10,10 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.data.IModel;
+import net.sf.genomeview.data.Model;
 
 import org.java.plugin.ObjectFactory;
 import org.java.plugin.PluginLifecycleException;
@@ -39,7 +38,7 @@ public class PluginLoader {
 
 	public static PluginManager pluginManager = null;
 
-	public static void load(final IModel model) {
+	public static void load(final Model model) {
 
 		DaemonThread dt = new DaemonThread(new Runnable() {
 			public void run() {

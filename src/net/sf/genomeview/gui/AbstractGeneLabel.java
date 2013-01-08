@@ -58,10 +58,10 @@ public abstract class AbstractGeneLabel extends JLabel implements Observer {
 				
 				if (e.isControlDown()||e.isMetaDown()||e.isAltDown()){
 					double rot = e.getWheelRotation() / 5.0;
-					double center = Convert.translateScreenToGenome(e.getX(), model
+					double center = Convert.translateScreenToGenome(e.getX(), model.vlm
 							.getAnnotationLocationVisible(),screenWidth);
-					double start = model.getAnnotationLocationVisible().start();
-					double end = model.getAnnotationLocationVisible().end();
+					double start = model.vlm.getAnnotationLocationVisible().start();
+					double end = model.vlm.getAnnotationLocationVisible().end();
 					double length = end - start + 1;
 					double fractionL = (center - start) / length;
 					double fractionR = (end - center) / length;
@@ -75,7 +75,7 @@ public abstract class AbstractGeneLabel extends JLabel implements Observer {
 					int newStart = (int) (start - fractionL * sizeChange);
 					int newEnd = (int) (end + fractionR * sizeChange);
 
-					model.setAnnotationLocationVisible(new Location(newStart,
+					model.vlm.setAnnotationLocationVisible(new Location(newStart,
 							newEnd));
 				} else if (e.isShiftDown()){
 					if (e.getWheelRotation() > 0){

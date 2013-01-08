@@ -37,7 +37,7 @@ public class SelectFromSelectedLast extends AbstractModelAction {
         Feature rf=model.selectionModel().getFeatureSelection().iterator().next();
         Location[]loc=rf.location();
         model.selectionModel().setLocationSelection(loc[loc.length-1]);
-        model.center(loc[loc.length-1].start() / 2 + loc[loc.length-1].end() / 2);
+        model.vlm.center(loc[loc.length-1].start() / 2 + loc[loc.length-1].end() / 2);
     }
 
 }

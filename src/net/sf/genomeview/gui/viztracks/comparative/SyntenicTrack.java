@@ -52,7 +52,7 @@ public class SyntenicTrack extends Track {
 				Entry e = model.entries().getEntry(sb.target());
 				if (e != null) {
 					model.setSelectedEntry(e);
-					model.setAnnotationLocationVisible(sb.targetLocation());
+					model.vlm.setAnnotationLocationVisible(sb.targetLocation());
 					return true;
 				}
 

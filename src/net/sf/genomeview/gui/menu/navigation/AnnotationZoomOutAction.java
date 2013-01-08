@@ -21,14 +21,14 @@ public class AnnotationZoomOutAction extends AbstractModelAction {
     }
 
     public void actionPerformed(ActionEvent arg0) {
-        Location r = model.getAnnotationLocationVisible();
+        Location r = model.vlm.getAnnotationLocationVisible();
         double start = r.start();
         double end = r.end();
         double center = end - (end - start) / 2;
         int newStart = (int) (center - (end - start) * 0.75);
         int newEnd = (int) (center + (end - start) * 0.75);
         if(enabled)
-        	model.setAnnotationLocationVisible(new Location(newStart, newEnd));
+        	model.vlm.setAnnotationLocationVisible(new Location(newStart, newEnd));
 
     }
 

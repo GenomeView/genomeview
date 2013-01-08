@@ -158,7 +158,7 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 					if (e.getClickCount() > 1) {
 						int min = rf.start();
 						int max = rf.end();
-						model.center((min+max)/2);
+						model.vlm.center((min+max)/2);
 					}
 				}
 

@@ -150,7 +150,7 @@ public class MergeFeatureDialog extends JDialog {
 
 				copy.setLocation(locations);
 				/* Add new feature to the annotation */
-				model.getSelectedEntry().getMemoryAnnotation(copy.type()).add(copy);
+				model.vlm.getSelectedEntry().getMemoryAnnotation(copy.type()).add(copy);
 				// ((MemoryFeatureAnnotation)
 				// model.getSelectedEntry().get(copy.type())).add(copy);
 
@@ -159,7 +159,7 @@ public class MergeFeatureDialog extends JDialog {
 					Set<Feature> toRemove = new HashSet<Feature>();
 					toRemove.addAll(model.selectionModel().getFeatureSelection());
 					for (Feature rf : toRemove)
-						model.getSelectedEntry().getMemoryAnnotation(rf.type()).remove(rf);
+						model.vlm.getSelectedEntry().getMemoryAnnotation(rf.type()).remove(rf);
 				}
 				model.selectionModel().clearLocationSelection();
 

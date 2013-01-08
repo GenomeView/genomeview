@@ -68,8 +68,8 @@ class PileupSummary extends Observable{
 		if (!queued.get(idx)) {
 			if (idx < forwardSummary.length) {
 				/* Only queue additional chunks in visible region */
-				if ((idx) * PileupSummary.CHUNK < model.getAnnotationLocationVisible().end
-						&& (idx + 1) * PileupSummary.CHUNK > model.getAnnotationLocationVisible().start) {
+				if ((idx) * PileupSummary.CHUNK < model.vlm.getAnnotationLocationVisible().end
+						&& (idx + 1) * PileupSummary.CHUNK > model.vlm.getAnnotationLocationVisible().start) {
 
 					queued.set(idx);
 					GenomeViewScheduler.submit(new PileupTask(pw, idx, this, model));

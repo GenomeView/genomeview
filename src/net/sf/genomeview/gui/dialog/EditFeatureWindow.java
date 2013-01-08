@@ -123,8 +123,8 @@ public class EditFeatureWindow extends JDialog {
 							int end = Integer.parseInt(as[1].trim());
 							if(start<1)
 								start=1;
-							if(end>model.getSelectedEntry().getMaximumLength())
-								end=model.getSelectedEntry().getMaximumLength();
+							if(end>model.vlm.getSelectedEntry().getMaximumLength())
+								end=model.vlm.getSelectedEntry().getMaximumLength();
 							loc.add(new Location(start, end));
 						}
 						feature.setLocation(loc);
@@ -136,10 +136,10 @@ public class EditFeatureWindow extends JDialog {
 					feature.setStrand(strandSelection.getStrand());
 					
 					if(feature.type()!=typeSelection.getTerm()){
-						MemoryFeatureAnnotation mf=model.getSelectedEntry().getMemoryAnnotation(feature.type());
+						MemoryFeatureAnnotation mf=model.vlm.getSelectedEntry().getMemoryAnnotation(feature.type());
 						mf.remove(feature);
 						feature.setType(typeSelection.getTerm());
-						mf=model.getSelectedEntry().getMemoryAnnotation(typeSelection.getTerm());
+						mf=model.vlm.getSelectedEntry().getMemoryAnnotation(typeSelection.getTerm());
 						mf.add(feature);
 						model.updateTracks();
 						

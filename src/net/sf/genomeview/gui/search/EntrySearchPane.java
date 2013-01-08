@@ -44,7 +44,7 @@ class EntrySearchPane extends SearchPanel {
 			public void mouseClicked(MouseEvent e) {
 				int row = resultTable.getSelectedRow();
 				Entry entry = srm.getEntry(row);
-				if (model.getSelectedEntry() != entry)
+				if (model.vlm.getSelectedEntry() != entry)
 					model.setSelectedEntry(entry);
 
 			}

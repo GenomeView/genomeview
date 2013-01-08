@@ -23,20 +23,20 @@ public class AnnotationZoomInAction extends AbstractModelAction {
     }
 
     public void actionPerformed(ActionEvent arg0) {
-        Location r = model.getAnnotationLocationVisible();
+        Location r = model.vlm.getAnnotationLocationVisible();
         double start = r.start();
         double end = r.end();
         double center = end - (end - start) / 2;
         int newStart = (int) (center - (end - start) * 0.25);
         int newEnd = (int) (center + (end - start) * 0.25);
         if(enabled)
-        	model.setAnnotationLocationVisible(new Location(newStart, newEnd));
+        	model.vlm.setAnnotationLocationVisible(new Location(newStart, newEnd));
 
     }
 
     @Override
     public void update(Observable arg0, Object arg1) {
-        setEnabled(model.getAnnotationLocationVisible().length() > Configuration.getInt("minimumNucleotides"));
+        setEnabled(model.vlm.getAnnotationLocationVisible().length() > Configuration.getInt("minimumNucleotides"));
 
     }
 

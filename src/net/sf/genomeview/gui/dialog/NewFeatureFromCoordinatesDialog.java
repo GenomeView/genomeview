@@ -93,7 +93,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					SortedSet<Location> loc = parse(coordinates.getText());
-					filterLocation(loc, new Location(1, model.getSelectedEntry().getMaximumLength()));
+					filterLocation(loc, new Location(1, model.vlm.getSelectedEntry().getMaximumLength()));
 					Feature f = new Feature();
 					f.setLocation(loc);
 					f.setType(typeCombo.getTerm());
@@ -101,7 +101,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 					// model.getSelectedEntry().annotation.add(f);
 					// MemoryFeatureAnnotation fa = (MemoryFeatureAnnotation)
 					// model.getSelectedEntry().get(f.type());
-					MemoryFeatureAnnotation fa = model.getSelectedEntry().getMemoryAnnotation(f.type());
+					MemoryFeatureAnnotation fa = model.vlm.getSelectedEntry().getMemoryAnnotation(f.type());
 					fa.add(f);
 					// model.setSelectedRegion(null);
 					model.updateTracks();

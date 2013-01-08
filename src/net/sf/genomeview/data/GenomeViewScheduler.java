@@ -51,7 +51,7 @@ public class GenomeViewScheduler {
 			@Override
 			public void run() {
 				while (true && !model.isExitRequested()) {
-					GenomeViewScheduler.boost(model.getAnnotationLocationVisible());
+					GenomeViewScheduler.boost(model.vlm.getAnnotationLocationVisible());
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {

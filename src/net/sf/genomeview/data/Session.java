@@ -147,8 +147,8 @@ public class Session {
 			Locator l = ds.getLocator();
 			out.println("DATA:" + l);
 		}
-		String e = model.getSelectedEntry().getID();
-		Location l = model.getAnnotationLocationVisible();
+		String e = model.vlm.getSelectedEntry().getID();
+		Location l = model.vlm.getAnnotationLocationVisible();
 		out.println("LOCATION:" + e + ":" + l.start + ":" + l.end);
 
 		out.close();

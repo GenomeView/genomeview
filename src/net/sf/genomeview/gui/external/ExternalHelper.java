@@ -46,11 +46,11 @@ public class ExternalHelper {
 							if (inRange(arr)) {
 								if (arr.length == 3) {
 									model.setSelectedEntry(model.entries().getEntry(arr[0]));
-									model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[1]), Integer
+									model.vlm.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[1]), Integer
 											.parseInt(arr[2])));
 
 								} else if (arr.length == 2) {
-									model.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[0]), Integer
+									model.vlm.setAnnotationLocationVisible(new Location(Integer.parseInt(arr[0]), Integer
 											.parseInt(arr[1])));
 								}
 								success = true;
@@ -87,7 +87,7 @@ public class ExternalHelper {
 				int max = Integer.parseInt(arr[arr.length - 1]);
 				Entry e = null;
 				if (arr.length == 2)
-					e = model.entries().getEntry();
+					e = model.vlm.getSelectedEntry();//model.entries().getEntry();
 				else
 					e = model.entries().getEntry(arr[0]);
 				return max <= e.getMaximumLength();

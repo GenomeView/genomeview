@@ -304,7 +304,7 @@ public class PileupTrackConfig extends TrackConfig {
 	}
 
 	boolean isNormalizationAvailable() {
-		return ((PileNormalization) model.getSelectedEntry().get(dataKey)).supportsNormalization();
+		return ((PileNormalization) model.vlm.getSelectedEntry().get(dataKey)).supportsNormalization();
 	}
 
 	boolean isDynamicScaling() {
@@ -350,7 +350,7 @@ public class PileupTrackConfig extends TrackConfig {
 						model.messageModel().setStatusBarMessage("Calculating normalization");
 						// model.getSelectedEntry().get(dataKey).get();
 
-						Data<Pile> dp = (Data<Pile>) model.getSelectedEntry().get(dataKey);
+						Data<Pile> dp = (Data<Pile>) model.vlm.getSelectedEntry().get(dataKey);
 						double[] sum = null;
 						int count = 0;
 						for (Pile p : dp.get()) {
@@ -420,7 +420,7 @@ public class PileupTrackConfig extends TrackConfig {
 	}
 
 	public Sequence sequence() {
-		return model.getSelectedEntry().sequence();
+		return model.vlm.getSelectedEntry().sequence();
 	}
 
 	public TrackCommunicationModel getTrackCommunication() {

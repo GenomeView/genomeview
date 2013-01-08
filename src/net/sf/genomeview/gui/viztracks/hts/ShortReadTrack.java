@@ -168,7 +168,7 @@ public class ShortReadTrack extends Track {
 				if (e.getKey().contains(x, y)) {
 					System.out.println("2*Click: " + e.getValue());
 					if (e.getValue().getReadPairedFlag() && !e.getValue().getMateUnmappedFlag())
-						model.center(e.getValue().getMateAlignmentStart());
+						model.vlm.center(e.getValue().getMateAlignmentStart());
 				}
 			}
 		}
@@ -185,7 +185,7 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
-		if (model.getAnnotationLocationVisible().length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+		if (model.vlm.getAnnotationLocationVisible().length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			ShortReadInsertion sri = null;
 			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : render.paintedBlocks.entrySet()) {
 				if (e.getKey().contains(x, y)) {
@@ -254,7 +254,7 @@ public class ShortReadTrack extends Track {
 			return 0;
 
 		/* Also check that config options remained the same */
-		Location currentVisible=model.getAnnotationLocationVisible();
+		Location currentVisible=model.vlm.getAnnotationLocationVisible();
 		Iterable<Status> status = provider.getStatus(currentVisible.start, currentVisible.end);
 		boolean ready=true;
 		for(Status s:status){

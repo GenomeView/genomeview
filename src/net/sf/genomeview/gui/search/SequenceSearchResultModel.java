@@ -135,7 +135,7 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 			private void performAminoAcidSearch() {
 				// byte[] byteSequence =
 				// model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
-				byte[] byteSequence = new BufferSeq(model.getSelectedEntry().sequence()).toString().toUpperCase()
+				byte[] byteSequence = new BufferSeq(model.vlm.getSelectedEntry().sequence()).toString().toUpperCase()
 						.getBytes();
 				byte[] translation = translate(byteSequence, 0);
 				forwardSearch(translation, 0);
@@ -160,7 +160,7 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 			private byte[] translate(byte[] seq, int offset) {
 				byte[] out = new byte[seq.length / 3];
 				for (int i = 0; i < out.length && 3 * i + offset + 2 < seq.length; i++) {
-					AminoAcidMapping aamap = model.getAAMapping(model.getSelectedEntry());
+					AminoAcidMapping aamap = model.getAAMapping(model.vlm.getSelectedEntry());
 					out[i] = (byte) aamap.get("" + (char) seq[3 * i + offset] + (char) seq[3 * i + offset + 1]
 							+ (char) seq[3 * i + offset + 2]);
 					// System.out.println((char)out[i]);
@@ -208,7 +208,7 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 			private void performNucleotideSearch() {
 				// byte[] byteSequence =
 				// model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
-				byte[] byteSequence = new BufferSeq(model.getSelectedEntry().sequence()).toString().toUpperCase()
+				byte[] byteSequence = new BufferSeq(model.vlm.getSelectedEntry().sequence()).toString().toUpperCase()
 						.getBytes();
 
 				forwardSearch(byteSequence, 0);

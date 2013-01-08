@@ -26,8 +26,8 @@ public class AnnotationStartAction extends AbstractModelAction {
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
-        Location r = model.getAnnotationLocationVisible();
-        model.setAnnotationLocationVisible(new Location(1,r.length()));
+        Location r = model.vlm.getAnnotationLocationVisible();
+        model.vlm.setAnnotationLocationVisible(new Location(1,r.length()));
 
     }
 

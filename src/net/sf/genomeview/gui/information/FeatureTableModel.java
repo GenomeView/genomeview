@@ -61,7 +61,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 
 	@Override
 	public int getRowCount() {
-		MemoryFeatureAnnotation fa = model.getSelectedEntry().getMemoryAnnotation(type);
+		MemoryFeatureAnnotation fa = model.vlm.getSelectedEntry().getMemoryAnnotation(type);
 		if(fa==null)
 			return 0;
 		return fa.cachedCount();// .noFeatures(type);
@@ -86,7 +86,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	}
 
 	public Feature getFeature(int row) {
-		return model.getSelectedEntry().getMemoryAnnotation(type).getCached(row);
+		return model.vlm.getSelectedEntry().getMemoryAnnotation(type).getCached(row);
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	}
 
 	public int getRow(Feature first) {
-		return model.getSelectedEntry().getMemoryAnnotation(type).getCachedIndexOf(first);
+		return model.vlm.getSelectedEntry().getMemoryAnnotation(type).getCachedIndexOf(first);
 
 	}
 

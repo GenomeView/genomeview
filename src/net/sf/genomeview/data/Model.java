@@ -16,6 +16,7 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -47,7 +48,7 @@ import be.abeel.util.DefaultHashMap;
  * @author Thomas Abeel
  * 
  */
-public class Model extends Observable implements IModel {
+public class Model extends Observable implements Observer {
 	private Logger logger = Logger.getLogger(Model.class.getCanonicalName());
 
 	private EntrySet entries = new EntrySet();
@@ -81,6 +82,15 @@ public class Model extends Observable implements IModel {
 
 		selectionModel.addObserver(this);
 		messageModel.addObserver(this);
+		final Model _this=this;
+		vlm.addObserver(new Observer() {
+			
+			@Override
+			public void update(Observable o, Object arg) {
+				_this.refresh();
+				
+			}
+		});
 		this.trackList = new TrackList(this);
 		// entries.addObserver(this);
 
@@ -109,9 +119,12 @@ public class Model extends Observable implements IModel {
 
 	}
 
+	public final VisualLocationModel vlm=new VisualLocationModel();
+	
 	public void clearEntries() {
 		selectionModel.clear();
-		visible=new Location(0,0);
+		vlm.clear();
+//		visible=new Location(0,0);
 		loadedSources.clear();
 		entries.clear();
 		undoStack.clear();
@@ -185,101 +198,66 @@ public class Model extends Observable implements IModel {
 
 	}
 
-	public Location getAnnotationLocationVisible() {
-		return visible;
-	}
+//	public Location getAnnotationLocationVisible() {
+//		return visible;
+//	}
 
-	private Location visible=new Location(0,0);
+//	private Location visible=new Location(0,0);
 	//private int annotationStart = 0, annotationEnd = 0;
 
-	public void setAnnotationLocationVisible(Location r, boolean mayExpand) {
-		int modStart = -1;
-		int modEnd = -1;
-		if (r.start > 1) {
-			modStart = r.start;
-		} else {
-			modStart = 1;
-			modEnd = r.length();
-		}
-		int chromLength = getSelectedEntry().getMaximumLength();
-		if (r.end < chromLength || chromLength == 0) {
-			modEnd = r.end;
-		} else {
-			modEnd = chromLength;
-			modStart = modEnd - r.length();
-			if (modStart < 1)
-				modStart = 1;
-		}
-		Location newZoom = new Location(modStart, modEnd);
-		/* When trying to zoom to something really small */
-		if (newZoom.length() < 50 && mayExpand) {
-			setAnnotationLocationVisible(new Location(modStart - 25, modEnd + 25));
-		}
-		if (newZoom.length() != visible.end - visible.start+ 1 && newZoom.length() < 50)
-			return;
-		// if (newZoom.length() != annotationEnd - annotationStart + 1
-		// && newZoom.length() > Configuration.getInt("general:zoomout"))
-		// return;
-		if (newZoom.start < 1 || newZoom.end < 1)
-			return;
 
-		ZoomChange zc = new ZoomChange(visible, newZoom);
-		zc.doChange();
-		refresh();
 
-	}
+//	/**
+//	 * Set the visible area in the evidence and structure frame to the given
+//	 * Location.
+//	 * 
+//	 * start and end one-based [start,end]
+//	 * 
+//	 * @param start
+//	 * @param annotationEnd
+//	 */
+//
+//	public void setAnnotationLocationVisible(Location r) {
+//		setAnnotationLocationVisible(r, false);
+//
+//	}
 
-	/**
-	 * Set the visible area in the evidence and structure frame to the given
-	 * Location.
-	 * 
-	 * start and end one-based [start,end]
-	 * 
-	 * @param start
-	 * @param annotationEnd
-	 */
-
-	public void setAnnotationLocationVisible(Location r) {
-		setAnnotationLocationVisible(r, false);
-
-	}
-
-	/**
-	 * Provides implementation to do/undo zoom changes.
-	 * 
-	 * @author Thomas Abeel
-	 * 
-	 */
-	class ZoomChange implements ChangeEvent {
-		/* The original zoom */
-		private Location orig;
-
-		/* The new zoom */
-		private Location neww;
-
-		public ZoomChange(Location location, Location newZoom) {
-			this.orig = location;
-			this.neww = newZoom;
-		}
-
-		@Override
-		public void doChange() {
-//			annotationStart = neww.start();
-//			annotationEnd = neww.end();
-			visible=neww;
-
-		}
-
-		@Override
-		public void undoChange() {
-			assert (visible.start == neww.start());
-			assert (visible.end == neww.end());
-			visible=orig;
-			
-
-		}
-
-	}
+//	/**
+//	 * Provides implementation to do/undo zoom changes.
+//	 * 
+//	 * @author Thomas Abeel
+//	 * 
+//	 */
+//	class ZoomChange implements ChangeEvent {
+//		/* The original zoom */
+//		private Location orig;
+//
+//		/* The new zoom */
+//		private Location neww;
+//
+//		public ZoomChange(Location location, Location newZoom) {
+//			this.orig = location;
+//			this.neww = newZoom;
+//		}
+//
+//		@Override
+//		public void doChange() {
+////			annotationStart = neww.start();
+////			annotationEnd = neww.end();
+//			visible=neww;
+//
+//		}
+//
+//		@Override
+//		public void undoChange() {
+//			assert (visible.start == neww.start());
+//			assert (visible.end == neww.end());
+//			visible=orig;
+//			
+//
+//		}
+//
+//	}
 
 	public boolean isExitRequested() {
 		return exitRequested;
@@ -321,18 +299,7 @@ public class Model extends Observable implements IModel {
 		refresh();
 	}
 
-	/**
-	 * Center the model on a certain position. This will cause the nucleotide
-	 * start, end and the normal start and end to change.
-	 * 
-	 * @param genomePosition
-	 *            the position to center on
-	 */
-	public void center(int genomePosition) {
-		int length = (visible.end - visible.start) / 2;
-		setAnnotationLocationVisible(new Location(genomePosition - length, genomePosition + length));
-
-	}
+	
 
 	/**
 	 * Load new entries from a data source.
@@ -348,7 +315,7 @@ public class Model extends Observable implements IModel {
 	 */
 	void addData(DataSource f) throws ReadFailedException {
 		if (entries.size() == 0)
-			setAnnotationLocationVisible(new Location(1, 51));
+			vlm.setAnnotationLocationVisible(new Location(1, 51));
 		logger.info("Reading source:" + f);
 		try {
 			f.read(entries);
@@ -373,7 +340,7 @@ public class Model extends Observable implements IModel {
 	}
 
 	public AminoAcidMapping getAAMapping() {
-		return aamapping.get(getSelectedEntry());
+		return aamapping.get(vlm.getSelectedEntry());
 	}
 
 	public void setAAMapping(Entry e, AminoAcidMapping aamapping) {
@@ -409,7 +376,7 @@ public class Model extends Observable implements IModel {
 	public synchronized void updateTracks() {
 		try {
 			
-			Entry e = this.getSelectedEntry();
+			Entry e = vlm.getSelectedEntry();
 			boolean changed=trackList.update(e);
 			
 			if(changed)
@@ -499,7 +466,7 @@ public class Model extends Observable implements IModel {
 		return guimanager;
 	}
 
-	@Override
+	
 	public Location getSelectedRegion() {
 		return selectionModel.getSelectedRegion();
 	}
@@ -507,18 +474,19 @@ public class Model extends Observable implements IModel {
 	public SelectionModel selectionModel() {
 		return selectionModel;
 	}
-
-	public Entry getSelectedEntry() {
-		if (entries.size() == 0)
-			return DummyEntry.dummy;
-		return entries.getEntry();
-	}
+//
+//	public Entry getSelectedEntry() {
+//		if (entries.size() == 0)
+//			return DummyEntry.dummy;
+//		return entries.getEntry();
+//	}
 
 	public synchronized void setSelectedEntry(Entry entry) {
-		entries.setDefault(entry);
+		vlm.setVisibleEntry(entry);
+//		entries.setDefault(entry);
 		selectionModel.clear();
 
-		setAnnotationLocationVisible(getAnnotationLocationVisible());
+		vlm.setAnnotationLocationVisible(vlm.getVisibleLocation());
 		trackList.clear();
 		updateTracks();
 		refresh(NotificationTypes.ENTRYCHANGED);
@@ -565,6 +533,8 @@ public class Model extends Observable implements IModel {
 	}
 	
 	private Stack<Throwable>exceptionStack=new Stack<Throwable>();
+
+//	private Stack<Throwable>exceptionStack=new Stack<Throwable>();
 	/**
 	 * Method to register daemon exceptions to the model.
 	 * @param e

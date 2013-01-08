@@ -61,14 +61,14 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 	@Override
 	public void mousePressed(MouseEvent e) {
 		pressed = e;
-		pressLocation = model.getAnnotationLocationVisible();
+		pressLocation = model.vlm.getAnnotationLocationVisible();
 	}
 
 	private Location currentLocation = null;
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		Location full = new Location(1, model.getSelectedEntry().getMaximumLength());
+		Location full = new Location(1, model.vlm.getSelectedEntry().getMaximumLength());
 		int pressedX = Convert.translateScreenToGenome(pressed.getX(), full, this.getWidth());
 		if (left) {
 			int mouseX = Convert.translateScreenToGenome(e.getX(), full, this.getWidth());
@@ -88,9 +88,9 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 			if (pressLocation.start() + diff > 0 && pressLocation.end() + diff <= full.end())
 				currentLocation = (new Location(pressLocation.start() + diff, pressLocation.end() + diff));
 			else if (pressLocation.start() + diff <= 0) {
-				currentLocation = (new Location(1, model.getAnnotationLocationVisible().length()));
+				currentLocation = (new Location(1, model.vlm.getAnnotationLocationVisible().length()));
 			} else if (pressLocation.end() + diff > full.end())
-				currentLocation = (new Location(full.end() - model.getAnnotationLocationVisible().length() - 1, full.end()));
+				currentLocation = (new Location(full.end() - model.vlm.getAnnotationLocationVisible().length() - 1, full.end()));
 		}
 		repaint();
 	}
@@ -114,7 +114,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 		super.paintComponent(g1);
 		Graphics2D g = (Graphics2D) g1;
 		/* Paint tick marks */
-		Location r = new Location(1, model.getSelectedEntry().getMaximumLength());
+		Location r = new Location(1, model.vlm.getSelectedEntry().getMaximumLength());
 		g.setColor(Color.BLACK);
 		g.drawLine(0, 15, g.getClipBounds().width, 15);
 
@@ -146,7 +146,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 		}
 
 		
-		Location current = model.getAnnotationLocationVisible();
+		Location current = model.vlm.getAnnotationLocationVisible();
 		
 		loc(g,current,Color.CYAN,Color.BLUE);
 		if (currentLocation != null)
@@ -159,7 +159,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	private void loc(Graphics2D g,Location current,Color light,Color dark) {
 		Dimension dim = this.getSize();
-		Location full = new Location(1, model.getSelectedEntry().getMaximumLength());
+		Location full = new Location(1, model.vlm.getSelectedEntry().getMaximumLength());
 		int start = Convert.translateGenomeToScreen(current.start(), full, dim.width);
 		int end = Convert.translateGenomeToScreen(current.end(), full, dim.width);
 	
@@ -221,9 +221,9 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		Location full = new Location(1, model.getSelectedEntry().getMaximumLength());
+		Location full = new Location(1, model.vlm.getSelectedEntry().getMaximumLength());
 		int x = Convert.translateScreenToGenome(pressed.getX(), full, this.getWidth());
-		model.center(x);
+		model.vlm.center(x);
 	}
 
 	@Override
@@ -241,7 +241,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (currentLocation != null)
-			model.setAnnotationLocationVisible(currentLocation);
+			model.vlm.setAnnotationLocationVisible(currentLocation);
 		currentLocation = null;
 
 	}

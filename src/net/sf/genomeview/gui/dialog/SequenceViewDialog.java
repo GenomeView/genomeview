@@ -88,11 +88,11 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		if (model.selectionModel().getLocationSelection() != null
 				&& model.selectionModel().getFeatureSelection().size() == 1) {
 			Feature rf = model.selectionModel().getLocationSelection().iterator().next().getParent();
-			seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence(), rf);
+			seq = SequenceTools.extractSequence(model.vlm.getSelectedEntry().sequence(), rf);
 
 		} else if (model.getSelectedRegion() != null) {
 			Location l = model.getSelectedRegion();
-			seq =model.getSelectedEntry().sequence().subsequence(l.start,l.end+1);
+			seq =model.vlm.getSelectedEntry().sequence().subsequence(l.start,l.end+1);
 			if(model.getPressTrack()<0){
 				seq=SequenceTools.reverseComplement(seq);
 			}
@@ -286,7 +286,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		// String nucs = new String();
 		Set<Feature> feats = model.selectionModel().getFeatureSelection();
 		for (Feature feat : feats) {
-			String nucs = SequenceTools.extractSequence(model.getSelectedEntry().sequence(), feat).stringRepresentation();
+			String nucs = SequenceTools.extractSequence(model.vlm.getSelectedEntry().sequence(), feat).stringRepresentation();
 			// SymbolList symbols = feat.getSymbols();
 			// nucs = symbols.seqString();
 			newList.put(feat, nucs);
@@ -298,7 +298,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		Map<Feature, String> newList = new HashMap<Feature, String>();
 		Set<Feature> feats = model.selectionModel().getFeatureSelection();
 		for (Feature feat : feats) {
-			Sequence seq = SequenceTools.extractSequence(model.getSelectedEntry().sequence(), feat);
+			Sequence seq = SequenceTools.extractSequence(model.vlm.getSelectedEntry().sequence(), feat);
 			String prots = SequenceTools.translate(seq, model.getAAMapping());
 
 			newList.put(feat, prots);

@@ -27,7 +27,7 @@ public class GotoPosition extends AbstractModelAction {
         if (input != null&&input.trim().length()>0) {
         	try{
         		int i = Integer.parseInt(input.trim());
-        		super.model.center(i);
+        		super.model.vlm.center(i);
             }catch(NumberFormatException e){
             	JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Invalid location");
             }

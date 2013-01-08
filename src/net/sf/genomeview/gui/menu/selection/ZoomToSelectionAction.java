@@ -23,7 +23,7 @@ public class ZoomToSelectionAction extends AbstractModelAction {
     }
 
     public void actionPerformed(ActionEvent arg0) {
-        model.setAnnotationLocationVisible(model.getSelectedRegion());
+        model.vlm.setAnnotationLocationVisible(model.getSelectedRegion());
     }
 
 }

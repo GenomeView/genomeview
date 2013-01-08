@@ -57,7 +57,7 @@ final class EntryListModel implements Observer, ComboBoxModel {
 
 	@Override
 	public Object getSelectedItem() {
-		return model.getSelectedEntry();
+		return model.vlm.getSelectedEntry();
 	}
 
 	@Override

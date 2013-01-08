@@ -42,7 +42,7 @@ public class RemoveLocationAction extends AbstractModelAction implements Observe
 				f.removeLocation(rf);
 			/* If this is the last location of the feature, remove the feature instead*/
 			else {
-				Data<?>d=model.getSelectedEntry().get(f.type());
+				Data<?>d=model.vlm.getSelectedEntry().get(f.type());
 				if(d instanceof MemoryFeatureAnnotation){
 					MemoryFeatureAnnotation mf=(MemoryFeatureAnnotation)d;
 					mf.remove(f);

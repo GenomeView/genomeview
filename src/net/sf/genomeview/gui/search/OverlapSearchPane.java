@@ -46,7 +46,7 @@ class OverlapSearchPane extends SearchPanel {
 					Feature f = srm.getFeature(row);
 					model.selectionModel().setLocationSelection(f);
 					double border = 0.05 * (f.end() - f.start());
-					model.setAnnotationLocationVisible(new Location((int) (f.start() - border),
+					model.vlm.setAnnotationLocationVisible(new Location((int) (f.start() - border),
 							(int) (f.end() + border)));
 
 				}

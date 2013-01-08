@@ -33,7 +33,7 @@ public class RemoveAction extends AbstractModelAction implements Observer {
 		Set<Feature> toRemove = new HashSet<Feature>();
 		toRemove.addAll(model.selectionModel().getFeatureSelection());
 		for (Feature rf : toRemove)
-			model.getSelectedEntry().getMemoryAnnotation(rf.type()).remove(rf);
+			model.vlm.getSelectedEntry().getMemoryAnnotation(rf.type()).remove(rf);
 		model.refresh(NotificationTypes.JANNOTCHANGE);
 	}
 

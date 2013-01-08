@@ -60,14 +60,14 @@ public class GeneStructureView extends JLabel implements Observer {
 				Location l = collisionMap.uniqueLocation(e.getX(), e.getY());
 				if (e.getClickCount() > 1 && l != null) {
 					int gap = (int) (l.length() * 0.05);
-					_self.model.setAnnotationLocationVisible(new Location(l.start() - gap, l.end() + gap));
+					_self.model.vlm.setAnnotationLocationVisible(new Location(l.start() - gap, l.end() + gap));
 				} else {
 					int hGap = (int) (_self.getWidth() * 0.05);
 					double posPixelRatio = (double) (_self.getWidth() * 0.90) / (double) rf.length();
 					int pos = (int) ((e.getX() - hGap) / posPixelRatio);
 					System.out.println("CDSView click:" + pos);
 					if (rf != null)
-						_self.model.center(rf.start() + pos);
+						_self.model.vlm.center(rf.start() + pos);
 				}
 			}
 
@@ -91,7 +91,7 @@ public class GeneStructureView extends JLabel implements Observer {
 				&& Configuration.getTypeSet("geneStructures").contains(
 						model.selectionModel().getFeatureSelection().first().type())) {
 			rf = model.selectionModel().getFeatureSelection().first();
-			entry = model.getSelectedEntry();
+			entry = model.vlm.getSelectedEntry();
 		}
 		if (rf != null) {
 			renderCDS((Graphics2D) g, rf);
@@ -315,7 +315,7 @@ public class GeneStructureView extends JLabel implements Observer {
 		/* --------------------- */
 		/* Paint viewport */
 		/* --------------------- */
-		Location l = model.getAnnotationLocationVisible();
+		Location l = model.vlm.getAnnotationLocationVisible();
 		/* Start of the block */
 		int lmin = (int) ((l.start() - rf.start()) * posPixelRatio);
 		/* End of the block */
@@ -330,7 +330,7 @@ public class GeneStructureView extends JLabel implements Observer {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if (!model.getSelectedEntry().equals(entry)) {
+		if (!model.vlm.getSelectedEntry().equals(entry)) {
 			rf = null;
 			entry = null;
 		}

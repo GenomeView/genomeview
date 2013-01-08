@@ -188,7 +188,7 @@ public class WiggleTrack extends Track {
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,
 			JViewport view,TrackCommunicationModel tcm) {
-		this.currentVisible = model.getAnnotationLocationVisible();
+		this.currentVisible = model.vlm.getAnnotationLocationVisible();
 		this.currentYOffset = yOffset;
 		this.screenWidth = screenWidth;
 

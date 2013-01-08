@@ -90,7 +90,7 @@ public abstract class Track {
 		this.config=config;
 		TrackConfigWindow tcw=new TrackConfigWindow(model,config);
 		log.log(Level.INFO, "Creating track\t" + key + "\t" + visible);
-		this.entry = model.getSelectedEntry();
+		this.entry = model.vlm.getSelectedEntry();
 //		config.setCollapsible(collapsible);
 //		this.collapsible = collapsible;
 		config.addObserver(model);

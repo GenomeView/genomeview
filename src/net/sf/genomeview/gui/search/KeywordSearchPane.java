@@ -47,11 +47,11 @@ class KeywordSearchPane extends SearchPanel {
 				int row = resultTable.getSelectedRow();
 				Feature f = srm.getFeature(row);
 				Entry entry = srm.getEntry(row);
-				if (model.getSelectedEntry() != entry)
+				if (model.vlm.getSelectedEntry() != entry)
 					model.setSelectedEntry(entry);
 				model.selectionModel().setLocationSelection(f);
 				double border = 0.05 * (f.end() - f.start());
-				model.setAnnotationLocationVisible(new Location((int) (f.start() - border), (int) (f.end() + border)),
+				model.vlm.setAnnotationLocationVisible(new Location((int) (f.start() - border), (int) (f.end() + border)),
 						true);
 
 			}

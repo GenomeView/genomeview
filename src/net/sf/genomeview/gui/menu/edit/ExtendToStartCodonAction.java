@@ -40,7 +40,7 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 	public void update(Observable o, Object obj) {
 		if (model.selectionModel().getFeatureSelection().size() == 1
 				&& model.selectionModel().getFeatureSelection().first().type() == Type.get("CDS")) {
-			AnalyzedFeature af = new AnalyzedFeature(model.getSelectedEntry().sequence(), model.selectionModel()
+			AnalyzedFeature af = new AnalyzedFeature(model.vlm.getSelectedEntry().sequence(), model.selectionModel()
 					.getFeatureSelection().first(), model.getAAMapping());
 
 			setEnabled(af.hasMissingStartCodon());
@@ -54,10 +54,10 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 		assert (model.selectionModel().getFeatureSelection() != null);
 		assert (model.selectionModel().getFeatureSelection().size() == 1);
 		Feature rf = model.selectionModel().getFeatureSelection().iterator().next();
-		Sequence seq = model.getSelectedEntry().sequence();
+		Sequence seq = model.vlm.getSelectedEntry().sequence();
 		String nt = SequenceTools.extractSequence(seq, rf).stringRepresentation();
 		// int rest = nt.length() % 3;
-		AnalyzedFeature af = new AnalyzedFeature(model.getSelectedEntry().sequence(), rf, model.getAAMapping());
+		AnalyzedFeature af = new AnalyzedFeature(model.vlm.getSelectedEntry().sequence(), rf, model.getAAMapping());
 		assert (af.hasMissingStartCodon());
 		if (rf.strand() == Strand.FORWARD) {
 			int start = rf.start();
@@ -69,7 +69,7 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 		} else if (rf.strand() == Strand.REVERSE) {
 			int start = rf.end();
 
-			while (!hasReverseStart(start)&&start<model.getSelectedEntry().getMaximumLength()) {
+			while (!hasReverseStart(start)&&start<model.vlm.getSelectedEntry().getMaximumLength()) {
 				start++;
 			}
 			rf.location()[rf.location().length-1].setEnd(start+2);
@@ -80,7 +80,7 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 
 	private boolean hasReverseStart(int start) {
 		String codon = SequenceTools.reverseComplement(
-				model.getSelectedEntry().sequence().subsequence(start, start + 3)).stringRepresentation();
+				model.vlm.getSelectedEntry().sequence().subsequence(start, start + 3)).stringRepresentation();
 		if (model.getAAMapping().isStart(codon)) {
 			if (!Configuration.getBoolean("general:onlyMethionineAsStart") || model.getAAMapping().get(codon) == 'M')
 				return true;
@@ -90,7 +90,7 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 	}
 
 	private boolean hasStart(int start) {
-		String codon = model.getSelectedEntry().sequence().subsequence(start, start + 3).stringRepresentation();
+		String codon = model.vlm.getSelectedEntry().sequence().subsequence(start, start + 3).stringRepresentation();
 		if (model.getAAMapping().isStart(codon)) {
 			if (!Configuration.getBoolean("general:onlyMethionineAsStart") || model.getAAMapping().get(codon) == 'M')
 				return true;

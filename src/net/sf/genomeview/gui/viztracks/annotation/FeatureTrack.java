@@ -309,7 +309,7 @@ public class FeatureTrack extends Track {
 		boolean forceLabels = Configuration.getBoolean("track:forceFeatureLabels");
 		boolean collision = false;
 		hitmap.clear();
-		Location visible = model.getAnnotationLocationVisible();
+		Location visible = model.vlm.getAnnotationLocationVisible();
 		// List<Feature> types = entry.annotation.getByType(type,);
 		// FeatureAnnotation annot = entry.getAnnotation(type);
 		FeatureAnnotation annot = (FeatureAnnotation) entry.get(ftm.type());
@@ -362,8 +362,8 @@ public class FeatureTrack extends Track {
 			}
 
 			g.setColor(c);
-			int x1 = Convert.translateGenomeToScreen(rf.start(), model.getAnnotationLocationVisible(), width);
-			int x2 = Convert.translateGenomeToScreen(rf.end() + 1, model.getAnnotationLocationVisible(), width);
+			int x1 = Convert.translateGenomeToScreen(rf.start(), model.vlm.getAnnotationLocationVisible(), width);
+			int x2 = Convert.translateGenomeToScreen(rf.end() + 1, model.vlm.getAnnotationLocationVisible(), width);
 
 			// TODO is this not always the case?
 			if (x2 > 0) {
@@ -403,8 +403,8 @@ public class FeatureTrack extends Track {
 				ArrayList<Rectangle> rectList = new ArrayList<Rectangle>();
 				for (Location l : loc) {
 
-					int subX1 = Convert.translateGenomeToScreen(l.start(), model.getAnnotationLocationVisible(), width);
-					int subX2 = Convert.translateGenomeToScreen(l.end() + 1, model.getAnnotationLocationVisible(), width);
+					int subX1 = Convert.translateGenomeToScreen(l.start(), model.vlm.getAnnotationLocationVisible(), width);
+					int subX2 = Convert.translateGenomeToScreen(l.end() + 1, model.vlm.getAnnotationLocationVisible(), width);
 					Rectangle rec = new Rectangle(subX1, thisLine * lineThickness, subX2 - subX1, lineThickness - 5);
 					/* Add this rectangle to the location hits */
 					hitmap.addLocation(rec, l);
@@ -452,8 +452,8 @@ public class FeatureTrack extends Track {
 				 * the feature in it
 				 */
 				if (forceLabels || x2 - x1 > 100) {
-					int a = Convert.translateGenomeToScreen(loc[0].start(), model.getAnnotationLocationVisible(), width);
-					int b = Convert.translateGenomeToScreen(loc[0].end() + 1, model.getAnnotationLocationVisible(), width);
+					int a = Convert.translateGenomeToScreen(loc[0].start(), model.vlm.getAnnotationLocationVisible(), width);
+					int b = Convert.translateGenomeToScreen(loc[0].end() + 1, model.vlm.getAnnotationLocationVisible(), width);
 					if (forceLabels || b - a > 100) {
 						Font resetFont = g.getFont();
 						g.setColor(c.darker().darker().darker());
@@ -488,7 +488,7 @@ public class FeatureTrack extends Track {
 			Feature featHit = locationHit.getParent();
 			model.selectionModel().setLocationSelection(featHit);
 			int l = featHit.length();
-			model.setAnnotationLocationVisible(new Location(featHit.start() - (l / 20), featHit.end() + (l / 20)));
+			model.vlm.setAnnotationLocationVisible(new Location(featHit.start() - (l / 20), featHit.end() + (l / 20)));
 			return true;
 		}
 		return false;

@@ -30,8 +30,8 @@ class OverlapSearchResultModel extends AbstractSearchResultModel {
 	}
 
 	void search(Type source, Type target) {
-		for (Feature f : ((FeatureAnnotation) model.getSelectedEntry().get(source)).get()) {
-			for (Feature g : ((FeatureAnnotation) model.getSelectedEntry().get(target)).get()) {
+		for (Feature f : ((FeatureAnnotation) model.vlm.getSelectedEntry().get(source)).get()) {
+			for (Feature g : ((FeatureAnnotation) model.vlm.getSelectedEntry().get(target)).get()) {
 				if (f.overlaps(g)) {
 					features.add(f);
 					break;

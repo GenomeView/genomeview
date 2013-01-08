@@ -61,7 +61,7 @@ public class SelectFromSelectedForward extends AbstractModelAction {
         Location next = getNext();
         if (next != null) {
             model.selectionModel().setLocationSelection(next);
-            model.center(next.start()/2+next.end()/2);
+            model.vlm.center(next.start()/2+next.end()/2);
         }
     }
 

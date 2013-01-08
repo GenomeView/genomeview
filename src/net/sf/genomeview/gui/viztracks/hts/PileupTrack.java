@@ -90,7 +90,7 @@ public class PileupTrack extends Track {
 		ptm.setScreenWidth(screenWidth);
 		ptm.setTrackCommunication(tcm);
 		// System.out.println("- drawing track "+this);
-		Location visible = model.getAnnotationLocationVisible();
+		Location visible = model.vlm.getAnnotationLocationVisible();
 		/* Status messages for data queuing an retrieval */
 		// Iterable<Status> status = provider.getStatus(visible.start,
 		// visible.end);
@@ -101,13 +101,13 @@ public class PileupTrack extends Track {
 			/* The actual data */
 			// Iterable<Pile> piles = provider.get(visible.start, visible.end);
 
-			if (model.getAnnotationLocationVisible().length() < Configuration.getInt("pileup:switchBarLine")) {
+			if (model.vlm.getAnnotationLocationVisible().length() < Configuration.getInt("pileup:switchBarLine")) {
 				// System.out.println("Track: "+this+"\t"+provider);
 				ptm.setVizBuffer(new BarChartBuffer(visible, provider, ptm));
 			} else
 				ptm.setVizBuffer(new LineChartBuffer(visible, provider, ptm));
 
-			ptm.lastQuery = model.getAnnotationLocationVisible();
+			ptm.lastQuery = model.vlm.getAnnotationLocationVisible();
 		}
 
 		/* Do the actual painting */

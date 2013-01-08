@@ -32,7 +32,7 @@ public class AAMappingChooser extends JComboBox implements ActionListener,
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (!model.getAAMapping().equals(this.getSelectedItem()))
-			model.setAAMapping(model.getSelectedEntry(),
+			model.setAAMapping(model.vlm.getSelectedEntry(),
 					(AminoAcidMapping) this.getSelectedItem());
 	}
 
