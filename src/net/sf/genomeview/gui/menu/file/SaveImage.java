@@ -82,7 +82,7 @@ public class SaveImage extends AbstractAction {
 							RepaintManager currentManager = RepaintManager.currentManager(mw);
 							currentManager.setDoubleBufferingEnabled(false);
 							g.scale(factor, factor);
-							mw.actualPaint(g, null);
+							mw.paintTracks(g, null);
 							ImageIO.write(bi, "PNG", ef);
 							currentManager.setDoubleBufferingEnabled(true);
 						} catch (IOException ex) {

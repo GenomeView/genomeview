@@ -111,7 +111,7 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 
 	}
 
-	public void actualPaint(Graphics g, JViewport view) {
+	public void paintTracks(Graphics g, JViewport view) {
 		tracks.clear();
 		framePixelsUsed = 0;
 		screenWidth = this.getSize().width + 1;
@@ -152,41 +152,19 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 	protected int framePixelsUsed = 0;
 	protected double screenWidth = 0;
 
-	// protected void paintVisibilityFrame(Graphics g, Location frame,
-	// Location real) {
-	//
-	// g.setColor(Color.RED);
-	//
-	// int start = Convert.translateGenomeToScreen(frame.start(),
-	// real,screenWidth);
-	// int end = Convert.translateGenomeToScreen(frame.end(), real,screenWidth);
-	// g
-	// .drawRect(start, 0, end - start, framePixelsUsed > g
-	// .getClipBounds().height ? framePixelsUsed - 1 : g
-	// .getClipBounds().height - 1);
-	//
-	// }
 
-	// public void paintComponent(Graphics g) {
-	// super.paintComponent(g);
-	//
-	// }
-
-	// public void update(Observable arg0, Object arg1) {
-	// repaint();
-	// }
 
 	public void setScrollPaneListener(MouseWheelListener scrollPaneListener) {
 		this.scrollPaneListener = scrollPaneListener;
 	}
 
-	public MouseWheelListener getScrollPaneListener() {
-		return scrollPaneListener;
-	}
+//	public MouseWheelListener getScrollPaneListener() {
+//		return scrollPaneListener;
+//	}
 
 	@Override
 	public void paintComponent(Graphics g) {
-		actualPaint(g, viewport);
+		paintTracks(g, viewport);
 
 		// FIXME paintSelectedLocation(g, model.getAnnotationLocationVisible());
 
