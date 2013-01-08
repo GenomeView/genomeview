@@ -11,16 +11,22 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.Observable;
+import java.util.Observer;
 import java.util.TreeMap;
 
+import javax.swing.JLabel;
 import javax.swing.JViewport;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.AbstractGeneLabel;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.menu.PopUpMenu;
+import net.sf.genomeview.gui.menu.navigation.AnnotationMoveLeftAction;
+import net.sf.genomeview.gui.menu.navigation.AnnotationMoveRightAction;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
@@ -30,17 +36,60 @@ import net.sf.jannot.Location;
  * @author Thomas Abeel
  * 
  */
-public class GeneEvidenceLabel extends AbstractGeneLabel implements
-		MouseListener, MouseMotionListener {
+public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener, MouseMotionListener {
 
 	private static final long serialVersionUID = -8338383664013028337L;
 
-	
+	protected Model model;
+
+	/**
+	 * The MouseWheelListener passed on from the JScrollPane. Only to be invoked
+	 * for regular scrolling.
+	 */
+	private MouseWheelListener scrollPaneListener;
 
 	private TrackCommunicationModel tcm = new TrackCommunicationModel();
 
-	public GeneEvidenceLabel(Model model) {
-		super(model);
+	public GeneEvidenceLabel(final Model model) {
+		// super(model);
+
+		this.addMouseWheelListener(new MouseWheelListener() {
+
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+
+				if (e.isControlDown() || e.isMetaDown() || e.isAltDown()) {
+					double rot = e.getWheelRotation() / 5.0;
+					double center = Convert.translateScreenToGenome(e.getX(), model.vlm.getAnnotationLocationVisible(), screenWidth);
+					double start = model.vlm.getAnnotationLocationVisible().start();
+					double end = model.vlm.getAnnotationLocationVisible().end();
+					double length = end - start + 1;
+					double fractionL = (center - start) / length;
+					double fractionR = (end - center) / length;
+					// System.out.println(fractionL+"\t"+fractionR);
+					if (rot < 0 && length < Configuration.getInt("minimumNucleotides")) {
+						return;
+					}
+					double sizeChange = rot * length;
+					// System.out.println("SC:"+sizeChange);
+					int newStart = (int) (start - fractionL * sizeChange);
+					int newEnd = (int) (end + fractionR * sizeChange);
+
+					model.vlm.setAnnotationLocationVisible(new Location(newStart, newEnd));
+				} else if (e.isShiftDown()) {
+					if (e.getWheelRotation() > 0) {
+						AnnotationMoveRightAction.perform(model);
+					} else {
+						AnnotationMoveLeftAction.perform(model);
+					}
+				} else {
+					scrollPaneListener.mouseWheelMoved(e);
+				}
+
+			}
+
+		});
+
 		setBackground(Color.WHITE);
 		setOpaque(true);
 		this.addMouseListener(this);
@@ -69,20 +118,18 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		if (view == null) {
 			view = new JViewport() {
 				public Rectangle getViewRect() {
-					return new Rectangle(0, 0, (int) screenWidth,
-							Integer.MAX_VALUE);
+					return new Rectangle(0, 0, (int) screenWidth, Integer.MAX_VALUE);
 				}
 			};
 		}
 
 		super.paintComponent(g);
 		int index = 0;
-		
+
 		for (Track track : model.getTrackList()) {
 			if (track.config.isVisible()) {
-				int height = track.paint(g, framePixelsUsed, screenWidth,
-						index++, view,tcm);
-				
+				int height = track.paint(g, framePixelsUsed, screenWidth, index++, view, tcm);
+
 				// FIXME we shouldn't give each paint method the yOffset. We
 				// should use the Graphics translate function to make sure we
 				// are positioned correctly.
@@ -91,10 +138,50 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 				framePixelsUsed += height;
 			}
 		}
-		if(tcm.isChanged()){
+		if (tcm.isChanged()) {
 			tcm.resetChanged();
 			repaint();
 		}
+	}
+
+	protected boolean drag = false;
+
+	/**
+	 * Keeps track of how many pixels are already used in the Y direction
+	 */
+	protected int framePixelsUsed = 0;
+	protected double screenWidth = 0;
+
+	// protected void paintVisibilityFrame(Graphics g, Location frame,
+	// Location real) {
+	//
+	// g.setColor(Color.RED);
+	//
+	// int start = Convert.translateGenomeToScreen(frame.start(),
+	// real,screenWidth);
+	// int end = Convert.translateGenomeToScreen(frame.end(), real,screenWidth);
+	// g
+	// .drawRect(start, 0, end - start, framePixelsUsed > g
+	// .getClipBounds().height ? framePixelsUsed - 1 : g
+	// .getClipBounds().height - 1);
+	//
+	// }
+
+	// public void paintComponent(Graphics g) {
+	// super.paintComponent(g);
+	//
+	// }
+
+//	public void update(Observable arg0, Object arg1) {
+//		repaint();
+//	}
+
+	public void setScrollPaneListener(MouseWheelListener scrollPaneListener) {
+		this.scrollPaneListener = scrollPaneListener;
+	}
+
+	public MouseWheelListener getScrollPaneListener() {
+		return scrollPaneListener;
 	}
 
 	@Override
@@ -104,8 +191,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		// FIXME paintSelectedLocation(g, model.getAnnotationLocationVisible());
 
 		if (this.getPreferredSize().height != framePixelsUsed) {
-			this.setPreferredSize(new Dimension(this.getPreferredSize().width,
-					framePixelsUsed));
+			this.setPreferredSize(new Dimension(this.getPreferredSize().width, framePixelsUsed));
 			revalidate();
 
 		}
@@ -113,8 +199,8 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 		/* Highlight current selection */
 		g.setColor(new Color(180, 180, 180, 120));
 		for (Feature f : model.selectionModel().getFeatureSelection()) {
-			assert f!=null;
-			assert f.location()!=null;
+			assert f != null;
+			assert f.location() != null;
 			for (Location l : f.location()) {
 				highlight(l, g);
 			}
@@ -124,16 +210,13 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 
 		g.setColor(new Color(120, 120, 120, 120));
 		// draw guide line.
-		g.drawLine(currentMouseX, 0, currentMouseX,
-				this.getPreferredSize().height);
-		
+		g.drawLine(currentMouseX, 0, currentMouseX, this.getPreferredSize().height);
+
 	}
 
 	private void highlight(Location l, Graphics g) {
-		int x1 = Convert.translateGenomeToScreen(l.start(),
-				model.vlm.getAnnotationLocationVisible(), screenWidth);
-		int x2 = Convert.translateGenomeToScreen(l.end() + 1,
-				model.vlm.getAnnotationLocationVisible(), screenWidth);
+		int x1 = Convert.translateGenomeToScreen(l.start(), model.vlm.getAnnotationLocationVisible(), screenWidth);
+		int x2 = Convert.translateGenomeToScreen(l.end() + 1, model.vlm.getAnnotationLocationVisible(), screenWidth);
 		g.drawLine(x1 - 1, 0, x1 - 1, this.getPreferredSize().height);
 		g.drawLine(x2, 0, x2, this.getPreferredSize().height);
 		g.setColor(new Color(180, 180, 255, 50));
@@ -244,8 +327,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		currentMouseX = e.getX();
-		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX,
-				model.vlm.getAnnotationLocationVisible(), screenWidth);
+		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX, model.vlm.getAnnotationLocationVisible(), screenWidth);
 
 		/* Transfer MouseEvent to corresponding track */
 		Track mouseTrack = tracks.get(e);
@@ -271,19 +353,15 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 				// int currentGenomeX =
 				// Convert.translateScreenToGenome(currentMouseX,
 				// model.getAnnotationLocationVisible(), screenWidth);
-				int pressGenomeX = Convert.translateScreenToGenome(pressX,
-						model.vlm.getAnnotationLocationVisible(), screenWidth);
+				int pressGenomeX = Convert.translateScreenToGenome(pressX, model.vlm.getAnnotationLocationVisible(), screenWidth);
 
-				int start = pressGenomeX < currentGenomeX ? pressGenomeX
-						: currentGenomeX;
-				int end = pressGenomeX < currentGenomeX ? currentGenomeX
-						: pressGenomeX;
+				int start = pressGenomeX < currentGenomeX ? pressGenomeX : currentGenomeX;
+				int end = pressGenomeX < currentGenomeX ? currentGenomeX : pressGenomeX;
 
 				selectionStart = start;
 				selectionEnd = end + 1;
 
-				model.selectionModel().setSelectedRegion(
-						new Location(selectionStart, selectionEnd));
+				model.selectionModel().setSelectedRegion(new Location(selectionStart, selectionEnd));
 				// when selecting: update the mouse position
 				model.mouseModel().setCurrentCoord(currentGenomeX);
 
@@ -320,8 +398,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		currentMouseX = e.getX();
-		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX,
-				model.vlm.getAnnotationLocationVisible(), screenWidth);
+		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX, model.vlm.getAnnotationLocationVisible(), screenWidth);
 		model.mouseModel().setCurrentCoord(currentGenomeX);
 
 		/* Transfer MouseEvent to corresponding track */
@@ -340,10 +417,7 @@ public class GeneEvidenceLabel extends AbstractGeneLabel implements
 			}
 			consumed = mouseTrack.mouseMoved(e.getX(), e.getY(), e);
 			if (!(mouseTrack instanceof StructureTrack))
-				model.getGUIManager()
-						.getParent()
-						.setCursor(
-								Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				model.getGUIManager().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
 		if (consumed)
 			return;
