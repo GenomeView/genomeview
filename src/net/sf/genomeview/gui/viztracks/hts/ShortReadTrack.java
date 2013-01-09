@@ -17,11 +17,9 @@ import javax.swing.border.Border;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.ShortReadProvider;
-import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
-import net.sf.jannot.Location;
 import net.sf.samtools.SAMRecord;
 
 /**
@@ -224,51 +222,9 @@ public class ShortReadTrack extends Track {
 		return false;
 	}
 
-//	private Location currentVisible;
-
-	// private Color pairingColor;
-
-//	private Rectangle viewRectangle;
-
-	
-
-	
-
-	
-
-//	private Rectangle prevView = null;
-
-//	private srtRender render=null;
-
 	@Override
 	public int paintTrack(Graphics2D gGlobal, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
-
-		// this.view = view;
-//		this.viewRectangle = view.getViewRect();
-		// /* Store information to be used in other methods */
-		// currentEntry = entry;
-		// currentScreenWidth = screenWidth;
-	
-		// this.currentYOffset = yOffset;
-		/* Configuration options */
-		
-
-//		if (provider == null)
-//			return 0;
-
-		/* Also check that config options remained the same */
-		
-			
-			
-
-		
-
-//		} else {
-//			//System.out.println("Using bufferedimage!");
-//		}
-
 		gGlobal.drawImage(render.buffer(), 0, yOffset, null);
-		// return yOffset - originalYOffset;
 		return render.buffer().getHeight();
 	}
 
