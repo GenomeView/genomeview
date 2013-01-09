@@ -103,7 +103,7 @@ public class PileupTrack extends Track {
 
 //			if (model.vlm.getAnnotationLocationVisible().length() < Configuration.getInt("pileup:switchBarLine")) {
 				// System.out.println("Track: "+this+"\t"+provider);
-				ptm.setVizBuffer(new BarChartBuffer(visible, provider, ptm));
+				ptm.setVizBuffer(new BarChartBuffer(model,visible, provider, ptm));
 //			} else
 //				ptm.setVizBuffer(new LineChartBuffer(visible, provider, ptm));
 

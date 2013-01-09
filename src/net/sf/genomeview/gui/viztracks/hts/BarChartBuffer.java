@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.DataCallback;
 import net.sf.genomeview.data.provider.PileProvider;
 import net.sf.genomeview.data.provider.Status;
@@ -50,10 +51,11 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 
 	
 	
-	public BarChartBuffer(Location visible, PileProvider provider, PileupTrackConfig ptm) {
+	public BarChartBuffer(Model model,Location visible, PileProvider provider, PileupTrackConfig ptm) {
 		this.visible = visible;
 		this.provider = provider;
 		this.ptm = ptm;
+		this.model=model;
 
 		
 //		status = provider.getStatus(visible.start, visible.end);
@@ -522,6 +524,8 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 	private NumberFormat nf = NumberFormat.getPercentInstance(Locale.US);
 	private NumberFormat nrReg = NumberFormat.getInstance(Locale.US);
 
+	private Model model;
+
 	@Override
 	public String getTooltip(int mouseX) {
 		double factor = MAX_WIDTH / visible.length();
@@ -667,6 +671,6 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 			}
 			
 		}
-		
+		model.refresh();
 	}
 }

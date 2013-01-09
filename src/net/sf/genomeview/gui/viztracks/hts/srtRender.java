@@ -232,8 +232,8 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 						// if (two != null) {
 						if (ShortReadTools.isPaired(one) && !one.getMateUnmappedFlag()
 								&& one.getReferenceIndex() == one.getMateReferenceIndex() && one.getMateReferenceIndex() != -1) {
-							if (two == null)
-								System.out.println("Mate missing: " + one.getMateAlignmentStart());
+//							if (two == null)
+//								System.out.println("Mate missing: " + one.getMateAlignmentStart());
 							// if (two.getAlignmentStart() <
 							// one.getAlignmentStart()) {
 							if (one.getMateAlignmentStart() < one.getAlignmentStart()) {
@@ -317,6 +317,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		// }
 		// }
 		buffer = bi;
+		model.refresh();
 	}
 
 	// }
@@ -617,8 +618,12 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		for (Status s : status) {
 			ready &= s.isReady();
 		}
-		if (!same(currentVisible, ready))
+		if (!same(currentVisible, ready)){
 			requestNew(model.vlm.getVisibleEntry(), dataKey, provider, currentVisible, srtc, model.vlm.screenWidth());
+			System.out.println("Requesting new SRT render");
+		}else{
+			System.out.println("Using previous render");
+		}
 
 	}
 
