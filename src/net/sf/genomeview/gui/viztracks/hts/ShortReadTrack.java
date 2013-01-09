@@ -277,11 +277,5 @@ public class ShortReadTrack extends Track {
 	
 
 
-	public void clear() {
-//		paintedBlocks.clear();
-//		hitMap.clear();
-//		provider = null;
-
-	}
 
 }
