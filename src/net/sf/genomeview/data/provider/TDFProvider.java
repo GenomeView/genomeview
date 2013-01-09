@@ -52,7 +52,7 @@ public class TDFProvider extends PileProvider {
 		if (start >= lastStart && end <= lastEnd
 				&& (lastEnd - lastStart) <= 2 * (end - start))
 //			return new NoFailIterable<Pile>(buffer);
-			cb.dataReady(new NoFailIterable<Pile>(buffer));
+			cb.dataReady(buffer);
 
 		/* New request */
 
@@ -86,7 +86,7 @@ public class TDFProvider extends PileProvider {
 				}
 				thisJob.setFinished();
 //				notifyListeners();
-				cb.dataReady(new NoFailIterable<Pile>(buffer));
+				cb.dataReady(buffer);
 			}
 
 		};

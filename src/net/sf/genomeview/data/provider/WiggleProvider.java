@@ -31,14 +31,13 @@ public class WiggleProvider extends PileProvider implements Observer {
 	// private Model model;
 
 	public WiggleProvider(Entry e, Data<Pile> source, Model model) {
-//		super(model);
+		// super(model);
 		summary = new PileupSummary(model, e);
 		summary.addObserver(this);
 		this.source = source;
 
 	}
 
-	
 	private ArrayList<Pile> buffer = new ArrayList<Pile>();
 	private ArrayList<Status> status = new ArrayList<Status>();
 	private int lastStart = -1;
@@ -47,12 +46,11 @@ public class WiggleProvider extends PileProvider implements Observer {
 	private float maxPile;
 
 	@Override
-	public void get(final int start, final int end,final DataCallback<Pile>cb) {
+	public void get(final int start, final int end, final DataCallback<Pile> cb) {
 		/* Check whether request can be fulfilled by buffer */
 		if (start >= lastStart && end <= lastEnd && (lastEnd - lastStart) <= 2 * (end - start))
-			cb.dataReady(new NoFailIterable<Pile>(buffer));
+			cb.dataReady(buffer);
 
-		
 		/* New request */
 
 		// reset status
@@ -61,31 +59,32 @@ public class WiggleProvider extends PileProvider implements Observer {
 
 		buffer.clear();
 		status.clear();
-		
+
 		if (end - start + 1 < PileupSummary.CHUNK) {
-			
+
 			status.add(new Status(false, true, false, start, end));
-			final Status thisJob=status.get(0);
+			final Status thisJob = status.get(0);
 			// queue up retrieval
 			Task t = new Task(new Location(start, end)) {
 
 				@Override
 				public void run() {
-					// When actually running, check again whether we actually need
+					// When actually running, check again whether we actually
+					// need
 					// this data
 					if (!(start >= lastStart && end <= lastEnd && (lastEnd - lastStart) <= 2 * (end - start)))
 						return;
 					thisJob.setRunning();
 					// FIXME hard coded arbitrary value
-//					Iterable<Pile> fresh = null;
-////					if (end - start + 1 < PileupSummary.CHUNK) {
-//						fresh = 
-//					} else {
-//						fresh = summary.get(source, start, end);
-//
-//					}
+					// Iterable<Pile> fresh = null;
+					// // if (end - start + 1 < PileupSummary.CHUNK) {
+					// fresh =
+					// } else {
+					// fresh = summary.get(source, start, end);
+					//
+					// }
 					for (Pile p : source.get(start, end)) {
-						float val = p.getTotal();//.getCoverage();
+						float val = p.getTotal();// .getCoverage();
 						// int len = p.getLength();
 						// if (len > 1 && val > maxSummary)
 						// maxSummary = val;
@@ -94,18 +93,18 @@ public class WiggleProvider extends PileProvider implements Observer {
 
 						buffer.add(p);
 					}
-					
+
 					thisJob.setFinished();
-					cb.dataReady(new NoFailIterable<Pile>(buffer));
-//					notifyListeners();
+					cb.dataReady(buffer);
+					// notifyListeners();
 				}
 
 			};
 			GenomeViewScheduler.submit(t);
-//			fresh = source.get(start, end);
+			// fresh = source.get(start, end);
 		} else {
 			for (Pile p : summary.get(source, start, end)) {
-				float val = p.getTotal();//p.getCoverage();
+				float val = p.getTotal();// p.getCoverage();
 				// int len = p.getLength();
 				// if (len > 1 && val > maxSummary)
 				// maxSummary = val;
@@ -114,18 +113,12 @@ public class WiggleProvider extends PileProvider implements Observer {
 
 				buffer.add(p);
 			}
-			cb.dataReady(new NoFailIterable<Pile>(buffer));
+			cb.dataReady(buffer);
 		}
-		
-		
 
 		// System.out.println("\tServing new request from provider");
 
-//		return new NoFailIterable<Pile>(buffer);
-		
-		
-		
-		
+		// return new NoFailIterable<Pile>(buffer);
 
 	}
 
@@ -142,10 +135,10 @@ public class WiggleProvider extends PileProvider implements Observer {
 	public Iterable<Status> getStatus(int start, int end) {
 		if (end - start < PileupSummary.CHUNK) {
 			return status;
-//			Status t=new Status(false,false,true,start,end);
-//			ArrayList<Status>out=new ArrayList<Status>();
-//			out.add(t);
-//			return out; 
+			// Status t=new Status(false,false,true,start,end);
+			// ArrayList<Status>out=new ArrayList<Status>();
+			// out.add(t);
+			// return out;
 		}
 		return summary.getStatus(start, end);
 	}
@@ -158,14 +151,14 @@ public class WiggleProvider extends PileProvider implements Observer {
 		lastStart = -1;
 		lastEnd = -1;
 		buffer.clear();
-//		setChanged();
-//		notifyObservers();
+		// setChanged();
+		// notifyObservers();
 	}
 
-//	@Override
-//	public String label() {
-//		return source.label();
-//	}
+	// @Override
+	// public String label() {
+	// return source.label();
+	// }
 
 	@Override
 	public WindowFunction[] getWindowFunctions() {
@@ -174,13 +167,13 @@ public class WiggleProvider extends PileProvider implements Observer {
 
 	@Override
 	public void requestWindowFunction(WindowFunction wf) {
-		//Do nothing, it's always average!
+		// Do nothing, it's always average!
 
 	}
 
 	@Override
 	public boolean isCurrentWindowFunction(WindowFunction wf) {
-		//Sure whatever...
+		// Sure whatever...
 		return true;
 	}
 }

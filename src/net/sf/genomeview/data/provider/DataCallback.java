@@ -1,4 +1,7 @@
 package net.sf.genomeview.data.provider;
+
+import java.util.List;
+
 /**
  * 
  * @author Thomas Abeel
@@ -8,5 +11,5 @@ package net.sf.genomeview.data.provider;
 public interface DataCallback<T> {
 
 	
-	public void dataReady(Iterable<T>it);
+	public void dataReady(List<T>it);
 }

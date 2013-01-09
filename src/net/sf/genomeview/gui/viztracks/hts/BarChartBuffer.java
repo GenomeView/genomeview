@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -597,7 +598,7 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 	}
 
 	@Override
-	public void dataReady(Iterable<Pile> itt) {
+	public void dataReady(List<Pile> itt) {
 		double factor = MAX_WIDTH / visible.length();
 		if (exact)
 			factor = 1;

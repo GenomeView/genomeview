@@ -19,6 +19,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import be.abeel.util.LRUCache;
+
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.LocationTools;
 import net.sf.genomeview.data.Model;
@@ -44,6 +46,9 @@ import net.sf.samtools.SAMRecord;
  */
 public class srtRender implements Observer, DataCallback<SAMRecord> {
 
+	
+	
+	private org.broad.LRUCache<SAMRecord, Integer> rowCache=new org.broad.LRUCache<SAMRecord, Integer>(50000);
 	/* Keeps track of the short-read insertions */
 	Map<Rectangle, ShortReadInsertion> paintedBlocks = new HashMap<Rectangle, ShortReadInsertion>();
 	/*
@@ -121,7 +126,8 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 	// class srtDataCallback implements DataCallback<SAMRecord>{
 
 	@Override
-	public void dataReady(Iterable<SAMRecord> reads) {
+	public void dataReady(List<SAMRecord> reads) {
+		
 
 		int maxReads = Configuration.getInt("shortread:maxReads");
 
