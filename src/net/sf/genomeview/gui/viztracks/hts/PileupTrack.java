@@ -61,7 +61,7 @@ public class PileupTrack extends Track {
 		ptm = (PileupTrackConfig)config;
 		tooltip = new PileupTooltip(ptm);
 		this.provider=provider;
-		provider.addObserver(new PTMObserver(ptm, model));
+//		provider.addObserver(new PTMObserver(ptm, model));
 		nf.setMaximumFractionDigits(0);
 
 	}
@@ -94,18 +94,18 @@ public class PileupTrack extends Track {
 		/* Status messages for data queuing an retrieval */
 		// Iterable<Status> status = provider.getStatus(visible.start,
 		// visible.end);
-		Iterable<Status> status = provider.getStatus(visible.start, visible.end);
+//		Iterable<Status> status = provider.getStatus(visible.start, visible.end);
 		/* Only retrieve data when location changed */
 		if (ptm.lastQuery == null || !ptm.lastQuery.equals(visible)) {
 			// System.out.println("--Using fresh data from provider in track");
 			/* The actual data */
 			// Iterable<Pile> piles = provider.get(visible.start, visible.end);
 
-			if (model.vlm.getAnnotationLocationVisible().length() < Configuration.getInt("pileup:switchBarLine")) {
+//			if (model.vlm.getAnnotationLocationVisible().length() < Configuration.getInt("pileup:switchBarLine")) {
 				// System.out.println("Track: "+this+"\t"+provider);
 				ptm.setVizBuffer(new BarChartBuffer(visible, provider, ptm));
-			} else
-				ptm.setVizBuffer(new LineChartBuffer(visible, provider, ptm));
+//			} else
+//				ptm.setVizBuffer(new LineChartBuffer(visible, provider, ptm));
 
 			ptm.lastQuery = model.vlm.getAnnotationLocationVisible();
 		}

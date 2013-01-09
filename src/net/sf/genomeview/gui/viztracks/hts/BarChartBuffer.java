@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.data.provider.DataCallback;
 import net.sf.genomeview.data.provider.PileProvider;
 import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
@@ -27,7 +28,7 @@ import net.sf.jannot.tdf.ReadType;
  * @author Thomas Abeel
  * 
  */
-class BarChartBuffer implements VizBuffer {
+class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 	/* Data for pileupgraph barchart */
 	private double[][] detailedRects = null;
 
@@ -47,87 +48,19 @@ class BarChartBuffer implements VizBuffer {
 	private double MAX_WIDTH = 2000;
 	private Iterable<Status> status;
 
+	
+	
 	public BarChartBuffer(Location visible, PileProvider provider, PileupTrackConfig ptm) {
 		this.visible = visible;
 		this.provider = provider;
 		this.ptm = ptm;
 
-		double factor = MAX_WIDTH / visible.length();
-		if (exact)
-			factor = 1;
+		
+//		status = provider.getStatus(visible.start, visible.end);
 
-		/* Variables for SNP track */
-		if (visible.length() < MAX_WIDTH)
-			nc = new NucCounter(visible.length());
-		else
-			nc = null;
-		status = provider.getStatus(visible.start, visible.end);
+		/*Iterable<Pile> itt =*/ provider.get(visible.start, visible.end + 1,this);
 
-		Iterable<Pile> itt = provider.get(visible.start, visible.end + 1);
-
-		for (Pile p : itt) {
-			if (p == null) {
-				System.out.println("Null pile");
-				continue;
-			}
-			if (detailedRects == null)
-				initArray(p, visible.length());
-
-			if (p.start() + p.getLength() < visible.start || p.start() > visible.end) {
-
-				continue;
-			}
-
-			if (nc != null && p.getBases() != null) {
-				count(nc, p, visible);
-
-			}
-
-			pileWidth = p.getLength();
-			int startPos = p.start();
-			int endPos = p.end();
-
-			int startIdx = (int) ((startPos - visible.start) * factor);
-			int endIdx = (int) ((endPos - visible.start) * factor);
-			if (exact) {
-				startIdx = startPos - visible.start;
-				endIdx = endPos - visible.start;
-			}
-
-//			if(p.getTotal()>0)
-//				System.out.println("Pile: \t"+startPos+"\t"+startIdx+"\t"+endPos+"\t"+endIdx+"\t"+p.getTotal());
-			for (int i = startIdx; i <= endIdx; i++) {
-				if (i >= 0 && i < detailedRects[0].length) {
-					// float fcov = p.getFCoverage();
-					// float rcov = p.getRCoverage();
-					// int pos=i - visible.start;
-					for (int j = 0; j < p.getValueCount(); j++) {
-						double val = p.getValue(j);
-						if (ptm.isNormalizationAvailable() && ptm.isNormalizeMean() && ptm.normalizationEngine.value() != null) {
-							val /= ptm.normalizationEngine.value()[j];
-						}
-
-						if (val > detailedRects[j][i])
-							detailedRects[j][i] = val;
-					}
-					// detailedRects[1][i] = rcov;
-					// covValues[0][i] = fcov;
-					// covValues[1][i] = rcov;
-
-					double coverage = p.getTotal();
-					if (ptm.isNormalizationAvailable() && ptm.isNormalizeMean() && ptm.normalizationEngine.value() != null) {
-						coverage /= ptm.normalizationEngine.value()[0];
-					}
-					ptm.getTrackCommunication().updateLocalPileupMax(coverage, visible);
-
-					if (coverage > localMaxPile)
-						localMaxPile = coverage;
-					if (coverage < localMinPile)
-						localMinPile = coverage;
-				}
-			}
-			
-		}
+		
 	//	System.out.println("Halt!");
 	}
 
@@ -266,7 +199,7 @@ class BarChartBuffer implements VizBuffer {
 		}
 
 		int returnTrackHeight = 2 * graphLineHeigh + snpTrackHeight;
-		Track.paintStatus(g, status, yOffset - 2 * graphLineHeigh, returnTrackHeight, visible, screenWidth);
+//		Track.paintStatus(g, status, yOffset - 2 * graphLineHeigh, returnTrackHeight, visible, screenWidth);
 
 		return returnTrackHeight;
 
@@ -657,5 +590,83 @@ class BarChartBuffer implements VizBuffer {
 		}
 		text.append("</html>");
 		return text.toString();
+	}
+
+	@Override
+	public void dataReady(Iterable<Pile> itt) {
+		double factor = MAX_WIDTH / visible.length();
+		if (exact)
+			factor = 1;
+
+		/* Variables for SNP track */
+		if (visible.length() < MAX_WIDTH)
+			nc = new NucCounter(visible.length());
+		else
+			nc = null;
+		
+		for (Pile p : itt) {
+			if (p == null) {
+				System.out.println("Null pile");
+				continue;
+			}
+			if (detailedRects == null)
+				initArray(p, visible.length());
+
+			if (p.start() + p.getLength() < visible.start || p.start() > visible.end) {
+
+				continue;
+			}
+
+			if (nc != null && p.getBases() != null) {
+				count(nc, p, visible);
+
+			}
+
+			pileWidth = p.getLength();
+			int startPos = p.start();
+			int endPos = p.end();
+
+			int startIdx = (int) ((startPos - visible.start) * factor);
+			int endIdx = (int) ((endPos - visible.start) * factor);
+			if (exact) {
+				startIdx = startPos - visible.start;
+				endIdx = endPos - visible.start;
+			}
+
+//			if(p.getTotal()>0)
+//				System.out.println("Pile: \t"+startPos+"\t"+startIdx+"\t"+endPos+"\t"+endIdx+"\t"+p.getTotal());
+			for (int i = startIdx; i <= endIdx; i++) {
+				if (i >= 0 && i < detailedRects[0].length) {
+					// float fcov = p.getFCoverage();
+					// float rcov = p.getRCoverage();
+					// int pos=i - visible.start;
+					for (int j = 0; j < p.getValueCount(); j++) {
+						double val = p.getValue(j);
+						if (ptm.isNormalizationAvailable() && ptm.isNormalizeMean() && ptm.normalizationEngine.value() != null) {
+							val /= ptm.normalizationEngine.value()[j];
+						}
+
+						if (val > detailedRects[j][i])
+							detailedRects[j][i] = val;
+					}
+					// detailedRects[1][i] = rcov;
+					// covValues[0][i] = fcov;
+					// covValues[1][i] = rcov;
+
+					double coverage = p.getTotal();
+					if (ptm.isNormalizationAvailable() && ptm.isNormalizeMean() && ptm.normalizationEngine.value() != null) {
+						coverage /= ptm.normalizationEngine.value()[0];
+					}
+					ptm.getTrackCommunication().updateLocalPileupMax(coverage, visible);
+
+					if (coverage > localMaxPile)
+						localMaxPile = coverage;
+					if (coverage < localMinPile)
+						localMinPile = coverage;
+				}
+			}
+			
+		}
+		
 	}
 }

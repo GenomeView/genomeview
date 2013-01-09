@@ -9,6 +9,7 @@ public class VisualLocationModel extends Observable {
 
 	private Entry visibleEntry = null;
 	private Location visibleLocation = new Location(0, 0);
+	private double screenWidth;
 
 	public Entry getVisibleEntry() {
 		if(visibleEntry==null)
@@ -112,6 +113,21 @@ public class VisualLocationModel extends Observable {
 	@Deprecated
 	public Entry getSelectedEntry() {
 		return getVisibleEntry();
+
+	
+	}
+
+	public void setScreenWidth(double d){
+		if(d!=screenWidth){
+			this.screenWidth=d;
+			setChanged();
+			notifyObservers();
+		}
+		
+		
+	}
+	public double screenWidth() {
+		return screenWidth;
 	}
 
 	

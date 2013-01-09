@@ -25,21 +25,21 @@ import org.broad.igv.track.WindowFunction;
  * @author Thomas Abeel
  * 
  */
-public class ShortReadProvider extends AbstractDataProvider<SAMRecord> {
+public class ShortReadProvider implements DataProvider<SAMRecord> {
 
 	private ReadGroup source;
 
-	private Model model;
+//	private Model model;
 
 	public ShortReadProvider(Entry e, ReadGroup source, Model model) {
-		super(model);
+		//super(model);
 		this.source = source;
 //		/* Select default window function */
 //		WindowFunction wf=WindowFunction.getWindowFunction(Configuration.get("pileup:defaultWindowFunction"));
 //		System.out.println("requesting: "+Configuration.get("pileup:defaultWindowFunction")+"\t"+wf);
 //		if(source.availableWindowFunctions().contains(wf))
 //			source.requestWindowFunction(wf);
-		this.model = model;
+//		this.model = model;
 	}
 
 	private ArrayList<SAMRecord> buffer = new ArrayList<SAMRecord>();
@@ -50,11 +50,12 @@ public class ShortReadProvider extends AbstractDataProvider<SAMRecord> {
 //	private float maxPile;
 
 	@Override
-	public Iterable<SAMRecord> get(final int start, final int end) {
+	public void get(final int start, final int end,final DataCallback<SAMRecord>cb) {
 		/* Check whether request can be fulfilled by buffer */
 		if (start >= lastStart && end <= lastEnd
 				&& (lastEnd - lastStart) <= 2 * (end - start))
-			return buffer;
+			cb.dataReady(buffer);
+			//return buffer;
 
 		/* New request */
 
@@ -85,14 +86,15 @@ public class ShortReadProvider extends AbstractDataProvider<SAMRecord> {
 				}
 				thisJob.setFinished();
 				buffer=tmp;
-				notifyListeners();
+				cb.dataReady(buffer);
+				//notifyListeners();
 			}
 
 		};
 		GenomeViewScheduler.submit(t);
 
 		// System.out.println("\tServing new request from provider");
-		return buffer;
+		//return buffer;
 //		return new NoFailIterable<SAMRecord>(buffer);
 
 	}

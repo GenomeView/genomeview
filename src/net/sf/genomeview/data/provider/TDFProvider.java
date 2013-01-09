@@ -28,7 +28,7 @@ public class TDFProvider extends PileProvider {
 
 
 	public TDFProvider(Entry e, TDFData source, Model model) {
-		super(model);
+//		super(model);
 		this.source = source;
 		/* Select default window function */
 		WindowFunction wf=WindowFunction.getWindowFunction(Configuration.get("pileup:defaultWindowFunction"));
@@ -47,11 +47,12 @@ public class TDFProvider extends PileProvider {
 	private float maxPile;
 
 	@Override
-	public Iterable<Pile> get(final int start, final int end) {
+	public void get(final int start, final int end,final DataCallback<Pile>cb) {
 		/* Check whether request can be fulfilled by buffer */
 		if (start >= lastStart && end <= lastEnd
 				&& (lastEnd - lastStart) <= 2 * (end - start))
-			return new NoFailIterable<Pile>(buffer);
+//			return new NoFailIterable<Pile>(buffer);
+			cb.dataReady(new NoFailIterable<Pile>(buffer));
 
 		/* New request */
 
@@ -84,7 +85,8 @@ public class TDFProvider extends PileProvider {
 					buffer.add(p);
 				}
 				thisJob.setFinished();
-				notifyListeners();
+//				notifyListeners();
+				cb.dataReady(new NoFailIterable<Pile>(buffer));
 			}
 
 		};
@@ -92,7 +94,7 @@ public class TDFProvider extends PileProvider {
 
 		// System.out.println("\tServing new request from provider");
 
-		return new NoFailIterable<Pile>(buffer);
+//		return new NoFailIterable<Pile>(buffer);
 
 	}
 
@@ -127,8 +129,8 @@ public class TDFProvider extends PileProvider {
 			lastEnd = -1;
 			maxPile = 0;
 			buffer.clear();
-			setChanged();
-			notifyObservers();
+//			setChanged();
+//			notifyObservers();
 		}
 
 	}

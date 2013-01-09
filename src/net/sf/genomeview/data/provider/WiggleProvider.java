@@ -31,7 +31,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 	// private Model model;
 
 	public WiggleProvider(Entry e, Data<Pile> source, Model model) {
-		super(model);
+//		super(model);
 		summary = new PileupSummary(model, e);
 		summary.addObserver(this);
 		this.source = source;
@@ -47,10 +47,10 @@ public class WiggleProvider extends PileProvider implements Observer {
 	private float maxPile;
 
 	@Override
-	public Iterable<Pile> get(final int start, final int end) {
+	public void get(final int start, final int end,final DataCallback<Pile>cb) {
 		/* Check whether request can be fulfilled by buffer */
 		if (start >= lastStart && end <= lastEnd && (lastEnd - lastStart) <= 2 * (end - start))
-			return new NoFailIterable<Pile>(buffer);
+			cb.dataReady(new NoFailIterable<Pile>(buffer));
 
 		
 		/* New request */
@@ -96,7 +96,8 @@ public class WiggleProvider extends PileProvider implements Observer {
 					}
 					
 					thisJob.setFinished();
-					notifyListeners();
+					cb.dataReady(new NoFailIterable<Pile>(buffer));
+//					notifyListeners();
 				}
 
 			};
@@ -113,13 +114,14 @@ public class WiggleProvider extends PileProvider implements Observer {
 
 				buffer.add(p);
 			}
+			cb.dataReady(new NoFailIterable<Pile>(buffer));
 		}
 		
 		
 
 		// System.out.println("\tServing new request from provider");
 
-		return new NoFailIterable<Pile>(buffer);
+//		return new NoFailIterable<Pile>(buffer);
 		
 		
 		
@@ -156,8 +158,8 @@ public class WiggleProvider extends PileProvider implements Observer {
 		lastStart = -1;
 		lastEnd = -1;
 		buffer.clear();
-		setChanged();
-		notifyObservers();
+//		setChanged();
+//		notifyObservers();
 	}
 
 //	@Override

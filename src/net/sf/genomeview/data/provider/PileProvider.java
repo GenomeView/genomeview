@@ -13,12 +13,12 @@ import net.sf.jannot.pileup.Pile;
  * @author Thomas Abeel
  *
  */
-public abstract class PileProvider extends AbstractDataProvider<Pile> {
+public abstract class PileProvider implements DataProvider<Pile> {
 	
 
-	public PileProvider(Model model) {
-		super(model);
-	}
+//	public PileProvider(Model model) {
+//		super(model);
+//	}
 
 	public abstract double getMaxPile();
 

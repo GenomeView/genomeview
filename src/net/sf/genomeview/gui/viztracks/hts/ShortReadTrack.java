@@ -31,13 +31,17 @@ import net.sf.samtools.SAMRecord;
  */
 public class ShortReadTrack extends Track {
 
-	private ShortReadProvider provider;
+	
+	private srtRender render;
+	
+//	private ShortReadProvider provider;
 	private ShortReadTrackConfig srtc;
 
 	public ShortReadTrack(DataKey key, ShortReadProvider provider, Model model) {
 		super(key, model, true, new ShortReadTrackConfig(model, key));
 		this.srtc = (ShortReadTrackConfig) config;
-		this.provider = provider;
+//		this.provider = provider;
+		render=new srtRender(model,provider,srtc, key);
 	}
 
 	private InsertionTooltip tooltip = new InsertionTooltip();
@@ -233,9 +237,8 @@ public class ShortReadTrack extends Track {
 	
 
 //	private Rectangle prevView = null;
-	private Location prevVisible = null;
-	private boolean prevReady=false;
-	private srtRender render=null;
+
+//	private srtRender render=null;
 
 	@Override
 	public int paintTrack(Graphics2D gGlobal, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
@@ -250,39 +253,26 @@ public class ShortReadTrack extends Track {
 		/* Configuration options */
 		
 
-		if (provider == null)
-			return 0;
+//		if (provider == null)
+//			return 0;
 
 		/* Also check that config options remained the same */
-		Location currentVisible=model.vlm.getAnnotationLocationVisible();
-		Iterable<Status> status = provider.getStatus(currentVisible.start, currentVisible.end);
-		boolean ready=true;
-		for(Status s:status){
-			ready &=s.isReady();
-		}
-		if (!same(currentVisible,ready)) {
-			render=new srtRender(entry,dataKey,provider, currentVisible,srtc, screenWidth);
+		
 			
 			
 
 		
 
-		} else {
-			//System.out.println("Using bufferedimage!");
-		}
+//		} else {
+//			//System.out.println("Using bufferedimage!");
+//		}
 
 		gGlobal.drawImage(render.buffer(), 0, yOffset, null);
 		// return yOffset - originalYOffset;
 		return render.buffer().getHeight();
 	}
 
-	private boolean same(Location loc,  boolean ready) {
-		boolean same =  loc.equals(prevVisible)&&prevReady==ready;
-//		prevView = view;
-		prevReady=ready;
-		prevVisible = loc;
-		return same;
-	}
+	
 
 	
 
@@ -290,7 +280,7 @@ public class ShortReadTrack extends Track {
 	public void clear() {
 //		paintedBlocks.clear();
 //		hitMap.clear();
-		provider = null;
+//		provider = null;
 
 	}
 

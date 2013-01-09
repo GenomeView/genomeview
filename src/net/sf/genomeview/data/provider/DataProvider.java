@@ -32,9 +32,9 @@ public interface DataProvider<T> {
 	 *            one-based coordinate.
 	 * @return the selected data.
 	 */
-	public Iterable<T> get(int start, int end);
+	public void get(int start, int end,DataCallback<T> cb);
 
-	public Iterable<Status> getStatus(int start, int end);
+//	public Iterable<Status> getStatus(int start, int end);
 
 
 }

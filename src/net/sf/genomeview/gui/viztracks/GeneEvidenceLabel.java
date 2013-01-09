@@ -115,6 +115,8 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 		tracks.clear();
 		framePixelsUsed = 0;
 		screenWidth = this.getSize().width + 1;
+		model.vlm.setScreenWidth(screenWidth);
+		
 		if (view == null) {
 			view = new JViewport() {
 				public Rectangle getViewRect() {
