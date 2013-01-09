@@ -29,25 +29,15 @@ public class ShortReadProvider implements DataProvider<SAMRecord> {
 
 	private ReadGroup source;
 
-//	private Model model;
-
 	public ShortReadProvider(Entry e, ReadGroup source, Model model) {
-		//super(model);
 		this.source = source;
-//		/* Select default window function */
-//		WindowFunction wf=WindowFunction.getWindowFunction(Configuration.get("pileup:defaultWindowFunction"));
-//		System.out.println("requesting: "+Configuration.get("pileup:defaultWindowFunction")+"\t"+wf);
-//		if(source.availableWindowFunctions().contains(wf))
-//			source.requestWindowFunction(wf);
-//		this.model = model;
+
 	}
 
 	private ArrayList<SAMRecord> buffer = new ArrayList<SAMRecord>();
-	private ArrayList<Status> status = new ArrayList<Status>();
+
 	private int lastStart = -1;
 	private int lastEnd = -1;
-	// privFate float maxSummary;
-//	private float maxPile;
 
 	@Override
 	public void get(final int start, final int end,final DataCallback<SAMRecord>cb) {
@@ -55,19 +45,12 @@ public class ShortReadProvider implements DataProvider<SAMRecord> {
 		if (start >= lastStart && end <= lastEnd
 				&& (lastEnd - lastStart) <= 2 * (end - start))
 			cb.dataReady(buffer);
-			//return buffer;
 
 		/* New request */
 
-		// reset status
 		lastStart = start;
 		lastEnd = end;
-
-//		buffer.clear();
-		status.clear();
-		status.add(new Status(false, true, false, start, end));
-		final Status thisJob=status.get(0);
-		// queue up retrieval
+		/* Queue up retrieval*/
 		Task t = new Task(new Location(start, end)) {
 
 			@Override
@@ -76,7 +59,6 @@ public class ShortReadProvider implements DataProvider<SAMRecord> {
 				// this data
 				if (!(start >= lastStart && end <= lastEnd && (lastEnd - lastStart) <= 2 * (end - start)))
 					return;
-				thisJob.setRunning();
 				Iterable<SAMRecord> fresh = source.get(start, end);
 				ArrayList<SAMRecord>tmp=new ArrayList<SAMRecord>();
 				for (SAMRecord p : fresh) {
@@ -84,72 +66,16 @@ public class ShortReadProvider implements DataProvider<SAMRecord> {
 
 					tmp.add(p);
 				}
-				thisJob.setFinished();
 				buffer=tmp;
 				cb.dataReady(buffer);
-				//notifyListeners();
 			}
 
 		};
 		GenomeViewScheduler.submit(t);
 
-		// System.out.println("\tServing new request from provider");
-		//return buffer;
-//		return new NoFailIterable<SAMRecord>(buffer);
-
 	}
 
 	
-	
-//	@Override
-//	public double getMaxPile() {
-//		return maxPile;
-//	}
-
-	public Iterable<Status> getStatus(int start, int end) {
-		return status;
-	}
-
-//	@Override
-//	public Data<Pile> getSourceData() {
-//		return source;
-//	}
-
-//	@Override
-//	public WindowFunction[] getWindowFunctions() {
-//		return source.availableWindowFunctions().toArray(new WindowFunction[0]);
-//	}
-//
-//	@Override
-//	public void requestWindowFunction(WindowFunction wf) {
-//		// System.out.println("WF in TDF: "+wf);
-//		if (source.availableWindowFunctions().contains(wf)) {
-//			// System.out.println("\tWe are nwo using WF: "+wf);
-//			source.requestWindowFunction(wf);
-//			lastStart = -1;
-//			lastEnd = -1;
-//			maxPile = 0;
-//			buffer.clear();
-//			setChanged();
-//			notifyObservers();
-//		}
-//
-//	}
-//
-//	@Override
-//	public boolean isCurrentWindowFunction(WindowFunction wf) {
-//		return source.isCurrentWindowFunction(wf);
-//	}
-
-
-
-//	@Override
-//	public String label() {
-//		return source.label();
-//	}
-
-
-
 	public int readLength() {
 		return source.readLength();
 	}

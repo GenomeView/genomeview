@@ -232,8 +232,9 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 						// if (two != null) {
 						if (ShortReadTools.isPaired(one) && !one.getMateUnmappedFlag()
 								&& one.getReferenceIndex() == one.getMateReferenceIndex() && one.getMateReferenceIndex() != -1) {
-//							if (two == null)
-//								System.out.println("Mate missing: " + one.getMateAlignmentStart());
+							// if (two == null)
+							// System.out.println("Mate missing: " +
+							// one.getMateAlignmentStart());
 							// if (two.getAlignmentStart() <
 							// one.getAlignmentStart()) {
 							if (one.getMateAlignmentStart() < one.getAlignmentStart()) {
@@ -596,12 +597,9 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 	}
 
 	private Location prevVisible = null;
-	private boolean prevReady = false;
 
-	private boolean same(Location loc, boolean ready) {
-		boolean same = loc.equals(prevVisible) && prevReady == ready;
-		// prevView = view;
-		prevReady = ready;
+	private boolean same(Location loc) {
+		boolean same = loc.equals(prevVisible);
 		prevVisible = loc;
 		return same;
 	}
@@ -613,15 +611,11 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		 */
 
 		Location currentVisible = model.vlm.getAnnotationLocationVisible();
-		Iterable<Status> status = provider.getStatus(currentVisible.start, currentVisible.end);
-		boolean ready = true;
-		for (Status s : status) {
-			ready &= s.isReady();
-		}
-		if (!same(currentVisible, ready)){
+
+		if (!same(currentVisible)) {
 			requestNew(model.vlm.getVisibleEntry(), dataKey, provider, currentVisible, srtc, model.vlm.screenWidth());
 			System.out.println("Requesting new SRT render");
-		}else{
+		} else {
 			System.out.println("Using previous render");
 		}
 
