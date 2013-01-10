@@ -312,28 +312,14 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			lines++;
 
 		}
-		if ((lines + 1) * readLineHeight + 5 > 25)
-			yOffset += (lines + 1) * readLineHeight + 5;
-		else
-			yOffset += 25;
-		// /* Draw status */
-		// Iterable<Status> status = provider.getStatus(currentVisible.start,
-		// currentVisible.end);
-		// Track.paintStatus(g, status, 0, yOffset, currentVisible,
-		// screenWidth);
-		// }
-		// }
-		buffer = bi;
+
+		
+		/* Crop buffered image if not everything is needed */
+		int actualHeight = lines * readLineHeight;
+		buffer = bi.getSubimage(0, 0, bi.getWidth(), actualHeight);
 		model.refresh();
 	}
 
-	// }
-
-	// }
-
-	// public srtRender(Entry entry, DataKey dataKey,ShortReadProvider
-	// provider,Location currentVisible, ShortReadTrackConfig srtc,double
-	// screenWidth) {
 	public void requestNew(Entry entry, DataKey dataKey, ShortReadProvider provider, Location currentVisible, ShortReadTrackConfig srtc,
 			double screenWidth) {
 		this.currentVisible = currentVisible;
