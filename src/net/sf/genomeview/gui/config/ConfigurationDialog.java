@@ -155,31 +155,31 @@ public class ConfigurationDialog extends JDialog {
 		}
 	}
 
-	/**
-	 * Options for the AnnotationView
-	 * 
-	 * @author Thomas Abeel
-	 * 
-	 */
-	static class AnnotationConfigPanel extends GridBagPanel {
-
-		/**
-         * 
-         */
-		private static final long serialVersionUID = -628553625113038258L;
-
-		public AnnotationConfigPanel(Model model) {
-//			this.add(ConfigBox.integerInstance("evidenceLineHeight", "Height of a track in pixels"), gc);
+//	/**
+//	 * Options for the AnnotationView
+//	 * 
+//	 * @author Thomas Abeel
+//	 * 
+//	 */
+//	static class AnnotationConfigPanel extends GridBagPanel {
+//
+//		/**
+//         * 
+//         */
+//		private static final long serialVersionUID = -628553625113038258L;
+//
+//		public AnnotationConfigPanel(Model model) {
+////			this.add(ConfigBox.integerInstance("evidenceLineHeight", "Height of a track in pixels"), gc);
+////			gc.gridy++;
+////			this.add(ConfigBox.booleanInstance(model,"showTrackName", "Show evidence track names"), gc);
+////			gc.gridy++;
+//			this.add(ConfigBox.booleanInstance(model,"useColorQualifierTag", "Use the /color qualifier tag"), gc);
 //			gc.gridy++;
-//			this.add(ConfigBox.booleanInstance(model,"showTrackName", "Show evidence track names"), gc);
-//			gc.gridy++;
-			this.add(ConfigBox.booleanInstance(model,"useColorQualifierTag", "Use the /color qualifier tag"), gc);
-			gc.gridy++;
-//			this.add(ConfigBox.stringInstance("visibleTypes", "Visible types on start-up"), gc);
-//			gc.gridy++;
-//			this.add(ConfigBox.integerInstance("annotationview:maximumNoVisibleFeatures", "Maximum number of features of each type to display on the AnnotationView"), gc);
-		}
-	}
+////			this.add(ConfigBox.stringInstance("visibleTypes", "Visible types on start-up"), gc);
+////			gc.gridy++;
+////			this.add(ConfigBox.integerInstance("annotationview:maximumNoVisibleFeatures", "Maximum number of features of each type to display on the AnnotationView"), gc);
+//		}
+//	}
 
 	class StructureConfigPanel extends GridBagPanel {
 		/**
@@ -356,13 +356,13 @@ public class ConfigurationDialog extends JDialog {
 		JTabbedPane jtp = new JTabbedPane();
 		// JPanel colorPanel = new ConfigureColorPanel();
 		JPanel structure = new StructureConfigPanel(model);
-		JPanel evidence = new AnnotationConfigPanel(model);
+//		JPanel evidence = new AnnotationConfigPanel(model);
 		JPanel colors = new AANucleotideColorsConfigPanel(model);
 		JPanel miscPanel = new MiscellaneousPanel(model);
 		
 
 		jtp.add("Structure view", structure);
-		jtp.add("Evidence view", evidence);
+//		jtp.add("Evidence view", evidence);
 		jtp.add("AA&nucleotide colors", colors);
 		jtp.add("Feature track", new FeatureTrackConfigPanel(model));
 
