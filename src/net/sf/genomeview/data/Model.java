@@ -57,16 +57,15 @@ public class Model extends Observable implements Observer {
 	private MouseModel mouseModel = new MouseModel();
 	private MessageModel messageModel = new MessageModel(this);
 
-	public MessageModel messageModel(){
+	public MessageModel messageModel() {
 		return messageModel;
 	}
-	
+
 	public MouseModel mouseModel() {
 		return mouseModel;
 	}
 
 	public Model(String id) {
-		
 
 		guimanager = new GUIManager();
 
@@ -82,13 +81,13 @@ public class Model extends Observable implements Observer {
 
 		selectionModel.addObserver(this);
 		messageModel.addObserver(this);
-		final Model _this=this;
+		final Model _this = this;
 		vlm.addObserver(new Observer() {
-			
+
 			@Override
 			public void update(Observable o, Object arg) {
 				_this.refresh();
-				
+
 			}
 		});
 		this.trackList = new TrackList(this);
@@ -103,10 +102,8 @@ public class Model extends Observable implements Observer {
 		return entries.size();
 	}
 
-
-
 	public void update(Observable arg0, Object arg) {
-		System.out.println("Model update "+arg0+"\t"+arg );
+		System.out.println("Model update " + arg0 + "\t" + arg);
 		if (arg instanceof ChangeEvent) {
 			undoStack.push((ChangeEvent) arg);
 			redoStack.clear();
@@ -119,12 +116,12 @@ public class Model extends Observable implements Observer {
 
 	}
 
-	public final VisualLocationModel vlm=new VisualLocationModel();
-	
+	public final VisualLocationModel vlm = new VisualLocationModel();
+
 	public void clearEntries() {
 		selectionModel.clear();
 		vlm.clear();
-//		visible=new Location(0,0);
+		// visible=new Location(0,0);
 		loadedSources.clear();
 		entries.clear();
 		undoStack.clear();
@@ -188,7 +185,7 @@ public class Model extends Observable implements Observer {
 	public void exit() {
 		this.exitRequested = true;
 		try {
-			if(Configuration.getBoolean("session:enableRememberLast"))
+			if (Configuration.getBoolean("session:enableRememberLast"))
 				Session.save(new File(Configuration.getDirectory(), "previous.gvs"), this);
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Problem saving last session", e);
@@ -198,66 +195,64 @@ public class Model extends Observable implements Observer {
 
 	}
 
-//	public Location getAnnotationLocationVisible() {
-//		return visible;
-//	}
+	// public Location getAnnotationLocationVisible() {
+	// return visible;
+	// }
 
-//	private Location visible=new Location(0,0);
-	//private int annotationStart = 0, annotationEnd = 0;
+	// private Location visible=new Location(0,0);
+	// private int annotationStart = 0, annotationEnd = 0;
 
+	// /**
+	// * Set the visible area in the evidence and structure frame to the given
+	// * Location.
+	// *
+	// * start and end one-based [start,end]
+	// *
+	// * @param start
+	// * @param annotationEnd
+	// */
+	//
+	// public void setAnnotationLocationVisible(Location r) {
+	// setAnnotationLocationVisible(r, false);
+	//
+	// }
 
-
-//	/**
-//	 * Set the visible area in the evidence and structure frame to the given
-//	 * Location.
-//	 * 
-//	 * start and end one-based [start,end]
-//	 * 
-//	 * @param start
-//	 * @param annotationEnd
-//	 */
-//
-//	public void setAnnotationLocationVisible(Location r) {
-//		setAnnotationLocationVisible(r, false);
-//
-//	}
-
-//	/**
-//	 * Provides implementation to do/undo zoom changes.
-//	 * 
-//	 * @author Thomas Abeel
-//	 * 
-//	 */
-//	class ZoomChange implements ChangeEvent {
-//		/* The original zoom */
-//		private Location orig;
-//
-//		/* The new zoom */
-//		private Location neww;
-//
-//		public ZoomChange(Location location, Location newZoom) {
-//			this.orig = location;
-//			this.neww = newZoom;
-//		}
-//
-//		@Override
-//		public void doChange() {
-////			annotationStart = neww.start();
-////			annotationEnd = neww.end();
-//			visible=neww;
-//
-//		}
-//
-//		@Override
-//		public void undoChange() {
-//			assert (visible.start == neww.start());
-//			assert (visible.end == neww.end());
-//			visible=orig;
-//			
-//
-//		}
-//
-//	}
+	// /**
+	// * Provides implementation to do/undo zoom changes.
+	// *
+	// * @author Thomas Abeel
+	// *
+	// */
+	// class ZoomChange implements ChangeEvent {
+	// /* The original zoom */
+	// private Location orig;
+	//
+	// /* The new zoom */
+	// private Location neww;
+	//
+	// public ZoomChange(Location location, Location newZoom) {
+	// this.orig = location;
+	// this.neww = newZoom;
+	// }
+	//
+	// @Override
+	// public void doChange() {
+	// // annotationStart = neww.start();
+	// // annotationEnd = neww.end();
+	// visible=neww;
+	//
+	// }
+	//
+	// @Override
+	// public void undoChange() {
+	// assert (visible.start == neww.start());
+	// assert (visible.end == neww.end());
+	// visible=orig;
+	//
+	//
+	// }
+	//
+	// }
 
 	public boolean isExitRequested() {
 		return exitRequested;
@@ -299,8 +294,6 @@ public class Model extends Observable implements Observer {
 		refresh();
 	}
 
-	
-
 	/**
 	 * Load new entries from a data source.
 	 * 
@@ -311,7 +304,7 @@ public class Model extends Observable implements Observer {
 	 *            data source to load data from
 	 * @throws ReadFailedException
 	 * 
-	 * FIXME move to read worker
+	 *             FIXME move to read worker
 	 */
 	void addData(DataSource f) throws ReadFailedException {
 		if (entries.size() == 0)
@@ -330,8 +323,8 @@ public class Model extends Observable implements Observer {
 
 	}
 
-	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(
-			AminoAcidMapping.valueOf(Configuration.get("translationTable:default")));
+	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(AminoAcidMapping.valueOf(Configuration
+			.get("translationTable:default")));
 
 	// private Configuration trackMap;
 
@@ -352,10 +345,6 @@ public class Model extends Observable implements Observer {
 
 	private final TrackList trackList;
 
-	
-
-	
-
 	/**
 	 * Returns a list of all tracks. This method creates a copy to make it safe
 	 * to iterate the returned list.
@@ -366,7 +355,6 @@ public class Model extends Observable implements Observer {
 		return trackList;
 	}
 
-	
 	/**
 	 * This method keeps the track list up to date when adding new data to the
 	 * entry from outside the model.
@@ -375,11 +363,11 @@ public class Model extends Observable implements Observer {
 	 */
 	public synchronized void updateTracks() {
 		try {
-			
+
 			Entry e = vlm.getSelectedEntry();
-			boolean changed=trackList.update(e);
-			
-			if(changed)
+			boolean changed = trackList.update(e);
+
+			if (changed)
 				refresh(NotificationTypes.UPDATETRACKS);
 		} catch (ConcurrentModificationException e) {
 			logger.log(Level.INFO, "Update tracks interrupted, tracks already changed", e);
@@ -466,7 +454,6 @@ public class Model extends Observable implements Observer {
 		return guimanager;
 	}
 
-	
 	public Location getSelectedRegion() {
 		return selectionModel.getSelectedRegion();
 	}
@@ -474,16 +461,17 @@ public class Model extends Observable implements Observer {
 	public SelectionModel selectionModel() {
 		return selectionModel;
 	}
-//
-//	public Entry getSelectedEntry() {
-//		if (entries.size() == 0)
-//			return DummyEntry.dummy;
-//		return entries.getEntry();
-//	}
+
+	//
+	// public Entry getSelectedEntry() {
+	// if (entries.size() == 0)
+	// return DummyEntry.dummy;
+	// return entries.getEntry();
+	// }
 
 	public synchronized void setSelectedEntry(Entry entry) {
 		vlm.setVisibleEntry(entry);
-//		entries.setDefault(entry);
+		// entries.setDefault(entry);
 		selectionModel.clear();
 
 		vlm.setAnnotationLocationVisible(vlm.getVisibleLocation());
@@ -501,12 +489,12 @@ public class Model extends Observable implements Observer {
 	public void remove(Track track) {
 		if (!(track instanceof StructureTrack) && !(track instanceof TickmarkTrack)) {
 			trackList.remove(track.getDataKey());
-			for(Entry e:entries){
+			for (Entry e : entries) {
 				e.remove(track.getDataKey());
 			}
-			
+
 		}
-		
+
 		GenomeViewScheduler.submit(Task.GC);
 		setChanged();
 		notifyObservers(NotificationTypes.UPDATETRACKS);
@@ -524,26 +512,33 @@ public class Model extends Observable implements Observer {
 
 	}
 
-	
-	
-	public synchronized Throwable processException(){
-		if(!exceptionStack.isEmpty())
+	public synchronized Throwable processException() {
+		if (!exceptionStack.isEmpty())
 			return exceptionStack.pop();
 		return null;
 	}
-	
-	private Stack<Throwable>exceptionStack=new Stack<Throwable>();
 
-//	private Stack<Throwable>exceptionStack=new Stack<Throwable>();
+	private Stack<Throwable> exceptionStack = new Stack<Throwable>();
+
+	// private Stack<Throwable>exceptionStack=new Stack<Throwable>();
 	/**
 	 * Method to register daemon exceptions to the model.
+	 * 
 	 * @param e
 	 */
 	public synchronized void daemonException(Throwable e) {
 		exceptionStack.push(e);
-		logger.log(Level.SEVERE,"Exception in daemon thread",e);
+		logger.log(Level.SEVERE, "Exception in daemon thread", e);
 		setChanged();
 		notifyObservers(NotificationTypes.EXCEPTION);
-		
+
+	}
+
+	
+
+	private AnnotationModel annotationModel = new AnnotationModel();
+
+	public AnnotationModel annotationModel() {
+		return annotationModel;
 	}
 }

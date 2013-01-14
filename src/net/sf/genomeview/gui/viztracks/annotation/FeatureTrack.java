@@ -62,9 +62,11 @@ import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel.FillMode;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.genomeview.gui.viztracks.TrackConfig;
+import net.sf.genomeview.gui.viztracks.annotation.FeatureTrack.FeatureTrackModel;
 import net.sf.jannot.Feature;
 import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Location;
+import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
 import be.abeel.gui.GridBagPanel;
 
@@ -148,9 +150,8 @@ public class FeatureTrack extends Track {
 				}
 
 			});
-			
-			
-			ColorConfig cc=new ColorConfig(model,"TYPE_" + type(),"Display color" );
+
+			ColorConfig cc = new ColorConfig(model, "TYPE_" + type(), "Display color");
 			out.gc.gridy++;
 			out.add(cc, out.gc);
 
@@ -282,7 +283,8 @@ public class FeatureTrack extends Track {
 	}
 
 	private CollisionMap hitmap;
-	final private FeatureTrackConfig ftm;
+	final private FeatureTrackConfig ftc;
+	private FeatureTrackModel ftm;
 
 	/**
 	 * Returns the type this track represents
@@ -291,19 +293,75 @@ public class FeatureTrack extends Track {
 	 */
 	public Type getType() {
 
-		return ftm.type();
+		return ftc.type();
 	}
 
 	public FeatureTrack(Model model, Type key) {
 		super(key, model, true, new FeatureTrackConfig(model, key));
-		ftm = (FeatureTrackConfig) config;
+		ftc = (FeatureTrackConfig) config;
 		hitmap = new CollisionMap(model);
 
-		floatingWindow = new FeatureInfoWindow(ftm);
+		floatingWindow = new FeatureInfoWindow(ftc);
+
+		ftm = new FeatureTrackModel((FeatureAnnotation) entry.get(ftc.type()));
+		
 
 	}
 
-	
+	class FeatureTrackModel implements Observer{
+		private double minScore, maxScore;
+		private HashSet<String> qualifierKeys;
+
+		public FeatureTrackModel(FeatureAnnotation annot) {
+			init();
+			
+		}
+
+		private void init() {
+			minScore = Double.POSITIVE_INFINITY;
+			maxScore = Double.NEGATIVE_INFINITY;
+			qualifierKeys=new HashSet<String>();
+			FeatureAnnotation annot =(FeatureAnnotation) entry.get(ftc.type());
+			
+			model.annotationModel().addObserver(this);
+			if (annot instanceof MemoryFeatureAnnotation)
+				for (Feature f : annot.get())
+					update(f);
+				
+		}
+
+		void update(Feature f) {
+			if (f.getScore() > maxScore)
+				maxScore = f.getScore();
+			if (f.getScore() < minScore)
+				minScore = f.getScore();
+			qualifierKeys.addAll(f.getQualifiersKeys());
+		}
+
+		public double getMaxScore() {
+			return maxScore;
+		}
+
+		public double getMinScore() {
+			return minScore;
+		}
+
+		@Override
+		public void update(Observable o, Object arg) {
+			assert(arg instanceof Type);
+			if(ftc.type()==(Type)arg)
+				init();
+				
+				
+			
+		}
+
+		public Set<String> qualifierKeys() {
+			return qualifierKeys;
+		}
+
+	}
+
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view, TrackCommunicationModel tcm) {
 		boolean forceLabels = Configuration.getBoolean("track:forceFeatureLabels");
@@ -312,14 +370,15 @@ public class FeatureTrack extends Track {
 		Location visible = model.vlm.getAnnotationLocationVisible();
 		// List<Feature> types = entry.annotation.getByType(type,);
 		// FeatureAnnotation annot = entry.getAnnotation(type);
-		FeatureAnnotation annot = (FeatureAnnotation) entry.get(ftm.type());
-		if (annot.qualifierKeys().contains("color") || annot.qualifierKeys().contains("colour"))
-			ftm.setColorQualifierEnabled(true);
+		FeatureAnnotation annot = (FeatureAnnotation) entry.get(ftc.type());
+
+		if (ftm.qualifierKeys().contains("color") || ftm.qualifierKeys().contains("colour"))
+			ftc.setColorQualifierEnabled(true);
 		/* If there are proper scores, enable color gradient */
-		if (annot.getMaxScore() - annot.getMinScore() > 0.00001) {
-			ftm.setScoreColorGradientEnabled(true);
-			ftm.setMaxScore(annot.getMaxScore());
-			ftm.setMinScore(annot.getMinScore());
+		if (ftm.getMaxScore() - ftm.getMinScore() > 0.00001) {
+			ftc.setScoreColorGradientEnabled(true);
+			ftc.setMaxScore(ftm.getMaxScore());
+			ftc.setMinScore(ftm.getMinScore());
 		}
 
 		/* Get feature estimate */
@@ -328,7 +387,7 @@ public class FeatureTrack extends Track {
 		if (estimate > 25 * Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
 
 			g.setColor(Color.BLACK);
-			g.drawString(ftm.type() + ": Too many features to display, zoom in to see features", 10, yOffset + 10);
+			g.drawString(ftc.type() + ": Too many features to display, zoom in to see features", 10, yOffset + 10);
 			return 20 + 5;
 		} else if (estimate > Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
 			manyFeature = true;
@@ -342,23 +401,25 @@ public class FeatureTrack extends Track {
 		int lines = 0;
 
 		for (Feature rf : list) {
+			// if(!(annot instanceof MemoryFeatureAnnotation))
+			ftm.update(rf);
 
 			/* Skip feature that do not satisfy threshold filter */
-			if (rf.getScore() <= ftm.getThreshold())
+			if (rf.getScore() <= ftc.getThreshold())
 				continue;
 			int thisLine = 0;
 
 			Color c = Configuration.getColor("TYPE_" + rf.type());
-			if (ftm.isColorQualifier() && rf.getColor() != null) {
+			if (ftc.isColorQualifier() && rf.getColor() != null) {
 				String color = rf.getColor();
 				if (color != null) {
 					c = Colors.decodeColor(color);
 				}
 			}
-			if (ftm.isScoreColorGradient()) {
-				double range = annot.getMaxScore() - annot.getMinScore();
+			if (ftc.isScoreColorGradient()) {
+				double range = ftm.getMaxScore() - ftm.getMinScore();
 				if (range > 0.00001)
-					c = ftm.getColor(rf.getScore() / range);
+					c = ftc.getColor(rf.getScore() / range);
 			}
 
 			g.setColor(c);

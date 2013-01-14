@@ -135,17 +135,7 @@ public class EditFeatureWindow extends JDialog {
 					}
 					feature.setStrand(strandSelection.getStrand());
 					
-					if(feature.type()!=typeSelection.getTerm()){
-						MemoryFeatureAnnotation mf=model.vlm.getSelectedEntry().getMemoryAnnotation(feature.type());
-						mf.remove(feature);
-						feature.setType(typeSelection.getTerm());
-						mf=model.vlm.getSelectedEntry().getMemoryAnnotation(typeSelection.getTerm());
-						mf.add(feature);
-						model.updateTracks();
-						
-						
-					}
-
+					/* Update qualifiers */
 					try {
 //						feature.setMute(true);
 						feature.clearQualifiers();
@@ -178,6 +168,23 @@ public class EditFeatureWindow extends JDialog {
 						JOptionPane.showMessageDialog(_self, "Failed to parse the notes, please double check!", "Notes failed", JOptionPane.WARNING_MESSAGE);
 						warning = true;
 					}
+					
+					/* Update type if needed and notify annotation model */
+					if(feature.type()!=typeSelection.getTerm()){
+						MemoryFeatureAnnotation mf=model.vlm.getSelectedEntry().getMemoryAnnotation(feature.type());
+						mf.remove(feature);
+						feature.setType(typeSelection.getTerm());
+						mf=model.vlm.getSelectedEntry().getMemoryAnnotation(typeSelection.getTerm());
+						mf.add(feature);
+						model.updateTracks();
+						
+						model.annotationModel().typeUpdated(feature.type());
+						model.annotationModel().typeUpdated(typeSelection.getTerm());
+					}else{
+						model.annotationModel().typeUpdated(feature.type());
+					}
+
+					
 					if (!warning)
 						_self.setVisible(false);
 
