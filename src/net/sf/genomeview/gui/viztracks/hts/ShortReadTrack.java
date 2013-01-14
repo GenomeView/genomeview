@@ -17,9 +17,11 @@ import javax.swing.border.Border;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.ShortReadProvider;
+import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
+import net.sf.jannot.Location;
 import net.sf.samtools.SAMRecord;
 
 /**
@@ -224,7 +226,10 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public int paintTrack(Graphics2D gGlobal, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
-		gGlobal.drawImage(render.buffer(), 0, yOffset, null);
+		Location bufferedLocation=render.location();
+		Location visible=model.vlm.getVisibleLocation();
+		int x=Convert.translateGenomeToScreen(bufferedLocation.start,visible, screenWidth);
+		gGlobal.drawImage(render.buffer(), x, yOffset, null);
 		return render.buffer().getHeight();
 	}
 

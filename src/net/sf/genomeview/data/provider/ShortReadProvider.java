@@ -28,46 +28,38 @@ import org.broad.igv.track.WindowFunction;
 public class ShortReadProvider implements DataProvider<SAMRecord> {
 
 	private ReadGroup source;
+	private int lastStart;
+	private int lastEnd;
 
 	public ShortReadProvider(Entry e, ReadGroup source, Model model) {
 		this.source = source;
 
 	}
 
-	private ArrayList<SAMRecord> buffer = new ArrayList<SAMRecord>();
-
-	private int lastStart = -1;
-	private int lastEnd = -1;
-
 	@Override
-	public void get(final int start, final int end,final DataCallback<SAMRecord>cb) {
-		/* Check whether request can be fulfilled by buffer */
-		if (start >= lastStart && end <= lastEnd
-				&& (lastEnd - lastStart) <= 2 * (end - start))
-			cb.dataReady(buffer);
+	public void get(final int start, final int end, final DataCallback<SAMRecord> cb) {
 
 		/* New request */
-
 		lastStart = start;
 		lastEnd = end;
-		/* Queue up retrieval*/
+
+		/* Queue up retrieval */
 		Task t = new Task(new Location(start, end)) {
 
 			@Override
 			public void run() {
-				// When actually running, check again whether we actually need
+				// When actually running, check again whether we still need
 				// this data
-				if (!(start >= lastStart && end <= lastEnd && (lastEnd - lastStart) <= 2 * (end - start)))
+				if (start != lastStart && end != lastEnd)
 					return;
-				Iterable<SAMRecord> fresh = source.get(start, end);
-				ArrayList<SAMRecord>tmp=new ArrayList<SAMRecord>();
-				for (SAMRecord p : fresh) {
-					
 
+				Iterable<SAMRecord> fresh = source.get(start, end);
+				ArrayList<SAMRecord> tmp = new ArrayList<SAMRecord>();
+				for (SAMRecord p : fresh) {
 					tmp.add(p);
 				}
-				buffer=tmp;
-				cb.dataReady(buffer);
+				/* Notify rendered that the data is ready */
+				cb.dataReady(new Location(start, end), tmp);
 			}
 
 		};
@@ -75,18 +67,13 @@ public class ShortReadProvider implements DataProvider<SAMRecord> {
 
 	}
 
-	
 	public int readLength() {
 		return source.readLength();
 	}
 
-
-
 	public SAMRecord getSecondRead(SAMRecord one) {
 		return source.getSecondRead(one);
 	}
-
-
 
 	public SAMRecord getFirstRead(SAMRecord one) {
 		return source.getFirstRead(one);

@@ -598,7 +598,8 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 	}
 
 	@Override
-	public void dataReady(List<Pile> itt) {
+	public void dataReady(Location dataLocation, List<Pile> itt) {
+		//FIXME add check on dataLocation to make sure this is the right data
 		double factor = MAX_WIDTH / visible.length();
 		if (exact)
 			factor = 1;

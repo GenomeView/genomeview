@@ -49,7 +49,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 	public void get(final int start, final int end, final DataCallback<Pile> cb) {
 		/* Check whether request can be fulfilled by buffer */
 		if (start >= lastStart && end <= lastEnd && (lastEnd - lastStart) <= 2 * (end - start))
-			cb.dataReady(buffer);
+			cb.dataReady(new Location(start,end),buffer);
 
 		/* New request */
 
@@ -95,7 +95,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 					}
 
 					thisJob.setFinished();
-					cb.dataReady(buffer);
+					cb.dataReady(new Location(start,end),buffer);
 					// notifyListeners();
 				}
 
@@ -113,7 +113,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 
 				buffer.add(p);
 			}
-			cb.dataReady(buffer);
+			cb.dataReady(new Location(start,end),buffer);
 		}
 
 		// System.out.println("\tServing new request from provider");

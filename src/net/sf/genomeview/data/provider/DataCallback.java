@@ -2,6 +2,8 @@ package net.sf.genomeview.data.provider;
 
 import java.util.List;
 
+import net.sf.jannot.Location;
+
 /**
  * 
  * @author Thomas Abeel
@@ -11,5 +13,5 @@ import java.util.List;
 public interface DataCallback<T> {
 
 	
-	public void dataReady(List<T>it);
+	public void dataReady(Location l,List<T>it);
 }
