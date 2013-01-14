@@ -316,6 +316,10 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		
 		/* Crop buffered image if not everything is needed */
 		int actualHeight = lines * readLineHeight;
+		if(lines==0)
+			lines=1;
+		//FIXME add message that there is no data in this window
+		
 		buffer = bi.getSubimage(0, 0, bi.getWidth(), actualHeight);
 		model.refresh();
 	}
