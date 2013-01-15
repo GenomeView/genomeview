@@ -228,7 +228,9 @@ public class ShortReadTrack extends Track {
 	public int paintTrack(Graphics2D gGlobal, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
 		Location bufferedLocation=render.location();
 		Location visible=model.vlm.getVisibleLocation();
-		int x=Convert.translateGenomeToScreen(bufferedLocation.start,visible, screenWidth);
+		int x=0;
+		if(bufferedLocation!=null)
+			x=Convert.translateGenomeToScreen(bufferedLocation.start,visible, screenWidth);
 		gGlobal.drawImage(render.buffer(), x, yOffset, null);
 		return render.buffer().getHeight();
 	}
