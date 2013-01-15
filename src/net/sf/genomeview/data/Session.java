@@ -85,18 +85,14 @@ public class Session {
 								continue;
 							char firstchar=line.toUpperCase().charAt(0);
 							
-							/* Make sure split character is colon, to avoid ambiguous split because of previous implementation details */
-							if(firstchar=='C'||firstchar=='U'||firstchar=='F')
-								line=firstchar+":"+line.substring(2);
-							
-							String[] arr = line.split(":", 2);
+							String[] arr = line.split("[: \t]", 2);
 
 							model.messageModel().setStatusBarMessage("Loading session, current file: " + line + "...");
 							SessionInstruction si = null;
 							try {
 								si = SessionInstruction.valueOf(arr[0].toUpperCase());
 							} catch (Exception e) {
-								log.info("Could not parse: " + arr[0] + "\n Unknown instruction.\nCould not load session line: " + line);
+								log.log(Level.WARNING,"Could not parse: " + arr[0] + "\n Unknown instruction.\nCould not load session line: " + line,e);
 							}
 							if (si != null) {
 								switch (si) {
