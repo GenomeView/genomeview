@@ -31,7 +31,7 @@ public class ExternalHelper {
 				try {
 					boolean success = false;
 					while (!success) {
-						String[] tmp = StringUtil.reverseString(position).split(":",3);
+						String[] tmp = StringUtil.reverseString(position).split("[:-]",3);
 						String[] arr=new String[Math.min(tmp.length, 3)];
 						for(int i=0;i<arr.length;i++)
 							arr[i]=StringUtil.reverseString(tmp[(arr.length-1)-i]);
@@ -60,8 +60,7 @@ public class ExternalHelper {
 						try {
 							Thread.sleep(250);
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							//Nothing to do in this case
 						}
 						if(!success){
 							log.info("Failed to move to location: "+position+". This instruction has been requeued and will be retried.");
