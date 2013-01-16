@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
 
@@ -29,7 +30,7 @@ public class GotoPosition extends AbstractModelAction {
         		int i = Integer.parseInt(input.trim());
         		super.model.vlm.center(i);
             }catch(NumberFormatException e){
-            	JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Invalid location");
+            	ExternalHelper.setPosition(input.trim(), model);
             }
             
         }
