@@ -25,6 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.gui.StaticUtils;
+import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.genomeview.gui.external.JavaScriptHandler;
 import net.sf.genomeview.gui.viztracks.TickmarkTrack;
 import net.sf.genomeview.gui.viztracks.Track;
@@ -312,6 +314,17 @@ public class Model extends Observable implements Observer {
 		logger.info("Reading source:" + f);
 		try {
 			f.read(entries);
+			if(entries.size()>0&&vlm.getVisibleEntry() instanceof DummyEntry){
+				vlm.setVisibleEntry(entries.firstEntry());
+				Entry selected=vlm.getVisibleEntry();
+				int len=selected.getMaximumLength();
+				if(len>5000){
+					int randomStart=StaticUtils.rg.nextInt((len/2)-1000)+len/4;
+					logger.info("Setting random location at data load: "+selected+"\t"+randomStart);
+					vlm.setAnnotationLocationVisible(new Location(randomStart, randomStart+1000));
+				}
+						
+			}
 		} catch (Exception e) {
 			throw new ReadFailedException(e);
 		}
