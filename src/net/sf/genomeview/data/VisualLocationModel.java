@@ -29,6 +29,7 @@ public class VisualLocationModel extends Observable {
 
 	public void setVisibleLocation(Location visibleLocation) {
 		this.visibleLocation = visibleLocation;
+		setChanged();
 		notifyObservers(visibleLocation);
 	}
 
