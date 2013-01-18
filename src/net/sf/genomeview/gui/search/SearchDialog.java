@@ -34,6 +34,7 @@ public class SearchDialog extends JDialog {
 		pane.add("Keyword search", new KeywordSearchPane(model));
 		pane.add("Entry search",new EntrySearchPane(model));
 		pane.add("Sequence search", new SequenceSearchPane(model));
+		pane.add("Motif search", new MotifSearchPane(model));
 		
 		pane.add("Overlap search", new OverlapSearchPane(model));
 
