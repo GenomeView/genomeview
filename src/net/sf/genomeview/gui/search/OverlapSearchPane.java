@@ -23,59 +23,62 @@ import be.abeel.gui.TitledComponent;
 /**
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 class OverlapSearchPane extends SearchPanel {
-		
+
 	private static final long serialVersionUID = 2986333484335063190L;
 
-		public OverlapSearchPane(final Model model) {
-			gc.weightx = 1;
-			gc.weighty = 0;
-			gc.fill = GridBagConstraints.BOTH;
-			final JTextArea seq = new JTextArea(7, 30);
-			super.setFocusField(seq);
-			final TypeCombo sourceType = new TypeCombo(model);
-			final TypeCombo targetType = new TypeCombo(model);
-			final OverlapSearchResultModel srm = new OverlapSearchResultModel(model);
-			final JTable results = new JTable(srm);
-			results.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					int row = results.getSelectedRow();
-					Feature f = srm.getFeature(row);
-					model.selectionModel().setLocationSelection(f);
+	public OverlapSearchPane(final Model model) {
+		gc.weightx = 1;
+		gc.weighty = 0;
+		gc.fill = GridBagConstraints.BOTH;
+		final JTextArea seq = new JTextArea(7, 30);
+		super.setFocusField(seq);
+		final TypeCombo sourceType = new TypeCombo(model);
+		final TypeCombo targetType = new TypeCombo(model);
+		final OverlapSearchResultModel srm = new OverlapSearchResultModel(model);
+		final JTable results = new JTable(srm);
+		results.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int row = results.getSelectedRow();
+				Feature f = srm.getFeature(row);
+				model.selectionModel().setLocationSelection(f);
+				if (f.length() < model.vlm.getVisibleLocation().length())
+					model.vlm.center((f.end() + f.start()) / 2);
+				else {
 					double border = 0.05 * (f.end() - f.start());
-					model.vlm.setAnnotationLocationVisible(new Location((int) (f.start() - border),
-							(int) (f.end() + border)));
-
-				}
-			});
-			JButton searchButton = new JButton("Search");
-			searchButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					srm.clear();
-					srm.search(sourceType.getTerm(), targetType.getTerm());
-
+					model.vlm.setAnnotationLocationVisible(new Location((int) (f.start() - border), (int) (f.end() + border)), true);
 				}
 
-			});
-			
-			gc.gridwidth = 2;
-			add(new TitledComponent("Overlap between type ", sourceType), gc);
-			gc.gridy++;
-			add(new TitledComponent("and type", targetType), gc);
-			gc.gridy++;
-			
-			add(searchButton, gc);
-			
-			gc.gridwidth = 2;
+			}
+		});
+		JButton searchButton = new JButton("Search");
+		searchButton.addActionListener(new ActionListener() {
 
-			gc.gridy++;
-			gc.weighty = 1;
-			add(new JScrollPane(results), gc);
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				srm.clear();
+				srm.search(sourceType.getTerm(), targetType.getTerm());
 
-		}
+			}
+
+		});
+
+		gc.gridwidth = 2;
+		add(new TitledComponent("Overlap between type ", sourceType), gc);
+		gc.gridy++;
+		add(new TitledComponent("and type", targetType), gc);
+		gc.gridy++;
+
+		add(searchButton, gc);
+
+		gc.gridwidth = 2;
+
+		gc.gridy++;
+		gc.weighty = 1;
+		add(new JScrollPane(results), gc);
+
 	}
+}
