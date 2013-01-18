@@ -137,15 +137,15 @@ public class FeatureTrack extends Track {
 			out.add(filter, out.gc);
 
 			out.gc.gridy++;
-			final JComponent colorQualifier = new BooleanConfig("feature:useColorQualifierTag_" + type(), "Use /color qualifier", model);
-			out.add(colorQualifier, out.gc);
+//			final JComponent colorQualifier = new BooleanConfig("feature:useColorQualifierTag_" + type(), "Use /color qualifier", model);
+//			out.add(colorQualifier, out.gc);
 
 			this.addObserver(new Observer() {
 
 				@Override
 				public void update(Observable o, Object arg) {
 					colorGradient.setEnabled(isScoreColorGradientEnabled());
-					colorQualifier.setEnabled(isColorQualifierEnabled());
+//					colorQualifier.setEnabled(isColorQualifierEnabled());
 					filter.setEnabled(isScoreColorGradientEnabled());
 				}
 
@@ -195,22 +195,22 @@ public class FeatureTrack extends Track {
 			this.maxScore = maxScore;
 		}
 
-		public boolean isColorQualifier() {
-			return Configuration.getBoolean("feature:useColorQualifierTag_" + type());
-			// return colorQualifier;
-		}
+//		public boolean isColorQualifier() {
+//			return Configuration.getBoolean("feature:useColorQualifierTag_" + type());
+//			// return colorQualifier;
+//		}
 
 		public Type type() {
 			return (Type) super.dataKey;
 		}
 
-		public void setColorQualifier(boolean colorQualifier) {
-			// this.colorQualifier = colorQualifier;
-			if (isColorQualifier() != colorQualifier) {
-				Configuration.set("feature:useColorQualifierTag_" + type(), colorQualifier);
-				model.refresh(this);
-			}
-		}
+//		public void setColorQualifier(boolean colorQualifier) {
+//			// this.colorQualifier = colorQualifier;
+//			if (isColorQualifier() != colorQualifier) {
+//				Configuration.set("feature:useColorQualifierTag_" + type(), colorQualifier);
+//				model.refresh(this);
+//			}
+//		}
 
 		private boolean scoreColorGradientEnabled;
 
@@ -410,12 +410,12 @@ public class FeatureTrack extends Track {
 			int thisLine = 0;
 
 			Color c = Configuration.getColor("TYPE_" + rf.type());
-			if (ftc.isColorQualifier() && rf.getColor() != null) {
+//			if (ftc.isColorQualifier() && rf.getColor() != null) {
 				String color = rf.getColor();
 				if (color != null) {
 					c = Colors.decodeColor(color);
 				}
-			}
+//			}
 			if (ftc.isScoreColorGradient()) {
 				double range = ftm.getMaxScore() - ftm.getMinScore();
 				if (range > 0.00001)
