@@ -470,13 +470,16 @@ public class Model extends Observable implements Observer {
 	// }
 
 	public synchronized void setSelectedEntry(Entry entry) {
+		logger.info("Setting selected entry: "+entry);
 		vlm.setVisibleEntry(entry);
 		// entries.setDefault(entry);
 		selectionModel.clear();
 
 		vlm.setAnnotationLocationVisible(vlm.getVisibleLocation());
 		trackList.clear();
+		//FIXME updateTracks also does update :-/
 		updateTracks();
+	//FIXME likely double notification
 		refresh(NotificationTypes.ENTRYCHANGED);
 
 	}
