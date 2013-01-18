@@ -3,7 +3,6 @@
  */
 package net.sf.genomeview.gui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -14,14 +13,12 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Random;
 
-import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
-import javax.swing.border.Border;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.EditFeatureWindow;
-import net.sf.genomeview.gui.dialog.MergeFeatureDialog;
 import net.sf.genomeview.gui.dialog.SplitFeatureDialog;
 
 /**
@@ -37,6 +34,9 @@ public final class StaticUtils {
 	private StaticUtils() {
 	};
 
+	
+	public static final Random rg=new Random(System.currentTimeMillis());
+	
 	private static EditFeatureWindow editStructure = null;
 
 	public static EditFeatureWindow getEditStructure(Model model) {
