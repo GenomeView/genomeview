@@ -40,8 +40,6 @@ class SequenceSearchPane extends SearchPanel {
 		mismatch.addItem(1);
 		mismatch.addItem(2);
 		mismatch.addItem(3);
-		mismatch.addItem(4);
-		mismatch.addItem(5);
 		mismatch.setSelectedItem(0);
 		JButton search = new JButton("Search");
 
