@@ -104,11 +104,12 @@ class MotifSearchResultModel extends AbstractSearchResultModel {
 	 * @param model
 	 * @param text
 	 */
-	void search(final Model model, final String pattern, final SequenceType type) {
+	void search(final Model model, String inPattern, final SequenceType type) {
 		locations.clear();
 		model.clearHighlights();
 		// final byte[] bytePattern = pattern.toUpperCase().getBytes();
 
+		final String pattern =inPattern.replace('*', '.').replace('?', '.').replace('-', '.');
 		new Thread(new Runnable() {
 
 			@Override
