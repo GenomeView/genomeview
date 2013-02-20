@@ -271,7 +271,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 					int yRec = line * readLineHeight;
 
 					/* paired read - calculate connection coordinates */
-					if (ShortReadTools.isPaired(one) && !one.getMateUnmappedFlag()
+					if (enablePairing&& ShortReadTools.isPaired(one) && !one.getMateUnmappedFlag()
 							&& one.getReferenceIndex() == one.getMateReferenceIndex() && one.getMateReferenceIndex() != -1) {
 						int subX1, subX2;
 						subX1 = Convert.translateGenomeToScreen(one.getAlignmentEnd(), currentVisible, screenWidth);
