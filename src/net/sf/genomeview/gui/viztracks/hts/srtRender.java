@@ -542,7 +542,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 					 * white box, now put some color back
 					 */
 					if (readNt == '_') {
-						g.setColor(srtc.color(ReadColor.PAIRING));
+						g.setColor(srtc.color(ReadColor.SPLICING));
 						g.fillRect((int) tx1, yRec + 4, (int) (tx2 - tx1), readLineHeight - 8 - 1);
 					}
 					if (readNt != '_' && annotationVisible.length() < 100) {
@@ -594,7 +594,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			for (int i = 0; i < locs[0].length; i++) {
 				int lx1 = Convert.translateGenomeToScreen(rf.getAlignmentStart() + locs[0][i], annotationVisible, screenWidth);
 				int lx2 = Convert.translateGenomeToScreen(rf.getAlignmentStart() + locs[1][i], annotationVisible, screenWidth);
-				g.setColor(srtc.color(ReadColor.PAIRING));
+				g.setColor(srtc.color(ReadColor.SPLICING));
 				g.fillRect(lx1, yRec, lx2 - lx1, readLineHeight - 1);
 			}
 		}

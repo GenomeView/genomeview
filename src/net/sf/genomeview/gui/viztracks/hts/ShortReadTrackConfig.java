@@ -32,7 +32,7 @@ public class ShortReadTrackConfig extends TrackConfig {
 	enum ReadColor {
 		FORWARD_SENSE("shortread:forwardColor"), FORWARD_ANTISENSE("shortread:forwardAntiColor"), REVERSE_SENSE(
 				"shortread:reverseColor"), REVERSE_ANTISENSE("shortread:reverseAntiColor"), MATE_DIFFERENT_CHROMOSOME(
-				"shortread:mateDifferentChromosome"), PAIRING("shortread:pairingColor"), MISSING_MATE("shortread:missingMateColor");
+				"shortread:mateDifferentChromosome"), PAIRING("shortread:pairingColor"), MISSING_MATE("shortread:missingMateColor"),SPLICING("shortread:splicingColor");
 
 		private Color c;
 		private ColorGradient cg;
