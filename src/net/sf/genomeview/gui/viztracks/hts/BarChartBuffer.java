@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.NoFailIterable;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.DataCallback;
 import net.sf.genomeview.data.provider.PileProvider;
@@ -610,7 +611,7 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 		else
 			nc = null;
 		
-		for (Pile p : itt) {
+		for (Pile p : new NoFailIterable<Pile>(itt)) {
 			if (p == null) {
 				System.out.println("Null pile");
 				continue;
