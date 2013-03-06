@@ -102,6 +102,7 @@ public class VisualLocationModel extends Observable {
 	}
 
 	public void clear() {
+		visibleEntry=null;
 		visibleLocation = new Location(0, 0);
 
 	}
