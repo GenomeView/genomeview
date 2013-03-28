@@ -26,8 +26,8 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
-import net.sf.samtools.util.SeekableFileStream;
-import net.sf.samtools.util.SeekableStream;
+import net.sf.samtools.seekablestream.SeekableFileStream;
+import net.sf.samtools.seekablestream.SeekableStream;
 import be.abeel.gui.MemoryWidget;
 import be.abeel.io.ExtensionManager;
 

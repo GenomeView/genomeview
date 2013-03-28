@@ -9,7 +9,7 @@ import java.io.InterruptedIOException;
 
 import javax.swing.ProgressMonitor;
 
-import net.sf.samtools.util.SeekableStream;
+import net.sf.samtools.seekablestream.SeekableStream;
 /**
  * 
  * @author Thomas Abeel
@@ -96,6 +96,11 @@ public class SeekableProgressStream extends SeekableStream {
 
 	public ProgressMonitor getProgressMonitor() {
 		return monitor;
+	}
+
+	@Override
+	public long position() throws IOException {
+		return in.position();
 	}
 
 }

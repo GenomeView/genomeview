@@ -108,7 +108,8 @@ public class Session {
 									break;
 								case C:
 								case CONFIG:
-									Configuration.loadExtra(URIFactory.url(arr[1]).openStream());
+									Configuration.loadExtra(new Locator(arr[1]).stream());
+									//Configuration.loadExtra(URIFactory.url(arr[1]).openStream());
 									break;
 								case OPTION:
 									String[] ap = arr[1].split("=", 2);
