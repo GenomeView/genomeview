@@ -20,7 +20,6 @@ import net.sf.genomeview.data.provider.DataCallback;
 import net.sf.genomeview.data.provider.PileProvider;
 import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.refseq.Sequence;
@@ -31,12 +30,11 @@ import net.sf.jannot.tdf.ReadType;
  * @author Thomas Abeel
  * 
  */
-class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
+class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 	/* Data for pileupgraph barchart */
 	private double[][] detailedRects = null;
 
 	/* Actual coverage values for barchart */
-	// private double[][] covValues = null;
 	private Location visible;
 	private double localMaxPile = 0;
 	private double localMinPile = 0;
@@ -51,21 +49,17 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 	private double MAX_WIDTH = 2000;
 	private Iterable<Status> status;
 
-	
-	
-	public BarChartBuffer(Model model,Location visible, PileProvider provider, PileupTrackConfig ptm) {
+	public BarChartBuffer(Model model, Location visible, PileProvider provider, PileupTrackConfig ptm) {
 		this.visible = visible;
 		this.provider = provider;
 		this.ptm = ptm;
-		this.model=model;
+		this.model = model;
 
-		
-//		status = provider.getStatus(visible.start, visible.end);
+		// status = provider.getStatus(visible.start, visible.end);
 
-		/*Iterable<Pile> itt =*/ provider.get(visible.start, visible.end + 1,this);
+		/* Iterable<Pile> itt = */provider.get(visible.start, visible.end + 1, this);
 
-		
-	//	System.out.println("Halt!");
+		// System.out.println("Halt!");
 	}
 
 	private void initArray(Pile p, int length) {
@@ -75,6 +69,7 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 		} else {
 			detailedRects = new double[p.getValueCount()][(int) MAX_WIDTH];
 		}
+
 	}
 
 	private void count(NucCounter nc, Pile p, Location visible) {
@@ -116,6 +111,7 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 		int snpTrackMinimumCoverage = Configuration.getInt("shortread:snpTrackMinimumCoverage");
 
 		double range = provider.getMaxPile() - localMinPile;
+		// System.out.println("Min-max: "+provider.getMaxPile()+"\t"+localMinPile);
 		// System.out.println("provider max="+provider.getMaxPile());
 		// System.out.println("local minpile ="+localMinPile);
 		// System.out.println("local maxpile="+localMaxPile);
@@ -203,14 +199,15 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 		}
 
 		int returnTrackHeight = 2 * graphLineHeigh + snpTrackHeight;
-//		Track.paintStatus(g, status, yOffset - 2 * graphLineHeigh, returnTrackHeight, visible, screenWidth);
+		// Track.paintStatus(g, status, yOffset - 2 * graphLineHeigh,
+		// returnTrackHeight, visible, screenWidth);
 
 		return returnTrackHeight;
 
 	}
 
 	private void drawFour(Graphics2D g, double range, int graphLineHeigh, double screenWidth, int yOffset) {
-		//range = 2 * range;
+		// range = 2 * range;
 		Color forwardColor = Configuration.getColor("shortread:forwardColor");
 		Color reverseColor = Configuration.getColor("shortread:reverseColor");
 		Color forwardAntiColor = Configuration.getColor("shortread:forwardAntiColor");
@@ -220,7 +217,7 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 
 		if (ptm.isLogscaling()) {
 			range = log2(range);
-			range*=2;
+			range *= 2;
 
 		}
 		for (int i = 0; detailedRects != null && i < detailedRects[0].length; i++) {
@@ -233,19 +230,19 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 				if (f1cov >= 1)
 					f1cov = log2(f1cov);
 				else
-					f1cov=0;
-				if (f2cov >=1)
+					f1cov = 0;
+				if (f2cov >= 1)
 					f2cov = log2(f2cov);
 				else
-					f2cov=0;
+					f2cov = 0;
 				if (r1cov >= 1)
 					r1cov = log2(r1cov);
 				else
-					r1cov=0;
+					r1cov = 0;
 				if (r2cov >= 1)
 					r2cov = log2(r2cov);
 				else
-					r2cov=0;
+					r2cov = 0;
 			}
 
 			double coverage = f1cov + r1cov + f2cov + r2cov;
@@ -284,12 +281,8 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 				sLoc = (int) ((i) + visible.start);
 				eLoc = (int) (((i)) + 1 + visible.start);
 			}
-//			if(f2cov+r1cov+(f1cov+r2cov)>0)
-//				System.out.println("LOC: "+sLoc+"\t"+eLoc+"\t"+(f2cov+r1cov)+"\t"+(f1cov+r2cov));
 			int screenX1 = Convert.translateGenomeToScreen(sLoc, visible, screenWidth);
 			int screenX2 = Convert.translateGenomeToScreen(eLoc, visible, screenWidth);
-			// System.out.println("Screen: "+screenX1+"\t"+screenX2);
-			// System.out.println(frac+"\t"+ffrac+"\t"+rfrac);
 			if (screenX1 > lastX) {
 				lastX = screenX1;
 				g.setColor(Colors.LIGHEST_GRAY);
@@ -342,58 +335,71 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 
 	private void drawOne(Graphics2D g, double range, int graphLineHeigh, double screenWidth, int yOffset) {
 
-		int lastX = -10;
-		double lastFrac = 0;
+		range = localMaxPile - localMinPile;
 		if (ptm.isLogscaling()) {
-			// val = log2(val + 1);
 			range = log2(range);
-			// val /= log2(provider.getMaxPile());
-			/* Regular scaling */
+		
 		}
+
+		double positiveSection = localMaxPile / range;
+		double negativeSection = -localMinPile / range;
+		
 		for (int i = 0; detailedRects != null && i < detailedRects[0].length; i++) {
-
-			/* Val is normalized to baseline zero with localMinPile */
 			double val = 0;
-			for (int j = 0; j < detailedRects.length; j++)
-				val += detailedRects[j][i] - localMinPile;
 
+			/* Aggregate multiple values */
+			for (int j = 0; j < detailedRects.length; j++)
+				val += detailedRects[j][i];
+		
 			if (ptm.isLogscaling())
 				val = log2(val);
 
+			double upFraction = 0;
+			double downFraction = 0;
+			if (val > 0)
+				upFraction = val / localMaxPile;
+			if (val < 0)
+				downFraction = val / localMinPile;
+
+			double upDraw = positiveSection * 2 * graphLineHeigh * upFraction;
+			double downDraw = downFraction * 2 * graphLineHeigh * negativeSection;
+
 			if (val > range)
 				val = range;
-
-			double frac = val / range;
-			int size = (int) (frac * graphLineHeigh);
-
+		
 			double factor = MAX_WIDTH / visible.length();
+
 			int sLoc = (int) ((i / factor) + visible.start);
 			int eLoc = (int) (((i + 1) / factor) + 1 + visible.start);
 			if (exact) {
-				// System.out.println("Exact!");
 				sLoc = (int) ((i) + visible.start);
 				eLoc = (int) (((i)) + 1 + visible.start);
 			}
-			// System.out.println("LOC: "+sLoc+"\t"+eLoc);
 			int screenX1 = Convert.translateGenomeToScreen(sLoc, visible, screenWidth);
 			int screenX2 = Convert.translateGenomeToScreen(eLoc, visible, screenWidth);
 			if (screenX2 == screenX1)
 				screenX2 = screenX1 + 1;
-			// if(frac>0)
-			// System.out.println("Screen: "+screenX1+"\t"+screenX2+"\t"+frac);
-			// System.out.println(frac+"\t"+ffrac+"\t"+rfrac);
-			if (screenX1 > lastX || frac > lastFrac) {
-				lastX = screenX1;
-				lastFrac = frac;
-				g.setColor(Color.ORANGE);
-				g.fillRect(screenX1, yOffset + 2 * graphLineHeigh - 2 * size, screenX2 - screenX1 + 1, 2 * size);
+			g.setColor(Color.BLUE);
 
-			}
-			g.setColor(Color.GRAY);
+			/* Up fill */
+			double topY = ((1 - upFraction) * positiveSection) * 2 * graphLineHeigh;
+			g.fillRect(screenX1, yOffset + (int) topY, screenX2 - screenX1 + 1,(int) Math.ceil(upDraw));
+			/* Down fill */
+			g.fillRect(screenX1, (int) (yOffset + positiveSection * 2 * graphLineHeigh), screenX2 - screenX1 + 1, (int)Math.ceil(downDraw));
+			
+			
+			
 		}
 
-		yOffset += 2 * graphLineHeigh;
+		
 
+		if(positiveSection>0&&negativeSection>0){
+			int y=(int)(2*graphLineHeigh*positiveSection+yOffset);
+			g.drawLine(0,y , (int)screenWidth, y);
+		}
+		g.setColor(Color.GRAY);
+		
+		yOffset += 2 * graphLineHeigh;
 		g.setColor(Color.BLACK);
 		for (Line line : ptm.getLines()) {
 			// g.fillRect(screenX1, yOffset + graphLineHeigh - size, screenX2 -
@@ -564,7 +570,7 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 		if (exact)
 			effectivePosition = Convert.translateScreenToGenome(mouseX, visible, ptm.getScreenWidth()) - visible.start;
 		if (detailedRects != null) {
-			text.append("<strong>" + (pileWidth > 1 ? "Average " : "") + "Coverage:</strong> ");
+			text.append("<strong>" + (pileWidth > 1 ? "Average " : "") + "Value:</strong> ");
 			if (detailedRects.length == 4) {
 				double f1cov = detailedRects[ReadType.FIRSTREADFORWARDMAP.ordinal()][effectivePosition];
 				double f2cov = detailedRects[ReadType.SECONDREADFORWARDMAP.ordinal()][effectivePosition];
@@ -572,14 +578,15 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 				double r2cov = detailedRects[ReadType.SECONDREADREVERSEMAP.ordinal()][effectivePosition];
 				double sense = f2cov + r1cov;
 				double antisense = r2cov + f1cov;
-				double reverse=r1cov+r2cov;
-				double forward=f1cov+f2cov;
-				text.append(nrReg.format(sense+antisense) + "<br/>");
-				text.append("Forward transcript: " + nrReg.format(sense)+" ("+nrReg.format(r1cov)+" - "+nrReg.format(f2cov)+")" + "<br/>");
-				text.append("Reverse transcript: " + nrReg.format(antisense) +" ("+nrReg.format(f1cov)+" - "+nrReg.format(r2cov)+")" + "<br/>");
-//				text.append("Forward mapping: " + nrReg.format(forward) + "<br/>");
-//				text.append("Reverse mapping: " + nrReg.format(reverse) + "<br/>");
-				
+				double reverse = r1cov + r2cov;
+				double forward = f1cov + f2cov;
+				text.append(nrReg.format(sense + antisense) + "<br/>");
+				text.append("Forward transcript: " + nrReg.format(sense) + " (" + nrReg.format(r1cov) + " - " + nrReg.format(f2cov) + ")" + "<br/>");
+				text.append("Reverse transcript: " + nrReg.format(antisense) + " (" + nrReg.format(f1cov) + " - " + nrReg.format(r2cov) + ")" + "<br/>");
+				// text.append("Forward mapping: " + nrReg.format(forward) +
+				// "<br/>");
+				// text.append("Reverse mapping: " + nrReg.format(reverse) +
+				// "<br/>");
 
 			} else if (detailedRects.length == 2) {
 				text.append(nrReg.format(detailedRects[0][effectivePosition] + detailedRects[1][effectivePosition]) + "<br/>");
@@ -600,7 +607,7 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 
 	@Override
 	public void dataReady(Location dataLocation, List<Pile> itt) {
-		//FIXME add check on dataLocation to make sure this is the right data
+		// FIXME add check on dataLocation to make sure this is the right data
 		double factor = MAX_WIDTH / visible.length();
 		if (exact)
 			factor = 1;
@@ -610,7 +617,7 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 			nc = new NucCounter(visible.length());
 		else
 			nc = null;
-		
+
 		for (Pile p : new NoFailIterable<Pile>(itt)) {
 			if (p == null) {
 				System.out.println("Null pile");
@@ -640,8 +647,8 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 				endIdx = endPos - visible.start;
 			}
 
-//			if(p.getTotal()>0)
-//				System.out.println("Pile: \t"+startPos+"\t"+startIdx+"\t"+endPos+"\t"+endIdx+"\t"+p.getTotal());
+			// if(p.getTotal()>0)
+			// System.out.println("Pile: \t"+startPos+"\t"+startIdx+"\t"+endPos+"\t"+endIdx+"\t"+p.getTotal());
 			for (int i = startIdx; i <= endIdx; i++) {
 				if (i >= 0 && i < detailedRects[0].length) {
 					// float fcov = p.getFCoverage();
@@ -653,8 +660,13 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 							val /= ptm.normalizationEngine.value()[j];
 						}
 
-						if (val > detailedRects[j][i])
+						/* Visualize min-max */
+						if (val > 0 && val > detailedRects[j][i])
 							detailedRects[j][i] = val;
+						if (val < 0 && val < detailedRects[j][i])
+							detailedRects[j][i] = val;
+						// System.out.println("Inserted: " +
+						// detailedRects[j][i]);
 					}
 					// detailedRects[1][i] = rcov;
 					// covValues[0][i] = fcov;
@@ -672,7 +684,7 @@ class BarChartBuffer implements VizBuffer,DataCallback<Pile> {
 						localMinPile = coverage;
 				}
 			}
-			
+
 		}
 		model.refresh();
 	}
