@@ -198,7 +198,7 @@ public abstract class Track {
 
 	protected void paintDisplayName(Graphics2D g, int yOffset) {
 		g.setColor(Color.BLACK);
-		g.drawString(config.shortDisplayName(), 20, yOffset + 16);
+		g.drawString(config.shortDisplayName(), 20, yOffset + 16+cogOffset());
 		
 	}
 	/**
