@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="2082" />
+	<property name="version" value="2126" />
 	<property name="src" value="src" />
 	<property name="res" value="resources" />
 	<property name="build" value="build" />
@@ -135,8 +135,8 @@
 		<!-- sign everything -->
 		<!-- TODO: if jarsigner 1 returned, we should ask again for passwords -->
 		<!-- Jarsigning can't be lazy, it then complains about not the same certificate -->
-		<signjar lazy="false" alias="${alias}" keystore="devtools/key.store" storepass="${storepass}" keypass="${aliaspass}" jar="${dist}/${jar}" />
-		<signjar lazy="false" alias="${alias}" keystore="devtools/key.store" storepass="${storepass}" keypass="${aliaspass}">
+		<signjar lazy="false" alias="${alias}" keystore="devtools/keystore.jks" storepass="${storepass}" keypass="${aliaspass}" jar="${dist}/${jar}" />
+		<signjar lazy="false" alias="${alias}" keystore="devtools/keystore.jks" storepass="${storepass}" keypass="${aliaspass}">
 			<fileset dir="${dist}/lib/">
 				<include name="**/*.jar" />
 			</fileset>
