@@ -105,7 +105,6 @@ public class Model extends Observable implements Observer {
 	}
 
 	public void update(Observable arg0, Object arg) {
-		System.out.println("Model update " + arg0 + "\t" + arg);
 		if (arg instanceof ChangeEvent) {
 			undoStack.push((ChangeEvent) arg);
 			redoStack.clear();
