@@ -3,7 +3,6 @@
  */
 package net.sf.genomeview.gui.viztracks.hts;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
@@ -14,10 +13,8 @@ import java.util.logging.Logger;
 
 import javax.swing.JViewport;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
-import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
@@ -34,6 +31,10 @@ public class PileupTrack extends Track {
 
 	private PileProvider provider;
 	
+	
+	protected int cogOffset(){
+		return 10;
+	}
 	// private String label;
 	static class PTMObserver implements Observer {
 
