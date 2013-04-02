@@ -17,18 +17,18 @@ import be.abeel.net.URIFactory;
 public class Blast {
 
 	public static void blastn(String header, String seq) {
-		go("http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?PROGRAM=blastn&BLAST_PROGRAMS=megaBlast&PAGE_TYPE=BlastSearch&SHOW_DEFAULTS=on&BLAST_SPEC=&LINK_LOC=blasttab&QUERY=%3E"
-				+ header + "%0A" + seq);
+		go("http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?PROGRAM=blastn&BLAST_PROGRAMS=megaBlast&PAGE_TYPE=BlastSearch&SHOW_DEFAULTS=on&BLAST_SPEC=&LINK_LOC=blasttab&QUERY=>"
+				+ header + "\n" + seq);
 	}
 
 	public static void blastp(String header, String seq) {
-		go("http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?PROGRAM=blastp&BLAST_PROGRAMS=blastp&PAGE_TYPE=BlastSearch&SHOW_DEFAULTS=on&BLAST_SPEC=&LINK_LOC=blasttab&QUERY=%3E"
-				+ header + "%0A" + seq);
+		go("http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?PROGRAM=blastp&BLAST_PROGRAMS=blastp&PAGE_TYPE=BlastSearch&SHOW_DEFAULTS=on&BLAST_SPEC=&LINK_LOC=blasttab&QUERY=>"
+				+ header + "\n" + seq);
 	}
 
 	public static void blastx(String header, String seq) {
-		go("http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?PROGRAM=blastx&BLAST_PROGRAMS=blastx&PAGE_TYPE=BlastSearch&SHOW_DEFAULTS=on&BLAST_SPEC=&LINK_LOC=blasttab&QUERY=%3E"
-				+ header + "%0A" + seq);
+		go("http://www.ncbi.nlm.nih.gov/blast/Blast.cgi?PROGRAM=blastx&BLAST_PROGRAMS=blastx&PAGE_TYPE=BlastSearch&SHOW_DEFAULTS=on&BLAST_SPEC=&LINK_LOC=blasttab&QUERY=>"
+				+ header + "\n" + seq);
 	}
 
 	private static void go(String url) {
