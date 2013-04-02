@@ -196,7 +196,7 @@ public class SaveDialog extends JDialog {
 		 */
 		addSeparator("Annotation types to save");
 		boolean typeSelectionEnabledFlag = Configuration.getBoolean("save:enableTypeSelection");
-		final MultiSelectionArray<Type> typesList = new MultiSelectionArray<Type>(Arrays.asList(Type.values()),typeSelectionEnabledFlag);
+		final MultiSelectionArray<net.sf.jannot.Type> typesList = new MultiSelectionArray<net.sf.jannot.Type>(Arrays.asList(net.sf.jannot.Type.values()),typeSelectionEnabledFlag);
 		add(new JScrollPane(typesList), "growx,growy,span 1 2");
 
 		JButton selectAllTypes = new JButton("Select all types");
@@ -230,7 +230,7 @@ public class SaveDialog extends JDialog {
 					public void run() {
 						try {
 
-							Collection<Type> selectedTypes = Arrays.asList(Type.values());
+							Collection<net.sf.jannot.Type> selectedTypes = Arrays.asList(net.sf.jannot.Type.values());
 							if (typesList.selectedItems().size() > 0)
 								selectedTypes = typesList.selectedItems();
 
@@ -247,6 +247,7 @@ public class SaveDialog extends JDialog {
 							FileOutputStream fos = new FileOutputStream(tmp);
 
 							for (Entry e : entriesList.selectedItems()) {
+								System.out.println(selectedTypes);
 								parser.write(fos, e, selectedTypes.toArray(new net.sf.jannot.Type[0]));
 							}
 							fos.close();
