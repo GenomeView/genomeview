@@ -326,7 +326,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		
 		/* Crop buffered image if not everything is needed */
 		int actualHeight = lines * readLineHeight;
-		if(lines==0){
+		if(visibleReadCount==0){
 			g.setColor(Color.BLACK);
 			
 			g.drawString("No data in this region", (int) (screenWidth / 2), 10);
