@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="2126" />
+	<property name="version" value="2138" />
 	<property name="src" value="src" />
 	<property name="res" value="resources" />
 	<property name="build" value="build" />
