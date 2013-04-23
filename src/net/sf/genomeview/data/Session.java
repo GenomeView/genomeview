@@ -61,7 +61,7 @@ public class Session {
 	private static Logger log = Logger.getLogger(Session.class.getCanonicalName());
 
 	enum SessionInstruction {
-		CONFIG, DATA, OPTION, LOCATION, C, U, F;
+		PREFIX, CONFIG, DATA, OPTION, LOCATION, C, U, F;
 	}
 
 	private static void loadSession(final Model model, final InputStream is) {
@@ -75,16 +75,18 @@ public class Session {
 
 				try {
 					String key = it.next();
-					if (!key.startsWith("##GenomeView session")) {
+					String lcKey = key.toLowerCase();
+					if (!(lcKey.contains("genomeview") && lcKey.contains("session"))) {
 						JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "The selected file is not a GenomeView session");
 					} else {
 
 						model.clearEntries();
+						String prefix = "";
 						for (String line : it) {
 							if (line.startsWith("#") || line.isEmpty())
 								continue;
-							char firstchar=line.toUpperCase().charAt(0);
-							
+							char firstchar = line.toUpperCase().charAt(0);
+
 							String[] arr = line.split("[: \t]", 2);
 
 							model.messageModel().setStatusBarMessage("Loading session, current file: " + line + "...");
@@ -92,15 +94,19 @@ public class Session {
 							try {
 								si = SessionInstruction.valueOf(arr[0].toUpperCase());
 							} catch (Exception e) {
-								log.log(Level.WARNING,"Could not parse: " + arr[0] + "\n Unknown instruction.\nCould not load session line: " + line,e);
+								log.log(Level.WARNING, "Could not parse: " + arr[0] + "\n Unknown instruction.\nCould not load session line: " + line, e);
 							}
+							
 							if (si != null) {
 								switch (si) {
+								case PREFIX:
+									prefix = arr[1];
+									break;
 								case U:
 								case F:
 								case DATA:
 									try {
-										DataSourceHelper.load(model, new Locator(arr[1]));
+										DataSourceHelper.load(model, new Locator(prefix + arr[1]));
 									} catch (RuntimeException re) {
 										log.log(Level.SEVERE, "Something went wrong while loading line: " + line
 												+ "\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.", re);
@@ -108,8 +114,8 @@ public class Session {
 									break;
 								case C:
 								case CONFIG:
-									Configuration.loadExtra(new Locator(arr[1]).stream());
-									//Configuration.loadExtra(URIFactory.url(arr[1]).openStream());
+									Configuration.loadExtra(new Locator(prefix + arr[1]).stream());
+									// Configuration.loadExtra(URIFactory.url(arr[1]).openStream());
 									break;
 								case OPTION:
 									String[] ap = arr[1].split("=", 2);
