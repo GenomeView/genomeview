@@ -3,6 +3,7 @@
  */
 package net.sf.genomeview.gui;
 
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Authenticator;
 import java.util.Arrays;
@@ -16,13 +17,14 @@ import javax.swing.SwingUtilities;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import be.abeel.concurrency.DaemonThread;
+
 /**
  * 
  * @author Thomas Abeel
- *
+ * 
  */
 public class GenomeView {
-	private static Logger logger=Logger.getLogger(GenomeView.class.getCanonicalName());
+	private static Logger logger = Logger.getLogger(GenomeView.class.getCanonicalName());
 
 	private static WindowManager mw;
 
@@ -34,49 +36,59 @@ public class GenomeView {
 			args[0] = "--file";
 
 	}
-	private static Splash splash=null;
 
-	
-	public static Model getModel(){
-		if(mw==null)
+	private static Splash splash = null;
+
+	public static Model getModel() {
+		if (mw == null)
 			return null;
 		return mw.getModel();
 	}
+
 	public static void main(final String[] args) {
-		
+
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 
 				@Override
 				public void run() {
-					
+
 					splash = new Splash();
 				}
 			});
 		} catch (InterruptedException e1) {
-			//Ignore, it's not like we really care
+			// Ignore, it's not like we really care
 		} catch (InvocationTargetException e1) {
-			//Ignore, it's not like we really care
+			// Ignore, it's not like we really care
 		}
-		
+
 		/* Rewrite JNLP arguments */
 		jnlprewrite(args);
 		/*
-		 * The configuration class needs to be called at least once
-		 * before we can start the logger
+		 * The configuration class needs to be called at least once before we
+		 * can start the logger
 		 */
 		System.out.println("Starting GenomeView " + Configuration.version());
-		
+
 		new DaemonThread(new Runnable() {
 
 			@Override
 			public void run() {
-				
 
 				LogConfigurator.config();
-				logger.info("GenomeView version "+Configuration.version());
-				logger.info("Current date and time: "+new Date());
-				logger.info("Command line instructions: "+Arrays.toString(args));
+				logger.info("Configuration summary: \n\tGenomeView version: " + Configuration.version() + "\n\t" + "Current date and time: " + new Date() + "\n\t"
+						+ "Command line instructions: " + Arrays.toString(args) + "\n\t" + "Number of processors: "
+						+ Integer.toString(Runtime.getRuntime().availableProcessors()) + "\n\t" + "Free memory :"
+						+ Long.toString(Runtime.getRuntime().freeMemory()) + "\n\t" + "Max memory: " + Long.toString(Runtime.getRuntime().maxMemory()) + "\n\t"
+						+ "Total JVM: " + Long.toString(Runtime.getRuntime().totalMemory()) + "\n\t" + "OS: "
+						+ ManagementFactory.getOperatingSystemMXBean().getName() + " " + ManagementFactory.getOperatingSystemMXBean().getVersion() + "\n\t"
+						+ "Architecture: " + ManagementFactory.getOperatingSystemMXBean().getArch() + "\n\t" + "JVM version: "
+						+ System.getProperty("java.version")
+
+				);
+
+				
+
 				CommandLineOptions.init(args);
 				/* Single instance manager */
 				boolean singleInstance = Configuration.getBoolean("general:singleInstance");
@@ -88,14 +100,13 @@ public class GenomeView {
 						StaticUtils.forceExit();
 						return;
 					}
-					
 
 				}
 
 				Authenticator.setDefault(new MyAuthenticator());
 
 				try {
-					mw = new WindowManager(args,splash);
+					mw = new WindowManager(args, splash);
 					ApplicationInstanceManager.setCallback(mw);
 				} catch (InterruptedException e) {
 					logger.log(Level.SEVERE, "main window initialization", e);
@@ -106,5 +117,4 @@ public class GenomeView {
 			}
 		}).start();
 	}
-
 }
