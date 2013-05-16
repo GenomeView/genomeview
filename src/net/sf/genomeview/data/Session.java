@@ -96,34 +96,38 @@ public class Session {
 							} catch (Exception e) {
 								log.log(Level.WARNING, "Could not parse: " + arr[0] + "\n Unknown instruction.\nCould not load session line: " + line, e);
 							}
-							
-							if (si != null) {
-								switch (si) {
-								case PREFIX:
-									prefix = arr[1];
-									break;
-								case U:
-								case F:
-								case DATA:
-									try {
-										DataSourceHelper.load(model, new Locator(prefix + arr[1]));
-									} catch (RuntimeException re) {
-										log.log(Level.SEVERE, "Something went wrong while loading line: " + line
-												+ "\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.", re);
-									}
-									break;
-								case C:
-								case CONFIG:
-									Configuration.loadExtra(new Locator(prefix + arr[1]).stream());
-									// Configuration.loadExtra(URIFactory.url(arr[1]).openStream());
-									break;
-								case OPTION:
-									String[] ap = arr[1].split("=", 2);
-									Configuration.set(ap[0], ap[1]);
-									break;
-								case LOCATION:
-									ExternalHelper.setPosition(arr[1], model);
 
+							if (si != null) {
+								try {
+									switch (si) {
+									case PREFIX:
+										prefix = arr[1];
+										break;
+									case U:
+									case F:
+									case DATA:
+										try {
+											DataSourceHelper.load(model, new Locator(prefix + arr[1]));
+										} catch (RuntimeException re) {
+											log.log(Level.SEVERE, "Something went wrong while loading line: " + line
+													+ "\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.", re);
+										}
+										break;
+									case C:
+									case CONFIG:
+										Configuration.loadExtra(new Locator(prefix + arr[1]).stream());
+										// Configuration.loadExtra(URIFactory.url(arr[1]).openStream());
+										break;
+									case OPTION:
+										String[] ap = arr[1].split("=", 2);
+										Configuration.set(ap[0], ap[1]);
+										break;
+									case LOCATION:
+										ExternalHelper.setPosition(arr[1], model);
+
+									}
+								} catch (Exception e) {
+									log.log(Level.WARNING, "Exception while executing this instruction: " + line + "\n Skipping this line and continuing.", e);
 								}
 							}
 
