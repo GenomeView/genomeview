@@ -309,9 +309,10 @@ public class PileupTrackConfig extends TrackConfig {
 	}
 
 	boolean isDynamicScaling() {
-		if (globalSettings)
+		if (globalSettings){
+			dynamicScaling=Configuration.getBoolean("pileup:dynamicRange");
 			return Configuration.getBoolean("pileup:dynamicRange");
-		else
+		}else
 			return dynamicScaling;
 	}
 
