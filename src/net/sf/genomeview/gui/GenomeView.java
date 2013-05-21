@@ -64,18 +64,20 @@ public class GenomeView {
 
 		/* Rewrite JNLP arguments */
 		jnlprewrite(args);
-		/*
-		 * The configuration class needs to be called at least once before we
-		 * can start the logger
-		 */
-		System.out.println("Starting GenomeView " + Configuration.version());
+		
 
 		new DaemonThread(new Runnable() {
 
 			@Override
 			public void run() {
-
 				LogConfigurator.config();
+				/*
+				 * The configuration class needs to be called at least once before we
+				 * can start the logger
+				 */
+				
+				System.out.println("Starting GenomeView " + Configuration.version());
+				
 				logger.info("Configuration summary: \n\tGenomeView version: " + Configuration.version() + "\n\t" + "Current date and time: " + new Date() + "\n\t"
 						+ "Command line instructions: " + Arrays.toString(args) + "\n\t" + "Number of processors: "
 						+ Integer.toString(Runtime.getRuntime().availableProcessors()) + "\n\t" + "Free memory :"
