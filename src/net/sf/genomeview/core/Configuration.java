@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
@@ -176,7 +177,13 @@ public class Configuration {
 				logger.log(Level.SEVERE, "Something went horribly wrong while loading the configuration.", e);
 			}
 		}
+		updateSynonyms();
+
+	}
+
+	private static void updateSynonyms(){
 		try {
+			logger.warning("Updating synonyms for :"+Arrays.toString(get("synonyms").split(",")));
 			for (String s : get("synonyms").split(",")) {
 
 				try {
@@ -190,9 +197,7 @@ public class Configuration {
 		} catch (Exception e) {
 			logger.log(Level.WARNING, "Failed to load additional synonyms for option: " + get("synonyms"), e);
 		}
-
 	}
-
 	/**
 	 * Save all configuration back to the respective files.
 	 * 
@@ -301,6 +306,7 @@ public class Configuration {
 			}
 		}
 		it.close();
+		updateSynonyms();
 
 	}
 
