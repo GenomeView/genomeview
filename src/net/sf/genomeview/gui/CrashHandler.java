@@ -46,87 +46,97 @@ import be.abeel.net.URIFactory;
  */
 public class CrashHandler {
 
-	private static Logger log=Logger.getLogger(CrashHandler.class.getCanonicalName());
+	private static Logger log = Logger.getLogger(CrashHandler.class.getCanonicalName());
 
-	public static void showErrorMessage(String message,Throwable cause){
+	public static void showErrorMessage(String message, Throwable cause) {
 		log.log(Level.SEVERE, message, cause);
-		JOptionPane.showMessageDialog(null, message+"\n\n" + MessageManager.getString("crashhandler.error_logged"), MessageManager.getString("crashhandler.error "), JOptionPane.ERROR_MESSAGE );
-		
+		JOptionPane.showMessageDialog(null, message + "\n\n" + MessageManager.getString("crashhandler.error_logged"),
+				MessageManager.getString("crashhandler.error "), JOptionPane.ERROR_MESSAGE);
+
 	}
-	
 
 	private CrashHandler() {
+		try {
+			final JFrame window = new JFrame(MessageManager.getString("crashhandler.error"));
+			window.setAlwaysOnTop(true);
+			window.setResizable(false);
+			JTextArea ll = new JTextArea(10, 30);
+			ll.setText(MessageManager.getString("crashhandler.unrecoverable_error"));
+			ll.setWrapStyleWord(true);
+			ll.setLineWrap(true);
+			ll.setEditable(false);
+			window.setLayout(new GridBagLayout());
+			GridBagConstraints gc = new GridBagConstraints();
+			gc.gridx = 0;
+			gc.weighty = 1;
+			gc.fill = GridBagConstraints.BOTH;
 
-		final JFrame window = new JFrame(MessageManager.getString("crashhandler.error"));
-		window.setAlwaysOnTop(true);
-		window.setResizable(false);
-		JTextArea ll = new JTextArea(10, 30);
-		ll.setText(MessageManager.getString("crashhandler.unrecoverable_error"));
-		ll.setWrapStyleWord(true);
-		ll.setLineWrap(true);
-		ll.setEditable(false);
-		window.setLayout(new GridBagLayout());
-		GridBagConstraints gc = new GridBagConstraints();
-		gc.gridx = 0;
-		gc.weighty=1;
-		gc.fill=GridBagConstraints.BOTH;
-		
-		// gc.grid
-		window.add(ll, gc);
-		JButton open = new JButton(MessageManager.getString("crashhandler.open_logs"));
-		open.addActionListener(new ActionListener() {
+			// gc.grid
+			window.add(ll, gc);
+			JButton open = new JButton(MessageManager.getString("crashhandler.open_logs"));
+			open.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					/* We should not use the configuration class as it may be the source of the crash */
-					String s = System.getProperty("user.home");
-					File confDir = new File(s + "/.genomeview");
-					Desktop.getDesktop().open(confDir);
-				} catch (IOException e1) {
-					JOptionPane.showMessageDialog(window, MessageManager.getString("crashhandler.couldnt_open_log_folder"));
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						/*
+						 * We should not use the configuration class as it may
+						 * be the source of the crash
+						 */
+						String s = System.getProperty("user.home");
+						File confDir = new File(s + "/.genomeview");
+						Desktop.getDesktop().open(confDir);
+					} catch (IOException e1) {
+						JOptionPane.showMessageDialog(window, MessageManager.getString("crashhandler.couldnt_open_log_folder"));
+					}
+
 				}
+			});
+			window.add(open, gc);
 
-			}
-		});
-		window.add(open, gc);
-		
-		JButton report = new JButton(MessageManager.getString("crashhandler.report"));
-		report.addActionListener(new ActionListener() {
+			JButton report = new JButton(MessageManager.getString("crashhandler.report"));
+			report.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					Desktop.getDesktop().browse(URIFactory.uri("https://sourceforge.net/tracker/?func=add&group_id=208107&atid=1004368"));
-				} catch (Exception e1) {
-					JOptionPane.showMessageDialog(window, MessageManager.getString("crashhandler.couldnt_bugtrack"));
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						Desktop.getDesktop().browse(URIFactory.uri("https://sourceforge.net/tracker/?func=add&group_id=208107&atid=1004368"));
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(window, MessageManager.getString("crashhandler.couldnt_bugtrack"));
+					}
+
 				}
+			});
+			window.add(report, gc);
 
-			}
-		});
-		window.add(report, gc);
-		
-		JButton close = new JButton(MessageManager.getString("crashhandler.close_window"));
-		close.addActionListener(new ActionListener() {
+			JButton close = new JButton(MessageManager.getString("crashhandler.close_window"));
+			close.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.exit(-1);
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					System.exit(-1);
 
-			}
-		});
-		window.add(close, gc);
+				}
+			});
+			window.add(close, gc);
 
-		window.pack();
-		StaticUtils.center(null,window);
-		window.setVisible(true);
-		window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+			window.pack();
+			StaticUtils.center(null, window);
+			window.setVisible(true);
+			window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		} catch (Throwable e) {
+
+			log.log(Level.SEVERE, "GenomeView could not execute post-mortem", e);
+			System.exit(-2);
+
+		}
 	}
-	
+
 	public static void crash(Level logLevel, String logMessage, Throwable ex) {
 		log.log(logLevel, logMessage, ex);
 		log.severe("GenomeView is dead, initializing post-mortem.");
+
 		new CrashHandler();
-		
+
 	}
 }
