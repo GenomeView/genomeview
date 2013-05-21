@@ -18,6 +18,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.search.SearchDialog.SequenceType;
 import net.sf.jannot.Location;
 import be.abeel.gui.TitledComponent;
@@ -38,7 +39,7 @@ class MotifSearchPane extends SearchPanel {
 		final JTextField seq = new JTextField(40);
 		this.setFocusField(seq);
 		
-		JButton search = new JButton("Search");
+		JButton search = new JButton(MessageManager.getString("button.search"));
 
 		final MotifSearchResultModel mrm = new MotifSearchResultModel(model);
 		final JTable results = new JTable(mrm);
@@ -95,7 +96,7 @@ class MotifSearchPane extends SearchPanel {
 		gc.weightx = 1;
 		gc.gridwidth = 4;
 		gc.weighty = 0.1;
-		add(new TitledComponent("Query sequence (N for ambiguous nucletodie, X for ambiguous amino acid)", seq), gc);
+		add(new TitledComponent(MessageManager.getString("motifsearch.query_sequence"), seq), gc);
 		gc.weighty = 0;
 		gc.gridwidth = 1;
 		gc.gridy++;
@@ -111,7 +112,7 @@ class MotifSearchPane extends SearchPanel {
 		gc.gridy++;
 		gc.weighty = 1;
 		gc.weightx = 1;
-		add(new TitledComponent("Result locations", new JScrollPane(results)), gc);
+		add(new TitledComponent(MessageManager.getString("motifsearch.result_locations"), new JScrollPane(results)), gc);
 
 	}
 

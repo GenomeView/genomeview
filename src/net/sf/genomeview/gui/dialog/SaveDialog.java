@@ -36,6 +36,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.ClientHttpUpload;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Type;
@@ -117,17 +118,17 @@ public class SaveDialog extends JDialog {
 	}
 
 	public SaveDialog(final Model model) {
-		super(model.getGUIManager().getParent(), "Save dialog", true);
+		super(model.getGUIManager().getParent(), MessageManager.getString("savedialog.title"), true);
 		setLayout(new MigLayout("wrap 2"));
 
 		/*
 		 * Save location
 		 */
-		addSeparator("Location to save to");
+		addSeparator(MessageManager.getString("savedialog.location_to_save_to"));
 		final JTextField locationField = new JTextField();
 		add(locationField, "growx");
 
-		JButton browseButton = new JButton("Browse...");
+		JButton browseButton = new JButton(MessageManager.getString("savedialog.browse"));
 		browseButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -156,7 +157,7 @@ public class SaveDialog extends JDialog {
 		/*
 		 * Parser selection
 		 */
-		addSeparator("File format options");
+		addSeparator(MessageManager.getString("savedialog.file_format_options"));
 		Parser defaultParser = Configuration.getParser("save:defaultParser");
 		Parser[] arr = new Parser[] { Parser.GFF3, Parser.EMBL };
 
@@ -176,15 +177,15 @@ public class SaveDialog extends JDialog {
 		add(includeSequence);
 
 		/* Entries list */
-		addSeparator("Select entries to save");
+		addSeparator(MessageManager.getString("savedialog.select_entries_to_save"));
 		boolean entrySelectionEnabledFlag = Configuration.getBoolean("save:enableEntrySelection");
 		final MultiSelectionArray<Entry> entriesList = new MultiSelectionArray<Entry>(model.entries(),entrySelectionEnabledFlag);
 		add(new JScrollPane(entriesList), "growx,growy,span 1 2");
 
-		JButton selectAllEntries = new JButton("Select all entries");
+		JButton selectAllEntries = new JButton(MessageManager.getString("savedialog.select_all_entries"));
 		add(selectAllEntries);
 
-		JButton selectNoneEntries = new JButton("Deselect all entries");
+		JButton selectNoneEntries = new JButton(MessageManager.getString("savedialog.deselect_all_entries"));
 		add(selectNoneEntries);
 
 	
@@ -194,15 +195,15 @@ public class SaveDialog extends JDialog {
 		/*
 		 * Type selection
 		 */
-		addSeparator("Annotation types to save");
+		addSeparator(MessageManager.getString("savedialog.annotation_types"));
 		boolean typeSelectionEnabledFlag = Configuration.getBoolean("save:enableTypeSelection");
 		final MultiSelectionArray<net.sf.jannot.Type> typesList = new MultiSelectionArray<net.sf.jannot.Type>(Arrays.asList(net.sf.jannot.Type.values()),typeSelectionEnabledFlag);
 		add(new JScrollPane(typesList), "growx,growy,span 1 2");
 
-		JButton selectAllTypes = new JButton("Select all types");
+		JButton selectAllTypes = new JButton(MessageManager.getString("savedialog.select_all_types"));
 		add(selectAllTypes);
 
-		JButton selectNoneTypes = new JButton("Deselect all types");
+		JButton selectNoneTypes = new JButton(MessageManager.getString("savedialog.deselect_all_types"));
 		add(selectNoneTypes);
 
 		
@@ -214,8 +215,8 @@ public class SaveDialog extends JDialog {
 		 * Actions
 		 */
 		addSeparator("");
-		JButton save = new JButton("Save");
-		JButton close = new JButton("Cancel");
+		JButton save = new JButton(MessageManager.getString("button.save"));
+		JButton close = new JButton(MessageManager.getString("button.cancel"));
 
 		add(save, "center");
 		add(close, "center");
@@ -224,7 +225,7 @@ public class SaveDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				model.messageModel().setStatusBarMessage("Saving data, you will be notified when complete...");
+				model.messageModel().setStatusBarMessage(MessageManager.getString("savedialog.saving_data"));
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -264,12 +265,12 @@ public class SaveDialog extends JDialog {
 									String reply = ClientHttpUpload.upload(tmp, url);
 
 									if (reply.equals("")) {
-										throw new SaveFailedException("Empty reply from server");
+										throw new SaveFailedException(MessageManager.getString("savedialog.empty_reply_server"));
 									}
 
 									if (reply.toLowerCase().contains("error")) {
 										showServerMessage(reply);
-										throw new SaveFailedException("Error reply from server");
+										throw new SaveFailedException(MessageManager.getString("savedialog.empty_reply_server"));
 
 									}
 									showServerMessage(reply);
@@ -289,9 +290,9 @@ public class SaveDialog extends JDialog {
 
 								boolean succes = tmp.renameTo(out);
 								if (!succes) {
-									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Save failed!");
+									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("savedialog.save_failed"));
 								} else {
-									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Save succeeded!");
+									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("savedialog.save_succeeded"));
 								}
 							}
 
@@ -310,7 +311,7 @@ public class SaveDialog extends JDialog {
 						diag.setTitle("Server reply");
 						diag.getContentPane().setLayout(new BorderLayout());
 						diag.getContentPane().add(new JScrollPane(txt), BorderLayout.CENTER);
-						diag.getContentPane().add(new JButton(new AbstractAction("OK") {
+						diag.getContentPane().add(new JButton(new AbstractAction(MessageManager.getString("button.ok")) {
 
 							@Override
 							public void actionPerformed(ActionEvent e) {

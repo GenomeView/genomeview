@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import net.sf.genomeview.gui.dialog.OpenDialog;
 import be.abeel.gui.GridBagPanel;
@@ -41,7 +42,7 @@ class GenomesPanel extends GridBagPanel implements ScrollToTop {
 			gc.gridy++;
 			gc.weightx = 0;
 			
-			JButton myData=new JButton("Work with my data",Icons.LARGEOPEN);
+			JButton myData=new JButton(MessageManager.getString("genomespanel.work_with_my_data"),Icons.LARGEOPEN);
 			myData.setBackground(Color.WHITE);
 			add(myData, gc);
 			myData.addActionListener(new ActionListener() {
@@ -69,7 +70,7 @@ class GenomesPanel extends GridBagPanel implements ScrollToTop {
 			
 			gc.weighty = 0;
 			gc.gridy++;
-			JButton box=new JButton("Dismiss this dialog");
+			JButton box=new JButton(MessageManager.getString("button.dismiss_dialog"));
 			box.setBackground(Color.WHITE);
 			box.addActionListener(new ActionListener() {
 				
@@ -137,7 +138,7 @@ class GenomesPanel extends GridBagPanel implements ScrollToTop {
 			gc.weighty=0;
 			JEditorPaneLabel requestNewGenome=new JEditorPaneLabel();
 			requestNewGenome.getStyleSheet().addRule("body{ text-align: right;}");
-			requestNewGenome.setText("If your genome of interest is not in the list, <a href=\"mailto:support@genomeview.org\">please e-mail us</a> your request.");
+			requestNewGenome.setText(MessageManager.getString("genomespanel.request_text"));
 			requestNewGenome.setBackground(Color.WHITE);
 			add(requestNewGenome,gc);
 			

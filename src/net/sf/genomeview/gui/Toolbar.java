@@ -41,7 +41,7 @@ public class Toolbar extends JToolBar {
 		add(new AnnotationMoveLeftAction(model));
 		add(new AnnotationMoveRightAction(model));
 		addSeparator();
-		add(new JLabel("Chromosome:"));
+		add(new JLabel(MessageManager.getString("toolbar.chromosome")));
 		final JComboBox cb=new JComboBox(new EntryListModel(model));
 		model.addObserver(new Observer() {
 			
@@ -54,7 +54,7 @@ public class Toolbar extends JToolBar {
 		add(cb);
 		
 		if (Configuration.getBoolean("geneticCodeSelection")) {
-			add(new JLabel("Code:"));
+			add(new JLabel(MessageManager.getString("toolbar.code")));
 			add(new AAMappingChooser(model));
 		}
 		

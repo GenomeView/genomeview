@@ -43,6 +43,7 @@ import javax.swing.text.JTextComponent;
 import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.data.Blast;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
@@ -81,7 +82,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 	private String subSequenceNuc;
 	private String subSequenceProt;
 
-	private final JButton toggleButton = new JButton(TO_PROT_CAPTION);
+	private final JButton toggleButton = new JButton(MessageManager.getString("sequenceviewdialog.protein_view"));
 
 	private Sequence getseq() {
 		Sequence seq=null;
@@ -104,7 +105,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		// this.setModal(true);
 
 		this.setLayout(new BorderLayout());
-		this.setTitle("Sequence view");
+		this.setTitle(MessageManager.getString("sequenceviewdialog.sequence_view"));
 		this.setAlwaysOnTop(true);
 		this.model = model;
 		model.addObserver(this);
@@ -123,10 +124,10 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
 		// buttons
 
-		JButton closeButton = new JButton("Close");
-		JButton exportButton = new JButton("Export as Fasta...");
+		JButton closeButton = new JButton(MessageManager.getString("button.close"));
+		JButton exportButton = new JButton(MessageManager.getString("sequenceviewdialog.export_fasta"));
 
-		JButton clipboardButton = new JButton("Copy to clipboard");
+		JButton clipboardButton = new JButton(MessageManager.getString("sequenceviewdialog.copy_clipboard"));
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -138,7 +139,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonPanel.add(exportButton);
 		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-		buttonPanel.add(new JButton(new AbstractAction("NCBI Blastp") {
+		buttonPanel.add(new JButton(new AbstractAction(MessageManager.getString("sequenceviewdialog.ncbi_blastp")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -151,7 +152,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 			
 		}));
 		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-		buttonPanel.add(new JButton(new AbstractAction("NCBI Blastn") {
+		buttonPanel.add(new JButton(new AbstractAction(MessageManager.getString("sequenceviewdialog.ncbi_blastn")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -161,7 +162,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 			}
 		}));
 		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-		buttonPanel.add(new JButton(new AbstractAction("NCBI Blastx") {
+		buttonPanel.add(new JButton(new AbstractAction(MessageManager.getString("sequenceviewdialog.ncbi_blastx")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -419,10 +420,10 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		subSequenceProt = null;
 		if (viewMode == NUC_MODE) {
 			fillWithNucleotides();
-			toggleButton.setText(TO_PROT_CAPTION);
+			toggleButton.setText(MessageManager.getString("sequenceviewdialog.protein_view"));
 		} else {
 			fillWithProteins();
-			toggleButton.setText(TO_NUC_CAPTION);
+			toggleButton.setText(MessageManager.getString("sequenceviewdialog.nucleotide_view"));
 		}
 		highlight(sequenceText);
 

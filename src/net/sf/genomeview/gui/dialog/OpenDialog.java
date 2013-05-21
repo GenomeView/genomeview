@@ -32,6 +32,7 @@ import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.NotificationTypes;
 import net.sf.genomeview.data.ReadWorker;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
@@ -82,11 +83,11 @@ public class OpenDialog extends JDialog {
 		// public void run() {
 		GridBagPanel gp = new GridBagPanel();
 		_self.setContentPane(gp);
-		JButton file = new JButton("Local files", Icons.get("Hard Disk_48x48.png"));
+		JButton file = new JButton(MessageManager.getString("opendialog.local_files"), Icons.get("Hard Disk_48x48.png"));
 		configButton(file);
 		gp.add(file, gp.gc);
 		gp.gc.gridx++;
-		JButton url = new JButton("URL", Icons.get("Globe_48x48.png"));
+		JButton url = new JButton(MessageManager.getString("opendialog.url"), Icons.get("Globe_48x48.png"));
 		configButton(url);
 		gp.add(url, gp.gc);
 		gp.gc.gridx++;

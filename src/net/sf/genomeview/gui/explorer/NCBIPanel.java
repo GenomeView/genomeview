@@ -30,6 +30,7 @@ import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import net.sf.genomeview.gui.dialog.OpenDialog;
 import net.sf.jannot.exception.ReadFailedException;
@@ -72,7 +73,7 @@ public class NCBIPanel extends GridBagPanel implements ScrollToTop {
 				try {
 					DataSourceHelper.load(model, new Locator(prefix + s));
 				} catch (Exception e) {
-					CrashHandler.showErrorMessage("Failed to load NCBI data", e);
+					CrashHandler.showErrorMessage(MessageManager.getString("ncbipanel.failed_to_load_data"), e);
 				}
 			}
 
@@ -99,7 +100,7 @@ public class NCBIPanel extends GridBagPanel implements ScrollToTop {
 				}
 				it.close();
 			} catch (Exception e) {
-				CrashHandler.showErrorMessage("Could not read NCBI bacterial genome archive", e);
+				CrashHandler.showErrorMessage(MessageManager.getString("ncbipanel.coudnt_read_ncbi"), e);
 			}
 		}
 
@@ -140,7 +141,7 @@ public class NCBIPanel extends GridBagPanel implements ScrollToTop {
 		gc.gridy++;
 		gc.weightx = 0;
 
-		JButton myData = new JButton("Work with my data", Icons.LARGEOPEN);
+		JButton myData = new JButton(MessageManager.getString("ncbipanel.work_with_my_data"), Icons.LARGEOPEN);
 		myData.setBackground(Color.WHITE);
 		add(myData, gc);
 		myData.addActionListener(new ActionListener() {
@@ -156,14 +157,14 @@ public class NCBIPanel extends GridBagPanel implements ScrollToTop {
 		gc.gridy++;
 		gc.weighty = 1;
 		JEditorPaneLabel msgLabel = new JEditorPaneLabel();
-		msgLabel.setText("All Bacterial genomes available from NCBI\n\nDouble click the name of any species to load chromosome and plasmid data.");
+		msgLabel.setText(MessageManager.getString("ncbipanel.all_ncbi_bacterial_data"));
 
 		msgLabel.setPreferredSize(new Dimension(Icons.LOGO.getIconWidth(), 50));
 		add(msgLabel, gc);
 
 		gc.weighty = 0;
 		gc.gridy++;
-		JButton box = new JButton("Dismiss this dialog");
+		JButton box = new JButton(MessageManager.getString("button.dismiss_dialog"));
 		box.setBackground(Color.WHITE);
 		box.addActionListener(new ActionListener() {
 

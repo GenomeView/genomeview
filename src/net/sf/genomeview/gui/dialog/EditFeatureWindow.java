@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.StrandCombo;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
@@ -68,16 +69,16 @@ public class EditFeatureWindow extends JDialog {
 			location.setLineWrap(true);
 			strandSelection = new StrandCombo();
 			typeSelection = new TypeCombo(model);
-			this.add(new TitledComponent("Type", typeSelection), gc);
+			this.add(new TitledComponent(MessageManager.getString("editfeature.type"), typeSelection), gc);
 			gc.gridy++;
-			this.add(new TitledComponent("Strand", strandSelection), gc);
+			this.add(new TitledComponent(MessageManager.getString("editfeature.strand"), strandSelection), gc);
 
 			/* Notes legend */
 			gc.gridy++;
 			gc.gridwidth = 1;
-			this.add(new JLabel("Notes"), gc);
+			this.add(new JLabel(MessageManager.getString("editfeature.notes")), gc);
 			gc.gridx++;
-			this.add(new HelpButton(_self, "One qualifier per line, key=value"), gc);
+			this.add(new HelpButton(_self, MessageManager.getString("editfeature.help_one_qualifier_line")), gc);
 
 			/* Notes text area */
 			gc.gridy++;
@@ -91,9 +92,9 @@ public class EditFeatureWindow extends JDialog {
 			gc.weighty = 0;
 			gc.gridy++;
 			gc.gridwidth = 1;
-			this.add(new JLabel("Location"), gc);
+			this.add(new JLabel(MessageManager.getString("editfeature.location")), gc);
 			gc.gridx++;
-			this.add(new HelpButton(_self, "Locations separated with a comma, start and stop coordinate separated with two dots. White space and new lines are ignored."), gc);
+			this.add(new HelpButton(_self, MessageManager.getString("editfeature.location_separator")), gc);
 
 			/* Location text area */
 			gc.gridy++;
@@ -105,7 +106,7 @@ public class EditFeatureWindow extends JDialog {
 
 			gc.gridy++;
 			gc.weighty = 0;
-			JButton ok = new JButton("Save & Close");
+			JButton ok = new JButton(MessageManager.getString("button.save_close"));
 			ok.addActionListener(new ActionListener() {
 
 				public void actionPerformed(ActionEvent arg0) {
@@ -130,7 +131,7 @@ public class EditFeatureWindow extends JDialog {
 						feature.setLocation(loc);
 					} catch (Exception e) {
 						e.printStackTrace();
-						JOptionPane.showMessageDialog(_self, "Could not parse the location, please double check!", "Location failed", JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(_self, MessageManager.getString("editfeature.location_failed_warn"), MessageManager.getString("editfeature.location_failed"), JOptionPane.WARNING_MESSAGE);
 						warning = true;
 					}
 					feature.setStrand(strandSelection.getStrand());
@@ -165,7 +166,7 @@ public class EditFeatureWindow extends JDialog {
 //						feature.setMute(false);
 					} catch (Exception e) {
 						e.printStackTrace();
-						JOptionPane.showMessageDialog(_self, "Failed to parse the notes, please double check!", "Notes failed", JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(_self, MessageManager.getString("editfeature.notes_failed_warn"), MessageManager.getString("editfeature.notes_failed"), JOptionPane.WARNING_MESSAGE);
 						warning = true;
 					}
 					
@@ -211,7 +212,7 @@ public class EditFeatureWindow extends JDialog {
 	}
 
 	public EditFeatureWindow(Model model) {
-		super(model.getGUIManager().getParent(), "Edit structure");
+		super(model.getGUIManager().getParent(), MessageManager.getString("editfeature.edit_structure"));
 		_self = this;
 		setModal(true);
 		this.model = model;

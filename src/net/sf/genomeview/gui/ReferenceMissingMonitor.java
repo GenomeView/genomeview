@@ -54,7 +54,7 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 	
 	private ReferenceMissingMonitor(Model model) {
 		super(model.getGUIManager().getParent(), ModalityType.MODELESS);
-		setTitle("Reference sequence missing!!");
+		setTitle(MessageManager.getString("referencemissing.title"));
 		setIconImage(Icons.MINILOGO);
 		addWindowListener(new WindowAdapter() {
 
@@ -93,7 +93,7 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 		buttons.setLayout(new BorderLayout());
 		add(buttons, BorderLayout.SOUTH);
 
-		JButton dismiss = new JButton("Dismiss");
+		JButton dismiss = new JButton(MessageManager.getString("referencemissing.dismiss"));
 		dismiss.addActionListener(new ActionListener() {
 
 			@Override
@@ -106,7 +106,7 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 
 		buttons.add(dismiss, BorderLayout.WEST);
 
-		JButton data = new JButton("Load data");
+		JButton data = new JButton(MessageManager.getString("referencemissing.load_data"));
 		data.addActionListener(new LoadFeaturesAction(model));
 		buttons.add(data, BorderLayout.EAST);
 		pack();
@@ -173,7 +173,7 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 		
 		if (missingReference > 0 && lastMissing != missingReference) {
 			StringBuffer msg = new StringBuffer(
-					"<html><h1>Warning!!</h1>Not every entry has a reference sequence loaded! Some visualizations will not work as expected without reference.<br><br>Entries without reference: ");
+					MessageManager.getString("referencemissing.not_every_entry_has_reference"));
 			for (String s : missing) {
 				msg.append("\n" + s);
 			}

@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 
@@ -27,7 +28,7 @@ public class UniqueFeatureHitDialog extends JDialog {
 
     public UniqueFeatureHitDialog(java.util.Set<Feature> list, Model model) {
 
-        super(model.getGUIManager().getParent(), "Multiple possibilities!");
+        super(model.getGUIManager().getParent(), MessageManager.getString("uniquefeaturehitdialog.title"));
         this.model = model;
         this.setModal(true);
         this.setLayout(new BorderLayout());
@@ -39,7 +40,7 @@ public class UniqueFeatureHitDialog extends JDialog {
         for (Feature p : list) {
             box.addItem(p);
         }
-        JButton ok = new JButton("OK");
+        JButton ok = new JButton(MessageManager.getString("button.ok"));
         this.getRootPane().setDefaultButton(ok);
         ok.addActionListener(new ActionListener() {
             @Override
@@ -49,7 +50,7 @@ public class UniqueFeatureHitDialog extends JDialog {
             }
 
         });
-        this.add(new JLabel("Please select your choice"), BorderLayout.NORTH);
+        this.add(new JLabel(MessageManager.getString("uniquefeaturehitdialog.select")), BorderLayout.NORTH);
         this.add(box, BorderLayout.CENTER);
         this.add(ok, BorderLayout.SOUTH);
         this.pack();

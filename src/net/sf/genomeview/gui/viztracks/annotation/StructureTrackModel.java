@@ -28,6 +28,7 @@ import javax.swing.JButton;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.StructureTrackConfig;
 import net.sf.genomeview.gui.viztracks.TrackConfig;
 import net.sf.jannot.StringKey;
@@ -68,7 +69,7 @@ public class StructureTrackModel extends TrackConfig {
 		GridBagPanel out = super.getGUIContainer();
 		final StructureTrackModel _self = this;
 		out.gc.gridy++;
-		out.add(new JButton(new AbstractAction("Configure visible types") {
+		out.add(new JButton(new AbstractAction(MessageManager.getString("structuretrack.configure")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {

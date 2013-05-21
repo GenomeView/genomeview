@@ -37,7 +37,7 @@ public class Splash extends JDialog {
 		content.setBackground(Color.WHITE);
 		content.setLayout(new BorderLayout());
 		floater = new JLabel(new ImageIcon(this.getClass().getResource("/images/splash.png")));
-		text = new JLabel("Starting GenomeView...");
+		text = new JLabel(MessageManager.getString("splash.starting"));
 		Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 
 		// this.setAlwaysOnTop(true);

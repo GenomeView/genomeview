@@ -1,5 +1,22 @@
 /**
- * %HEADER%
+ * This file is part of GenomeView, a genome browser and annotation curator
+ * 
+ * Copyright (C) 2007-2013 Thomas Abeel and contributors
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ *
+ * Project: http://genomeview.org/
  */
 package net.sf.genomeview.gui;
 
@@ -33,19 +50,18 @@ public class CrashHandler {
 
 	public static void showErrorMessage(String message,Throwable cause){
 		log.log(Level.SEVERE, message, cause);
-		JOptionPane.showMessageDialog(null, message+"\n\nThis error has been logged.", "GenomeView error!", JOptionPane.ERROR_MESSAGE );
+		JOptionPane.showMessageDialog(null, message+"\n\n" + MessageManager.getString("crashhandler.error_logged"), MessageManager.getString("crashhandler.error "), JOptionPane.ERROR_MESSAGE );
 		
 	}
 	
 
 	private CrashHandler() {
 
-		final JFrame window = new JFrame("GenomeView ERROR!");
+		final JFrame window = new JFrame(MessageManager.getString("crashhandler.error"));
 		window.setAlwaysOnTop(true);
 		window.setResizable(false);
 		JTextArea ll = new JTextArea(10, 30);
-		ll
-				.setText("GenomeView has encountered an error from which it cannot recover and will be terminated.\n\nPlease report this problem.\n\nWhen reporting this issue, make sure to include the a description of what you were doing. Please also include the most recent log file. You can find error logs in the .genomeview folder in your home directory.");
+		ll.setText(MessageManager.getString("crashhandler.unrecoverable_error"));
 		ll.setWrapStyleWord(true);
 		ll.setLineWrap(true);
 		ll.setEditable(false);
@@ -57,7 +73,7 @@ public class CrashHandler {
 		
 		// gc.grid
 		window.add(ll, gc);
-		JButton open = new JButton("Open folder with logs");
+		JButton open = new JButton(MessageManager.getString("crashhandler.open_logs"));
 		open.addActionListener(new ActionListener() {
 
 			@Override
@@ -68,14 +84,14 @@ public class CrashHandler {
 					File confDir = new File(s + "/.genomeview");
 					Desktop.getDesktop().open(confDir);
 				} catch (IOException e1) {
-					JOptionPane.showMessageDialog(window, "Could not open log folder");
+					JOptionPane.showMessageDialog(window, MessageManager.getString("crashhandler.couldnt_open_log_folder"));
 				}
 
 			}
 		});
 		window.add(open, gc);
 		
-		JButton report = new JButton("Report this problem");
+		JButton report = new JButton(MessageManager.getString("crashhandler.report"));
 		report.addActionListener(new ActionListener() {
 
 			@Override
@@ -83,14 +99,14 @@ public class CrashHandler {
 				try {
 					Desktop.getDesktop().browse(URIFactory.uri("https://sourceforge.net/tracker/?func=add&group_id=208107&atid=1004368"));
 				} catch (Exception e1) {
-					JOptionPane.showMessageDialog(window, "Could not open bugtracker website");
+					JOptionPane.showMessageDialog(window, MessageManager.getString("crashhandler.couldnt_bugtrack"));
 				}
 
 			}
 		});
 		window.add(report, gc);
 		
-		JButton close = new JButton("Close this window!");
+		JButton close = new JButton(MessageManager.getString("crashhandler.close_window"));
 		close.addActionListener(new ActionListener() {
 
 			@Override

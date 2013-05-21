@@ -53,6 +53,7 @@ import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.genomeview.gui.components.DoubleJSlider;
@@ -87,14 +88,14 @@ public class FeatureTrack extends Track {
 			GridBagPanel out = super.getGUIContainer();
 
 			out.gc.gridy++;
-			final JComponent colorGradient = new BooleanConfig("feature:scoreColorGradient_" + type(), "Use score color gradient", model);
+			final JComponent colorGradient = new BooleanConfig("feature:scoreColorGradient_" + type(), MessageManager.getString("featuretrack.use_color_gradient"), model);
 			out.add(colorGradient, out.gc);
 
 			/* Filter items based on score */
 
 			out.gc.gridy++;
 
-			final JButton filter = new JButton(new AbstractAction("Filter items by score") {
+			final JButton filter = new JButton(new AbstractAction(MessageManager.getString("featuretrack.filter_by_score")) {
 				// filter.setAction(new
 				// AbstractAction("Filter items by score") {
 				@Override
@@ -122,10 +123,10 @@ public class FeatureTrack extends Track {
 						}
 					};
 					slider.addChangeListener(changeListener);
-					optionPane.setMessage(new Object[] { "Select score threshold: ", slider, label });
+					optionPane.setMessage(new Object[] { MessageManager.getString("featuretrack.select_score_th"), slider, label });
 					optionPane.setMessageType(JOptionPane.QUESTION_MESSAGE);
 					optionPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-					JDialog dialog = optionPane.createDialog(model.getGUIManager().getParent(), "Score threshold");
+					JDialog dialog = optionPane.createDialog(model.getGUIManager().getParent(), MessageManager.getString("featuretrack.score_th"));
 					// dialog.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 					dialog.setVisible(true);
 					setThreshold((Double) optionPane.getInputValue());
@@ -151,7 +152,7 @@ public class FeatureTrack extends Track {
 
 			});
 
-			ColorConfig cc = new ColorConfig(model, "TYPE_" + type(), "Display color");
+			ColorConfig cc = new ColorConfig(model, "TYPE_" + type(), MessageManager.getString("featuretrack.display_color"));
 			out.gc.gridy++;
 			out.add(cc, out.gc);
 
@@ -387,7 +388,7 @@ public class FeatureTrack extends Track {
 		if (estimate > 25 * Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
 
 			g.setColor(Color.BLACK);
-			g.drawString(ftc.type() + ": Too many features to display, zoom in to see features", 10, yOffset + 10);
+			g.drawString(ftc.type() + ": " + MessageManager.getString("featuretrack.too_many_to_display_warn"), 10, yOffset + 10);
 			return 20 + 5;
 		} else if (estimate > Configuration.getInt("annotationview:maximumNoVisibleFeatures")) {
 			manyFeature = true;

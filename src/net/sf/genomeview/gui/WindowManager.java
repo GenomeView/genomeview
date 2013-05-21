@@ -167,11 +167,11 @@ public class WindowManager extends WindowAdapter implements Observer {
 		// FIXME special handling if this is not the first time the application
 		// is initialized
 		if (splash != null)
-			splash.setText("Parsing parameters...");
+			splash.setText(MessageManager.getString("windowmanager.parsing_params"));
 		CommandLineOptions.init(args);
 
 		if (splash != null)
-			splash.setText("Creating windows...");
+			splash.setText(MessageManager.getString("windowmanager.creating_windows"));
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice[] gs = ge.getScreenDevices();
 		boolean freshwindow = false;
@@ -184,7 +184,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 		if (window == null) {
 			freshwindow = true;
-			logger.info("Creating new window");
+			logger.info(MessageManager.getString("windowmanager.creating_new_window"));
 			window = new GenomeViewWindow(model, "GenomeView :: " + Configuration.version(), gs[0].getDefaultConfiguration());
 			model.getGUIManager().registerMainWindow(window);
 			window.setIconImage(Icons.MINILOGO);
@@ -220,12 +220,12 @@ public class WindowManager extends WindowAdapter implements Observer {
 			}
 			window.setVisible(true);
 			if (splash != null)
-				splash.setText("Installing plugins...");
+				splash.setText(MessageManager.getString("windowmanager.installing_plugins"));
 			PluginLoader.load(model);
 
 		}
 		if (splash != null)
-			splash.setText("Loading data...");
+			splash.setText(MessageManager.getString("windowmanager.loading_data"));
 		/* Data specified on command line */
 		InitDataLoader idl = new InitDataLoader(model);
 		if (CommandLineOptions.goodParse()) {

@@ -18,6 +18,7 @@ import javax.swing.JRadioButton;
 
 import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
@@ -36,7 +37,7 @@ public class SelectedSequenceDialog extends JDialog {
     private static final long serialVersionUID = 2529848844411398233L;
 
     private SelectedSequenceDialog(final Model model) {
-        super(model.getGUIManager().getParent(), "Which sequence?", true);
+        super(model.getGUIManager().getParent(), MessageManager.getString("selectedsequencedialog.which_seq"), true);
         setLayout(new GridBagLayout());
         GridBagConstraints gc = new GridBagConstraints();
         gc.insets = new Insets(3, 3, 3, 3);
@@ -44,10 +45,10 @@ public class SelectedSequenceDialog extends JDialog {
         gc.gridy = 0;
         gc.gridwidth = 2;
         gc.gridheight = 1;
-        add(new JLabel("Location or complete feature?"), gc);
+        add(new JLabel(MessageManager.getString("selectedsequencedialog.location_or_complete")), gc);
         ButtonGroup loc = new ButtonGroup();
-        final JRadioButton location = new JRadioButton("Selected location(s)");
-        final JRadioButton feature = new JRadioButton("Complete feature(s)");
+        final JRadioButton location = new JRadioButton(MessageManager.getString("selectedsequencedialog.selected_locations"));
+        final JRadioButton feature = new JRadioButton(MessageManager.getString("selectedsequencedialog.completed_features"));
         feature.setSelected(true);
         loc.add(location);
         loc.add(feature);
@@ -56,12 +57,12 @@ public class SelectedSequenceDialog extends JDialog {
         gc.gridy++;
         add(feature, gc);
         gc.gridy++;
-        add(new JLabel("Nucleotides or amino acids?"), gc);
+        add(new JLabel(MessageManager.getString("selectedsequencedialog.nucleotides_or_amino")), gc);
 
         ButtonGroup trans = new ButtonGroup();
-        final JRadioButton nucleotides = new JRadioButton("Nucleotides");
+        final JRadioButton nucleotides = new JRadioButton(MessageManager.getString("selectedsequencedialog.nucleotides"));
         nucleotides.setSelected(true);
-        final JRadioButton aa = new JRadioButton("Amino acids");
+        final JRadioButton aa = new JRadioButton(MessageManager.getString("selectedsequencedialog.amino"));
         trans.add(nucleotides);
         trans.add(aa);
         gc.gridy++;
@@ -69,7 +70,7 @@ public class SelectedSequenceDialog extends JDialog {
         gc.gridy++;
         add(aa, gc);
 
-        JButton ok = new JButton("OK");
+        JButton ok = new JButton(MessageManager.getString("button.ok"));
         ok.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -117,7 +118,7 @@ public class SelectedSequenceDialog extends JDialog {
         gc.gridy++;
         gc.gridwidth = 1;
         add(ok, gc);
-        JButton close = new JButton("Close");
+        JButton close = new JButton(MessageManager.getString("button.close"));
         close.addActionListener(new ActionListener() {
 
             @Override

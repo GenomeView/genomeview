@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.config.BooleanConfig;
 import net.sf.genomeview.gui.config.StringConfig;
 import net.sf.jannot.DataKey;
@@ -45,16 +46,16 @@ public class TrackConfig extends Observable {
 	protected TrackConfig(Model model, DataKey dataKey) {
 		this.dataKey = dataKey;
 		this.model=model;
-		guicontainer.add(new JLabel("Track key: \n" + dataKey), guicontainer.gc);
+		guicontainer.add(new JLabel(MessageManager.getString("trackconfig.track_key") + " \n" + dataKey), guicontainer.gc);
 		guicontainer.gc.gridy++;
 
-		guicontainer.add(new StringConfig("track:alias:" + dataKey, "Track alias:", model), guicontainer.gc);
+		guicontainer.add(new StringConfig("track:alias:" + dataKey, MessageManager.getString("trackconfig.track_alias"), model), guicontainer.gc);
 		guicontainer.gc.gridy++;
 		Configuration.getVisible(dataKey);
-		guicontainer.add(new BooleanConfig("track:visible:" + dataKey, "Track visible", model), guicontainer.gc);
+		guicontainer.add(new BooleanConfig("track:visible:" + dataKey, MessageManager.getString("trackconfig.track_visible"), model), guicontainer.gc);
 		if (isCollapsible()) {
 			guicontainer.gc.gridy++;
-			guicontainer.add(new BooleanConfig("track:collapsed:" + dataKey, "Track collapsed", model), guicontainer.gc);
+			guicontainer.add(new BooleanConfig("track:collapsed:" + dataKey, MessageManager.getString("trackconfig.track_collapsed"), model), guicontainer.gc);
 		}
 
 	}

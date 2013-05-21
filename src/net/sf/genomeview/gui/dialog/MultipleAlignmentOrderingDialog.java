@@ -22,6 +22,7 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.genomeview.core.BiMap;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 
 
 /**
@@ -43,7 +44,7 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 
 		setLayout(new BorderLayout());
 		add(table,BorderLayout.CENTER);
-		JButton close=new JButton("Close");
+		JButton close=new JButton(MessageManager.getString("button.close"));
 		close.addActionListener(new ActionListener(){
 
 			@Override

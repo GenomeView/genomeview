@@ -41,6 +41,7 @@ import javax.swing.JRadioButton;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.config.BooleanConfig;
 import net.sf.genomeview.gui.config.ConfigListener;
 
@@ -91,18 +92,18 @@ public class PileupTrackConfig extends TrackConfig {
 		/*
 		 * Threshold line
 		 */
-		JButton item = new JButton(new AbstractAction("Add threshold line") {
+		JButton item = new JButton(new AbstractAction(MessageManager.getString("pileuptrack.add_thereshold_line")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String in = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-						"Input the height of the new threshold line", "Input value", JOptionPane.QUESTION_MESSAGE);
+						MessageManager.getString("pileuptrack.new_thereshold_line_height"), MessageManager.getString("pileuptrack.input_value"), JOptionPane.QUESTION_MESSAGE);
 				if (in != null) {
 					try {
 						Double d = Double.parseDouble(in);
 						addLine(new Line(d));
 					} catch (Exception ex) {
-						log.log(Level.WARNING, "Unparseble value for maximum in PileupTrack: " + in, ex);
+						log.log(Level.WARNING, MessageManager.getString("pileuptrack.unparseable_pileuptrack_warn") + in, ex);
 					}
 				}
 
@@ -112,7 +113,7 @@ public class PileupTrackConfig extends TrackConfig {
 		out.gc.gridy++;
 		out.add(item, out.gc);
 
-		item = new JButton(new AbstractAction("Clear threshold lines") {
+		item = new JButton(new AbstractAction(MessageManager.getString("pileuptrack.clear_thereshold_lines")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -129,7 +130,7 @@ public class PileupTrackConfig extends TrackConfig {
 		 */
 		final JCheckBox itemGlobal = new JCheckBox();
 		itemGlobal.setSelected(isGlobalSettings());
-		itemGlobal.setAction(new AbstractAction("Track uses defaults") {
+		itemGlobal.setAction(new AbstractAction(MessageManager.getString("pileuptrack.track_default")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setGlobalSettings(itemGlobal.isSelected());
@@ -139,7 +140,7 @@ public class PileupTrackConfig extends TrackConfig {
 		out.gc.gridy++;
 		out.add(itemGlobal, out.gc);
 
-		final BooleanConfig normalize = new BooleanConfig("track:pile:normalize:" + dataKey, "Normalize by mean", model);
+		final BooleanConfig normalize = new BooleanConfig("track:pile:normalize:" + dataKey, MessageManager.getString("pileuptrack.norm_by_mean"), model);
 		normalize.addConfigListener(new ConfigListener() {
 
 			@Override
@@ -155,7 +156,7 @@ public class PileupTrackConfig extends TrackConfig {
 		/* Log scaling of line graph */
 		final JCheckBox item4 = new JCheckBox();
 		item4.setSelected(isLogscaling());
-		item4.setAction(new AbstractAction("Use log scaling") {
+		item4.setAction(new AbstractAction(MessageManager.getString("pileuptrack.use_log_scaling")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setLogscaling(item4.isSelected());
@@ -169,7 +170,7 @@ public class PileupTrackConfig extends TrackConfig {
 		/* Dynamic scaling for both plots */
 		final JCheckBox item3 = new JCheckBox();
 		item3.setSelected(isDynamicScaling());
-		item3.setAction(new AbstractAction("Use dynamic scaling for plots") {
+		item3.setAction(new AbstractAction(MessageManager.getString("pileuptrack.use_dynamic_scaling")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setDynamicScaling(item3.isSelected());
@@ -181,19 +182,19 @@ public class PileupTrackConfig extends TrackConfig {
 		out.add(item3, out.gc);
 
 		/* Maximum value */
-		final JButton item2 = new JButton(new AbstractAction("Set maximum value") {
+		final JButton item2 = new JButton(new AbstractAction(MessageManager.getString("pileuptrack.set_maximum")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String in = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-						"Input the maximum value, choose a negative number for unlimited", "Input maximum value",
+						MessageManager.getString("pileuptrack.input_max_info"), MessageManager.getString("pileuptrack.input_max"),
 						JOptionPane.QUESTION_MESSAGE);
 				if (in != null) {
 					try {
 						Double d = Double.parseDouble(in);
 						setMaxValue(d);
 					} catch (Exception ex) {
-						log.log(Level.WARNING, "Unparseble value for maximum in PileupTrack: " + in, ex);
+						log.log(Level.WARNING, MessageManager.getString("pileuptrack.unparseable_pileuptrack_warn") + in, ex);
 					}
 				}
 
@@ -345,9 +346,9 @@ public class PileupTrackConfig extends TrackConfig {
 					public void run() {
 						if (!isNormalizationAvailable()) {
 							throw new RuntimeException(
-									"Should not create normalization engine if the data format does not support it!");
+									MessageManager.getString("pileuptrack.normalization_format_not_supported"));
 						}
-						model.messageModel().setStatusBarMessage("Calculating normalization");
+						model.messageModel().setStatusBarMessage(MessageManager.getString("pileuptrack.calculating_normalization"));
 						// model.getSelectedEntry().get(dataKey).get();
 
 						Data<Pile> dp = (Data<Pile>) model.vlm.getSelectedEntry().get(dataKey);
@@ -366,7 +367,7 @@ public class PileupTrackConfig extends TrackConfig {
 							sum[i] /= count;
 						value = sum;
 						calculated = true;
-						model.messageModel().setStatusBarMessage("Normalization calculated");
+						model.messageModel().setStatusBarMessage(MessageManager.getString("pileuptrack.normalization_calculated"));
 
 					}
 

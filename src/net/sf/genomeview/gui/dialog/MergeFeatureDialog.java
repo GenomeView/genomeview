@@ -28,6 +28,7 @@ import javax.swing.JDialog;
 import javax.swing.JRadioButton;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
@@ -41,7 +42,7 @@ public class MergeFeatureDialog extends JDialog {
 	private static final long serialVersionUID = -770863087750087961L;
 
 	public MergeFeatureDialog(final Model model) {
-		super(model.getGUIManager().getParent(), "Merge features");
+		super(model.getGUIManager().getParent(), MessageManager.getString("mergefeatures.title"));
 		final MergeFeatureDialog _self = this;
 		setModal(true);
 		setAlwaysOnTop(true);
@@ -58,9 +59,9 @@ public class MergeFeatureDialog extends JDialog {
 		gc.fill = GridBagConstraints.BOTH;
 
 		ButtonGroup mergeType = new ButtonGroup();
-		final JRadioButton intron = new JRadioButton("Merge with space between features as intron");
+		final JRadioButton intron = new JRadioButton(MessageManager.getString("mergefeatures.merge_space_intron"));
 		intron.setSelected(true);
-		final JRadioButton exon = new JRadioButton("Merge with space between features as exon");
+		final JRadioButton exon = new JRadioButton(MessageManager.getString("mergefeatures.merge_space_exon"));
 		mergeType.add(intron);
 		mergeType.add(exon);
 		gc.gridwidth = 2;
@@ -95,16 +96,16 @@ public class MergeFeatureDialog extends JDialog {
 			// fs[index++] = f;
 		}
 		// System.out.println(mapping);
-		c.add(new TitledComponent("Master feature", cp), gc);
+		c.add(new TitledComponent(MessageManager.getString("mergefeatures.master_feature"), cp), gc);
 		gc.gridy++;
 
 		// c.add(select, gc);
-		final JCheckBox remove = new JCheckBox("Remove original features after merger.");
+		final JCheckBox remove = new JCheckBox(MessageManager.getString("mergefeatures.remove_original_after_merger"));
 		gc.gridy++;
 		c.add(remove, gc);
 		gc.gridwidth = 1;
 		gc.gridy++;
-		JButton ok = new JButton("OK");
+		JButton ok = new JButton(MessageManager.getString("button.ok"));
 		ok.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -168,7 +169,7 @@ public class MergeFeatureDialog extends JDialog {
 			}
 
 		});
-		JButton cancel = new JButton("Cancel");
+		JButton cancel = new JButton(MessageManager.getString("button.cancel"));
 		cancel.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {

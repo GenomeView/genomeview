@@ -17,6 +17,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.Entry;
 import be.abeel.gui.TitledComponent;
 
@@ -35,7 +36,7 @@ class EntrySearchPane extends SearchPanel {
 		gc.fill = GridBagConstraints.BOTH;
 		final JTextField text = new JTextField(40);
 		setFocusField(text);
-		JButton searchButton = new JButton("Search");
+		JButton searchButton = new JButton(MessageManager.getString("button.search"));
 
 		final EntrySearchResultModel srm = new EntrySearchResultModel(model);
 		final JTable resultTable = new JTable(srm);
@@ -84,7 +85,7 @@ class EntrySearchPane extends SearchPanel {
 		});
 
 		gc.gridwidth = 2;
-		add(new TitledComponent("Entry", text), gc);
+		add(new TitledComponent(MessageManager.getString("entrypane.entry"), text), gc);
 		gc.gridy++;
 
 		add(searchButton, gc);

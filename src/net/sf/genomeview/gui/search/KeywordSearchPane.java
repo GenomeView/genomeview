@@ -17,6 +17,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
@@ -37,7 +38,7 @@ class KeywordSearchPane extends SearchPanel {
 		gc.fill = GridBagConstraints.BOTH;
 		final JTextField text = new JTextField(40);
 		setFocusField(text);
-		JButton searchButton = new JButton("Search");
+		JButton searchButton = new JButton(MessageManager.getString("button.search"));
 
 		final KeywordSearchResultModel srm = new KeywordSearchResultModel(model);
 		final JTable resultTable = new JTable(srm);
@@ -89,7 +90,7 @@ class KeywordSearchPane extends SearchPanel {
 		});
 
 		gc.gridwidth = 2;
-		add(new TitledComponent("Keyword", text), gc);
+		add(new TitledComponent(MessageManager.getString("keywordpane.keyword"), text), gc);
 		gc.gridy++;
 
 		add(searchButton, gc);

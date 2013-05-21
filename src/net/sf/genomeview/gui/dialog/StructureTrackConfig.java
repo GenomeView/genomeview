@@ -16,6 +16,7 @@ import javax.swing.JDialog;
 import be.abeel.gui.GridBagPanel;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrackModel;
 import net.sf.jannot.Type;
@@ -30,7 +31,7 @@ public class StructureTrackConfig extends JDialog {
 	private static final long serialVersionUID = -5209291628487502687L;
 
 	private StructureTrackConfig(final Model model, final StructureTrackModel stm) {
-		super(model.getGUIManager().getParent(), "Structure track configuration", true);
+		super(model.getGUIManager().getParent(), MessageManager.getString("structuretrackconfig.title"), true);
 		final Window _self=this;
 		setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagPanel().gc;
@@ -48,7 +49,7 @@ public class StructureTrackConfig extends JDialog {
 			add(jc, gc);
 			gc.gridy++;
 		}
-		add(new JButton(new AbstractAction("OK") {
+		add(new JButton(new AbstractAction(MessageManager.getString("button.ok")) {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {

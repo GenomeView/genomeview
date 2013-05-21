@@ -24,6 +24,7 @@ import javax.swing.text.html.StyleSheet;
 
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 
 public class JOptionPaneX {
@@ -57,7 +58,7 @@ class DD {
 		text.setText("<html>" + msg + "</html>");
 
 		contentPane.add(text, BorderLayout.CENTER);
-		JButton ok = new JButton("OK");
+		JButton ok = new JButton(MessageManager.getString("button.ok"));
 		
 
 		ok.addActionListener(new ActionListener() {
@@ -70,7 +71,7 @@ class DD {
 			}
 		});
 		
-		JButton cancel = new JButton("Cancel");
+		JButton cancel = new JButton(MessageManager.getString("button.cancel"));
 		cancel.addActionListener(new ActionListener() {
 
 			@Override

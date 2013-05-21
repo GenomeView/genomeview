@@ -18,6 +18,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
@@ -27,7 +28,7 @@ public class SplitFeatureDialog extends JDialog {
 	private static final long serialVersionUID = -770863087750087961L;
 
 	public SplitFeatureDialog(final Model model) {
-		super(model.getGUIManager().getParent(), "Split feature");
+		super(model.getGUIManager().getParent(), MessageManager.getString("splitfeaturedialog.title"));
 		final SplitFeatureDialog _self = this;
 		setModal(true);
 		setAlwaysOnTop(true);
@@ -45,7 +46,7 @@ public class SplitFeatureDialog extends JDialog {
 
 		select.setSelectedItem(selected.type());
 
-		final JCheckBox remove = new JCheckBox("Delete original feature after split.");
+		final JCheckBox remove = new JCheckBox(MessageManager.getString("splitfeaturedialog.delete_original_after_split"));
 
 		gc.gridwidth = 2;
 		c.add(select, gc);
@@ -54,7 +55,7 @@ public class SplitFeatureDialog extends JDialog {
 		gc.gridy++;
 		gc.gridwidth = 1;
 
-		JButton ok = new JButton("OK");
+		JButton ok = new JButton(MessageManager.getString("button.ok"));
 		ok.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -102,7 +103,7 @@ public class SplitFeatureDialog extends JDialog {
 			}
 
 		});
-		JButton cancel = new JButton("Cancel");
+		JButton cancel = new JButton(MessageManager.getString("button.cancel"));
 		cancel.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {

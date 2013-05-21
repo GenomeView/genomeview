@@ -17,6 +17,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.StrandCombo;
 import net.sf.genomeview.gui.components.TypeCombo;
@@ -36,7 +37,7 @@ public class NewFeatureDialog extends JDialog {
     private static final long serialVersionUID = -770863087750087961L;
 
     public NewFeatureDialog(final Model model) {
-    	super(model.getGUIManager().getParent(), "Create new feature");
+    	super(model.getGUIManager().getParent(), MessageManager.getString("newfeature.title"));
         final NewFeatureDialog _self = this;
         setModal(true);
         setAlwaysOnTop(true);
@@ -58,7 +59,7 @@ public class NewFeatureDialog extends JDialog {
         c.add(typeCombo, gc);
         gc.gridwidth = 1;
         gc.gridy++;
-        JButton ok = new JButton("OK");
+        JButton ok = new JButton(MessageManager.getString("button.ok"));
         ok.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -77,7 +78,7 @@ public class NewFeatureDialog extends JDialog {
             }
 
         });
-        JButton cancel = new JButton("Cancel");
+        JButton cancel = new JButton(MessageManager.getString("button.cancel"));
         cancel.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {

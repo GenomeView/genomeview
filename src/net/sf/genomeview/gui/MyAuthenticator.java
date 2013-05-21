@@ -70,7 +70,7 @@ public class MyAuthenticator extends Authenticator {
 			}
 		};
 
-		jd.setTitle("Enter password");
+		jd.setTitle(MessageManager.getString("authenticator.enter_password"));
 		jd.setModal(true);
 		jd.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -78,19 +78,19 @@ public class MyAuthenticator extends Authenticator {
 		gc.gridy = 0;
 		gc.fill = GridBagConstraints.BOTH;
 
-		JLabel jl = new JLabel("Please enter login details for: " + getRequestingPrompt() + " at "
+		JLabel jl = new JLabel(MessageManager.getString("authenticator.enter_details")+ " "+ getRequestingPrompt() + " at "
 				+ getRequestingHost());
 		jd.add(jl, gc);
 		gc.gridy++;
 		JTextField username = new JTextField();
 		username.addActionListener(dps);
-		jd.add(new TitledComponent("User name", username), gc);
+		jd.add(new TitledComponent(MessageManager.getString("authenticator.user_name"), username), gc);
 		gc.gridy++;
 		JPasswordField password = new JPasswordField();
 		password.addActionListener(dps);
-		jd.add(new TitledComponent("Password", password), gc);
+		jd.add(new TitledComponent(MessageManager.getString("authenticator.password"), password), gc);
 		gc.gridy++;
-		JButton jb = new JButton("OK");
+		JButton jb = new JButton(MessageManager.getString("button.ok"));
 		jb.addActionListener(dps);
 		jd.add(jb, gc);
 

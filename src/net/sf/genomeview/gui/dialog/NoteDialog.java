@@ -12,6 +12,7 @@ import javax.swing.JDialog;
 import javax.swing.JTextField;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.QualifierCombo;
 import net.sf.jannot.Feature;
@@ -30,7 +31,7 @@ public class NoteDialog extends JDialog {
     private final QualifierCombo term;
 
     private NoteDialog(final Model model) {
-    	super(model.getGUIManager().getParent(), "Note editor");
+    	super(model.getGUIManager().getParent(), MessageManager.getString("notedialog.title"));
         setModal(true);
 
         term = new QualifierCombo();
@@ -40,7 +41,7 @@ public class NoteDialog extends JDialog {
 
         value = new JTextField();
         add(value, BorderLayout.CENTER);
-        JButton ok = new JButton("OK");
+        JButton ok = new JButton(MessageManager.getString("button.ok"));
         this.getRootPane().setDefaultButton(ok);
         ok.addActionListener(new ActionListener() {
 

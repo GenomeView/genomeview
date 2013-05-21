@@ -24,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.StrandCombo;
 import net.sf.genomeview.gui.components.TypeCombo;
@@ -47,7 +48,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 	private static Logger log = Logger.getLogger(NewFeatureFromCoordinatesDialog.class.getCanonicalName());
 
 	public NewFeatureFromCoordinatesDialog(final Model model) {
-		super(model.getGUIManager().getParent(), "Create new feature");
+		super(model.getGUIManager().getParent(), MessageManager.getString("newfeature.title"));
 		final NewFeatureFromCoordinatesDialog _self = this;
 		setModal(true);
 		Container c = new Container();
@@ -78,7 +79,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 		gc.gridx += 2;
 		c.add(new HelpButton(
 				this,
-				"Fill in the coordinates of the feature you want to create.<br/><br/>One location is defined as two coordinates with two dots (..) between, multiple locations are separated with a comma (,).<br/><br/>For example: 100..200,300..400 creates a feature with two locations, one from 100 to 200 and the other from 300 to 400."));
+				MessageManager.getString("newfeaturecoord.hlp_text")));
 
 		gc.gridx = 0;
 		gc.gridy++;
@@ -87,7 +88,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 		c.add(typeCombo, gc);
 		gc.gridwidth = 1;
 		gc.gridy++;
-		JButton ok = new JButton("OK");
+		JButton ok = new JButton(MessageManager.getString("button.ok"));
 		ok.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -110,8 +111,8 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 					JOptionPane
 							.showMessageDialog(
 									_self,
-									"Could not create new feature! \n\nGo with you mouse over the blue question mark\n in the previous dialog.\nThat will give you detailed instructions.",
-									"Error!", JOptionPane.WARNING_MESSAGE);
+									MessageManager.getString("newfeaturecoord.couldnt_create_warn"),
+									MessageManager.getString("newfeaturecoord.error"), JOptionPane.WARNING_MESSAGE);
 				}
 
 			}
@@ -150,7 +151,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 
 		});
 
-		JButton cancel = new JButton("Cancel");
+		JButton cancel = new JButton(MessageManager.getString("button.cancel"));
 		cancel.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {

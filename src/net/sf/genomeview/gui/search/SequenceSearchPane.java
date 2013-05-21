@@ -18,6 +18,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.search.SearchDialog.SequenceType;
 import net.sf.jannot.Location;
 import be.abeel.gui.TitledComponent;
@@ -41,7 +42,7 @@ class SequenceSearchPane extends SearchPanel {
 		mismatch.addItem(2);
 		mismatch.addItem(3);
 		mismatch.setSelectedItem(0);
-		JButton search = new JButton("Search");
+		JButton search = new JButton(MessageManager.getString("button.search"));
 
 		final SequenceSearchResultModel srm = new SequenceSearchResultModel(model);
 		final JTable results = new JTable(srm);
@@ -98,14 +99,14 @@ class SequenceSearchPane extends SearchPanel {
 		gc.weightx = 1;
 		gc.gridwidth = 4;
 		gc.weighty = 0.1;
-		add(new TitledComponent("Query sequence", seq), gc);
+		add(new TitledComponent(MessageManager.getString("seqsearchpane.query_sequence"), seq), gc);
 		gc.weighty = 0;
 		gc.gridwidth = 1;
 		gc.gridy++;
 		add(type, gc);
 		gc.gridx++;
 		gc.weightx = 1;
-		add(new TitledComponent("Mismatches allowed", mismatch), gc);
+		add(new TitledComponent(MessageManager.getString("seqsearchpane.mismatch_allow"), mismatch), gc);
 		gc.weightx = 0;
 		gc.gridx++;
 		add(search, gc);
@@ -117,7 +118,7 @@ class SequenceSearchPane extends SearchPanel {
 		gc.gridy++;
 		gc.weighty = 1;
 		gc.weightx = 1;
-		add(new TitledComponent("Result locations", new JScrollPane(results)), gc);
+		add(new TitledComponent(MessageManager.getString("seqsearchpane.results"), new JScrollPane(results)), gc);
 
 	}
 

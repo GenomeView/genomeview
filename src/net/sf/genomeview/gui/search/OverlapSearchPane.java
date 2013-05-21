@@ -15,6 +15,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
@@ -54,7 +55,7 @@ class OverlapSearchPane extends SearchPanel {
 
 			}
 		});
-		JButton searchButton = new JButton("Search");
+		JButton searchButton = new JButton(MessageManager.getString("button.search"));
 		searchButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -67,9 +68,9 @@ class OverlapSearchPane extends SearchPanel {
 		});
 
 		gc.gridwidth = 2;
-		add(new TitledComponent("Overlap between type ", sourceType), gc);
+		add(new TitledComponent( MessageManager.getString("overlappane.overlap_1")+ " ", sourceType), gc);
 		gc.gridy++;
-		add(new TitledComponent("and type", targetType), gc);
+		add(new TitledComponent(MessageManager.getString("overlappane.overlap_2"), targetType), gc);
 		gc.gridy++;
 
 		add(searchButton, gc);

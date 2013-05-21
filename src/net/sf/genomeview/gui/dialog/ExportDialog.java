@@ -36,6 +36,7 @@ import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.IndexManager;
@@ -158,7 +159,7 @@ public class ExportDialog extends JDialog {
 		gc.fill = GridBagConstraints.BOTH;
 
 		final ArrayList<DataSourceCheckbox> dss = new ArrayList<DataSourceCheckbox>();
-		add(new JLabel("Select sources to save"), gc);
+		add(new JLabel(MessageManager.getString("exportdialog.select_sources")), gc);
 
 		gc.gridy++;
 		Container cp = new Container();
@@ -182,8 +183,8 @@ public class ExportDialog extends JDialog {
 		}
 		add(new JScrollPane(cp), gc);
 		gc.gridy++;
-		JButton save = new JButton("Save");
-		JButton close = new JButton("Close");
+		JButton save = new JButton(MessageManager.getString("button.save"));
+		JButton close = new JButton(MessageManager.getString("button.close"));
 
 		gc.gridwidth = 1;
 		gc.gridy++;
@@ -195,7 +196,7 @@ public class ExportDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				final Hider h = new Hider(model, "Saving data...");
+				final Hider h = new Hider(model, MessageManager.getString("exportdialog.saving_data"));
 
 				EventQueue.invokeLater(new Runnable() {
 					@Override
@@ -233,18 +234,18 @@ public class ExportDialog extends JDialog {
 									}
 									
 									
-									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Export completed");
+									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("exportdialog.export_complete"));
 									
 								}
 								
 							});
 							moni.setDaemon(true);
 							moni.start();
-							JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Export started...\nYou will be notified when all files have been copied!");
+							JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("exportdialog.export_started"));
 						
 						} catch (Exception ex) {
 							log.log(Level.SEVERE, "Save failed", ex);
-							JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Save failed!");
+							JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("exportdialog.save_failed"));
 						}
 						h.dispose();
 						_self.dispose();

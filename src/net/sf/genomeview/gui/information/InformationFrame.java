@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.ConnectionMonitor;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.genomeview.gui.dialog.HelpButton;
@@ -53,11 +54,11 @@ public class InformationFrame extends GridBagPanel {
 		gc.gridwidth=1;
 		gc.weighty = 0;
 		gc.weightx = 0;
-		add(new HelpButton(model.getGUIManager().getParent(), "Clicking the eye will hide that track.<br><br>Clicking the trash can will unload the data<br><br>You can drag tracks up and down to reorganize them."),gc);
+		add(new HelpButton(model.getGUIManager().getParent(), MessageManager.getString("infoframe.track_list_help")),gc);
 		gc.gridx++;
 		gc.gridwidth=4;
 		gc.weightx =1;
-		add(new JLabel("Track list"), gc);
+		add(new JLabel(MessageManager.getString("infoframe.track_list")), gc);
 		
 	
 		gc.gridwidth=5;
@@ -72,9 +73,9 @@ public class InformationFrame extends GridBagPanel {
 		gc.weighty = 0;
 		gc.gridwidth = 1;
 		gc.weightx=0;
-		add(new HelpButton(model.getGUIManager().getParent(), "You can select which type of items you want in the table below with the drop down list to the right."),gc);
+		add(new HelpButton(model.getGUIManager().getParent(), MessageManager.getString("infoframe.features_help")),gc);
 		gc.gridx++;
-		add(new JLabel("Features"), gc);
+		add(new JLabel(MessageManager.getString("infoframe.features")), gc);
 		TypeCombo type = new TypeCombo(model, false);
 		type.setSelectedItem(Type.get("CDS"));
 		type.addActionListener(annotationTrackList);
@@ -94,10 +95,10 @@ public class InformationFrame extends GridBagPanel {
 		gc.gridy++;
 		gc.weighty = 0;
 		gc.gridwidth=1;
-		add(new HelpButton(model.getGUIManager().getParent(), "If you select an item in the view panel, details on that item will be displayed here. <br><br>You can select any text in this window and directly query it at a number the knowledge repositories with the buttons above the text panel."),gc);
+		add(new HelpButton(model.getGUIManager().getParent(), MessageManager.getString("infoframe.details_item_help")),gc);
 		gc.gridx++;
 		gc.gridwidth=4;
-		add(new JLabel("Details on selected items:"), gc);
+		add(new JLabel(MessageManager.getString("infoframe.details_item")), gc);
 		gc.gridy++;
 		gc.weightx = 0;
 		gc.gridx=0;
