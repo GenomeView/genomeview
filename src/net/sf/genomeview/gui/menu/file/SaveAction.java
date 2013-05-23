@@ -21,7 +21,7 @@ public class SaveAction extends AbstractModelAction {
     private static final long serialVersionUID = 5192584831566138816L;
 
     public SaveAction(Model model) {
-        super("Save annotation", model);
+        super("Save annotation...", model);
         super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control S"));
     }
 
