@@ -22,7 +22,7 @@ public class ExportDataAction extends AbstractModelAction {
 	private static final long serialVersionUID = -8134920521497962449L;
 
 	public ExportDataAction(Model model) {
-		super("Export data", model);
+		super("Export data...", model);
 
 	}
 
