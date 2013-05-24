@@ -62,6 +62,9 @@ public class Configuration {
 
 	}
 
+	/* Map with resource configuration */
+	private static HashMap<String, String> resourceMap = new HashMap<String, String>();
+	
 	/* Map with default genomeview configuration */
 	private static HashMap<String, String> defaultMap = new HashMap<String, String>();
 
@@ -88,6 +91,9 @@ public class Configuration {
 	}
 
 	public static String get(String key) {
+		if (resourceMap.containsKey(key)) {
+			return resourceMap.get(key);
+		} else
 		if (extraMap.containsKey(key)) {
 			return extraMap.get(key);
 		} else if (localMap.containsKey(key)) {
@@ -123,13 +129,18 @@ public class Configuration {
 		LineIterator it;
 
 		try {
-			it = new LineIterator(Configuration.class.getResourceAsStream("/conf/default.conf"));
-			it.setSkipBlanks(true);
-			it.setSkipComments(true);
+			it = new LineIterator(Configuration.class.getResourceAsStream("/conf/default.conf"),true,true);
 			for (String line : it) {
 				String key = line.substring(0, line.indexOf('='));
 				String value = line.substring(line.indexOf('=') + 1);
 				defaultMap.put(key.trim(), value.trim());
+			}
+			it.close();
+			it = new LineIterator(Configuration.class.getResourceAsStream("/conf/resources.conf"),true,true);
+			for (String line : it) {
+				String key = line.substring(0, line.indexOf('='));
+				String value = line.substring(line.indexOf('=') + 1);
+				resourceMap.put(key.trim(), value.trim());
 			}
 			it.close();
 		} catch (Exception e) {

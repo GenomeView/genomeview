@@ -19,7 +19,13 @@ public class MessageManager {
 	private static Logger log=Logger.getLogger(MessageManager.class.getCanonicalName());
 	
 	private static Locale loc = Configuration.get("lang:current").equals("automatic")?Locale.getDefault():new Locale(Configuration.get("lang:current"));
+	
+	
+	
     static{
+    	/* Localize Java dialogs */
+    	Locale.setDefault(loc);
+    	/* Getting messages for GV */
     	log.info("Getting messages for lang: "+loc);
         rb = ResourceBundle.getBundle("lang.Messages", loc);
         log.finest("Language keys: "+rb.keySet());

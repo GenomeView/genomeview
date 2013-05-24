@@ -20,32 +20,30 @@ import be.abeel.gui.GridBagPanel;
 public class ComboBoxConfig extends GridBagPanel {
 
 	
+
 	private static final long serialVersionUID = 5793902272456842701L;
 
-	public ComboBoxConfig(String listKey,final String selectedKey, String msg) {
+	public ComboBoxConfig(String[] list, final String selectedKey, String msg) {
 		gc.weightx = 0;
 		gc.weighty = 0;
 		add(new JLabel(msg), gc);
 		gc.gridx++;
-		
-		final JComboBox jbc=new JComboBox(Configuration.getStringSet(listKey).toArray());
+
+		final JComboBox jbc = new JComboBox(list);
 		jbc.setSelectedItem(Configuration.get(selectedKey));
-		
-		jbc.addActionListener(new ActionListener(){
+
+		jbc.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Object o=jbc.getSelectedItem();
-				System.out.println("Selected item: "+o);
+				Object o = jbc.getSelectedItem();
+				System.out.println("Selected item: " + o);
 				Configuration.set(selectedKey, o.toString());
-				
+
 			}
-			
+
 		});
 		add(jbc, gc);
 	}
-
-	
-	
 
 }
