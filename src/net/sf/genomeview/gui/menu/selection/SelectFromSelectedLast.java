@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.util.Observable;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
@@ -21,7 +22,7 @@ public class SelectFromSelectedLast extends AbstractModelAction {
     private static final long serialVersionUID = 944182722570469980L;
 
     public SelectFromSelectedLast(Model model) {
-        super("Select last location", model);
+        super(MessageManager.getString("selectionmenu.select_last_location"), model);
         model.addObserver(this);
         update(null,null);
     }

@@ -10,6 +10,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 /**
  * 
  * @author Thomas Abeel
@@ -21,7 +22,7 @@ public class ShowGenomeExplorerAction extends AbstractAction {
 	private Model model;
 
 	public ShowGenomeExplorerAction(Model model) {
-		super("Show Genome Explorer");
+		super(MessageManager.getString("filemenu.show_genome_explorer"));
 			this.model = model;
 		}
 

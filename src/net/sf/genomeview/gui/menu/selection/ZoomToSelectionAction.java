@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.util.Observable;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
 
@@ -14,7 +15,7 @@ public class ZoomToSelectionAction extends AbstractModelAction {
     static final long serialVersionUID = -330839317356311971L;
 
     public ZoomToSelectionAction(Model model) {
-        super("Zoom to selected features", model);
+        super(MessageManager.getString("selectionmenu.zoom_to_selected_features"), model);
     }
 
     @Override

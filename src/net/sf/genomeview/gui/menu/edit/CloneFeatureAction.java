@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.util.Observable;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
 
@@ -15,7 +16,7 @@ public class CloneFeatureAction extends AbstractModelAction {
 	private static final long serialVersionUID = 4521376746707912717L;
 
 	public CloneFeatureAction(Model model) {
-		super("Clone selected feature", model);
+		super(MessageManager.getString("editmenu.clone_selected_feature"), model);
 		
 	}
 

@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Observable;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
@@ -21,7 +22,7 @@ public class SelectFromSelectedBack extends AbstractModelAction {
     private static final long serialVersionUID = -3698699205405201460L;
 
     public SelectFromSelectedBack(Model model) {
-        super("Move location selection back", model);
+        super(MessageManager.getString("selectionmenu.move_back_location"), model);
 
     }
 

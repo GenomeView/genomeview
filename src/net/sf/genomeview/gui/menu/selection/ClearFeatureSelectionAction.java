@@ -8,6 +8,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
 
@@ -16,7 +17,7 @@ public class ClearFeatureSelectionAction extends AbstractModelAction implements 
     private static final long serialVersionUID = 3091007204195190317L;
 
     public ClearFeatureSelectionAction(Model model) {
-        super("Clear feature selection", model);
+        super(MessageManager.getString("selectionmenu.clear_feature"), model);
     }
 
     public void actionPerformed(ActionEvent e) {

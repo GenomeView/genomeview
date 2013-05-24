@@ -20,6 +20,7 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.ReadWorker;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.CrashHandler;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import be.abeel.io.LineIterator;
@@ -36,7 +37,7 @@ public class LoadSessionAction extends AbstractAction {
 	private Model model;
 
 	public LoadSessionAction(Model model) {
-		super("Load session");
+		super(MessageManager.getString("filemenu.load_session"));
 		this.model = model;
 	}
 

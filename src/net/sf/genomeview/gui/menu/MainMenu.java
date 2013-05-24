@@ -8,6 +8,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.OverlayListener;
 import net.sf.genomeview.gui.menu.edit.CloneFeatureAction;
 import net.sf.genomeview.gui.menu.edit.CopySequenceAction;
@@ -46,10 +47,10 @@ public class MainMenu extends JMenuBar {
 	private static final long serialVersionUID = 6478474621947392346L;
 
 	public MainMenu(Model model) {
-		JMenu file = new JMenu("File");
+		JMenu file = new JMenu(MessageManager.getString("mainmenu.file"));
 		
 		JMenuItem i=new JMenuItem(new LoadFeaturesAction(model));
-		OverlayListener ol=new OverlayListener("This allows you to load data.<br/><br/><strong>Sources:</strong><br/>You can load data from either a local file on your computer or from a URL.<br/><br/><b>Supported formats</b>");
+		OverlayListener ol=new OverlayListener(MessageManager.getString("mainmenu.load_info"));
 		i.addMouseListener(ol);
 		i.addActionListener(ol);
 		file.add(i);
@@ -71,7 +72,7 @@ public class MainMenu extends JMenuBar {
 		file.add(new ExitAction(model));
 		add(file);
 
-		JMenu edit = new JMenu("Edit");
+		JMenu edit = new JMenu(MessageManager.getString("mainmenu.edit"));
 
 		edit.add(new CopySequenceAction(model));
 		edit.add(new CloneFeatureAction(model));
@@ -88,12 +89,12 @@ public class MainMenu extends JMenuBar {
 		
 		add(edit);
 
-		JMenu navigation = new JMenu("Navigation");
+		JMenu navigation = new JMenu(MessageManager.getString("mainmenu.navigation"));
 		navigation.add(new GotoPosition(model));
 		navigation.add(new SearchAction(model));
 		add(navigation);
 
-		JMenu select = new JMenu("Selection");
+		JMenu select = new JMenu(MessageManager.getString("mainmenu.selection"));
 		select.add(new ShowSequenceWindowAction(model));
 //		select.add(new NCBIdnaBlastAction(model));
 //		select.add(new NCBIproteinBlastAction(model));
@@ -108,27 +109,26 @@ public class MainMenu extends JMenuBar {
 		add(select);
 
 
-		JMenu plugin = new JMenu("Plugins");
+		JMenu plugin = new JMenu(MessageManager.getString("mainmenu.plugins"));
 		model.getGUIManager().registerPluginMenu(plugin);
 		add(plugin);
 
-		JMenu help = new JMenu("Help");
-		help
-				.add(new OpenURLAction("User documentation",
+		JMenu help = new JMenu(MessageManager.getString("mainmenu.help"));
+		help.add(new OpenURLAction(MessageManager.getString("mainmenu.user_documentation"),
 						"http://genomeview.org/content/user-documentation"));
-		help.add(new OpenURLAction("Post bug report or feature request",
+		help.add(new OpenURLAction(MessageManager.getString("mainmenu.post_bug_request"),
 				"http://sourceforge.net/tracker/?group_id=208107"));
-		help.add(new OpenURLAction("Join mailinglist", "https://lists.sourceforge.net/lists/listinfo/genomeview-support"));
+		help.add(new OpenURLAction(MessageManager.getString("mainmenu.mailing_list"), "https://lists.sourceforge.net/lists/listinfo/genomeview-support"));
 		help.addSeparator();
 		help.add(new ShowInstalledModulesAction(model));
 //		help.add(new OpenURLAction("Official list plugins",
 //				"http://genomeview.sourceforge.net/plugins"));
-		JMenu pluginDoc=new JMenu("Plugin documentation");
+		JMenu pluginDoc=new JMenu(MessageManager.getString("mainmenu.plugin"));
 		model.getGUIManager().registerPluginDocumentationMenu(pluginDoc);
 		help.add(pluginDoc);
 		help.addSeparator();
 		help.add(new ShowAboutDialogAction(model));
+		
 		add(help);
-
 	}
 }

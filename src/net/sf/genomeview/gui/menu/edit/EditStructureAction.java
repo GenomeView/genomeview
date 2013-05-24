@@ -9,6 +9,7 @@ import java.util.Observable;
 import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
@@ -18,7 +19,7 @@ public class EditStructureAction extends AbstractModelAction {
     private static final long serialVersionUID = -2032099327942679205L;
 
     public EditStructureAction(Model model) {
-        super("Edit selected structure", model);
+        super(MessageManager.getString("editmenu.edit_structure"), model);
         super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control E"));
     }
 

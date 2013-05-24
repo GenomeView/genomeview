@@ -16,6 +16,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.CrashHandler;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
 import net.sf.jannot.source.Locator;
@@ -33,7 +34,7 @@ public class SaveSessionAction extends AbstractAction {
 	private Model model;
 
 	public SaveSessionAction(Model model) {
-		super("Save session");
+		super(MessageManager.getString("filemenu.save_session"));
 		this.model = model;
 	}
 
@@ -50,7 +51,7 @@ public class SaveSessionAction extends AbstractAction {
 
 			@Override
 			public String getDescription() {
-				return "GenomeView sessions";
+				return MessageManager.getString("filemenu.session_desc");
 			}
 
 		});
@@ -69,7 +70,7 @@ public class SaveSessionAction extends AbstractAction {
 				Configuration.set("lastDirectory", f.getParentFile());
 				
 			} catch (Exception ex) {
-				CrashHandler.crash(Level.SEVERE, "Could not save session", ex);
+				CrashHandler.crash(Level.SEVERE, MessageManager.getString("filemenu.could_not_save_session"), ex);
 			}
 		}
 

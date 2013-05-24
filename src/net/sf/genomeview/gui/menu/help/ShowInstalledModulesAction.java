@@ -10,6 +10,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.plugin.PluginLoader;
 
 import org.java.plugin.registry.PluginDescriptor;
@@ -22,7 +23,7 @@ public class ShowInstalledModulesAction extends AbstractAction {
     private static final long serialVersionUID = 4182067300462615334L;
 
     public ShowInstalledModulesAction(Model model) {
-        super("List of installed modules");
+        super(MessageManager.getString("helpmenu.installed_modules"));
         this.model = model;
     }
 

@@ -9,6 +9,7 @@ import java.util.Observable;
 import javax.swing.ImageIcon;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
 
@@ -24,7 +25,7 @@ public class RedoAction extends AbstractModelAction{
     private static final long serialVersionUID = -1318894389028565654L;
 
     public RedoAction(Model model) {
-        super("Redo", new ImageIcon(model.getClass().getResource("/images/redo.png")), model);
+        super(MessageManager.getString("editmenu.redo"), new ImageIcon(model.getClass().getResource("/images/redo.png")), model);
     }
 
     public void actionPerformed(ActionEvent arg0) {

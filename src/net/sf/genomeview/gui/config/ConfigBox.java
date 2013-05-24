@@ -15,6 +15,10 @@ public abstract class ConfigBox {
 
 	}
 
+	public static Container dropDownInstance(String listKey, String valueKey,String title){
+		return new ComboBoxConfig(listKey,valueKey,title);
+	}
+	
 	public static Container stringInstance(String key, String title) {
 		return new StringConfig(key, title);
 

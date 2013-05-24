@@ -15,6 +15,7 @@ import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.edit.CloneFeatureAction;
 import net.sf.genomeview.gui.menu.edit.CreateNewFeatureAction;
 import net.sf.genomeview.gui.menu.edit.EditStructureAction;
@@ -87,7 +88,7 @@ public class PopUpMenu extends JPopupMenu {
 		count = 0;
 
 		
-		add(new AbstractAction("Configure track") {
+		add(new AbstractAction(MessageManager.getString("mainmenu.configure_track")) {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {

@@ -46,7 +46,9 @@ public class GenomeView {
 	}
 
 	public static void main(final String[] args) {
-
+		LogConfigurator.config();
+		logger.info("Starting GenomeView " + Configuration.version());
+		logger.info("Using language: "+MessageManager.getLocale());
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -70,13 +72,13 @@ public class GenomeView {
 
 			@Override
 			public void run() {
-				LogConfigurator.config();
+				
 				/*
 				 * The configuration class needs to be called at least once before we
 				 * can start the logger
 				 */
 				
-				System.out.println("Starting GenomeView " + Configuration.version());
+				
 				
 				logger.info("Configuration summary: \n\tGenomeView version: " + Configuration.version() + "\n\t" + "Current date and time: " + new Date() + "\n\t"
 						+ "Command line instructions: " + Arrays.toString(args) + "\n\t" + "Number of processors: "

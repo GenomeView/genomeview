@@ -28,6 +28,7 @@ import be.abeel.io.ExtensionManager;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.Hider;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel;
 
@@ -42,7 +43,7 @@ public class SaveImage extends AbstractAction {
 	private Model model;
 
 	public SaveImage(Model model) {
-		super("Export image...");
+		super(MessageManager.getString("filemenu.save_image"));
 		this.model = model;
 	}
 
@@ -58,7 +59,7 @@ public class SaveImage extends AbstractAction {
 			final File ef = ExtensionManager.extension(chooser.getSelectedFile(), ExtensionManager.PNG);
 			if (ef.exists()) {
 				int confirm = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
-						"This file exists, are you certain you want to overwrite it?");
+						MessageManager.getString("filemenu.save_image_warn"));
 				if (confirm != JOptionPane.YES_OPTION) {
 					return;
 				}
@@ -66,7 +67,7 @@ public class SaveImage extends AbstractAction {
 			}
 
 			
-			final Hider h = new Hider(model,"Exporting image...");
+			final Hider h = new Hider(model,MessageManager.getString("filemenu.exporting_image"));
 			SwingUtilities.invokeLater(new Runnable() {
 
 				@Override

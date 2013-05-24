@@ -8,6 +8,7 @@ import java.util.Observable;
 
 import net.sf.genomeview.core.AnalyzedFeature;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Strand;
@@ -24,7 +25,7 @@ import net.sf.jannot.utils.SequenceTools;
 public class ExtendToStopCodonAction extends AbstractModelAction {
 
 	public ExtendToStopCodonAction(Model model) {
-		super("Extend to next stop codon", model);
+		super(MessageManager.getString("editmenu.extend_to_next_stop_codon"), model);
 		model.addObserver(this);
 		update(null, null);
 

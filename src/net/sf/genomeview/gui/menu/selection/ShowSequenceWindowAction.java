@@ -9,6 +9,7 @@ import java.util.Observable;
 import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.SequenceViewDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
@@ -24,7 +25,7 @@ public class ShowSequenceWindowAction extends AbstractModelAction {
     private static final long serialVersionUID = 4601582100774522419L;
 
     public ShowSequenceWindowAction(Model model) {
-        super("Show DNA or protein sequence", model);
+        super(MessageManager.getString("selectionmenu.show_dna_protein"), model);
         super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control Q"));
     }
 

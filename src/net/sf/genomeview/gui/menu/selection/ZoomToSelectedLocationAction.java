@@ -9,6 +9,7 @@ import java.util.Observer;
 import java.util.Set;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Location;
 
@@ -20,7 +21,7 @@ public class ZoomToSelectedLocationAction extends AbstractModelAction implements
     private static final long serialVersionUID = 8764835346246357318L;
 
     public ZoomToSelectedLocationAction(Model model) {
-        super("Zoom to location selection", model);
+        super(MessageManager.getString("selectionmenu.zoom_to_location"), model);
     }
 
     public void actionPerformed(ActionEvent e) {

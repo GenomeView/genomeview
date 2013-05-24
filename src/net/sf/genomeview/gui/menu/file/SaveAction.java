@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.SaveDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
@@ -21,7 +22,7 @@ public class SaveAction extends AbstractModelAction {
     private static final long serialVersionUID = 5192584831566138816L;
 
     public SaveAction(Model model) {
-        super("Save annotation...", model);
+        super(MessageManager.getString("filemenu.save_annotation"), model);
         super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control S"));
     }
 

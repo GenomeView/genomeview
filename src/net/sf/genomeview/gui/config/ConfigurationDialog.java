@@ -275,6 +275,8 @@ public class ConfigurationDialog extends JDialog {
 			this.add(ConfigBox.booleanInstance(model,"geneticCodeSelection", MessageManager.getString("configdialog.enable_genetic_code_selection")), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("general:exportMagnifyFactor", MessageManager.getString("configdialog.resultion_increase_export_images")), gc);
+			gc.gridy++;
+			this.add(ConfigBox.dropDownInstance("lang:available","lang:current", MessageManager.getString("configdialog.select_language")), gc);
 			
 			
 			

@@ -29,6 +29,7 @@ import java.util.Observer;
 import javax.swing.JDialog;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 
 /**
@@ -45,7 +46,7 @@ public class TrackConfigWindow implements Observer {
 		window = new JDialog(model.getGUIManager().getParent());
 		
 		window.setModal(false);
-		window.setTitle("Configure track");
+		window.setTitle(MessageManager.getString("trackconfig.configure_track"));
 		this.config = config;
 		System.out.println(config);
 		window.add(config.getGUIContainer());

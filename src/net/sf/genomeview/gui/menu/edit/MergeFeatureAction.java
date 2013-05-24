@@ -9,6 +9,7 @@ import java.util.Observable;
 import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.MergeFeatureDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
@@ -25,7 +26,7 @@ public class MergeFeatureAction extends AbstractModelAction {
     private static final long serialVersionUID = -3265609839659200956L;
 
     public MergeFeatureAction(Model model) {
-        super("Merge selected features", model);
+        super(MessageManager.getString("editmenu.merge_feature"), model);
         super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control M"));
     }
 

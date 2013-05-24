@@ -9,6 +9,7 @@ import java.util.Observable;
 import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
@@ -21,7 +22,7 @@ public class SplitFeatureAction extends AbstractModelAction {
     private static final long serialVersionUID = -3265609839659200956L;
 
     public SplitFeatureAction(Model model) {
-        super("Split feature between two selected locations", model);
+        super(MessageManager.getString("editmenu.split_feature"), model);
         super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control U"));
     }
 

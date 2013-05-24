@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.util.Observable;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
 
@@ -18,7 +19,7 @@ public class SelectFromSelectedFirst extends AbstractModelAction {
     private static final long serialVersionUID = 3658234266201763591L;
 
     public SelectFromSelectedFirst(Model model) {
-        super("Select first location", model);
+        super(MessageManager.getString("selectionmenu.select_first_location"), model);
         model.addObserver(this);
         update(null, null);
     }
