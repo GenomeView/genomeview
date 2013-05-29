@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="2144" />
+	<property name="version" value="2170" />
 	<property name="src" value="src" />
 	<property name="res" value="resources" />
 	<property name="build" value="build" />
@@ -85,6 +85,9 @@
 		<mkdir dir="${build}/images" />
 		<copy todir="${build}/images">
 			<fileset dir="${res}/images" />
+		</copy>
+		<copy todir="${build}/lang">
+			<fileset dir="${res}/lang" />
 		</copy>
 		<copy todir="${build}">
 		    <fileset dir="${res}">

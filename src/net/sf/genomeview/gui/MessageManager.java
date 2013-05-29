@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 import net.sf.genomeview.core.Configuration;
 /**
  * 
- * @author David Roldán Martínez
+ * @author David Roldan Martinez
  * @author Thomas Abeel
  * 
  *
