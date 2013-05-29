@@ -12,14 +12,17 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.LRUSet;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
+import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
 import be.abeel.net.URIFactory;
@@ -119,13 +122,13 @@ class InstructionWorker implements Runnable {
 		s.setTcpNoDelay(true);
 		System.out.println("Handling client");
 		// InputStream is = new BufferedInputStream(s.getInputStream());
-		BufferedReader it=new BufferedReader(new InputStreamReader(s.getInputStream()));
-//		LineIterator it = new LineIterator(s.getInputStream());
+		BufferedReader it = new BufferedReader(new InputStreamReader(s.getInputStream()));
+		// LineIterator it = new LineIterator(s.getInputStream());
 		String line = it.readLine();
 		if (line.startsWith("GenomeViewJavaScriptHandler-")) {
 			otherPorts.add(new Port(Integer.parseInt(line.split("-")[1])));
 		} else {
-			while (!line.startsWith("GET") && line!=null) {
+			while (!line.startsWith("GET") && line != null) {
 				// System.out.println("Handler: GET: " + line);
 				line = it.readLine();
 				// System.out.println(line);
@@ -133,7 +136,7 @@ class InstructionWorker implements Runnable {
 			}
 			StringBuffer others = writeOther(line);
 			System.out.println("Reply from others: " + others);
-			if(others.length()>0){
+			if (others.length() > 0) {
 				PrintWriter pw = new PrintWriter(s.getOutputStream());
 				pw.print(others.toString());
 				pw.close();
@@ -155,7 +158,11 @@ class InstructionWorker implements Runnable {
 								doLoad(arr[3]);
 							}
 
-						} else if (arr[2].toLowerCase().equals("session")) {
+						} else if (arr[2].toLowerCase().equals("track")) {
+							doTrack(arr[3]);
+						} else if (arr[2].toLowerCase().equals("config")) {
+							doConfig(arr[3]);
+						}else if (arr[2].toLowerCase().equals("session")) {
 							doSession(arr[3]);
 
 						} else if (arr[2].toLowerCase().equals("unload")) {
@@ -186,19 +193,38 @@ class InstructionWorker implements Runnable {
 
 	}
 
+	/**
+	 * Scroll to track
+	 * 
+	 * 
+	 * 
+	 * @param trackName
+	 */
+	private void doTrack(String trackName) {
+		String input = trackName.toLowerCase();
+		ArrayList<Track> hits = new ArrayList<Track>();
+		for (Track t : model.getTrackList()) {
+			if (t.getDataKey().toString().toLowerCase().contains(input) || t.config().displayName().toLowerCase().contains(input))
+				hits.add(t);
+
+		}
+		if (hits.size() > 0)
+			model.getGUIManager().getEvidenceLabel().scroll2track(hits.get(0));
+	}
+
 	private StringBuffer writeOther(String line) {
 		StringBuffer buffer = new StringBuffer();
 		for (Port port : otherPorts) {
 			try {
 				Socket clientSocket = new Socket(InetAddress.getLocalHost(), port.getPort());
 				clientSocket.setTcpNoDelay(true);
-				
+
 				BufferedReader bis = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 				PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
 				out.println(line);
 				out.flush();
-//				out.close();
-				
+				// out.close();
+
 				String l = bis.readLine();
 				while (l != null) {
 					buffer.append(l + "\n");
@@ -240,6 +266,10 @@ class InstructionWorker implements Runnable {
 
 	}
 
+	private void doConfig(String string){
+		String[] arr=string.trim().split("=",2);
+		Configuration.set(arr[0], arr[1]);
+	}
 	private void doPosition(String string) {
 		ExternalHelper.setPosition(string, model);
 

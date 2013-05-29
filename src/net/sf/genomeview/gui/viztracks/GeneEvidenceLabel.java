@@ -13,6 +13,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.TreeMap;
@@ -116,7 +117,7 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 		framePixelsUsed = 0;
 		screenWidth = this.getSize().width + 1;
 		model.vlm.setScreenWidth(screenWidth);
-		
+
 		if (view == null) {
 			view = new JViewport() {
 				public Rectangle getViewRect() {
@@ -136,7 +137,7 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 				// should use the Graphics translate function to make sure we
 				// are positioned correctly.
 				if (height > 0)
-					tracks.put(framePixelsUsed, track);
+					tracks.put(framePixelsUsed,height, track);
 				framePixelsUsed += height;
 			}
 		}
@@ -154,15 +155,13 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 	protected int framePixelsUsed = 0;
 	protected double screenWidth = 0;
 
-
-
 	public void setScrollPaneListener(MouseWheelListener scrollPaneListener) {
 		this.scrollPaneListener = scrollPaneListener;
 	}
 
-//	public MouseWheelListener getScrollPaneListener() {
-//		return scrollPaneListener;
-//	}
+	// public MouseWheelListener getScrollPaneListener() {
+	// return scrollPaneListener;
+	// }
 
 	@Override
 	public void paintComponent(Graphics g) {
@@ -218,7 +217,8 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 	class TrackMap {
 		/* A mapping from position to track */
 		private TreeMap<Integer, Track> tracks = new TreeMap<Integer, Track>();
-
+		private HashMap<Track, Integer> reverseTrack = new HashMap<Track, Integer>();
+		private HashMap<Track, Integer>heightMap=new HashMap<Track,Integer>();
 		/**
 		 * Returns the track where the MouseEvent takes place
 		 * 
@@ -236,16 +236,29 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 			return max;
 		}
 
-		public void clear() {
+		void clear() {
 			tracks.clear();
+			reverseTrack.clear();
+			heightMap.clear();
 
 		}
 
-		public void put(int framePixelsUsed, Track track) {
+		
+		void put(int framePixelsUsed,int height, Track track) {
 			tracks.put(framePixelsUsed, track);
+			reverseTrack.put(track, framePixelsUsed);
+			heightMap.put(track, height);
 
 		}
 
+		int getYOffset(Track t){
+			if(reverseTrack.containsKey(t))
+				return reverseTrack.get(t).intValue();
+			else
+				return 0;
+			
+		}
+		
 		public Track get(MouseEvent e) {
 			if (e.getY() > framePixelsUsed)
 				return null;
@@ -253,6 +266,16 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 			e.translatePoint(0, -mouseOffset);
 			return tracks.get(mouseOffset);
 		}
+
+		public int getHeight(Track t) {
+			return heightMap.get(t);
+		}
+	}
+
+	public void scroll2track(Track t){
+		int y=tracks.getYOffset(t);
+		int h=tracks.getHeight(t);
+		scrollRectToVisible(new Rectangle(0, y, (int)screenWidth, h));
 	}
 
 	private TrackMap tracks = new TrackMap();
