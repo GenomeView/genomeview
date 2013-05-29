@@ -268,14 +268,19 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 		}
 
 		public int getHeight(Track t) {
-			return heightMap.get(t);
+			if(heightMap.containsKey(t))
+				return heightMap.get(t);
+			else return 0;
 		}
 	}
 
 	public void scroll2track(Track t){
 		int y=tracks.getYOffset(t);
 		int h=tracks.getHeight(t);
-		scrollRectToVisible(new Rectangle(0, y, (int)screenWidth, h));
+		if(h>0){
+//			scrollRectToVisible(new Rectangle(0,0,(int)screenWidth, h));
+			scrollRectToVisible(new Rectangle(0, y, (int)screenWidth, h));
+		}
 	}
 
 	private TrackMap tracks = new TrackMap();
