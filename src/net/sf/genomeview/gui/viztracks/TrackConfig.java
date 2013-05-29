@@ -53,6 +53,9 @@ public class TrackConfig extends Observable {
 		guicontainer.gc.gridy++;
 		Configuration.getVisible(dataKey);
 		guicontainer.add(new BooleanConfig("track:visible:" + dataKey, MessageManager.getString("trackconfig.track_visible"), model), guicontainer.gc);
+		guicontainer.gc.gridy++;
+		guicontainer.add(new BooleanConfig("track:highlight:" + dataKey, MessageManager.getString("trackconfig.track_highlight"), model), guicontainer.gc);
+		
 		if (isCollapsible()) {
 			guicontainer.gc.gridy++;
 			guicontainer.add(new BooleanConfig("track:collapsed:" + dataKey, MessageManager.getString("trackconfig.track_collapsed"), model), guicontainer.gc);
