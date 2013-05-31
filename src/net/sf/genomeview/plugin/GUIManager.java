@@ -13,6 +13,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StatusBar;
 import net.sf.genomeview.gui.dialog.OpenDialog;
 import net.sf.genomeview.gui.explorer.GenomeExplorerManager;
@@ -41,7 +42,7 @@ public class GUIManager {
 
 	public void startPluginLoading(){
 		for (JMenu menu : pluginMenu){
-			JMenuItem jmi=new JMenuItem("Loading plug-ins...\nThis may take a minute!");
+			JMenuItem jmi=new JMenuItem(MessageManager.getString("guimanager.loading_plugins"));
 			jmi.setEnabled(false);
 			menu.add(jmi);
 			
