@@ -23,6 +23,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.CrashHandler;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import be.abeel.gui.GridBagPanel;
 
@@ -64,7 +65,7 @@ class Genome extends GridBagPanel {
 					repaint();
 					Session.loadSession(model, url);
 				} catch (IOException e1) {
-					CrashHandler.showErrorMessage("Could not load this session.", e1);
+					CrashHandler.showErrorMessage(MessageManager.getString("genome.couldnt_load_this_session"), e1);
 				}finally{
 					picture.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				}
@@ -88,7 +89,7 @@ class Genome extends GridBagPanel {
 				try {
 					Session.loadSession(model, url);
 				} catch (IOException e1) {
-					CrashHandler.showErrorMessage("Could not load this session.", e1);
+					CrashHandler.showErrorMessage(MessageManager.getString("genome.couldnt_load_this_session"), e1);
 				}
 			}
 		});

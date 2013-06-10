@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.samtools.util.StringUtil;
@@ -37,7 +38,7 @@ public class ExternalHelper {
 							arr[i]=StringUtil.reverseString(tmp[(arr.length-1)-i]);
 						/* If the location is not 2 or 3 tokens long, just stop */
 						if (arr.length > 3 || arr.length < 2) {
-							CrashHandler.showErrorMessage("Could not parse location: " + position,
+							CrashHandler.showErrorMessage(MessageManager.getString("externalhelper.couldnt_parse_location") + " " + position,
 									new NumberFormatException("Unknown format"));
 							return;
 
@@ -67,7 +68,7 @@ public class ExternalHelper {
 						}
 					}
 				} catch (NumberFormatException ne) {
-					CrashHandler.showErrorMessage("Could not parse location: " + position, ne);
+					CrashHandler.showErrorMessage(MessageManager.getString("externalhelper.couldnt_parse_location") + " " + position, ne);
 				}
 			}
 

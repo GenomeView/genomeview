@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
+import net.sf.genomeview.gui.MessageManager;
 import be.abeel.concurrency.DaemonThread;
 import be.abeel.io.LineIterator;
 
@@ -48,17 +49,17 @@ public class ConnectionMonitor extends Observable {
 			public void update(Observable o, Object arg) {
 				if (webstartOnline) {
 					webLabel.setIcon(online);
-					webLabel.setToolTipText("GenomeView online");
+					webLabel.setToolTipText(MessageManager.getString("connectionmonitor.genomeview_online"));
 				} else {
 					webLabel.setIcon(offline);
-					webLabel.setToolTipText("Cannot connect to genomeview.org");
+					webLabel.setToolTipText(MessageManager.getString("connectionmonitor.cannot_connect_genomeview"));
 				}
 				if (reposOnline) {
 					reposLabel.setIcon(online);
-					reposLabel.setToolTipText("Data repository online");
+					reposLabel.setToolTipText(MessageManager.getString("connectionmonitor.data_repository_online"));
 				} else {
 					reposLabel.setIcon(offline);
-					reposLabel.setToolTipText("Cannot connect to data repository");
+					reposLabel.setToolTipText(MessageManager.getString("connectionmonitor.cannot_connect_data_repository"));
 				}
 
 				StringBuffer text = new StringBuffer();

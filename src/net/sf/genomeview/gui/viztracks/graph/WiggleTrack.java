@@ -22,6 +22,7 @@ import javax.swing.border.Border;
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
@@ -77,7 +78,7 @@ public class WiggleTrack extends Track {
 	private class WigglePopup extends JPopupMenu {
 		public WigglePopup() {
 			if (!logScaled)
-				add(new AbstractAction("Use log scaling") {
+				add(new AbstractAction(MessageManager.getString("wiggletrack.use_log_scaling")) {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -88,7 +89,7 @@ public class WiggleTrack extends Track {
 
 				});
 			else {
-				add(new AbstractAction("Use normal scaling") {
+				add(new AbstractAction(MessageManager.getString("wiggletrack.use_normal_scaling")) {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -99,7 +100,7 @@ public class WiggleTrack extends Track {
 
 				});
 			}
-			add(new AbstractAction("Toggle plot mode") {
+			add(new AbstractAction(MessageManager.getString("wiggletrack.toggle_plot_mode")) {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {

@@ -89,12 +89,12 @@ class CommandLineOptions {
 			return true;
 		} catch (IllegalOptionValueException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
-			CrashHandler.showErrorMessage("Error while parsing command line arguments: " + e.getMessage()
-					+ "\n\nWill continue without command line arguments.", e);
+			CrashHandler.showErrorMessage(MessageManager.getString("commandlineoptions.parsing_command_line_error") + " " + e.getMessage()
+					+ "\n\n" + MessageManager.getString("commandlineoptions.will_continue_without_args"), e);
 		} catch (UnknownOptionException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
-			CrashHandler.showErrorMessage("Error while parsing command line arguments: " + e.getMessage()
-					+ "\n\nWill continue without command line arguments.", e);
+			CrashHandler.showErrorMessage(MessageManager.getString("commandlineoptions.parsing_command_line_error") + " " + e.getMessage()
+					+ "\n\n" + MessageManager.getString("commandlineoptions.will_continue_without_args"), e);
 		}
 		return false;
 

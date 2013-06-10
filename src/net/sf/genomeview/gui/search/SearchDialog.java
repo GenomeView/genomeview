@@ -10,6 +10,7 @@ import javax.swing.JDialog;
 import javax.swing.JTabbedPane;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 
 /**
@@ -26,17 +27,17 @@ public class SearchDialog extends JDialog {
 	final private JTabbedPane pane;
 
 	private SearchDialog(Model model) {
-		super(model.getGUIManager().getParent(), "Search");
+		super(model.getGUIManager().getParent(), MessageManager.getString("searchdialog.search"));
 		setModalityType(ModalityType.MODELESS);
 		pane = new JTabbedPane();
 		setLayout(new BorderLayout());
 		add(pane, BorderLayout.CENTER);
-		pane.add("Keyword search", new KeywordSearchPane(model));
-		pane.add("Entry search",new EntrySearchPane(model));
-		pane.add("Sequence search", new SequenceSearchPane(model));
-		pane.add("Motif search", new MotifSearchPane(model));
+		pane.add(MessageManager.getString("searchdialog.keyword_search"), new KeywordSearchPane(model));
+		pane.add(MessageManager.getString("searchdialog.entry_search"),new EntrySearchPane(model));
+		pane.add(MessageManager.getString("searchdialog.sequence_search"), new SequenceSearchPane(model));
+		pane.add(MessageManager.getString("searchdialog.motif_search"), new MotifSearchPane(model));
 		
-		pane.add("Overlap search", new OverlapSearchPane(model));
+		pane.add(MessageManager.getString("searchdialog.overlap_search"), new OverlapSearchPane(model));
 
 		pack();
 		StaticUtils.right(this, model.getGUIManager().getParent());

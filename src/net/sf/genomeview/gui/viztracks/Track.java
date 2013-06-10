@@ -35,6 +35,7 @@ import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
@@ -69,7 +70,7 @@ public abstract class Track {
 				g.fillRect(x1, y, x2 - x1 + 1, returnTrackHeight);
 				if (visible.overlaps(st.start(), st.end())) {
 					g.setColor(Color.BLACK);
-					g.drawString("Retrieving data...", 100, y + returnTrackHeight / 2);
+					g.drawString(MessageManager.getString("track.retrieving_data"), 100, y + returnTrackHeight / 2);
 				}
 
 			}

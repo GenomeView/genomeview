@@ -69,7 +69,7 @@ public class MergeFeatureDialog extends JDialog {
 		cp.setLayout(new BorderLayout());
 		cp.add(intron, BorderLayout.NORTH);
 		cp.add(exon, BorderLayout.SOUTH);
-		c.add(new TitledComponent("Merge type", cp), gc);
+		c.add(new TitledComponent(MessageManager.getString("mergefeatures.merge_type"), cp), gc);
 		gc.gridy++;
 		setBackground(exon.getBackground());
 		// final TypeCombo select = new TypeCombo(model);

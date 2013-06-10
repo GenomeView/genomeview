@@ -18,6 +18,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.ShortReadProvider;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
@@ -70,7 +71,7 @@ public class ShortReadTrack extends Track {
 			text.append("<html>");
 
 			if (sri != null) {
-				text.append("Insertion: ");
+				text.append(MessageManager.getString("shortreadtrack.insertion") + " ");
 				byte[] bases = sri.esr.getReadBases();
 				for (int i = sri.start; i < sri.start + sri.len; i++) {
 					text.append((char) bases[i]);
@@ -115,17 +116,17 @@ public class ShortReadTrack extends Track {
 			text.append("<html>");
 
 			if (sr != null) {
-				text.append("Name: " + sr.getReadName() + "<br/>");
-				text.append("Len: " + sr.getReadLength() + "<br/>");
-				text.append("Cigar: " + sr.getCigarString() + "<br/>");
-				text.append("Sequence: " + rerun(sr.getReadString()) + "<br/>");
-				text.append("Paired: " + sr.getReadPairedFlag() + "<br/>");
+				text.append(MessageManager.getString("shortreadtrack.name") + " " + sr.getReadName() + "<br/>");
+				text.append(MessageManager.getString("shortreadtrack.len") + " " + sr.getReadLength() + "<br/>");
+				text.append(MessageManager.getString("shortreadtrack.cigar") + " " + sr.getCigarString() + "<br/>");
+				text.append(MessageManager.getString("shortreadtrack.sequence") + " " + rerun(sr.getReadString()) + "<br/>");
+				text.append(MessageManager.getString("shortreadtrack.paired") + " " + sr.getReadPairedFlag() + "<br/>");
 				if (sr.getReadPairedFlag()) {
 					if (!sr.getMateUnmappedFlag())
-						text.append("Mate: " + sr.getMateReferenceName() + ":" + sr.getMateAlignmentStart() + "<br/>");
+						text.append(MessageManager.getString("shortreadtrack.mate") + " " + sr.getMateReferenceName() + ":" + sr.getMateAlignmentStart() + "<br/>");
 					else
-						text.append("Mate missing" + "<br/>");
-					text.append("Second: " + sr.getFirstOfPairFlag());
+						text.append(MessageManager.getString("shortreadtrack.mate_missing") + "<br/>");
+					text.append(MessageManager.getString("shortreadtrack.second") + " " + sr.getFirstOfPairFlag());
 				}
 				// text.append("<br/>");
 			}

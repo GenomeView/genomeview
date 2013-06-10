@@ -31,6 +31,7 @@ import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Task;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.genomeview.gui.dialog.MultipleAlignmentOrderingDialog;
@@ -65,7 +66,7 @@ public class MultipleAlignmentTrack2 extends Track {
 		private static final long serialVersionUID = 1103364926466070222L;
 
 		public MultipleAlignmentPopUp() {
-			add(new AbstractAction("Toggle all entries mode") {
+			add(new AbstractAction(MessageManager.getString("multiplealignmenttrack.toggle_all_entries")) {
 
 				/**
 				 * 
@@ -79,7 +80,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				}
 
 			});
-			add(new AbstractAction("Rearrange ordering") {
+			add(new AbstractAction(MessageManager.getString("multiplealignmenttrack.rearrange_ordering")) {
 
 				/**
 				 * 
@@ -213,7 +214,7 @@ public class MultipleAlignmentTrack2 extends Track {
 		currentYOffset = yOffset;
 		AbstractMAFMultipleAlignment ma = (AbstractMAFMultipleAlignment) entry.get(dataKey);
 		if (ma == null) {
-			g.drawString("No multiple alignment loaded for this entry", 10, yOffset + 10);
+			g.drawString(MessageManager.getString("multiplealignmenttrack.no_multiple_alignment_loaded_warn"), 10, yOffset + 10);
 			return 20 + 5;
 		}
 		/*
@@ -247,7 +248,7 @@ public class MultipleAlignmentTrack2 extends Track {
 		Iterable<AbstractAlignmentBlock> abs = ma.get(visible.start, visible.end);
 
 		if (!abs.iterator().hasNext()) {
-			g.drawString("No alignment blocks in this region", 10, yOffset + 10);
+			g.drawString(MessageManager.getString("multiplealignmenttrack.no_alignment_blocks_warn"), 10, yOffset + 10);
 			return 20 + 5;
 		}
 

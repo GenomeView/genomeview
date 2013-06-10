@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
+import net.sf.genomeview.gui.MessageManager;
 import be.abeel.concurrency.DaemonThreadFactory;
 
 /**
@@ -84,7 +85,7 @@ public class JavaScriptHandler  {
 						log.log(Level.INFO, "This is normal when closing the socket", e);
 
 					} catch (IOException e) {
-						CrashHandler.showErrorMessage("Failed to accept socket", e);
+						CrashHandler.showErrorMessage(MessageManager.getString("jshandler.failed_to_accept_socket"), e);
 					}
 				}
 

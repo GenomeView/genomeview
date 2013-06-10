@@ -77,7 +77,7 @@ public class LoadSessionAction extends AbstractAction {
 			try {
 				Session.loadSession(model,chooser.getSelectedFile());
 			} catch (FileNotFoundException e1) {
-				CrashHandler.showErrorMessage("Could not load session file, because GenomeView couldn't find it.", e1);
+				CrashHandler.showErrorMessage(MessageManager.getString("loadsessionaction.couldnt_load_session_file"), e1);
 			}
 			
 			Configuration.set("lastDirectory", chooser.getSelectedFile().getParentFile());

@@ -3,6 +3,7 @@
  */
 package net.sf.genomeview.data;
 
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.Entry;
 
 /**
@@ -14,7 +15,7 @@ final public class DummyEntry extends Entry {
 	
 	public static Entry dummy=new DummyEntry();
 	private DummyEntry() {
-		super("Nothing loaded");
+		super(MessageManager.getString("dummyentry.nothing_loaded"));
 	}
 
 }

@@ -25,6 +25,7 @@ import javax.swing.JViewport;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
@@ -120,7 +121,7 @@ public class MultipleAlignmentTrack extends Track {
 		if (mat.hasData()) {
 			if (r.length() > 10000000) {
 				g.setColor(Color.BLACK);
-				g.drawString("Too much data in alignment, zoom in to see details", 5, yOffset + lineHeigh - 2);
+				g.drawString(MessageManager.getString("multiplealignmenttrack.too_much_data_warn"), 5, yOffset + lineHeigh - 2);
 				return lineHeigh;
 			}
 			if (r.length() < 1000) {
