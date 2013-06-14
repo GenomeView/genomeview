@@ -43,6 +43,11 @@ public class InformationFrame extends GridBagPanel {
 
 	public InformationFrame(final Model model) {
 		this.model = model;
+		
+		//let's make this frame available to plugins
+		model.getGUIManager().registerInformationFrame(this);
+				
+				
 		gc.fill = GridBagConstraints.BOTH;
 		gc.weightx = 1;
 		gc.weighty = 1;
@@ -128,7 +133,33 @@ public class InformationFrame extends GridBagPanel {
 
 
 	}
-
+	
+	/**
+	 * Gives plugins the possibility to add panels at the bottom of this frame.
+	 * 
+	 * @param gc {@link GridBagConstraints} to tweak the way the new panel should be added.
+	 * @param panel
+	 */
+	public void addSubPanel(JPanel panel, GridBagConstraints gc){
+		gc.gridy++;
+		gc.weighty = 0.3;
+		add(panel, gc);
+		
+		this.revalidate();
+	}
+	/**
+	 * Add a subpanel without altering the {@link GridBagConstraints}
+	 * @param panel
+	 */
+	public void addSubPanel(JPanel panel){
+		this.addSubPanel(panel, this.gc);
+	}
+	public GridBagConstraints getGridBagConstraints(){
+		return gc;
+	}
+	
+	
+	
 	class MonitorPanel extends GridBagPanel{
 		
 		private static final long serialVersionUID = 1226803679142353777L;

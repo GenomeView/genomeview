@@ -3,11 +3,11 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/ajt-2.10.jar"/>
 	<classpathentry kind="lib" path="lib/collections-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/jannot-2168.jar"/>
 	<classpathentry kind="lib" path="lib/jargs.jar"/>
 	<classpathentry kind="lib" path="lib/sam-r1439.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/AJT"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
