@@ -239,7 +239,7 @@ public class OpenDialog extends JDialog {
 					         session.login(userName, password);
 					         return;
 					    } catch (final AuthorizationException e1) {
-					         JOptionPane.showMessageDialog(null, "Invalid user name or password!","Login Error", 
+					         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.invalid_username_pwd"),MessageManager.getString("opendialog.login_error"), 
 					         JOptionPane.ERROR_MESSAGE);
 					    } catch (ServerNotFoundException e2) {
 							// TODO Auto-generated catch block

@@ -11,6 +11,7 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.search.SearchDialog.SequenceType;
 import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.Location;
@@ -63,11 +64,11 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 	public String getColumnName(int columnIndex) {
 		switch (columnIndex) {
 		case 0:
-			return "Strand";
+			return MessageManager.getString("searchsequenceresult.strand");
 		case 1:
-			return "Start";
+			return MessageManager.getString("searchsequenceresult.start");
 		case 2:
-			return "End";
+			return MessageManager.getString("searchsequenceresult.end");
 		}
 		return null;
 	}
@@ -123,10 +124,7 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 					JOptionPane
 							.showMessageDialog(
 									model.getGUIManager().getParent(),
-									"<html>Mismatch search has some limitations:<br/>"
-											+ "<table><tr><td>Editing distance</td><td>maximum pattern length</td></tr><tr><td>"
-											+ "1</td><td>15</td></tr><tr><td>" + "2-3</td><td>10</td></tr><tr><td>"
-											+ "4-5</td><td>7</td></tr></table></html>", "Too many mismatches",
+									MessageManager.getString("searchsequenceresult.too_many_mismatches_warn"), MessageManager.getString("searchsequenceresult.too_many_mismatches"),
 									JOptionPane.WARNING_MESSAGE);
 				}
 

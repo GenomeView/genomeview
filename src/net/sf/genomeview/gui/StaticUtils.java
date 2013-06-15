@@ -110,11 +110,11 @@ public final class StaticUtils {
 			Desktop.getDesktop().browse(uri);
 		} catch (IOException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Could not open the specified url: " + uri, "URL open failed",
+			JOptionPane.showMessageDialog(null, MessageManager.formatMessage("staticutils.couldnt_open_url_warn", new Object[]{uri.getPath()}), MessageManager.getString("staticutils.url_open_failed"),
 					JOptionPane.ERROR_MESSAGE);
 		} catch (UnsupportedOperationException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Could not open the specified url: " + uri, "URL open failed",
+			JOptionPane.showMessageDialog(null, MessageManager.formatMessage("staticutils.couldnt_open_url_warn", new Object[]{uri.getPath()}), MessageManager.getString("staticutils.url_open_failed"),
 					JOptionPane.ERROR_MESSAGE);
 
 		}

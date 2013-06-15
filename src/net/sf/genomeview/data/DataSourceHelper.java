@@ -17,6 +17,7 @@ import javax.swing.ProgressMonitorInputStream;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.JOptionPaneX;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.mafix.MafixFactory;
@@ -58,8 +59,8 @@ public class DataSourceHelper {
 		data.stripIndex();
 
 		if (!data.exists()) {
-			JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "Data file is missing " + data + "\nSkipping this file...",
-					"Data missing", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.formatMessage("datasourcehelper.data_missing_warn", new Object[]{data.getName()}),
+					MessageManager.getString("datasourcehelper.data_missing"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -69,7 +70,7 @@ public class DataSourceHelper {
 		if (data.requiresIndex() && index == null) {
 			if (IndexManager.canBuildIndex(data)) {
 				int res = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
-						"Index is required and missing. Do you want to create the index?", "Index required",
+						MessageManager.getString("datasourcehelper.index_missing_warn"), MessageManager.getString("datasourcehelper.index_required"),
 						JOptionPane.YES_NO_OPTION);
 				if (res == JOptionPane.YES_OPTION) {
 					index(model, data);
@@ -78,8 +79,7 @@ public class DataSourceHelper {
 				return;
 
 			} else {
-				JOptionPaneX.showOkCancelDialog(model.getGUIManager().getParent(), "Could not locate index for " + data
-						+ "\nSkipping this file...", "Index missing", JOptionPane.ERROR_MESSAGE);
+				JOptionPaneX.showOkCancelDialog(model.getGUIManager().getParent(), MessageManager.formatMessage("datasourcehelper.couldnt_locate_index", new Object[]{data.getName()}), MessageManager.getString("datasourcehelper.index_missing"), JOptionPane.ERROR_MESSAGE);
 
 			}
 
@@ -88,9 +88,8 @@ public class DataSourceHelper {
 
 		if (data.isWig()) {
 			int res = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
-					"Wig is not a recommended file format for GenomeView.\n"
-							+ "Do you want to convert your file to the more efficient TDF format?",
-					"Wiggle format not recommended!", JOptionPane.YES_NO_OPTION);
+					MessageManager.getString("datasourcehelper.wig_not_recommended_warn"),
+					MessageManager.getString("datasourcehelper.wig_not_recommended"), JOptionPane.YES_NO_OPTION);
 			if (res == JOptionPane.YES_OPTION) {
 				convertWig2TDF(model, data);
 				return;
@@ -100,8 +99,7 @@ public class DataSourceHelper {
 		if (index == null && data.supportsIndex() && data.length() > 5 * 1024 * 1024) {
 			if (IndexManager.canBuildIndex(data)) {
 				int res = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
-						"Performance would benefit from indexing this file.\n" + data
-								+ "\nDo you want to create the index?", "Index missing", JOptionPane.YES_NO_OPTION);
+						MessageManager.formatMessage("datasourcehleper.create_index", new Object[]{data.getName()}), MessageManager.getString("datasourcehelper.index_missing"), JOptionPane.YES_NO_OPTION);
 				if (res == JOptionPane.YES_OPTION) {
 					index(model, data);
 					return;
@@ -113,9 +111,8 @@ public class DataSourceHelper {
 					int res = JOptionPane
 							.showConfirmDialog(
 									model.getGUIManager().getParent(),
-									data
-											+ "\nThis multiple alignment file is not preprocessed.\nThis will increase performance drastically.\nDo you want to do it now?",
-									"Preprocessing available", JOptionPane.YES_NO_OPTION);
+									MessageManager.formatMessage("datasourcehelper.preprocessing_warn", new Object[]{data.getName()}),
+									MessageManager.getString("datasourcehelper.preprocessing_available"), JOptionPane.YES_NO_OPTION);
 					if (res == JOptionPane.YES_OPTION) {
 						mafprocess(model, data);
 						return;
@@ -126,10 +123,8 @@ public class DataSourceHelper {
 						boolean ok = JOptionPaneX
 								.showOkCancelDialog(
 										model.getGUIManager().getParent(),
-										"<b>Trying to load a rather large file without index</b>.<br> "
-												+ data
-												+ "<br>To improve performance you may want to build an index.<br><a href='http://www.genomeview.org/content/preparing-feature-files'>Manual: Indexing annotation</a>.<br><br>GenomeView can try to load the file anyway.</html>",
-										"Index missing", JOptionPane.WARNING_MESSAGE);
+										MessageManager.formatMessage("datasourcehelper.load_big_file_no_index", new Object[]{data.getName()}),
+										MessageManager.getString("datasourcehelper.index_missing"), JOptionPane.WARNING_MESSAGE);
 						if (!ok)
 							return;
 					}
@@ -141,10 +136,8 @@ public class DataSourceHelper {
 			JOptionPane
 					.showMessageDialog(
 							null,
-							"Large file:\n"
-									+ data
-									+ "It may take a while to load this file.\nIf GenomeView becomes unresponsive, please increase the amount of memory.",
-							"Large file!", JOptionPane.WARNING_MESSAGE);
+							MessageManager.formatMessage("datasourcehelper.large_file_warn", new Object[]{data.getName()}),
+							MessageManager.getString("datasourcehelper.large_file"), JOptionPane.WARNING_MESSAGE);
 		}
 		DataSource ds = DataSourceFactory.create(data, index);
 		if (ds instanceof AbstractStreamDataSource) {
@@ -156,7 +149,7 @@ public class DataSourceHelper {
 				} else
 					return;
 			}
-			asd.setIos(new ProgressMonitorInputStream(model.getGUIManager().getParent(), "Reading file",
+			asd.setIos(new ProgressMonitorInputStream(model.getGUIManager().getParent(), MessageManager.getString("datasourcehelper.reading_file"),
 					new BufferedInputStream(asd.getIos(), 512 * 1024)));
 
 		}
@@ -165,9 +158,8 @@ public class DataSourceHelper {
 			JOptionPane
 					.showMessageDialog(
 							model.getGUIManager().getParent(),
-							data
-									+ "\nThis file is larger than the amount of available memory.\nEither increase the memory or index the file.\n\nFile will not be loaded.",
-							"Not enough memory", JOptionPane.ERROR_MESSAGE);
+							MessageManager.formatMessage("datasourcehelper.memory_warn", new Object[]{data.getName()}),
+							MessageManager.getString("datasourcehelper.not_enough_memory"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -265,7 +257,7 @@ public class DataSourceHelper {
 
 						@Override
 						public String getDescription() {
-							return "Multiple alignment files";
+							return MessageManager.getString("datasourcehelper.multiple_alignment_files");
 						}
 
 					});
@@ -281,7 +273,7 @@ public class DataSourceHelper {
 
 							ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(model.getGUIManager()
 									.getParent(),
-									"Compressing MAF file.\nThis will take a while depending on the file size.", data
+									MessageManager.getString("datasourcehelper.compressing_maf_file"), data
 											.stream());
 							pmis.getProgressMonitor().setMaximum((int) data.length());
 							MafixFactory.generateBlockZippedFile(pmis, file);
@@ -289,7 +281,7 @@ public class DataSourceHelper {
 							SeekableStream is = new SeekableFileStream(file);
 							SeekableProgressStream spmis = new SeekableProgressStream(
 									model.getGUIManager().getParent(),
-									"Indexing MAF file.\nThis will take a while depending on the file size.", is);
+									MessageManager.getString("datasourcehelper.indexing_maf_file"), is);
 							spmis.getProgressMonitor().setMaximum((int) file.length());
 							MafixFactory.generateIndex(spmis, new File(file + ".mfi"));
 							Locator mafdata = new Locator(file.toString());
@@ -346,7 +338,7 @@ public class DataSourceHelper {
 
 	private static Parser offerParserChoice(Model model) {
 		Parser p = (Parser) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-				"Could not detect file type, please select the correct parser manually.", "Parser detection",
+				MessageManager.getString("datasourcehelper.couldnt_detect_file"), MessageManager.getString("datasourcehelper.parser_detection"),
 				JOptionPane.QUESTION_MESSAGE, null, Parser.parsers, Parser.parsers[0]);
 		return p;
 	}
