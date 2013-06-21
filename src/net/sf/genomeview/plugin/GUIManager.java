@@ -71,6 +71,11 @@ public class GUIManager {
 		for (JMenu menu : pluginMenu)
 			getMenu(menu, pathMenu).add(a);
 	}
+	
+	public void addPluginMenuItem(JMenuItem i, String pathMenu){
+		for (JMenu menu : pluginMenu)
+			getMenu(menu, pathMenu).add(i);
+	}
 
 	/**
 	 * Recursive method to find the actual menu.
