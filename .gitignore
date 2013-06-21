@@ -1,4 +1,8 @@
 bin/
 .cache
+<<<<<<< HEAD
 *.class
 devtools/keystore.jks
+=======
+*.class
+>>>>>>> 15b3ab404e3b8005f3f3c044ec3f2931197933f6
