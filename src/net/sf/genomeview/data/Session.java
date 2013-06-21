@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.CrashHandler;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
@@ -65,7 +66,7 @@ public class Session {
 	}
 
 	private static void loadSession(final Model model, final InputStream is) {
-		model.messageModel().setStatusBarMessage("Preparing to load session, retrieving session file.");
+		model.messageModel().setStatusBarMessage(MessageManager.getString("session.preparing_load_session"));
 
 		new Thread(new Runnable() {
 
@@ -77,7 +78,7 @@ public class Session {
 					String key = it.next();
 					String lcKey = key.toLowerCase();
 					if (!(lcKey.contains("genomeview") && lcKey.contains("session"))) {
-						JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "The selected file is not a GenomeView session");
+						JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("session.not_genome_view_session"));
 					} else {
 
 						model.clearEntries();
@@ -89,7 +90,7 @@ public class Session {
 
 							String[] arr = line.split("[: \t]", 2);
 
-							model.messageModel().setStatusBarMessage("Loading session, current file: " + line + "...");
+							model.messageModel().setStatusBarMessage(MessageManager.formatMessage("session.loading_session_current_file_line", new Object[]{line}));
 							SessionInstruction si = null;
 							try {
 								si = SessionInstruction.valueOf(arr[0].toUpperCase());
@@ -134,7 +135,7 @@ public class Session {
 						}
 					}
 				} catch (Exception ex) {
-					CrashHandler.crash(Level.SEVERE, "Could not load session", ex);
+					CrashHandler.crash(Level.SEVERE, MessageManager.getString("crashhandler.couldnt_load_session"), ex);
 				}
 				it.close();
 				model.messageModel().setStatusBarMessage(null);

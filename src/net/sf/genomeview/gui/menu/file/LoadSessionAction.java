@@ -67,8 +67,8 @@ public class LoadSessionAction extends AbstractAction {
 		if (result == JFileChooser.APPROVE_OPTION) {
 			if (model.loadedSources().size() != 0) {
 				result = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
-						"Do you really want to load a session? This will clear all currently loaded data!",
-						"Clear entries?", JOptionPane.YES_NO_OPTION);
+						MessageManager.getString("filemenu.load_session_warn"),
+						MessageManager.getString("filemenu.clear_session"), JOptionPane.YES_NO_OPTION);
 				if (result != JOptionPane.YES_OPTION) {
 					return;
 				}
