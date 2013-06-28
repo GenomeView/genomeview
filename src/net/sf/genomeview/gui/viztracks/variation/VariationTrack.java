@@ -66,14 +66,14 @@ public class VariationTrack extends Track {
 			if(w<1)
 				w=1;
 			for (Allele a : v.alleles()) {
-				float freq = a.alternativeFrequency();
+				//float freq = a.alternativeFrequency();
 				if(a.reference().length()>a.alternative().length())
 					g.setColor(Color.RED);
 				else if(a.reference().length()<a.alternative().length())
 					g.setColor(Color.BLACK);
 				else
 					g.setColor(Color.CYAN);
-					g.fillRect(x1, yOffset, w, (int)(40*freq));
+					g.fillRect(x1, yOffset, w, (int)(40/*freq*/));
 			}
 		}
 
