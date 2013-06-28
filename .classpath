@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="junit"/>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/collections-1.0.jar"/>
@@ -37,5 +38,6 @@
 	<classpathentry kind="lib" path="lib/org.apache.servicemix.specs.stax-api-1.0-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/org.genomespace.jersey-apache-client-1.5.jar"/>
 	<classpathentry kind="lib" path="lib/stax-api-1.0-2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
