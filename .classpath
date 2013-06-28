@@ -6,7 +6,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/collections-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
-	<classpathentry kind="lib" path="lib/jannot-2168.jar"/>
 	<classpathentry kind="lib" path="lib/jargs.jar"/>
 	<classpathentry kind="lib" path="lib/sam-r1439.jar"/>
 	<classpathentry kind="lib" path="lib/ajt-2.10.jar"/>
@@ -39,5 +38,6 @@
 	<classpathentry kind="lib" path="lib/org.genomespace.jersey-apache-client-1.5.jar"/>
 	<classpathentry kind="lib" path="lib/stax-api-1.0-2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/jannot-2205.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
