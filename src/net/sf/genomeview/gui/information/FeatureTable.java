@@ -28,6 +28,7 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.components.TypeCombo;
+import net.sf.genomeview.gui.viztracks.annotation.FeatureUtils;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 
@@ -52,6 +53,8 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 			this.setForeground(Color.DARK_GRAY);
 			Component c = super.getTableCellRendererComponent(tbl, v, isSelected, isFocused, row, col);
 			
+			Feature f=(Feature)v;
+			setText(FeatureUtils.displayName(f));
 			if (tbl.getSelectionModel().isSelectedIndex(row)) {
 				c.setBackground(new Color((float)0.7, (float) 0.7, (float) 1.0));
 			} else {

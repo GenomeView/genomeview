@@ -31,6 +31,7 @@ import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -88,7 +89,8 @@ public class FeatureTrack extends Track {
 			GridBagPanel out = super.getGUIContainer();
 
 			out.gc.gridy++;
-			final JComponent colorGradient = new BooleanConfig("feature:scoreColorGradient_" + type(), MessageManager.getString("featuretrack.use_color_gradient"), model);
+			final JComponent colorGradient = new BooleanConfig("feature:scoreColorGradient_" + type(),
+					MessageManager.getString("featuretrack.use_color_gradient"), model);
 			out.add(colorGradient, out.gc);
 
 			/* Filter items based on score */
@@ -104,8 +106,8 @@ public class FeatureTrack extends Track {
 					final JLabel label = new JLabel();
 					final NumberFormat nf = NumberFormat.getInstance();
 					nf.setMaximumFractionDigits(2);
-					final DoubleJSlider slider = new DoubleJSlider(minScore, maxScore, getThreshold() > minScore ? getThreshold()
-							: minScore, (maxScore - minScore) / 100.0);
+					final DoubleJSlider slider = new DoubleJSlider(minScore, maxScore, getThreshold() > minScore ? getThreshold() : minScore,
+							(maxScore - minScore) / 100.0);
 					optionPane.setInputValue(slider.getDoubleValue());
 					label.setText(nf.format(slider.getDoubleValue()));
 					// slider.setMajorTickSpacing((int)((ftm.maxScore-ftm.minScore)/10));
@@ -138,15 +140,17 @@ public class FeatureTrack extends Track {
 			out.add(filter, out.gc);
 
 			out.gc.gridy++;
-//			final JComponent colorQualifier = new BooleanConfig("feature:useColorQualifierTag_" + type(), "Use /color qualifier", model);
-//			out.add(colorQualifier, out.gc);
+			// final JComponent colorQualifier = new
+			// BooleanConfig("feature:useColorQualifierTag_" + type(),
+			// "Use /color qualifier", model);
+			// out.add(colorQualifier, out.gc);
 
 			this.addObserver(new Observer() {
 
 				@Override
 				public void update(Observable o, Object arg) {
 					colorGradient.setEnabled(isScoreColorGradientEnabled());
-//					colorQualifier.setEnabled(isColorQualifierEnabled());
+					// colorQualifier.setEnabled(isColorQualifierEnabled());
 					filter.setEnabled(isScoreColorGradientEnabled());
 				}
 
@@ -196,22 +200,24 @@ public class FeatureTrack extends Track {
 			this.maxScore = maxScore;
 		}
 
-//		public boolean isColorQualifier() {
-//			return Configuration.getBoolean("feature:useColorQualifierTag_" + type());
-//			// return colorQualifier;
-//		}
+		// public boolean isColorQualifier() {
+		// return Configuration.getBoolean("feature:useColorQualifierTag_" +
+		// type());
+		// // return colorQualifier;
+		// }
 
 		public Type type() {
 			return (Type) super.dataKey;
 		}
 
-//		public void setColorQualifier(boolean colorQualifier) {
-//			// this.colorQualifier = colorQualifier;
-//			if (isColorQualifier() != colorQualifier) {
-//				Configuration.set("feature:useColorQualifierTag_" + type(), colorQualifier);
-//				model.refresh(this);
-//			}
-//		}
+		// public void setColorQualifier(boolean colorQualifier) {
+		// // this.colorQualifier = colorQualifier;
+		// if (isColorQualifier() != colorQualifier) {
+		// Configuration.set("feature:useColorQualifierTag_" + type(),
+		// colorQualifier);
+		// model.refresh(this);
+		// }
+		// }
 
 		private boolean scoreColorGradientEnabled;
 
@@ -305,30 +311,29 @@ public class FeatureTrack extends Track {
 		floatingWindow = new FeatureInfoWindow(ftc);
 
 		ftm = new FeatureTrackModel((FeatureAnnotation) entry.get(ftc.type()));
-		
 
 	}
 
-	class FeatureTrackModel implements Observer{
+	class FeatureTrackModel implements Observer {
 		private double minScore, maxScore;
 		private HashSet<String> qualifierKeys;
 
 		public FeatureTrackModel(FeatureAnnotation annot) {
 			init();
-			
+
 		}
 
 		private void init() {
 			minScore = Double.POSITIVE_INFINITY;
 			maxScore = Double.NEGATIVE_INFINITY;
-			qualifierKeys=new HashSet<String>();
-			FeatureAnnotation annot =(FeatureAnnotation) entry.get(ftc.type());
-			
+			qualifierKeys = new HashSet<String>();
+			FeatureAnnotation annot = (FeatureAnnotation) entry.get(ftc.type());
+
 			model.annotationModel().addObserver(this);
 			if (annot instanceof MemoryFeatureAnnotation)
 				for (Feature f : annot.get())
 					update(f);
-				
+
 		}
 
 		void update(Feature f) {
@@ -349,12 +354,10 @@ public class FeatureTrack extends Track {
 
 		@Override
 		public void update(Observable o, Object arg) {
-			assert(arg instanceof Type);
-			if(ftc.type()==(Type)arg)
+			assert (arg instanceof Type);
+			if (ftc.type() == (Type) arg)
 				init();
-				
-				
-			
+
 		}
 
 		public Set<String> qualifierKeys() {
@@ -411,12 +414,12 @@ public class FeatureTrack extends Track {
 			int thisLine = 0;
 
 			Color c = Configuration.getColor("TYPE_" + rf.type());
-//			if (ftc.isColorQualifier() && rf.getColor() != null) {
-				String color = rf.getColor();
-				if (color != null) {
-					c = Colors.decodeColor(color);
-				}
-//			}
+			// if (ftc.isColorQualifier() && rf.getColor() != null) {
+			String color = rf.getColor();
+			if (color != null) {
+				c = Colors.decodeColor(color);
+			}
+			// }
 			if (ftc.isScoreColorGradient()) {
 				double range = ftm.getMaxScore() - ftm.getMinScore();
 				if (range > 0.00001)
@@ -437,8 +440,7 @@ public class FeatureTrack extends Track {
 				 * overlapping?
 				 */
 				int closenessOverlap = Configuration.getInt("closenessOverlap");
-				Rectangle r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness, maxX - x1 + 2 * closenessOverlap,
-						lineThickness);
+				Rectangle r = new Rectangle(x1 - closenessOverlap, thisLine * lineThickness, maxX - x1 + 2 * closenessOverlap, lineThickness);
 
 				if (!config.isCollapsed() && !manyFeature) {
 					// only when the blocks should be tiled, do we need to
@@ -520,7 +522,7 @@ public class FeatureTrack extends Track {
 						Font resetFont = g.getFont();
 						g.setColor(c.darker().darker().darker());
 						g.setFont(new Font("SansSerif", Font.PLAIN, 10));
-						g.drawString(rf.toString(), a + 5, thisLine * lineThickness + 9);
+						g.drawString(FeatureUtils.displayName(rf), a + 5, thisLine * lineThickness + 9);
 						g.setFont(resetFont);
 					}
 
@@ -611,7 +613,7 @@ public class FeatureTrack extends Track {
 				StringBuffer text = new StringBuffer();
 				text.append("<html>");
 				for (Feature f : features) {
-					String name = f.toString();
+					String name = FeatureUtils.displayName(f);
 					if (name.length() > 50)
 						name = name.substring(0, 50);
 					text.append("Name : " + name + "<br />");
@@ -671,3 +673,4 @@ public class FeatureTrack extends Track {
 	}
 
 }
+
