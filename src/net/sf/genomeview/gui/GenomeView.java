@@ -9,8 +9,10 @@ import java.net.Authenticator;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.SwingUtilities;
 
@@ -24,7 +26,7 @@ import be.abeel.concurrency.DaemonThread;
  * 
  */
 public class GenomeView {
-	private static Logger logger = Logger.getLogger(GenomeView.class.getCanonicalName());
+	private static Logger logger = LoggerFactory.getLogger(GenomeView.class.getCanonicalName());
 
 	private static WindowManager mw;
 
@@ -113,9 +115,9 @@ public class GenomeView {
 					mw = new WindowManager(args, splash);
 					ApplicationInstanceManager.setCallback(mw);
 				} catch (InterruptedException e) {
-					logger.log(Level.SEVERE, "main window initialization", e);
+					logger.error( "main window initialization", e);
 				} catch (ExecutionException e) {
-					logger.log(Level.SEVERE, "main window initialization", e);
+					logger.error( "main window initialization", e);
 				}
 				splash.dispose();
 			}

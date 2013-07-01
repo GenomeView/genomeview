@@ -4,7 +4,8 @@
 package net.sf.genomeview.gui.menu.file;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
@@ -26,7 +27,7 @@ public class ShowGenomeExplorerAction extends AbstractAction {
 			this.model = model;
 		}
 
-		private static Logger log = Logger.getLogger(LoadSessionAction.class.getCanonicalName());
+		private static Logger log = LoggerFactory.getLogger(LoadSessionAction.class.getCanonicalName());
 
 		@Override
 		public void actionPerformed(ActionEvent e) {

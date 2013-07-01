@@ -9,7 +9,8 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -113,7 +114,7 @@ public class WiggleTrack extends Track {
 		}
 	}
 
-	private static final Logger log = Logger.getLogger(WiggleTrack.class
+	private static final Logger log = LoggerFactory.getLogger(WiggleTrack.class
 			.getCanonicalName());
 
 	@Override
@@ -121,7 +122,7 @@ public class WiggleTrack extends Track {
 		super.mouseClicked(x, y, e);
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
-			log.finest("Wiggle track consumes button2||button3");
+			log.debug("Wiggle track consumes button2||button3");
 			new WigglePopup().show(e.getComponent(), e.getX(), currentYOffset
 					+ e.getY());
 			e.consume();

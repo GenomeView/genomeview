@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.provider.BigWigProvider;
@@ -50,7 +51,7 @@ import net.sf.jannot.wiggle.Graph;
  */
 public class TrackList implements Iterable<Track> {
 
-	private Logger log = Logger.getLogger(TrackList.class.getCanonicalName());
+	private Logger log = LoggerFactory.getLogger(TrackList.class.getCanonicalName());
 
 	private Model model;
 

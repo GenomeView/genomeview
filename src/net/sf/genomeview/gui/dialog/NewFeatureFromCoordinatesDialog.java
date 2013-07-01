@@ -16,7 +16,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -45,7 +46,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
      */
 	private static final long serialVersionUID = -5266511180264863028L;
 
-	private static Logger log = Logger.getLogger(NewFeatureFromCoordinatesDialog.class.getCanonicalName());
+	private static Logger log = LoggerFactory.getLogger(NewFeatureFromCoordinatesDialog.class.getCanonicalName());
 
 	public NewFeatureFromCoordinatesDialog(final Model model) {
 		super(model.getGUIManager().getParent(), MessageManager.getString("newfeature.title"));
@@ -141,7 +142,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 					try {
 						out.add(new Location(Integer.parseInt(a2[0].trim()), Integer.parseInt(a2[1].trim())));
 					} catch (NumberFormatException ne) {
-						log.warning("Error while parsing '" + l + "' in " + Arrays.toString(arr));
+						log.warn("Error while parsing '" + l + "' in " + Arrays.toString(arr));
 						throw ne;
 					}
 

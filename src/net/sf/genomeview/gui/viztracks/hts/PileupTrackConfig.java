@@ -25,8 +25,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -65,7 +67,7 @@ import be.abeel.gui.GridBagPanel;
  */
 public class PileupTrackConfig extends TrackConfig {
 
-	private static Logger log = Logger.getLogger(PileupTrackConfig.class.getCanonicalName());
+	private static Logger log = LoggerFactory.getLogger(PileupTrackConfig.class.getCanonicalName());
 
 	@Override
 	protected GridBagPanel getGUIContainer() {
@@ -103,7 +105,7 @@ public class PileupTrackConfig extends TrackConfig {
 						Double d = Double.parseDouble(in);
 						addLine(new Line(d));
 					} catch (Exception ex) {
-						log.log(Level.WARNING, MessageManager.getString("pileuptrack.unparseable_pileuptrack_warn") + in, ex);
+						log.warn( MessageManager.getString("pileuptrack.unparseable_pileuptrack_warn") + in, ex);
 					}
 				}
 
@@ -194,7 +196,7 @@ public class PileupTrackConfig extends TrackConfig {
 						Double d = Double.parseDouble(in);
 						setMaxValue(d);
 					} catch (Exception ex) {
-						log.log(Level.WARNING, MessageManager.getString("pileuptrack.unparseable_pileuptrack_warn") + in, ex);
+						log.warn( MessageManager.getString("pileuptrack.unparseable_pileuptrack_warn") + in, ex);
 					}
 				}
 

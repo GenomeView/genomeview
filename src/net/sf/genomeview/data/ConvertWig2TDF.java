@@ -32,8 +32,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
@@ -63,7 +65,7 @@ import be.abeel.io.LineIterator;
  */
 public class ConvertWig2TDF {
 
-	private static Logger log = Logger.getLogger(ConvertWig2TDF.class.toString());
+	private static Logger log = LoggerFactory.getLogger(ConvertWig2TDF.class.toString());
 	private boolean compressed = true;
 	private boolean skipZeroes = false;
 	private int nZoom;
@@ -605,7 +607,7 @@ public class ConvertWig2TDF {
 				try {
 					writer.writeTile(dsName, tileNumber, tile);
 				} catch (IOException iOException) {
-					log.log(Level.SEVERE, "Error writing tile: " + dsName + " [" + tileNumber + "]", iOException);
+					log.error("Error writing tile: " + dsName + " [" + tileNumber + "]", iOException);
 					// TODO -- replace with PreprocessorException
 					throw new RuntimeException(iOException);
 				}
@@ -716,7 +718,7 @@ public class ConvertWig2TDF {
 						addData(arr[0], position, endpos, d, null);
 					}
 				} catch (Exception e) {
-					log.log(Level.SEVERE, "Couldn't parse line: " + line + " -> " + Arrays.toString(arr), e);
+					log.error("Couldn't parse line: " + line + " -> " + Arrays.toString(arr), e);
 				}
 				// if (wiggleMode) {
 				// if (variableStep) {

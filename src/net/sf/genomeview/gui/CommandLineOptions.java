@@ -9,8 +9,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.core.Configuration;
 
@@ -30,7 +32,7 @@ class CommandLineOptions {
 	private static Option configurationO;
 	private static Option fileO;
 	private static Option urlO;
-	private static Logger logger=Logger.getLogger(CommandLineOptions.class.getCanonicalName());
+	private static Logger logger=LoggerFactory.getLogger(CommandLineOptions.class.getCanonicalName());
 	private static boolean goodParse;
 	private static AutoHelpCmdLineParser parser;
 
@@ -70,13 +72,13 @@ class CommandLineOptions {
 					Configuration.loadExtra(new FileInputStream(config));
 				}
 			} catch (FileNotFoundException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
+				logger.error( "loading extra configuration", e);
 			} catch (MalformedURLException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
+				logger.error( "loading extra configuration", e);
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
+				logger.error( "loading extra configuration", e);
 			} catch (URISyntaxException e) {
-				logger.log(Level.SEVERE, "loading extra configuration", e);
+				logger.error( "loading extra configuration", e);
 			}
 		}
 		
@@ -88,11 +90,11 @@ class CommandLineOptions {
 			parser.parse(args);
 			return true;
 		} catch (IllegalOptionValueException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.error( e.getMessage(), e);
 			CrashHandler.showErrorMessage(MessageManager.getString("commandlineoptions.parsing_command_line_error") + " " + e.getMessage()
 					+ "\n\n" + MessageManager.getString("commandlineoptions.will_continue_without_args"), e);
 		} catch (UnknownOptionException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.error( e.getMessage(), e);
 			CrashHandler.showErrorMessage(MessageManager.getString("commandlineoptions.parsing_command_line_error") + " " + e.getMessage()
 					+ "\n\n" + MessageManager.getString("commandlineoptions.will_continue_without_args"), e);
 		}

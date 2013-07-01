@@ -14,8 +14,10 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
@@ -32,7 +34,7 @@ public class JavaScriptHandler  {
 
 	
 
-	private Logger log = Logger.getLogger(JavaScriptHandler.class.getCanonicalName());
+	private Logger log = LoggerFactory.getLogger(JavaScriptHandler.class.getCanonicalName());
 
 	private ExecutorService es = Executors.newSingleThreadExecutor(new DaemonThreadFactory());
 
@@ -82,7 +84,7 @@ public class JavaScriptHandler  {
 						es.execute(ws);
 
 					} catch (SocketException e) {
-						log.log(Level.INFO, "This is normal when closing the socket", e);
+						log.debug( "This is normal when closing the socket", e);
 
 					} catch (IOException e) {
 						CrashHandler.showErrorMessage(MessageManager.getString("jshandler.failed_to_accept_socket"), e);

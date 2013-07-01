@@ -14,8 +14,10 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.LRUSet;
@@ -90,7 +92,7 @@ class InstructionWorker implements Runnable {
 
 	private String id;
 
-	private static Logger log = Logger.getLogger(InstructionWorker.class.getCanonicalName());
+	private static Logger log = LoggerFactory.getLogger(InstructionWorker.class.getCanonicalName());
 
 	private static HashSet<Port> otherPorts = new HashSet<Port>();
 
@@ -178,11 +180,11 @@ class InstructionWorker implements Runnable {
 							pw.close();
 
 						} else {
-							log.log(Level.WARNING, "Instruction " + line + " was not understood by GenomeView");
+							log.warn( "Instruction " + line + " was not understood by GenomeView");
 
 						}
 					} else {
-						log.log(Level.WARNING, "This instruction doesn't belong to GenomeView, I'll ignore it.");
+						log.warn( "This instruction doesn't belong to GenomeView, I'll ignore it.");
 					}
 				}
 

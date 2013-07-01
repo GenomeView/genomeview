@@ -7,7 +7,8 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -34,7 +35,7 @@ import net.sf.jannot.Feature;
  * 
  */
 public class PopUpMenu extends JPopupMenu {
-	private Logger log = Logger.getLogger(PopUpMenu.class.toString());
+	private Logger log = LoggerFactory.getLogger(PopUpMenu.class.toString());
 	private static final long serialVersionUID = 2573433669184123608L;
 
 	private int count = 0;

@@ -9,7 +9,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -39,7 +40,7 @@ import be.abeel.io.ExtensionManager;
  */
 public class DataSourceHelper {
 
-	private static Logger log = Logger.getLogger(DataSourceHelper.class.getCanonicalName());
+	private static Logger log = LoggerFactory.getLogger(DataSourceHelper.class.getCanonicalName());
 
 	public static void load(Model model, Locator data) throws URISyntaxException, IOException, ReadFailedException {
 		load(model, data, false);

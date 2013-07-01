@@ -8,7 +8,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -24,7 +25,7 @@ import net.sf.genomeview.gui.viztracks.AnnotationFrame;
  */
 public class MainContent {
 
-	private static Logger logger = Logger.getLogger(MainContent.class.getCanonicalName());
+	private static Logger logger = LoggerFactory.getLogger(MainContent.class.getCanonicalName());
 
 	private static final long serialVersionUID = -2304899922750491897L;
 

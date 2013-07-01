@@ -7,7 +7,8 @@ import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JComponent;
 import javax.swing.JTable;
@@ -28,7 +29,7 @@ import net.sf.genomeview.gui.viztracks.Track;
  * 
  */
 public class TrackTable extends JTable {
-	private Logger log = Logger.getLogger(TrackTable.class.getCanonicalName());
+	private Logger log = LoggerFactory.getLogger(TrackTable.class.getCanonicalName());
 	private Model model;
 	private static final long serialVersionUID = 2680194422003453639L;
 
