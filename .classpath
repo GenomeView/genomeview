@@ -9,7 +9,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/ajt-2.10.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_38"/>
 	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
-	<classpathentry kind="lib" path="lib/jannot-2205.jar"/>
 	<classpathentry kind="lib" path="lib/activation-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/analysistoolmgmt-messages-0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/clientdevelopmentkit-0.1-SNAPSHOT.jar"/>
@@ -38,5 +37,6 @@
 	<classpathentry kind="lib" path="lib/org.apache.servicemix.specs.stax-api-1.0-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/org.genomespace.jersey-apache-client-1.5.jar"/>
 	<classpathentry kind="lib" path="lib/stax-api-1.0-2.jar"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/JAnnot"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
