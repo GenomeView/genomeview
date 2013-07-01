@@ -2,3 +2,4 @@ bin/
 .cache
 *.class
 devtools/keystore.jks
+.classpath
