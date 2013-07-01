@@ -31,15 +31,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
+import org.apache.commons.io.FileExistsException;
+import org.apache.commons.io.FileUtils;
+
 import net.miginfocom.swing.MigLayout;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.ClientHttpUpload;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.MessageManager;
+import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import net.sf.jannot.Entry;
-import net.sf.jannot.Type;
 import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.parser.EMBLParser;
 import net.sf.jannot.parser.GFF3Parser;
@@ -288,11 +290,30 @@ public class SaveDialog extends JDialog {
 								if (parser instanceof EMBLParser)
 									out = ExtensionManager.extension(out, "embl");
 
-								boolean succes = tmp.renameTo(out);
-								if (!succes) {
-									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("savedialog.save_failed"));
-								} else {
-									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("savedialog.save_succeeded"));
+								boolean tryToSave = true;
+								while (tryToSave){
+									try {
+										FileUtils.moveFile(tmp, out);
+										JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("savedialog.save_succeeded"));
+										tryToSave = false;
+									} catch (FileExistsException fee){
+										int answer = JOptionPane.showOptionDialog(model.getGUIManager().getParent(),
+												MessageManager.getString("savedialog.file_exists"),
+												MessageManager.getString("savedialog.file_exists_title"),
+												JOptionPane.YES_NO_OPTION, 
+												JOptionPane.QUESTION_MESSAGE,
+												null, 
+												null, null);
+										if (answer==JOptionPane.YES_OPTION){
+											out.delete();
+										} else {
+											tryToSave = false;
+										}
+									} catch (IOException e) {
+										JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("savedialog.save_failed"));
+										tryToSave = false;
+										e.printStackTrace();
+									}
 								}
 							}
 

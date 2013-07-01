@@ -1,5 +1,6 @@
 package net.sf.genomeview.gui;
 
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -44,5 +45,8 @@ public class MessageManager {
     
 	public static Locale getLocale() {
 		return loc;
+	}
+	public static String formatMessage(String key, Object[] params){
+		return MessageFormat.format(rb.getString(key), params);
 	}
 }

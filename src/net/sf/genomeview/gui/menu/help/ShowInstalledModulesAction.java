@@ -23,7 +23,7 @@ public class ShowInstalledModulesAction extends AbstractAction {
     private static final long serialVersionUID = 4182067300462615334L;
 
     public ShowInstalledModulesAction(Model model) {
-        super(MessageManager.getString("helpmenu.installed_modules"));
+        super(MessageManager.getString("helpmenu.installed_modules_list"));
         this.model = model;
     }
 
@@ -34,7 +34,7 @@ public class ShowInstalledModulesAction extends AbstractAction {
         for (PluginDescriptor p : col) {
             // PluginLoader.pluginManager.
             if (p.getId().equals("genomeview.core")) {
-                message += "Plugin manager (" + p.getVersion() + ")<br/>";
+                message += MessageManager.formatMessage("helpmenu.pluginmanager", new Object[]{p.getVersion().toString()});
             } else {
                 message += p.getExtensions().iterator().next().getParameter("name").rawValue();
                 message += " (" + p.getVersion() + ")<br/>";
@@ -48,7 +48,7 @@ public class ShowInstalledModulesAction extends AbstractAction {
         }
         message += "</html>";
 
-        JOptionPane.showMessageDialog(model.getGUIManager().getParent(), message, "Installed modules", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(model.getGUIManager().getParent(), message, MessageManager.getString("helpmenu.installed_modules"), JOptionPane.INFORMATION_MESSAGE);
     }
 
 }

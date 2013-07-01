@@ -81,7 +81,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 	@Override
 	public void windowClosing(WindowEvent e) {
 
-		int result=JOptionPane.showConfirmDialog(model.getGUIManager().getParent(), "Do you want to exit GenomeView?");
+		int result=JOptionPane.showConfirmDialog(model.getGUIManager().getParent(), MessageManager.getString("windowmanager.exit"));
 		if(result==JOptionPane.YES_OPTION)
 			this.model.exit();
 	}

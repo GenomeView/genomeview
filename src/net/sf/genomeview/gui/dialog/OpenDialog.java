@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.dialog;
 
 import java.awt.HeadlessException;
 import java.awt.Window;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -41,6 +42,13 @@ import net.sf.jannot.source.Locator;
 import net.sf.jannot.source.das.DAS;
 import net.sf.jannot.source.das.DAS.EntryPoint;
 
+import org.genomespace.client.GsSession;
+import org.genomespace.client.exceptions.AuthorizationException;
+import org.genomespace.client.exceptions.InternalServerException;
+import org.genomespace.client.exceptions.ServerNotFoundException;
+import org.genomespace.client.ui.GSFileBrowserDialog;
+import org.genomespace.client.ui.GSLoginDialog;
+import org.genomespace.datamanager.core.GSFileMetadata;
 import org.xml.sax.SAXException;
 
 import be.abeel.gui.GridBagPanel;
@@ -91,6 +99,9 @@ public class OpenDialog extends JDialog {
 		configButton(url);
 		gp.add(url, gp.gc);
 		gp.gc.gridx++;
+		JButton genomespace = new JButton(MessageManager.getString("opendialog.genomespace"), Icons.get("genomespace.png"));
+		configButton(genomespace);
+		gp.add(genomespace, gp.gc);
 //		JButton das = new JButton("DAS(exp)", Icons.get("das.png"));
 //		configButton(das);
 //		gp.add(das, gp.gc);
@@ -208,6 +219,60 @@ public class OpenDialog extends JDialog {
 			}
 		});
 
+		genomespace.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				_self.dispose();
+				try {
+					GsSession session = new GsSession();
+					if (session.isLoggedIn()){
+					    // if we were logged in by another app on this machine we can get the cached username
+					    //lblUsername.setText(session.getCachedUsernameForSSO());
+					} else {
+					    // open a GSLogin Dialog 
+					    final GSLoginDialog loginDialog = new GSLoginDialog(null, ModalityType.APPLICATION_MODAL);
+					    loginDialog.setVisible(true);
+					    final String userName = loginDialog.getUsername();
+					    final String password = loginDialog.getPassword();
+					    try {
+					         session.login(userName, password);
+					         return;
+					    } catch (final AuthorizationException e1) {
+					         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.invalid_username_pwd"),MessageManager.getString("opendialog.login_error"), 
+					         JOptionPane.ERROR_MESSAGE);
+					    } catch (ServerNotFoundException e2) {
+							// TODO Auto-generated catch block
+						} catch (InternalServerException e3) {
+							// TODO Auto-generated catch block
+						} 
+					}
+					//Once user is logged, list its working files
+					GSFileBrowserDialog fileBrowser = new GSFileBrowserDialog(null, session.getDataManagerClient(), 
+							GSFileBrowserDialog.DialogType.FILE_SELECTION_DIALOG); 
+							fileBrowser.setVisible(true);
+					GSFileMetadata selection = fileBrowser.getSelectedFileMetadata();
+							// Do something with the selected file
+					DataSourceHelper.load(model,new Locator(selection.getPath()));
+
+				}  catch (MalformedURLException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} catch (IOException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} catch (URISyntaxException e3) {
+					// TODO Auto-generated catch block
+					e3.printStackTrace();
+				} catch (ReadFailedException e4) {
+					// TODO Auto-generated catch block
+					e4.printStackTrace();
+				} catch (InternalServerException e5) {
+					// TODO Auto-generated catch block
+				}
+
+			}
+		});		
 //		das.addActionListener(new ActionListener() {
 //
 //			@Override
