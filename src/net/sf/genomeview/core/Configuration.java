@@ -8,9 +8,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
@@ -274,6 +276,16 @@ public class Configuration {
 
 	}
 
+	
+	public static List<String> getStringList(String key) {
+		String tmp = get(key);
+		List<String> out = new ArrayList<String>();
+		for (String s : tmp.split(",")) {
+			out.add(s.trim());
+		}
+		return out;
+	}
+	
 	public static Set<String> getStringSet(String key) {
 		String tmp = get(key);
 		Set<String> out = new HashSet<String>();

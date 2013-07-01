@@ -37,6 +37,7 @@ import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.genomeview.gui.dialog.MultipleAlignmentOrderingDialog;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
+import net.sf.genomeview.gui.viztracks.annotation.FeatureUtils;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
@@ -462,7 +463,7 @@ public class MultipleAlignmentTrack2 extends Track {
 														- featureScreenStart, lineHeight - 6);
 												if (visible.length() < 10000) {
 													g.setColor(Color.CYAN.darker().darker());
-													g.drawString(f.toString(), (int) featureScreenStart, rec.y + (line) * lineHeight - 4);
+													g.drawString(FeatureUtils.displayName(f), (int) featureScreenStart, rec.y + (line) * lineHeight - 4);
 												}
 											} else {
 												g.drawLine(featureScreenStart, rec.y + (line - 1) * lineHeight + lineHeight/2, featureScreenEnd, rec.y
