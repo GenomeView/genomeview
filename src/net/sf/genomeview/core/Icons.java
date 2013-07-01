@@ -7,8 +7,10 @@ import java.awt.Image;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -58,14 +60,14 @@ public class Icons {
 
 	}
 
-	private static Logger log=Logger.getLogger(Icons.class.getCanonicalName());
+	private static Logger log=LoggerFactory.getLogger(Icons.class.getCanonicalName());
 	
 	public static ImageIcon get(String string) {
 		if (string.startsWith("http"))
 			try {
 				return new ImageIcon(new URL(string));
 			} catch (MalformedURLException e) {
-				log.log(Level.SEVERE,"Problem while loading image from URL: "+string,e);
+				log.error("Problem while loading image from URL: "+string,e);
 				return null;
 			}
 		else
