@@ -7,8 +7,10 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URL;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JOptionPane;
 
@@ -34,7 +36,7 @@ import be.abeel.net.URIFactory;
  */
 public class PluginLoader {
 
-	private static Logger log = Logger.getLogger(PluginLoader.class.getCanonicalName());
+	private static Logger log = LoggerFactory.getLogger(PluginLoader.class.getCanonicalName());
 
 	public static PluginManager pluginManager = null;
 
@@ -126,7 +128,7 @@ public class PluginLoader {
 							if (e.getMessage().contains("can't start")) {
 								errorMessage.append("The " + name + " plugin can't be started.\n");
 							}
-							log.severe("Cannot load " + pd + " " + e.getMessage());
+							log.error("Cannot load " + pd + " " + e.getMessage());
 						} catch (InstantiationException e) {
 							throw new RuntimeException(e);
 						} catch (IllegalAccessException e) {
@@ -144,7 +146,7 @@ public class PluginLoader {
 					}
 
 				} catch (Exception e) {
-					log.log(Level.SEVERE, "Plugin loading exception", e);
+					log.error( "Plugin loading exception", e);
 				}
 				model.getGUIManager().finishPluginLoading();
 			}

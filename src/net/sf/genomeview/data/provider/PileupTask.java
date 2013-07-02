@@ -3,7 +3,8 @@
  */
 package net.sf.genomeview.data.provider;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Task;
@@ -18,7 +19,7 @@ import net.sf.jannot.pileup.Pile;
  */
 class PileupTask extends Task {
 
-	private Logger log = Logger.getLogger(PileupTask.class.toString());
+	private Logger log = LoggerFactory.getLogger(PileupTask.class.toString());
 
 	private int idx;
 	private Data<Pile> pw;
@@ -73,10 +74,10 @@ class PileupTask extends Task {
 			summary.setReady(idx);
 
 		} catch (Exception e) {
-			log.severe("Scheduler exception: " + pw + "\t" + idx + "\tpw.get(" + idx * PileupSummary.CHUNK + ", "
+			log.error("Scheduler exception: " + pw + "\t" + idx + "\tpw.get(" + idx * PileupSummary.CHUNK + ", "
 					+ (idx + 1) * PileupSummary.CHUNK + ")\n\t" + e);
 		} catch (Error er) {
-			log.severe("Scheduler error: " + pw + "\t" + idx + "\tpw.get(" + idx * PileupSummary.CHUNK + ", "
+			log.error("Scheduler error: " + pw + "\t" + idx + "\tpw.get(" + idx * PileupSummary.CHUNK + ", "
 					+ (idx + 1) * PileupSummary.CHUNK + ")\n\t" + er);
 		}
 	}

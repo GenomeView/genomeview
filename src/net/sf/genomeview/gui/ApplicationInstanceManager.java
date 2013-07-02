@@ -12,8 +12,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import be.abeel.concurrency.DaemonThread;
 /**
@@ -23,7 +25,7 @@ import be.abeel.concurrency.DaemonThread;
  */
 public class ApplicationInstanceManager {
 
-	private static final Logger log = Logger.getLogger(ApplicationInstanceManager.class.getCanonicalName());
+	private static final Logger log = LoggerFactory.getLogger(ApplicationInstanceManager.class.getCanonicalName());
 
 	/** Randomly chosen, but static, high socket number */
 	public static final int SINGLE_INSTANCE_NETWORK_SOCKET = 15987;
@@ -69,10 +71,10 @@ public class ApplicationInstanceManager {
 								in.close();
 								client.close();
 							} catch (IOException e) {
-								log.log(Level.SEVERE,"Exception in ApplicationInstanceManager",e);
+								log.error("Exception in ApplicationInstanceManager",e);
 								socketClosed = true;
 							} catch (Exception e) {
-								log.log(Level.SEVERE,"Exception in ApplicationInstanceManager",e);
+								log.error("Exception in ApplicationInstanceManager",e);
 								
 							} 
 						}
@@ -83,7 +85,7 @@ public class ApplicationInstanceManager {
 //			initialize(args);
 			// listen
 		} catch (UnknownHostException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
+			log.error( e.getMessage(), e);
 			return returnValueOnError;
 		} catch (IOException e) {
 			log.info("Port is already taken.  Notifying first instance.");
@@ -101,11 +103,11 @@ public class ApplicationInstanceManager {
 				log.info("Successfully notified first instance.");
 				return false;
 			} catch (UnknownHostException e1) {
-				log.log(Level.SEVERE, e.getMessage(), e);
+				log.error( e.getMessage(), e);
 				return returnValueOnError;
 			} catch (IOException e1) {
-				log.severe("Error connecting to local port for single instance notification");
-				log.log(Level.SEVERE, e1.getMessage(), e1);
+				log.error("Error connecting to local port for single instance notification");
+				log.error( e1.getMessage(), e1);
 				return returnValueOnError;
 			}
 

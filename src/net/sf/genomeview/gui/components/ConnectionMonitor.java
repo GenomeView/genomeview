@@ -6,8 +6,10 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -31,7 +33,7 @@ public class ConnectionMonitor extends Observable {
 	private boolean webstartOnline = false;
 	private boolean reposOnline = false;
 	private boolean networkInterface = false;
-	private Logger log = Logger.getLogger(ConnectionMonitor.class.getCanonicalName());
+	private Logger log = LoggerFactory.getLogger(ConnectionMonitor.class.getCanonicalName());
 
 	public static final ConnectionMonitor instance = new ConnectionMonitor();
 
@@ -107,14 +109,14 @@ public class ConnectionMonitor extends Observable {
 						webstartOnline = true;
 					} catch (Exception e) {
 						// Failed, try again later;
-						log.log(Level.INFO, "Connection failed", e);
+						log.debug( "Connection failed", e);
 					}
 					setChanged();
 					notifyObservers();
 					try {
 						Thread.sleep(10 * 1000);
 					} catch (InterruptedException e) {
-						log.log(Level.INFO, "interrupted", e);
+						log.debug( "interrupted", e);
 					}
 
 				}
@@ -136,14 +138,14 @@ public class ConnectionMonitor extends Observable {
 						reposOnline = true;
 					} catch (Exception e) {
 						// Failed, try again later;
-						log.log(Level.INFO, "Connection failed", e);
+						log.debug( "Connection failed", e);
 					}
 					setChanged();
 					notifyObservers();
 					try {
 						Thread.sleep(10 * 1000);
 					} catch (InterruptedException e) {
-						log.log(Level.INFO, "interrupted", e);
+						log.debug( "interrupted", e);
 					}
 				}
 
@@ -178,7 +180,7 @@ public class ConnectionMonitor extends Observable {
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
-						log.log(Level.INFO, "interrupted", e);
+						log.debug( "interrupted", e);
 					}
 
 				}

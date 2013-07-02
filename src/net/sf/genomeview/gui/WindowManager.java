@@ -17,8 +17,10 @@ import java.lang.management.ThreadMXBean;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -39,7 +41,7 @@ import net.sf.jannot.Cleaner;
  * 
  */
 public class WindowManager extends WindowAdapter implements Observer {
-	private static Logger logger = Logger.getLogger(WindowManager.class.getCanonicalName());
+	private static Logger logger = LoggerFactory.getLogger(WindowManager.class.getCanonicalName());
 
 	private GenomeViewWindow window = null;
 
@@ -108,7 +110,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 			try {
 				Configuration.save();
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, "Problem saving configuration", e);
+				logger.error( "Problem saving configuration", e);
 			}
 
 			running--;

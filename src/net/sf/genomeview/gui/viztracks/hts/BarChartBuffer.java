@@ -9,8 +9,10 @@ import java.awt.Graphics2D;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
@@ -41,7 +43,7 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 	private double localMinPile = 0;
 	private NucCounter nc;
 	private PileupTrackConfig ptm;
-	private Logger log = Logger.getLogger(BarChartBuffer.class.toString());
+	private Logger log = LoggerFactory.getLogger(BarChartBuffer.class.toString());
 	private PileProvider provider;
 
 	private int pileWidth = 1;
@@ -91,7 +93,7 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 					nc.count((char) reads[i], p.start() - visible.start);
 				}
 			} catch (NumberFormatException ne) {
-				log.log(Level.WARNING, "Pileup parser failed on line: " + new String(reads), ne);
+				log.warn( "Pileup parser failed on line: " + new String(reads), ne);
 				System.err.println("Pileup parser failed on line: " + new String(reads));
 			}
 		}

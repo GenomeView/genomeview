@@ -235,6 +235,17 @@ public class OpenDialog extends JDialog {
 					    loginDialog.setVisible(true);
 					    final String userName = loginDialog.getUsername();
 					    final String password = loginDialog.getPassword();
+					    if ((userName==null) || (userName.trim().length()==0))
+					         JOptionPane.showMessageDialog(null, 
+					        		 	MessageManager.getString("opendialog.empty_username"),
+					        		 	MessageManager.getString("opendialog.login_error"),
+					        		 	JOptionPane.ERROR_MESSAGE);
+					    if ((password==null) || (password.trim().length()==0))
+					         JOptionPane.showMessageDialog(null, 
+					        		 	MessageManager.getString("opendialog.empty_password"),
+					        		 	MessageManager.getString("opendialog.login_error"),
+					        		 	JOptionPane.ERROR_MESSAGE);
+					    	
 					    try {
 					         session.login(userName, password);
 					         return;

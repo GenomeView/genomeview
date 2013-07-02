@@ -15,8 +15,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.zip.GZIPInputStream;
 
 import net.sf.genomeview.data.Model;
@@ -50,14 +52,14 @@ public class Configuration {
 
 	}
 
-	private static Logger logger = Logger.getLogger(Configuration.class.getCanonicalName());
+	private static Logger logger = LoggerFactory.getLogger(Configuration.class.getCanonicalName());
 
 	static {
 		String s = System.getProperty("user.home");
 		confDir = new File(s + "/.genomeview");
 		if (!confDir.exists()) {
 			if (!confDir.mkdir())
-				logger.warning("Could not create configuration directory: " + confDir);
+				logger.warn("Could not create configuration directory: " + confDir);
 
 		}
 		logger.info("User config: " + confDir);
@@ -87,7 +89,7 @@ public class Configuration {
 			 */
 			save();
 		} catch (IOException e) {
-			CrashHandler.crash(Level.SEVERE, "IOException while loading configuration", e);
+			CrashHandler.crash("IOException while loading configuration", e);
 
 		}
 	}
@@ -118,7 +120,7 @@ public class Configuration {
 			is = Configuration.class.getResourceAsStream("/genomeview.properties");
 			gvProperties.load(is);
 		} catch (Exception e1) {
-			logger.warning("genomeview.properties file could not be loaded! GenomeView assumes your are a developer and know why you can ignore this.");
+			logger.warn("genomeview.properties file could not be loaded! GenomeView assumes your are a developer and know why you can ignore this.");
 
 		} finally {
 			if (is != null)
@@ -150,7 +152,7 @@ public class Configuration {
 			 * Do not I18N this message String as the error indicates that the
 			 * folder where it resides is missing.
 			 */
-			CrashHandler.crash(Level.SEVERE, "Could not find default configuration file.\n\n\tIf you're encountering this error as a developer, \n"
+			CrashHandler.crash("Could not find default configuration file.\n\n\tIf you're encountering this error as a developer, \n"
 					+ "you must make sure that the 'resource' folder is on your classpath.\n"
 					+ "In Eclipse you can easily do this by adding the 'resource' folder as\n" + "a 'source' folder."
 					+ "\n\n\tIf you're seeing this message as a user, \n" + "you're in trouble and you'll need to get in touch with us.\n\n", e);
@@ -162,11 +164,11 @@ public class Configuration {
 		configFile = new File(confDir, "personal.conf.gz");
 		if (!configFile.exists()) {
 			if (!configFile.createNewFile()) {
-				logger.warning("Cannot create your personal configuration file sure GenomeView has write access to you home directory!");
+				logger.warn("Cannot create your personal configuration file sure GenomeView has write access to you home directory!");
 			}
 		} else if (configFile.length() == 0) {
 			// Empty config file, don't load it.
-			logger.warning("Config file has size zero!");
+			logger.warn("Config file has size zero!");
 		} else {
 			try {
 				it = new LineIterator(new GZIPInputStream(new FileInputStream(configFile)));
@@ -178,13 +180,13 @@ public class Configuration {
 						String value = line.substring(line.indexOf('=') + 1);
 						localMap.put(key.trim(), value.trim());
 					} else {
-						logger.warning("Invalid line in configuration file! '" + line + "'");
+						logger.warn("Invalid line in configuration file! '" + line + "'");
 					}
 
 				}
 				it.close();
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, "Something went horribly wrong while loading the configuration.", e);
+				logger.error("Something went horribly wrong while loading the configuration.", e);
 			}
 		}
 		updateSynonyms();
@@ -193,19 +195,19 @@ public class Configuration {
 
 	private static void updateSynonyms(){
 		try {
-			logger.warning("Updating synonyms for :"+Arrays.toString(get("synonyms").split(",")));
+			logger.warn("Updating synonyms for :"+Arrays.toString(get("synonyms").split(",")));
 			for (String s : get("synonyms").split(",")) {
 
 				try {
 					NameService.addSynonyms(URIFactory.url(s).openStream());
 				} catch (Exception e) {
-					logger.log(Level.WARNING, "Failed to load additional synonyms for: " + s, e);
+					logger.warn("Failed to load additional synonyms for: " + s, e);
 				}
 
 			}
 
 		} catch (Exception e) {
-			logger.log(Level.WARNING, "Failed to load additional synonyms for option: " + get("synonyms"), e);
+			logger.warn("Failed to load additional synonyms for option: " + get("synonyms"), e);
 		}
 	}
 	/**
@@ -322,7 +324,7 @@ public class Configuration {
 					extraMap.put(key.trim(), value.trim());
 				}
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, "Failed to parse line: " + line, e);
+				logger.warn("Failed to parse line: " + line, e);
 			}
 		}
 		it.close();
@@ -334,7 +336,7 @@ public class Configuration {
 		File modules = new File(confDir, "plugin");
 		if (!modules.exists()) {
 			if (!modules.mkdir())
-				logger.warning("Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
+				logger.warn("Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
 		}
 
 		return modules;
@@ -364,7 +366,7 @@ public class Configuration {
 		try {
 			load();
 		} catch (IOException e) {
-			CrashHandler.crash(Level.SEVERE, "IOException while loading configuration", e);
+			CrashHandler.crash("IOException while loading configuration", e);
 		}
 		model.refresh();
 	}

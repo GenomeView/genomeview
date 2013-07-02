@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Authenticator;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JApplet;
 import javax.swing.JFrame;
@@ -33,7 +35,7 @@ public class GVApplet extends JApplet {
 	private static final long serialVersionUID = 1L;
 	protected Model model;
 
-	private Logger logger = Logger.getLogger(GVApplet.class.getCanonicalName());
+	private Logger logger = LoggerFactory.getLogger(GVApplet.class.getCanonicalName());
 	private JPanel gvPanel;
 
 	@Override
@@ -98,7 +100,7 @@ public class GVApplet extends JApplet {
 
 					if (System.getProperty("os.name").contains("Mac")
 							|| Configuration.getBoolean("debug:forceMacApplet")) {
-						logger.warning("GenomeView has detected Mac OS X, trying to escape!!!");
+						logger.warn("GenomeView has detected Mac OS X, trying to escape!!!");
 						JFrame escape=new JFrame("GenomeView Mac OS X applet");
 						model.getGUIManager().registerMainWindow(escape);
 						escape.add(gvPanel);
@@ -152,7 +154,7 @@ public class GVApplet extends JApplet {
 		try {
 			Configuration.save();
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Problem saving configuration", e);
+			logger.error( "Problem saving configuration", e);
 		}
 
 		Cleaner.exit();

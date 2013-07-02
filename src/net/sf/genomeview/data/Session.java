@@ -12,8 +12,10 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JOptionPane;
 
@@ -59,7 +61,7 @@ public class Session {
 		loadSession(model, url.openStream());
 	}
 
-	private static Logger log = Logger.getLogger(Session.class.getCanonicalName());
+	private static Logger log = LoggerFactory.getLogger(Session.class.getCanonicalName());
 
 	enum SessionInstruction {
 		PREFIX, CONFIG, DATA, OPTION, LOCATION, C, U, F;
@@ -89,13 +91,13 @@ public class Session {
 							char firstchar = line.toUpperCase().charAt(0);
 
 							String[] arr = line.split("[: \t]", 2);
-
-							model.messageModel().setStatusBarMessage(MessageManager.formatMessage("session.loading_session_current_file_line", new Object[]{line}));
+							
+							model.messageModel().setStatusBarMessage(MessageManager.formatMessage("session.loading_session_current_file_line", new Object[]{arr[1]}));
 							SessionInstruction si = null;
 							try {
 								si = SessionInstruction.valueOf(arr[0].toUpperCase());
 							} catch (Exception e) {
-								log.log(Level.WARNING, "Could not parse: " + arr[0] + "\n Unknown instruction.\nCould not load session line: " + line, e);
+								log.warn("Could not parse: " + arr[0] + "\n Unknown instruction.\nCould not load session line: " + line, e);
 							}
 
 							if (si != null) {
@@ -110,7 +112,7 @@ public class Session {
 										try {
 											DataSourceHelper.load(model, new Locator(prefix + arr[1]));
 										} catch (RuntimeException re) {
-											log.log(Level.SEVERE, "Something went wrong while loading line: " + line
+											log.error("Something went wrong while loading line: " + line
 													+ "\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.", re);
 										}
 										break;
@@ -128,14 +130,14 @@ public class Session {
 
 									}
 								} catch (Exception e) {
-									log.log(Level.WARNING, "Exception while executing this instruction: " + line + "\n Skipping this line and continuing.", e);
+									log.warn("Exception while executing this instruction: " + line + "\n Skipping this line and continuing.", e);
 								}
 							}
 
 						}
 					}
 				} catch (Exception ex) {
-					CrashHandler.crash(Level.SEVERE, MessageManager.getString("crashhandler.couldnt_load_session"), ex);
+					CrashHandler.crash(MessageManager.getString("crashhandler.couldnt_load_session"), ex);
 				}
 				it.close();
 				model.messageModel().setStatusBarMessage(null);

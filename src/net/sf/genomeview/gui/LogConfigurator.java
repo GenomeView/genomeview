@@ -4,9 +4,14 @@
 package net.sf.genomeview.gui;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.LogManager;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * 
  * @author Thomas Abeel
@@ -21,10 +26,11 @@ public class LogConfigurator {
 		
 		/* Configure logging */
 		try {
+			
 			LogManager.getLogManager().readConfiguration(GenomeView.class.getResourceAsStream("/conf/logging.conf"));
-			logger = Logger.getLogger(GenomeView.class.getCanonicalName());
+			logger = LoggerFactory.getLogger(GenomeView.class.getCanonicalName());
 		} catch (SecurityException e) {
-			logger.log(Level.SEVERE, "log initialization", e);
+			logger.error( "log initialization", e);
 			/*
 			 * These exceptions likely indicate that the log could not be
 			 * initialized, print also to console
@@ -32,7 +38,7 @@ public class LogConfigurator {
 			e.printStackTrace();
 
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "log initialization", e);
+			logger.error( "log initialization", e);
 			/*
 			 * These exceptions likely indicate that the log could not be
 			 * initialized, print also to console

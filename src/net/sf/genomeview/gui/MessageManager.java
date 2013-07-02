@@ -3,7 +3,8 @@ package net.sf.genomeview.gui;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.core.Configuration;
 /**
@@ -17,7 +18,7 @@ public class MessageManager {
 
 	private static ResourceBundle rb;    
 		
-	private static Logger log=Logger.getLogger(MessageManager.class.getCanonicalName());
+	private static Logger log=LoggerFactory.getLogger(MessageManager.class.getCanonicalName());
 	
 	private static Locale loc = Configuration.get("lang:current").equals("automatic")?Locale.getDefault():new Locale(Configuration.get("lang:current"));
 	
@@ -29,7 +30,7 @@ public class MessageManager {
     	/* Getting messages for GV */
     	log.info("Getting messages for lang: "+loc);
         rb = ResourceBundle.getBundle("lang.Messages", loc);
-        log.finest("Language keys: "+rb.keySet());
+        log.debug("Language keys: "+rb.keySet());
      
     }
     
@@ -38,7 +39,7 @@ public class MessageManager {
     	try{
     		value = rb.getString(key);
     	}catch(Exception e){
-    		log.warning("I18N missing: "+loc+"\t"+key);
+    		log.warn("I18N missing: "+loc+"\t"+key);
     	}
     	return value;
     }
