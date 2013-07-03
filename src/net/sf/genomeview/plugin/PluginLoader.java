@@ -5,21 +5,15 @@ package net.sf.genomeview.plugin;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 
-import org.java.plugin.JpfException;
 import org.java.plugin.ObjectFactory;
 import org.java.plugin.PluginLifecycleException;
 import org.java.plugin.PluginManager;
@@ -28,6 +22,8 @@ import org.java.plugin.registry.Extension;
 import org.java.plugin.registry.PluginDescriptor;
 import org.java.plugin.standard.StandardPluginLocation;
 import org.java.plugin.util.ExtendedProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import be.abeel.concurrency.DaemonThread;
 import be.abeel.net.URIFactory;
@@ -118,7 +114,21 @@ public class PluginLoader {
 		model.getGUIManager().finishPluginLoading();
 	}
 	
-	
+	public static void loadPlugins(final List<File> pluginFiles){
+		DaemonThread dt = new DaemonThread(new Runnable() {
+			public void run() {
+				while (!lockPluginLoader()){
+					//keep trying... you're bound to get in at some point
+				}
+				
+				
+				
+				//don't forget to release the lock
+				unlockPluginLoader();
+			}
+		});
+		dt.start();
+	}
 	
 	public static void load(final Model model) {
 
@@ -127,8 +137,6 @@ public class PluginLoader {
 
 				try {
 
-					
-					
 					/* Load all other plugins */
 					File pluginsDir = Configuration.getPluginDirectory();
 
