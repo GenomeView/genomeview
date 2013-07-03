@@ -25,8 +25,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JViewport;
 
@@ -89,7 +91,7 @@ public abstract class Track {
 		this.dataKey = key;
 		this.config = config;
 		TrackConfigWindow tcw = new TrackConfigWindow(model, config);
-		log.log(Level.INFO, "Creating track\t" + key + "\t" + visible);
+		log.debug( "Creating track\t" + key + "\t" + visible);
 		this.entry = model.vlm.getSelectedEntry();
 		// config.setCollapsible(collapsible);
 		// this.collapsible = collapsible;
@@ -98,14 +100,14 @@ public abstract class Track {
 	}
 
 	// private boolean visible;
-	private static final Logger log = Logger.getLogger(Track.class.getCanonicalName());
+	private static final Logger log = LoggerFactory.getLogger(Track.class.getCanonicalName());
 
 	/**
 	 * To pass along mouse clicks from the original panel.
 	 */
 	public boolean mouseClicked(int x, int y, MouseEvent source) {
 		if (configCog != null && configCog.contains(x, y)) {
-			log.finest("Track consumes click");
+			log.debug("Track consumes click");
 			config.setConfigVisible(true);
 			// this.setCollapsed(!this.isCollapsed());
 			source.consume();

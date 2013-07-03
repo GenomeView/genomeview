@@ -27,8 +27,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -46,10 +48,10 @@ import be.abeel.net.URIFactory;
  */
 public class CrashHandler {
 
-	private static Logger log = Logger.getLogger(CrashHandler.class.getCanonicalName());
+	private static Logger log = LoggerFactory.getLogger(CrashHandler.class.getCanonicalName());
 
 	public static void showErrorMessage(String message, Throwable cause) {
-		log.log(Level.SEVERE, message, cause);
+		log.error(message, cause);
 		JOptionPane.showMessageDialog(null, message + "\n\n" + MessageManager.getString("crashhandler.error_logged"),
 				MessageManager.getString("crashhandler.error "), JOptionPane.ERROR_MESSAGE);
 
@@ -125,16 +127,15 @@ public class CrashHandler {
 			window.setVisible(true);
 			window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		} catch (Throwable e) {
-
-			log.log(Level.SEVERE, "GenomeView could not execute post-mortem", e);
+			log.error("GenomeView could not execute post-mortem", e);
 			System.exit(-2);
 
 		}
 	}
 
-	public static void crash(Level logLevel, String logMessage, Throwable ex) {
-		log.log(logLevel, logMessage, ex);
-		log.severe("GenomeView is dead, initializing post-mortem.");
+	public static void crash(String logMessage, Throwable ex) {
+		log.error(logMessage, ex);
+		log.error("GenomeView is dead, initializing post-mortem.");
 
 		new CrashHandler();
 

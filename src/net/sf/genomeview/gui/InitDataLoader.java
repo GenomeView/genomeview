@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.DataSourceHelper;
@@ -30,7 +31,7 @@ public class InitDataLoader {
 
 	public InitDataLoader(Model model) {
 		this.model = model;
-		logger = Logger.getLogger(InitDataLoader.class.getCanonicalName());
+		logger = LoggerFactory.getLogger(InitDataLoader.class.getCanonicalName());
 	}
 
 	public void init(String cmdUrl, String cmdFile, String[] remArgs, String position, String session)

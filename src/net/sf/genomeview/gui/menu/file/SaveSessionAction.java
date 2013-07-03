@@ -6,7 +6,8 @@ package net.sf.genomeview.gui.menu.file;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.logging.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
@@ -70,7 +71,7 @@ public class SaveSessionAction extends AbstractAction {
 				Configuration.set("lastDirectory", f.getParentFile());
 				
 			} catch (Exception ex) {
-				CrashHandler.crash(Level.SEVERE, MessageManager.getString("filemenu.could_not_save_session"), ex);
+				CrashHandler.crash(MessageManager.getString("filemenu.could_not_save_session"), ex);
 			}
 		}
 

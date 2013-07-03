@@ -9,7 +9,8 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JViewport;
 
@@ -83,7 +84,7 @@ public class PileupTrack extends Track {
 		return false;
 	}
 
-	private Logger log = Logger.getLogger(PileupTrack.class.toString());
+	private Logger log = LoggerFactory.getLogger(PileupTrack.class.toString());
 
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {

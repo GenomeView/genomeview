@@ -19,7 +19,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
@@ -108,7 +109,7 @@ public class MultipleAlignmentTrack2 extends Track {
 		return false;
 	}
 
-	private static final Logger log = Logger.getLogger(MultipleAlignmentTrack2.class.getCanonicalName());
+	private static final Logger log = LoggerFactory.getLogger(MultipleAlignmentTrack2.class.getCanonicalName());
 
 	public boolean mouseExited(int x, int y, MouseEvent e) {
 		lastMouse = null;
@@ -147,7 +148,7 @@ public class MultipleAlignmentTrack2 extends Track {
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
-			log.finest("Multiple alignment track consumes button2||button3");
+			log.debug("Multiple alignment track consumes button2||button3");
 			new MultipleAlignmentPopUp().show(e.getComponent(), e.getX(), currentYOffset + e.getY());
 			e.consume();
 			return true;

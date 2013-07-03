@@ -21,8 +21,10 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.StaticUtils;
@@ -51,7 +53,7 @@ import be.abeel.util.DefaultHashMap;
  * 
  */
 public class Model extends Observable implements Observer {
-	private Logger logger = Logger.getLogger(Model.class.getCanonicalName());
+	private Logger logger = LoggerFactory.getLogger(Model.class.getCanonicalName());
 
 	private EntrySet entries = new EntrySet();
 
@@ -189,7 +191,7 @@ public class Model extends Observable implements Observer {
 			if (Configuration.getBoolean("session:enableRememberLast"))
 				Session.save(new File(Configuration.getDirectory(), "previous.gvs"), this);
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Problem saving last session", e);
+			logger.error("Problem saving last session", e);
 		}
 		loadedSources.clear();
 		refresh();
@@ -382,7 +384,7 @@ public class Model extends Observable implements Observer {
 			if (changed)
 				refresh(NotificationTypes.UPDATETRACKS);
 		} catch (ConcurrentModificationException e) {
-			logger.log(Level.INFO, "Update tracks interrupted, tracks already changed", e);
+			logger.error("Update tracks interrupted, tracks already changed", e);
 		}
 
 	}
@@ -543,7 +545,7 @@ public class Model extends Observable implements Observer {
 	 */
 	public synchronized void daemonException(Throwable e) {
 		exceptionStack.push(e);
-		logger.log(Level.SEVERE, "Exception in daemon thread", e);
+		logger.error("Exception in daemon thread", e);
 		setChanged();
 		notifyObservers(NotificationTypes.EXCEPTION);
 

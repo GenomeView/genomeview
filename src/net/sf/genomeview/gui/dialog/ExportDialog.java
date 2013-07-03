@@ -21,8 +21,10 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -127,7 +129,7 @@ public class ExportDialog extends JDialog {
 						out.close();
 						in.close();
 					} catch (Exception e) {
-						log.log(Level.SEVERE, "Error while copying file", e);
+						log.error( "Error while copying file", e);
 					}
 					
 				}
@@ -141,7 +143,7 @@ public class ExportDialog extends JDialog {
 
 	}
 
-	private static final Logger log = Logger.getLogger(ExportDialog.class.getCanonicalName());
+	private static final Logger log = LoggerFactory.getLogger(ExportDialog.class.getCanonicalName());
 
 	private ExportDialog(final Model model, final boolean useDefault) {
 		super(model.getGUIManager().getParent(), "Export dialog", true);
@@ -244,7 +246,7 @@ public class ExportDialog extends JDialog {
 							JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("exportdialog.export_started"));
 						
 						} catch (Exception ex) {
-							log.log(Level.SEVERE, "Save failed", ex);
+							log.error( "Save failed", ex);
 							JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("exportdialog.save_failed"));
 						}
 						h.dispose();

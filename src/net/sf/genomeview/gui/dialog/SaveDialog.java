@@ -17,7 +17,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -56,7 +57,7 @@ import be.abeel.net.URIFactory;
  */
 public class SaveDialog extends JDialog {
 
-	private static final Logger log = Logger.getLogger(SaveDialog.class.getCanonicalName());
+	private static final Logger log = LoggerFactory.getLogger(SaveDialog.class.getCanonicalName());
 
 	private static final long serialVersionUID = -5209291628487502687L;
 

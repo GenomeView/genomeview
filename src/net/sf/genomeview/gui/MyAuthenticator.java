@@ -28,7 +28,8 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -58,7 +59,7 @@ public class MyAuthenticator extends Authenticator {
 
 	protected PasswordAuthentication getPasswordAuthentication() {
 
-		Logger logger = Logger.getLogger(MyAuthenticator.class.getCanonicalName());
+		Logger logger = LoggerFactory.getLogger(MyAuthenticator.class.getCanonicalName());
 		logger.info("Requesting Host  : " + getRequestingHost());
 		logger.info("Requesting Port  : " + getRequestingPort());
 		logger.info("Requesting Prompt : " + getRequestingPrompt());

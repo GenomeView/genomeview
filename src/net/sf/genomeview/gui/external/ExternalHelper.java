@@ -3,7 +3,8 @@
  */
 package net.sf.genomeview.gui.external;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
@@ -23,7 +24,7 @@ import net.sf.samtools.util.StringUtil;
 public class ExternalHelper {
 
 	
-	private static Logger log=Logger.getLogger(ExternalHelper.class.getCanonicalName());
+	private static Logger log=LoggerFactory.getLogger(ExternalHelper.class.getCanonicalName());
 	public static void setPosition(final String position, final Model model) {
 
 		Thread t = new Thread(new Runnable() {

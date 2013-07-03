@@ -12,8 +12,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -66,7 +68,7 @@ class GenomeExplorer extends JDialog {
 			try {
 				parse(list, new URL(line).openStream());
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Could not load instances from " + line, e);
+				log.error( "Could not load instances from " + line, e);
 			}
 		it.close();
 		parse(list, GenomeExplorer.class.getResourceAsStream("/conf/plazainstances.txt"));
@@ -76,7 +78,7 @@ class GenomeExplorer extends JDialog {
 			try {
 				parse(list, new URL(externalRepo).openStream());
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Something went wrong while loading the external repository: " + externalRepo, e);
+				log.error( "Something went wrong while loading the external repository: " + externalRepo, e);
 			}
 		}
 
@@ -135,7 +137,7 @@ class GenomeExplorer extends JDialog {
 				}
 				tabs.setSelectedIndex(tabs.getTabCount() - 1);
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Something went wrong while loading the external repository: " + externalRepo, e);
+				log.error( "Something went wrong while loading the external repository: " + externalRepo, e);
 
 			}
 		}
@@ -152,7 +154,7 @@ class GenomeExplorer extends JDialog {
 		StaticUtils.center(model.getGUIManager().getParent(), this);
 	}
 
-	private Logger log = Logger.getLogger(GenomeExplorer.class.getCanonicalName());
+	private Logger log = LoggerFactory.getLogger(GenomeExplorer.class.getCanonicalName());
 
 	private void parse(HashMap<String, ArrayList<Genome>> list, InputStream resourceAsStream) {
 		LineIterator it = new LineIterator(resourceAsStream, true, true);
@@ -165,7 +167,7 @@ class GenomeExplorer extends JDialog {
 			try {
 				list.get(arr[0]).add(new Genome(model, arr[1], instanceImage(arr[2]), arr[3], URIFactory.url(arr[4])));
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Could not parse instance line: " + line, e);
+				log.error( "Could not parse instance line: " + line, e);
 			}
 
 		}
@@ -179,7 +181,7 @@ class GenomeExplorer extends JDialog {
 			try {
 				url = new URL(path);
 			} catch (MalformedURLException e) {
-				log.log(Level.SEVERE, "Failed to load instance image", e);
+				log.error( "Failed to load instance image", e);
 			}
 
 		if (url == null)
