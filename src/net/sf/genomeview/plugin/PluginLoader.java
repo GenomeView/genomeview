@@ -130,6 +130,12 @@ public class PluginLoader {
 		dt.start();
 	}
 	
+	public static void loadPlugin(File pluginFile){
+		File[] pluginFiles = new File[1];
+		pluginFiles[0] = pluginFile;
+		loadPlugins(pluginFiles);
+	}
+	
 	public static void loadPlugins(final File[] pluginFiles){
 		DaemonThread dt = new DaemonThread(new Runnable() {
 			public void run() {
