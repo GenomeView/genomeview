@@ -5,6 +5,8 @@ package net.sf.genomeview.plugin;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import javax.swing.JOptionPane;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 
+import org.java.plugin.JpfException;
 import org.java.plugin.ObjectFactory;
 import org.java.plugin.PluginLifecycleException;
 import org.java.plugin.PluginManager;
@@ -40,25 +43,33 @@ public class PluginLoader {
 
 	public static PluginManager pluginManager = null;
 
-	public static void load(final Model model) {
+	private static boolean pluginLock = false;
+	private static boolean corePluginLoaded = false;
 
+	private static Model model;
+
+	
+	public PluginLoader(Model model){
+		PluginLoader.model = model;
+		log.info("Shadow folder: " + System.getProperty("java.io.tmpdir") + "/.jpf-shadow");
+		
+		ExtendedProperties ep = new ExtendedProperties();
+		
+		ep.put("org.java.plugin.PathResolver", "org.java.plugin.standard.ShadingPathResolver");
+		ep.put("unpackMode", "always");
+		ep.put("org.java.plugin.standard.ShadingPathResolver.unpackMode", "always");
+		
+		pluginManager = ObjectFactory.newInstance(ep).createManager(
+				ObjectFactory.newInstance(ep).createRegistry(),
+				ObjectFactory.newInstance(ep).createPathResolver());
+		
+		loadCorePlugin();
+	}
+	
+	private static void loadCorePlugin(){
 		DaemonThread dt = new DaemonThread(new Runnable() {
 			public void run() {
-				model.getGUIManager().startPluginLoading();
-				log.info("Shadow folder: " + System.getProperty("java.io.tmpdir") + "/.jpf-shadow");
-
-				ExtendedProperties ep = new ExtendedProperties();
-
-				ep.put("org.java.plugin.PathResolver", "org.java.plugin.standard.ShadingPathResolver");
-				ep.put("unpackMode", "always");
-				ep.put("org.java.plugin.standard.ShadingPathResolver.unpackMode", "always");
-
-				pluginManager = ObjectFactory.newInstance(ep).createManager(
-						ObjectFactory.newInstance(ep).createRegistry(),
-						ObjectFactory.newInstance(ep).createPathResolver());
-
 				try {
-
 					/* Load core plugin */
 					PluginLocation coreLocation;
 					URL manifest = PluginLoader.class.getResource("/plugin.xml");
@@ -66,7 +77,7 @@ public class PluginLoader {
 					String jar;
 
 					if (manifest.toString().startsWith("jar")) { // normal
-																	// usage
+						// usage
 						jar = manifest.toString().substring(4, manifest.toString().lastIndexOf('/') - 1);
 					} else
 						// developer usage
@@ -75,7 +86,49 @@ public class PluginLoader {
 					System.err.println("Core plugin context: " + context);
 					coreLocation = new StandardPluginLocation(context, manifest);
 					pluginManager.publishPlugins(new PluginLocation[] { coreLocation });
+					corePluginLoaded = true;
+				} catch (Exception e) {
+					log.error( "Plugin loading exception", e);
+				}
+			}
+		});
+		dt.start();
+	}
+	
+	/** 
+	 * Tries to lock the plugin loader so it can be used by one single thread.
+	 * The lock can only be obtained if unlocked and the core plugin is already loaded.
+	 * 
+	 * @return true when the lock was obtained, false when lock is in use
+	 */
+	public static boolean lockPluginLoader(){
+		if (pluginLock || !corePluginLoaded){
+			return false;
+		} else {
+			model.getGUIManager().startPluginLoading();
+			pluginLock = true;
+			return true;
+		}
+	}
+	/** 
+	 * Release lock on {@link PluginLoader}
+	 */
+	public static void unlockPluginLoader(){
+		pluginLock = false;
+		model.getGUIManager().finishPluginLoading();
+	}
+	
+	
+	
+	public static void load(final Model model) {
 
+		DaemonThread dt = new DaemonThread(new Runnable() {
+			public void run() {
+
+				try {
+
+					
+					
 					/* Load all other plugins */
 					File pluginsDir = Configuration.getPluginDirectory();
 
@@ -148,7 +201,7 @@ public class PluginLoader {
 				} catch (Exception e) {
 					log.error( "Plugin loading exception", e);
 				}
-				model.getGUIManager().finishPluginLoading();
+
 			}
 		});
 		dt.start();
