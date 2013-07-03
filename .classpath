@@ -6,7 +6,6 @@
 	<classpathentry kind="lib" path="lib/jargs.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sam-r1439.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ajt-2.10.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_38"/>
 	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="lib/activation-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/analysistoolmgmt-messages-0.1-SNAPSHOT.jar"/>
@@ -37,5 +36,6 @@
 	<classpathentry kind="lib" path="lib/log4j-over-slf4j-1.7.5.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-jdk14-1.7.5.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_43"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
