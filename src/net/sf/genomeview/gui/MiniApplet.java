@@ -96,7 +96,8 @@ public class MiniApplet extends JApplet {
 					getRootPane().setTransferHandler(new DropTransferHandler(model));
 					KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new Hotkeys(model));
 
-					PluginLoader.load(model);
+					PluginLoader.init(model);
+
 					model.setSilent(false);
 					ReferenceMissingMonitor.init(model);
 					

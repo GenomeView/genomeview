@@ -44,8 +44,12 @@ public class PluginLoader {
 
 	private static Model model;
 
-	
-	public PluginLoader(Model model){
+	/**
+	 * Sets up the plugin manager and loads the core and default plugins
+	 * 
+	 * @param model
+	 */
+	public static void init(Model model){
 		PluginLoader.model = model;
 		log.info("Shadow folder: " + System.getProperty("java.io.tmpdir") + "/.jpf-shadow");
 		
@@ -60,6 +64,41 @@ public class PluginLoader {
 				ObjectFactory.newInstance(ep).createPathResolver());
 		
 		loadCorePlugin();
+		File[] defaultPlugins = gatherDefaultPlugins();
+		loadPlugins(defaultPlugins);		
+	}
+
+	/** 
+	 * Tries to lock the plugin loader so it can be used by one single thread.
+	 * The lock can only be obtained if unlocked and if the core plugin is already loaded.
+	 * 
+	 * @return true when the lock was obtained, false when lock is in use
+	 */
+	synchronized public static boolean lockPluginLoader(){
+		if (pluginLock || !corePluginLoaded){
+			return false;
+		} else {
+			model.getGUIManager().startPluginLoading();
+			pluginLock = true;
+			return true;
+		}
+	}
+	/** 
+	 * Release lock on {@link PluginLoader}
+	 */
+	synchronized public static void unlockPluginLoader(){
+		pluginLock = false;
+		model.getGUIManager().finishPluginLoading();
+	}
+	
+	private static File[] gatherDefaultPlugins() {
+		File pluginsDir = Configuration.getPluginDirectory();
+		File[] plugins = pluginsDir.listFiles(new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+				return name.toLowerCase().endsWith(".zip") || name.toLowerCase().endsWith(".jar");
+			}
+		});
+		return plugins;
 	}
 	
 	private static void loadCorePlugin(){
@@ -91,74 +130,29 @@ public class PluginLoader {
 		dt.start();
 	}
 	
-	/** 
-	 * Tries to lock the plugin loader so it can be used by one single thread.
-	 * The lock can only be obtained if unlocked and the core plugin is already loaded.
-	 * 
-	 * @return true when the lock was obtained, false when lock is in use
-	 */
-	public static boolean lockPluginLoader(){
-		if (pluginLock || !corePluginLoaded){
-			return false;
-		} else {
-			model.getGUIManager().startPluginLoading();
-			pluginLock = true;
-			return true;
-		}
-	}
-	/** 
-	 * Release lock on {@link PluginLoader}
-	 */
-	public static void unlockPluginLoader(){
-		pluginLock = false;
-		model.getGUIManager().finishPluginLoading();
-	}
-	
-	public static void loadPlugins(final List<File> pluginFiles){
+	public static void loadPlugins(final File[] pluginFiles){
 		DaemonThread dt = new DaemonThread(new Runnable() {
 			public void run() {
 				while (!lockPluginLoader()){
 					//keep trying... you're bound to get in at some point
 				}
-				
-				
-				
-				//don't forget to release the lock
-				unlockPluginLoader();
-			}
-		});
-		dt.start();
-	}
-	
-	public static void load(final Model model) {
-
-		DaemonThread dt = new DaemonThread(new Runnable() {
-			public void run() {
 
 				try {
-
-					/* Load all other plugins */
-					File pluginsDir = Configuration.getPluginDirectory();
-
-					File[] plugins = pluginsDir.listFiles(new FilenameFilter() {
-						public boolean accept(File dir, String name) {
-							return name.toLowerCase().endsWith(".zip") || name.toLowerCase().endsWith(".jar");
-						}
-
-					});
+					//publish the plugins with the pluginManager
 					try {
+						PluginLocation[] locations = new PluginLocation[pluginFiles.length];
 
-						PluginLocation[] locations = new PluginLocation[plugins.length];
-
-						for (int i = 0; i < plugins.length; i++) {
-							locations[i] = StandardPluginLocation.create(plugins[i]);
+						int i=0;
+						for (File plugin : pluginFiles) {
+							locations[i++] = StandardPluginLocation.create(plugin);
 						}
-
 						pluginManager.publishPlugins(locations);
 
 					} catch (Exception e) {
+						unlockPluginLoader();
 						throw new RuntimeException(e);
 					}
+
 					StringBuffer errorMessage = new StringBuffer();
 					for (PluginDescriptor pd : pluginManager.getRegistry().getPluginDescriptors()) {
 						try {
@@ -191,28 +185,31 @@ public class PluginLoader {
 							}
 							log.error("Cannot load " + pd + " " + e.getMessage());
 						} catch (InstantiationException e) {
+							unlockPluginLoader();
 							throw new RuntimeException(e);
 						} catch (IllegalAccessException e) {
+							unlockPluginLoader();
 							throw new RuntimeException(e);
 						} catch (ClassNotFoundException e) {
-							// TODO Auto-generated catch block
+							//class not found == just carry on???
 							e.printStackTrace();
 						}
-
 					}
 					if (errorMessage.length() > 0) {
 						errorMessage.append("\nTo fix this, please update your plugins to the latest version");
 						JOptionPane.showMessageDialog(model.getGUIManager().getParent(), errorMessage, "Plugin error!",
 								JOptionPane.ERROR_MESSAGE);
 					}
-
-				} catch (Exception e) {
+				} catch(Exception e){
 					log.error( "Plugin loading exception", e);
+				} finally{
+					//don't forget to release the lock
+					unlockPluginLoader();					
 				}
-
 			}
 		});
 		dt.start();
-
 	}
+
+
 }
