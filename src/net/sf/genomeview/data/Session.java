@@ -12,6 +12,8 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import org.java.plugin.PluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.external.ExternalHelper;
+import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
@@ -64,7 +67,7 @@ public class Session {
 	private static Logger log = LoggerFactory.getLogger(Session.class.getCanonicalName());
 
 	enum SessionInstruction {
-		PREFIX, CONFIG, DATA, OPTION, LOCATION, C, U, F;
+		PREFIX, CONFIG, DATA, OPTION, LOCATION, PLUGIN, C, U, F;
 	}
 
 	private static void loadSession(final Model model, final InputStream is) {
@@ -124,6 +127,9 @@ public class Session {
 									case OPTION:
 										String[] ap = arr[1].split("=", 2);
 										Configuration.set(ap[0], ap[1]);
+										break;
+									case PLUGIN:
+										PluginLoader.installPlugin(new Locator(prefix + arr[1]), Configuration.getSessionPluginDirectory());
 										break;
 									case LOCATION:
 										ExternalHelper.setPosition(arr[1], model);

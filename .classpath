@@ -2,11 +2,16 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="src" path="junit"/>
 	<classpathentry kind="lib" path="lib/collections-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/jargs.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sam-r1439.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ajt-2.10.jar"/>
-	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.4.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://commons.apache.org/proper/commons-io/javadocs/api-2.4"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/activation-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/analysistoolmgmt-messages-0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/clientdevelopmentkit-0.1-SNAPSHOT.jar"/>
@@ -37,5 +42,6 @@
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-jdk14-1.7.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_38"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
