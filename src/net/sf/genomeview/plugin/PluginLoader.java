@@ -272,7 +272,7 @@ public class PluginLoader {
 	 * Gets a plugin location, copies the plugin to the given destination directory and registers/activates the new plugin with 
 	 * {@link #loadPlugin(File)}.
 	 * 
-	 * @param pluginLocation place to copy or download the jar/zip file from 
+	 * @param pluginLocation place download the jar/zip file from 
 	 * @param pluginDirectory place to store the plugin. This will be eiter the default plugin directory or the sessions plugin dir.
 	 */
 	public static void installPlugin(URL pluginLocation, File pluginDirectory) throws IOException{
@@ -280,6 +280,21 @@ public class PluginLoader {
 		String jarName = pluginLocation.getPath().split("/")[path.length-1];
 		File dest = new File(pluginDirectory, jarName);
 		FileUtils.copyURLToFile(pluginLocation, dest);
+		
+		loadPlugin(dest);
+	}
+	/**
+	 * Gets a plugin location, copies the plugin to the given destination directory and registers/activates the new plugin with 
+	 * {@link #loadPlugin(File)}.
+	 * 
+	 * @param pluginLocation place to copy the jar/zip file from 
+	 * @param pluginDirectory place to store the plugin. This will be eiter the default plugin directory or the sessions plugin dir.
+	 */
+	public static void installPlugin(File pluginLocation, File pluginDirectory) throws IOException{
+		String[] path = pluginLocation.getPath().split("/");
+		String jarName = pluginLocation.getPath().split("/")[path.length-1];
+		File dest = new File(pluginDirectory, jarName);
+		FileUtils.copyFile(pluginLocation, dest);
 		
 		loadPlugin(dest);
 	}

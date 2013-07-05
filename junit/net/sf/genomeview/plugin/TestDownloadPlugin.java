@@ -36,4 +36,27 @@ public class TestDownloadPlugin {
 		}
 		
 	}
+	
+	@Test
+	public void testCopyJar(){
+		String origString = "/home/thpar/curationassistant-0.1.jar";
+		File toDir = new File("/home/thpar/temp_gv");
+		
+		File resultFile = new File(toDir, "curationassistant-0.1.jar");
+		
+		Assert.assertFalse(resultFile.exists());
+		
+		try {
+			File file = new File(origString);
+			PluginLoader.installPlugin(file, toDir);
+			
+			Assert.assertTrue(resultFile.exists());
+			
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e){
+			e.printStackTrace();
+		}
+		
+	}
 }
