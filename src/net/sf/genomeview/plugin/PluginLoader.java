@@ -6,8 +6,10 @@ package net.sf.genomeview.plugin;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 
@@ -19,6 +21,7 @@ import org.java.plugin.PluginLifecycleException;
 import org.java.plugin.PluginManager;
 import org.java.plugin.PluginManager.PluginLocation;
 import org.java.plugin.registry.Extension;
+import org.java.plugin.registry.Identity;
 import org.java.plugin.registry.PluginDescriptor;
 import org.java.plugin.standard.StandardPluginLocation;
 import org.java.plugin.util.ExtendedProperties;
@@ -40,6 +43,7 @@ public class PluginLoader {
 	public static PluginManager pluginManager = null;
 
 	private static boolean pluginLock = false;
+	
 	private static boolean corePluginLoaded = false;
 
 	private static Model model;
@@ -138,39 +142,42 @@ public class PluginLoader {
 	
 	public static void loadPlugins(final File[] pluginFiles){
 		DaemonThread dt = new DaemonThread(new Runnable() {
-			public void run() {
+			private Set<String> newUrls;
+
+			public void run() {				
 				while (!lockPluginLoader()){
 					//keep trying... you're bound to get in at some point
 				}
 
 				try {
 					//publish the plugins with the pluginManager
+					Collection<Identity> newIds;
 					try {
 						PluginLocation[] locations = new PluginLocation[pluginFiles.length];
-
+						
 						int i=0;
 						for (File plugin : pluginFiles) {
 							locations[i++] = StandardPluginLocation.create(plugin);
 						}
-						pluginManager.publishPlugins(locations);
-
+						Map<String, Identity> newPlugins = pluginManager.publishPlugins(locations);
+						newIds = newPlugins.values();
 					} catch (Exception e) {
 						unlockPluginLoader();
 						throw new RuntimeException(e);
 					}
 
 					StringBuffer errorMessage = new StringBuffer();
-					for (PluginDescriptor pd : pluginManager.getRegistry().getPluginDescriptors()) {
+					
+					for (Identity pluginId : newIds) {
+						PluginDescriptor pd = (PluginDescriptor)pluginId;
 						try {
 							log.info("Loading plugin " + pd);
 							pluginManager.activatePlugin(pd.getId());
 
 							Iterator<Extension> it = pd.getExtensions().iterator();
 							while (it.hasNext()) {
-
 								Extension ext = (Extension) it.next();
-								ClassLoader classLoader = pluginManager.getPluginClassLoader(ext
-										.getDeclaringPluginDescriptor());
+								ClassLoader classLoader = pluginManager.getPluginClassLoader(ext.getDeclaringPluginDescriptor());
 
 								Class<?> toolCls = classLoader.loadClass(ext.getParameter("class").valueAsString());
 
@@ -178,7 +185,6 @@ public class PluginLoader {
 
 								tool.init(model);
 							}
-							// }
 						} catch (PluginLifecycleException e) {
 							String name = pd.getPluginClassName();
 							name = name.substring(name.lastIndexOf('.') + 1);
