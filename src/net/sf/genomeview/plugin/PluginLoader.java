@@ -17,6 +17,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 
 import org.java.plugin.ObjectFactory;
+import org.java.plugin.Plugin;
 import org.java.plugin.PluginLifecycleException;
 import org.java.plugin.PluginManager;
 import org.java.plugin.PluginManager.PluginLocation;
@@ -95,6 +96,12 @@ public class PluginLoader {
 		model.getGUIManager().finishPluginLoading();
 	}
 	
+	/**
+	 * Reads the default plugin directory as described in {@link Configuration} and detects all
+	 * zip and jar files there.
+	 * 
+	 * @return array of plugin files.
+	 */
 	private static File[] gatherDefaultPlugins() {
 		File pluginsDir = Configuration.getPluginDirectory();
 		File[] plugins = pluginsDir.listFiles(new FilenameFilter() {
@@ -105,6 +112,9 @@ public class PluginLoader {
 		return plugins;
 	}
 	
+	/**
+	 * Registers and loads the GenomeView core plugin.
+	 */
 	private static void loadCorePlugin(){
 		DaemonThread dt = new DaemonThread(new Runnable() {
 			public void run() {
@@ -134,12 +144,25 @@ public class PluginLoader {
 		dt.start();
 	}
 	
+	/**
+	 * Convenience method to load a single plugin file. Runs {@link #loadPlugins(File[])}.
+	 * 
+	 * @param pluginFile single plugin file to register and start.
+	 */
 	public static void loadPlugin(File pluginFile){
 		File[] pluginFiles = new File[1];
 		pluginFiles[0] = pluginFile;
 		loadPlugins(pluginFiles);
 	}
 	
+	
+	/**
+	 * Registers a list of plugin files (jar or zip) with the current {@link PluginManager} and activates them, including
+	 * extentions 
+	 * ({@link IPlugin#init(Model)} and {@link Plugin#doStart()} methods of the plugin will be executed.
+	 * 
+	 * @param pluginFiles array of plugin files
+	 */
 	public static void loadPlugins(final File[] pluginFiles){
 		DaemonThread dt = new DaemonThread(new Runnable() {
 			private Set<String> newUrls;
