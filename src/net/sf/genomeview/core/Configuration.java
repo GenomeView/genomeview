@@ -341,7 +341,16 @@ public class Configuration {
 
 		return modules;
 	}
+	public static File getSessionPluginDirectory() {
+		File modules = new File(confDir, "session_plugin");
+		if (!modules.exists()) {
+			if (!modules.mkdir())
+				logger.warn("Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
+		}
 
+		return modules;
+	}
+	
 	public static void set(String key, int value) {
 		set(key, "" + value);
 
