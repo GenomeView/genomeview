@@ -5,8 +5,11 @@ package net.sf.genomeview.plugin;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +19,7 @@ import javax.swing.JOptionPane;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 
+import org.apache.commons.io.FileUtils;
 import org.java.plugin.ObjectFactory;
 import org.java.plugin.Plugin;
 import org.java.plugin.PluginLifecycleException;
@@ -181,8 +185,27 @@ public class PluginLoader {
 						for (File plugin : pluginFiles) {
 							locations[i++] = StandardPluginLocation.create(plugin);
 						}
+						
+						//get a list of plugins that are already registered
+						Collection<PluginDescriptor> oldDescriptors = pluginManager.getRegistry().getPluginDescriptors();
+						Set<String> oldIds = new HashSet<String>();
+						for (PluginDescriptor oldDesc :oldDescriptors){
+							oldIds.add(oldDesc.getId());
+						}
+						
+						//publish given plugins
 						Map<String, Identity> newPlugins = pluginManager.publishPlugins(locations);
 						newIds = newPlugins.values();
+												
+						//filter out plugins that were already registered
+						Set<Identity> overlap = new HashSet<Identity>();
+						for (Identity id : newIds){
+							if (oldIds.contains(id.getId())){
+								overlap.add(id);
+							}
+						}
+						newIds.removeAll(overlap);
+						
 					} catch (Exception e) {
 						unlockPluginLoader();
 						throw new RuntimeException(e);
@@ -245,5 +268,20 @@ public class PluginLoader {
 		dt.start();
 	}
 
+	/**
+	 * Gets a plugin location, copies the plugin to the given destination directory and registers/activates the new plugin with 
+	 * {@link #loadPlugin(File)}.
+	 * 
+	 * @param pluginLocation place to copy or download the jar/zip file from 
+	 * @param pluginDirectory place to store the plugin. This will be eiter the default plugin directory or the sessions plugin dir.
+	 */
+	public static void installPlugin(URL pluginLocation, File pluginDirectory) throws IOException{
+		String[] path = pluginLocation.getPath().split("/");
+		String jarName = pluginLocation.getPath().split("/")[path.length-1];
+		File dest = new File(pluginDirectory, jarName);
+		FileUtils.copyURLToFile(pluginLocation, dest);
+		
+		loadPlugin(dest);
+	}
 
 }
