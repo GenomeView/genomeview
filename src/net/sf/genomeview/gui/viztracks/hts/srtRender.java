@@ -19,16 +19,12 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
-import be.abeel.util.LRUCache;
-
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.LocationTools;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.DataCallback;
 import net.sf.genomeview.data.provider.ShortReadProvider;
-import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.hts.ShortReadTrackConfig.ReadColor;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
@@ -155,7 +151,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		hitMap.clear();
 		seqBuffer = null;
 
-		Entry entry = model.vlm.getSelectedEntry();
+		Entry entry = model.vlm.getVisibleEntry();
 
 		/*
 		 * Draw individual reads when possible
@@ -622,15 +618,11 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		 * If new location -> request new render
 		 */
 
-		Location currentVisible = model.vlm.getAnnotationLocationVisible();
+		Location currentVisible = model.vlm.getVisibleLocation();
 
 		if (!same(currentVisible)) {
 			requestNew(model.vlm.getVisibleEntry(), dataKey, provider, currentVisible, srtc, model.vlm.screenWidth());
-//			System.out.println("Requesting new SRT render");
-		} else {
-//			System.out.println("Using previous render");
 		}
-
 	}
 
 	public Location location() {
