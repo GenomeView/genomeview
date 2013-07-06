@@ -42,18 +42,24 @@ import net.sf.samtools.SAMRecord;
  */
 public class srtRender implements Observer, DataCallback<SAMRecord> {
 
+	class RenderingMetaData {
+		/* Keeps track of the short-read insertions */
+		Map<Rectangle, ShortReadInsertion> paintedBlocks = new HashMap<Rectangle, ShortReadInsertion>();
+
+		/*
+		 * Mapping of all painted reads, at least in detailed mode
+		 */
+		HashMap<Rectangle, SAMRecord> hitMap = new HashMap<Rectangle, SAMRecord>();
+		/*
+		 * Buffer that will contain the visible reference sequence as soon as it
+		 * has been used to paint mismatches
+		 */
+		char[] seqBuffer = null;
+	}
+
+	private RenderingMetaData meta = new RenderingMetaData();
 	private org.broad.LRUCache<SAMRecord, Integer> rowCache = new org.broad.LRUCache<SAMRecord, Integer>(50000);
-	/* Keeps track of the short-read insertions */
-	Map<Rectangle, ShortReadInsertion> paintedBlocks = new HashMap<Rectangle, ShortReadInsertion>();
-	/*
-	 * Mapping of all painted reads, at least in detailed mode
-	 */
-	HashMap<Rectangle, SAMRecord> hitMap = new HashMap<Rectangle, SAMRecord>();
-	/*
-	 * Buffer that will contain the visible reference sequence as soon as it has
-	 * been used to paint mismatches
-	 */
-	private char[] seqBuffer = null;
+
 	private Model model;
 	private ShortReadProvider provider;
 	private DataKey dataKey;
@@ -113,7 +119,6 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		return out;
 	}
 
-	
 	// private Location currentVisible;
 	private ShortReadTrackConfig srtc;
 	private BufferedImage buffer;
@@ -126,8 +131,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 	@Override
 	public void dataReady(Location currentVisible, List<SAMRecord> reads) {
 
-		HashMap<Rectangle, SAMRecord> newHitMap = new HashMap<Rectangle, SAMRecord>();
-		Map<Rectangle, ShortReadInsertion> newPaintedBlocks = new HashMap<Rectangle, ShortReadInsertion>();
+		RenderingMetaData newMeta = new RenderingMetaData();
 		int maxReads = Configuration.getInt("shortread:maxReads");
 
 		int maxStack = Configuration.getInt("shortread:maxStack");
@@ -149,9 +153,10 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 
 		int yOffset = 0;
 		// int originalYOffset = yOffset;
-//		paintedBlocks.clear();
-//		hitMap.clear();
-		seqBuffer = null;
+		// paintedBlocks.clear();
+		// hitMap.clear();
+		char[] newSeqBuffer = null;
+		// seqBuffer = null;
 
 		Entry entry = model.vlm.getVisibleEntry();
 
@@ -286,13 +291,13 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 						lines = line;
 					g.translate(0, yOffset);
 
-					boolean paintOne = paintRead(g, one, yRec, screenWidth, readLineHeight, entry, null, yOffset,newHitMap,newPaintedBlocks);
+					boolean paintOne = paintRead(g, one, yRec, screenWidth, readLineHeight, entry, null, yOffset, newMeta);
 					boolean paintTwo = false;
 					if (paintOne)
 						visibleReadCount++;
 					if (two != null) {
 
-						paintTwo = paintRead(g, two, yRec, screenWidth, readLineHeight, entry, one, yOffset,newHitMap,newPaintedBlocks);
+						paintTwo = paintRead(g, two, yRec, screenWidth, readLineHeight, entry, one, yOffset, newMeta);
 						if (paintTwo)
 							visibleReadCount++;
 					}
@@ -337,9 +342,8 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		bufferLocation = currentVisible;
 		buffer = bi.getSubimage(0, 0, bi.getWidth(), actualHeight);
 		backupBuffer = buffer;
-		paintedBlocks=newPaintedBlocks;
-		hitMap=newHitMap;
-				
+		meta = newMeta;
+
 		model.refresh();
 	}
 
@@ -363,7 +367,6 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		} else {
 			BufferedImage bi = new BufferedImage((int) screenWidth, backupBuffer.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g = bi.createGraphics();
-			
 
 			Location bufferedLocation = location();
 			Location visible = model.vlm.getVisibleLocation();
@@ -371,7 +374,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			if (bufferedLocation != null)
 				x = Convert.translateGenomeToScreen(bufferedLocation.start, visible, screenWidth);
 			g.drawImage(backupBuffer, x, 0, null);
-			
+
 			g.setColor(Color.BLACK);
 			g.drawString("Queried data, waiting...", (int) (screenWidth / 2), 10);
 
@@ -398,11 +401,12 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 	 * @param otherRead
 	 *            the other read in the pair, this should only be set for the
 	 *            second read, and should be null for the first read.
-	 * @param newHitMap 
-	 * @param newPaintedBlocks 
+	 * @param newHitMap
+	 * @param newPaintedBlocks
 	 * @return Returns true if the read was actually painted, false if it wasn't
 	 */
-	private boolean paintRead(Graphics2D g, SAMRecord rf, int yRec, double screenWidth, int readLineHeight, Entry entry, SAMRecord otherRead, double yOff, HashMap<Rectangle, SAMRecord> newHitMap, Map<Rectangle, ShortReadInsertion> newPaintedBlocks) {
+	private boolean paintRead(Graphics2D g, SAMRecord rf, int yRec, double screenWidth, int readLineHeight, Entry entry, SAMRecord otherRead, double yOff,
+			RenderingMetaData newMeta) {
 		Location annotationVisible = model.vlm.getVisibleLocation();
 		/* If outside vertical view, return immediately */
 
@@ -512,18 +516,18 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		 */
 		if (annotationVisible.length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 
-			newHitMap.put(r, rf);
+			newMeta.hitMap.put(r, rf);
 			/* If there is no sequence, return immediately */
 			if (entry.sequence().size() == 0)
 				return true;
-			if (seqBuffer == null) {
+			if (newMeta.seqBuffer == null) {
 
 				Iterable<Character> bufferedSeq = entry.sequence().get(annotationVisible.start, annotationVisible.end + 1);
 
-				seqBuffer = new char[annotationVisible.length() + 1];
+				newMeta.seqBuffer = new char[annotationVisible.length() + 1];
 				int idx = 0;
 				for (char cc : bufferedSeq) {
-					seqBuffer[idx++] = cc;
+					newMeta.seqBuffer[idx++] = cc;
 				}
 
 			}
@@ -537,7 +541,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 				char readNt = (char) readNts[j - rf.getAlignmentStart()];
 				// char refNt = entry.sequence.getNucleotide(j);
 
-				char refNt = seqBuffer[j - annotationVisible.start];
+				char refNt = newMeta.seqBuffer[j - annotationVisible.start];
 				double tx1 = Convert.translateGenomeToScreen(j, annotationVisible, screenWidth);
 				double tx2 = Convert.translateGenomeToScreen(j + 1, annotationVisible, screenWidth);
 
@@ -602,7 +606,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 					in.esr = rf;
 					in.start = pos;
 					in.len = ce.getLength();
-					newPaintedBlocks.put(rec, in);
+					newMeta.paintedBlocks.put(rec, in);
 				} else {
 					if (!skip.contains(ce.getOperator()))
 						pos += ce.getLength();
@@ -653,6 +657,10 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 
 	public Location location() {
 		return bufferLocation;
+	}
+
+	public RenderingMetaData meta() {
+		return meta;
 	}
 
 }

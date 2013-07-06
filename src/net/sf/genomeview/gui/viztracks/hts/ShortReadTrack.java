@@ -214,7 +214,7 @@ public class ShortReadTrack extends Track {
 
 		// System.out.println("Click: " + x + " " + y);
 		if (source.getClickCount() > 1) {
-			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render.hitMap.entrySet()) {
+			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render.meta().hitMap.entrySet()) {
 				if (e.getKey().contains(x, y)) {
 					System.out.println("2*Click: " + e.getValue());
 					if (e.getValue().getReadPairedFlag() && !e.getValue().getMateUnmappedFlag())
@@ -240,7 +240,7 @@ public class ShortReadTrack extends Track {
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
 		if (model.vlm.getAnnotationLocationVisible().length() < Configuration.getInt("geneStructureNucleotideWindow")) {
 			ShortReadInsertion sri = null;
-			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : render.paintedBlocks.entrySet()) {
+			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : render.meta().paintedBlocks.entrySet()) {
 				if (e.getKey().contains(x, y)) {
 					sri = e.getValue();
 					break;
@@ -257,7 +257,7 @@ public class ShortReadTrack extends Track {
 			}
 			//
 			// System.out.println("Moved: " + x + " " + y);
-			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render.hitMap.entrySet()) {
+			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render.meta().hitMap.entrySet()) {
 				if (e.getKey().contains(x, y)) {
 					// System.out.println("Prijs: " + e.getValue());
 					readinfo.set(source, e.getValue());
