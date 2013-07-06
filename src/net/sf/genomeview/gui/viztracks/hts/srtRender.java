@@ -332,12 +332,13 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 
 		/* Crop buffered image if not everything is needed */
 		int actualHeight = lines * readLineHeight;
-		if (visibleReadCount == 0) {
+		if (visibleReadCount == 0||actualHeight==0) {
 			g.setColor(Color.BLACK);
 
 			g.drawString("No data in this region", (int) (screenWidth / 2), 10);
 			actualHeight = 20;
 		}
+		
 
 		bufferLocation = currentVisible;
 		buffer = bi.getSubimage(0, 0, bi.getWidth(), actualHeight);
