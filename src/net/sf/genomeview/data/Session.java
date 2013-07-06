@@ -31,6 +31,7 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
+import be.abeel.util.Config;
 
 /**
  * 
@@ -163,6 +164,11 @@ public class Session {
 			Locator l = ds.getLocator();
 			out.println("DATA:" + l);
 		}
+		for(String key:Configuration.keySet()){
+			out.println("OPTION:"+key+"="+Configuration.get(key));
+			
+		}
+		
 		String e = model.vlm.getSelectedEntry().getID();
 		Location l = model.vlm.getAnnotationLocationVisible();
 		out.println("LOCATION:" + e + ":" + l.start + ":" + l.end);

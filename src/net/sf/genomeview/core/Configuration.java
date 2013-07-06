@@ -38,6 +38,15 @@ import be.abeel.net.URIFactory;
  * 
  */
 public class Configuration {
+	
+	
+	public static Set<String>keySet(){
+		Set<String>tmp=new HashSet<String>();
+		tmp.addAll(extraMap.keySet());
+		tmp.addAll(localMap.keySet());
+		tmp.addAll(defaultMap.keySet());
+		return tmp;
+	}
 
 	public static final Color green = new Color(0, 128, 0);
 
