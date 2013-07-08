@@ -36,6 +36,7 @@ import net.sf.genomeview.gui.menu.help.ShowInstalledModulesAction;
 import net.sf.genomeview.gui.menu.navigation.GotoPosition;
 import net.sf.genomeview.gui.menu.navigation.GotoTrack;
 import net.sf.genomeview.gui.menu.navigation.SearchAction;
+import net.sf.genomeview.gui.menu.plugins.LoadPluginFromURLAction;
 import net.sf.genomeview.gui.menu.selection.ClearFeatureSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ClearRegionSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ShowSequenceWindowAction;
@@ -113,6 +114,13 @@ public class MainMenu extends JMenuBar {
 
 		JMenu plugin = new JMenu(MessageManager.getString("mainmenu.plugins"));
 		model.getGUIManager().registerPluginMenu(plugin);
+		plugin.add(new LoadPluginFromURLAction(model));
+		plugin.addSeparator();
+		JMenuItem tempItem = new JMenuItem(MessageManager.getString("guimanager.loading_plugins"));
+		tempItem.setEnabled(false);
+		tempItem.setVisible(false);
+		model.getGUIManager().registerPluginMenuToggle(tempItem);
+		plugin.add(tempItem);
 		add(plugin);
 
 		JMenu help = new JMenu(MessageManager.getString("mainmenu.help"));
