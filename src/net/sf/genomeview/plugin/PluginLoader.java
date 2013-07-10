@@ -41,6 +41,7 @@ import be.abeel.net.URIFactory;
 /**
  * 
  * @author Thomas Abeel
+ * @author thpar
  * 
  */
 public class PluginLoader {

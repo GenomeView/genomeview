@@ -5,6 +5,7 @@ package net.sf.genomeview.plugin;
 
 import java.awt.Component;
 import java.awt.Frame;
+import java.awt.dnd.DropTarget;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,6 @@ import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StatusBar;
 import net.sf.genomeview.gui.explorer.GenomeExplorerManager;
 import net.sf.genomeview.gui.information.InformationFrame;
@@ -22,6 +22,7 @@ import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel;
  * Manages GUI components that are accessible for plugins.
  * 
  * @author Thomas Abeel
+ * @author thpar
  * 
  */
 public class GUIManager {
@@ -140,6 +141,7 @@ public class GUIManager {
 
 	public void registerEvidenceLabel(GeneEvidenceLabel gel) {
 		this.gel = gel;
+		DropTarget target = new DropTarget(gel, new PluginDropListener());
 	}
 
 	public GeneEvidenceLabel getEvidenceLabel() {
