@@ -40,18 +40,11 @@ public class GUIManager {
 	}
 
 	public void startPluginLoading(){
-		for (JMenu menu : pluginMenu){
-			JMenuItem jmi=new JMenuItem(MessageManager.getString("guimanager.loading_plugins"));
-			jmi.setEnabled(false);
-			menu.add(jmi);
-			
-		}
+		togglePluginLoadingMessage(true);
 	}
 	
 	public void finishPluginLoading(){
-		for (JMenu menu : pluginMenu){
-			menu.remove(0);
-		}
+		togglePluginLoadingMessage(false);
 	}
 	
 	/* There can be multiple menus as there will be one for each screen */
@@ -138,6 +131,7 @@ public class GUIManager {
 	private StatusBar statusBar;
 	private GenomeExplorerManager genomeExplorerManager;
 	private InformationFrame infoFrame;
+	private JMenuItem pluginLoadingMessage;
 
 
 	public StatusBar getStatusBar() {
@@ -179,5 +173,25 @@ public class GUIManager {
 		return infoFrame;
 	}
 
+	
+	/**
+	 * Give the {@link GUIManager} a reference to the "Plugin Loading" message 
+	 * in the plugin menu.
+	 * 
+	 * @param tempItem
+	 */
+	public void registerPluginMenuToggle(JMenuItem tempItem) {
+		pluginLoadingMessage = tempItem;
+		
+	}
+	
+	/**
+	 * Toggle the "Plugin loading" message (in)visible.
+	 * 
+	 * @param visible
+	 */
+	public void togglePluginLoadingMessage(boolean visible){
+		this.pluginLoadingMessage.setVisible(visible);
+	}
 
 }
