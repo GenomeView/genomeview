@@ -9,9 +9,9 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.data.Model;
 
 public class PluginDropListener implements DropTargetListener {
 	private static DataFlavor urlFlavor;
@@ -63,6 +63,13 @@ public class PluginDropListener implements DropTargetListener {
         		URL url = (URL) transferable.getTransferData (urlFlavor);
         		System.out.println("URL: "+url);
         		PluginLoader.installPlugin(url, Configuration.getPluginDirectory());
+        		gotData = true;
+        	} else if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)){
+        		List<File> files =(List<File>)transferable.getTransferData(DataFlavor.javaFileListFlavor);
+        		for (File file : files){
+        			System.out.println("File: "+file);
+        			PluginLoader.installPlugin(file, Configuration.getPluginDirectory());
+        		}
         		gotData = true;
         	} else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)){
         		String s =(String) transferable.getTransferData (DataFlavor.stringFlavor);

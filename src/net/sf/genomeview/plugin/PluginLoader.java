@@ -302,7 +302,7 @@ public class PluginLoader {
 		if (dest.exists()){
 			loadPlugin(dest);			
 		} else {
-			if (confirmPluginInstall(jarName)){
+			if (checkFileType(jarName) && confirmPluginInstall(jarName)){
 				FileUtils.copyURLToFile(pluginLocation, dest);
 				loadPlugin(dest);
 			}
@@ -325,7 +325,7 @@ public class PluginLoader {
 		if (dest.exists()){
 			loadPlugin(dest);			
 		} else {
-			if (confirmPluginInstall(jarName)){
+			if (checkFileType(jarName) && confirmPluginInstall(jarName)){
 				FileUtils.copyFile(pluginLocation, dest);
 				loadPlugin(dest);
 			}
@@ -333,6 +333,20 @@ public class PluginLoader {
 		
 	}
 	
+	private static boolean checkFileType(String jarName) {
+		String[] parts = jarName.split("\\.");
+		String ext = parts[parts.length-1];
+		if (ext.equalsIgnoreCase("jar") || ext.equalsIgnoreCase("zip")){
+			return true;
+		} else {
+			JOptionPane.showMessageDialog(model.getGUIManager().getParent(),
+					MessageManager.formatMessage("pluginloader.invalid_extension", new Object[]{jarName}), 
+					MessageManager.getString("pluginloader.plugin_error"), 
+					JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+	}
+
 	/**
 	 * Warn the user that extra code will be loaded and used and asks for confirmation.
 	 * 
