@@ -29,6 +29,7 @@ import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
+import net.sf.nameservice.NameService;
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
 import be.abeel.util.Config;
@@ -40,41 +41,47 @@ import be.abeel.util.Config;
  */
 public class Session {
 
-	public static void loadSession(Model model, String in) throws IOException {
+	public static Thread loadSession(Model model, String in) throws IOException {
 		if (in.startsWith("http://") || in.startsWith("https://")) {
 			try {
-				loadSession(model, URIFactory.url(in));
+				return loadSession(model, URIFactory.url(in));
 			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				CrashHandler.showErrorMessage("Failed to load from URL: "+in, e);
+				return null;
 			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				CrashHandler.showErrorMessage("Failed to load from URL: "+in, e);
+				return null;
 			}
 		} else {
-			loadSession(model, new File(in));
+			return loadSession(model, new File(in));
 		}
 	}
 
-	public static void loadSession(Model model, File selectedFile) throws FileNotFoundException {
-		loadSession(model, new FileInputStream(selectedFile));
+	public static Thread loadSession(Model model, File selectedFile) throws FileNotFoundException {
+		return loadSession(model, new FileInputStream(selectedFile));
 
 	}
 
-	public static void loadSession(Model model, URL url) throws IOException {
-		loadSession(model, url.openStream());
+	public static Thread loadSession(Model model, URL url) throws IOException {
+		return loadSession(model, url.openStream());
 	}
 
 	private static Logger log = LoggerFactory.getLogger(Session.class.getCanonicalName());
 
 	enum SessionInstruction {
-		PREFIX, CONFIG, DATA, OPTION, LOCATION, PLUGIN, C, U, F;
+		PREFIX, CONFIG, DATA, OPTION, LOCATION, PLUGIN, ALIAS, C, U, F;
 	}
 
-	private static void loadSession(final Model model, final InputStream is) {
+	/**
+	 * Asynchronous loading of a session file 
+	 * @param model model to load the session into
+	 * @param is inputstream that contains the session
+	 * @return thread loading the session
+	 */
+	private static Thread loadSession(final Model model, final InputStream is) {
 		model.messageModel().setStatusBarMessage(MessageManager.getString("session.preparing_load_session"));
 
-		new Thread(new Runnable() {
+		Thread t=new Thread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -129,6 +136,10 @@ public class Session {
 										String[] ap = arr[1].split("=", 2);
 										Configuration.set(ap[0], ap[1]);
 										break;
+									case ALIAS:
+										String[] al = arr[1].split("=", 2);
+										NameService.addSynonym(al[1], al[0]);
+										break;
 									case PLUGIN:
 										PluginLoader.installPlugin(new Locator(prefix + arr[1]), Configuration.getSessionPluginDirectory());
 										break;
@@ -150,7 +161,9 @@ public class Session {
 				model.messageModel().setStatusBarMessage(null);
 
 			}
-		}).start();
+		});
+		t.start();
+		return t;
 
 	}
 
