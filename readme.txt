@@ -19,4 +19,4 @@ Import in Eclipse:
 
 - If you want to run the Unit tests:
 	* Add a JUnit 4 library
-	* Add the 'junit' folder to the classpath.
+	* Add the 'junit' folder as a source folder
