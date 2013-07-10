@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.source.Locator;
 
 import org.apache.commons.io.FileUtils;
@@ -235,11 +236,10 @@ public class PluginLoader {
 							String name = pd.getPluginClassName();
 							name = name.substring(name.lastIndexOf('.') + 1);
 							if (e.getMessage().contains("incompatible version")) {
-								errorMessage.append("The " + name
-										+ " plugin is not compatible with the current version of GenomeView\n");
+								errorMessage.append(MessageManager.formatMessage("pluginloader.incompatible_plugin", new Object[]{name}));
 							}
 							if (e.getMessage().contains("can't start")) {
-								errorMessage.append("The " + name + " plugin can't be started.\n");
+								errorMessage.append(MessageManager.formatMessage("pluginloader.cannot_start_plugin", new Object[]{name}));
 							}
 							log.error("Cannot load " + pd + " " + e.getMessage());
 						} catch (InstantiationException e) {
@@ -254,8 +254,9 @@ public class PluginLoader {
 						}
 					}
 					if (errorMessage.length() > 0) {
-						errorMessage.append("\nTo fix this, please update your plugins to the latest version");
-						JOptionPane.showMessageDialog(model.getGUIManager().getParent(), errorMessage, "Plugin error!",
+						errorMessage.append(MessageManager.getString("pluginloader.fix_plugins"));
+						JOptionPane.showMessageDialog(model.getGUIManager().getParent(), errorMessage, 
+								MessageManager.getString("pluginloader.plugin_error"),
 								JOptionPane.ERROR_MESSAGE);
 					}
 				} catch(Exception e){
@@ -296,11 +297,16 @@ public class PluginLoader {
 		String[] path = pluginLocation.getPath().split("/");
 		String jarName = pluginLocation.getPath().split("/")[path.length-1];
 		File dest = new File(pluginDirectory, jarName);
-		if (!dest.exists()){
-			FileUtils.copyURLToFile(pluginLocation, dest);			
+				
+		if (dest.exists()){
+			loadPlugin(dest);			
+		} else {
+			if (confirmPluginInstall(jarName)){
+				FileUtils.copyURLToFile(pluginLocation, dest);
+				loadPlugin(dest);
+			}
 		}
 		
-		loadPlugin(dest);
 	}
 	/**
 	 * Gets a plugin location, copies the plugin to the given destination directory and registers/activates the new plugin with 
@@ -314,11 +320,29 @@ public class PluginLoader {
 		String[] path = pluginLocation.getPath().split("/");
 		String jarName = pluginLocation.getPath().split("/")[path.length-1];
 		File dest = new File(pluginDirectory, jarName);
-		if (!dest.exists()){
-			FileUtils.copyFile(pluginLocation, dest);			
+				
+		if (dest.exists()){
+			loadPlugin(dest);			
+		} else {
+			if (confirmPluginInstall(jarName)){
+				FileUtils.copyFile(pluginLocation, dest);
+				loadPlugin(dest);
+			}
 		}
 		
-		loadPlugin(dest);
+	}
+	
+	/**
+	 * Warn the user that extra code will be loaded and used and asks for confirmation.
+	 * 
+	 * @return true if the user accepts the plugin for the first time.
+	 */
+	private static boolean confirmPluginInstall(String jarName){
+		int answer = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(), 
+				MessageManager.formatMessage("pluginloader.confirm_install", new Object[]{jarName}),
+				MessageManager.getString("pluginloader.confirm_install_title"),
+				JOptionPane.YES_NO_OPTION);
+		return answer==JOptionPane.YES_OPTION;
 	}
 
 }
