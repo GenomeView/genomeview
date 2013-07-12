@@ -81,6 +81,7 @@ class GenomesPanel extends GridBagPanel implements ScrollToTop {
 				}
 			});
 			add(box, gc);
+
 			/*------------------*/
 			gc.gridy = 0;
 			gc.gridx++;
