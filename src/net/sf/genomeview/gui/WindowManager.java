@@ -241,13 +241,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 			String initialLocation = CommandLineOptions.position();// (String)
 																	// parser.getOptionValue(positionO);
 
-			File prevSession = new File(Configuration.getDirectory(), "previous.gvs");
-			logger.info("Loading previous session: " + prevSession);
-			if (prevSession.exists() && prevSession.length() > 0 && cmdUrl == null && cmdFile == null && session == null
-					&& remArgs.length == 0)
-				idl.init(null, null, new String[0], null, prevSession.toString());
-			else
-				idl.init(cmdUrl, cmdFile, remArgs, initialLocation, session);
+			idl.init(cmdUrl, cmdFile, remArgs, initialLocation, session);
 		} else {
 			idl.init(null, null, new String[0], null, null);
 		}

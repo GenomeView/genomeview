@@ -38,6 +38,8 @@ public class NoFailIterable<T> implements Iterable<T> {
 
 			@Override
 			public T next() {
+				if(idx>=list.size())
+					return null;
 				return list.get(idx++);
 			}
 

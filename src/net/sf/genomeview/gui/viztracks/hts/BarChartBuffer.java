@@ -210,7 +210,8 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 	}
 
 	private void drawFour(Graphics2D g, double range, int graphLineHeigh, double screenWidth, int yOffset) {
-		// range = 2 * range;
+//		 range = 2 * range;
+		//System.out.println("Range: "+range);
 		Color forwardColor = Configuration.getColor("shortread:forwardColor");
 		Color reverseColor = Configuration.getColor("shortread:reverseColor");
 		Color forwardAntiColor = Configuration.getColor("shortread:forwardAntiColor");
@@ -255,14 +256,19 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 			// div = ptm.maxValue();
 			if (coverage > range)
 				coverage = range;
-			if (r1cov > range)
-				r1cov = range;
+			
 			if (f1cov > range)
 				f1cov = range;
-			if (r2cov > range)
-				r2cov = range;
-			if (f2cov > range)
-				f2cov = range;
+			if (r2cov > range-f1cov)
+				r2cov = range-f1cov;
+		
+			
+			if (r1cov > range)
+				r1cov = range;
+			if (f2cov > range-r1cov)
+				f2cov = range-r1cov;
+			
+			
 			// }
 			double frac = coverage / range;
 			int size = (int) (frac * graphLineHeigh);

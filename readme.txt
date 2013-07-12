@@ -11,7 +11,12 @@ Import in Eclipse:
 - Make sure you have the EGit plugin or similar installed in Eclipse
 - Clone the repository: git://git.code.sf.net/p/genomeview/genomeview-code genomeview-genomeview-code
 	* If you want to commit you need the RW repository: https://sourceforge.net/p/genomeview/genomeview-code/
-- Add all libraries in lib/ to the classpath (should already be done)
-- Add a JUnit 4 library
+- Add all libraries in lib/ to the classpath
+
 - Add 'src' and 'resources' as source folders.
 - If there is no version of JAnnot in the lib/ directory, check out the JAnnot project and add it to the GenomeView classpath
+
+
+- If you want to run the Unit tests:
+	* Add a JUnit 4 library
+	* Add the 'junit' folder to the classpath.
