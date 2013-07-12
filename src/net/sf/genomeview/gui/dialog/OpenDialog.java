@@ -44,6 +44,7 @@ import net.sf.jannot.source.das.DAS.EntryPoint;
 
 import org.genomespace.client.GsSession;
 import org.genomespace.client.exceptions.AuthorizationException;
+import org.genomespace.client.exceptions.ConfigurationError;
 import org.genomespace.client.exceptions.InternalServerException;
 import org.genomespace.client.exceptions.ServerNotFoundException;
 import org.genomespace.client.ui.GSFileBrowserDialog;
@@ -225,12 +226,8 @@ public class OpenDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
 				try {
-					GsSession session = new GsSession();
-					if (session.isLoggedIn()){
-					    // if we were logged in by another app on this machine we can get the cached username
-					    //lblUsername.setText(session.getCachedUsernameForSSO());
-					} else {
 					    // open a GSLogin Dialog 
+					GsSession session = null;
 					    final GSLoginDialog loginDialog = new GSLoginDialog(null, ModalityType.APPLICATION_MODAL);
 					    loginDialog.setVisible(true);
 					    final String userName = loginDialog.getUsername();
@@ -246,18 +243,10 @@ public class OpenDialog extends JDialog {
 					        		 	MessageManager.getString("opendialog.login_error"),
 					        		 	JOptionPane.ERROR_MESSAGE);
 					    	
-					    try {
+			    	 session = loginDialog.getGsSession();
+			    	 if (session==null)
+			    		 session = new GsSession();
 					         session.login(userName, password);
-					         return;
-					    } catch (final AuthorizationException e1) {
-					         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.invalid_username_pwd"),MessageManager.getString("opendialog.login_error"), 
-					         JOptionPane.ERROR_MESSAGE);
-					    } catch (ServerNotFoundException e2) {
-							// TODO Auto-generated catch block
-						} catch (InternalServerException e3) {
-							// TODO Auto-generated catch block
-						} 
-					}
 					//Once user is logged, list its working files
 					GSFileBrowserDialog fileBrowser = new GSFileBrowserDialog(null, session.getDataManagerClient(), 
 							GSFileBrowserDialog.DialogType.FILE_SELECTION_DIALOG); 
@@ -266,6 +255,17 @@ public class OpenDialog extends JDialog {
 							// Do something with the selected file
 					DataSourceHelper.load(model,new Locator(selection.getPath()));
 
+			    } catch (final AuthorizationException e1) {
+			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.invalid_username_pwd"),MessageManager.getString("opendialog.login_error"), 
+			         JOptionPane.ERROR_MESSAGE);
+			    }catch (ConfigurationError ce){
+			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_unavailable"),MessageManager.getString("opendialog.connection_error"), 
+			         JOptionPane.ERROR_MESSAGE);
+			    	
+				}catch (ServerNotFoundException e2) {
+					// TODO Auto-generated catch block
+				} catch (InternalServerException e3) {
+					// TODO Auto-generated catch block
 				}  catch (MalformedURLException e2) {
 					// TODO Auto-generated catch block
 					e2.printStackTrace();
@@ -278,8 +278,6 @@ public class OpenDialog extends JDialog {
 				} catch (ReadFailedException e4) {
 					// TODO Auto-generated catch block
 					e4.printStackTrace();
-				} catch (InternalServerException e5) {
-					// TODO Auto-generated catch block
 				}
 
 			}
