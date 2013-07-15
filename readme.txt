@@ -9,7 +9,7 @@ Webstart: http://genomeview.org/start/launch.jnlp
 
 Import in Eclipse:
 - Make sure you have the EGit plugin or similar installed in Eclipse
-- Clone the repository: git://git.code.sf.net/p/genomeview/genomeview-code genomeview-genomeview-code
+- Clone the repository: git://git.code.sf.net/p/genomeview/genomeview-code
 	* If you want to commit you need the RW repository: https://sourceforge.net/p/genomeview/genomeview-code/
 - Add all libraries in lib/ to the classpath
 
@@ -19,4 +19,4 @@ Import in Eclipse:
 
 - If you want to run the Unit tests:
 	* Add a JUnit 4 library
-	* Add the 'junit' folder to the classpath.
+	* Add the 'junit' folder as a source folder
