@@ -141,7 +141,6 @@ public class GUIManager {
 
 	public void registerEvidenceLabel(GeneEvidenceLabel gel) {
 		this.gel = gel;
-		DropTarget target = new DropTarget(gel, new PluginDropListener());
 	}
 
 	public GeneEvidenceLabel getEvidenceLabel() {
