@@ -92,6 +92,7 @@ class DropTransferHandler extends TransferHandler {
 	        		} else {
 	        			DataSourceHelper.load(model,new Locator(s));
 	        		}
+	        		return true;
 				} else if (flavor.equals(urlFlavor)){
 					URL url = (URL) t.getTransferData (urlFlavor);
 	        		System.out.println("URL dropped: "+url);
@@ -100,6 +101,7 @@ class DropTransferHandler extends TransferHandler {
 	        		} else {
 	        			DataSourceHelper.load(model,new Locator(url.toString()));
 	        		}
+	        		return true;
 				} else {
 					System.out.println("Data rejected: " + flavor);
 					// Don't return; try next flavor.
