@@ -144,7 +144,7 @@ public class DataSourceHelper {
 		if (ds instanceof AbstractStreamDataSource) {
 			AbstractStreamDataSource asd = ((AbstractStreamDataSource) ds);
 			if (asd.getParser() == null) {
-				Parser tmp = offerParserChoice(model);
+				Parser tmp = offerParserChoice(model,data);
 				if (tmp != null) {
 					asd.setParser(tmp);
 				} else
@@ -337,10 +337,10 @@ public class DataSourceHelper {
 
 	}
 
-	private static Parser offerParserChoice(Model model) {
+	private static Parser offerParserChoice(Model model,Locator l) {
 		Parser p = (Parser) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
 				MessageManager.getString("datasourcehelper.couldnt_detect_file"), MessageManager.getString("datasourcehelper.parser_detection"),
-				JOptionPane.QUESTION_MESSAGE, null, Parser.parsers, Parser.parsers[0]);
+				JOptionPane.QUESTION_MESSAGE, null, Parser.parsers(l), Parser.parsers(l)[0]);
 		return p;
 	}
 }
