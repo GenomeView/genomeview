@@ -22,6 +22,8 @@ import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cern.colt.Arrays;
+
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
@@ -32,6 +34,7 @@ import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Task;
 import net.sf.genomeview.gui.Convert;
+import net.sf.genomeview.gui.GenomeView;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.components.CollisionMap;
@@ -212,6 +215,7 @@ public class MultipleAlignmentTrack2 extends Track {
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
 		boolean comparativeAnnotation = Configuration.getBoolean("maf:enableAnnotation");
 		Type comparativeAnnotationType = Type.get(Configuration.get("maf:annotationType"));
+		int maximumVisibleRange = Configuration.getInt("maf:maximumVisibleRange");
 
 		currentYOffset = yOffset;
 		AbstractMAFMultipleAlignment ma = (AbstractMAFMultipleAlignment) entry.get(dataKey);
@@ -318,10 +322,11 @@ public class MultipleAlignmentTrack2 extends Track {
 
 				int line = 1;
 				Font font = g.getFont();
-				Font tmpFont = font.deriveFont(10f);
+				Font tmpFont = font.deriveFont(10f);	
 				g.setFont(tmpFont);
+//				System.out.println("Tree: "+Arrays.toString(ab2.toArray()));
 				for (AbstractAlignmentSequence as : ab2) {
-
+//					System.out.println("\tAS: "+as);
 					if (showAll) {
 						line = ordering.getForward(as.getName()) + 1;
 						// System.out.println("ASLINES: "+as+"\t"+line);
@@ -342,8 +347,8 @@ public class MultipleAlignmentTrack2 extends Track {
 									if (as.strand() == Strand.FORWARD)
 										nt = as.seq().get(translated, translated + 1).iterator().next();
 									else
-										nt = SequenceTools.complement(as.seq()
-												.get(as.seq().size() - translated + 1, as.seq().size() - translated + 2).iterator().next());
+										nt = SequenceTools.complement(as.seq().get(as.seq().size() - translated + 1, as.seq().size() - translated + 2)
+												.iterator().next());
 
 									// System.out.println("NT: "+translated+"\t"+nt);
 									if (ref[i - visible.start] != nt) {
@@ -351,17 +356,15 @@ public class MultipleAlignmentTrack2 extends Track {
 											g.setColor(Color.RED);
 										else
 											g.setColor(Color.DARK_GRAY);
-										g.fillRect((int) ((i - visible.start) * width), rec.y + (line - 1) * lineHeight,
-												(int) Math.ceil(width), lineHeight);
+										g.fillRect((int) ((i - visible.start) * width), rec.y + (line - 1) * lineHeight, (int) Math.ceil(width), lineHeight);
 										if (visible.length() < 100) {
 											Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
 											if (nt == '-')
 												g.setColor(Color.BLACK);
 											else
 												g.setColor(Configuration.getNucleotideColor(nt).brighter());
-											g.drawString("" + nt,
-													(int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)), rec.y
-															+ line * lineHeight - 2);
+											g.drawString("" + nt, (int) (((i - visible.start) * width - stringSize.getWidth() / 2) + (width / 2)), rec.y + line
+													* lineHeight - 2);
 										}
 									}
 								}
@@ -386,8 +389,17 @@ public class MultipleAlignmentTrack2 extends Track {
 						g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight, blockScreenEnd - blockScreenStart, lineHeight);
 
 					}
-
-					if (comparativeAnnotation && st != null) {
+					
+					
+					
+					if (comparativeAnnotation && st == null) {
+						Color or = Color.orange;
+						g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(), 100));
+						g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight, blockScreenEnd - blockScreenStart, lineHeight);
+					} else if (comparativeAnnotation && st != null && visible.length() >= maximumVisibleRange) {
+						g.setColor(Color.BLACK);
+						g.drawString("Zoom in to see comparative annotation", 15, yOffset + 10);
+					} else if (comparativeAnnotation && st != null && visible.length() < maximumVisibleRange) {
 						SequenceTranslator localTranslator = getSequenceTranslator(as);
 
 						if (localTranslator != null) {
@@ -442,10 +454,8 @@ public class MultipleAlignmentTrack2 extends Track {
 										featureStart = revtable[featureStart];
 										featureEnd = revtable[featureEnd] + 1;
 
-										int featureScreenStart = Convert.translateGenomeToScreen(featureStart + ab.start(), visible,
-												screenWidth);
-										int featureScreenEnd = Convert.translateGenomeToScreen(featureEnd + ab.start(), visible,
-												screenWidth);
+										int featureScreenStart = Convert.translateGenomeToScreen(featureStart + ab.start(), visible, screenWidth);
+										int featureScreenEnd = Convert.translateGenomeToScreen(featureEnd + ab.start(), visible, screenWidth);
 
 										if (featureScreenStart < blockScreenStart) {
 											featureScreenStart = blockScreenStart;
@@ -455,20 +465,19 @@ public class MultipleAlignmentTrack2 extends Track {
 										if (featureScreenEnd > blockScreenEnd)
 											featureScreenEnd = blockScreenEnd;
 
-										if (featureScreenEnd > featureScreenStart && featureScreenEnd >= 0
-												&& featureScreenStart <= screenWidth) {
+										if (featureScreenEnd > featureScreenStart && featureScreenEnd >= 0 && featureScreenStart <= screenWidth) {
 											Color c = Color.CYAN;
 											g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 80));
 											if (i % 2 == 0) {
-												g.fillRect(featureScreenStart, rec.y + (line - 1) * lineHeight + 3, featureScreenEnd
-														- featureScreenStart, lineHeight - 6);
+												g.fillRect(featureScreenStart, rec.y + (line - 1) * lineHeight + 3, featureScreenEnd - featureScreenStart,
+														lineHeight - 6);
 												if (visible.length() < 10000) {
 													g.setColor(Color.CYAN.darker().darker());
 													g.drawString(FeatureUtils.displayName(f), (int) featureScreenStart, rec.y + (line) * lineHeight - 4);
 												}
 											} else {
-												g.drawLine(featureScreenStart, rec.y + (line - 1) * lineHeight + lineHeight/2, featureScreenEnd, rec.y
-														+ (line - 1) * lineHeight + lineHeight/2);
+												g.drawLine(featureScreenStart, rec.y + (line - 1) * lineHeight + lineHeight / 2, featureScreenEnd, rec.y
+														+ (line - 1) * lineHeight + lineHeight / 2);
 											}
 
 										}
@@ -477,10 +486,6 @@ public class MultipleAlignmentTrack2 extends Track {
 								}
 
 							}
-						} else {
-							Color or = Color.orange;
-							g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(), 100));
-							g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight, blockScreenEnd - blockScreenStart, lineHeight);
 						}
 					}
 
@@ -515,7 +520,7 @@ public class MultipleAlignmentTrack2 extends Track {
 			}
 			/* Mouse is over a block and there is some information to display */
 			if (mh != null) {
-
+				boolean fullNames = Configuration.getBoolean("maf:extendedNames");
 				HashMap<String, AbstractAlignmentSequence> shown = new HashMap<String, AbstractAlignmentSequence>();
 				if (showAll) {
 					for (String e : ma.species()) {
@@ -526,6 +531,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 				for (AbstractAlignmentSequence as : mh.ab) {
 					shown.put(as.getName(), as);
+//					System.out.println("AS: "+as.getName());
 
 				}
 
@@ -539,7 +545,7 @@ public class MultipleAlignmentTrack2 extends Track {
 					if (as != null)
 						arr[ordering.getForward(e)] = shown.get(e).toString();
 
-					arr[ordering.getForward(e)] = chopchop(arr[ordering.getForward(e)]);
+					arr[ordering.getForward(e)] = fullNames ? arr[ordering.getForward(e)] : chopchop(arr[ordering.getForward(e)]);
 
 					Rectangle2D stringSize = g.getFontMetrics().getStringBounds(arr[ordering.getForward(e)], g);
 					size[ordering.getForward(e)] = stringSize;
@@ -577,37 +583,44 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	private Set<AbstractAlignmentSequence> translatorQueue = Collections.synchronizedSet(new HashSet<AbstractAlignmentSequence>());
 
-	private SequenceTranslator getSequenceTranslator(final AbstractAlignmentSequence ab) {
+	private synchronized SequenceTranslator getSequenceTranslator(final AbstractAlignmentSequence ab) {
 		final String key = ab.getName() + ":" + ab.start() + "-" + ab.end();
 		SequenceTranslator st = stCache.get(key);
 		if (st == null) {
-			GenomeViewScheduler.submit(new Task(new Location(ab.start(), ab.end())) {
-				private boolean cancelled = false;
+//			System.out.println(" Mafix load/cache: " + GenomeViewScheduler.queueLength() + "\t" + stCache.size());
+//			System.out.println("\t"+translatorQueue);
+			
+			if (!translatorQueue.contains(ab)) {
+				translatorQueue.add(ab);
 
-				public void cancel() {
-					cancelled = true;
-				}
+				GenomeViewScheduler.submit(new Task(new Location(ab.start(), ab.end())) {
+					private boolean cancelled = false;
 
-				public boolean isCancelled() {
-					return cancelled;
-				}
+					public void cancel() {
+						translatorQueue.remove(ab);
+						cancelled = true;
+					}
 
-				@Override
-				public void run() {
-					if (cancelled)
-						return;
-					if (!translatorQueue.contains(ab)) {
-						translatorQueue.add(ab);
+					public boolean isCancelled() {
+						return cancelled;
+					}
+
+					@Override
+					public void run() {
+						translatorQueue.remove(ab);
+						if (cancelled)
+							return;
+
 						// System.out.println("Calculating new translator " +
 						// stCache.size());
 						SequenceTranslator tmp = new SequenceTranslator(ab);
 						stCache.put(key, tmp);
-						translatorQueue.remove(ab);
-						model.refresh();
-					}
 
-				}
-			});
+						model.refresh();
+
+					}
+				});
+			}
 			return null;
 
 		}

@@ -16,6 +16,9 @@ import be.abeel.concurrency.DaemonThreadFactory;
  */
 public class GenomeViewScheduler {
 
+	public static int queueLength(){
+		return gvs.size();
+	}
 	static PriorityBlockingQueue<Runnable> gvs;
 	static {
 		gvs = new PriorityBlockingQueue<Runnable>();

@@ -261,6 +261,10 @@ public class ConfigurationDialog extends JDialog {
 			this.add(ConfigBox.booleanInstance(model, "maf:enableAnnotation", MessageManager.getString("configdialog.enable_comparative_annotations")), gc);
 			gc.gridy++;
 			this.add(ConfigBox.stringInstance("maf:annotationType", MessageManager.getString("configdialog.annotation_comparative")), gc);
+			gc.gridy++;
+			this.add(ConfigBox.integerInstance("maf:maximumVisibleRange", MessageManager.getString("configdialog.maximum_visible_range")), gc);
+			gc.gridy++;
+			this.add(ConfigBox.booleanInstance(model,"maf:extendedNames", MessageManager.getString("configdialog.extended_names")), gc);
 		}
 	}
 
