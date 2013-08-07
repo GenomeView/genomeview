@@ -17,8 +17,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -32,9 +30,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
-import org.apache.commons.io.FileExistsException;
-import org.apache.commons.io.FileUtils;
-
 import net.miginfocom.swing.MigLayout;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.ClientHttpUpload;
@@ -47,6 +42,12 @@ import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.parser.EMBLParser;
 import net.sf.jannot.parser.GFF3Parser;
 import net.sf.jannot.parser.Parser;
+
+import org.apache.commons.io.FileExistsException;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.abeel.io.ExtensionManager;
 import be.abeel.net.URIFactory;
 
@@ -111,6 +112,12 @@ public class SaveDialog extends JDialog {
 					out.add(item.data);
 			}
 			return out;
+		}
+		
+		public void selectAllItems(boolean select){
+			for (TCheckBox item : dss){
+				item.setSelected(select);
+			}
 		}
 	}
 
@@ -188,9 +195,24 @@ public class SaveDialog extends JDialog {
 		JButton selectAllEntries = new JButton(MessageManager.getString("savedialog.select_all_entries"));
 		add(selectAllEntries);
 
+		
+		selectAllEntries.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				entriesList.selectAllItems(true);				
+			}
+			
+		});
+		
 		JButton selectNoneEntries = new JButton(MessageManager.getString("savedialog.deselect_all_entries"));
 		add(selectNoneEntries);
-
+		selectNoneEntries.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				entriesList.selectAllItems(false);
+				
+			}
+		});
 	
 		entriesList.setEnabled(entrySelectionEnabledFlag);
 		selectAllEntries.setEnabled(entrySelectionEnabledFlag);
@@ -213,6 +235,22 @@ public class SaveDialog extends JDialog {
 		typesList.setEnabled(typeSelectionEnabledFlag);
 		selectAllTypes.setEnabled(typeSelectionEnabledFlag);
 		selectNoneTypes.setEnabled(typeSelectionEnabledFlag);
+		
+		
+		selectAllTypes.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				typesList.selectAllItems(true);
+				
+			}
+		});
+		selectNoneTypes.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				typesList.selectAllItems(false);
+				
+			}
+		});
 		
 		/*
 		 * Actions
