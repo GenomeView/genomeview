@@ -358,6 +358,8 @@ public class SaveDialog extends JDialog {
 
 						} catch (Exception ex) {
 							ex.printStackTrace();
+						} finally {
+							model.messageModel().setStatusBarMessage(null);
 						}
 						// h.dispose();
 					}
