@@ -9,12 +9,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
@@ -24,7 +24,6 @@ import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
-import net.sf.jannot.Type;
 
 /**
  * Dialog window to create a new feature from a selected Location on the genome.
@@ -69,6 +68,7 @@ public class NewFeatureDialog extends JDialog {
                 f.setLocation(loc);
                 f.setType(typeCombo.getTerm());
                 f.setStrand(strandSelection.getStrand());
+                setRandomFeatureID(f);
                 MemoryFeatureAnnotation fa = model.vlm.getSelectedEntry().getMemoryAnnotation(f.type());
 				fa.add(f);
 				model.selectionModel().setSelectedRegion(null);
@@ -94,5 +94,17 @@ public class NewFeatureDialog extends JDialog {
         pack();
         StaticUtils.center(model.getGUIManager().getParent(),this);
 
+    }
+    
+    /**
+     * Generate and set a temporary ID, to make sure multi-exon CDS's have a common ID to refer to.
+     * 
+     * @param feat
+     */
+    private void setRandomFeatureID(Feature feat){
+    	Random randomizer = new Random();
+    	int r = randomizer.nextInt(10000000);
+    	String rand = String.format("%08d", r);
+    	feat.setQualifier("ID", "Random_ID_"+rand);
     }
 }
