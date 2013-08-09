@@ -100,9 +100,12 @@ public class OpenDialog extends JDialog {
 		configButton(url);
 		gp.add(url, gp.gc);
 		gp.gc.gridx++;
+		/* DISABLED GS button for now
 		JButton genomespace = new JButton(MessageManager.getString("opendialog.genomespace"), Icons.get("genomespace.png"));
 		configButton(genomespace);
 		gp.add(genomespace, gp.gc);
+		*/
+		
 //		JButton das = new JButton("DAS(exp)", Icons.get("das.png"));
 //		configButton(das);
 //		gp.add(das, gp.gc);
@@ -220,6 +223,7 @@ public class OpenDialog extends JDialog {
 			}
 		});
 
+		/* DISABLED FOR NOW 
 		genomespace.addActionListener(new ActionListener() {
 
 			@Override
@@ -281,7 +285,8 @@ public class OpenDialog extends JDialog {
 				}
 
 			}
-		});		
+		});	
+		*/	
 //		das.addActionListener(new ActionListener() {
 //
 //			@Override
