@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -72,7 +73,8 @@ class DropTransferHandler extends TransferHandler {
 				if (flavor.equals(DataFlavor.javaFileListFlavor)) {
 					System.out.println("importData: FileListFlavor");
 
-					List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+					List<File> l = (List<File>)t.getTransferData(DataFlavor.javaFileListFlavor);
+					
 					Iterator<File> iter = l.iterator();
 					while (iter.hasNext()) {
 						File file = (File) iter.next();
@@ -85,12 +87,16 @@ class DropTransferHandler extends TransferHandler {
 					}
 					return true;
 				} else if (flavor.equals(DataFlavor.stringFlavor)){
-					String s =(String) t.getTransferData(DataFlavor.stringFlavor);
-	        		System.out.println("String dropped: "+s);
-	        		if (s.endsWith(".jar")){
-	        			PluginLoader.installPlugin(new URL(s), Configuration.getPluginDirectory());	        			
-	        		} else {
-	        			DataSourceHelper.load(model,new Locator(s));
+					String initString =(String) t.getTransferData(DataFlavor.stringFlavor);
+	        		System.out.println("String dropped: "+initString);
+	        		String[] lines = initString.split(System.getProperty("line.separator"));
+	        		for (String s : lines){
+	        			System.out.println("String '"+s+"'");
+	        			if (s.endsWith(".jar")){
+	        				PluginLoader.installPlugin(new URL(s), Configuration.getPluginDirectory());	        			
+	        			} else {
+	        				DataSourceHelper.load(model,new Locator(s));
+	        			}
 	        		}
 	        		return true;
 				} else if (flavor.equals(urlFlavor)){
