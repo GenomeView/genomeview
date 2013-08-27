@@ -35,12 +35,13 @@ class DropTransferHandler extends TransferHandler {
 
 	private Model model;
 	private DataFlavor urlFlavor;
+	private DataFlavor uriFlavor;
 
 	public DropTransferHandler(Model model) {
 		this.model = model;
 		try { 
-			urlFlavor = 
-			new DataFlavor ("application/x-java-url; class=java.net.URL"); 
+			urlFlavor = new DataFlavor ("application/x-java-url;class=java.net.URL"); 
+			uriFlavor = new DataFlavor ("text/uri-list;class=java.lang.String");
 		} catch (ClassNotFoundException cnfe) { 
 			cnfe.printStackTrace( ); 
 		}
@@ -51,9 +52,10 @@ class DropTransferHandler extends TransferHandler {
 	@Override
 	public boolean canImport(JComponent arg0, DataFlavor[] flavors) {
 		Set<DataFlavor> accepted = new HashSet<DataFlavor>();
+		accepted.add(uriFlavor);                       //custom uri (string) flavor
+		accepted.add(urlFlavor);                       //custom url flavor
 		accepted.add(DataFlavor.javaFileListFlavor);   //data files
 		accepted.add(DataFlavor.stringFlavor);         //urls or even files on some systems
-		accepted.add(urlFlavor);                       //custom url flavor
 		
 		for (int i = 0; i < flavors.length; i++) {
 			if (accepted.contains(flavors[i])){
@@ -70,7 +72,38 @@ class DropTransferHandler extends TransferHandler {
 		for (int i = 0; i < flavors.length; i++) {
 			DataFlavor flavor = flavors[i];
 			try {
-				if (flavor.equals(DataFlavor.javaFileListFlavor)) {
+				if (flavor.equals(urlFlavor)){
+					URL url = (URL) t.getTransferData (urlFlavor);
+					System.out.println("URL dropped: "+url);
+					if (url.toString().endsWith(".jar")){
+						PluginLoader.installPlugin(url, Configuration.getPluginDirectory());	        			
+					} else {
+						DataSourceHelper.load(model,new Locator(url.toString()));
+					}
+					return true;
+				} else if (flavor.equals(uriFlavor)){
+					String uriString = (String) t.getTransferData (uriFlavor);
+					System.out.println("URI String dropped: "+uriString);
+					if (uriString.endsWith(".jar")){
+						PluginLoader.installPlugin(new URL(uriString), Configuration.getPluginDirectory());	        			
+					} else {
+						DataSourceHelper.load(model,new Locator(uriString));
+					}
+					return true;
+				} else if (flavor.equals(DataFlavor.stringFlavor)){
+					String initString =(String) t.getTransferData(DataFlavor.stringFlavor);
+					System.out.println("String dropped: "+initString);
+					String[] lines = initString.split(System.getProperty("line.separator"));
+					for (String s : lines){
+						System.out.println("String '"+s+"'");
+						if (s.endsWith(".jar")){
+							PluginLoader.installPlugin(new URL(s), Configuration.getPluginDirectory());	        			
+						} else {
+							DataSourceHelper.load(model,new Locator(s));
+						}
+					}
+					return true;
+				} else if (flavor.equals(DataFlavor.javaFileListFlavor)) {
 					System.out.println("importData: FileListFlavor");
 
 					List<File> l = (List<File>)t.getTransferData(DataFlavor.javaFileListFlavor);
@@ -85,29 +118,11 @@ class DropTransferHandler extends TransferHandler {
 							DataSourceHelper.load(model,new Locator(file.toString()));							
 						}
 					}
-					return true;
-				} else if (flavor.equals(DataFlavor.stringFlavor)){
-					String initString =(String) t.getTransferData(DataFlavor.stringFlavor);
-	        		System.out.println("String dropped: "+initString);
-	        		String[] lines = initString.split(System.getProperty("line.separator"));
-	        		for (String s : lines){
-	        			System.out.println("String '"+s+"'");
-	        			if (s.endsWith(".jar")){
-	        				PluginLoader.installPlugin(new URL(s), Configuration.getPluginDirectory());	        			
-	        			} else {
-	        				DataSourceHelper.load(model,new Locator(s));
-	        			}
-	        		}
-	        		return true;
-				} else if (flavor.equals(urlFlavor)){
-					URL url = (URL) t.getTransferData (urlFlavor);
-	        		System.out.println("URL dropped: "+url);
-	        		if (url.toString().endsWith(".jar")){
-	        			PluginLoader.installPlugin(url, Configuration.getPluginDirectory());	        			
-	        		} else {
-	        			DataSourceHelper.load(model,new Locator(url.toString()));
-	        		}
-	        		return true;
+					if (l.size() != 0){
+						return true;						
+					} else {
+						System.out.println("FileList was empty... (trying next flavor)");
+					}
 				} else {
 					System.out.println("Data rejected: " + flavor);
 					// Don't return; try next flavor.
