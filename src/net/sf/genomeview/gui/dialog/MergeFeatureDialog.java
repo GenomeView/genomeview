@@ -83,6 +83,11 @@ public class MergeFeatureDialog extends JDialog {
 
 		for (Feature f : set) {
 			String label=f.toString();
+			if (f.getQualifiersKeys().contains("Name")){
+				label = f.qualifier("Name") +" ("+label+")";
+			} else if (f.getQualifiersKeys().contains("ID")){
+				label = f.qualifier("ID")  +" ("+label+")";
+			}
 			if(label.length()>50)
 				label=label.substring(0, 50)+"...";
 			JRadioButton button = new JRadioButton(label);
