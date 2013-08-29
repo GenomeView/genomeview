@@ -24,9 +24,11 @@ import javax.swing.JOptionPane;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.MessageManager;
+import net.sf.genomeview.gui.dialog.TryAgainHandler;
 import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Location;
+import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
 import net.sf.nameservice.NameService;
@@ -42,15 +44,15 @@ import be.abeel.util.Config;
 public class Session {
 
 	public static Thread loadSession(Model model, String in) throws IOException {
-		log.debug("Loading session from String: "+in);
+		log.debug("Loading session from String: " + in);
 		if (in.startsWith("http://") || in.startsWith("https://")) {
 			try {
 				return loadSession(model, URIFactory.url(in));
 			} catch (MalformedURLException e) {
-				CrashHandler.showErrorMessage("Failed to load from URL: "+in, e);
+				CrashHandler.showErrorMessage("Failed to load from URL: " + in, e);
 				return null;
 			} catch (URISyntaxException e) {
-				CrashHandler.showErrorMessage("Failed to load from URL: "+in, e);
+				CrashHandler.showErrorMessage("Failed to load from URL: " + in, e);
 				return null;
 			}
 		} else {
@@ -59,13 +61,13 @@ public class Session {
 	}
 
 	public static Thread loadSession(Model model, File selectedFile) throws FileNotFoundException {
-		log.debug("Loading session from File: "+selectedFile);
+		log.debug("Loading session from File: " + selectedFile);
 		return loadSession(model, new FileInputStream(selectedFile));
 
 	}
 
 	public static Thread loadSession(Model model, URL url) throws IOException {
-		log.debug("Loading session from URL: "+url);
+		log.debug("Loading session from URL: " + url);
 		return loadSession(model, url.openStream());
 	}
 
@@ -76,15 +78,18 @@ public class Session {
 	}
 
 	/**
-	 * Asynchronous loading of a session file 
-	 * @param model model to load the session into
-	 * @param is inputstream that contains the session
+	 * Asynchronous loading of a session file
+	 * 
+	 * @param model
+	 *            model to load the session into
+	 * @param is
+	 *            inputstream that contains the session
 	 * @return thread loading the session
 	 */
 	private static Thread loadSession(final Model model, final InputStream is) {
 		model.messageModel().setStatusBarMessage(MessageManager.getString("session.preparing_load_session"));
 
-		Thread t=new Thread(new Runnable() {
+		Thread t = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -105,8 +110,9 @@ public class Session {
 							char firstchar = line.toUpperCase().charAt(0);
 
 							String[] arr = line.split("[: \t]", 2);
-							
-							model.messageModel().setStatusBarMessage(MessageManager.formatMessage("session.loading_session_current_file_line", new Object[]{arr[1]}));
+
+							model.messageModel().setStatusBarMessage(
+									MessageManager.formatMessage("session.loading_session_current_file_line", new Object[] { arr[1] }));
 							SessionInstruction si = null;
 							try {
 								si = SessionInstruction.valueOf(arr[0].toUpperCase());
@@ -123,11 +129,22 @@ public class Session {
 									case U:
 									case F:
 									case DATA:
+										final Locator loc = new Locator(prefix + arr[1]);
 										try {
-											DataSourceHelper.load(model, new Locator(prefix + arr[1]));
+											DataSourceHelper.load(model, loc);
 										} catch (RuntimeException re) {
+											TryAgainHandler.ask(model, "Something went wrong while loading line: " + line
+													+ "\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.", new Runnable() {
+												public void run() {
+													try {
+														DataSourceHelper.load(model, loc);
+													} catch (Exception e) {
+														throw new RuntimeException(e);
+													}
+												}
+											});
 											log.error("Something went wrong while loading line: " + line
-													+ "\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.", re);
+													+ "\n\tfrom the session file.\n\tAsked the user to try again.", re);
 										}
 										break;
 									case C:
@@ -180,11 +197,11 @@ public class Session {
 			Locator l = ds.getLocator();
 			out.println("DATA:" + l);
 		}
-		for(String key:Configuration.keySet()){
-			out.println("OPTION:"+key+"="+Configuration.get(key));
-			
+		for (String key : Configuration.keySet()) {
+			out.println("OPTION:" + key + "=" + Configuration.get(key));
+
 		}
-		
+
 		String e = model.vlm.getSelectedEntry().getID();
 		Location l = model.vlm.getAnnotationLocationVisible();
 		out.println("LOCATION:" + e + ":" + l.start + ":" + l.end);
