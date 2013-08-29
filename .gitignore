@@ -3,3 +3,4 @@ bin/
 *.class
 devtools/keystore.jks
 .classpath
+.sf-testing-cache
