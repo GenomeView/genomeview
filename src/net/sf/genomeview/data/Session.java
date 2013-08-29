@@ -42,6 +42,7 @@ import be.abeel.util.Config;
 public class Session {
 
 	public static Thread loadSession(Model model, String in) throws IOException {
+		log.debug("Loading session from String: "+in);
 		if (in.startsWith("http://") || in.startsWith("https://")) {
 			try {
 				return loadSession(model, URIFactory.url(in));
@@ -58,11 +59,13 @@ public class Session {
 	}
 
 	public static Thread loadSession(Model model, File selectedFile) throws FileNotFoundException {
+		log.debug("Loading session from File: "+selectedFile);
 		return loadSession(model, new FileInputStream(selectedFile));
 
 	}
 
 	public static Thread loadSession(Model model, URL url) throws IOException {
+		log.debug("Loading session from URL: "+url);
 		return loadSession(model, url.openStream());
 	}
 
