@@ -177,6 +177,7 @@ public class SaveDialog extends JDialog {
 			parserList.setEnabled(false);
 		}
 		add(parserList);
+		
 
 		/*
 		 * Include sequence
@@ -185,6 +186,22 @@ public class SaveDialog extends JDialog {
 		final JCheckBox includeSequence = new JCheckBox("Include sequence");
 		includeSequence.setEnabled(enableIncludeSequenceFlag);
 		add(includeSequence);
+		
+		Parser p = (Parser)parserList.getSelectedItem();
+		if (p instanceof GFF3Parser){
+			includeSequence.setEnabled(false);					
+		}
+		parserList.addActionListener(new ActionListener() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Parser p = (Parser)parserList.getSelectedItem();
+				if (p instanceof GFF3Parser){
+					includeSequence.setEnabled(false);					
+				} else {
+					includeSequence.setEnabled(true);					
+				}
+			}
+		});
 
 		/* Entries list */
 		addSeparator(MessageManager.getString("savedialog.select_entries_to_save"));
