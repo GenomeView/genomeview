@@ -68,7 +68,6 @@ public class NewFeatureDialog extends JDialog {
                 f.setLocation(loc);
                 f.setType(typeCombo.getTerm());
                 f.setStrand(strandSelection.getStrand());
-                setRandomFeatureID(f);
                 MemoryFeatureAnnotation fa = model.vlm.getSelectedEntry().getMemoryAnnotation(f.type());
 				fa.add(f);
 				model.selectionModel().setSelectedRegion(null);
@@ -96,15 +95,4 @@ public class NewFeatureDialog extends JDialog {
 
     }
     
-    /**
-     * Generate and set a temporary ID, to make sure multi-exon CDS's have a common ID to refer to.
-     * 
-     * @param feat
-     */
-    private void setRandomFeatureID(Feature feat){
-    	Random randomizer = new Random();
-    	int r = randomizer.nextInt(10000000);
-    	String rand = String.format("%08d", r);
-    	feat.setQualifier("ID", "Random_ID_"+rand);
-    }
 }

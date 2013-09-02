@@ -300,6 +300,9 @@ public class SaveDialog extends JDialog {
 									((EMBLParser) parser).storeSequence = true;
 
 							}
+							if (parser instanceof GFF3Parser){
+								((GFF3Parser)parser).setAssureIDs(true);
+							}
 							File tmp = File.createTempFile("GV_", ".save");
 							tmp.deleteOnExit();
 
@@ -423,4 +426,6 @@ public class SaveDialog extends JDialog {
 		StaticUtils.center(model.getGUIManager().getParent(), this);
 		setVisible(true);
 	}
+	
+	
 }
