@@ -50,7 +50,6 @@ public class EscapeDialog extends JDialog {
 	private void init(){
 		ActionListener actionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
-				System.out.println("Catch ESC");
 				setVisible(false);
 			}
 		};
