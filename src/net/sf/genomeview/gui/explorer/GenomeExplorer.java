@@ -28,6 +28,7 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.genomeview.gui.components.EscapeDialog;
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
 
@@ -36,7 +37,7 @@ import be.abeel.net.URIFactory;
  * @author Thomas Abeel
  * 
  */
-class GenomeExplorer extends JDialog {
+class GenomeExplorer extends EscapeDialog {
 
 	private static final long serialVersionUID = -7057835080241255157L;
 	private Model model;
