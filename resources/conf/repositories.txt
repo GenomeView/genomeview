@@ -1,1 +1,1 @@
-http://genomeview.org/instances/public.tsv
+http://genomeview.org/resources/public.tsv
