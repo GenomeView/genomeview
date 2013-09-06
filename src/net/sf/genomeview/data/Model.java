@@ -189,7 +189,9 @@ public class Model extends Observable implements Observer {
 		this.exitRequested = true;
 		try {
 			if (Configuration.getBoolean("session:enableRememberLast"))
-				Session.save(new File(Configuration.getDirectory(), "previous.gvs"), this);
+				/* Only store session if there is something to store */
+				if(this.loadedSources().size()>0)
+					Session.save(new File(Configuration.getDirectory(), "previous.gvs"), this);
 		} catch (IOException e) {
 			logger.error("Problem saving last session", e);
 		}
