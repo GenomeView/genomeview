@@ -13,7 +13,7 @@ import org.junit.Test;
  * @author Thomas Abeel
  *
  */
-public class TestSession {
+public class InteractiveTestSession {
 
 	
 	

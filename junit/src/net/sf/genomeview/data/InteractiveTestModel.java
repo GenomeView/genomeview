@@ -7,9 +7,6 @@ package net.sf.genomeview.data;
 import java.util.concurrent.ExecutionException;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.jannot.EntrySet;
-import net.sf.jannot.exception.ReadFailedException;
-import net.sf.jannot.source.DataSource;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,7 +16,7 @@ import org.junit.Test;
  * @author Thomas Abeel
  * 
  */
-public class TestModel {
+public class InteractiveTestModel {
 
 	String v=Configuration.get("version");
 	

@@ -47,7 +47,7 @@ import support.DataManager;
  * java.io.BufferedReader.readLine(BufferedReader.java:382) at
  * be.abeel.io.LineIterator.<init>(LineIterator.java:114)
  */
-public class TestSessionURL {
+public class InteractiveTestSessionURL {
 
 	@Test
 	public void testSessionURL() {
