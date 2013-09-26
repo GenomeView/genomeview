@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="2300" />
+	<property name="version" value="2350" />
 	<property name="src" value="src" />
 	<property name="res" value="resources" />
 	<property name="build" value="build" />
@@ -92,8 +92,8 @@
 		<copy todir="${build}">
 		    <fileset dir="${res}">
 		        <include name="**/*.conf" />
-				<include name="/conf/*.txt" />
-				<include name="/conf/*.tsv" />
+				<include name="conf/*.txt" />
+				<include name="conf/*.tsv" />
 		    </fileset>
 			<fileset dir="${src}">
 				
