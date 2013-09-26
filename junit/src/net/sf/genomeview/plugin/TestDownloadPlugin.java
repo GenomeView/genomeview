@@ -16,6 +16,7 @@ public class TestDownloadPlugin {
 	
 	@Test
 	public void testDownloadJar(){
+		/* FIXME -!!! Hardcoded paths
 		String urlString = "http://bioinformatics.psb.ugent.be/img/splash/beg_logo.png";
 		File toDir = new File("/home/thpar/temp_gv");
 		
@@ -34,11 +35,13 @@ public class TestDownloadPlugin {
 		} catch (IOException e){
 			e.printStackTrace();
 		}
+		*/
 		
 	}
 	
 	@Test
 	public void testCopyJar(){
+		/* FIXME -!!! Hardcoded paths
 		String origString = "/home/thpar/curationassistant-0.1.jar";
 		File toDir = new File("/home/thpar/temp_gv");
 		
@@ -57,6 +60,8 @@ public class TestDownloadPlugin {
 		} catch (IOException e){
 			e.printStackTrace();
 		}
+		*/
+		
 		
 	}
 }

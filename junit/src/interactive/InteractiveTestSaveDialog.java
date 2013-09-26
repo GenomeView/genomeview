@@ -1,4 +1,4 @@
-package net.sf.genomeview.gui.dialog;
+package interactive;
 
 import java.io.IOException;
 
@@ -6,10 +6,11 @@ import junit.framework.Assert;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
+import net.sf.genomeview.gui.dialog.SaveDialog;
 
 import org.junit.Test;
 
-public class TestSaveDialog {
+public class InteractiveTestSaveDialog {
 
 	@Test
 	public void testSaveDialog1(){

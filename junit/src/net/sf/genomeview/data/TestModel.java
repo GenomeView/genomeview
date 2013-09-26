@@ -3,8 +3,10 @@
  */
 package net.sf.genomeview.data;
 
+
 import java.util.concurrent.ExecutionException;
 
+import net.sf.genomeview.core.Configuration;
 import net.sf.jannot.EntrySet;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
@@ -19,20 +21,22 @@ import org.junit.Test;
  */
 public class TestModel {
 
-	class TModel extends Model{
-		public TModel(String id) {
-			super(id);
+	String v=Configuration.get("version");
 	
-		}
-	}
-	
+//	static class TModel extends Model{
+//		public TModel(String id) {
+//			super(id);
+//	
+//		}
+//	}
+//	
 	
 
 	@Test
 	public void testClearEntries() {
 		Model model = new Model(null);
 		try {
-			TestDataSource ds = new TestDataSource();
+			TDataSource ds = new TDataSource();
 			ReadWorker rw = new ReadWorker(ds, model);
 			rw.execute();
 			rw.get();
@@ -49,39 +53,5 @@ public class TestModel {
 
 	}
 
-	class TestDataSource extends DataSource {
-
-		protected TestDataSource() {
-			super(null);
-			// TODO Auto-generated constructor stub
-		}
-
-		@Override
-		public EntrySet read(EntrySet add) throws ReadFailedException {
-			for (int i = 0; i < 5; i++)
-				add.getOrCreateEntry("entry" + i);
-			return add;
-		}
-
-		@Override
-		public void finalize() {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public boolean isIndexed() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public long size() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
 	
-
-	}
 }

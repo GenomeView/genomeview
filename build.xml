@@ -141,4 +141,102 @@
 
 	</target>
 
+	
+	<target name="junit" >
+  		<delete
+            dir="build.test"
+            failonerror="false" />
+        <mkdir dir="build.test" />
+
+        <mkdir dir="build.test/images" />
+		<copy todir="build.test/images">
+			<fileset dir="${res}/images" />
+		</copy>
+		<copy todir="build.test/lang">
+			<fileset dir="${res}/lang" />
+		</copy>
+		<copy todir="build.test">
+		    <fileset dir="${res}">
+		        <include name="**/*.conf" />
+				<include name="/conf/*.txt" />
+				<include name="/conf/*.tsv" />
+		    </fileset>
+			<fileset dir="${src}">
+				
+				<include name="org/java/**/*.properties" />
+				<include name="org/java/**/*.dtd" />
+			</fileset>
+		</copy>
+
+		
+
+		<copy file="genomeview.properties" todir="build.test" />
+		<copy file="${res}/plugin.xml" todir="build.test" />
+
+        <javac
+            debug="true"
+            debuglevel="lines,vars,source"
+            destdir="build.test"
+            source="1.6"
+            target="1.6" >
+
+            <src path="${src}" />
+
+            <src path="junit/src" />
+
+            <classpath>
+
+                <fileset dir="lib/" >
+
+                    <include name="*.jar" />
+                </fileset>
+
+                <fileset dir="lib_compile/" >
+
+                    <include name="*.jar" />
+                </fileset>
+            </classpath>
+        </javac>
+        <!-- <taskdef name="unit-lib" classpath="" /> -->
+
+        <junit
+            errorProperty="test.failed"
+            failureProperty="test.failed"
+            fork="no" >
+
+            <formatter type="plain" />
+
+            <classpath>
+
+                <fileset dir="lib/" >
+
+                    <include name="*.jar" />
+                </fileset>
+
+                <fileset dir="lib_compile/" >
+
+                    <include name="*.jar" />
+                </fileset>
+
+                <pathelement location="build.test/" />
+            </classpath>
+
+            <batchtest>
+
+                <fileset dir="build.test" >
+
+                    <include name="**/Test*.class" />
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <fail
+            if="test.failed"
+            message="Tests failed. Please see test reports" />
+		<echo message="Tests have complete successfully!"/>
+        <delete
+            dir="build.test"
+            failonerror="false" />
+    </target>
+	
 </project>
