@@ -130,7 +130,6 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 
 	@Override
 	public void dataReady(Location currentVisible, List<SAMRecord> reads) {
-
 		RenderingMetaData newMeta = new RenderingMetaData();
 		int maxReads = Configuration.getInt("shortread:maxReads");
 
@@ -331,7 +330,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		}
 
 		/* Crop buffered image if not everything is needed */
-		int actualHeight = lines * readLineHeight;
+		int actualHeight = (lines+1)* readLineHeight;
 		if (visibleReadCount == 0||actualHeight==0) {
 			g.setColor(Color.BLACK);
 
