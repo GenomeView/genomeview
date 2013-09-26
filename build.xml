@@ -71,7 +71,7 @@
 		<copy todir="${dist}">
 			
 		    <fileset dir=".">
-		        <include name="*.txt" />
+		        <include name="readme.txt" />
 		    </fileset>
 		    <fileset dir="legal/">
 		        <include name="*.txt" />
