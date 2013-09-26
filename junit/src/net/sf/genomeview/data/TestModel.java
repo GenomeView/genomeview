@@ -17,12 +17,16 @@ import org.junit.Test;
  * @author Thomas Abeel
  * 
  */
-public class TestModel extends Model {
+public class TestModel {
 
-	public TestModel(String id) {
-		super(id);
-		// TODO Auto-generated constructor stub
+	class TModel extends Model{
+		public TModel(String id) {
+			super(id);
+	
+		}
 	}
+	
+	
 
 	@Test
 	public void testClearEntries() {
