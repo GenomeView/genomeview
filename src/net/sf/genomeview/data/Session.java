@@ -105,71 +105,77 @@ public class Session {
 						model.clearEntries();
 						String prefix = "";
 						for (String line : it) {
-							if (line.startsWith("#") || line.isEmpty())
-								continue;
-							char firstchar = line.toUpperCase().charAt(0);
-
-							String[] arr = line.split("[: \t]", 2);
-
-							model.messageModel().setStatusBarMessage(
-									MessageManager.formatMessage("session.loading_session_current_file_line", new Object[] { arr[1] }));
-							SessionInstruction si = null;
 							try {
-								si = SessionInstruction.valueOf(arr[0].toUpperCase());
-							} catch (Exception e) {
-								log.warn("Could not parse: " + arr[0] + "\n Unknown instruction.\nCould not load session line: " + line, e);
-							}
+								if (line.startsWith("#") || line.isEmpty())
+									continue;
+								char firstchar = line.toUpperCase().charAt(0);
 
-							if (si != null) {
+								String[] arr = line.split("[: \t]", 2);
+								model.messageModel().setStatusBarMessage(
+										MessageManager.formatMessage("session.loading_session_current_file_line", new Object[] { arr[1] }));
+								SessionInstruction si = null;
 								try {
-									switch (si) {
-									case PREFIX:
-										prefix = arr[1];
-										break;
-									case U:
-									case F:
-									case DATA:
-										final Locator loc = new Locator(prefix + arr[1]);
-										try {
-											DataSourceHelper.load(model, loc);
-										} catch (RuntimeException re) {
-											TryAgainHandler.ask(model, "Something went wrong while loading line: " + line
-													+ "\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.", new Runnable() {
-												public void run() {
-													try {
-														DataSourceHelper.load(model, loc);
-													} catch (Exception e) {
-														throw new RuntimeException(e);
+									si = SessionInstruction.valueOf(arr[0].toUpperCase());
+								} catch (Exception e) {
+									log.warn("Could not parse: " + arr[0] + "\n Unknown instruction.\nCould not load session line: " + line, e);
+								}
+
+								if (si != null) {
+									try {
+										switch (si) {
+										case PREFIX:
+											prefix = arr[1];
+											break;
+										case U:
+										case F:
+										case DATA:
+											final Locator loc = new Locator(prefix + arr[1]);
+											try {
+												DataSourceHelper.load(model, loc);
+											} catch (RuntimeException re) {
+												TryAgainHandler.ask(model, "Something went wrong while loading line: " + line
+														+ "\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.", new Runnable() {
+													public void run() {
+														try {
+															DataSourceHelper.load(model, loc);
+														} catch (Exception e) {
+															throw new RuntimeException(e);
+														}
 													}
-												}
-											});
-											log.error("Something went wrong while loading line: " + line
-													+ "\n\tfrom the session file.\n\tAsked the user to try again.", re);
+												});
+												log.error("Something went wrong while loading line: " + line
+														+ "\n\tfrom the session file.\n\tAsked the user to try again.", re);
+											}
+											break;
+										case C:
+										case CONFIG:
+											Configuration.loadExtra(new Locator(prefix + arr[1]).stream());
+											// Configuration.loadExtra(URIFactory.url(arr[1]).openStream());
+											break;
+										case OPTION:
+											String[] ap = arr[1].split("=", 2);
+											Configuration.set(ap[0], ap[1]);
+											break;
+										case ALIAS:
+											String[] al = arr[1].split("=", 2);
+											NameService.addSynonym(al[1], al[0]);
+											break;
+										case PLUGIN:
+											PluginLoader.installPlugin(new Locator(prefix + arr[1]), Configuration.getSessionPluginDirectory());
+											break;
+										case LOCATION:
+											ExternalHelper.setPosition(arr[1], model);
+
 										}
-										break;
-									case C:
-									case CONFIG:
-										Configuration.loadExtra(new Locator(prefix + arr[1]).stream());
-										// Configuration.loadExtra(URIFactory.url(arr[1]).openStream());
-										break;
-									case OPTION:
-										String[] ap = arr[1].split("=", 2);
-										Configuration.set(ap[0], ap[1]);
-										break;
-									case ALIAS:
-										String[] al = arr[1].split("=", 2);
-										NameService.addSynonym(al[1], al[0]);
-										break;
-									case PLUGIN:
-										PluginLoader.installPlugin(new Locator(prefix + arr[1]), Configuration.getSessionPluginDirectory());
-										break;
-									case LOCATION:
-										ExternalHelper.setPosition(arr[1], model);
+									} catch (Exception e) {
+										CrashHandler.showErrorMessage("Problem while executing this instruction: " + line
+												+ "\nSkipping this line and continuing.", e);
 
 									}
-								} catch (Exception e) {
-									log.warn("Exception while executing this instruction: " + line + "\n Skipping this line and continuing.", e);
 								}
+							} catch (Exception e) {
+								CrashHandler.showErrorMessage("Problem while parsing this line: " + line + "\nSkipping this line and continuing.", e);
+
 							}
 
 						}

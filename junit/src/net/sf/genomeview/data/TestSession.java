@@ -16,6 +16,20 @@ import org.junit.Test;
 public class TestSession {
 
 	@Test
+	public void testSessionParser() throws FileNotFoundException{
+		Model model=new Model("TestModel");
+		Thread t=Session.loadSession(model, new File("junit/resource/brokensession1.gvs"));
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			Assert.fail();
+		}
+		
+	}
+	
+	@Test
 	public void testAlias() throws FileNotFoundException{
 		Model model=new Model("TestModel");
 		Thread t=Session.loadSession(model, new File("junit/resource/testsession.gvs"));
