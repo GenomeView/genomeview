@@ -13,13 +13,16 @@ import net.sf.jannot.source.Locator;
 
 import org.junit.Test;
 
+import support.DataManager;
+
 public class InteractiveTestIndex {
 	
 	@Test
 	public void testAutoIndex(){
-		File f=new File("u:/Users/Thomas/gv_work/index/tworead.bam");
+		File f= DataManager.file("tworead.bam");
 		try {
 			JFrame frame=new JFrame("dummy");
+			frame.pack();
 			frame.setVisible(true);
 			Model model=new Model("test");
 			model.getGUIManager().registerMainWindow(frame);
