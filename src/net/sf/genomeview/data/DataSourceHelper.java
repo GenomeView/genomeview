@@ -46,21 +46,24 @@ public class DataSourceHelper {
 		load(model, data, false);
 	}
 
-	public static void load(final Model model, Locator data, boolean wait) throws URISyntaxException, IOException,
-			ReadFailedException {
-		
-		/* Check whether data locator is session, if so, load as session and skip the rest */
-		if(data.getName().endsWith(".gvs")){
+	public static void load(final Model model, Locator data, boolean wait) throws URISyntaxException, IOException, ReadFailedException {
+
+		/*
+		 * Check whether data locator is session, if so, load as session and
+		 * skip the rest
+		 */
+		if (data.getName().endsWith(".gvs")) {
 			Session.loadSession(model, data.toString());
 			return;
 		}
-		
+
 		Locator index = null;
 
 		data.stripIndex();
 
 		if (!data.exists()) {
-			JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.formatMessage("datasourcehelper.data_missing_warn", new Object[]{data.getName()}),
+			JOptionPane.showMessageDialog(model.getGUIManager().getParent(),
+					MessageManager.formatMessage("datasourcehelper.data_missing_warn", new Object[] { data.getName() }),
 					MessageManager.getString("datasourcehelper.data_missing"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -68,11 +71,32 @@ public class DataSourceHelper {
 		if (!data.isWebservice())
 			index = IndexManager.getIndex(data);
 
+		/* Check for stale index */
+		if (index != null && index.lastModified() < data.lastModified()) {
+			if (IndexManager.canBuildIndex(data)) {
+				JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("datasourcehelper.index_outdated_warn_message"),
+						MessageManager.getString("datasourcehelper.index_outdated_warn_title"),JOptionPane.WARNING_MESSAGE);
+//				if (res == JOptionPane.YES_OPTION) {
+					index(model, data);
+//				}
+
+				return;
+
+			} else {
+				JOptionPaneX.showOkCancelDialog(model.getGUIManager().getParent(),
+						MessageManager.formatMessage("datasourcehelper.index_outdated_error_message", new Object[] { data.getName() }),
+						MessageManager.getString("datasourcehelper.index_outdated_error_title"), JOptionPane.ERROR_MESSAGE);
+
+			}
+
+			return;
+
+		}
+
 		if (data.requiresIndex() && index == null) {
 			if (IndexManager.canBuildIndex(data)) {
-				int res = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
-						MessageManager.getString("datasourcehelper.index_missing_warn"), MessageManager.getString("datasourcehelper.index_required"),
-						JOptionPane.YES_NO_OPTION);
+				int res = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(), MessageManager.getString("datasourcehelper.index_missing_warn"),
+						MessageManager.getString("datasourcehelper.index_required"), JOptionPane.YES_NO_OPTION);
 				if (res == JOptionPane.YES_OPTION) {
 					index(model, data);
 				}
@@ -80,7 +104,9 @@ public class DataSourceHelper {
 				return;
 
 			} else {
-				JOptionPaneX.showOkCancelDialog(model.getGUIManager().getParent(), MessageManager.formatMessage("datasourcehelper.couldnt_locate_index", new Object[]{data.getName()}), MessageManager.getString("datasourcehelper.index_missing"), JOptionPane.ERROR_MESSAGE);
+				JOptionPaneX.showOkCancelDialog(model.getGUIManager().getParent(),
+						MessageManager.formatMessage("datasourcehelper.couldnt_locate_index", new Object[] { data.getName() }),
+						MessageManager.getString("datasourcehelper.index_missing"), JOptionPane.ERROR_MESSAGE);
 
 			}
 
@@ -88,8 +114,7 @@ public class DataSourceHelper {
 		}
 
 		if (data.isWig()) {
-			int res = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
-					MessageManager.getString("datasourcehelper.wig_not_recommended_warn"),
+			int res = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(), MessageManager.getString("datasourcehelper.wig_not_recommended_warn"),
 					MessageManager.getString("datasourcehelper.wig_not_recommended"), JOptionPane.YES_NO_OPTION);
 			if (res == JOptionPane.YES_OPTION) {
 				convertWig2TDF(model, data);
@@ -100,51 +125,43 @@ public class DataSourceHelper {
 		if (index == null && data.supportsIndex() && data.length() > 5 * 1024 * 1024) {
 			if (IndexManager.canBuildIndex(data)) {
 				int res = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
-						MessageManager.formatMessage("datasourcehleper.create_index", new Object[]{data.getName()}), MessageManager.getString("datasourcehelper.index_missing"), JOptionPane.YES_NO_OPTION);
+						MessageManager.formatMessage("datasourcehleper.create_index", new Object[] { data.getName() }),
+						MessageManager.getString("datasourcehelper.index_missing"), JOptionPane.YES_NO_OPTION);
 				if (res == JOptionPane.YES_OPTION) {
 					index(model, data);
 					return;
 				}
 
-			} 
-			
-				if (data.isMaf() && !data.isBlockCompressed()) {
-					int res = JOptionPane
-							.showConfirmDialog(
-									model.getGUIManager().getParent(),
-									MessageManager.formatMessage("datasourcehelper.preprocessing_warn", new Object[]{data.getName()}),
-									MessageManager.getString("datasourcehelper.preprocessing_available"), JOptionPane.YES_NO_OPTION);
-					if (res == JOptionPane.YES_OPTION) {
-						mafprocess(model, data);
-						return;
-					}
-				} else {
-					/* It will silently try to load files up to 40 Mb */
-					if (data.length() > 40 * 1024 * 1024) {
-						boolean ok = JOptionPaneX
-								.showOkCancelDialog(
-										model.getGUIManager().getParent(),
-										MessageManager.formatMessage("datasourcehelper.load_big_file_no_index", new Object[]{data.getName()}),
-										MessageManager.getString("datasourcehelper.index_missing"), JOptionPane.WARNING_MESSAGE);
-						if (!ok)
-							return;
-					}
-				}
+			}
 
-			
+			if (data.isMaf() && !data.isBlockCompressed()) {
+				int res = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
+						MessageManager.formatMessage("datasourcehelper.preprocessing_warn", new Object[] { data.getName() }),
+						MessageManager.getString("datasourcehelper.preprocessing_available"), JOptionPane.YES_NO_OPTION);
+				if (res == JOptionPane.YES_OPTION) {
+					mafprocess(model, data);
+					return;
+				}
+			} else {
+				/* It will silently try to load files up to 40 Mb */
+				if (data.length() > 40 * 1024 * 1024) {
+					boolean ok = JOptionPaneX.showOkCancelDialog(model.getGUIManager().getParent(),
+							MessageManager.formatMessage("datasourcehelper.load_big_file_no_index", new Object[] { data.getName() }),
+							MessageManager.getString("datasourcehelper.index_missing"), JOptionPane.WARNING_MESSAGE);
+					if (!ok)
+						return;
+				}
+			}
 
 		} else if (index == null && data.length() > 50000000 && !(data.isTDF() || data.isBigWig())) {
-			JOptionPane
-					.showMessageDialog(
-							null,
-							MessageManager.formatMessage("datasourcehelper.large_file_warn", new Object[]{data.getName()}),
-							MessageManager.getString("datasourcehelper.large_file"), JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, MessageManager.formatMessage("datasourcehelper.large_file_warn", new Object[] { data.getName() }),
+					MessageManager.getString("datasourcehelper.large_file"), JOptionPane.WARNING_MESSAGE);
 		}
 		DataSource ds = DataSourceFactory.create(data, index);
 		if (ds instanceof AbstractStreamDataSource) {
 			AbstractStreamDataSource asd = ((AbstractStreamDataSource) ds);
 			if (asd.getParser() == null) {
-				Parser tmp = offerParserChoice(model,data);
+				Parser tmp = offerParserChoice(model, data);
 				if (tmp != null) {
 					asd.setParser(tmp);
 				} else
@@ -154,13 +171,11 @@ public class DataSourceHelper {
 					new BufferedInputStream(asd.getIos(), 512 * 1024)));
 
 		}
-		if (MemoryWidget.getAvailable()>0&& index == null && !data.isTDF() && !data.isBigWig() && data.length() > (0.75 * MemoryWidget.getAvailable())) {
+		if (MemoryWidget.getAvailable() > 0 && index == null && !data.isTDF() && !data.isBigWig() && data.length() > (0.75 * MemoryWidget.getAvailable())) {
 			System.out.println("Available mem: " + MemoryWidget.getAvailable());
-			JOptionPane
-					.showMessageDialog(
-							model.getGUIManager().getParent(),
-							MessageManager.formatMessage("datasourcehelper.memory_warn", new Object[]{data.getName()}),
-							MessageManager.getString("datasourcehelper.not_enough_memory"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(model.getGUIManager().getParent(),
+					MessageManager.formatMessage("datasourcehelper.memory_warn", new Object[] { data.getName() }),
+					MessageManager.getString("datasourcehelper.not_enough_memory"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -215,7 +230,7 @@ public class DataSourceHelper {
 				public void run() {
 					try {
 						Configuration.set("lastDirectory", files.getParentFile());
-						File extFile=ExtensionManager.extension(files, "tdf");
+						File extFile = ExtensionManager.extension(files, "tdf");
 						ConvertWig2TDF.convertWig2TDF(data, extFile);
 						Locator mafdata = new Locator(extFile.toString());
 						log.info("Load newly create tdf file as: " + mafdata);
@@ -247,8 +262,7 @@ public class DataSourceHelper {
 							if (f.isDirectory())
 								return true;
 
-							if (f.getName().toLowerCase().endsWith("maf")
-									|| f.getName().toLowerCase().endsWith("maf.gz")
+							if (f.getName().toLowerCase().endsWith("maf") || f.getName().toLowerCase().endsWith("maf.gz")
 									|| f.getName().toLowerCase().endsWith("maf.bgz")) {
 								return true;
 							}
@@ -272,17 +286,14 @@ public class DataSourceHelper {
 							Configuration.set("lastDirectory", files.getParentFile());
 							File file = ExtensionManager.extension(files, "maf.bgz");
 
-							ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(model.getGUIManager()
-									.getParent(),
-									MessageManager.getString("datasourcehelper.compressing_maf_file"), data
-											.stream());
+							ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(model.getGUIManager().getParent(), MessageManager
+									.getString("datasourcehelper.compressing_maf_file"), data.stream());
 							pmis.getProgressMonitor().setMaximum((int) data.length());
 							MafixFactory.generateBlockZippedFile(pmis, file);
 
 							SeekableStream is = new SeekableFileStream(file);
-							SeekableProgressStream spmis = new SeekableProgressStream(
-									model.getGUIManager().getParent(),
-									MessageManager.getString("datasourcehelper.indexing_maf_file"), is);
+							SeekableProgressStream spmis = new SeekableProgressStream(model.getGUIManager().getParent(), MessageManager
+									.getString("datasourcehelper.indexing_maf_file"), is);
 							spmis.getProgressMonitor().setMaximum((int) file.length());
 							MafixFactory.generateIndex(spmis, new File(file + ".mfi"));
 							Locator mafdata = new Locator(file.toString());
@@ -307,6 +318,12 @@ public class DataSourceHelper {
 
 	}
 
+	/**
+	 * Will try to create an index an reload the file
+	 * 
+	 * @param model
+	 * @param prep
+	 */
 	private static void index(final Model model, final Locator prep) {
 
 		// final Locator prep = data;
@@ -337,10 +354,9 @@ public class DataSourceHelper {
 
 	}
 
-	private static Parser offerParserChoice(Model model,Locator l) {
-		Parser p = (Parser) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-				MessageManager.getString("datasourcehelper.couldnt_detect_file"), MessageManager.getString("datasourcehelper.parser_detection"),
-				JOptionPane.QUESTION_MESSAGE, null, Parser.parsers(l), Parser.parsers(l)[0]);
+	private static Parser offerParserChoice(Model model, Locator l) {
+		Parser p = (Parser) JOptionPane.showInputDialog(model.getGUIManager().getParent(), MessageManager.getString("datasourcehelper.couldnt_detect_file"),
+				MessageManager.getString("datasourcehelper.parser_detection"), JOptionPane.QUESTION_MESSAGE, null, Parser.parsers(l), Parser.parsers(l)[0]);
 		return p;
 	}
 }
