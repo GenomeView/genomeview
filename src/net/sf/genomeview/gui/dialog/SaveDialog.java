@@ -47,7 +47,6 @@ import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import be.abeel.io.ExtensionManager;
 import be.abeel.net.URIFactory;
 
@@ -340,40 +339,47 @@ public class SaveDialog extends JDialog {
 									throw new SaveFailedException("IOException");
 								}
 							} else {
-								File out = new File(location);
-								if (parser instanceof GFF3Parser)
-									out = ExtensionManager.extension(out, "gff");
-
-								if (parser instanceof EMBLParser)
-									out = ExtensionManager.extension(out, "embl");
-
-								boolean tryToSave = true;
-								while (tryToSave){
-									try {
-										FileUtils.moveFile(tmp, out);
-										JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("savedialog.save_succeeded"));
-										tryToSave = false;
-									} catch (FileExistsException fee){
-										int answer = JOptionPane.showOptionDialog(model.getGUIManager().getParent(),
-												MessageManager.getString("savedialog.file_exists"),
-												MessageManager.getString("savedialog.file_exists_title"),
-												JOptionPane.YES_NO_OPTION, 
-												JOptionPane.QUESTION_MESSAGE,
-												null, 
-												null, null);
-										if (answer==JOptionPane.YES_OPTION){
-											out.delete();
-										} else {
+								if ((location==null) || (location.trim().length()==0)){
+									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), 
+												MessageManager.getString("savedialog.provided_path_emtpy"),
+												MessageManager.getString("savedialog.save_failed"),
+												JOptionPane.ERROR_MESSAGE);
+								}else{
+									File out = new File(location);
+									if (parser instanceof GFF3Parser)
+										out = ExtensionManager.extension(out, "gff");
+	
+									if (parser instanceof EMBLParser)
+										out = ExtensionManager.extension(out, "embl");
+	
+									boolean tryToSave = true;
+									while (tryToSave){
+										try {
+											FileUtils.moveFile(tmp, out);
+											JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("savedialog.save_succeeded"));
 											tryToSave = false;
+										} catch (FileExistsException fee){
+											fee.printStackTrace();
+											int answer = JOptionPane.showOptionDialog(model.getGUIManager().getParent(),
+													MessageManager.getString("savedialog.file_exists"),
+													MessageManager.getString("savedialog.file_exists_title"),
+													JOptionPane.YES_NO_OPTION, 
+													JOptionPane.QUESTION_MESSAGE,
+													null, 
+													null, null);
+											if (answer==JOptionPane.YES_OPTION){
+												out.delete();
+											} else {
+												tryToSave = false;
+											}
+										} catch (IOException e) {
+											JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("savedialog.save_failed"));
+											tryToSave = false;
+											e.printStackTrace();
 										}
-									} catch (IOException e) {
-										JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("savedialog.save_failed"));
-										tryToSave = false;
-										e.printStackTrace();
 									}
 								}
 							}
-
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						} finally {
