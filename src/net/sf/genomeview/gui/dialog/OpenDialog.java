@@ -100,11 +100,9 @@ public class OpenDialog extends JDialog {
 		configButton(url);
 		gp.add(url, gp.gc);
 		gp.gc.gridx++;
-		/* DISABLED GS button for now
 		JButton genomespace = new JButton(MessageManager.getString("opendialog.genomespace"), Icons.get("genomespace.png"));
 		configButton(genomespace);
 		gp.add(genomespace, gp.gc);
-		*/
 		
 //		JButton das = new JButton("DAS(exp)", Icons.get("das.png"));
 //		configButton(das);
@@ -223,7 +221,6 @@ public class OpenDialog extends JDialog {
 			}
 		});
 
-		/* DISABLED FOR NOW 
 		genomespace.addActionListener(new ActionListener() {
 
 			@Override
@@ -266,27 +263,28 @@ public class OpenDialog extends JDialog {
 			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_unavailable"),MessageManager.getString("opendialog.connection_error"), 
 			         JOptionPane.ERROR_MESSAGE);
 			    	
-				}catch (ServerNotFoundException e2) {
-					// TODO Auto-generated catch block
+				}catch (ServerNotFoundException e2) {					
+			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
+			         JOptionPane.ERROR_MESSAGE);
 				} catch (InternalServerException e3) {
-					// TODO Auto-generated catch block
+			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
+			         JOptionPane.ERROR_MESSAGE);
 				}  catch (MalformedURLException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
+			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
+			         JOptionPane.ERROR_MESSAGE);
 				} catch (IOException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
+			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
+			         JOptionPane.ERROR_MESSAGE);
 				} catch (URISyntaxException e3) {
-					// TODO Auto-generated catch block
-					e3.printStackTrace();
+			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
+			         JOptionPane.ERROR_MESSAGE);
 				} catch (ReadFailedException e4) {
-					// TODO Auto-generated catch block
-					e4.printStackTrace();
+			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
+			         JOptionPane.ERROR_MESSAGE);
 				}
-
 			}
 		});	
-		*/	
+		
 //		das.addActionListener(new ActionListener() {
 //
 //			@Override
