@@ -38,10 +38,9 @@ import be.abeel.net.URIFactory;
  * 
  */
 public class Configuration {
-	
-	
-	public static Set<String>keySet(){
-		Set<String>tmp=new HashSet<String>();
+
+	public static Set<String> keySet() {
+		Set<String> tmp = new HashSet<String>();
 		tmp.addAll(extraMap.keySet());
 		tmp.addAll(localMap.keySet());
 		tmp.addAll(defaultMap.keySet());
@@ -67,8 +66,16 @@ public class Configuration {
 		String s = System.getProperty("user.home");
 		confDir = new File(s + "/.genomeview");
 		if (!confDir.exists()) {
-			if (!confDir.mkdir())
-				logger.warn("Could not create configuration directory: " + confDir);
+			if (!confDir.mkdir()) {
+				logger.warn("Could not create configuration in user directory: " + confDir + ", let's try run folder.");
+				confDir = new File(".genomeview");
+				if (!confDir.exists()) {
+					if (!confDir.mkdir()) {
+						logger.error("Could not create configuration in runtime directory directory: " + confDir);
+						confDir = null;
+					}
+				}
+			}
 
 		}
 		logger.info("User config: " + confDir);
@@ -77,7 +84,7 @@ public class Configuration {
 
 	/* Map with resource configuration */
 	private static HashMap<String, String> resourceMap = new HashMap<String, String>();
-	
+
 	/* Map with default genomeview configuration */
 	private static HashMap<String, String> defaultMap = new HashMap<String, String>();
 
@@ -106,8 +113,7 @@ public class Configuration {
 	public static String get(String key) {
 		if (resourceMap.containsKey(key)) {
 			return resourceMap.get(key);
-		} else
-		if (extraMap.containsKey(key)) {
+		} else if (extraMap.containsKey(key)) {
 			return extraMap.get(key);
 		} else if (localMap.containsKey(key)) {
 			return localMap.get(key);
@@ -142,14 +148,14 @@ public class Configuration {
 		LineIterator it;
 
 		try {
-			it = new LineIterator(Configuration.class.getResourceAsStream("/conf/default.conf"),true,true);
+			it = new LineIterator(Configuration.class.getResourceAsStream("/conf/default.conf"), true, true);
 			for (String line : it) {
 				String key = line.substring(0, line.indexOf('='));
 				String value = line.substring(line.indexOf('=') + 1);
 				defaultMap.put(key.trim(), value.trim());
 			}
 			it.close();
-			it = new LineIterator(Configuration.class.getResourceAsStream("/conf/resources.conf"),true,true);
+			it = new LineIterator(Configuration.class.getResourceAsStream("/conf/resources.conf"), true, true);
 			for (String line : it) {
 				String key = line.substring(0, line.indexOf('='));
 				String value = line.substring(line.indexOf('=') + 1);
@@ -202,9 +208,9 @@ public class Configuration {
 
 	}
 
-	private static void updateSynonyms(){
+	private static void updateSynonyms() {
 		try {
-			logger.warn("Updating synonyms for :"+Arrays.toString(get("synonyms").split(",")));
+			logger.warn("Updating synonyms for :" + Arrays.toString(get("synonyms").split(",")));
 			for (String s : get("synonyms").split(",")) {
 
 				try {
@@ -219,6 +225,7 @@ public class Configuration {
 			logger.warn("Failed to load additional synonyms for option: " + get("synonyms"), e);
 		}
 	}
+
 	/**
 	 * Save all configuration back to the respective files.
 	 * 
@@ -287,7 +294,6 @@ public class Configuration {
 
 	}
 
-	
 	public static List<String> getStringList(String key) {
 		String tmp = get(key);
 		List<String> out = new ArrayList<String>();
@@ -296,7 +302,7 @@ public class Configuration {
 		}
 		return out;
 	}
-	
+
 	public static Set<String> getStringSet(String key) {
 		String tmp = get(key);
 		Set<String> out = new HashSet<String>();
@@ -350,6 +356,7 @@ public class Configuration {
 
 		return modules;
 	}
+
 	public static File getSessionPluginDirectory() {
 		File modules = new File(confDir, "session_plugin");
 		if (!modules.exists()) {
@@ -359,7 +366,7 @@ public class Configuration {
 
 		return modules;
 	}
-	
+
 	public static void set(String key, int value) {
 		set(key, "" + value);
 
