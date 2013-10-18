@@ -153,8 +153,9 @@ public class Configuration {
 				String key = line.substring(0, line.indexOf('='));
 				String value = line.substring(line.indexOf('=') + 1);
 				defaultMap.put(key.trim(), value.trim());
-				updateSynonyms();
+				
 			}
+			updateSynonyms();
 			it.close();
 			it = new LineIterator(Configuration.class.getResourceAsStream("/conf/resources.conf"), true, true);
 			for (String line : it) {
