@@ -173,7 +173,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		// if (reads != null) {
 		double screenWidth = model.vlm.screenWidth();
 		int lines = 0;
-		int height = maxStack * readLineHeight;
+		int height = (maxStack+1) * readLineHeight;
 		BufferedImage bi = new BufferedImage((int) screenWidth, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) bi.getGraphics();
 		boolean stackExceeded = false;
@@ -338,7 +338,6 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			actualHeight = 20;
 		}
 		
-
 		bufferLocation = currentVisible;
 		buffer = bi.getSubimage(0, 0, bi.getWidth(), actualHeight);
 		backupBuffer = buffer;
