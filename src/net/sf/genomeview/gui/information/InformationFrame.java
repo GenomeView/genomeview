@@ -109,7 +109,7 @@ public class InformationFrame extends GridBagPanel {
 		gc.gridx=0;
 		gc.gridwidth=5;
 		
-		add(new SearchButtons(), gc);
+//		add(new SearchButtons(), gc);
 		gc.weightx = 1;
 		gc.gridy++;
 
@@ -178,50 +178,50 @@ public class InformationFrame extends GridBagPanel {
 		}
 	}
 	
-	class SearchButtons extends JToolBar {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -1886328161085622722L;
-
-		public SearchButtons() {
-			super.setFloatable(false);
-			add(buttonate(Query.google));
-			add(buttonate(Query.ncbiQuery));
-			add(buttonate(Query.ensemblQuery));
-			add(buttonate(Query.plaza));
-			super.addSeparator();
-
-		}
-
-		private JButton buttonate(final Query q) {
-			final JButton out;
-
-			if (q.getIcon() != null)
-				out = new JButton(q.getIcon());
-			else
-				out = new JButton(q.getLabel());
-			model.addObserver(new Observer() {
-
-				@Override
-				public void update(Observable o, Object arg) {
-					out.setEnabled(model.selectionModel().isFeatureSelected());
-
-				}
-			});
-
-			out.setToolTipText(q.getLabel());
-			out.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					q.query(model.selectionModel().getFeatureSelection().first().toString());
-
-				}
-			});
-			return out;
-		}
-	}
+//	class SearchButtons extends JToolBar {
+//
+//		/**
+//		 * 
+//		 */
+//		private static final long serialVersionUID = -1886328161085622722L;
+//
+//		public SearchButtons() {
+//			super.setFloatable(false);
+//			add(buttonate(Query.google));
+//			add(buttonate(Query.ncbiQuery));
+//			add(buttonate(Query.ensemblQuery));
+//			add(buttonate(Query.plaza));
+//			super.addSeparator();
+//
+//		}
+//
+//		private JButton buttonate(final Query q) {
+//			final JButton out;
+//
+//			if (q.getIcon() != null)
+//				out = new JButton(q.getIcon());
+//			else
+//				out = new JButton(q.getLabel());
+//			model.addObserver(new Observer() {
+//
+//				@Override
+//				public void update(Observable o, Object arg) {
+//					out.setEnabled(model.selectionModel().isFeatureSelected());
+//
+//				}
+//			});
+//
+//			out.setToolTipText(q.getLabel());
+//			out.addActionListener(new ActionListener() {
+//
+//				@Override
+//				public void actionPerformed(ActionEvent e) {
+//					q.query(model.selectionModel().getFeatureSelection().first().toString());
+//
+//				}
+//			});
+//			return out;
+//		}
+//	}
 
 }
