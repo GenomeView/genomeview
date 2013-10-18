@@ -4,3 +4,4 @@ bin/
 devtools/keystore.jks
 .classpath
 .sf-testing-cache
+.genomeview
