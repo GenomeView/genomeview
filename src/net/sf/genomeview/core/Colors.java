@@ -84,7 +84,10 @@ public class Colors {
                 String rgb = colorString.substring(colorString.indexOf('(')+1, colorString.indexOf(')'));
                 String[]arr=rgb.split(",");
                 color = new Color(Integer.parseInt(arr[0]),Integer.parseInt(arr[1]),Integer.parseInt(arr[2]));
-            } else {
+            } else if(colorString.contains(",")) {
+            	String[]arr=colorString.split(",");
+                color = new Color(Integer.parseInt(arr[0]),Integer.parseInt(arr[1]),Integer.parseInt(arr[2]));
+            }else{
                 // if a color name is given, see if a Color constant is
                 // defined, otherwise use gray.
                 Field colorField = Color.class.getDeclaredField(colorString);
