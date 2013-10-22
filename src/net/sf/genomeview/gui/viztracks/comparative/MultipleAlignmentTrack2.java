@@ -381,9 +381,12 @@ public class MultipleAlignmentTrack2 extends Track {
 							lines.set(line - 1);
 						}
 						if (as.strand() == Strand.FORWARD) {
-							g.setColor(Configuration.getColor("ma:forwardColor"));
+							Color or = Configuration.getColor("ma:forwardColor");
+							g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(), 100));
+							
 						} else {
-							g.setColor(Configuration.getColor("ma:reverseColor"));
+							Color or = Configuration.getColor("ma:reverseColor");
+							g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(), 100));
 						}
 
 						g.fillRect(blockScreenStart, rec.y + (line - 1) * lineHeight, blockScreenEnd - blockScreenStart, lineHeight);
@@ -467,7 +470,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 										if (featureScreenEnd > featureScreenStart && featureScreenEnd >= 0 && featureScreenStart <= screenWidth) {
 											Color c = Color.CYAN;
-											g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 80));
+											g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 150));
 											if (i % 2 == 0) {
 												g.fillRect(featureScreenStart, rec.y + (line - 1) * lineHeight + 3, featureScreenEnd - featureScreenStart,
 														lineHeight - 6);
