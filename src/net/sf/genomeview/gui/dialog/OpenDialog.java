@@ -247,7 +247,7 @@ public class OpenDialog extends JDialog {
 			    	 session = loginDialog.getGsSession();
 			    	 if (session==null)
 			    		 session = new GsSession();
-					         session.login(userName, password);
+			    	 session.login(userName, password);
 					//Once user is logged, list its working files
 					GSFileBrowserDialog fileBrowser = new GSFileBrowserDialog(null, session.getDataManagerClient(), 
 							GSFileBrowserDialog.DialogType.FILE_SELECTION_DIALOG); 
@@ -255,14 +255,12 @@ public class OpenDialog extends JDialog {
 					GSFileMetadata selection = fileBrowser.getSelectedFileMetadata();
 							// Do something with the selected file
 					DataSourceHelper.load(model,new Locator(selection.getPath()));
-
 			    } catch (final AuthorizationException e1) {
 			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.invalid_username_pwd"),MessageManager.getString("opendialog.login_error"), 
 			         JOptionPane.ERROR_MESSAGE);
 			    }catch (ConfigurationError ce){
 			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_unavailable"),MessageManager.getString("opendialog.connection_error"), 
-			         JOptionPane.ERROR_MESSAGE);
-			    	
+			         JOptionPane.ERROR_MESSAGE);			    	
 				}catch (ServerNotFoundException e2) {					
 			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
 			         JOptionPane.ERROR_MESSAGE);
@@ -281,6 +279,9 @@ public class OpenDialog extends JDialog {
 				} catch (ReadFailedException e4) {
 			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
 			         JOptionPane.ERROR_MESSAGE);
+				} catch(Exception e5){
+			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.invalid_username_pwd"),MessageManager.getString("opendialog.login_error"), 
+			         JOptionPane.ERROR_MESSAGE);					
 				}
 			}
 		});	
