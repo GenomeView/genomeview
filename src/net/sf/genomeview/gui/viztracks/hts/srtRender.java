@@ -173,7 +173,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		// if (reads != null) {
 		double screenWidth = model.vlm.screenWidth();
 		int lines = 0;
-		int height = (maxStack+1) * readLineHeight;
+		int height = (maxStack + 1) * readLineHeight;
 		BufferedImage bi = new BufferedImage((int) screenWidth, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) bi.getGraphics();
 		boolean stackExceeded = false;
@@ -330,14 +330,14 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		}
 
 		/* Crop buffered image if not everything is needed */
-		int actualHeight = (lines+1)* readLineHeight;
-		if (visibleReadCount == 0||actualHeight==0) {
+		int actualHeight = (lines + 1) * readLineHeight;
+		if (visibleReadCount == 0 || actualHeight == 0) {
 			g.setColor(Color.BLACK);
 
 			g.drawString("No data in this region", (int) (screenWidth / 2), 10);
 			actualHeight = 20;
 		}
-		
+
 		bufferLocation = currentVisible;
 		buffer = bi.getSubimage(0, 0, bi.getWidth(), actualHeight);
 		backupBuffer = buffer;
@@ -634,10 +634,12 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 	}
 
 	private Location prevVisible = null;
+	private int prevScreenWidth = -1;
 
-	private boolean same(Location loc) {
-		boolean same = loc.equals(prevVisible);
+	private boolean same(Location loc, int width) {
+		boolean same = loc.equals(prevVisible)&&prevScreenWidth==width;
 		prevVisible = loc;
+		prevScreenWidth=width;
 		return same;
 	}
 
@@ -648,8 +650,8 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		 */
 
 		Location currentVisible = model.vlm.getVisibleLocation();
-
-		if (!same(currentVisible)) {
+		int currentWidth = (int)model.vlm.screenWidth();
+		if (!same(currentVisible, currentWidth)) {
 			requestNew(model.vlm.getVisibleEntry(), dataKey, provider, currentVisible, srtc, model.vlm.screenWidth());
 		}
 	}
