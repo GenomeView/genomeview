@@ -124,7 +124,10 @@ public class Session {
 									try {
 										switch (si) {
 										case PREFIX:
-											prefix = arr[1];
+											if(arr.length==1)
+												prefix="";
+											else
+												prefix = arr[1];
 											break;
 										case U:
 										case F:
