@@ -73,13 +73,8 @@ public class Model extends Observable implements Observer {
 
 		guimanager = new GUIManager();
 
-		/* JavaScriptInputHandler */
-		if (Configuration.getBoolean("integration:monitorJavaScript")) {
-			new JavaScriptHandler(this, id);
-			logger.info("JavaScriptHandler started");
-		} else {
-			logger.info("JavaScriptHandler NOT started");
-		}
+		new JavaScriptHandler(this, id);
+		logger.info("JavaScriptHandler started");
 
 		GenomeViewScheduler.start(this);
 
