@@ -111,8 +111,9 @@ public class Session {
 								char firstchar = line.toUpperCase().charAt(0);
 
 								String[] arr = line.split("[: \t]", 2);
+								
 								model.messageModel().setStatusBarMessage(
-										MessageManager.formatMessage("session.loading_session_current_file_line", new Object[] { arr[1] }));
+										MessageManager.formatMessage("session.loading_session_current_file_line", new Object[] { line }));
 								SessionInstruction si = null;
 								try {
 									si = SessionInstruction.valueOf(arr[0].toUpperCase());
