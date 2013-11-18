@@ -2,7 +2,6 @@
 # File is read in net.sf.nameservice
 #
 # Copyright 2012-2013 Thomas Abeel
-Mycobacterium tuberculosis H37Rv (CP003248.2?)=Broad_V5,MT_H37RV_BRD_V5,H37RV_V5_1
 Mycobacterium tuberculosis H37Rv (CP003248.1)=Broad_V3,CP003248,CP003248.1,NC_018143,NC_018143.1,gi|395136682|gb|CP003248.1|,H37Rv
 Francisella tularensis holarctica LVS (NC_007880)=NC_007880,NC_007880.1
 Francisella tularensis SCHU S4(NC_006570)=NC_006570,NC_006570.1
