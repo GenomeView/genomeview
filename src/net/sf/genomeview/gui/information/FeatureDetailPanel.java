@@ -7,7 +7,10 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -26,6 +29,7 @@ import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import net.sf.jannot.Feature;
 import be.abeel.gui.GridBagPanel;
+import be.abeel.util.NaturalOrderComparator;
 
 /**
  * Panel with detailed information about a single Feature. (bottom -right in
@@ -147,8 +151,10 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 					text.append("Location: " + StaticUtils.escapeHTML(Arrays.toString(rf.location())) + "<br/>");
 				text.append("Strand: " + rf.strand() + "<br/>");
 				text.append("Score: " + rf.getScore() + "<br/>");
-				Set<String> qks = rf.getQualifiersKeys();
-				for (String key : qks) {
+				List<String>list=new ArrayList<String>();
+				list.addAll(rf.getQualifiersKeys());
+				Collections.sort(list, NaturalOrderComparator.NUMERICAL_ORDER_IGNORE_CASE);
+				for (String key : list) {
 					if (key.equals("url")) {
 						String[] urls = rf.qualifier(key).split(",");
 						for (String url : urls)
