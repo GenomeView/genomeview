@@ -106,7 +106,7 @@ public class Session {
 						String prefix = "";
 						for (String line : it) {
 							try {
-								if (line.startsWith("#") || line.isEmpty())
+								if (line.trim().startsWith("#") || line.trim().isEmpty())
 									continue;
 								char firstchar = line.toUpperCase().charAt(0);
 
