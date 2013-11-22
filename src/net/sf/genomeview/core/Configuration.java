@@ -153,9 +153,9 @@ public class Configuration {
 				String key = line.substring(0, line.indexOf('='));
 				String value = line.substring(line.indexOf('=') + 1);
 				defaultMap.put(key.trim(), value.trim());
-				
+
 			}
-			updateSynonyms();
+			
 			it.close();
 			it = new LineIterator(Configuration.class.getResourceAsStream("/conf/resources.conf"), true, true);
 			for (String line : it) {
@@ -164,6 +164,9 @@ public class Configuration {
 				resourceMap.put(key.trim(), value.trim());
 			}
 			it.close();
+			
+			updateSynonyms();
+			
 		} catch (Exception e) {
 			/*
 			 * Do not I18N this message String as the error indicates that the
@@ -212,11 +215,33 @@ public class Configuration {
 
 	private static void updateSynonyms() {
 		try {
-			logger.warn("Updating synonyms for :" + Arrays.toString(get("synonyms").split(",")));
-			for (String s : get("synonyms").split(",")) {
+			/**
+			 * Default synonyms
+			 */
+			logger.info("Updating default synonyms for :" + Arrays.toString(get("synonyms.default").split(",")));
+			for (String s : get("synonyms.default").split(",")) {
 
 				try {
-					NameService.addSynonyms(URIFactory.url(s).openStream());
+					if(s.length()>0)
+						NameService.addSynonyms(URIFactory.url(s).openStream());
+					else
+						logger.info("Default synonyms URL is empty");
+				} catch (Exception e) {
+					logger.warn("Failed to load default synonyms for: " + s, e);
+				}
+
+			}
+			/**
+			 * User configured additional synonyms
+			 */
+			logger.info("Updating additional synonyms for :" + Arrays.toString(get("synonyms.additional").split(",")));
+			for (String s : get("synonyms.additional").split(",")) {
+
+				try {
+					if(s.length()>0)
+						NameService.addSynonyms(URIFactory.url(s).openStream());
+					else
+						logger.info("Additional synonyms URL is empty");
 				} catch (Exception e) {
 					logger.warn("Failed to load additional synonyms for: " + s, e);
 				}
