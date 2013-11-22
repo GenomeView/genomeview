@@ -128,12 +128,12 @@ public class Session {
 											if(arr.length==1)
 												prefix="";
 											else
-												prefix = arr[1];
+												prefix = arr[1].trim();
 											break;
 										case U:
 										case F:
 										case DATA:
-											final Locator loc = new Locator(prefix + arr[1]);
+											final Locator loc = new Locator(prefix + arr[1].trim());
 											try {
 												DataSourceHelper.load(model, loc);
 											} catch (RuntimeException re) {
@@ -153,22 +153,22 @@ public class Session {
 											break;
 										case C:
 										case CONFIG:
-											Configuration.loadExtra(new Locator(prefix + arr[1]).stream());
+											Configuration.loadExtra(new Locator(prefix + arr[1].trim()).stream());
 											// Configuration.loadExtra(URIFactory.url(arr[1]).openStream());
 											break;
 										case OPTION:
-											String[] ap = arr[1].split("=", 2);
-											Configuration.set(ap[0], ap[1]);
+											String[] ap = arr[1].trim().split("=", 2);
+											Configuration.set(ap[0].trim(), ap[1].trim());
 											break;
 										case ALIAS:
-											String[] al = arr[1].split("=", 2);
-											NameService.addSynonym(al[1], al[0]);
+											String[] al = arr[1].trim().split("=", 2);
+											NameService.addSynonym(al[1].trim(), al[0].trim());
 											break;
 										case PLUGIN:
-											PluginLoader.installPlugin(new Locator(prefix + arr[1]), Configuration.getSessionPluginDirectory());
+											PluginLoader.installPlugin(new Locator(prefix + arr[1].trim()), Configuration.getSessionPluginDirectory());
 											break;
 										case LOCATION:
-											ExternalHelper.setPosition(arr[1], model);
+											ExternalHelper.setPosition(arr[1].trim(), model);
 
 										}
 									} catch (Exception e) {
