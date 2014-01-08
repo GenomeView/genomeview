@@ -157,7 +157,13 @@ public class ConfigurationDialog extends JDialog {
 							MessageManager.getString("configdialog.color_reads_mapping_reverse_strands_anti")), gc);
 			gc.gridy++;
 			this.add(ConfigBox.colorInstance(model, "shortread:pairingColor", MessageManager.getString("configdialog.color_between_paired_reads")), gc);
-
+			gc.gridy++;
+			this.add(ConfigBox.colorInstance(model, "shortread:mateDifferentChromosome", "Mate different chromosome"), gc);
+			gc.gridy++;
+			this.add(ConfigBox.colorInstance(model, "shortread:missingMateColor", "Missing mate"), gc);
+			gc.gridy++;
+			this.add(ConfigBox.colorInstance(model, "shortread:splicingColor", "Splicing color"), gc);
+			gc.gridy++;
 		}
 	}
 
@@ -264,7 +270,7 @@ public class ConfigurationDialog extends JDialog {
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("maf:maximumVisibleRange", MessageManager.getString("configdialog.maximum_visible_range")), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance(model,"maf:extendedNames", MessageManager.getString("configdialog.extended_names")), gc);
+			this.add(ConfigBox.booleanInstance(model, "maf:extendedNames", MessageManager.getString("configdialog.extended_names")), gc);
 		}
 	}
 
@@ -277,36 +283,34 @@ public class ConfigurationDialog extends JDialog {
 
 		public MiscellaneousPanel(final Model model) {
 			gc.gridwidth = 2;
-			gc.weightx=1;
+			gc.weightx = 1;
 			this.add(ConfigBox.integerInstance("general:zoomout", MessageManager.getString("configdialog.max_zoom_out")), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance(model,"general:monitorConnection", MessageManager.getString("configdialog.monitor_connection")), gc);
+			this.add(ConfigBox.booleanInstance(model, "general:monitorConnection", MessageManager.getString("configdialog.monitor_connection")), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance(model,"dualscreen", MessageManager.getString("configdialog.enable_dual_screen")), gc);
+			this.add(ConfigBox.booleanInstance(model, "dualscreen", MessageManager.getString("configdialog.enable_dual_screen")), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance(model,"general:singleInstance", MessageManager.getString("configdialog.allow_one_instance")), gc);
+			this.add(ConfigBox.booleanInstance(model, "general:singleInstance", MessageManager.getString("configdialog.allow_one_instance")), gc);
 			gc.gridy++;
-			this.add(ConfigBox.booleanInstance(model,"geneticCodeSelection", MessageManager.getString("configdialog.enable_genetic_code_selection")), gc);
+			this.add(ConfigBox.booleanInstance(model, "geneticCodeSelection", MessageManager.getString("configdialog.enable_genetic_code_selection")), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("general:exportMagnifyFactor", MessageManager.getString("configdialog.resultion_increase_export_images")), gc);
 			gc.gridy++;
-			
-			this.add(ConfigBox.dropDownInstance(Configuration.getStringSet("resource:lang:available").toArray(new String[0]),"lang:current", MessageManager.getString("configdialog.select_language")), gc);
-			
-			
-			
+
+			this.add(
+					ConfigBox.dropDownInstance(Configuration.getStringSet("resource:lang:available").toArray(new String[0]), "lang:current",
+							MessageManager.getString("configdialog.select_language")), gc);
+
 			gc.gridy++;
 			gc.gridwidth = 1;
-		
-			
-			
-			this.add(ConfigBox.booleanInstance(model,"general:disableURLCaching", MessageManager.getString("configdialog.disable_url_caching")), gc);
-			gc.weightx=0;
+
+			this.add(ConfigBox.booleanInstance(model, "general:disableURLCaching", MessageManager.getString("configdialog.disable_url_caching")), gc);
+			gc.weightx = 0;
 			gc.gridx++;
-			this.add(new HelpButton(model.getGUIManager().getParent(), MessageManager.getString("configdialog.disable_url_caching_to_save")),gc);
+			this.add(new HelpButton(model.getGUIManager().getParent(), MessageManager.getString("configdialog.disable_url_caching_to_save")), gc);
 			gc.gridwidth = 2;
-			gc.weightx=1;
-			gc.gridx=0;
+			gc.weightx = 1;
+			gc.gridx = 0;
 			gc.gridy++;
 			// this.add(ConfigBox.booleanInstance("logToFile",
 			// "Log console output to a file (Requires restart)"), gc);
@@ -333,7 +337,8 @@ public class ConfigurationDialog extends JDialog {
 						System.out.println("Marking for deletion:" + f);
 						f.deleteOnExit();
 					}
-					JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("configdialog.clear_cache_info"), MessageManager.getString("configdialog.cache_cleared"), JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("configdialog.clear_cache_info"),
+							MessageManager.getString("configdialog.cache_cleared"), JOptionPane.INFORMATION_MESSAGE);
 
 				}
 
