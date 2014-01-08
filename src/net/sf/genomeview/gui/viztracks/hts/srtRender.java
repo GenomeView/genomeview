@@ -431,11 +431,9 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 
 		lastX = subX2;
 		ReadColor c = null;
-		if (ShortReadTools.isPaired(rf) && !rf.getMateUnmappedFlag() && rf.getReferenceIndex() != rf.getMateReferenceIndex()
+		if (ShortReadTools.isPaired(rf) && !rf.getMateUnmappedFlag() && rf.getReferenceIndex().intValue() != rf.getMateReferenceIndex().intValue()
 				&& rf.getMateReferenceIndex() != -1) {
-			// System.out.println("Different indices: " + rf.getReferenceIndex()
-			// + "\t"
-			// + rf.getMateReferenceIndex());
+			System.out.println("Different indices: " + rf.getReferenceIndex() + "\t" + rf.getMateReferenceIndex());
 			c = ReadColor.MATE_DIFFERENT_CHROMOSOME;
 		} else if (rf.getReadPairedFlag()) {
 			if (rf.getFirstOfPairFlag()) {
@@ -637,9 +635,9 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 	private int prevScreenWidth = -1;
 
 	private boolean same(Location loc, int width) {
-		boolean same = loc.equals(prevVisible)&&prevScreenWidth==width;
+		boolean same = loc.equals(prevVisible) && prevScreenWidth == width;
 		prevVisible = loc;
-		prevScreenWidth=width;
+		prevScreenWidth = width;
 		return same;
 	}
 
@@ -650,7 +648,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		 */
 
 		Location currentVisible = model.vlm.getVisibleLocation();
-		int currentWidth = (int)model.vlm.screenWidth();
+		int currentWidth = (int) model.vlm.screenWidth();
 		if (!same(currentVisible, currentWidth)) {
 			requestNew(model.vlm.getVisibleEntry(), dataKey, provider, currentVisible, srtc, model.vlm.screenWidth());
 		}
