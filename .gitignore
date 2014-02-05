@@ -5,3 +5,4 @@ devtools/keystore.jks
 .classpath
 .sf-testing-cache
 .genomeview
+genomeview.properties
