@@ -323,15 +323,15 @@ public class SaveDialog extends JDialog {
 									String reply = ClientHttpUpload.upload(tmp, url);
 
 									if (reply.equals("")) {
-										throw new SaveFailedException(MessageManager.getString("savedialog.empty_reply_server"));
-									}
-
-									if (reply.toLowerCase().contains("error")) {
+										showServerMessage(MessageManager.getString("savedialog.empty_reply_server"));
+//										throw new SaveFailedException();
+									}else if (reply.toLowerCase().contains("error")) {
 										showServerMessage(reply);
-										throw new SaveFailedException(MessageManager.getString("savedialog.empty_reply_server"));
+//										throw new SaveFailedException(MessageManager.getString("savedialog.save_failed"));
 
+									}else {
+										showServerMessage(reply);
 									}
-									showServerMessage(reply);
 
 								} catch (IOException ex) {
 
