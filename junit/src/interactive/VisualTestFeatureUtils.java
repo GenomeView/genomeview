@@ -1,7 +1,8 @@
-package net.sf.genomeview.gui.viztracks.annotation;
+package interactive;
 
 import junit.framework.Assert;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.gui.viztracks.annotation.FeatureUtils;
 import net.sf.jannot.Feature;
 
 import org.junit.Test;
@@ -10,7 +11,7 @@ import org.junit.Test;
  * @author Thomas Abeel
  *
  */
-public class TestFeatureUtils {
+public class VisualTestFeatureUtils {
 	
 	@Test
 	public void testDisplayName(){

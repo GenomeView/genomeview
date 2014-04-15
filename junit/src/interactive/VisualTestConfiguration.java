@@ -1,6 +1,8 @@
-package net.sf.genomeview.core;
+package interactive;
 
 import java.util.List;
+
+import net.sf.genomeview.core.Configuration;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -12,7 +14,7 @@ import org.junit.Test;
  * 
  */
 
-public class TestConfiguration {
+public class VisualTestConfiguration {
 
 	@BeforeClass
 	static public  void start() {
