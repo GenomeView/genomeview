@@ -6,3 +6,4 @@ devtools/keystore.jks
 .sf-testing-cache
 .genomeview
 genomeview.properties
+TEST-*
