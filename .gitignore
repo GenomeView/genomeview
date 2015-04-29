@@ -7,3 +7,4 @@ devtools/keystore.jks
 .genomeview
 genomeview.properties
 TEST-*
+/bin
