@@ -1,0 +1,16 @@
+The Vertebrate Mitochondrial Code
+*Differences from the Standard Code:
+        Code 2          Standard
+ AGA    Ter  *          Arg  R
+ AGG    Ter  *          Arg  R
+ AUA    Met  M          Ile  I
+ UGA    Trp  W          Ter  *
+*Alternative Initiation Codon:
+Bos: AUA
+Homo: AUA, AUU
+Mus: AUA, AUU, AUC
+Coturnix, Gallus: also GUG (Desjardins and Morais, 1991)
+*Systematic Range:
+Vertebrata
+*Comment:
+# The transcripts of several vertebrate mitochondrial genes end in U or UA, which become termination codons (UAA) upon subsequent polyadenylation. 

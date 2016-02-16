@@ -1,0 +1,3 @@
+Thraustochytrium Mitochondrial Code
+This code has been created for the mitochondrial genome of the labyrinthulid Thraustochytrium aureum sequenced by the The Organelle Genome Megasequencing Program (OGMP).
+It is the similar to the bacterial code (trans_table 11) but it contains an additional stop codon (TTA) and also has a different set of start codons.

@@ -1,0 +1,10 @@
+The Alternative Yeast Nuclear Code
+*Differences from the Standard Code:
+           Code 12      Standard
+ CUG       Ser          Leu
+*Alternative Initiation Codons:
+CAG may be used in Candida albicans (Santos et al., 1993).
+*Systematic Range:
+Endomycetales (yeasts): Candida albicans, Candida cylindracea, Candida melibiosica, Candida parapsilosis, and Candida rugosa (Ohama et al., 1993).
+*Comment:
+However, other yeast, including Saccharomyces cerevisiae, Candida azyma, Candida diversa, Candida magnoliae, Candida rugopelliculosa, Yarrowia lipolytica, and Zygoascus hellenicus, definitely use the standard (nuclear) code (Ohama et al., 1993). 

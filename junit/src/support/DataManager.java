@@ -68,5 +68,31 @@ public class DataManager {
 		}
 	}
 
-
+//	public static String[] vcfFiles() {
+//
+//		/*
+//		 * TODO
+//		 * 
+//		 * Before returning this list of files, make sure that those files and
+//		 * their indices have been downloaded to the correct folder.
+//		 * 
+//		 * - Check internet connection - Check available disk-space - Check if
+//		 * files are present
+//		 * 
+//		 * if not: Download files (with progress indication)
+//		 * 
+//		 * return list of files
+//		 */
+//		String[] out = new String[] { "test/resource/CEU.SRP000031.2010_03.genotypes.vcf.gz", "test/resource/CEU.SRP000032.2010_03.genotypes.vcf.gz",
+//				"test/resource/CEU.SRP000033.2010_03.genotypes.vcf.gz", "test/resource/CEU.trio.2010_03.genotypes.vcf.gz",
+//				"test/resource/CHB.SRP000033.2010_03.genotypes.vcf.gz", "test/resource/CHB+JPT.SRP000031.2010_03.genotypes.vcf.gz",
+//				"test/resource/CHD.SRP000033.2010_03.genotypes.vcf.gz",
+//				"test/resource/JPT.SRP000033.2010_03.genotypes.vcf.gz",
+//				"test/resource/LWK.SRP000033.2010_03.genotypes.vcf.gz",
+//				// "test/resource/trio.2010_06.ychr.genotypes.vcf.gz",
+//				"test/resource/TSI.SRP000033.2010_03.genotypes.vcf.gz", "test/resource/YRI.SRP000031.2010_03.genotypes.vcf.gz",
+//				"test/resource/YRI.SRP000032.2010_03.genotypes.vcf.gz", "test/resource/YRI.SRP000033.2010_03.genotypes.vcf.gz",
+//				"test/resource/YRI.trio.2010_03.genotypes.vcf.gz" };
+//		return out;
+//	}
 }

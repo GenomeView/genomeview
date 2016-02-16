@@ -1,0 +1,9 @@
+The Echinoderm and Flatworm Mitochondrial Code
+*Differences from the Standard Code:
+          Code 9        Standard
+ AAA      Asn  N        Lys K
+ AGA      Ser  S        Arg R
+ AGG      Ser  S        Arg R
+ UGA      Trp  W        Ter *
+*Systematic Range:
+Asterozoa (starfishes) (Himeno et al., 1987) Echinozoa (sea urchins) (Jacobs et al., 1988; Cantatore et al., 1989) Rhabditophora among the Platyhelminthes (Telford et al. 2000) 

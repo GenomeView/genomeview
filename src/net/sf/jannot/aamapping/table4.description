@@ -1,0 +1,17 @@
+The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
+*Differences from the Standard Code:
+        Code 4         Standard
+ UGA    Trp  W          Ter  *
+*Alternative Initiation Codons:
+Trypanosoma: UUA, UUG, CUG
+Leishmania: AUU, AUA
+Tertrahymena: AUU, AUA, AUG
+Paramecium: AUU, AUA, AUG, AUC, GUG, GUA(?)
+(Pritchard et al., 1990)
+*Systematic Range:
+Mollicutes: The code is used in Entomoplasmatales and Mycoplasmatales (Bove et al. 1989). The situation in the Acholeplasmatales is unclear. Based on a study of ribosomal protein genes, it had been concluded that UGA does not code for tryptophan in plant-pathogenic mycoplasma-like organisms (MLO) and the Acholeplasmataceae (Lim and Sears, 1992) and there seems to be only a single tRNA-CCA for tryptophan in Acholeplasma laidlawii (Tanaka et al. 1989). In contrast, in a study of codon usage in Phytoplasmas, it was found that 30 out of 78 ORFs analyzed translated better with code 4 (UGA for tryptophan) than with code 11 while the remainder showed no differences between the two codes (Melamed et al. 2003).
+Fungi: Emericella nidulans, Neurospora crassa, Podospora anserina, Acremonium (Fox, 1987), Candida parapsilosis (Guelin et al., 1991), Trichophyton rubrum (de Bievre and Dujon, 1992), Dekkera/Brettanomyces, Eeniella (Hoeben et al., 1993), and probably Ascobolus immersus, Aspergillus amstelodami, Claviceps purpurea, and Cochliobolus heterostrophus.
+Other Eukaryotes: Gigartinales among the red algae (Boyen et al. 1994), and the protozoa Trypanosoma brucei, Leishmania tarentolae, Paramecium tetraurelia, Tetrahymena pyriformis and probably Plasmodium gallinaceum (Aldritt et al., 1989).
+Metazoa: Coelenterata (Ctenophora and Cnidaria)
+*Comments:
+This code is also used for the kinetoplast DNA (maxicircles, minicircles). Kinetoplasts are modified mitochondria (or their parts). 

@@ -1,0 +1,7 @@
+Scenedesmus obliquus mitochondrial Code
+*Differences from the Standard Code:
+          Code 22       Standard
+TCA       STOP *        Ser
+TAG       Leu  L        STOP
+*Systematic Range:
+Scenedesmus obliquus: Nedelcu A, Lee RW, Lemieux C, Gray MW and Burger G. "The complete mitochondrial DNA sequence of Scenedesmus obliquus reflects an intermediate stage in the evolution of the green algal mitochondrial genome." Genome Res. 2000 Jun;10(6):819-31. 

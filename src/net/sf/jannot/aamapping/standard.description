@@ -1,0 +1,5 @@
+The Standard Code
+*Initiation Codon:
+AUG
+*Alternative Initiation Codons:
+In rare cases, translation in eukaryotes can be initiated from codons other than AUG. A well documented case (including direct protein sequencing) is the GUG start of a ribosomal P protein of the fungus Candida albicans (Abramczyk et al.) and the GUG initiation in mammalian NAT1 (Takahashi et al. 2005). Other examples can be found in the following references: Peabody 1989; Prats et al. 1989; Hann et al. 1992; Sugihara et al. 1990. The standard code currently allows initiation from UUG and CUG in addition to AUG. 
