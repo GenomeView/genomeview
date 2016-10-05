@@ -238,7 +238,7 @@ public class TDFReader {
 		else
 			dsName = "/" + chr + "/raw";
 
-		log.info("TDF-DSQUERY: " + dsName);
+		log.finest("TDF-DSQUERY: " + dsName);
 		TDFDataset ds = getDataset(dsName);
 
 		return ds;
