@@ -1,8 +1,17 @@
 # display name=synonyms
 # File is read in net.sf.nameservice
 #
-# Copyright 2012-2013 Thomas Abeel
+# Copyright 2012-2016 Thomas Abeel
 Mycobacterium tuberculosis H37Rv (CP003248.1)=Broad_V3,CP003248,CP003248.1,NC_018143,NC_018143.1,gi|395136682|gb|CP003248.1|,H37Rv
 Campylobacter jejuni subsp. jejuni 81-176 plasmid pTet, complete (NC_008790)=NC_008790,NC_008790.1,gi|121999251|ref|NC_008790.1|
 Campylobacter jejuni subsp. jejuni 81-176 plasmid pVir, complete (NC_008770)=NC_008770,NC_008770.1,gi|121582657|ref|NC_008770.1|
 Campylobacter jejuni subsp. jejuni 81-176, complete genome. (NC_008787)=NC_008787,NC_008787.1,gi|121612099|ref|NC_008787.1|
+AP012213.1 Kluyveromyces marxianus DMKU3-1042 DNA, complete genome, chromosome 1=AP012213.1
+AP012214.1 Kluyveromyces marxianus DMKU3-1042 DNA, complete genome, chromosome 2=AP012214.1
+AP012215.1 Kluyveromyces marxianus DMKU3-1042 DNA, complete genome, chromosome 3=AP012215.1
+AP012216.1 Kluyveromyces marxianus DMKU3-1042 DNA, complete genome, chromosome 4=AP012216.1
+AP012217.1 Kluyveromyces marxianus DMKU3-1042 DNA, complete genome, chromosome 5=AP012217.1
+AP012218.1 Kluyveromyces marxianus DMKU3-1042 DNA, complete genome, chromosome 6=AP012218.1
+AP012219.1 Kluyveromyces marxianus DMKU3-1042 DNA, complete genome, chromosome 7=AP012219.1
+AP012220.1 Kluyveromyces marxianus DMKU3-1042 DNA, complete genome, chromosome 8=AP012220.1
+AP012221.1 Kluyveromyces marxianus DMKU3-1042 mitochondrial DNA, complete genome=AP012221.1
