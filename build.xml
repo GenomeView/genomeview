@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="X1" />
+	<property name="version" value="development" />
 	<property name="src" value="src" />
 	<property name="res" value="resources" />
 	<property name="build" value="build" />
@@ -14,7 +14,7 @@
 	</propertyfile>
 
 	<property name="dist" value="genomeview-${version}" />
-	<property name="jar" value="genomeview.jar" />
+	<property name="jar" value="genomeview-${version}.jar" />
 	<property name="srcjar" value="genomeview-${version}-src.zip" />
 
 
@@ -80,10 +80,7 @@
 			</fileset>
 
 		</copy>
-		<copy todir="${dist}/lib">
-			<fileset dir="${lib}" />
-
-		</copy>
+		
 		<mkdir dir="${build}/images" />
 		<copy todir="${build}/images">
 			<fileset dir="${res}/images" />
@@ -122,7 +119,7 @@
 	</target>
 
 	<target name="compile" depends="init">
-		<javac source="1.8" target="1.8" debug="true" debuglevel="lines,vars,source" srcdir="${src}" destdir="${build}" excludes="junit/**">
+		<javac source="1.7" target="1.7" debug="true" debuglevel="lines,vars,source" srcdir="${src}" destdir="${build}" excludes="junit/**">
 			<classpath>
 				<fileset dir="${lib}">
 					<include name="**/*.jar" />
@@ -137,7 +134,13 @@
 
 
 
-		<jar destfile="${dist}/${jar}" basedir="${build}" manifest="devtools/MANIFEST.MF">
+		<jar destfile="${dist}/${jar}" basedir="${build}">
+	    <zipgroupfileset dir="lib/" includes="*.jar"/>
+			<manifest>
+			    <attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Main-Class" value="net.sf.genomeview.gui.GenomeView"/>
+			
+			  </manifest>
 		</jar>
 
 
@@ -182,7 +185,7 @@
 		<copy file="genomeview.properties" todir="build.test" />
 		<copy file="${res}/plugin.xml" todir="build.test" />
 
-		<javac debug="true" debuglevel="lines,vars,source" destdir="build.test" source="1.8" target="1.8">
+		<javac debug="true" debuglevel="lines,vars,source" destdir="build.test" source="1.7" target="1.7">
 
 			<src path="${src}" />
 
@@ -237,3 +240,4 @@
 	</target>
 
 </project>
+
