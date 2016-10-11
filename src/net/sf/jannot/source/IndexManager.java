@@ -4,14 +4,13 @@
 package net.sf.jannot.source;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
+import atk.util.MD5Tools;
 import net.sf.jannot.indexing.Faidx;
 import net.sf.jannot.mafix.MafixFactory;
 import net.sf.jannot.tabix.TabixWriter;
@@ -21,8 +20,6 @@ import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.seekablestream.SeekableFileStream;
-import be.abeel.security.MD5Tools;
 
 /**
  * @author Thomas Abeel

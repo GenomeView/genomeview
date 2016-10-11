@@ -13,14 +13,13 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.java.plugin.PluginManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.swing.JOptionPane;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.abeel.io.LineIterator;
+import be.abeel.net.URIFactory;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.MessageManager;
@@ -28,13 +27,9 @@ import net.sf.genomeview.gui.dialog.TryAgainHandler;
 import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Location;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
 import net.sf.nameservice.NameService;
-import be.abeel.io.LineIterator;
-import be.abeel.net.URIFactory;
-import be.abeel.util.Config;
 
 /**
  * 

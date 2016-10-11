@@ -24,6 +24,7 @@ import be.abeel.net.URIFactory;
  * @author Thomas Abeel
  * 
  */
+
 class CommandLineOptions {
 
 	private static Option idO;

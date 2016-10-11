@@ -1,20 +1,14 @@
 package net.sf.genomeview.gui.viztracks.hts;
 
 import java.awt.Color;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.JComponent;
 
 import be.abeel.gui.GridBagPanel;
-import be.abeel.util.Config;
 import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.config.BooleanConfig;
 import net.sf.genomeview.gui.config.ConfigListener;
 import net.sf.genomeview.gui.viztracks.TrackConfig;
-import net.sf.genomeview.gui.viztracks.hts.ShortReadTrackConfig.ReadColor;
 import net.sf.jannot.DataKey;
 
 /**

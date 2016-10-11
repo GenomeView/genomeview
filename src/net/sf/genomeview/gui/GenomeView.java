@@ -9,16 +9,15 @@ import java.net.Authenticator;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.SwingUtilities;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.abeel.concurrency.DaemonThread;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
-import be.abeel.concurrency.DaemonThread;
 
 /**
  * 

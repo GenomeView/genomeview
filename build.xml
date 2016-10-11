@@ -2,7 +2,7 @@
 <project name="GenomeView" default="jar" basedir=".">
 
 
-	<property name="version" value="2600" />
+	<property name="version" value="X1" />
 	<property name="src" value="src" />
 	<property name="res" value="resources" />
 	<property name="build" value="build" />
@@ -18,7 +18,7 @@
 	<property name="srcjar" value="genomeview-${version}-src.zip" />
 
 
-	
+
 	<target name="init">
 		<delete failonerror="false" dir="${build}" />
 		<delete failonerror="false" dir="${dist}" />
@@ -33,6 +33,7 @@
 				<include name="**/*.txt" />
 				<include name="**/*.java" />
 				<include name="**/*.tsv" />
+				<include name="net/sf/jannot/aamapping/**" />
 			</fileset>
 			<fileset dir="${res}">
 				<include name="**/*.txt" />
@@ -40,10 +41,11 @@
 				<include name="**/*.png" />
 				<include name="**/*.tsv" />
 			</fileset>
+
 		</copy>
 		<replaceregexp match="%HEADER%" replace="This file is part of GenomeView, a genome browser and annotation curator${line.separator}
 * ${line.separator}
-* Copyright (C) 2007-2013 Thomas Abeel and contributors${line.separator}
+* Copyright (C) 2007-2016 Thomas Abeel and contributors${line.separator}
 * ${line.separator}
 * This program is free software: you can redistribute it and/or modify${line.separator}
 * it under the terms of the GNU General Public License as published by${line.separator}
@@ -69,14 +71,14 @@
 		<delete failonerror="false" dir="sourcebuild" />
 
 		<copy todir="${dist}">
-			
-		    <fileset dir=".">
-		        <include name="readme.txt" />
-		    </fileset>
-		    <fileset dir="legal/">
-		        <include name="*.txt" />
-		    </fileset>    
-			
+
+			<fileset dir=".">
+				<include name="readme.txt" />
+			</fileset>
+			<fileset dir="legal/">
+				<include name="*.txt" />
+			</fileset>
+
 		</copy>
 		<copy todir="${dist}/lib">
 			<fileset dir="${lib}" />
@@ -90,19 +92,28 @@
 			<fileset dir="${res}/lang" />
 		</copy>
 		<copy todir="${build}">
-		    <fileset dir="${res}">
-		        <include name="**/*.conf" />
+			<fileset dir="${res}">
+				<include name="**/*.conf" />
 				<include name="conf/*.txt" />
 				<include name="conf/*.tsv" />
-		    </fileset>
+
+			</fileset>
 			<fileset dir="${src}">
-				
+
 				<include name="org/java/**/*.properties" />
 				<include name="org/java/**/*.dtd" />
+
+
+
+				<include name="net/sf/jannot/aamapping/**" />
+
+				<include name="**/*.txt" />
+
+
 			</fileset>
 		</copy>
 
-		
+
 
 		<copy file="genomeview.properties" todir="${build}" />
 		<copy file="${res}/plugin.xml" todir="${build}" />
@@ -111,12 +122,12 @@
 	</target>
 
 	<target name="compile" depends="init">
-		<javac source="1.6" target="1.6" debug="true" debuglevel="lines,vars,source" srcdir="${src}" destdir="${build}" excludes="junit/**">
+		<javac source="1.8" target="1.8" debug="true" debuglevel="lines,vars,source" srcdir="${src}" destdir="${build}" excludes="junit/**">
 			<classpath>
 				<fileset dir="${lib}">
 					<include name="**/*.jar" />
 				</fileset>
-				 <pathelement location="${java.home}/lib/javaws.jar" />
+				<pathelement location="${java.home}/lib/javaws.jar" />
 			</classpath>
 		</javac>
 	</target>
@@ -130,7 +141,7 @@
 		</jar>
 
 
-		
+
 
 
 		<zip destfile="${dist}.zip" basedir="." includes="${dist}/**/*" />
@@ -141,14 +152,12 @@
 
 	</target>
 
-	
-	<target name="junit" >
-  		<delete
-            dir="build.test"
-            failonerror="false" />
-        <mkdir dir="build.test" />
 
-        <mkdir dir="build.test/images" />
+	<target name="junit">
+		<delete dir="build.test" failonerror="false" />
+		<mkdir dir="build.test" />
+
+		<mkdir dir="build.test/images" />
 		<copy todir="build.test/images">
 			<fileset dir="${res}/images" />
 		</copy>
@@ -156,87 +165,75 @@
 			<fileset dir="${res}/lang" />
 		</copy>
 		<copy todir="build.test">
-		    <fileset dir="${res}">
-		        <include name="**/*.conf" />
+			<fileset dir="${res}">
+				<include name="**/*.conf" />
 				<include name="/conf/*.txt" />
 				<include name="/conf/*.tsv" />
-		    </fileset>
+			</fileset>
 			<fileset dir="${src}">
-				
+
 				<include name="org/java/**/*.properties" />
 				<include name="org/java/**/*.dtd" />
 			</fileset>
 		</copy>
 
-		
+
 
 		<copy file="genomeview.properties" todir="build.test" />
 		<copy file="${res}/plugin.xml" todir="build.test" />
 
-        <javac
-            debug="true"
-            debuglevel="lines,vars,source"
-            destdir="build.test"
-            source="1.6"
-            target="1.6" >
+		<javac debug="true" debuglevel="lines,vars,source" destdir="build.test" source="1.8" target="1.8">
 
-            <src path="${src}" />
+			<src path="${src}" />
 
-            <src path="junit/src" />
+			<src path="junit/src" />
 
-            <classpath>
+			<classpath>
 
-                <fileset dir="lib/" >
+				<fileset dir="lib/">
 
-                    <include name="*.jar" />
-                </fileset>
+					<include name="*.jar" />
+				</fileset>
 
-                <fileset dir="lib_compile/" >
+				<fileset dir="lib_compile/">
 
-                    <include name="*.jar" />
-                </fileset>
-            </classpath>
-        </javac>
-        <!-- <taskdef name="unit-lib" classpath="" /> -->
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+		<!-- <taskdef name="unit-lib" classpath="" /> -->
 
-        <junit
-            errorProperty="test.failed"
-            failureProperty="test.failed"
-            fork="no" >
+		<junit errorProperty="test.failed" failureProperty="test.failed" fork="no">
 
-            <formatter type="plain" />
+			<formatter type="plain" />
 
-            <classpath>
+			<classpath>
 
-                <fileset dir="lib/" >
+				<fileset dir="lib/">
 
-                    <include name="*.jar" />
-                </fileset>
+					<include name="*.jar" />
+				</fileset>
 
-                <fileset dir="lib_compile/" >
+				<fileset dir="lib_compile/">
 
-                    <include name="*.jar" />
-                </fileset>
+					<include name="*.jar" />
+				</fileset>
 
-                <pathelement location="build.test/" />
-            </classpath>
+				<pathelement location="build.test/" />
+			</classpath>
 
-            <batchtest>
+			<batchtest>
 
-                <fileset dir="build.test" >
+				<fileset dir="build.test">
 
-                    <include name="**/Test*.class" />
-                </fileset>
-            </batchtest>
-        </junit>
+					<include name="**/Test*.class" />
+				</fileset>
+			</batchtest>
+		</junit>
 
-        <fail
-            if="test.failed"
-            message="Tests failed. Please see test reports" />
-		<echo message="Tests have complete successfully!"/>
-        <delete
-            dir="build.test"
-            failonerror="false" />
-    </target>
-	
+		<fail if="test.failed" message="Tests failed. Please see test reports" />
+		<echo message="Tests have complete successfully!" />
+		<delete dir="build.test" failonerror="false" />
+	</target>
+
 </project>

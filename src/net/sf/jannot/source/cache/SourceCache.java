@@ -12,10 +12,10 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+import atk.util.MD5Tools;
+import be.abeel.io.ExtensionFileFilter;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.FileSource;
-import be.abeel.io.ExtensionFileFilter;
-import be.abeel.security.MD5Tools;
 
 
 public class SourceCache {
