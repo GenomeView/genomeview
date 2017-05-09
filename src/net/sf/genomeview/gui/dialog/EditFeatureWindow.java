@@ -249,7 +249,7 @@ public class EditFeatureWindow extends JDialog {
 
 	private String format(Location[] loc) {
 		StringBuffer tmp = new StringBuffer(Arrays.toString(loc));
-		return tmp.substring(1, tmp.length() - 1);
+		return tmp.substring(1, tmp.length() - 1).replaceAll("\\s+", "");
 	}
 
 }
