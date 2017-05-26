@@ -42,16 +42,6 @@ import net.sf.jannot.source.Locator;
 import net.sf.jannot.source.das.DAS;
 import net.sf.jannot.source.das.DAS.EntryPoint;
 
-import org.genomespace.client.GsSession;
-import org.genomespace.client.exceptions.AuthorizationException;
-import org.genomespace.client.exceptions.ConfigurationError;
-import org.genomespace.client.exceptions.InternalServerException;
-import org.genomespace.client.exceptions.ServerNotFoundException;
-import org.genomespace.client.ui.GSFileBrowserDialog;
-import org.genomespace.client.ui.GSLoginDialog;
-import org.genomespace.datamanager.core.GSFileMetadata;
-import org.xml.sax.SAXException;
-
 import be.abeel.gui.GridBagPanel;
 import be.abeel.net.URIFactory;
 
@@ -221,70 +211,7 @@ public class OpenDialog extends JDialog {
 			}
 		});
 
-		genomespace.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				_self.dispose();
-				try {
-					    // open a GSLogin Dialog 
-					GsSession session = null;
-					    final GSLoginDialog loginDialog = new GSLoginDialog(null, ModalityType.APPLICATION_MODAL);
-					    loginDialog.setVisible(true);
-					    final String userName = loginDialog.getUsername();
-					    final String password = loginDialog.getPassword();
-					    if ((userName==null) || (userName.trim().length()==0))
-					         JOptionPane.showMessageDialog(null, 
-					        		 	MessageManager.getString("opendialog.empty_username"),
-					        		 	MessageManager.getString("opendialog.login_error"),
-					        		 	JOptionPane.ERROR_MESSAGE);
-					    if ((password==null) || (password.trim().length()==0))
-					         JOptionPane.showMessageDialog(null, 
-					        		 	MessageManager.getString("opendialog.empty_password"),
-					        		 	MessageManager.getString("opendialog.login_error"),
-					        		 	JOptionPane.ERROR_MESSAGE);
-					    	
-			    	 session = loginDialog.getGsSession();
-			    	 if (session==null)
-			    		 session = new GsSession();
-			    	 session.login(userName, password);
-					//Once user is logged, list its working files
-					GSFileBrowserDialog fileBrowser = new GSFileBrowserDialog(null, session.getDataManagerClient(), 
-							GSFileBrowserDialog.DialogType.FILE_SELECTION_DIALOG); 
-							fileBrowser.setVisible(true);
-					GSFileMetadata selection = fileBrowser.getSelectedFileMetadata();
-							// Do something with the selected file
-					DataSourceHelper.load(model,new Locator(selection.getPath()));
-			    } catch (final AuthorizationException e1) {
-			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.invalid_username_pwd"),MessageManager.getString("opendialog.login_error"), 
-			         JOptionPane.ERROR_MESSAGE);
-			    }catch (ConfigurationError ce){
-			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_unavailable"),MessageManager.getString("opendialog.connection_error"), 
-			         JOptionPane.ERROR_MESSAGE);			    	
-				}catch (ServerNotFoundException e2) {					
-			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
-			         JOptionPane.ERROR_MESSAGE);
-				} catch (InternalServerException e3) {
-			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
-			         JOptionPane.ERROR_MESSAGE);
-				}  catch (MalformedURLException e2) {
-			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
-			         JOptionPane.ERROR_MESSAGE);
-				} catch (IOException e2) {
-			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
-			         JOptionPane.ERROR_MESSAGE);
-				} catch (URISyntaxException e3) {
-			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
-			         JOptionPane.ERROR_MESSAGE);
-				} catch (ReadFailedException e4) {
-			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.connection_error_retry"),MessageManager.getString("opendialog.connection_error"), 
-			         JOptionPane.ERROR_MESSAGE);
-				} catch(Exception e5){
-			         JOptionPane.showMessageDialog(null, MessageManager.getString("opendialog.invalid_username_pwd"),MessageManager.getString("opendialog.login_error"), 
-			         JOptionPane.ERROR_MESSAGE);					
-				}
-			}
-		});	
+		
 		
 //		das.addActionListener(new ActionListener() {
 //
