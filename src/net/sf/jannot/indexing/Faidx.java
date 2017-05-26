@@ -44,7 +44,7 @@ public class Faidx {
 			for (int i = 0; i < read; i++) {
 
 				char c = (char) buffer[i];
-				if (c == '>') {
+				if (c == '>'&&!firstLine) {
 					spacer = 0;
 					// firstChar = true;
 					firstSpacer = true;
