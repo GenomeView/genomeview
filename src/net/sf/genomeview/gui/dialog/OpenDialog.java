@@ -3,9 +3,7 @@
  */
 package net.sf.genomeview.gui.dialog;
 
-import java.awt.HeadlessException;
 import java.awt.Window;
-import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -14,10 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -25,25 +20,17 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
-import javax.xml.parsers.ParserConfigurationException;
 
+import be.abeel.gui.GridBagPanel;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.NotificationTypes;
-import net.sf.genomeview.data.ReadWorker;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.exception.ReadFailedException;
-import net.sf.jannot.source.DataSource;
-import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
-import net.sf.jannot.source.das.DAS;
-import net.sf.jannot.source.das.DAS.EntryPoint;
-
-import be.abeel.gui.GridBagPanel;
-import be.abeel.net.URIFactory;
 
 /**
  * 
@@ -54,7 +41,6 @@ public class OpenDialog extends JDialog {
 
 	private static final long serialVersionUID = -9176452114031190911L;
 
-	private Model model;
 
 	private final String[] exts = new String[] { "fasta", "fa", "fas", "embl", "fna", "gtf", "gff", "gff3", "maln",
 			"syn", "wig", "mfa", "bed", "mapview", "bam", "maf", "snp", "tbl", "gb", "gbk", "pileup", "con", "peaks",
@@ -64,7 +50,7 @@ public class OpenDialog extends JDialog {
 	public OpenDialog(Window parent, final Model model) {
 		super(parent, "Load data", ModalityType.APPLICATION_MODAL);
 		this.setIconImage(Icons.MINILOGO);
-		this.model = model;
+
 		setResizable(false);
 		addWindowListener(new WindowAdapter() {
 
