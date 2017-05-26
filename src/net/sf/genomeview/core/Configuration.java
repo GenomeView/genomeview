@@ -133,7 +133,7 @@ public class Configuration {
 			is = Configuration.class.getResourceAsStream("/genomeview.properties");
 			gvProperties.load(is);
 		} catch (Exception e1) {
-			logger.warn("genomeview.properties file could not be loaded! GenomeView assumes your are a developer and know why you can ignore this.");
+			logger.warn("genomeview.properties file could not be loaded! GenomeView assumes you are a developer and know why you can ignore this.");
 
 		} finally {
 			if (is != null)
