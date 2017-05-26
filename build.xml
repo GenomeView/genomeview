@@ -80,7 +80,7 @@
 			</fileset>
 
 		</copy>
-		
+
 		<mkdir dir="${build}/images" />
 		<copy todir="${build}/images">
 			<fileset dir="${res}/images" />
@@ -135,12 +135,12 @@
 
 
 		<jar destfile="${dist}/${jar}" basedir="${build}">
-	    <zipgroupfileset dir="lib/" includes="*.jar"/>
+			<zipgroupfileset dir="lib/" includes="*.jar" />
 			<manifest>
-			    <attribute name="Built-By" value="${user.name}"/>
-				<attribute name="Main-Class" value="net.sf.genomeview.gui.GenomeView"/>
-			
-			  </manifest>
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Main-Class" value="net.sf.genomeview.gui.GenomeView" />
+
+			</manifest>
 		</jar>
 
 
@@ -177,6 +177,11 @@
 
 				<include name="org/java/**/*.properties" />
 				<include name="org/java/**/*.dtd" />
+
+				<include name="net/sf/jannot/aamapping/**" />
+
+				<include name="**/*.txt" />
+
 			</fileset>
 		</copy>
 
