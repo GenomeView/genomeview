@@ -76,13 +76,8 @@ public class OpenDialog extends JDialog {
 		configButton(url);
 		gp.add(url, gp.gc);
 		gp.gc.gridx++;
-		JButton genomespace = new JButton(MessageManager.getString("opendialog.genomespace"), Icons.get("genomespace.png"));
-		configButton(genomespace);
-		gp.add(genomespace, gp.gc);
+	
 		
-//		JButton das = new JButton("DAS(exp)", Icons.get("das.png"));
-//		configButton(das);
-//		gp.add(das, gp.gc);
 
 		/** Add logic to buttons */
 		file.addActionListener(new ActionListener() {
