@@ -35,7 +35,7 @@ public class TestLocator {
 	@Test
 	public void testLocalRelativeFile() throws URISyntaxException, IOException {
 
-		Locator l = new Locator("test/resource/junit.txt");
+		Locator l = new Locator("junit/resource/junit.txt");
 		for (String line : new LineIterator(l.stream())) {
 			System.out.println(line);
 		}
@@ -44,7 +44,7 @@ public class TestLocator {
 
 	@Test
 	public void testLocalAbsoluteFile() throws URISyntaxException, IOException {
-		String path = new java.io.File(".").getCanonicalPath() + "/test/resource/junit.txt";
+		String path = new java.io.File(".").getCanonicalPath() + "/junit/resource/junit.txt";
 		Locator l = new Locator(path);
 		for (String line : new LineIterator(l.stream())) {
 			System.out.println(line);
@@ -54,7 +54,7 @@ public class TestLocator {
 
 	@Test
 	public void testURLLocalAbsoluteFile() throws URISyntaxException, IOException {
-		String path = "file://" + new java.io.File(".").getCanonicalPath() + "/test/resource/junit.txt";
+		String path = "file://" + new java.io.File(".").getCanonicalPath() + "/junit/resource/junit.txt";
 		Locator l = new Locator(path);
 		for (String line : new LineIterator(l.stream())) {
 			System.out.println(line);
@@ -65,7 +65,7 @@ public class TestLocator {
 	@Test
 	public void testURLLocalFile() throws URISyntaxException, IOException {
 
-		Locator l = new Locator("file://test/resource/junit.txt");
+		Locator l = new Locator("file://junit/resource/junit.txt");
 		for (String line : new LineIterator(l.stream())) {
 			System.out.println(line);
 		}
