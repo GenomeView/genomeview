@@ -9,9 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
+
 /**
  * 
  * @author Thomas Abeel
@@ -24,13 +26,14 @@ public class ShowGenomeExplorerAction extends AbstractAction {
 
 	public ShowGenomeExplorerAction(Model model) {
 		super(MessageManager.getString("filemenu.show_genome_explorer"));
-			this.model = model;
-		}
+		this.model = model;
+		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control W"));
+	}
 
-		private static Logger log = LoggerFactory.getLogger(LoadSessionAction.class.getCanonicalName());
+	private static Logger log = LoggerFactory.getLogger(LoadSessionAction.class.getCanonicalName());
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			model.getGUIManager().getGenomeExplorer().setVisible(true);
-		}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		model.getGUIManager().getGenomeExplorer().setVisible(true);
+	}
 }

@@ -69,7 +69,7 @@ public class Session {
 	private static Logger log = LoggerFactory.getLogger(Session.class.getCanonicalName());
 
 	enum SessionInstruction {
-		PREFIX, CONFIG, DATA, OPTION, LOCATION, PLUGIN, ALIAS, C, U, F;
+		PREFIX, CONFIG, DATA, OPTION, LOCATION, PLUGIN, ALIAS, C, U, F,EXTRA;
 	}
 
 	/**
@@ -124,6 +124,10 @@ public class Session {
 												prefix="";
 											else
 												prefix = arr[1].trim();
+											break;
+										case EXTRA:
+											model.getExtraSessionFiles().addElement(arr[1]);
+											log.warn("Extra file: "+arr[1]);
 											break;
 										case U:
 										case F:

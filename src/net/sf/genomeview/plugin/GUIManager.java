@@ -14,7 +14,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import net.sf.genomeview.gui.StatusBar;
-import net.sf.genomeview.gui.explorer.GenomeExplorerManager;
+import net.sf.genomeview.gui.explorer.DataExplorerManager;
 import net.sf.genomeview.gui.information.InformationFrame;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel;
 
@@ -130,7 +130,7 @@ public class GUIManager {
 
 	private GeneEvidenceLabel gel = null;
 	private StatusBar statusBar;
-	private GenomeExplorerManager genomeExplorerManager;
+	private DataExplorerManager genomeExplorerManager;
 	private InformationFrame infoFrame;
 	private JMenuItem pluginLoadingMessage;
 
@@ -157,12 +157,12 @@ public class GUIManager {
 
 	}
 
-	public void registerGenomeExplorer(GenomeExplorerManager genomeExplorerManager) {
+	public void registerGenomeExplorer(DataExplorerManager genomeExplorerManager) {
 		this.genomeExplorerManager = genomeExplorerManager;
 
 	}
 
-	public GenomeExplorerManager getGenomeExplorer() {
+	public DataExplorerManager getGenomeExplorer() {
 		return genomeExplorerManager;
 	}
 

@@ -14,7 +14,7 @@ import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.ReadWorker;
 import net.sf.genomeview.data.Session;
-import net.sf.genomeview.gui.explorer.GenomeExplorerManager;
+import net.sf.genomeview.gui.explorer.DataExplorerManager;
 import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
@@ -137,7 +137,7 @@ public class InitDataLoader {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new GenomeExplorerManager(model);
+				new DataExplorerManager(model);
 				model.refresh(this);
 
 			}

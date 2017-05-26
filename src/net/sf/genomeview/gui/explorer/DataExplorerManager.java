@@ -19,14 +19,14 @@ import net.sf.genomeview.gui.components.ConnectionMonitor;
  * @author Thomas Abeel
  * 
  */
-public class GenomeExplorerManager implements Observer {
-	GenomeExplorer bg;
+public class DataExplorerManager implements Observer {
+	DataExplorer bg;
 	private Model model;
 
 	private boolean autoMode = Configuration.getBoolean("general:enableGenomeExplorer");
 
-	public GenomeExplorerManager(Model model) {
-		bg = new GenomeExplorer(model);
+	public DataExplorerManager(Model model) {
+		bg = new DataExplorer(model);
 		this.model = model;
 		model.getGUIManager().registerGenomeExplorer(this);
 		model.addObserver(this);
@@ -42,7 +42,7 @@ public class GenomeExplorerManager implements Observer {
 
 	}
 
-	private boolean firstUse = true;
+//	private boolean firstUse = true;
 
 	private void visi(final boolean vis) {
 		EventQueue.invokeLater(new Runnable() {
@@ -58,17 +58,17 @@ public class GenomeExplorerManager implements Observer {
 			}
 		});
 
-		if (vis && firstUse) {
-			firstUse = false;
-			EventQueue.invokeLater(new Runnable() {
-
-				@Override
-				public void run() {
-					bg.scollToTop();
-				}
-			});
-
-		}
+//		if (vis && firstUse) {
+//			firstUse = false;
+//			EventQueue.invokeLater(new Runnable() {
+//
+//				@Override
+//				public void run() {
+//					bg.scollToTop();
+//				}
+//			});
+//
+//		}
 	}
 
 	@Override

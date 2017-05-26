@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -21,13 +22,18 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
+
+import javax.swing.DefaultListModel;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.genomeview.gui.explorer.FilteredListModel;
 import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.genomeview.gui.external.JavaScriptHandler;
 import net.sf.genomeview.gui.viztracks.TickmarkTrack;
@@ -42,8 +48,8 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
-import net.sf.nameservice.NameService;
-import be.abeel.net.URIFactory;
+import net.sf.samtools.util.RuntimeEOFException;
+import be.abeel.io.LineIterator;
 import be.abeel.util.DefaultHashMap;
 
 /**
@@ -94,6 +100,18 @@ public class Model extends Observable implements Observer {
 
 		Configuration.getTypeSet("visibleTypes");
 		updateTracks();
+
+		try {
+
+			File recent = new File(Configuration.getDirectory(), "recent.gv");
+			if (recent.exists()&&recent.length()>0) {
+				LineIterator it = new LineIterator(recent);
+				while (it.hasNext())
+					recentFiles.addElement(it.next());
+			}
+		} catch (Exception e) {
+			CrashHandler.showErrorMessage("Could not retrieve recently used files", e);
+		}
 
 	}
 
@@ -182,11 +200,25 @@ public class Model extends Observable implements Observer {
 
 	public void exit() {
 		this.exitRequested = true;
+
 		try {
-			if (Configuration.getBoolean("session:enableRememberLast"))
+			if (Configuration.getBoolean("session:enableRememberLast")) {
+
+				/*
+				 * Write recent files to disk
+				 */
+				PrintWriter pw = new PrintWriter(new File(Configuration.getDirectory(), "recent.gv"));
+
+				for (int i = 0; i < recentFiles.getSize(); i++) {
+
+					pw.println(recentFiles.getElementAt(i));
+				}
+				pw.close();
+
 				/* Only store session if there is something to store */
-				if(this.loadedSources().size()>0)
+				if (this.loadedSources().size() > 0)
 					Session.save(new File(Configuration.getDirectory(), "previous.gvs"), this);
+			}
 		} catch (IOException e) {
 			logger.error("Problem saving last session", e);
 		}
@@ -310,18 +342,20 @@ public class Model extends Observable implements Observer {
 		if (entries.size() == 0)
 			vlm.setAnnotationLocationVisible(new Location(1, 51));
 		logger.info("Reading source:" + f);
+		recentFiles.removeElement(f.getLocator().toString());
+		recentFiles.add(0, f.getLocator().toString());
 		try {
 			f.read(entries);
-			if(entries.size()>0&&vlm.getVisibleEntry() instanceof DummyEntry){
+			if (entries.size() > 0 && vlm.getVisibleEntry() instanceof DummyEntry) {
 				vlm.setVisibleEntry(entries.firstEntry());
-				Entry selected=vlm.getVisibleEntry();
-				int len=selected.getMaximumLength();
-				if(len>5000){
-					int randomStart=StaticUtils.rg.nextInt((len/2)-1000)+len/4;
-					logger.info("Setting random location at data load: "+selected+"\t"+randomStart);
-					vlm.setAnnotationLocationVisible(new Location(randomStart, randomStart+1000));
+				Entry selected = vlm.getVisibleEntry();
+				int len = selected.getMaximumLength();
+				if (len > 5000) {
+					int randomStart = StaticUtils.rg.nextInt((len / 2) - 1000) + len / 4;
+					logger.info("Setting random location at data load: " + selected + "\t" + randomStart);
+					vlm.setAnnotationLocationVisible(new Location(randomStart, randomStart + 1000));
 				}
-						
+
 			}
 		} catch (Exception e) {
 			throw new ReadFailedException(e);
@@ -334,8 +368,7 @@ public class Model extends Observable implements Observer {
 
 	}
 
-	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(AminoAcidMapping.valueOf(Configuration
-			.get("translationTable:default")));
+	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(AminoAcidMapping.valueOf(Configuration.get("translationTable:default")));
 
 	// private Configuration trackMap;
 
@@ -382,6 +415,7 @@ public class Model extends Observable implements Observer {
 				refresh(NotificationTypes.UPDATETRACKS);
 		} catch (ConcurrentModificationException e) {
 			logger.error("Update tracks interrupted, tracks already changed", e);
+			refresh(NotificationTypes.UPDATETRACKS);
 		}
 
 	}
@@ -481,16 +515,16 @@ public class Model extends Observable implements Observer {
 	// }
 
 	public synchronized void setSelectedEntry(Entry entry) {
-		logger.info("Setting selected entry: "+entry);
+		logger.info("Setting selected entry: " + entry);
 		vlm.setVisibleEntry(entry);
 		// entries.setDefault(entry);
 		selectionModel.clear();
 
 		vlm.setAnnotationLocationVisible(vlm.getVisibleLocation());
 		trackList.clear();
-		//FIXME updateTracks also does update :-/
+		// FIXME updateTracks also does update :-/
 		updateTracks();
-	//FIXME likely double notification
+		// FIXME likely double notification
 		refresh(NotificationTypes.ENTRYCHANGED);
 
 	}
@@ -548,11 +582,21 @@ public class Model extends Observable implements Observer {
 
 	}
 
-	
-
 	private AnnotationModel annotationModel = new AnnotationModel();
 
 	public AnnotationModel annotationModel() {
 		return annotationModel;
+	}
+
+	private FilteredListModel<String> recentFiles = new FilteredListModel<String>(new DefaultListModel<String>());
+
+	public FilteredListModel<String> getRecentFiles() {
+		return recentFiles;
+	}
+
+	private FilteredListModel<String> extraFiles = new FilteredListModel<String>(new DefaultListModel<String>());
+
+	public FilteredListModel<String> getExtraSessionFiles() {
+		return extraFiles;
 	}
 }
