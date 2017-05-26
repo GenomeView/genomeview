@@ -213,57 +213,13 @@ public class OpenDialog extends JDialog {
 
 		
 		
-//		das.addActionListener(new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				_self.dispose();
-//				try {
-//					String url = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-//							"Give the URL of the data").trim();
-//					DAS das = new DAS(url);
-//					List<String> refs = das.getReferences();
-//					Collections.sort(refs);
-//					String ref = (String) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-//							"Select reference genome", "Reference selection", JOptionPane.INFORMATION_MESSAGE, null,
-//							refs.toArray(), refs.get(0));
-//					List<EntryPoint> eps = das.getEntryPoints(ref);
-//					EntryPoint ep = (EntryPoint) JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-//							"Select entry point", "Entry point selection", JOptionPane.INFORMATION_MESSAGE, null,
-//							eps.toArray(), eps.get(0));
-//					das.setEntryPoint(ep);
-//					das.setReference(ref);
-//					das.
-////					load(new DataSource[] { das });
-//				} catch (HeadlessException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				} catch (MalformedURLException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				} catch (ParserConfigurationException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				} catch (SAXException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				} catch (IOException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				} catch (URISyntaxException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				}
-//
-//			}
-//		});
+
 
 		pack();
 		StaticUtils.center(model.getGUIManager().getParent(),_self);
 		setVisible(true);
 
-		// }
-		// });
+		
 
 	}
 
@@ -273,26 +229,6 @@ public class OpenDialog extends JDialog {
 
 	}
 
-	// public void doSomething() {
-	// Sources source = (Sources)
-	// JOptionPane.showInputDialog(model.getGUIManager().getParent(),
-	// "Select feature source", "Data selection",
-	// JOptionPane.INFORMATION_MESSAGE, null, Sources.values(),
-	// Sources.values()[0]);
-	// if (source != null) {
-	// DataSource[] data = DataMenu.create(source, model, new String[] {
-	// "fasta", "fa", "fas", "embl", "fna",
-	// "gtf", "gff", "gff3", "maln", "syn", "wig", "mfa", "bed", "mapview",
-	// "bai", "maf", "snp", "tbl",
-	// "gb", "gbk", "pileup", "con", "peaks" });
-	// if (data != null) {
-	// for (DataSource ds : data) {
-	// final ReadWorker rw = new ReadWorker(ds, model);
-	// rw.execute();
-	// }
-	//
-	// }
-	// }
-	// }
+	
 
 }
