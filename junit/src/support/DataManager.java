@@ -18,15 +18,11 @@ package support;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
-
-
-import be.abeel.io.LineIterator;
 
 /**
  * 
@@ -56,6 +52,7 @@ public class DataManager {
 
 	private static void retrieveSF(String identifier, File out) throws Exception {
 		URL url = new URL("http://genomeview.org/junit/" + identifier);
+		System.out.println("Trying: "+url);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		int response = conn.getResponseCode();
 		if (response == 302) {
@@ -65,7 +62,12 @@ public class DataManager {
 			IOUtils.copy(conn.getInputStream(),fof );
 			fof.close();
 			
+		}else if (response==200){
+			FileOutputStream fof=new FileOutputStream(out);
+			IOUtils.copy(conn.getInputStream(),fof );
+			fof.close();
 		}
+		
 	}
 
 //	public static String[] vcfFiles() {
