@@ -45,7 +45,7 @@
 		</copy>
 		<replaceregexp match="%HEADER%" replace="This file is part of GenomeView, a genome browser and annotation curator${line.separator}
 * ${line.separator}
-* Copyright (C) 2007-2016 Thomas Abeel and contributors${line.separator}
+* Copyright (C) 2007-2017 Thomas Abeel and contributors${line.separator}
 * ${line.separator}
 * This program is free software: you can redistribute it and/or modify${line.separator}
 * it under the terms of the GNU General Public License as published by${line.separator}
