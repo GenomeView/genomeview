@@ -55,7 +55,7 @@ public class DataManager {
 	}
 
 	private static void retrieveSF(String identifier, File out) throws Exception {
-		URL url = new URL("https://sourceforge.net/projects/genomeview/files/unit%20test%20files/" + identifier + "/download?use_mirror=autoselect");
+		URL url = new URL("http://genomeview.org/junit/" + identifier);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		int response = conn.getResponseCode();
 		if (response == 302) {
