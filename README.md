@@ -1,9 +1,9 @@
 # genomeview
 
 
-Documentation: http://genomeview.org/
+Documentation: http://genomeview.org/manual
 
-Download: http://downloads.sourceforge.net/genomeview/
+Download: http://genomeview.org/jenkins/genomeview/
 
 Webstart: http://genomeview.org/start/launch.jnlp
 
