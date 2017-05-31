@@ -26,6 +26,7 @@ import javax.swing.JTabbedPane;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.data.NotificationTypes;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.dialog.HelpButton;
@@ -350,7 +351,7 @@ public class ConfigurationDialog extends JDialog {
 		}
 	}
 
-	public ConfigurationDialog(Model model) {
+	public ConfigurationDialog(final Model model) {
 		super(model.getGUIManager().getParent(), MessageManager.getString("configddialog.configuration_panel"));
 		setModal(true);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -360,6 +361,7 @@ public class ConfigurationDialog extends JDialog {
 			public void windowClosing(WindowEvent e) {
 				try {
 					Configuration.save();
+					model.refresh(NotificationTypes.CONFIGURATION_CHANGE);
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -399,6 +401,7 @@ public class ConfigurationDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					Configuration.save();
+					model.refresh(NotificationTypes.CONFIGURATION_CHANGE);
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

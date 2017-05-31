@@ -30,6 +30,11 @@ public enum NotificationTypes {
 	UPDATETRACKS,
 	
 	/**
+	 * Configuration changed
+	 */
+	CONFIGURATION_CHANGE,
+	
+	/**
 	 * The entry selection changed
 	 */
 	ENTRYCHANGED,
