@@ -5,12 +5,8 @@ package net.sf.genomeview.data;
 
 import java.awt.Color;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
@@ -27,14 +23,13 @@ import javax.swing.DefaultListModel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import be.abeel.io.LineIterator;
+import be.abeel.util.DefaultHashMap;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.explorer.FilteredListModel;
-import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.genomeview.gui.external.JavaScriptHandler;
 import net.sf.genomeview.gui.viztracks.TickmarkTrack;
 import net.sf.genomeview.gui.viztracks.Track;
@@ -48,9 +43,6 @@ import net.sf.jannot.Strand;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
-import net.sf.samtools.util.RuntimeEOFException;
-import be.abeel.io.LineIterator;
-import be.abeel.util.DefaultHashMap;
 
 /**
  * The Model.
