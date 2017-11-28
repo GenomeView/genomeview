@@ -499,12 +499,7 @@ public class Model extends Observable implements Observer {
 		return selectionModel;
 	}
 
-	//
-	// public Entry getSelectedEntry() {
-	// if (entries.size() == 0)
-	// return DummyEntry.dummy;
-	// return entries.getEntry();
-	// }
+	
 
 	public synchronized void setSelectedEntry(Entry entry) {
 		logger.info("Setting selected entry: " + entry);
