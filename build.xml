@@ -139,6 +139,7 @@
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Main-Class" value="net.sf.genomeview.gui.GenomeView" />
+				<attribute name="Permissions" value="all-permissions" />
 
 			</manifest>
 		</jar>
