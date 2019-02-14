@@ -426,6 +426,10 @@ public class SaveDialog extends JDialog {
 
 		});
 
+		Container content = this.getContentPane();
+		JScrollPane scrollPane = new JScrollPane(content);
+		this.setContentPane(scrollPane);
+		
 		pack();
 		StaticUtils.center(model.getGUIManager().getParent(), this);
 		setVisible(true);
