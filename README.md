@@ -9,9 +9,9 @@ Webstart: http://genomeview.org/start/launch.jnlp
 
 
 Import in Eclipse:
-- Make sure you have the EGit plugin or similar installed in Eclipse
+- Make sure you have the EGit plugin or similar installed in Eclipse.
 - Clone the repository: https://github.com/GenomeView/genomeview.git
-- Add all libraries in lib/ to the classpath
+- Add all libraries in lib/ to the classpath.
 
 - Add 'src' and 'resources' as source folders.
 
