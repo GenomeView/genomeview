@@ -79,6 +79,13 @@
 		    <systemPath>${basedir}/lib/slf4j-jdk14-1.7.5.jar</systemPath>
 		</dependency>
 		
+				
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		    <version>4.11</version>
+		    <scope>test</scope>
+		</dependency>
 		
 	</dependencies>
 	
