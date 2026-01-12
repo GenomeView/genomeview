@@ -17,12 +17,12 @@ import net.sf.jannot.exception.ReadFailedException;
  */
 public abstract class DataSource implements Comparable<DataSource> {
 
-	protected Locator locator=null;
-	
-	protected DataSource(Locator l){
-		this.locator=l;
+	protected Locator locator = null;
+
+	protected DataSource(Locator l) {
+		this.locator = l;
 	}
-	
+
 	@Override
 	public int compareTo(DataSource o) {
 		return this.toString().compareTo(o.toString());
@@ -38,6 +38,14 @@ public abstract class DataSource implements Comparable<DataSource> {
 
 	public abstract long size();
 
+	/**
+	 * try to read from given sources
+	 * 
+	 * @param url  a {@link URL}
+	 * @param file a {@link File}
+	 * @return the file length, or if null, the url content length, or 0 if if the
+	 *         url can also not be read
+	 */
 	protected static long size(URL url, File file) {
 		long size = 0;
 		if (url != null)
@@ -54,7 +62,7 @@ public abstract class DataSource implements Comparable<DataSource> {
 
 	}
 
-	public Locator getLocator(){
+	public Locator getLocator() {
 		return locator;
 	}
 }
