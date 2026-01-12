@@ -9,17 +9,27 @@
 		<maven.compiler.target>1.17</maven.compiler.target>
 		<maven.compiler.source>1.17</maven.compiler.source>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<local.repository.folder>${pom.basedir}/lib/m2</local.repository.folder>
 	</properties>
 
+	<repositories>
+	   <repository>
+	        <id>local-maven-repository</id>
+	        <url>file://${local.repository.folder}</url>
+	        <releases>
+	            <enabled>true</enabled>
+	        </releases>
+	        <snapshots>
+	            <enabled>true</enabled>
+	        </snapshots>
+	   </repository>
+	</repositories>
+
     <dependencies>
-
-
 	    <dependency>
 		    <groupId>be.abeel</groupId>
 		    <artifactId>atk</artifactId>
 		    <version>1.1.0</version>
-		    <scope>system</scope>
-		    <systemPath>${basedir}/lib/atk-110.jar</systemPath>
 		</dependency>
 		
 		
