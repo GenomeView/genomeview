@@ -13,7 +13,19 @@
 	</properties>
 
 	<repositories>
-	   <repository>
+		<repository>
+		  <id>central</id>
+		  <name>maven central</name>
+		  <url>https://repo1.maven.org/maven2/</url>
+		</repository>
+		
+		<repository>
+			<id>jboss</id>
+			<name>jboss</name>
+			<url>https://repository.jboss.org</url>
+		</repository>
+		
+		<repository>
 	        <id>local-maven-repository</id>
 	        <url>file://${local.repository.folder}</url>
 	        <releases>
@@ -33,62 +45,56 @@
 		</dependency>
 		
 		
-	    <dependency>
-		    <groupId>sf.net</groupId>
+		<dependency>
+		    <groupId>net.sf</groupId>
 		    <artifactId>samtools</artifactId>
-		    <version>1.112</version>
-		    <scope>system</scope>
-		    <systemPath>${basedir}/lib/sam-1.112.jar</systemPath>
-		</dependency>
-		
-	    <dependency>
-		    <groupId>jargs</groupId>
-		    <artifactId>gnu</artifactId>
-		    <version>1</version>
-		    <scope>system</scope>
-		    <systemPath>${basedir}/lib/jargs.jar</systemPath>
+		    <version>1.107</version>
 		</dependency>
 
-
-	    <dependency>
-		    <groupId>apache.commons</groupId>
-		    <artifactId>logging</artifactId>
-		    <version>1.7.5</version>
-		    <scope>system</scope>
-		    <systemPath>${basedir}/lib/jcl-over-slf4j-1.7.5.jar</systemPath>
+		<dependency>
+		    <groupId>net.sf</groupId>
+		    <artifactId>jargs</artifactId>
+		    <version>1.0</version>
 		</dependency>
-		
+
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>jcl-over-slf4j</artifactId>
+		    <version>1.7.34</version>
+		</dependency>		
+
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>log4j-over-slf4j</artifactId>
+		    <version>1.7.34</version>
+		</dependency>
+
 		<dependency>
 		    <groupId>commons-io</groupId>
 		    <artifactId>commons-io</artifactId>
 		    <version>2.4</version>
 		</dependency>
 
-	    <dependency>
-		    <groupId>cern.colt</groupId>
-		    <artifactId>collections</artifactId>
-		    <version>1.0</version>
-		    <scope>system</scope>
-		    <systemPath>${basedir}/lib/collections-1.0.jar</systemPath>
+
+		<dependency>
+		    <groupId>colt</groupId>
+		    <artifactId>colt</artifactId>
+		    <version>1.0.3</version>
 		</dependency>
-		
-		
-	    <dependency>
+
+		<dependency>
 		    <groupId>org.slf4j</groupId>
 		    <artifactId>slf4j-api</artifactId>
-		    <version>1.7.5</version>
-		    <scope>system</scope>
-		    <systemPath>${basedir}/lib/slf4j-api-1.7.5.jar</systemPath>
+		    <version>1.7.34</version>
 		</dependency>
-		
-	    <dependency>
+
+
+		<dependency>
 		    <groupId>org.slf4j</groupId>
 		    <artifactId>slf4j-jdk14</artifactId>
-		    <version>1.7.5</version>
-		    <scope>system</scope>
-		    <systemPath>${basedir}/lib/slf4j-jdk14-1.7.5.jar</systemPath>
+		    <version>1.7.34</version>
+		    <scope>test</scope>
 		</dependency>
-		
 				
 		<dependency>
 		    <groupId>junit</groupId>
