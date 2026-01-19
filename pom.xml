@@ -45,11 +45,6 @@
 			</snapshots>
 		</repository>
 		
-		<repository>
-			<id>hadoop</id>
-			<url> https://hadoop-bam.sourceforge.net/maven/ </url>
-		</repository>
-
 
 	</repositories>
 
