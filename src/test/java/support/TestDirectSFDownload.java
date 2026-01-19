@@ -19,6 +19,7 @@ package support;
 import java.io.File;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -29,6 +30,7 @@ import org.junit.Test;
  */
 public class TestDirectSFDownload {
 
+	@Ignore
 	@Test
 	public void testDownload(){
 		String id="minibed.bed";
@@ -39,6 +41,7 @@ public class TestDirectSFDownload {
 		
 	}
 	
+	@Ignore
 	@Test
 	public void testLargeDownload(){
 		String id="CEU.trio.2010_03.genotypes.vcf.gz";

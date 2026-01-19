@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 
 import net.sf.jannot.source.Locator;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import be.abeel.io.LineIterator;
@@ -32,10 +33,14 @@ import be.abeel.io.LineIterator;
  */
 public class TestLocator {
 
+	private static final String SRC_TEST_RESOURCES_JUNIT_TXT = "src/test/resources/junit.txt";
+	private static final String TEST_RESOURCES_JUNIT_TXT = "/"+SRC_TEST_RESOURCES_JUNIT_TXT;
+	private static final String JUNIT_TXT = "file://"+SRC_TEST_RESOURCES_JUNIT_TXT;
+
 	@Test
 	public void testLocalRelativeFile() throws URISyntaxException, IOException {
 
-		Locator l = new Locator("test/resource/junit.txt");
+		Locator l = new Locator(SRC_TEST_RESOURCES_JUNIT_TXT);
 		for (String line : new LineIterator(l.stream())) {
 			System.out.println(line);
 		}
@@ -44,7 +49,7 @@ public class TestLocator {
 
 	@Test
 	public void testLocalAbsoluteFile() throws URISyntaxException, IOException {
-		String path = new java.io.File(".").getCanonicalPath() + "/test/resource/junit.txt";
+		String path = new java.io.File(".").getCanonicalPath() + TEST_RESOURCES_JUNIT_TXT;
 		Locator l = new Locator(path);
 		for (String line : new LineIterator(l.stream())) {
 			System.out.println(line);
@@ -54,7 +59,7 @@ public class TestLocator {
 
 	@Test
 	public void testURLLocalAbsoluteFile() throws URISyntaxException, IOException {
-		String path = "file://" + new java.io.File(".").getCanonicalPath() + "/test/resource/junit.txt";
+		String path = "file://" + new java.io.File(".").getCanonicalPath() + TEST_RESOURCES_JUNIT_TXT;
 		Locator l = new Locator(path);
 		for (String line : new LineIterator(l.stream())) {
 			System.out.println(line);
@@ -65,13 +70,14 @@ public class TestLocator {
 	@Test
 	public void testURLLocalFile() throws URISyntaxException, IOException {
 
-		Locator l = new Locator("file://test/resource/junit.txt");
+		Locator l = new Locator(JUNIT_TXT);
 		for (String line : new LineIterator(l.stream())) {
 			System.out.println(line);
 		}
 
 	}
 
+	@Ignore
 	@Test
 	public void testURL() throws URISyntaxException, IOException {
 		Locator l = new Locator("http://genomeview.org/junit.php");

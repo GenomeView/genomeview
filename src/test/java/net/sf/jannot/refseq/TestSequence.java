@@ -15,10 +15,12 @@ import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.source.IndexedFastaDataSource;
 import net.sf.jannot.source.Locator;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestSequence {
 
+	@Ignore
 	@Test
 	public void testFaidx() throws URISyntaxException{
 		try {

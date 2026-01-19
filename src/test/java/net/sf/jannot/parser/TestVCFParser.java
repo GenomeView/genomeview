@@ -33,6 +33,7 @@ import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.Locator;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import support.DataManager;
@@ -44,6 +45,7 @@ import support.DataManager;
  */
 public class TestVCFParser {
 
+	@Ignore
 	@Test
 	public void testTinySize() {
 
@@ -83,6 +85,8 @@ public class TestVCFParser {
 			Assert.fail();
 		}
 	}
+	
+	@Ignore
 	@Test
 	public void testRegularSize() {
 

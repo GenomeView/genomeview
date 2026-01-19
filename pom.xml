@@ -162,7 +162,37 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
+		    <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-javadoc-plugin</artifactId>
+		        <version>3.6.2</version>
+		        <configuration>
+		            <doclint>none</doclint> <!-- Prints warnings iso errors -->
+		        </configuration>
+		        <executions>
+		            <execution>
+		                <id>attach-javadocs</id>
+		                <goals>
+		                    <goal>jar</goal>
+		                </goals>
+		            </execution>
+		        </executions>
+		    </plugin>		
+		    
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -191,10 +221,61 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+			<plugin>
+				<groupId>org.jfrog.buildinfo</groupId>
+				<artifactId>artifactory-maven-plugin</artifactId>
+				<version>3.2.3</version>
+				<executions>
+					<execution>
+						<id>build-info</id>
+						<goals>
+							<goal>publish</goal>
+						</goals>
+						<configuration>
+							<publisher>
+								<contextUrl>http://artifactory.ewi.tudelft.nl/artifactory</contextUrl>
+								<repoKey>libs-release</repoKey>
+								<username>wouter</username>
+								<password>${passwd}</password>
+							</publisher>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 
 		</plugins>
 	
+			<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.jfrog.buildinfo</groupId>
+										<artifactId>artifactory-maven-plugin</artifactId>
+										<versionRange>[1.0.0,)</versionRange>
+										<goals>
+											<goal>publish</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+
 	</build>
 	
 </project>

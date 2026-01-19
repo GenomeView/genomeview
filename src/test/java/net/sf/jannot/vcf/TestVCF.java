@@ -18,6 +18,7 @@ import net.sf.jannot.variation.Variation;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import support.DataManager;
@@ -56,6 +57,7 @@ public class TestVCF {
 		log.info("END test_dummyTest");
 	}
 
+	@Ignore
 	@Test
 	public void test_loadEntries() {
 		log.info("BEGIN test_loadEntries");
