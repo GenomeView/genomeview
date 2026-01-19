@@ -1,6 +1,6 @@
 # genomeview
 
-Manuals are available [here](github.com/genomeview/genomeviewweb).
+Manuals are available [here](https://github.com/GenomeView/genomeviewweb).
 
 
 Documentation: http://genomeview.org/manual
