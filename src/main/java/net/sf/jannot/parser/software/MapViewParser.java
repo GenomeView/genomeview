@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import be.abeel.io.LineIterator;
-import be.abeel.util.TimeInterval;
+import atk.util.TimeInterval;
 
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;

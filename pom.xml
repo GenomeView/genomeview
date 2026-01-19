@@ -24,7 +24,7 @@
 			<name>jboss</name>
 			<url>https://repository.jboss.org</url>
 		</repository>
-		
+
 		<repository>
 	        <id>local-maven-repository</id>
 	        <url>file://${local.repository.folder}</url>
@@ -35,15 +35,31 @@
 	            <enabled>true</enabled>
 	        </snapshots>
 	   </repository>
+
+		<repository>
+			<id>artifactory.ewi.tudelft.nl</id>
+			<url>https://artifactory.ewi.tudelft.nl/artifactory/libs-release</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		
+		<repository>
+			<id>hadoop</id>
+			<url> https://hadoop-bam.sourceforge.net/maven/ </url>
+		</repository>
+
+
 	</repositories>
+
+
 
     <dependencies>
 	    <dependency>
 		    <groupId>be.abeel</groupId>
 		    <artifactId>atk</artifactId>
-		    <version>1.1.0</version>
+		    <version>1.2.0</version>
 		</dependency>
-		
 		
 		<dependency>
 		    <groupId>net.sf</groupId>
