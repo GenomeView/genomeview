@@ -1,4 +1,4 @@
-package devtools.ascomponent;
+package net.sf.genomeview.ascomponent;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
