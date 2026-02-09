@@ -25,6 +25,8 @@ public class SelectionModel extends Observable {
 	 * Contains all selected locations, these can be subcomponents of a Feature.
 	 */
 	private SortedSet<Location> selectedLocation = new ExactSet();
+	
+	private Location selectedRegion = null;
 
 	public void addLocationSelection(Location rl) {
 		selectedLocation.add(rl);
@@ -53,6 +55,10 @@ public class SelectionModel extends Observable {
 		return selectedLocation;
 	}
 
+	/**
+	 * sets {@link #selectedLocation} to all locations of the Feature
+	 * @param rl the Feature to select
+	 */
 	public void setLocationSelection(Feature rl) {
 		selectedLocation.clear();
 		setSelectedRegion(null);
@@ -62,6 +68,10 @@ public class SelectionModel extends Observable {
 
 	}
 
+	/**
+	 * selects a single location
+	 * @param rl the {@link Location}
+	 */
 	public void setLocationSelection(Location rl) {
 		selectedLocation.clear();
 		setSelectedRegion(null);
@@ -69,6 +79,10 @@ public class SelectionModel extends Observable {
 
 	}
 
+	/**
+	 * remove location rl from the current selection
+	 * @param rl a single location
+	 */
 	public void removeLocationSelection(Location rl) {
 
 		selectedLocation.remove(rl);
@@ -76,7 +90,6 @@ public class SelectionModel extends Observable {
 
 	}
 
-	private Location selectedRegion = null;
 
 	public final Location getSelectedRegion() {
 		return selectedRegion;
@@ -87,9 +100,14 @@ public class SelectionModel extends Observable {
 		refresh();
 	}
 
+	/**
+	 * 
+	 * @return all known {@link Feature}s attached to the current selection
+	 */
 	public SortedSet<Feature> getFeatureSelection() {
 		SortedSet<Feature> out = new TreeSet<Feature>();
 		Set<Location> select = new TreeSet<Location>();
+		// FIXME is select a broken attempt to avoid race condition? 
 		select.addAll(selectedLocation);
 		for (Location l : select) {
 			out.add(l.getParent());
