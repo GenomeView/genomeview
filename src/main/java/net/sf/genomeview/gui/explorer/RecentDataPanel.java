@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.explorer;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,6 +26,7 @@ import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.MessageManager;
+import net.sf.genomeview.gui.WindowManager;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import net.sf.genomeview.gui.dialog.OpenFileButton;
 import net.sf.genomeview.gui.dialog.OpenURLButton;
@@ -116,9 +118,8 @@ public class RecentDataPanel extends GridBagPanel {
 		gc.weighty = 0;
 		gc.gridheight = 3;
 		gc.weightx = 0;
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		Dimension dim = toolkit.getScreenSize();
-		setPreferredSize(new Dimension((int) (dim.width * 0.9), 480));
+		Rectangle wh = WindowManager.getNiceWindowSize((int)(0.9*WindowManager.MAX_WIDTH), 480);
+		setPreferredSize(new Dimension((int)wh.getWidth(),(int) wh.getHeight()));
 		setBackground(Color.WHITE);
 		add(new JLabel(Icons.MINILOGO_ICON), gc);
 

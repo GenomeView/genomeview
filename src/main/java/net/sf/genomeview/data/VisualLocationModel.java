@@ -48,6 +48,11 @@ public class VisualLocationModel extends Observable {
 
 	}
 
+	/**
+	 * zoom to given {@link Location} if area positive and large enough
+	 * @param r the {@link Location} to zoom to
+	 * @param mayExpand true iff the zoom location must be expanded if smaller than 50 
+	 */
 	public void setAnnotationLocationVisible(Location r, boolean mayExpand) {
 		int modStart = -1;
 		int modEnd = -1;

@@ -41,6 +41,11 @@ import net.sf.jannot.Cleaner;
  * 
  */
 public class WindowManager extends WindowAdapter implements Observer {
+	
+	// limit window size on large screens.
+	public static final int MAX_WIDTH = 1920;
+	public static final int MAX_HEIGHT = 1080;
+
 	private static Logger logger = LoggerFactory.getLogger(WindowManager.class.getCanonicalName());
 
 	private GenomeViewWindow window = null;
@@ -206,7 +211,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 			window.setJMenuBar(new MainMenu(model));
 
 			window.pack();
-			Rectangle rec = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+			
+			Rectangle rec = getNiceWindowSize(MAX_WIDTH, MAX_HEIGHT);
 			window.setSize(rec.width, rec.height);
 
 			if (content.length > 1) {
@@ -251,7 +257,21 @@ public class WindowManager extends WindowAdapter implements Observer {
 		model.setSilent(false);
 
 	}
-
+	
+	/**
+	 * 
+	 * @param width preferred width. 
+	 * @param height preferred height
+	 * @return Dimension for a new window that is trying to be size width,height but not exceeding
+	 * actual screen size.
+	 */
+	public static Rectangle getNiceWindowSize(int width, int height) {
+		// we use GraphicsEnvironment because this in theory allows to check all attached displays.
+		// the alternative could be Toolkit.getDefaultToolkit().getScreenSize()
+		// but this might give only the main screen info.
+		Rectangle rec = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		return new Rectangle(Math.min(width, (int)rec.getWidth()), Math.min(height, (int)rec.getHeight()));
+	}
 }
 
 /**
@@ -295,5 +315,7 @@ class Environment {
 		applet = true;
 
 	}
+	
+	
 
 }

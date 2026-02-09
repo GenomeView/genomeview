@@ -59,6 +59,8 @@ public class Model extends Observable implements Observer {
 	private MouseModel mouseModel = new MouseModel();
 	private MessageModel messageModel = new MessageModel(this);
 
+	public final VisualLocationModel vlm = new VisualLocationModel();
+
 	public MessageModel messageModel() {
 		return messageModel;
 	}
@@ -124,7 +126,6 @@ public class Model extends Observable implements Observer {
 
 	}
 
-	public final VisualLocationModel vlm = new VisualLocationModel();
 
 	public void clearEntries() {
 		selectionModel.clear();
