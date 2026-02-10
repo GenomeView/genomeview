@@ -9,7 +9,6 @@
 		<maven.compiler.target>1.17</maven.compiler.target>
 		<maven.compiler.source>1.17</maven.compiler.source>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<local.repository.folder>${pom.basedir}/lib/m2</local.repository.folder>
 		<passwd>${env.ARTIFACTORY_PASS}</passwd>
 	</properties>
 
@@ -25,17 +24,6 @@
 			<name>jboss</name>
 			<url>https://repository.jboss.org</url>
 		</repository>
-
-		<repository>
-	        <id>local-maven-repository</id>
-	        <url>file://${local.repository.folder}</url>
-	        <releases>
-	            <enabled>true</enabled>
-	        </releases>
-	        <snapshots>
-	            <enabled>true</enabled>
-	        </snapshots>
-	   </repository>
 
 		<repository>
 			<id>artifactory.ewi.tudelft.nl</id>
@@ -146,24 +134,7 @@
 				</executions>
 			</plugin>
 
-<!--
-		    <plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-javadoc-plugin</artifactId>
-		        <version>3.6.2</version>
-		        <configuration>
-		            <doclint>none</doclint> 
-		        </configuration>
-		        <executions>
-		            <execution>
-		                <id>attach-javadocs</id>
-		                <goals>
-		                    <goal>jar</goal>
-		                </goals>
-		            </execution>
-		        </executions>
-		    </plugin>		
-	-->
+
 		    
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
