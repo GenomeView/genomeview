@@ -21,16 +21,14 @@ import javax.swing.border.Border;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
+import htsjdk.samtools.SAMRecord;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.ShortReadProvider;
-import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
-import net.sf.jannot.Location;
-import net.sf.samtools.SAMRecord;
 
 /**
  * 
@@ -44,7 +42,8 @@ public class ShortReadTrack extends Track {
 	// private ShortReadProvider provider;
 	private ShortReadTrackConfig srtc;
 
-	public ShortReadTrack(DataKey key, ShortReadProvider provider, Model model) {
+	public ShortReadTrack(DataKey key, ShortReadProvider provider,
+			Model model) {
 		super(key, model, true, new ShortReadTrackConfig(model, key));
 		this.srtc = (ShortReadTrackConfig) config;
 		// this.provider = provider;
@@ -65,7 +64,8 @@ public class ShortReadTrack extends Track {
 			floater.setForeground(Color.BLACK);
 			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
-			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder,
+					emptyBorder));
 			add(floater);
 			pack();
 		}
@@ -77,7 +77,8 @@ public class ShortReadTrack extends Track {
 			text.append("<html>");
 
 			if (sri != null) {
-				text.append(MessageManager.getString("shortreadtrack.insertion") + " ");
+				text.append(MessageManager.getString("shortreadtrack.insertion")
+						+ " ");
 				byte[] bases = sri.esr.getReadBases();
 				for (int i = sri.start; i < sri.start + sri.len; i++) {
 					text.append((char) bases[i]);
@@ -110,7 +111,8 @@ public class ShortReadTrack extends Track {
 			floater.setForeground(Color.BLACK);
 			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
-			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder,
+					emptyBorder));
 			add(floater);
 			pack();
 		}
@@ -122,18 +124,28 @@ public class ShortReadTrack extends Track {
 			text.append("<html>");
 
 			if (sr != null) {
-				text.append(MessageManager.getString("shortreadtrack.name") + " " + sr.getReadName() + "<br/>");
-				text.append(MessageManager.getString("shortreadtrack.len") + " " + sr.getReadLength() + "<br/>");
-				text.append(MessageManager.getString("shortreadtrack.cigar") + " " + sr.getCigarString() + "<br/>");
-				text.append(MessageManager.getString("shortreadtrack.sequence") + " " + rerun(sr.getReadString()) + "<br/>");
-				text.append(MessageManager.getString("shortreadtrack.paired") + " " + sr.getReadPairedFlag() + "<br/>");
+				text.append(MessageManager.getString("shortreadtrack.name")
+						+ " " + sr.getReadName() + "<br/>");
+				text.append(MessageManager.getString("shortreadtrack.len") + " "
+						+ sr.getReadLength() + "<br/>");
+				text.append(MessageManager.getString("shortreadtrack.cigar")
+						+ " " + sr.getCigarString() + "<br/>");
+				text.append(MessageManager.getString("shortreadtrack.sequence")
+						+ " " + rerun(sr.getReadString()) + "<br/>");
+				text.append(MessageManager.getString("shortreadtrack.paired")
+						+ " " + sr.getReadPairedFlag() + "<br/>");
 				if (sr.getReadPairedFlag()) {
 					if (!sr.getMateUnmappedFlag())
-						text.append(MessageManager.getString("shortreadtrack.mate") + " " + sr.getMateReferenceName() + ":" + sr.getMateAlignmentStart()
-								+ "<br/>");
+						text.append(
+								MessageManager.getString("shortreadtrack.mate")
+										+ " " + sr.getMateReferenceName() + ":"
+										+ sr.getMateAlignmentStart() + "<br/>");
 					else
-						text.append(MessageManager.getString("shortreadtrack.mate_missing") + "<br/>");
-					text.append(MessageManager.getString("shortreadtrack.second") + " " + sr.getFirstOfPairFlag());
+						text.append(MessageManager.getString(
+								"shortreadtrack.mate_missing") + "<br/>");
+					text.append(
+							MessageManager.getString("shortreadtrack.second")
+									+ " " + sr.getFirstOfPairFlag());
 				}
 				// text.append("<br/>");
 			}
@@ -151,7 +163,7 @@ public class ShortReadTrack extends Track {
 		}
 
 		public void textual() {
-			if(!isVisible())
+			if (!isVisible())
 				return;
 			// create jeditorpane
 			JEditorPane jEditorPane = new JEditorPane();
@@ -214,10 +226,12 @@ public class ShortReadTrack extends Track {
 
 		// System.out.println("Click: " + x + " " + y);
 		if (source.getClickCount() > 1) {
-			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render.meta().hitMap.entrySet()) {
+			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render
+					.meta().hitMap.entrySet()) {
 				if (e.getKey().contains(x, y)) {
 					System.out.println("2*Click: " + e.getValue());
-					if (e.getValue().getReadPairedFlag() && !e.getValue().getMateUnmappedFlag())
+					if (e.getValue().getReadPairedFlag()
+							&& !e.getValue().getMateUnmappedFlag())
 						model.vlm.center(e.getValue().getMateAlignmentStart());
 				}
 			}
@@ -238,9 +252,11 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
-		if (model.vlm.getAnnotationLocationVisible().length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+		if (model.vlm.getAnnotationLocationVisible().length() < Configuration
+				.getInt("geneStructureNucleotideWindow")) {
 			ShortReadInsertion sri = null;
-			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : render.meta().paintedBlocks.entrySet()) {
+			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : render
+					.meta().paintedBlocks.entrySet()) {
 				if (e.getKey().contains(x, y)) {
 					sri = e.getValue();
 					break;
@@ -257,7 +273,8 @@ public class ShortReadTrack extends Track {
 			}
 			//
 			// System.out.println("Moved: " + x + " " + y);
-			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render.meta().hitMap.entrySet()) {
+			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render
+					.meta().hitMap.entrySet()) {
 				if (e.getKey().contains(x, y)) {
 					// System.out.println("Prijs: " + e.getValue());
 					readinfo.set(source, e.getValue());
@@ -274,7 +291,8 @@ public class ShortReadTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D gGlobal, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
+	public int paintTrack(Graphics2D gGlobal, int yOffset, double screenWidth,
+			JViewport view, TrackCommunicationModel tcm) {
 //		Location bufferedLocation = render.location();
 //		Location visible = model.vlm.getVisibleLocation();
 //		int x = 0;

@@ -3,7 +3,8 @@
  */
 package net.sf.genomeview.gui.viztracks.hts;
 
-import net.sf.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecord;
+
 /**
  * 
  * @author Thomas Abeel

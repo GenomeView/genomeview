@@ -9,7 +9,8 @@ import java.io.InterruptedIOException;
 
 import javax.swing.ProgressMonitor;
 
-import net.sf.samtools.seekablestream.SeekableStream;
+import htsjdk.samtools.seekablestream.SeekableStream;
+
 /**
  * 
  * @author Thomas Abeel
@@ -22,7 +23,8 @@ public class SeekableProgressStream extends SeekableStream {
 	private int size = 0;
 	private SeekableStream in;
 
-	public SeekableProgressStream(Component parentComponent, Object message, SeekableStream in) {
+	public SeekableProgressStream(Component parentComponent, Object message,
+			SeekableStream in) {
 		this.in = in;
 		try {
 			size = in.available();
@@ -57,13 +59,12 @@ public class SeekableProgressStream extends SeekableStream {
 	@Override
 	public int read(byte[] arg0, int arg1, int arg2) throws IOException {
 		if (monitor.isCanceled()) {
-            InterruptedIOException exc =
-                                    new InterruptedIOException("progress");
-            exc.bytesTransferred = nread;
-            throw exc;
-        }
-		int read=in.read(arg0,arg1,arg2);
-		nread+=read;
+			InterruptedIOException exc = new InterruptedIOException("progress");
+			exc.bytesTransferred = nread;
+			throw exc;
+		}
+		int read = in.read(arg0, arg1, arg2);
+		nread += read;
 		monitor.setProgress(nread);
 		return read;
 	}
@@ -71,11 +72,10 @@ public class SeekableProgressStream extends SeekableStream {
 	@Override
 	public void seek(long arg0) throws IOException {
 		if (monitor.isCanceled()) {
-            InterruptedIOException exc =
-                                    new InterruptedIOException("progress");
-            exc.bytesTransferred = nread;
-            throw exc;
-        }
+			InterruptedIOException exc = new InterruptedIOException("progress");
+			exc.bytesTransferred = nread;
+			throw exc;
+		}
 		in.seek(arg0);
 
 	}
@@ -83,14 +83,13 @@ public class SeekableProgressStream extends SeekableStream {
 	@Override
 	public int read() throws IOException {
 		if (monitor.isCanceled()) {
-            InterruptedIOException exc =
-                                    new InterruptedIOException("progress");
-            exc.bytesTransferred = nread;
-            throw exc;
-        }
+			InterruptedIOException exc = new InterruptedIOException("progress");
+			exc.bytesTransferred = nread;
+			throw exc;
+		}
 		nread++;
 		monitor.setProgress(nread);
-	
+
 		return in.read();
 	}
 
