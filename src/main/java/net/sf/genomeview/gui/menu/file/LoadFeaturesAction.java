@@ -31,7 +31,7 @@ public class LoadFeaturesAction extends AbstractAction {
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
-		new OpenDialog(model.getGUIManager().getParent(), model);
+		new OpenDialog(model.getGUIManager().getMainWindow(), model);
 
 	}
 }

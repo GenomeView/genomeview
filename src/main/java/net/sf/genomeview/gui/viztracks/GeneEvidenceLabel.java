@@ -425,7 +425,7 @@ public class GeneEvidenceLabel extends JLabel implements Observer, MouseListener
 			}
 			consumed = mouseTrack.mouseMoved(e.getX(), e.getY(), e);
 			if (!(mouseTrack instanceof StructureTrack))
-				model.getGUIManager().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				model.getGUIManager().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
 		if (consumed)
 			return;

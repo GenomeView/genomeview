@@ -90,7 +90,7 @@ public class ExportDialog extends JDialog {
 				else
 					r=new FileInputStream(loc.file());
 				
-				InputStream in = new ProgressMonitorInputStream(m.getGUIManager().getParent(), "Downloading file "
+				InputStream in = new ProgressMonitorInputStream(m.getGUIManager().getMainWindow(), "Downloading file "
 						+ loc.getName(), r);
 				FileOutputStream fos = new FileOutputStream(out);
 				return copy(in, fos);
@@ -146,7 +146,7 @@ public class ExportDialog extends JDialog {
 	private static final Logger log = LoggerFactory.getLogger(ExportDialog.class.getCanonicalName());
 
 	private ExportDialog(final Model model, final boolean useDefault) {
-		super(model.getGUIManager().getParent(), "Export dialog", true);
+		super(model.getGUIManager().getMainWindow(), "Export dialog", true);
 		final ExportDialog _self=this;
 		setLayout(new GridBagLayout());
 
@@ -236,18 +236,18 @@ public class ExportDialog extends JDialog {
 									}
 									
 									
-									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("exportdialog.export_complete"));
+									JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("exportdialog.export_complete"));
 									
 								}
 								
 							});
 							moni.setDaemon(true);
 							moni.start();
-							JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("exportdialog.export_started"));
+							JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("exportdialog.export_started"));
 						
 						} catch (Exception ex) {
 							log.error( "Save failed", ex);
-							JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("exportdialog.save_failed"));
+							JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("exportdialog.save_failed"));
 						}
 						h.dispose();
 						_self.dispose();
@@ -293,7 +293,7 @@ public class ExportDialog extends JDialog {
 					}
 				});
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				int returnVal = chooser.showSaveDialog(model.getGUIManager().getParent());
+				int returnVal = chooser.showSaveDialog(model.getGUIManager().getMainWindow());
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					File files = chooser.getSelectedFile();
 					return files;
@@ -315,7 +315,7 @@ public class ExportDialog extends JDialog {
 		});
 
 		pack();
-		StaticUtils.center(model.getGUIManager().getParent(),this);
+		StaticUtils.center(model.getGUIManager().getMainWindow(),this);
 		setVisible(true);
 	}
 

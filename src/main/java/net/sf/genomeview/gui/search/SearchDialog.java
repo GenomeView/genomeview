@@ -40,7 +40,7 @@ public class SearchDialog extends EscapeDialog {
 	final private JTabbedPane pane;
 
 	private SearchDialog(Model model) {
-		super(model.getGUIManager().getParent(), MessageManager.getString("searchdialog.search"));
+		super(model.getGUIManager().getMainWindow(), MessageManager.getString("searchdialog.search"));
 		setModalityType(ModalityType.MODELESS);
 		pane = new JTabbedPane();
 		setLayout(new BorderLayout());
@@ -53,7 +53,7 @@ public class SearchDialog extends EscapeDialog {
 		pane.add(MessageManager.getString("searchdialog.overlap_search"), new OverlapSearchPane(model));
 
 		pack();
-		StaticUtils.right(this, model.getGUIManager().getParent());
+		StaticUtils.right(this, model.getGUIManager().getMainWindow());
 
 	}
 

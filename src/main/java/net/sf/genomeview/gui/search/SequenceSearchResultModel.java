@@ -123,7 +123,7 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 				} catch (IllegalArgumentException ie) {
 					JOptionPane
 							.showMessageDialog(
-									model.getGUIManager().getParent(),
+									model.getGUIManager().getMainWindow(),
 									MessageManager.getString("searchsequenceresult.too_many_mismatches_warn"), MessageManager.getString("searchsequenceresult.too_many_mismatches"),
 									JOptionPane.WARNING_MESSAGE);
 				}

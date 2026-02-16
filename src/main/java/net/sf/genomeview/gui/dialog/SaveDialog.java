@@ -63,7 +63,7 @@ public class SaveDialog extends JDialog {
 
 	private String file(Model model) {
 		JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
-		int returnVal = chooser.showSaveDialog(model.getGUIManager().getParent());
+		int returnVal = chooser.showSaveDialog(model.getGUIManager().getMainWindow());
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File files = chooser.getSelectedFile();
 			return files.toString();
@@ -127,7 +127,7 @@ public class SaveDialog extends JDialog {
 	}
 
 	public SaveDialog(final Model model) {
-		super(model.getGUIManager().getParent(), MessageManager.getString("savedialog.title"), true);
+		super(model.getGUIManager().getMainWindow(), MessageManager.getString("savedialog.title"), true);
 		setLayout(new MigLayout("wrap 2"));
 
 		/*
@@ -340,7 +340,7 @@ public class SaveDialog extends JDialog {
 								}
 							} else {
 								if ((location==null) || (location.trim().length()==0)){
-									JOptionPane.showMessageDialog(model.getGUIManager().getParent(), 
+									JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), 
 												MessageManager.getString("savedialog.provided_path_emtpy"),
 												MessageManager.getString("savedialog.save_failed"),
 												JOptionPane.ERROR_MESSAGE);
@@ -356,11 +356,11 @@ public class SaveDialog extends JDialog {
 									while (tryToSave){
 										try {
 											FileUtils.moveFile(tmp, out);
-											JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("savedialog.save_succeeded"));
+											JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("savedialog.save_succeeded"));
 											tryToSave = false;
 										} catch (FileExistsException fee){
 											fee.printStackTrace();
-											int answer = JOptionPane.showOptionDialog(model.getGUIManager().getParent(),
+											int answer = JOptionPane.showOptionDialog(model.getGUIManager().getMainWindow(),
 													MessageManager.getString("savedialog.file_exists"),
 													MessageManager.getString("savedialog.file_exists_title"),
 													JOptionPane.YES_NO_OPTION, 
@@ -373,7 +373,7 @@ public class SaveDialog extends JDialog {
 												tryToSave = false;
 											}
 										} catch (IOException e) {
-											JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("savedialog.save_failed"));
+											JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("savedialog.save_failed"));
 											tryToSave = false;
 											e.printStackTrace();
 										}
@@ -389,7 +389,7 @@ public class SaveDialog extends JDialog {
 					}
 
 					private void showServerMessage(String reply) {
-						final JDialog diag = new JDialog(model.getGUIManager().getParent());
+						final JDialog diag = new JDialog(model.getGUIManager().getMainWindow());
 						JEditorPaneLabel txt = new JEditorPaneLabel();
 						txt.setEditable(false);
 						txt.setText(reply);
@@ -406,7 +406,7 @@ public class SaveDialog extends JDialog {
 
 						}), BorderLayout.SOUTH);
 						diag.pack();
-						StaticUtils.center(model.getGUIManager().getParent(), diag);
+						StaticUtils.center(model.getGUIManager().getMainWindow(), diag);
 						diag.setVisible(true);
 
 					}
@@ -427,7 +427,7 @@ public class SaveDialog extends JDialog {
 		});
 
 		pack();
-		StaticUtils.center(model.getGUIManager().getParent(), this);
+		StaticUtils.center(model.getGUIManager().getMainWindow(), this);
 		setVisible(true);
 	}
 	

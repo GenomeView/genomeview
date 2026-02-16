@@ -59,7 +59,7 @@ public class InformationFrame extends GridBagPanel {
 		gc.gridwidth=1;
 		gc.weighty = 0;
 		gc.weightx = 0;
-		add(new HelpButton(model.getGUIManager().getParent(), MessageManager.getString("infoframe.track_list_help")),gc);
+		add(new HelpButton(model.getGUIManager().getMainWindow(), MessageManager.getString("infoframe.track_list_help")),gc);
 		gc.gridx++;
 		gc.gridwidth=4;
 		gc.weightx =1;
@@ -78,7 +78,7 @@ public class InformationFrame extends GridBagPanel {
 		gc.weighty = 0;
 		gc.gridwidth = 1;
 		gc.weightx=0;
-		add(new HelpButton(model.getGUIManager().getParent(), MessageManager.getString("infoframe.features_help")),gc);
+		add(new HelpButton(model.getGUIManager().getMainWindow(), MessageManager.getString("infoframe.features_help")),gc);
 		gc.gridx++;
 		add(new JLabel(MessageManager.getString("infoframe.features")), gc);
 		TypeCombo type = new TypeCombo(model, false);
@@ -100,7 +100,7 @@ public class InformationFrame extends GridBagPanel {
 		gc.gridy++;
 		gc.weighty = 0;
 		gc.gridwidth=1;
-		add(new HelpButton(model.getGUIManager().getParent(), MessageManager.getString("infoframe.details_item_help")),gc);
+		add(new HelpButton(model.getGUIManager().getMainWindow(), MessageManager.getString("infoframe.details_item_help")),gc);
 		gc.gridx++;
 		gc.gridwidth=4;
 		add(new JLabel(MessageManager.getString("infoframe.details_item")), gc);

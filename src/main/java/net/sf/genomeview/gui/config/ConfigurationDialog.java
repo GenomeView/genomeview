@@ -308,7 +308,7 @@ public class ConfigurationDialog extends JDialog {
 			this.add(ConfigBox.booleanInstance(model, "general:disableURLCaching", MessageManager.getString("configdialog.disable_url_caching")), gc);
 			gc.weightx = 0;
 			gc.gridx++;
-			this.add(new HelpButton(model.getGUIManager().getParent(), MessageManager.getString("configdialog.disable_url_caching_to_save")), gc);
+			this.add(new HelpButton(model.getGUIManager().getMainWindow(), MessageManager.getString("configdialog.disable_url_caching_to_save")), gc);
 			gc.gridwidth = 2;
 			gc.weightx = 1;
 			gc.gridx = 0;
@@ -338,7 +338,7 @@ public class ConfigurationDialog extends JDialog {
 						System.out.println("Marking for deletion:" + f);
 						f.deleteOnExit();
 					}
-					JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("configdialog.clear_cache_info"),
+					JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("configdialog.clear_cache_info"),
 							MessageManager.getString("configdialog.cache_cleared"), JOptionPane.INFORMATION_MESSAGE);
 
 				}
@@ -352,7 +352,7 @@ public class ConfigurationDialog extends JDialog {
 	}
 
 	public ConfigurationDialog(final Model model) {
-		super(model.getGUIManager().getParent(), MessageManager.getString("configddialog.configuration_panel"));
+		super(model.getGUIManager().getMainWindow(), MessageManager.getString("configddialog.configuration_panel"));
 		setModal(true);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
@@ -413,7 +413,7 @@ public class ConfigurationDialog extends JDialog {
 		});
 		add(ok, BorderLayout.SOUTH);
 		pack();
-		StaticUtils.center(model.getGUIManager().getParent(), this);
+		StaticUtils.center(model.getGUIManager().getMainWindow(), this);
 
 	}
 }

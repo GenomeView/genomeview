@@ -37,7 +37,7 @@ public class ShowAboutDialogAction extends AbstractAction {
 
         String message = MessageManager.formatMessage("helpmenu.message", new Object[]{Configuration.version(),Configuration.getDirectory().toString()});
         
-        JOptionPane.showMessageDialog(model.getGUIManager().getParent(), message, MessageManager.formatMessage("helpmenu.version", new Object[]{Configuration.version()}),
+        JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), message, MessageManager.formatMessage("helpmenu.version", new Object[]{Configuration.version()}),
                 JOptionPane.INFORMATION_MESSAGE,Icons.MINILOGO_ICON);
     }
 

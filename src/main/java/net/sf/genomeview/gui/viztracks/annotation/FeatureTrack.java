@@ -128,7 +128,7 @@ public class FeatureTrack extends Track {
 					optionPane.setMessage(new Object[] { MessageManager.getString("featuretrack.select_score_th"), slider, label });
 					optionPane.setMessageType(JOptionPane.QUESTION_MESSAGE);
 					optionPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-					JDialog dialog = optionPane.createDialog(model.getGUIManager().getParent(), MessageManager.getString("featuretrack.score_th"));
+					JDialog dialog = optionPane.createDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("featuretrack.score_th"));
 					// dialog.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 					dialog.setVisible(true);
 					setThreshold((Double) optionPane.getInputValue());

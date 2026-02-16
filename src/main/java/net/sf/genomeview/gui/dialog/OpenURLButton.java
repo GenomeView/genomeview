@@ -32,7 +32,7 @@ public class OpenURLButton extends JButton {
 			public void actionPerformed(ActionEvent e) {
 				
 				try {
-					String input = JOptionPane.showInputDialog(gvModel.getGUIManager().getParent(), "Give the URL of the data");
+					String input = JOptionPane.showInputDialog(gvModel.getGUIManager().getMainWindow(), "Give the URL of the data");
 					if (input != null && input.trim().length() > 0) {
 
 						DataSourceHelper.load(gvModel, new Locator(input.trim()));

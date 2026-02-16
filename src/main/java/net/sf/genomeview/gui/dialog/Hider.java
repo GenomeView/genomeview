@@ -37,8 +37,8 @@ public class Hider extends JDialog {
 	}
 
 	public Hider(Model model, String text, Color color) {
-		this(model, text, color, model.getGUIManager().getParent().getBounds().width / 5, model.getGUIManager()
-				.getParent().getBounds().height / 5);
+		this(model, text, color, model.getGUIManager().getMainWindow().getBounds().width / 5, model.getGUIManager()
+				.getMainWindow().getBounds().height / 5);
 
 	}
 
@@ -66,7 +66,7 @@ public class Hider extends JDialog {
 		floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
 		add(floater);
 		pack();
-		StaticUtils.center(model.getGUIManager().getParent(),this);
+		StaticUtils.center(model.getGUIManager().getMainWindow(),this);
 		final Hider _self=this;
 		EventQueue.invokeLater(new Runnable() {
 

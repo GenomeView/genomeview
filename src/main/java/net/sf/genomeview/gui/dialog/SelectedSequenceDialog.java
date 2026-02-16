@@ -37,7 +37,7 @@ public class SelectedSequenceDialog extends JDialog {
     private static final long serialVersionUID = 2529848844411398233L;
 
     private SelectedSequenceDialog(final Model model) {
-        super(model.getGUIManager().getParent(), MessageManager.getString("selectedsequencedialog.which_seq"), true);
+        super(model.getGUIManager().getMainWindow(), MessageManager.getString("selectedsequencedialog.which_seq"), true);
         setLayout(new GridBagLayout());
         GridBagConstraints gc = new GridBagConstraints();
         gc.insets = new Insets(3, 3, 3, 3);
@@ -131,7 +131,7 @@ public class SelectedSequenceDialog extends JDialog {
         gc.gridx++;
         add(close, gc);
         pack();
-        StaticUtils.center(model.getGUIManager().getParent(),this);
+        StaticUtils.center(model.getGUIManager().getMainWindow(),this);
 
     }
 

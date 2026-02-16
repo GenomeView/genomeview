@@ -57,7 +57,7 @@ public class SaveSessionAction extends AbstractAction {
 
 		});
 		
-		int result = chooser.showSaveDialog(model.getGUIManager().getParent());
+		int result = chooser.showSaveDialog(model.getGUIManager().getMainWindow());
 
 		if (result == JFileChooser.APPROVE_OPTION) {
 			try {

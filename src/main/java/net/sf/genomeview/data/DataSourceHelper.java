@@ -66,7 +66,7 @@ public class DataSourceHelper {
 		data.stripIndex();
 
 		if (!data.exists()) {
-			JOptionPane.showMessageDialog(model.getGUIManager().getParent(),
+			JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
 					MessageManager.formatMessage(
 							"datasourcehelper.data_missing_warn",
 							new Object[] { data.getName() }),
@@ -81,7 +81,7 @@ public class DataSourceHelper {
 		/* Check for stale index */
 		if (index != null && index.lastModified() < data.lastModified()) {
 			if (IndexManager.canBuildIndex(data)) {
-				JOptionPane.showMessageDialog(model.getGUIManager().getParent(),
+				JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
 						MessageManager.getString(
 								"datasourcehelper.index_outdated_warn_message"),
 						MessageManager.getString(
@@ -95,7 +95,7 @@ public class DataSourceHelper {
 
 			} else {
 				JOptionPaneX.showOkCancelDialog(
-						model.getGUIManager().getParent(),
+						model.getGUIManager().getMainWindow(),
 						MessageManager.formatMessage(
 								"datasourcehelper.index_outdated_error_message",
 								new Object[] { data.getName() }),
@@ -112,7 +112,7 @@ public class DataSourceHelper {
 		if (data.requiresIndex() && index == null) {
 			if (IndexManager.canBuildIndex(data)) {
 				int res = JOptionPane.showConfirmDialog(
-						model.getGUIManager().getParent(),
+						model.getGUIManager().getMainWindow(),
 						MessageManager.getString(
 								"datasourcehelper.index_missing_warn"),
 						MessageManager
@@ -126,7 +126,7 @@ public class DataSourceHelper {
 
 			} else {
 				JOptionPaneX.showOkCancelDialog(
-						model.getGUIManager().getParent(),
+						model.getGUIManager().getMainWindow(),
 						MessageManager.formatMessage(
 								"datasourcehelper.couldnt_locate_index",
 								new Object[] { data.getName() }),
@@ -141,7 +141,7 @@ public class DataSourceHelper {
 
 		if (data.isWig()) {
 			int res = JOptionPane.showConfirmDialog(
-					model.getGUIManager().getParent(),
+					model.getGUIManager().getMainWindow(),
 					MessageManager.getString(
 							"datasourcehelper.wig_not_recommended_warn"),
 					MessageManager
@@ -157,7 +157,7 @@ public class DataSourceHelper {
 				&& data.length() > 5 * 1024 * 1024) {
 			if (IndexManager.canBuildIndex(data)) {
 				int res = JOptionPane.showConfirmDialog(
-						model.getGUIManager().getParent(),
+						model.getGUIManager().getMainWindow(),
 						MessageManager.formatMessage(
 								"datasourcehleper.create_index",
 								new Object[] { data.getName() }),
@@ -173,7 +173,7 @@ public class DataSourceHelper {
 
 			if (data.isMaf() && !data.isBlockCompressed()) {
 				int res = JOptionPane.showConfirmDialog(
-						model.getGUIManager().getParent(),
+						model.getGUIManager().getMainWindow(),
 						MessageManager.formatMessage(
 								"datasourcehelper.preprocessing_warn",
 								new Object[] { data.getName() }),
@@ -188,7 +188,7 @@ public class DataSourceHelper {
 				/* It will silently try to load files up to 40 Mb */
 				if (data.length() > 40 * 1024 * 1024) {
 					boolean ok = JOptionPaneX.showOkCancelDialog(
-							model.getGUIManager().getParent(),
+							model.getGUIManager().getMainWindow(),
 							MessageManager.formatMessage(
 									"datasourcehelper.load_big_file_no_index",
 									new Object[] { data.getName() }),
@@ -220,7 +220,7 @@ public class DataSourceHelper {
 					return;
 			}
 			asd.setIos(new ProgressMonitorInputStream(
-					model.getGUIManager().getParent(),
+					model.getGUIManager().getMainWindow(),
 					MessageManager.getString("datasourcehelper.reading_file"),
 					new BufferedInputStream(asd.getIos(), 512 * 1024)));
 
@@ -229,7 +229,7 @@ public class DataSourceHelper {
 				&& !data.isBigWig()
 				&& data.length() > (0.75 * MemoryWidget.getAvailable())) {
 			System.out.println("Available mem: " + MemoryWidget.getAvailable());
-			JOptionPane.showMessageDialog(model.getGUIManager().getParent(),
+			JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
 					MessageManager.formatMessage("datasourcehelper.memory_warn",
 							new Object[] { data.getName() }),
 					MessageManager
@@ -280,7 +280,7 @@ public class DataSourceHelper {
 		});
 		chooser.setMultiSelectionEnabled(false);
 		int returnVal = chooser
-				.showSaveDialog(model.getGUIManager().getParent());
+				.showSaveDialog(model.getGUIManager().getMainWindow());
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			final File files = chooser.getSelectedFile();
 			// DataSource[] out = new DataSource[files.length];
@@ -346,7 +346,7 @@ public class DataSourceHelper {
 
 					chooser.setMultiSelectionEnabled(false);
 					int returnVal = chooser
-							.showSaveDialog(model.getGUIManager().getParent());
+							.showSaveDialog(model.getGUIManager().getMainWindow());
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						File files = chooser.getSelectedFile();
 						// DataSource[] out = new DataSource[files.length];
@@ -357,7 +357,7 @@ public class DataSourceHelper {
 									"maf.bgz");
 
 							ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(
-									model.getGUIManager().getParent(),
+									model.getGUIManager().getMainWindow(),
 									MessageManager.getString(
 											"datasourcehelper.compressing_maf_file"),
 									data.stream());
@@ -367,7 +367,7 @@ public class DataSourceHelper {
 
 							SeekableStream is = new SeekableFileStream(file);
 							SeekableProgressStream spmis = new SeekableProgressStream(
-									model.getGUIManager().getParent(),
+									model.getGUIManager().getMainWindow(),
 									MessageManager.getString(
 											"datasourcehelper.indexing_maf_file"),
 									is);
@@ -435,7 +435,7 @@ public class DataSourceHelper {
 
 	private static Parser offerParserChoice(Model model, Locator l) {
 		Parser p = (Parser) JOptionPane.showInputDialog(
-				model.getGUIManager().getParent(),
+				model.getGUIManager().getMainWindow(),
 				MessageManager
 						.getString("datasourcehelper.couldnt_detect_file"),
 				MessageManager.getString("datasourcehelper.parser_detection"),

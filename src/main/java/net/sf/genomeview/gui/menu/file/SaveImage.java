@@ -54,11 +54,11 @@ public class SaveImage extends AbstractAction {
 		final JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
 		chooser.setMultiSelectionEnabled(false);
 
-		int result = chooser.showSaveDialog(model.getGUIManager().getParent());
+		int result = chooser.showSaveDialog(model.getGUIManager().getMainWindow());
 		if (result == JFileChooser.APPROVE_OPTION) {
 			final File ef = ExtensionManager.extension(chooser.getSelectedFile(), ExtensionManager.PNG);
 			if (ef.exists()) {
-				int confirm = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
+				int confirm = JOptionPane.showConfirmDialog(model.getGUIManager().getMainWindow(),
 						MessageManager.getString("filemenu.save_image_warn"));
 				if (confirm != JOptionPane.YES_OPTION) {
 					return;

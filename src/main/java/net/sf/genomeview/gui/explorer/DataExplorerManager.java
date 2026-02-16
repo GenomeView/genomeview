@@ -51,7 +51,7 @@ public class DataExplorerManager implements Observer {
 			public void run() {
 				if(vis&&ConnectionMonitor.instance.offline()){
 					autoMode=false;
-					JOptionPane.showMessageDialog(model.getGUIManager().getParent(), MessageManager.getString("explorermanager.offline_warn"),MessageManager.getString("explorermanager.offline"),JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("explorermanager.offline_warn"),MessageManager.getString("explorermanager.offline"),JOptionPane.WARNING_MESSAGE);
 				}else{
 					bg.setVisible(vis);
 				}

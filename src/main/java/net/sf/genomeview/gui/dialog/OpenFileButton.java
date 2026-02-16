@@ -82,7 +82,7 @@ public class OpenFileButton extends JButton {
 				});
 
 				chooser.setMultiSelectionEnabled(true);
-				int returnVal = chooser.showOpenDialog(gvModel.getGUIManager().getParent());
+				int returnVal = chooser.showOpenDialog(gvModel.getGUIManager().getMainWindow());
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					File[] files = chooser.getSelectedFiles();
 					// DataSource[] out = new DataSource[files.length];

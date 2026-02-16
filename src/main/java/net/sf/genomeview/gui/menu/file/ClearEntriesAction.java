@@ -29,7 +29,7 @@ public class ClearEntriesAction extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		int result = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
+		int result = JOptionPane.showConfirmDialog(model.getGUIManager().getMainWindow(),
 				MessageManager.getString("filemenu.clear_all_loaded_warn"),
 				MessageManager.getString("filemenu.clear_entries"), JOptionPane.YES_NO_OPTION);
 		if (result == JOptionPane.YES_OPTION){

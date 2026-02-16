@@ -38,13 +38,13 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 	public void mouseMoved(MouseEvent e) {
 		if (e.getY() > visibleRec.y && e.getY() < visibleRec.y + visibleRec.height) {
 			if (Math.abs(e.getX() - visibleRec.x) < closeness) {
-				model.getGUIManager().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+				model.getGUIManager().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 				left = true;
 			} else if (Math.abs(e.getX() - (visibleRec.x + visibleRec.width)) < closeness) {
-				model.getGUIManager().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+				model.getGUIManager().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 				right = true;
 			} else {
-				model.getGUIManager().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				model.getGUIManager().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				left = false;
 				right = false;
 
@@ -234,7 +234,7 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		model.getGUIManager().getParent().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		model.getGUIManager().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 	}
 

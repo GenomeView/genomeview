@@ -28,11 +28,11 @@ public class UniqueFeatureHitDialog extends JDialog {
 
     public UniqueFeatureHitDialog(java.util.Set<Feature> list, Model model) {
 
-        super(model.getGUIManager().getParent(), MessageManager.getString("uniquefeaturehitdialog.title"));
+        super(model.getGUIManager().getMainWindow(), MessageManager.getString("uniquefeaturehitdialog.title"));
         this.model = model;
         this.setModal(true);
         this.setLayout(new BorderLayout());
-        this.setLocationRelativeTo(model.getGUIManager().getParent());
+        this.setLocationRelativeTo(model.getGUIManager().getMainWindow());
 
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
        

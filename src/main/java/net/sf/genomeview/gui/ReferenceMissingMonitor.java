@@ -53,7 +53,7 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 	}
 	
 	private ReferenceMissingMonitor(Model model) {
-		super(model.getGUIManager().getParent(), ModalityType.MODELESS);
+		super(model.getGUIManager().getMainWindow(), ModalityType.MODELESS);
 		setTitle(MessageManager.getString("referencemissing.title"));
 		setIconImage(Icons.MINILOGO);
 		addWindowListener(new WindowAdapter() {
@@ -71,7 +71,7 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 		this.model = model;
 		model.addObserver(this);
 		model.getWorkerManager().addObserver(this);
-		Rectangle bounds = model.getGUIManager().getParent().getBounds();
+		Rectangle bounds = model.getGUIManager().getMainWindow().getBounds();
 		
 		this.setPreferredSize(new Dimension(bounds.width / 3, bounds.height / 5));
 		

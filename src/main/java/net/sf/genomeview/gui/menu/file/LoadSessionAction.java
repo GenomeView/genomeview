@@ -64,11 +64,11 @@ public class LoadSessionAction extends AbstractAction {
 
 		});
 
-		int result = chooser.showOpenDialog(model.getGUIManager().getParent());
+		int result = chooser.showOpenDialog(model.getGUIManager().getMainWindow());
 
 		if (result == JFileChooser.APPROVE_OPTION) {
 			if (model.loadedSources().size() != 0) {
-				result = JOptionPane.showConfirmDialog(model.getGUIManager().getParent(),
+				result = JOptionPane.showConfirmDialog(model.getGUIManager().getMainWindow(),
 						MessageManager.getString("filemenu.load_session_warn"),
 						MessageManager.getString("filemenu.clear_session"), JOptionPane.YES_NO_OPTION);
 				if (result != JOptionPane.YES_OPTION) {

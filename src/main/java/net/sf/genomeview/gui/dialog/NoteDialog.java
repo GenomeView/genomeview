@@ -31,7 +31,7 @@ public class NoteDialog extends JDialog {
     private final QualifierCombo term;
 
     private NoteDialog(final Model model) {
-    	super(model.getGUIManager().getParent(), MessageManager.getString("notedialog.title"));
+    	super(model.getGUIManager().getMainWindow(), MessageManager.getString("notedialog.title"));
         setModal(true);
 
         term = new QualifierCombo();
@@ -63,7 +63,7 @@ public class NoteDialog extends JDialog {
         });
         add(ok, BorderLayout.SOUTH);
         pack();
-        StaticUtils.center(model.getGUIManager().getParent(),this);
+        StaticUtils.center(model.getGUIManager().getMainWindow(),this);
     }
 
     private static NoteDialog dialog = null;

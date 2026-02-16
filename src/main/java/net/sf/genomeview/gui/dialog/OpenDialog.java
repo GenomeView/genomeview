@@ -136,7 +136,7 @@ public class OpenDialog extends JDialog {
 				});
 
 				chooser.setMultiSelectionEnabled(true);
-				int returnVal = chooser.showOpenDialog(model.getGUIManager().getParent());
+				int returnVal = chooser.showOpenDialog(model.getGUIManager().getMainWindow());
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					File[] files = chooser.getSelectedFiles();
 //					DataSource[] out = new DataSource[files.length];
@@ -168,7 +168,7 @@ public class OpenDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
 				try {
-					String input = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+					String input = JOptionPane.showInputDialog(model.getGUIManager().getMainWindow(),
 							"Give the URL of the data");
 					if (input != null && input.trim().length() > 0) {
 						
@@ -197,7 +197,7 @@ public class OpenDialog extends JDialog {
 
 
 		pack();
-		StaticUtils.center(model.getGUIManager().getParent(),_self);
+		StaticUtils.center(model.getGUIManager().getMainWindow(),_self);
 		setVisible(true);
 
 		

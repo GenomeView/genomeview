@@ -99,7 +99,7 @@ public class Session {
 					if (!(lcKey.contains("genomeview")
 							&& lcKey.contains("session"))) {
 						JOptionPane.showMessageDialog(
-								model.getGUIManager().getParent(),
+								model.getGUIManager().getMainWindow(),
 								MessageManager.getString(
 										"session.not_genome_view_session"));
 					} else {

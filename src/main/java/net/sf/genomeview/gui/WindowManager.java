@@ -88,7 +88,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 	public void windowClosing(WindowEvent e) {
 
 		int result = JOptionPane.showConfirmDialog(
-				model.getGUIManager().getParent(),
+				model.getGUIManager().getMainWindow(),
 				MessageManager.getString("windowmanager.exit"));
 		if (result == JOptionPane.YES_OPTION)
 			this.model.exit();

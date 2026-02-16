@@ -3,14 +3,7 @@
  */
 package net.sf.genomeview.gui;
 
-import java.awt.Component;
 import java.awt.Frame;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.Action;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 
 import net.sf.genomeview.gui.explorer.DataExplorerManager;
 import net.sf.genomeview.gui.information.InformationFrame;
@@ -29,108 +22,23 @@ public class GUIManager {
 	 * The main window of the GUI belonging to this model.
 	 */
 	private Frame parent;
-
-	public GUIManager() {
-
-	}
-
-	public Frame getParent() {
-		return parent;
-	}
-
-	public void startPluginLoading() {
-		togglePluginLoadingMessage(true);
-	}
-
-	public void finishPluginLoading() {
-		togglePluginLoadingMessage(false);
-	}
-
-	/* There can be multiple menus as there will be one for each screen */
-	private List<JMenu> pluginMenu = new ArrayList<JMenu>();
-	private List<JMenu> pluginDoc = new ArrayList<JMenu>();
-
-	public void registerPluginMenu(JMenu plugin) {
-		this.pluginMenu.add(plugin);
-
-	}
-
-	public void registerPluginDocumentationMenu(JMenu pluginDoc) {
-		this.pluginDoc.add(pluginDoc);
-	}
-
-	public void addPluginAction(Action a, String pathMenu) {
-		for (JMenu menu : pluginMenu)
-			getMenu(menu, pathMenu).add(a);
-	}
-
-	public void addPluginMenuItem(JMenuItem i, String pathMenu) {
-		for (JMenu menu : pluginMenu)
-			getMenu(menu, pathMenu).add(i);
-	}
-
-	/**
-	 * Recursive method to find the actual menu.
-	 * 
-	 * @param moduleMenu
-	 * @param menu
-	 * @return
-	 */
-	private static JMenu getMenu(JMenu moduleMenu, String menu) {
-		// System.out.println("MM:"+moduleMenu);
-		String[] arr = menu.split("::");
-		if (arr.length > 1) {// still more submenus
-			JMenu check = null;
-			Component[] comps = moduleMenu.getMenuComponents();
-			// System.out.println("LM:" + moduleMenu);
-			// System.out.println(comps.length);
-			for (Component c : comps) {
-				// System.out.println("C::" + c);
-				if (c instanceof JMenu) {
-					JMenu cMenu = (JMenu) c;
-					if (cMenu.getText().equals(arr[0]))
-						check = cMenu;
-				}
-			}
-			if (check == null) {
-				check = new JMenu(arr[0]);
-				moduleMenu.add(check);
-			}
-			String newMenu = arr[1];
-			for (int i = 2; i < arr.length; i++) {
-				newMenu += "::" + arr[i];
-			}
-			return getMenu(check, newMenu);
-		} else {
-			// System.out.println("MM:" + moduleMenu);
-			Component[] comps = moduleMenu.getMenuComponents();
-			// System.out.println("\t" + comps.length);
-			for (Component c : comps) {
-				// System.out.println("C::" + c);
-				if (c instanceof JMenu) {
-					JMenu cMenu = (JMenu) c;
-					if (cMenu.getText().equals(arr[0]))
-						return cMenu;
-				}
-			}
-			JMenu fresh = new JMenu(arr[0]);
-			moduleMenu.add(fresh);
-			return fresh;
-		}
-
-	}
-
-	public void addPluginDocumentation(Action a) {
-		for (JMenu menu : pluginDoc)
-			menu.add(a);
-
-	}
-
 	private GeneEvidenceLabel gel = null;
 	private StatusBar statusBar;
 	private DataExplorerManager genomeExplorerManager;
 	private InformationFrame infoFrame;
-	private JMenuItem pluginLoadingMessage;
+
+	public void registerMainWindow(Frame parentFrame) {
+		this.parent = parentFrame;
+
+	}
+
+	/**
+	 * 
+	 * @return application main window
+	 */
+	public Frame getMainWindow() {
+		return parent;
+	}
 
 	public StatusBar getStatusBar() {
 		return statusBar;
@@ -146,11 +54,6 @@ public class GUIManager {
 
 	public void registerStatusBar(StatusBar statusBar) {
 		this.statusBar = statusBar;
-
-	}
-
-	public void registerMainWindow(Frame parentFrame) {
-		this.parent = parentFrame;
 
 	}
 
@@ -170,26 +73,6 @@ public class GUIManager {
 
 	public InformationFrame getInformationFrame() {
 		return infoFrame;
-	}
-
-	/**
-	 * Give the {@link GUIManager} a reference to the "Plugin Loading" message
-	 * in the plugin menu.
-	 * 
-	 * @param tempItem
-	 */
-	public void registerPluginMenuToggle(JMenuItem tempItem) {
-		pluginLoadingMessage = tempItem;
-
-	}
-
-	/**
-	 * Toggle the "Plugin loading" message (in)visible.
-	 * 
-	 * @param visible
-	 */
-	public void togglePluginLoadingMessage(boolean visible) {
-		this.pluginLoadingMessage.setVisible(visible);
 	}
 
 }

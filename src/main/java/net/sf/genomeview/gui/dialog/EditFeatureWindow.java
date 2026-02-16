@@ -212,7 +212,7 @@ public class EditFeatureWindow extends JDialog {
 	}
 
 	public EditFeatureWindow(Model model) {
-		super(model.getGUIManager().getParent(), MessageManager.getString("editfeature.edit_structure"));
+		super(model.getGUIManager().getMainWindow(), MessageManager.getString("editfeature.edit_structure"));
 		_self = this;
 		setModal(true);
 		this.model = model;

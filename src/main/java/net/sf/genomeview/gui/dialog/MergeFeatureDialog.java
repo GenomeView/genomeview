@@ -42,7 +42,7 @@ public class MergeFeatureDialog extends JDialog {
 	private static final long serialVersionUID = -770863087750087961L;
 
 	public MergeFeatureDialog(final Model model) {
-		super(model.getGUIManager().getParent(), MessageManager.getString("mergefeatures.title"));
+		super(model.getGUIManager().getMainWindow(), MessageManager.getString("mergefeatures.title"));
 		final MergeFeatureDialog _self = this;
 		setModal(true);
 		setAlwaysOnTop(true);
@@ -188,7 +188,7 @@ public class MergeFeatureDialog extends JDialog {
 		c.add(cancel, gc);
 		setContentPane(c);
 		pack();
-		StaticUtils.center(model.getGUIManager().getParent(),this);
+		StaticUtils.center(model.getGUIManager().getMainWindow(),this);
 		setVisible(true);
 
 	}

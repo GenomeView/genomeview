@@ -98,7 +98,7 @@ public class PileupTrackConfig extends TrackConfig {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String in = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+				String in = JOptionPane.showInputDialog(model.getGUIManager().getMainWindow(),
 						MessageManager.getString("pileuptrack.new_thereshold_line_height"), MessageManager.getString("pileuptrack.input_value"), JOptionPane.QUESTION_MESSAGE);
 				if (in != null) {
 					try {
@@ -188,7 +188,7 @@ public class PileupTrackConfig extends TrackConfig {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String in = JOptionPane.showInputDialog(model.getGUIManager().getParent(),
+				String in = JOptionPane.showInputDialog(model.getGUIManager().getMainWindow(),
 						MessageManager.getString("pileuptrack.input_max_info"), MessageManager.getString("pileuptrack.input_max"),
 						JOptionPane.QUESTION_MESSAGE);
 				if (in != null) {

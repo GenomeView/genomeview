@@ -43,7 +43,7 @@ public class TrackConfigWindow implements Observer {
 	private TrackConfig config;
 	
 	public TrackConfigWindow(Model model, final TrackConfig config) {
-		window = new JDialog(model.getGUIManager().getParent());
+		window = new JDialog(model.getGUIManager().getMainWindow());
 		
 		window.setModal(false);
 		window.setTitle(MessageManager.getString("trackconfig.configure_track"));
@@ -51,7 +51,7 @@ public class TrackConfigWindow implements Observer {
 		System.out.println(config);
 		window.add(config.getGUIContainer());
 		window.pack();
-		StaticUtils.center(model.getGUIManager().getParent(), window);
+		StaticUtils.center(model.getGUIManager().getMainWindow(), window);
 		config.addObserver(this);
 		window.addWindowListener(new WindowAdapter() {
 

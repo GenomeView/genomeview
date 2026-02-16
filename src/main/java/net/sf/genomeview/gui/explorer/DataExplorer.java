@@ -42,7 +42,7 @@ class DataExplorer extends EscapeDialog {
 //	private JTabbedPane tabs;
 
 	DataExplorer(final Model model) {
-		super(model.getGUIManager().getParent(), "GenomeView :: " + Configuration.version() + " - Data Explorer",
+		super(model.getGUIManager().getMainWindow(), "GenomeView :: " + Configuration.version() + " - Data Explorer",
 				ModalityType.APPLICATION_MODAL);
 		setIconImage(Icons.MINILOGO);
 		this.model = model;
@@ -151,7 +151,7 @@ class DataExplorer extends EscapeDialog {
 		setBackground(Color.WHITE);
 
 		pack();
-		StaticUtils.center(model.getGUIManager().getParent(), this);
+		StaticUtils.center(model.getGUIManager().getMainWindow(), this);
 	}
 
 	private Logger log = LoggerFactory.getLogger(DataExplorer.class.getCanonicalName());
