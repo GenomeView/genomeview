@@ -32,11 +32,9 @@ import net.sf.genomeview.gui.menu.file.SaveSessionAction;
 import net.sf.genomeview.gui.menu.file.ShowConfigurationAction;
 import net.sf.genomeview.gui.menu.file.ShowGenomeExplorerAction;
 import net.sf.genomeview.gui.menu.help.ShowAboutDialogAction;
-import net.sf.genomeview.gui.menu.help.ShowInstalledModulesAction;
 import net.sf.genomeview.gui.menu.navigation.GotoPosition;
 import net.sf.genomeview.gui.menu.navigation.GotoTrack;
 import net.sf.genomeview.gui.menu.navigation.SearchAction;
-import net.sf.genomeview.gui.menu.plugins.LoadPluginFromURLAction;
 import net.sf.genomeview.gui.menu.selection.ClearFeatureSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ClearRegionSelectionAction;
 import net.sf.genomeview.gui.menu.selection.ShowSequenceWindowAction;
@@ -50,18 +48,19 @@ public class MainMenu extends JMenuBar {
 
 	public MainMenu(Model model) {
 		JMenu file = new JMenu(MessageManager.getString("mainmenu.file"));
-		
-		JMenuItem i=new JMenuItem(new LoadFeaturesAction(model));
-		OverlayListener ol=new OverlayListener(MessageManager.getString("mainmenu.load_info"));
+
+		JMenuItem i = new JMenuItem(new LoadFeaturesAction(model));
+		OverlayListener ol = new OverlayListener(
+				MessageManager.getString("mainmenu.load_info"));
 		i.addMouseListener(ol);
 		i.addActionListener(ol);
 		file.add(i);
-		
+
 		file.addSeparator();
 		file.add(new ShowGenomeExplorerAction(model));
 		file.add(new SaveSessionAction(model));
 		file.add(new LoadSessionAction(model));
-		
+
 		file.addSeparator();
 		file.add(new SaveAction(model));
 		file.add(new ExportDataAction(model));
@@ -88,16 +87,18 @@ public class MainMenu extends JMenuBar {
 		edit.add(new SplitFeatureAction(model));
 		edit.add(new ExtendToStartCodonAction(model));
 		edit.add(new ExtendToStopCodonAction(model));
-		
+
 		add(edit);
 
-		JMenu navigation = new JMenu(MessageManager.getString("mainmenu.navigation"));
+		JMenu navigation = new JMenu(
+				MessageManager.getString("mainmenu.navigation"));
 		navigation.add(new GotoPosition(model));
 		navigation.add(new GotoTrack(model));
 		navigation.add(new SearchAction(model));
 		add(navigation);
 
-		JMenu select = new JMenu(MessageManager.getString("mainmenu.selection"));
+		JMenu select = new JMenu(
+				MessageManager.getString("mainmenu.selection"));
 		select.add(new ShowSequenceWindowAction(model));
 //		select.add(new NCBIdnaBlastAction(model));
 //		select.add(new NCBIproteinBlastAction(model));
@@ -111,34 +112,17 @@ public class MainMenu extends JMenuBar {
 		select.add(new ZoomToSelectedLocationAction(model));
 		add(select);
 
-
-		JMenu plugin = new JMenu(MessageManager.getString("mainmenu.plugins"));
-		model.getGUIManager().registerPluginMenu(plugin);
-		plugin.add(new LoadPluginFromURLAction(model));
-		plugin.addSeparator();
-		JMenuItem tempItem = new JMenuItem(MessageManager.getString("guimanager.loading_plugins"));
-		tempItem.setEnabled(false);
-		tempItem.setVisible(false);
-		model.getGUIManager().registerPluginMenuToggle(tempItem);
-		plugin.add(tempItem);
-		add(plugin);
-
 		JMenu help = new JMenu(MessageManager.getString("mainmenu.help"));
-		help.add(new OpenURLAction(MessageManager.getString("mainmenu.user_documentation"),
-						"http://genomeview.org/manual"));
-		help.add(new OpenURLAction(MessageManager.getString("mainmenu.post_bug_request"),
+		help.add(new OpenURLAction(
+				MessageManager.getString("mainmenu.user_documentation"),
+				"http://genomeview.org/manual"));
+		help.add(new OpenURLAction(
+				MessageManager.getString("mainmenu.post_bug_request"),
 				"https://github.com/GenomeView/genomeview/issues"));
 
 		help.addSeparator();
-		help.add(new ShowInstalledModulesAction(model));
-//		help.add(new OpenURLAction("Official list plugins",
-//				"http://genomeview.sourceforge.net/plugins"));
-		JMenu pluginDoc=new JMenu(MessageManager.getString("mainmenu.plugin"));
-		model.getGUIManager().registerPluginDocumentationMenu(pluginDoc);
-		help.add(pluginDoc);
-		help.addSeparator();
 		help.add(new ShowAboutDialogAction(model));
-		
+
 		add(help);
 	}
 }

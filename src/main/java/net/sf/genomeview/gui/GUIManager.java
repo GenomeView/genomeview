@@ -1,11 +1,10 @@
 /**
  * %HEADER%
  */
-package net.sf.genomeview.plugin;
+package net.sf.genomeview.gui;
 
 import java.awt.Component;
 import java.awt.Frame;
-import java.awt.dnd.DropTarget;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,13 +12,12 @@ import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import net.sf.genomeview.gui.StatusBar;
 import net.sf.genomeview.gui.explorer.DataExplorerManager;
 import net.sf.genomeview.gui.information.InformationFrame;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel;
 
 /**
- * Manages GUI components that are accessible for plugins.
+ * Manages GUI components that are accessible.
  * 
  * @author Thomas Abeel
  * @author thpar
@@ -40,14 +38,14 @@ public class GUIManager {
 		return parent;
 	}
 
-	public void startPluginLoading(){
+	public void startPluginLoading() {
 		togglePluginLoadingMessage(true);
 	}
-	
-	public void finishPluginLoading(){
+
+	public void finishPluginLoading() {
 		togglePluginLoadingMessage(false);
 	}
-	
+
 	/* There can be multiple menus as there will be one for each screen */
 	private List<JMenu> pluginMenu = new ArrayList<JMenu>();
 	private List<JMenu> pluginDoc = new ArrayList<JMenu>();
@@ -65,8 +63,8 @@ public class GUIManager {
 		for (JMenu menu : pluginMenu)
 			getMenu(menu, pathMenu).add(a);
 	}
-	
-	public void addPluginMenuItem(JMenuItem i, String pathMenu){
+
+	public void addPluginMenuItem(JMenuItem i, String pathMenu) {
 		for (JMenu menu : pluginMenu)
 			getMenu(menu, pathMenu).add(i);
 	}
@@ -134,7 +132,6 @@ public class GUIManager {
 	private InformationFrame infoFrame;
 	private JMenuItem pluginLoadingMessage;
 
-
 	public StatusBar getStatusBar() {
 		return statusBar;
 	}
@@ -157,7 +154,8 @@ public class GUIManager {
 
 	}
 
-	public void registerGenomeExplorer(DataExplorerManager genomeExplorerManager) {
+	public void registerGenomeExplorer(
+			DataExplorerManager genomeExplorerManager) {
 		this.genomeExplorerManager = genomeExplorerManager;
 
 	}
@@ -166,32 +164,31 @@ public class GUIManager {
 		return genomeExplorerManager;
 	}
 
-	public void registerInformationFrame(InformationFrame infoFrame){
+	public void registerInformationFrame(InformationFrame infoFrame) {
 		this.infoFrame = infoFrame;
 	}
-	
-	public InformationFrame getInformationFrame(){
+
+	public InformationFrame getInformationFrame() {
 		return infoFrame;
 	}
 
-	
 	/**
-	 * Give the {@link GUIManager} a reference to the "Plugin Loading" message 
+	 * Give the {@link GUIManager} a reference to the "Plugin Loading" message
 	 * in the plugin menu.
 	 * 
 	 * @param tempItem
 	 */
 	public void registerPluginMenuToggle(JMenuItem tempItem) {
 		pluginLoadingMessage = tempItem;
-		
+
 	}
-	
+
 	/**
 	 * Toggle the "Plugin loading" message (in)visible.
 	 * 
 	 * @param visible
 	 */
-	public void togglePluginLoadingMessage(boolean visible){
+	public void togglePluginLoadingMessage(boolean visible) {
 		this.pluginLoadingMessage.setVisible(visible);
 	}
 

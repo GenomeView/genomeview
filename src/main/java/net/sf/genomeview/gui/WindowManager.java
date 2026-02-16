@@ -10,28 +10,25 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
-import net.sf.genomeview.plugin.PluginLoader;
 import net.sf.jannot.Cleaner;
 
 /**
@@ -41,12 +38,13 @@ import net.sf.jannot.Cleaner;
  * 
  */
 public class WindowManager extends WindowAdapter implements Observer {
-	
+
 	// limit window size on large screens.
 	public static final int MAX_WIDTH = 1920;
 	public static final int MAX_HEIGHT = 1080;
 
-	private static Logger logger = LoggerFactory.getLogger(WindowManager.class.getCanonicalName());
+	private static Logger logger = LoggerFactory
+			.getLogger(WindowManager.class.getCanonicalName());
 
 	private GenomeViewWindow window = null;
 
@@ -68,7 +66,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 		model.addObserver(o);
 	}
 
-	public WindowManager(String args[], Splash splash) throws InterruptedException, ExecutionException {
+	public WindowManager(String args[], Splash splash)
+			throws InterruptedException, ExecutionException {
 		running++;
 		logger.info("Started running instance" + running);
 		init(args, splash);
@@ -88,8 +87,10 @@ public class WindowManager extends WindowAdapter implements Observer {
 	@Override
 	public void windowClosing(WindowEvent e) {
 
-		int result=JOptionPane.showConfirmDialog(model.getGUIManager().getParent(), MessageManager.getString("windowmanager.exit"));
-		if(result==JOptionPane.YES_OPTION)
+		int result = JOptionPane.showConfirmDialog(
+				model.getGUIManager().getParent(),
+				MessageManager.getString("windowmanager.exit"));
+		if (result == JOptionPane.YES_OPTION)
 			this.model.exit();
 	}
 
@@ -115,7 +116,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 			try {
 				Configuration.save();
 			} catch (IOException e) {
-				logger.error( "Problem saving configuration", e);
+				logger.error("Problem saving configuration", e);
 			}
 
 			running--;
@@ -125,7 +126,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 				Cleaner.exit();
 
 				// System.exit(0);
-				System.out.println("We should be exiting here, if it doesn't happen, we will need to do some work...");
+				System.out.println(
+						"We should be exiting here, if it doesn't happen, we will need to do some work...");
 
 				for (Frame f : Frame.getFrames()) {
 					System.out.println("Disposing loose frame: " + f);
@@ -135,7 +137,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 				System.out.println("Dumping all running threads");
 				Thread[] threads = getAllThreads();
 				for (Thread id : threads) {
-					System.out.println(id.getName() + "\t" + id.isDaemon() + "\t" + id.isAlive());
+					System.out.println(id.getName() + "\t" + id.isDaemon()
+							+ "\t" + id.isAlive());
 
 				}
 
@@ -170,34 +173,43 @@ public class WindowManager extends WindowAdapter implements Observer {
 		return java.util.Arrays.copyOf(threads, n);
 	}
 
-	public void init(String[] args, Splash splash) throws InterruptedException, ExecutionException {
+	public void init(String[] args, Splash splash)
+			throws InterruptedException, ExecutionException {
 		// FIXME special handling if this is not the first time the application
 		// is initialized
 		if (splash != null)
-			splash.setText(MessageManager.getString("windowmanager.parsing_params"));
+			splash.setText(
+					MessageManager.getString("windowmanager.parsing_params"));
 		CommandLineOptions.init(args);
 
 		if (splash != null)
-			splash.setText(MessageManager.getString("windowmanager.creating_windows"));
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			splash.setText(
+					MessageManager.getString("windowmanager.creating_windows"));
+		GraphicsEnvironment ge = GraphicsEnvironment
+				.getLocalGraphicsEnvironment();
 		GraphicsDevice[] gs = ge.getScreenDevices();
 		boolean freshwindow = false;
 
 		if (model == null) {
 			model = new Model(CommandLineOptions.id());
 			model.addObserver(this);
-			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new Hotkeys(model));
+			KeyboardFocusManager.getCurrentKeyboardFocusManager()
+					.addKeyEventDispatcher(new Hotkeys(model));
 		}
 
 		if (window == null) {
 			freshwindow = true;
-			logger.info(MessageManager.getString("windowmanager.creating_new_window"));
-			window = new GenomeViewWindow(model, "GenomeView :: " + Configuration.version(), gs[0].getDefaultConfiguration());
+			logger.info(MessageManager
+					.getString("windowmanager.creating_new_window"));
+			window = new GenomeViewWindow(model,
+					"GenomeView :: " + Configuration.version(),
+					gs[0].getDefaultConfiguration());
 			model.getGUIManager().registerMainWindow(window);
 			window.setIconImage(Icons.MINILOGO);
 			window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			window.addWindowListener(this);
-			window.getRootPane().setTransferHandler(new DropTransferHandler(model));
+			window.getRootPane()
+					.setTransferHandler(new DropTransferHandler(model));
 
 		}
 
@@ -206,20 +218,25 @@ public class WindowManager extends WindowAdapter implements Observer {
 		model.clearEntries();
 
 		if (freshwindow) {
-			JPanel[] content = MainContent.createContent(model, Configuration.getBoolean("dualscreen") ? gs.length : 1);
+			JPanel[] content = MainContent.createContent(model,
+					Configuration.getBoolean("dualscreen") ? gs.length : 1);
 			window.setContentPane(content[0]);
 			window.setJMenuBar(new MainMenu(model));
 
 			window.pack();
-			
+
 			Rectangle rec = getNiceWindowSize(MAX_WIDTH, MAX_HEIGHT);
 			window.setSize(rec.width, rec.height);
 
 			if (content.length > 1) {
 				for (int i = 1; i < content.length; i++) {
-					helper = new GenomeViewWindow(model, "GenomeView :: " + Configuration.version(), gs[i].getDefaultConfiguration());
+					helper = new GenomeViewWindow(model,
+							"GenomeView :: " + Configuration.version(),
+							gs[i].getDefaultConfiguration());
 					helper.setJMenuBar(new MainMenu(model));
-					helper.setIconImage(new ImageIcon(this.getClass().getResource("/images/gv2.png")).getImage());
+					helper.setIconImage(new ImageIcon(
+							this.getClass().getResource("/images/gv2.png"))
+							.getImage());
 					helper.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 					helper.setContentPane(content[i]);
 					helper.setVisible(true);
@@ -228,12 +245,13 @@ public class WindowManager extends WindowAdapter implements Observer {
 			}
 			window.setVisible(true);
 			if (splash != null)
-				splash.setText(MessageManager.getString("windowmanager.installing_plugins"));
-			PluginLoader.init(model);
+				splash.setText(MessageManager
+						.getString("windowmanager.installing_plugins"));
 
 		}
 		if (splash != null)
-			splash.setText(MessageManager.getString("windowmanager.loading_data"));
+			splash.setText(
+					MessageManager.getString("windowmanager.loading_data"));
 		/* Data specified on command line */
 		InitDataLoader idl = new InitDataLoader(model);
 		if (CommandLineOptions.goodParse()) {
@@ -257,20 +275,23 @@ public class WindowManager extends WindowAdapter implements Observer {
 		model.setSilent(false);
 
 	}
-	
+
 	/**
 	 * 
-	 * @param width preferred width. 
+	 * @param width  preferred width.
 	 * @param height preferred height
-	 * @return Dimension for a new window that is trying to be size width,height but not exceeding
-	 * actual screen size.
+	 * @return Dimension for a new window that is trying to be size width,height
+	 *         but not exceeding actual screen size.
 	 */
 	public static Rectangle getNiceWindowSize(int width, int height) {
-		// we use GraphicsEnvironment because this in theory allows to check all attached displays.
+		// we use GraphicsEnvironment because this in theory allows to check all
+		// attached displays.
 		// the alternative could be Toolkit.getDefaultToolkit().getScreenSize()
 		// but this might give only the main screen info.
-		Rectangle rec = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-		return new Rectangle(Math.min(width, (int)rec.getWidth()), Math.min(height, (int)rec.getHeight()));
+		Rectangle rec = GraphicsEnvironment.getLocalGraphicsEnvironment()
+				.getMaximumWindowBounds();
+		return new Rectangle(Math.min(width, (int) rec.getWidth()),
+				Math.min(height, (int) rec.getHeight()));
 	}
 }
 
@@ -315,7 +336,5 @@ class Environment {
 		applet = true;
 
 	}
-	
-	
 
 }
