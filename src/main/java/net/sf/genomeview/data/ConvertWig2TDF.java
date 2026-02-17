@@ -32,17 +32,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import net.sf.jannot.Entry;
-import net.sf.jannot.EntrySet;
-import net.sf.jannot.exception.ReadFailedException;
-import net.sf.jannot.refseq.Sequence;
-import net.sf.jannot.source.DataSourceFactory;
-import net.sf.jannot.source.Locator;
 
 import org.broad.igv.tdf.TDFBedTile;
 import org.broad.igv.tdf.TDFDataset;
@@ -55,8 +44,11 @@ import org.broad.igv.tools.Accumulator;
 import org.broad.igv.track.WindowFunction;
 import org.broad.igv.util.collections.FloatArrayList;
 import org.broad.igv.util.collections.IntArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import be.abeel.io.LineIterator;
+import net.sf.jannot.source.Locator;
 
 /**
  * 
@@ -65,7 +57,8 @@ import be.abeel.io.LineIterator;
  */
 public class ConvertWig2TDF {
 
-	private static Logger log = LoggerFactory.getLogger(ConvertWig2TDF.class.toString());
+	private static Logger log = LoggerFactory
+			.getLogger(ConvertWig2TDF.class.toString());
 	private boolean compressed = true;
 	private boolean skipZeroes = false;
 	private int nZoom;
@@ -87,8 +80,8 @@ public class ConvertWig2TDF {
 	private Map<String, String> attributes = new HashMap<String, String>();
 	private PrintStream out = System.out;
 
-	private List<WindowFunction> windowFunctions = Arrays.asList(WindowFunction.mean, WindowFunction.min,
-			WindowFunction.max);// ,
+	private List<WindowFunction> windowFunctions = Arrays.asList(
+			WindowFunction.mean, WindowFunction.min, WindowFunction.max);// ,
 	// WindowFunction.median,
 	// WindowFunction.min, WindowFunction.max);
 	private String trackName;
@@ -102,19 +95,24 @@ public class ConvertWig2TDF {
 		allDataStats = new Accumulator(windowFunctions);
 	}
 
-	public static void main(String[] args) throws IOException, URISyntaxException {
-		ConvertWig2TDF.convertWig2TDF(new Locator("z:/workspace/NetworkReconstruction/info/hotregions.wig"), new File(
-				"z:/workspace/NetworkReconstruction/info/hotregions.wig.tdf"));
+	public static void main(String[] args)
+			throws IOException, URISyntaxException {
+		ConvertWig2TDF.convertWig2TDF(new Locator(
+				"z:/workspace/NetworkReconstruction/info/hotregions.wig"),
+				new File(
+						"z:/workspace/NetworkReconstruction/info/hotregions.wig.tdf"));
 	}
 
 	/**
 	 * Called to set inital parameters. It is required that this be called prior
 	 * to writing the file
 	 */
-	private void setTrackParameters(String trackType, String trackLine, String[] trackNames) {
+	private void setTrackParameters(String trackType, String trackLine,
+			String[] trackNames) {
 
 		if (outputFile != null && writer == null) {
-			writer = new TDFWriter(outputFile, trackName, trackType, trackLine, trackNames, windowFunctions, compressed);
+			writer = new TDFWriter(outputFile, trackName, trackType, trackLine,
+					trackNames, windowFunctions, compressed);
 			nTracks = trackNames.length;
 
 			TDFGroup rootGroup = writer.getRootGroup();
@@ -129,7 +127,8 @@ public class ConvertWig2TDF {
 	 * for each sample/track in this dataset. The name is an optional probe or
 	 * feature name.
 	 */
-	private void addData(String chr, int start, int end, float[] data, String name) {
+	private void addData(String chr, int start, int end, float[] data,
+			String name) {
 
 		if (writer == null) {
 			return;
@@ -154,8 +153,9 @@ public class ConvertWig2TDF {
 
 		if (currentChr != null && chr.equals(currentChr)) {
 			if (start < (lastStartPosition - maxExtFactor)) {
-				String msg = "Error: Data is not sorted @ " + chr + " " + start + "  (last position = "
-						+ lastStartPosition + "   max ext factor = " + maxExtFactor + ")";
+				String msg = "Error: Data is not sorted @ " + chr + " " + start
+						+ "  (last position = " + lastStartPosition
+						+ "   max ext factor = " + maxExtFactor + ")";
 				out.println(msg);
 				throw new RuntimeException(msg);
 			}
@@ -173,8 +173,9 @@ public class ConvertWig2TDF {
 											// genome.getChromosome(chr).getLength();
 
 		if (start > chrLength) {
-			log.info("Ignoring data from non-existent locus.  Probe = " + name + "  Locus = " + chr + ":" + start + "-"
-					+ end + ". " + chr + " length = " + chrLength);
+			log.info("Ignoring data from non-existent locus.  Probe = " + name
+					+ "  Locus = " + chr + ":" + start + "-" + end + ". " + chr
+					+ " length = " + chrLength);
 			return;
 		}
 
@@ -197,8 +198,8 @@ public class ConvertWig2TDF {
 	private void newChromosome(String chr) {
 
 		if (visitedChromosomes.contains(chr)) {
-			String msg = "Error: Data is not ordered by start position. Chromosome " + chr
-					+ " appears in multiple blocks";
+			String msg = "Error: Data is not ordered by start position. Chromosome "
+					+ chr + " appears in multiple blocks";
 			out.println(msg);
 			throw new RuntimeException(msg);
 
@@ -247,7 +248,8 @@ public class ConvertWig2TDF {
 		writer.getRootGroup().setAttribute("chromosomes", chrString.toString());
 
 		for (Map.Entry<String, String> entry : attributes.entrySet()) {
-			writer.getRootGroup().setAttribute(entry.getKey(), entry.getValue());
+			writer.getRootGroup().setAttribute(entry.getKey(),
+					entry.getValue());
 		}
 
 		if (zoomLevels != null) {
@@ -258,7 +260,9 @@ public class ConvertWig2TDF {
 
 		if (rawData == null) {
 			// TODO -- delete .tdf file?
-			out.println("No features were found that matched chromosomes in genome: " + trackName);
+			out.println(
+					"No features were found that matched chromosomes in genome: "
+							+ trackName);
 
 		} else {
 			rawData.close();
@@ -268,7 +272,8 @@ public class ConvertWig2TDF {
 			TDFGroup group = writer.getGroup("/");
 			group.setAttribute(TDFGroup.USE_PERCENTILE_AUTOSCALING, "true");
 			for (WindowFunction wf : windowFunctions) {
-				group.setAttribute(wf.getDisplayName(), String.valueOf(allDataStats.getValue(wf)));
+				group.setAttribute(wf.getDisplayName(),
+						String.valueOf(allDataStats.getValue(wf)));
 			}
 			writer.closeFile();
 		}
@@ -341,7 +346,8 @@ public class ConvertWig2TDF {
 				if (startArray.size() > 0) {
 					int[] s = startArray.toArray();
 					int[] e = endArray.toArray();
-					float[][] d = new float[dataArray.length][dataArray[0].size()];
+					float[][] d = new float[dataArray.length][dataArray[0]
+							.size()];
 					for (int i = 0; i < dataArray.length; i++) {
 						d[i] = dataArray[i].toArray();
 					}
@@ -350,7 +356,8 @@ public class ConvertWig2TDF {
 							nameList.add("anonymous");
 						}
 					}
-					String[] n = nameList == null ? null : nameList.toArray(new String[] {});
+					String[] n = nameList == null ? null
+							: nameList.toArray(new String[] {});
 
 					TDFBedTile tile = new TDFBedTile(tileStart, s, e, d, n);
 					writer.writeTile(dsName, tileNumber, tile);
@@ -380,7 +387,8 @@ public class ConvertWig2TDF {
 			this.tileWidth = tileWidth;
 			int nTiles = (int) (chrLength / tileWidth) + 1;
 			dsName = "/" + chr + "/raw";
-			writer.createDataset(dsName, TDFDataset.DataType.FLOAT, tileWidth, nTiles);
+			writer.createDataset(dsName, TDFDataset.DataType.FLOAT, tileWidth,
+					nTiles);
 
 		}
 
@@ -413,7 +421,8 @@ public class ConvertWig2TDF {
 			for (int t = startTileNumber; t <= endTileNumber; t++) {
 				RawTile tile = activeTiles.get(t);
 				if (tile == null) {
-					tile = new RawTile(dsName, t, t * tileWidth, (t + 1) * tileWidth);
+					tile = new RawTile(dsName, t, t * tileWidth,
+							(t + 1) * tileWidth);
 					activeTiles.put(t, tile);
 				}
 				tile.addData(start, end, data, name);
@@ -449,7 +458,8 @@ public class ConvertWig2TDF {
 			// Create datasets -- one for each window function
 			for (WindowFunction wf : windowFunctions) {
 				String dsName = "/" + chr + "/z" + level + "/" + wf.toString();
-				datasets.put(wf, writer.createDataset(dsName, TDFDataset.DataType.FLOAT, tileWidth, nTiles));
+				datasets.put(wf, writer.createDataset(dsName,
+						TDFDataset.DataType.FLOAT, tileWidth, nTiles));
 			}
 		}
 
@@ -505,7 +515,8 @@ public class ConvertWig2TDF {
 		Accumulator[][] accumulators;
 		Map<WindowFunction, TDFDataset> datasets;
 
-		Tile(Map<WindowFunction, TDFDataset> datasets, int zoomLevel, int tileNumber, int nBins, int tileWidth) {
+		Tile(Map<WindowFunction, TDFDataset> datasets, int zoomLevel,
+				int tileNumber, int nBins, int tileWidth) {
 			this.totalCount = 0;
 			this.datasets = datasets;
 			// this.zoomLevel = zoomLevel;
@@ -522,14 +533,14 @@ public class ConvertWig2TDF {
 		 * 
 		 * @param start
 		 * @param end
-		 * @param data
-		 *            array of values at this position, 1 value per track
+		 * @param data  array of values at this position, 1 value per track
 		 */
 		void addData(int start, int end, float[] data) {
 			totalCount++;
 
 			int startBin = Math.max(0, (int) ((start - tileStart) / binWidth));
-			int endBin = Math.min(nBins - 1, (int) ((end - tileStart) / binWidth));
+			int endBin = Math.min(nBins - 1,
+					(int) ((end - tileStart) / binWidth));
 
 			int tmp = (int) ((start - tileStart - maxExtFactor) / binWidth);
 
@@ -551,8 +562,8 @@ public class ConvertWig2TDF {
 		}
 
 		/**
-         *
-         */
+		 *
+		 */
 		void close() {
 
 			// Count non-empty bins. All tracks should be the same
@@ -585,29 +596,34 @@ public class ConvertWig2TDF {
 							if (acc != null) {
 								data[t][n] = acc.getValue(wf);
 								if (t == nTracks - 1) {
-									starts[n] = (int) (tileStart + (i * binWidth));
+									starts[n] = (int) (tileStart
+											+ (i * binWidth));
 									n++;
 								}
 							}
 						}
 					}
-					tile = new TDFVaryTile((int) tileStart, binWidth, starts, data);
+					tile = new TDFVaryTile((int) tileStart, binWidth, starts,
+							data);
 
 				} else {
 					float[][] data = new float[nTracks][nBins];
 					for (int t = 0; t < nTracks; t++) {
 						for (int i = 0; i < nBins; i++) {
-							data[t][i] = accumulators[t][i] == null ? Float.NaN : accumulators[t][i].getValue(wf);
+							data[t][i] = accumulators[t][i] == null ? Float.NaN
+									: accumulators[t][i].getValue(wf);
 						}
 					}
-					tile = new TDFFixedTile(tileStart, tileStart, binWidth, data);
+					tile = new TDFFixedTile(tileStart, tileStart, binWidth,
+							data);
 				}
 
 				String dsName = datasets.get(wf).getName();
 				try {
 					writer.writeTile(dsName, tileNumber, tile);
 				} catch (IOException iOException) {
-					log.error("Error writing tile: " + dsName + " [" + tileNumber + "]", iOException);
+					log.error("Error writing tile: " + dsName + " ["
+							+ tileNumber + "]", iOException);
 					// TODO -- replace with PreprocessorException
 					throw new RuntimeException(iOException);
 				}
@@ -615,7 +631,8 @@ public class ConvertWig2TDF {
 		}
 	}
 
-	private void count(int maxZoomValue, Locator data) throws IOException, URISyntaxException {
+	private void count(int maxZoomValue, Locator data)
+			throws IOException, URISyntaxException {
 		// setNZoom(maxZoomValue);
 		nZoom = maxZoomValue;
 		String[] labels = trackName.split(",");
@@ -655,7 +672,8 @@ public class ConvertWig2TDF {
 		 * }
 		 */
 
-		BufferedInputStream bis = new BufferedInputStream(data.stream(), 1024 * 1024);
+		BufferedInputStream bis = new BufferedInputStream(data.stream(),
+				1024 * 1024);
 		LineIterator it = new LineIterator(bis, true, true);
 		// int max = 0;
 		// String trackName = null;
@@ -705,10 +723,12 @@ public class ConvertWig2TDF {
 							// String[] arr = line.split("\\s+");
 							position = Integer.parseInt(arr[0]);
 							float[] d = parseValues(1, arr);
-							addData(chr, position, position + span - 1, d, null);
+							addData(chr, position, position + span - 1, d,
+									null);
 						} else {
 							float[] d = parseValues(0, arr);
-							addData(chr, position, position + span - 1, d, null);
+							addData(chr, position, position + span - 1, d,
+									null);
 							position += stepSize;
 						}
 					} else {
@@ -718,7 +738,8 @@ public class ConvertWig2TDF {
 						addData(arr[0], position, endpos, d, null);
 					}
 				} catch (Exception e) {
-					log.error("Couldn't parse line: " + line + " -> " + Arrays.toString(arr), e);
+					log.error("Couldn't parse line: " + line + " -> "
+							+ Arrays.toString(arr), e);
 				}
 				// if (wiggleMode) {
 				// if (variableStep) {
@@ -768,9 +789,11 @@ public class ConvertWig2TDF {
 
 	private static HashMap<String, Integer> mapLength = new HashMap<String, Integer>();
 
-	public static void convertWig2TDF(Locator data, File output) throws IOException, URISyntaxException {
+	public static void convertWig2TDF(Locator data, File output)
+			throws IOException, URISyntaxException {
 		// this.dnaproperty = (ConversionMapDNAProperty) prop;
-		BufferedInputStream bis = new BufferedInputStream(data.stream(), 1024 * 1024);
+		BufferedInputStream bis = new BufferedInputStream(data.stream(),
+				1024 * 1024);
 		LineIterator it = new LineIterator(bis, true, true);
 		int max = 0;
 		String trackName = "genome";
