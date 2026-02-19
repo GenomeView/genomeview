@@ -15,7 +15,6 @@ import java.util.TreeSet;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
@@ -28,7 +27,8 @@ public class SplitFeatureDialog extends JDialog {
 	private static final long serialVersionUID = -770863087750087961L;
 
 	public SplitFeatureDialog(final Model model) {
-		super(model.getGUIManager().getMainWindow(), MessageManager.getString("splitfeaturedialog.title"));
+		super(model.getGUIManager().getMainWindow(),
+				MessageManager.getString("splitfeaturedialog.title"));
 		final SplitFeatureDialog _self = this;
 		setModal(true);
 		setAlwaysOnTop(true);
@@ -40,13 +40,15 @@ public class SplitFeatureDialog extends JDialog {
 		gc.insets = new Insets(3, 3, 3, 3);
 		gc.fill = GridBagConstraints.BOTH;
 
-		Feature selected = model.selectionModel().getFeatureSelection().iterator().next();
+		Feature selected = model.selectionModel().getFeatureSelection()
+				.iterator().next();
 
 		final TypeCombo select = new TypeCombo(model);
 
 		select.setSelectedItem(selected.type());
 
-		final JCheckBox remove = new JCheckBox(MessageManager.getString("splitfeaturedialog.delete_original_after_split"));
+		final JCheckBox remove = new JCheckBox(MessageManager
+				.getString("splitfeaturedialog.delete_original_after_split"));
 
 		gc.gridwidth = 2;
 		c.add(select, gc);
@@ -60,14 +62,18 @@ public class SplitFeatureDialog extends JDialog {
 
 			public void actionPerformed(ActionEvent e) {
 
-				assert (model.selectionModel().getLocationSelection().size() == 2);
-				assert (model.selectionModel().getFeatureSelection().size() == 1);
+				assert (model.selectionModel().getLocationSelection()
+						.size() == 2);
+				assert (model.selectionModel().getFeatureSelection()
+						.size() == 1);
 
-				Feature f = model.selectionModel().getFeatureSelection().first();
+				Feature f = model.selectionModel().getFeatureSelection()
+						.first();
 				/* Split locations */
 				SortedSet<Location> downstream = new TreeSet<Location>();
 				SortedSet<Location> upstream = new TreeSet<Location>();
-				Location query = model.selectionModel().getLocationSelection().last();
+				Location query = model.selectionModel().getLocationSelection()
+						.last();
 				for (Location l : f.location()) {
 					if (l.compareTo(query) == -1)
 						upstream.add(l.copy());
@@ -78,7 +84,8 @@ public class SplitFeatureDialog extends JDialog {
 				/* Create left feature */
 				Feature left = f.copy();
 				left.setLocation(upstream);
-				model.vlm.getSelectedEntry().getMemoryAnnotation(left.type()).add(left);// //.annotation.add(left);
+				model.vlm.getSelectedEntry().getMemoryAnnotation(left.type())
+						.add(left);// //.annotation.add(left);
 
 				/* Create right feature */
 				//
@@ -89,11 +96,13 @@ public class SplitFeatureDialog extends JDialog {
 				// }
 				Feature right = f.copy();
 				right.setLocation(downstream);
-				model.vlm.getSelectedEntry().getMemoryAnnotation(right.type()).add(right);
+				model.vlm.getSelectedEntry().getMemoryAnnotation(right.type())
+						.add(right);
 
 				/* Remove original features if requested */
 				if (remove.isSelected()) {
-					model.vlm.getSelectedEntry().getMemoryAnnotation(f.type()).remove(f);
+					model.vlm.getSelectedEntry().getMemoryAnnotation(f.type())
+							.remove(f);
 				}
 
 				model.selectionModel().clearLocationSelection();
@@ -117,7 +126,7 @@ public class SplitFeatureDialog extends JDialog {
 		c.add(cancel, gc);
 		setContentPane(c);
 		pack();
-		StaticUtils.center(model.getGUIManager().getMainWindow(),this);
+		StaticUtils.center(model.getGUIManager().getMainWindow(), this);
 
 	}
 }

@@ -16,13 +16,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
@@ -32,7 +33,6 @@ import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
-import net.sf.jannot.Type;
 
 /**
  * 
@@ -42,14 +42,16 @@ import net.sf.jannot.Type;
 public class NewFeatureFromCoordinatesDialog extends JDialog {
 
 	/**
-     * 
-     */
+	 * 
+	 */
 	private static final long serialVersionUID = -5266511180264863028L;
 
-	private static Logger log = LoggerFactory.getLogger(NewFeatureFromCoordinatesDialog.class.getCanonicalName());
+	private static Logger log = LoggerFactory.getLogger(
+			NewFeatureFromCoordinatesDialog.class.getCanonicalName());
 
 	public NewFeatureFromCoordinatesDialog(final Model model) {
-		super(model.getGUIManager().getMainWindow(), MessageManager.getString("newfeature.title"));
+		super(model.getGUIManager().getMainWindow(),
+				MessageManager.getString("newfeature.title"));
 		final NewFeatureFromCoordinatesDialog _self = this;
 		setModal(true);
 		Container c = new Container();
@@ -60,7 +62,8 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 		gc.insets = new Insets(3, 3, 3, 3);
 		gc.fill = GridBagConstraints.BOTH;
 		final JTextField coordinates = new JTextField("<coordinates>");
-		coordinates.setPreferredSize(new Dimension(200, coordinates.getPreferredSize().height));
+		coordinates.setPreferredSize(
+				new Dimension(200, coordinates.getPreferredSize().height));
 		coordinates.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent arg0) {
@@ -78,8 +81,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 		gc.gridwidth = 2;
 		c.add(coordinates, gc);
 		gc.gridx += 2;
-		c.add(new HelpButton(
-				this,
+		c.add(new HelpButton(this,
 				MessageManager.getString("newfeaturecoord.hlp_text")));
 
 		gc.gridx = 0;
@@ -95,30 +97,32 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					SortedSet<Location> loc = parse(coordinates.getText());
-					filterLocation(loc, new Location(1, model.vlm.getSelectedEntry().getMaximumLength()));
-					Feature f = new Feature();
-					f.setLocation(loc);
+					filterLocation(loc, new Location(1,
+							model.vlm.getSelectedEntry().getMaximumLength()));
+					Feature f = new Feature(loc);
 					f.setType(typeCombo.getTerm());
 					f.setStrand(strandSelection.getStrand());
 					// model.getSelectedEntry().annotation.add(f);
 					// MemoryFeatureAnnotation fa = (MemoryFeatureAnnotation)
 					// model.getSelectedEntry().get(f.type());
-					MemoryFeatureAnnotation fa = model.vlm.getSelectedEntry().getMemoryAnnotation(f.type());
+					MemoryFeatureAnnotation fa = model.vlm.getSelectedEntry()
+							.getMemoryAnnotation(f.type());
 					fa.add(f);
 					// model.setSelectedRegion(null);
 					model.updateTracks();
 					_self.dispose();
 				} catch (Exception ex) {
-					JOptionPane
-							.showMessageDialog(
-									_self,
-									MessageManager.getString("newfeaturecoord.couldnt_create_warn"),
-									MessageManager.getString("newfeaturecoord.error"), JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(_self,
+							MessageManager.getString(
+									"newfeaturecoord.couldnt_create_warn"),
+							MessageManager.getString("newfeaturecoord.error"),
+							JOptionPane.WARNING_MESSAGE);
 				}
 
 			}
 
-			private void filterLocation(SortedSet<Location> loc, Location range) {
+			private void filterLocation(SortedSet<Location> loc,
+					Location range) {
 				Iterator<Location> it = loc.iterator();
 				while (it.hasNext()) {
 					Location l = it.next();
@@ -140,9 +144,11 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 				for (String l : arr) {
 					String[] a2 = l.trim().split("\\.\\.");
 					try {
-						out.add(new Location(Integer.parseInt(a2[0].trim()), Integer.parseInt(a2[1].trim())));
+						out.add(new Location(Integer.parseInt(a2[0].trim()),
+								Integer.parseInt(a2[1].trim())));
 					} catch (NumberFormatException ne) {
-						log.warn("Error while parsing '" + l + "' in " + Arrays.toString(arr));
+						log.warn("Error while parsing '" + l + "' in "
+								+ Arrays.toString(arr));
 						throw ne;
 					}
 
