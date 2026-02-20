@@ -25,6 +25,7 @@ import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.JOptionPaneX;
+import net.sf.jannot.ConvertWig2TDF;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.mafix.MafixFactory;
 import net.sf.jannot.parser.Parser;
@@ -81,7 +82,8 @@ public class DataSourceHelper {
 		/* Check for stale index */
 		if (index != null && index.lastModified() < data.lastModified()) {
 			if (IndexManager.canBuildIndex(data)) {
-				JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
+				JOptionPane.showMessageDialog(
+						model.getGUIManager().getMainWindow(),
 						MessageManager.getString(
 								"datasourcehelper.index_outdated_warn_message"),
 						MessageManager.getString(
@@ -345,8 +347,8 @@ public class DataSourceHelper {
 					});
 
 					chooser.setMultiSelectionEnabled(false);
-					int returnVal = chooser
-							.showSaveDialog(model.getGUIManager().getMainWindow());
+					int returnVal = chooser.showSaveDialog(
+							model.getGUIManager().getMainWindow());
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						File files = chooser.getSelectedFile();
 						// DataSource[] out = new DataSource[files.length];
