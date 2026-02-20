@@ -38,7 +38,6 @@ import net.sf.jannot.source.Locator;
 /**
  * 
  * @author Thomas Abeel
- * 
  */
 public class DataSourceHelper {
 
