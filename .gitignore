@@ -14,3 +14,7 @@ TEST-*
 hs_err_pid*
 /genomeview-*.zip
 /save.bed
+/target/
+/.settings/
+/.project
+/tmpcacert
