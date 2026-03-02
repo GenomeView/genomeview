@@ -41,6 +41,10 @@ import net.sf.jannot.source.Locator;
  */
 public class DataSourceHelper {
 
+	// shortcuts to often used constants, to make code readable
+	private final static int warn = JOptionPane.WARNING_MESSAGE;
+	private final static int error = JOptionPane.ERROR_MESSAGE;
+
 	private static Logger log = LoggerFactory
 			.getLogger(DataSourceHelper.class.getCanonicalName());
 
@@ -71,7 +75,7 @@ public class DataSourceHelper {
 							"datasourcehelper.data_missing_warn",
 							new Object[] { data.getName() }),
 					MessageManager.getString("datasourcehelper.data_missing"),
-					JOptionPane.ERROR_MESSAGE);
+					error);
 			return;
 		}
 
@@ -81,29 +85,15 @@ public class DataSourceHelper {
 		/* Check for stale index */
 		if (index != null && index.lastModified() < data.lastModified()) {
 			if (IndexManager.canBuildIndex(data)) {
-				JOptionPane.showMessageDialog(
-						model.getGUIManager().getMainWindow(),
-						MessageManager.getString(
-								"datasourcehelper.index_outdated_warn_message"),
-						MessageManager.getString(
-								"datasourcehelper.index_outdated_warn_title"),
-						JOptionPane.WARNING_MESSAGE);
-//				if (res == JOptionPane.YES_OPTION) {
+				problem(model, "index_outdated_warn_message",
+						"index_outdated_warn_title", warn);
 				index(model, data);
-//				}
 
 				return;
 
 			} else {
-				JOptionPaneX.showOkCancelDialog(
-						model.getGUIManager().getMainWindow(),
-						MessageManager.formatMessage(
-								"datasourcehelper.index_outdated_error_message",
-								new Object[] { data.getName() }),
-						MessageManager.getString(
-								"datasourcehelper.index_outdated_error_title"),
-						JOptionPane.ERROR_MESSAGE);
-
+				problem(model, "index_outdated_error_message",
+						"index_outdated_error_title", warn, data.getName());
 			}
 
 			return;
@@ -112,13 +102,7 @@ public class DataSourceHelper {
 
 		if (data.requiresIndex() && index == null) {
 			if (IndexManager.canBuildIndex(data)) {
-				int res = JOptionPane.showConfirmDialog(
-						model.getGUIManager().getMainWindow(),
-						MessageManager.getString(
-								"datasourcehelper.index_missing_warn"),
-						MessageManager
-								.getString("datasourcehelper.index_required"),
-						JOptionPane.YES_NO_OPTION);
+				int res = yesno(model, "index_missing_warn", "index_required");
 				if (res == JOptionPane.YES_OPTION) {
 					index(model, data);
 				}
@@ -126,15 +110,8 @@ public class DataSourceHelper {
 				return;
 
 			} else {
-				JOptionPaneX.showOkCancelDialog(
-						model.getGUIManager().getMainWindow(),
-						MessageManager.formatMessage(
-								"datasourcehelper.couldnt_locate_index",
-								new Object[] { data.getName() }),
-						MessageManager
-								.getString("datasourcehelper.index_missing"),
-						JOptionPane.ERROR_MESSAGE);
-
+				problem(model, "couldnt_locate_index", "index_missing", error,
+						data.getName());
 			}
 
 			return;
@@ -157,14 +134,8 @@ public class DataSourceHelper {
 		if (index == null && data.supportsIndex()
 				&& data.length() > 5 * 1024 * 1024) {
 			if (IndexManager.canBuildIndex(data)) {
-				int res = JOptionPane.showConfirmDialog(
-						model.getGUIManager().getMainWindow(),
-						MessageManager.formatMessage(
-								"datasourcehleper.create_index",
-								new Object[] { data.getName() }),
-						MessageManager
-								.getString("datasourcehelper.index_missing"),
-						JOptionPane.YES_NO_OPTION);
+				int res = yesno(model, "create_index", "index_missing",
+						data.getName());
 				if (res == JOptionPane.YES_OPTION) {
 					index(model, data);
 					return;
@@ -173,14 +144,8 @@ public class DataSourceHelper {
 			}
 
 			if (data.isMaf() && !data.isBlockCompressed()) {
-				int res = JOptionPane.showConfirmDialog(
-						model.getGUIManager().getMainWindow(),
-						MessageManager.formatMessage(
-								"datasourcehelper.preprocessing_warn",
-								new Object[] { data.getName() }),
-						MessageManager.getString(
-								"datasourcehelper.preprocessing_available"),
-						JOptionPane.YES_NO_OPTION);
+				int res = yesno(model, "preprocessing_warn",
+						"preprocessing_available", data.getName());
 				if (res == JOptionPane.YES_OPTION) {
 					mafprocess(model, data);
 					return;
@@ -188,6 +153,7 @@ public class DataSourceHelper {
 			} else {
 				/* It will silently try to load files up to 40 Mb */
 				if (data.length() > 40 * 1024 * 1024) {
+
 					boolean ok = JOptionPaneX.showOkCancelDialog(
 							model.getGUIManager().getMainWindow(),
 							MessageManager.formatMessage(
@@ -203,12 +169,8 @@ public class DataSourceHelper {
 
 		} else if (index == null && data.length() > 50000000
 				&& !(data.isTDF() || data.isBigWig())) {
-			JOptionPane.showMessageDialog(null,
-					MessageManager.formatMessage(
-							"datasourcehelper.large_file_warn",
-							new Object[] { data.getName() }),
-					MessageManager.getString("datasourcehelper.large_file"),
-					JOptionPane.WARNING_MESSAGE);
+			problem(model, "large_file_warn", "large_file",
+					JOptionPane.ERROR_MESSAGE);
 		}
 		DataSource ds = DataSourceFactory.create(data, index);
 		if (ds instanceof AbstractStreamDataSource) {
@@ -230,12 +192,8 @@ public class DataSourceHelper {
 				&& !data.isBigWig()
 				&& data.length() > (0.75 * MemoryWidget.getAvailable())) {
 			System.out.println("Available mem: " + MemoryWidget.getAvailable());
-			JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
-					MessageManager.formatMessage("datasourcehelper.memory_warn",
-							new Object[] { data.getName() }),
-					MessageManager
-							.getString("datasourcehelper.not_enough_memory"),
-					JOptionPane.ERROR_MESSAGE);
+			problem(model, "memory_warn", "not_enough_memory", error,
+					data.getName());
 			return;
 		}
 
@@ -252,6 +210,41 @@ public class DataSourceHelper {
 				e.printStackTrace();
 			}
 
+	}
+
+	/**
+	 * Report problem to user. He has no choice but to click on OK button
+	 * 
+	 * @param model      the Model
+	 * @param messageref a string for MessageManager.getString for the main
+	 *                   message of the dialog
+	 * @param titleref   a string for MessageManager#getString for the dialog
+	 *                   title
+	 * @param optinos    The {@link #warn}, {@link #error} etc
+	 * @param params     the additional args to format the message.
+	 */
+	private static void problem(Model model, String messageref, String titleref,
+			int options, String... params) {
+		JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
+				MessageManager.formatMessage("datasourcehelper." + messageref,
+						params),
+				MessageManager.getString("datasourcehelper." + titleref),
+				options);
+	}
+
+	/**
+	 * as problem, but now showing yes/no option .
+	 * 
+	 * @return YES_OPTION or NO_OPTION
+	 */
+	private static int yesno(Model model, String messageref, String titleref,
+			String... params) {
+		return JOptionPane.showConfirmDialog(
+				model.getGUIManager().getMainWindow(),
+				MessageManager.formatMessage("datasourcehelper." + messageref,
+						params),
+				MessageManager.getString("datasourcehelper." + titleref),
+				JOptionPane.YES_NO_OPTION);
 	}
 
 	private static void convertWig2TDF(final Model model, final Locator data) {
