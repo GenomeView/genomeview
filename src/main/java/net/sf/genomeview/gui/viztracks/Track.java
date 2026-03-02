@@ -25,12 +25,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.JViewport;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
@@ -61,18 +60,23 @@ public abstract class Track {
 	 */
 	final protected TrackConfig config;
 
-	public static void paintStatus(Graphics g, Iterable<Status> status, int y, int returnTrackHeight, Location visible, double screenWidth) {
+	public static void paintStatus(Graphics g, Iterable<Status> status, int y,
+			int returnTrackHeight, Location visible, double screenWidth) {
 		for (Status st : status) {
 			// System.out.println("Not ready "+st.start()+"\t"+st.end());
 			if (!st.isReady()) {
-				int x1 = Convert.translateGenomeToScreen(st.start(), visible, screenWidth);
-				int x2 = Convert.translateGenomeToScreen(st.end() + 1, visible, screenWidth);
+				int x1 = Convert.translateGenomeToScreen(st.start(), visible,
+						screenWidth);
+				int x2 = Convert.translateGenomeToScreen(st.end() + 1, visible,
+						screenWidth);
 				g.setColor(new Color(0, 255, 0, 100));
 
 				g.fillRect(x1, y, x2 - x1 + 1, returnTrackHeight);
 				if (visible.overlaps(st.start(), st.end())) {
 					g.setColor(Color.BLACK);
-					g.drawString(MessageManager.getString("track.retrieving_data"), 100, y + returnTrackHeight / 2);
+					g.drawString(
+							MessageManager.getString("track.retrieving_data"),
+							100, y + returnTrackHeight / 2);
 				}
 
 			}
@@ -81,17 +85,27 @@ public abstract class Track {
 	}
 
 	@Deprecated
-	protected Track(DataKey key, Model model, boolean visible, boolean collapsible) {
+	protected Track(DataKey key, Model model, boolean visible,
+			boolean collapsible) {
 		this(key, model, visible, new TrackConfig(model, key));
 	}
 
 	// private TrackConfigWindow tcw;
-	protected Track(DataKey key, Model model, boolean visible, TrackConfig config) {
+	/**
+	 * 
+	 * @param key     the {@link DataKey}, maybe this refers to the name of this
+	 *                data {@link Entry} in the model.
+	 * @param model   the model containing all data
+	 * @param visible true iff this track is currently visible
+	 * @param config  the {@link TrackConfig}
+	 */
+	protected Track(DataKey key, Model model, boolean visible,
+			TrackConfig config) {
 		this.model = model;
 		this.dataKey = key;
 		this.config = config;
 		TrackConfigWindow tcw = new TrackConfigWindow(model, config);
-		log.debug( "Creating track\t" + key + "\t" + visible);
+		log.debug("Creating track\t" + key + "\t" + visible);
 		this.entry = model.vlm.getSelectedEntry();
 		// config.setCollapsible(collapsible);
 		// this.collapsible = collapsible;
@@ -100,7 +114,8 @@ public abstract class Track {
 	}
 
 	// private boolean visible;
-	private static final Logger log = LoggerFactory.getLogger(Track.class.getCanonicalName());
+	private static final Logger log = LoggerFactory
+			.getLogger(Track.class.getCanonicalName());
 
 	/**
 	 * To pass along mouse clicks from the original panel.
@@ -159,7 +174,8 @@ public abstract class Track {
 	}
 
 	private Rectangle configCog = null;
-	private Color[] background = new Color[] { new Color(204, 238, 255, 75), new Color(255, 255, 204, 75) };
+	private Color[] background = new Color[] { new Color(204, 238, 255, 75),
+			new Color(255, 255, 204, 75) };
 
 	private void paintConfigCog(Graphics2D g, int yOffset, double width) {
 		g.drawImage(Icons.COG, 2, 2 + yOffset + cogOffset(), null);// Icons.COG
@@ -175,15 +191,14 @@ public abstract class Track {
 	 * Paint this track in the annotation label and return the height it
 	 * occupies.
 	 * 
-	 * @param g
-	 *            graphics context to paint on
+	 * @param g     graphics context to paint on
 	 * @param view
 	 * @param tcm
-	 * @param model
-	 *            the entry that is currently displayed
+	 * @param model the entry that is currently displayed
 	 * @return the height that was painted
 	 */
-	public int paint(Graphics g, int yOffset, double width, int index, JViewport view, TrackCommunicationModel tcm) {
+	public int paint(Graphics g, int yOffset, double width, int index,
+			JViewport view, TrackCommunicationModel tcm) {
 		int used = paintTrack((Graphics2D) g, yOffset, width, view, tcm);
 
 		if (index >= 0 && !(this instanceof StructureTrack)) {
@@ -206,7 +221,8 @@ public abstract class Track {
 	 * @param used
 	 * @param yOffset
 	 */
-	private void paintHighlight(Graphics2D g, int yOffset, int used, double width) {
+	private void paintHighlight(Graphics2D g, int yOffset, int used,
+			double width) {
 		if (Configuration.getBoolean("track:highlight:" + config.dataKey)) {
 			g.setColor(new Color(255, 0, 0, 25));
 			g.fillRect(0, yOffset, (int) width, used);
@@ -222,19 +238,17 @@ public abstract class Track {
 	/**
 	 * Paint the actual track
 	 * 
-	 * @param g
-	 *            graphics environment
-	 * @param e
-	 *            the currently visible entry
-	 * @param yOffset
-	 *            the yOffset that should be taken into account when painting
-	 * @param width
-	 *            the width of the track
+	 * @param g       graphics environment
+	 * @param e       the currently visible entry
+	 * @param yOffset the yOffset that should be taken into account when
+	 *                painting
+	 * @param width   the width of the track
 	 * @param view
 	 * @param tcm
 	 * @return the height this track uses
 	 */
-	protected abstract int paintTrack(Graphics2D g, int yOffset, double width, JViewport view, TrackCommunicationModel tcm);
+	protected abstract int paintTrack(Graphics2D g, int yOffset, double width,
+			JViewport view, TrackCommunicationModel tcm);
 
 	public DataKey getDataKey() {
 		return dataKey;

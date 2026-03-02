@@ -24,15 +24,18 @@ import java.util.Observable;
 
 import javax.swing.JLabel;
 
+import be.abeel.gui.GridBagPanel;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.config.BooleanConfig;
 import net.sf.genomeview.gui.config.StringConfig;
 import net.sf.jannot.DataKey;
-import be.abeel.gui.GridBagPanel;
 
 /**
+ * Contains view options for the track like visibility, collapsed, color
+ * settings, thresholds. Usually a track will have track specific extensions,
+ * this is the default.
  * 
  * @author Thomas Abeel
  * 
@@ -41,47 +44,58 @@ public class TrackConfig extends Observable {
 
 	protected DataKey dataKey;
 	protected Model model;
-	
 
 	protected TrackConfig(Model model, DataKey dataKey) {
 		this.dataKey = dataKey;
-		this.model=model;
-		guicontainer.add(new JLabel(MessageManager.getString("trackconfig.track_key") + " \n" + dataKey), guicontainer.gc);
+		this.model = model;
+		guicontainer.add(
+				new JLabel(MessageManager.getString("trackconfig.track_key")
+						+ " \n" + dataKey),
+				guicontainer.gc);
 		guicontainer.gc.gridy++;
 
-		guicontainer.add(new StringConfig("track:alias:" + dataKey, MessageManager.getString("trackconfig.track_alias"), model), guicontainer.gc);
+		guicontainer.add(new StringConfig("track:alias:" + dataKey,
+				MessageManager.getString("trackconfig.track_alias"), model),
+				guicontainer.gc);
 		guicontainer.gc.gridy++;
 		Configuration.getVisible(dataKey);
-		guicontainer.add(new BooleanConfig("track:visible:" + dataKey, MessageManager.getString("trackconfig.track_visible"), model), guicontainer.gc);
+		guicontainer.add(new BooleanConfig("track:visible:" + dataKey,
+				MessageManager.getString("trackconfig.track_visible"), model),
+				guicontainer.gc);
 		guicontainer.gc.gridy++;
-		guicontainer.add(new BooleanConfig("track:highlight:" + dataKey, MessageManager.getString("trackconfig.track_highlight"), model), guicontainer.gc);
-		
+		guicontainer.add(new BooleanConfig("track:highlight:" + dataKey,
+				MessageManager.getString("trackconfig.track_highlight"), model),
+				guicontainer.gc);
+
 		if (isCollapsible()) {
 			guicontainer.gc.gridy++;
-			guicontainer.add(new BooleanConfig("track:collapsed:" + dataKey, MessageManager.getString("trackconfig.track_collapsed"), model), guicontainer.gc);
+			guicontainer.add(
+					new BooleanConfig("track:collapsed:" + dataKey,
+							MessageManager.getString(
+									"trackconfig.track_collapsed"),
+							model),
+					guicontainer.gc);
 		}
 
 	}
 
-	final public String shortDisplayName(){
+	final public String shortDisplayName() {
 		String alias = Configuration.get("track:alias:" + dataKey);
 		if (alias != null && alias.length() > 0)
 			return alias;
-		else{
-			String dn=""+dataKey;
-			int sepIdx=Math.max(dn.lastIndexOf('/'), dn.lastIndexOf('\\'))+1;
-			if(sepIdx<0)
-				sepIdx=0;
-			dn=dn.substring(sepIdx);
-			dn=dn.replaceAll("(\\.[a-zA-Z0-9]{3})+$", "");
+		else {
+			String dn = "" + dataKey;
+			int sepIdx = Math.max(dn.lastIndexOf('/'), dn.lastIndexOf('\\'))
+					+ 1;
+			if (sepIdx < 0)
+				sepIdx = 0;
+			dn = dn.substring(sepIdx);
+			dn = dn.replaceAll("(\\.[a-zA-Z0-9]{3})+$", "");
 			return dn;
 		}
-			
-		
+
 	}
-	
-	
-	
+
 	final public String displayName() {
 		String alias = Configuration.get("track:alias:" + dataKey);
 		if (alias != null && alias.length() > 0)
@@ -141,7 +155,5 @@ public class TrackConfig extends Observable {
 		return configVisible;
 
 	}
-
-
 
 }
