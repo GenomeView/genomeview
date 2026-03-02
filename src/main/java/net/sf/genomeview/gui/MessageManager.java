@@ -51,6 +51,16 @@ public class MessageManager {
 		return loc;
 	}
 
+	/**
+	 * 
+	 * @param key    the message key , used to fetch the actual message from the
+	 *               database.
+	 * @param params the params. Length is expected to match the number of {X}
+	 *               items in the message.
+	 * @return the message stored under key in the Message database, with all
+	 *         indices like <code>{0}</code> replaced with the corresponding
+	 *         item in the params.
+	 */
 	public static String formatMessage(String key, Object[] params) {
 		return MessageFormat.format(rb.getString(key), params);
 	}
