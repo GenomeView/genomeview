@@ -7,17 +7,16 @@ import java.util.HashSet;
 import java.util.Observable;
 
 /**
- * Keeps track of running worker threads. Threads need to register themselves
- * and unregister when finished.
+ * Keeps track of running worker threads. Those seem primarily used for loading
+ * data. Threads need to register themselves and unregister when finished.
  * 
  * @author Thomas Abeel
  * 
  */
-public class WorkerManager extends Observable{
+public class WorkerManager extends Observable {
 
 	private HashSet<DataSourceWorker> running = new HashSet<DataSourceWorker>();
 
-	
 	public synchronized void start(DataSourceWorker ds) {
 		running.add(ds);
 		setChanged();
@@ -30,7 +29,7 @@ public class WorkerManager extends Observable{
 		notifyObservers();
 	}
 
-	public synchronized  int runningJobs() {
+	public synchronized int runningJobs() {
 		return running.size();
 	}
 }

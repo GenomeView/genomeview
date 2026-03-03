@@ -32,6 +32,7 @@ import net.sf.genomeview.gui.GUIManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.explorer.FilteredListModel;
 import net.sf.genomeview.gui.external.JavaScriptHandler;
+import net.sf.genomeview.gui.menu.file.ExitAction;
 import net.sf.genomeview.gui.viztracks.TickmarkTrack;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
@@ -45,22 +46,98 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 
 /**
- * The Model.
+ * The Model. This seems to contain all the data sets loaded, and other models
+ * to handle user inputs (clicking, selecting), a messagemodel for statusbar
+ * messages.
  * 
  * @author Thomas Abeel
  * 
  */
 public class Model extends Observable implements Observer {
-	private Logger logger = LoggerFactory.getLogger(Model.class.getCanonicalName());
+	private final Logger logger = LoggerFactory
+			.getLogger(Model.class.getCanonicalName());
 
-	private EntrySet entries = new EntrySet();
+	private final EntrySet entries = new EntrySet();
 
-	private SelectionModel selectionModel = new SelectionModel();
-	private MouseModel mouseModel = new MouseModel();
-	private MessageModel messageModel = new MessageModel(this);
+	private final SelectionModel selectionModel = new SelectionModel();
+	private final MouseModel mouseModel = new MouseModel();
+	private final MessageModel messageModel = new MessageModel(this);
 
 	public final VisualLocationModel vlm = new VisualLocationModel();
 
+	/**
+	 * List of all available tracks. Some might be hidden from view.
+	 */
+	private final TrackList trackList;
+
+	/**
+	 * undo and redo support
+	 */
+	private final Stack<ChangeEvent> undoStack = new Stack<ChangeEvent>();
+
+	private final Stack<ChangeEvent> redoStack = new Stack<ChangeEvent>();
+
+	private final AnnotationModel annotationModel = new AnnotationModel();
+
+	/**
+	 * files used by the user
+	 */
+	private final FilteredListModel<String> recentFiles = new FilteredListModel<String>(
+			new DefaultListModel<String>());
+
+	private final FilteredListModel<String> extraFiles = new FilteredListModel<String>(
+			new DefaultListModel<String>());
+
+	/**
+	 * Exceptions
+	 */
+	private Stack<Throwable> exceptionStack = new Stack<Throwable>();
+
+	/* Cache of the sources that are currently loaded */
+	private ConcurrentSkipListSet<DataSource> loadedSources = new ConcurrentSkipListSet<DataSource>();
+
+	/**
+	 * Keep track of where the user click in the (main?) track. See
+	 * {@link #setSelectedTrack(int)}
+	 */
+	private int pressTrack;
+
+	/**
+	 * see {@link #setSilent(boolean)}
+	 */
+	private boolean silent;
+
+	private boolean exitRequested = false;
+
+	/**
+	 * highlights contains results from {@link MotifSearchResultModel} and
+	 * {@link SequenceSearchResultModel}
+	 */
+	private final ConcurrentLinkedQueue<Highlight> highlights = new ConcurrentLinkedQueue<Highlight>();
+
+	/**
+	 * amino-acid mapping - names of std sequences. See {@link AminoAcidMapping}
+	 */
+	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(
+			AminoAcidMapping
+					.valueOf(Configuration.get("translationTable:default")));
+
+	private final GUIManager guimanager;
+
+	private WorkerManager wm = new WorkerManager();
+
+	/**
+	 * 
+	 * 
+	 * FIELDS ABOVE THIS POINT. CODE STARTS HERE.
+	 * 
+	 * 
+	 * 
+	 */
+	/**
+	 * @return the {@link MessageModel} for statusbar
+	 * 
+	 */
 	public MessageModel messageModel() {
 		return messageModel;
 	}
@@ -98,13 +175,14 @@ public class Model extends Observable implements Observer {
 		try {
 
 			File recent = new File(Configuration.getDirectory(), "recent.gv");
-			if (recent.exists()&&recent.length()>0) {
+			if (recent.exists() && recent.length() > 0) {
 				LineIterator it = new LineIterator(recent);
 				while (it.hasNext())
 					recentFiles.addElement(it.next());
 			}
 		} catch (Exception e) {
-			CrashHandler.showErrorMessage("Could not retrieve recently used files", e);
+			CrashHandler.showErrorMessage(
+					"Could not retrieve recently used files", e);
 		}
 
 	}
@@ -125,7 +203,6 @@ public class Model extends Observable implements Observer {
 		}
 
 	}
-
 
 	public void clearEntries() {
 		selectionModel.clear();
@@ -157,8 +234,6 @@ public class Model extends Observable implements Observer {
 
 	}
 
-	private boolean silent;
-
 	/**
 	 * Set the mode of the model. In silent mode, the model does not pass on
 	 * notifications from its observables to its observers.
@@ -189,8 +264,9 @@ public class Model extends Observable implements Observer {
 
 	}
 
-	private boolean exitRequested = false;
-
+	/**
+	 * Exit the system. Close resources. Triggered by {@link ExitAction}
+	 */
 	public void exit() {
 		this.exitRequested = true;
 
@@ -200,7 +276,8 @@ public class Model extends Observable implements Observer {
 				/*
 				 * Write recent files to disk
 				 */
-				PrintWriter pw = new PrintWriter(new File(Configuration.getDirectory(), "recent.gv"));
+				PrintWriter pw = new PrintWriter(
+						new File(Configuration.getDirectory(), "recent.gv"));
 
 				for (int i = 0; i < recentFiles.getSize(); i++) {
 
@@ -210,7 +287,8 @@ public class Model extends Observable implements Observer {
 
 				/* Only store session if there is something to store */
 				if (this.loadedSources().size() > 0)
-					Session.save(new File(Configuration.getDirectory(), "previous.gvs"), this);
+					Session.save(new File(Configuration.getDirectory(),
+							"previous.gvs"), this);
 			}
 		} catch (IOException e) {
 			logger.error("Problem saving last session", e);
@@ -283,8 +361,6 @@ public class Model extends Observable implements Observer {
 		return exitRequested;
 	}
 
-	private ConcurrentLinkedQueue<Highlight> highlights = new ConcurrentLinkedQueue<Highlight>();
-
 	public class Highlight {
 		final public Location location;
 
@@ -300,10 +376,16 @@ public class Model extends Observable implements Observer {
 		final public Color color;
 	}
 
+	/**
+	 * 
+	 * @param region {@link Location} of the highlight
+	 * @return highlights / search results
+	 */
 	public List<Highlight> getHighlight(Location region) {
 		ArrayList<Highlight> out = new ArrayList<Highlight>();
 		for (Highlight f : highlights) {
-			if (f.location.end() > region.start() && f.location.start() < region.end())
+			if (f.location.end() > region.start()
+					&& f.location.start() < region.end())
 				out.add(f);
 		}
 		return Collections.unmodifiableList(out);
@@ -325,11 +407,10 @@ public class Model extends Observable implements Observer {
 	 * 
 	 * This should only be done by a ReadWorker.
 	 * 
-	 * @param f
-	 *            data source to load data from
+	 * @param f data source to load data from
 	 * @throws ReadFailedException
 	 * 
-	 *             FIXME move to read worker
+	 *                             FIXME move to read worker
 	 */
 	void addData(DataSource f) throws ReadFailedException {
 		if (entries.size() == 0)
@@ -339,14 +420,18 @@ public class Model extends Observable implements Observer {
 		recentFiles.add(0, f.getLocator().toString());
 		try {
 			f.read(entries);
-			if (entries.size() > 0 && vlm.getVisibleEntry() instanceof DummyEntry) {
+			if (entries.size() > 0
+					&& vlm.getVisibleEntry() instanceof DummyEntry) {
 				vlm.setVisibleEntry(entries.firstEntry());
 				Entry selected = vlm.getVisibleEntry();
 				int len = selected.getMaximumLength();
 				if (len > 5000) {
-					int randomStart = StaticUtils.rg.nextInt((len / 2) - 1000) + len / 4;
-					logger.info("Setting random location at data load: " + selected + "\t" + randomStart);
-					vlm.setAnnotationLocationVisible(new Location(randomStart, randomStart + 1000));
+					int randomStart = StaticUtils.rg.nextInt((len / 2) - 1000)
+							+ len / 4;
+					logger.info("Setting random location at data load: "
+							+ selected + "\t" + randomStart);
+					vlm.setAnnotationLocationVisible(
+							new Location(randomStart, randomStart + 1000));
 				}
 
 			}
@@ -360,8 +445,6 @@ public class Model extends Observable implements Observer {
 		refresh(NotificationTypes.GENERAL);
 
 	}
-
-	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(AminoAcidMapping.valueOf(Configuration.get("translationTable:default")));
 
 	// private Configuration trackMap;
 
@@ -379,8 +462,6 @@ public class Model extends Observable implements Observer {
 		refresh(NotificationTypes.TRANSLATIONTABLECHANGE);
 
 	}
-
-	private final TrackList trackList;
 
 	/**
 	 * Returns a list of all tracks. This method creates a copy to make it safe
@@ -407,15 +488,12 @@ public class Model extends Observable implements Observer {
 			if (changed)
 				refresh(NotificationTypes.UPDATETRACKS);
 		} catch (ConcurrentModificationException e) {
-			logger.error("Update tracks interrupted, tracks already changed", e);
+			logger.error("Update tracks interrupted, tracks already changed",
+					e);
 			refresh(NotificationTypes.UPDATETRACKS);
 		}
 
 	}
-
-	private Stack<ChangeEvent> undoStack = new Stack<ChangeEvent>();
-
-	private Stack<ChangeEvent> redoStack = new Stack<ChangeEvent>();
 
 	public boolean hasRedo() {
 		return redoStack.size() > 0;
@@ -453,11 +531,6 @@ public class Model extends Observable implements Observer {
 			return "";
 	}
 
-	/* Cache of the sources that are currently loaded */
-	private ConcurrentSkipListSet<DataSource> loadedSources = new ConcurrentSkipListSet<DataSource>();
-
-	private int pressTrack;
-
 	public Set<DataSource> loadedSources() {
 		return loadedSources;
 
@@ -486,8 +559,9 @@ public class Model extends Observable implements Observer {
 		this.pressTrack = pressTrack;
 	}
 
-	private final GUIManager guimanager;
-
+	/**
+	 * @return GUIManager. THe main connection to the main window.
+	 */
 	public GUIManager getGUIManager() {
 		return guimanager;
 	}
@@ -499,8 +573,6 @@ public class Model extends Observable implements Observer {
 	public SelectionModel selectionModel() {
 		return selectionModel;
 	}
-
-	
 
 	public synchronized void setSelectedEntry(Entry entry) {
 		logger.info("Setting selected entry: " + entry);
@@ -523,7 +595,8 @@ public class Model extends Observable implements Observer {
 	 * @param track
 	 */
 	public void remove(Track track) {
-		if (!(track instanceof StructureTrack) && !(track instanceof TickmarkTrack)) {
+		if (!(track instanceof StructureTrack)
+				&& !(track instanceof TickmarkTrack)) {
 			trackList.remove(track.getDataKey());
 			for (Entry e : entries) {
 				e.remove(track.getDataKey());
@@ -541,24 +614,21 @@ public class Model extends Observable implements Observer {
 
 	}
 
-	private WorkerManager wm = new WorkerManager();
-
 	public WorkerManager getWorkerManager() {
 		return wm;
 
 	}
 
-	public synchronized Throwable processException() {
-		if (!exceptionStack.isEmpty())
-			return exceptionStack.pop();
-		return null;
-	}
+// not used and buggy. Disabled to be sure
+//	public synchronized Throwable processException() {
+//		if (!exceptionStack.isEmpty())
+//			return exceptionStack.pop();
+//		return null;
+//	}
 
-	private Stack<Throwable> exceptionStack = new Stack<Throwable>();
-
-	// private Stack<Throwable>exceptionStack=new Stack<Throwable>();
 	/**
-	 * Method to register daemon exceptions to the model.
+	 * Method to register daemon exceptions to the model. WARNING seems buggy as
+	 * nobody handles exceptionStack events.
 	 * 
 	 * @param e
 	 */
@@ -570,19 +640,13 @@ public class Model extends Observable implements Observer {
 
 	}
 
-	private AnnotationModel annotationModel = new AnnotationModel();
-
 	public AnnotationModel annotationModel() {
 		return annotationModel;
 	}
 
-	private FilteredListModel<String> recentFiles = new FilteredListModel<String>(new DefaultListModel<String>());
-
 	public FilteredListModel<String> getRecentFiles() {
 		return recentFiles;
 	}
-
-	private FilteredListModel<String> extraFiles = new FilteredListModel<String>(new DefaultListModel<String>());
 
 	public FilteredListModel<String> getExtraSessionFiles() {
 		return extraFiles;

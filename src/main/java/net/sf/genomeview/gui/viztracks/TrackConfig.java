@@ -33,18 +33,27 @@ import net.sf.genomeview.gui.config.StringConfig;
 import net.sf.jannot.DataKey;
 
 /**
- * Contains view options for the track like visibility, collapsed, color
- * settings, thresholds. Usually a track will have track specific extensions,
- * this is the default.
+ * Contains model with track options like visibility, collapsed, color settings,
+ * thresholds. Usually a track will have track specific extensions, this is the
+ * default.
  * 
  * @author Thomas Abeel
  * 
  */
 public class TrackConfig extends Observable {
 
-	protected DataKey dataKey;
-	protected Model model;
+	protected final DataKey dataKey;
+	protected final Model model;
 
+	private final GridBagPanel guicontainer = new GridBagPanel();
+	private boolean configVisible = false;
+
+	/**
+	 * 
+	 * @param model   the {@link Model}
+	 * @param dataKey the datakey of the data containing the data for this
+	 *                model.
+	 */
 	protected TrackConfig(Model model, DataKey dataKey) {
 		this.dataKey = dataKey;
 		this.model = model;
@@ -105,8 +114,6 @@ public class TrackConfig extends Observable {
 
 	}
 
-	private GridBagPanel guicontainer = new GridBagPanel();
-
 	/**
 	 * When overriding this method, make sure to add new components to the
 	 * parent panel
@@ -141,8 +148,6 @@ public class TrackConfig extends Observable {
 	public boolean isCollapsed() {
 		return Configuration.getBoolean("track:collapsed:" + dataKey);
 	}
-
-	private boolean configVisible = false;
 
 	public void setConfigVisible(boolean b) {
 		configVisible = b;

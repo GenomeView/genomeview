@@ -90,7 +90,6 @@ public abstract class Track {
 		this(key, model, visible, new TrackConfig(model, key));
 	}
 
-	// private TrackConfigWindow tcw;
 	/**
 	 * 
 	 * @param key     the {@link DataKey}, maybe this refers to the name of this

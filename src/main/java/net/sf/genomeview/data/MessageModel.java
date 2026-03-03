@@ -23,7 +23,10 @@ package net.sf.genomeview.data;
 import java.util.Observable;
 
 import net.sf.jannot.Location;
+
 /**
+ * Model to communicate messages for the status bar. Maybe this was intended to
+ * handle other messages too (because of the more general name)
  * 
  * @author Thomas Abeel
  *
@@ -36,18 +39,19 @@ public class MessageModel extends Observable {
 		this.model = model;
 	}
 
-	public void setStatusBarMessage(String s){
-		this.message=s;
+	public void setStatusBarMessage(String s) {
+		this.message = s;
 		setChanged();
 		notifyObservers();
 	}
-	
+
 	private String message = null;
 
 	public String getStatusBarMessage() {
 		StringBuffer msg = new StringBuffer();
 		Location viz = model.vlm.getAnnotationLocationVisible();
-		msg.append("  "+model.vlm.getSelectedEntry()+":" + viz.start + ":" + viz.end + " ");
+		msg.append("  " + model.vlm.getSelectedEntry() + ":" + viz.start + ":"
+				+ viz.end + " ");
 
 		int currentCoord = model.mouseModel().getCurrentCoord();
 		if (currentCoord == -1) {
@@ -58,15 +62,15 @@ public class MessageModel extends Observable {
 
 		if (model.selectionModel().getNumberOfSelectedNucs() != 0) {
 			msg.append("Selected: ");
-			msg.append(model.selectionModel().getNumberOfSelectedNucs()
-					+ " nt / "
-					+ model.selectionModel().getNumberOfSelectedProts()
-					+ " aa ");
+			msg.append(
+					model.selectionModel().getNumberOfSelectedNucs() + " nt / "
+							+ model.selectionModel().getNumberOfSelectedProts()
+							+ " aa ");
 		}
 
 		if (message != null)
 			msg.append("-- " + message);
-		
+
 		return msg.toString();
 	}
 
