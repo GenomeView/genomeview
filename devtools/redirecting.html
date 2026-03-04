@@ -2,15 +2,38 @@
 <html>
 <body>
 
-<p id="demo"></p>
+	Redirecting to your download. A moment please, contacting server
+	
+	<!--script to find latest release 
+	This requires javascript because our
+	artifactory has no built-in way to do this.
+	-->
 
 <script>
-document.write("Hello JavaScript!");
+	function gotListing(listing) {
+		document.write(listing)
+	}
+	
+	function getListing() {
+		var available = new XMLHttpRequest();
+		available.overrideMimeType("application/json");
+		available.open("GET", "https://artifactory.ewi.tudelft.nl/ui/api/v1/ui/v2/nativeBrowser/libs-release-local/net/sf/genomeview", true);
+		available.onreadystatechange = function() {
+			if (available.readyState===4 && available.status == "200") {
+				gotlisting(available.responseText);
+			} else {
+				document.write("<br><b>FAILED TO FETCH DATA. SERVER DOWN?");
+			}	
+		}
+		available.send(null);
+	}
+
+	getListing();	
+	
 </script>
 
 <noscript>Sorry, your browser does not support JavaScript!</noscript>
 
-<p>A browser without support for JavaScript will show the text written inside the noscript element.</p>
  
 </body>
 </html>
