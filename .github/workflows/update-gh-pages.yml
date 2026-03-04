@@ -1,0 +1,188 @@
+name: Update GitHub Pages
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Run daily at 2 AM UTC
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch latest version from Artifactory
+        id: version
+        run: |
+          # Fetch directory listing from Artifactory
+          RESPONSE=$(curl -s "https://artifactory.ewi.tudelft.nl/ui/api/v1/ui/v2/nativeBrowser/libs-release-local/net/sf/genomeview")
+
+          # Extract version numbers and find the latest (sorted by semver)
+          LATEST_VERSION=$(echo "$RESPONSE" | grep -oP '"name"\s*:\s*"\K[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -1)
+
+          if [ -z "$LATEST_VERSION" ]; then
+            echo "Failed to fetch latest version"
+            exit 1
+          fi
+
+          echo "Latest version: $LATEST_VERSION"
+          echo "version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate download page
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          ARTIFACTORY_BASE="https://artifactory.ewi.tudelft.nl/artifactory/libs-release-local/net/sf/genomeview"
+
+          mkdir -p _site
+
+          cat > _site/index.html << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>GenomeView Download</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 2rem;
+                line-height: 1.6;
+                color: #333;
+              }
+              h1 { color: #2c5282; }
+              .version-badge {
+                display: inline-block;
+                background: #48bb78;
+                color: white;
+                padding: 0.25rem 0.75rem;
+                border-radius: 4px;
+                font-weight: bold;
+              }
+              .download-section {
+                background: #f7fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                padding: 1.5rem;
+                margin: 1.5rem 0;
+              }
+              .download-btn {
+                display: inline-block;
+                background: #3182ce;
+                color: white;
+                padding: 0.75rem 1.5rem;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: bold;
+                margin: 0.5rem 0.5rem 0.5rem 0;
+              }
+              .download-btn:hover { background: #2c5282; }
+              .download-btn.secondary {
+                background: #718096;
+              }
+              .download-btn.secondary:hover { background: #4a5568; }
+              table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+              th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #e2e8f0; }
+              th { background: #edf2f7; }
+              code { background: #edf2f7; padding: 0.2rem 0.4rem; border-radius: 3px; }
+              .updated { color: #718096; font-size: 0.875rem; margin-top: 2rem; }
+            </style>
+          </head>
+          <body>
+            <h1>GenomeView</h1>
+            <p>
+              GenomeView is a genome browser and annotation editor.
+              Documentation, manuals, and sample files are available at the
+              <a href="https://github.com/GenomeView/genomeviewweb">GenomeView web repository</a>.
+            </p>
+
+            <div class="download-section">
+              <h2>Latest Version: <span class="version-badge">__VERSION__</span></h2>
+              <p>Download the standalone JAR file with all dependencies included:</p>
+              <a href="__ARTIFACTORY_BASE__/__VERSION__/genomeview-__VERSION__-jar-with-dependencies.jar" class="download-btn">
+                Download GenomeView __VERSION__
+              </a>
+              <a href="__ARTIFACTORY_BASE__/__VERSION__/genomeview-__VERSION__-sources.jar" class="download-btn secondary">
+                Source JAR
+              </a>
+            </div>
+
+            <h3>All Available Files</h3>
+            <table>
+              <tr>
+                <th>File</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td><a href="__ARTIFACTORY_BASE__/__VERSION__/genomeview-__VERSION__-jar-with-dependencies.jar">genomeview-__VERSION__-jar-with-dependencies.jar</a></td>
+                <td>Standalone executable (recommended)</td>
+              </tr>
+              <tr>
+                <td><a href="__ARTIFACTORY_BASE__/__VERSION__/genomeview-__VERSION__.jar">genomeview-__VERSION__.jar</a></td>
+                <td>Core library only</td>
+              </tr>
+              <tr>
+                <td><a href="__ARTIFACTORY_BASE__/__VERSION__/genomeview-__VERSION__-sources.jar">genomeview-__VERSION__-sources.jar</a></td>
+                <td>Source code</td>
+              </tr>
+              <tr>
+                <td><a href="__ARTIFACTORY_BASE__/__VERSION__/genomeview-__VERSION__.pom">genomeview-__VERSION__.pom</a></td>
+                <td>Maven POM file</td>
+              </tr>
+            </table>
+
+            <h3>Running GenomeView</h3>
+            <p>After downloading, run GenomeView with:</p>
+            <pre><code>java -jar genomeview-__VERSION__-jar-with-dependencies.jar</code></pre>
+
+            <h3>Maven Dependency</h3>
+            <p>To use GenomeView as a dependency in your Maven project:</p>
+            <pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;net.sf.genomeview&lt;/groupId&gt;
+    &lt;artifactId&gt;genomeview&lt;/artifactId&gt;
+    &lt;version&gt;__VERSION__&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <p class="updated">
+              Page updated: __DATE__<br>
+              Source: <a href="https://github.com/GenomeView/genomeview">GitHub Repository</a>
+            </p>
+          </body>
+          </html>
+          HTMLEOF
+
+          # Replace placeholders
+          DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
+          sed -i "s|__VERSION__|${VERSION}|g" _site/index.html
+          sed -i "s|__ARTIFACTORY_BASE__|${ARTIFACTORY_BASE}|g" _site/index.html
+          sed -i "s|__DATE__|${DATE}|g" _site/index.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
