@@ -13,4 +13,4 @@ Webstart: http://genomeview.org/start/launch.jnlp
 
 
 <!-- TESTING download link -->
-<a href="devtools/redirecting.html">dl</a>
+<a href="https://raw.githack.com/GenomeView/genomeview/dev/devtools/redirecting.html">dl</a>
