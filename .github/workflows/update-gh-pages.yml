@@ -1,0 +1,62 @@
+name: Update GitHub Pages
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch latest version from Artifactory
+        id: version
+        run: |
+          RESPONSE=$(curl -s "https://artifactory.ewi.tudelft.nl/ui/api/v1/ui/v2/nativeBrowser/libs-release-local/net/sf/genomeview")
+          LATEST_VERSION=$(echo "$RESPONSE" | jq -r '[.data[] | select(.folder == true) | .name] | sort_by(split(".") | map(tonumber)) | last')
+          if [ -z "$LATEST_VERSION" ] || [ "$LATEST_VERSION" = "null" ]; then
+            echo "Failed to fetch latest version"
+            exit 1
+          fi
+          echo "Latest version: $LATEST_VERSION"
+          echo "version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate redirect page
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          DOWNLOAD_URL="https://artifactory.ewi.tudelft.nl/ui/repos/tree/General/libs-release-local/net/sf/genomeview/${VERSION}"
+          mkdir -p _site
+          cp .github/templates/index.html _site/index.html
+          sed -i "s|__VERSION__|${VERSION}|g" _site/index.html
+          sed -i "s|__DOWNLOAD_URL__|${DOWNLOAD_URL}|g" _site/index.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
