@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,6 @@ import net.sf.jannot.Type;
 import net.sf.jannot.alignment.maf.AbstractMAFMultipleAlignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
 import net.sf.jannot.bigwig.BigWigData;
-import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.shortread.ReadGroup;
 import net.sf.jannot.tabix.BEDWrapper;
@@ -51,7 +51,8 @@ import net.sf.jannot.wiggle.Graph;
  */
 public class TrackList implements Iterable<Track> {
 
-	private Logger log = LoggerFactory.getLogger(TrackList.class.getCanonicalName());
+	private Logger log = LoggerFactory
+			.getLogger(TrackList.class.getCanonicalName());
 
 	private Model model;
 
@@ -88,20 +89,34 @@ public class TrackList implements Iterable<Track> {
 		return (StructureTrack) mapping.get(StructureTrack.key);
 	}
 
+	/**
+	 * add/replace a track with given data key to our mapping and order
+	 * 
+	 * @param dk    the {@link DataKey}
+	 * @param track a visualization {@link Track}
+	 */
 	private void add(DataKey dk, Track track) {
 		mapping.put(dk, track);
-		if(!order.contains(dk)){
+		if (!order.contains(dk)) {
 			int x = findIndex(dk);
 			order.add(x, dk);
 		}
 
 	}
 
+	/**
+	 * 
+	 * @param dk a {@link Data}
+	 * @return a proper index for the data key, based on the weight of the
+	 *         entries we already have in {@link #order}. The weights are set in
+	 *         the preferences track:weight for all {@link DataKey}s
+	 */
 	private int findIndex(DataKey dk) {
 		int w = Configuration.getWeight(dk);
 
 		int count = 0;
-		while (count < order.size() && Configuration.getWeight(order.get(count)) <= w) {
+		while (count < order.size()
+				&& Configuration.getWeight(order.get(count)) <= w) {
 			count++;
 		}
 
@@ -126,7 +141,6 @@ public class TrackList implements Iterable<Track> {
 			Configuration.setWeight(order.get(row), tmpWeight + 1);
 			Configuration.setWeight(order.get(row + 1), tmpWeight);
 
-			
 			order.set(row, order.get(row + 1));
 			order.set(row + 1, tmp);
 
@@ -141,12 +155,14 @@ public class TrackList implements Iterable<Track> {
 			DataKey tmp = order.get(row);
 
 			// int tmpWeight = Configuration.getWeight(order.get(row));
-			Configuration.setWeight(order.get(row), Configuration.getWeight(order.get(row - 1)));
-			Configuration.setWeight(order.get(row - 1), Configuration.getWeight(order.get(row - 1)) + 1);
+			Configuration.setWeight(order.get(row),
+					Configuration.getWeight(order.get(row - 1)));
+			Configuration.setWeight(order.get(row - 1),
+					Configuration.getWeight(order.get(row - 1)) + 1);
 
 			order.set(row, order.get(row - 1));
 			order.set(row - 1, tmp);
-			
+
 			model.refresh();
 		}
 
@@ -200,6 +216,13 @@ public class TrackList implements Iterable<Track> {
 
 	}
 
+	/**
+	 * Update the tracks for entry e. Creates the correct visualization
+	 * {@link Track} for all available {@link Data} in the entry
+	 * 
+	 * @param e the selected {@link Entry}
+	 * @return true iff the final size equals the start size.
+	 */
 	public boolean update(Entry e) {
 		System.out.println("Updating tracks for " + e);
 		int startSize = this.size();
@@ -208,11 +231,12 @@ public class TrackList implements Iterable<Track> {
 			Data<?> data = e.get(key);
 
 			if (data instanceof MemoryFeatureAnnotation) {
-				if (!this.containsTrack(key) && ((MemoryFeatureAnnotation) data).cachedCount() > 0)
+				if (!this.containsTrack(key)
+						&& ((MemoryFeatureAnnotation) data).cachedCount() > 0)
 					this.add(key, new FeatureTrack(model, (Type) key));
 
 			}
-			if(data instanceof VCFWrapper){
+			if (data instanceof VCFWrapper) {
 				if (!this.containsTrack(key))
 					this.add(key, new VariationTrack(model, (Type) key));
 			}
@@ -224,17 +248,22 @@ public class TrackList implements Iterable<Track> {
 
 			if (data instanceof PileupWrapper || data instanceof SWigWrapper) {
 				if (!this.containsTrack(key))
-					this.add(key, new PileupTrack(key, new WiggleProvider(e, (Data<Pile>) data, model), model));
+					this.add(key, new PileupTrack(key,
+							new WiggleProvider(e, (Data<Pile>) data, model),
+							model));
 			}
 
 			if (data instanceof TDFData) {
 				if (!this.containsTrack(key))
-					this.add(key, new PileupTrack(key, new TDFProvider(e, (TDFData) data, model), model));
+					this.add(key, new PileupTrack(key,
+							new TDFProvider(e, (TDFData) data, model), model));
 			}
 
 			if (data instanceof BigWigData) {
 				if (!this.containsTrack(key))
-					this.add(key, new PileupTrack(key, new BigWigProvider(e, (BigWigData) data, model), model));
+					this.add(key, new PileupTrack(key,
+							new BigWigProvider(e, (BigWigData) data, model),
+							model));
 			}
 
 			if (data instanceof Graph) {
@@ -247,7 +276,9 @@ public class TrackList implements Iterable<Track> {
 			}
 			if (data instanceof ReadGroup) {
 				if (!this.containsTrack(key)) {
-					this.add(key, new ShortReadTrack(key, new ShortReadProvider(e, (ReadGroup) data, model), model));
+					this.add(key, new ShortReadTrack(key,
+							new ShortReadProvider(e, (ReadGroup) data, model),
+							model));
 				}
 			}
 			if (data instanceof AbstractMAFMultipleAlignment) {
@@ -262,10 +293,13 @@ public class TrackList implements Iterable<Track> {
 			// if (Configuration.getWeight(order.get(i - 1)) < Configuration
 			// .getWeight(order.get(i))) {
 			// System.err
-			// .println("This is not supposed to happen, why are we sorting?!!?");
+			// .println("This is not supposed to happen, why are we
+			// sorting?!!?");
 			// }
-			if (Configuration.getWeight(order.get(i - 1)) >= Configuration.getWeight(order.get(i))) {
-				Configuration.setWeight(order.get(i), Configuration.getWeight(order.get(i - 1)) + 1);
+			if (Configuration.getWeight(order.get(i - 1)) >= Configuration
+					.getWeight(order.get(i))) {
+				Configuration.setWeight(order.get(i),
+						Configuration.getWeight(order.get(i - 1)) + 1);
 
 			}
 		}
