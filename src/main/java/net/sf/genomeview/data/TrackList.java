@@ -45,6 +45,7 @@ import net.sf.jannot.tdf.TDFData;
 import net.sf.jannot.wiggle.Graph;
 
 /***
+ * List of all available tracks.
  * 
  * @author Thomas Abeel
  * 
@@ -56,7 +57,15 @@ public class TrackList implements Iterable<Track> {
 
 	private Model model;
 
+	/**
+	 * The order of the tracks. I suppose this list must always match
+	 * mapping.keys()
+	 */
 	private ArrayList<DataKey> order = new ArrayList<DataKey>();
+
+	/**
+	 * Each datakey maps to a track.
+	 */
 	private Map<DataKey, Track> mapping = new HashMap<DataKey, Track>();
 
 	// private List<DataKey> order = new ArrayList<DataKey>();
@@ -67,6 +76,11 @@ public class TrackList implements Iterable<Track> {
 
 	}
 
+	/**
+	 * 
+	 * @param index 0-based track number
+	 * @return the track[index].
+	 */
 	public Track get(int index) {
 		if (index == -1)
 			return null;
@@ -181,6 +195,10 @@ public class TrackList implements Iterable<Track> {
 	// return containsTrack(new StringKey(string));
 	// }
 
+	/**
+	 * 
+	 * @return the number of {@link Track}s in this list..
+	 */
 	public int size() {
 		return order.size();
 	}

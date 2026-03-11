@@ -574,6 +574,11 @@ public class Model extends Observable implements Observer {
 		return selectionModel;
 	}
 
+	/**
+	 * set current selected Entry.
+	 * 
+	 * @param entry the selected {@link Entry}
+	 */
 	public synchronized void setSelectedEntry(Entry entry) {
 		logger.info("Setting selected entry: " + entry);
 		vlm.setVisibleEntry(entry);

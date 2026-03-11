@@ -53,6 +53,7 @@ import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.utils.SequenceTools;
+
 /**
  * 
  * @author Thomas Abeel
@@ -64,12 +65,9 @@ public class StructureTrack extends Track {
 	private StructureTrackModel stm;
 	public static final StringKey key = new StringKey("GV::STRUCTURE");
 
-	@Override
-	protected int cogOffset(){
-		return 4*lineHeight+tickHeight/2-2;
-	}
 	public StructureTrack(Model model) {
-		super(key, model, Configuration.getBoolean("track:showStructure"), new StructureTrackModel(model,key));
+		super(key, model, Configuration.getBoolean("track:showStructure"),
+				new StructureTrackModel(model, key));
 
 		collisionMap = new CollisionMap(model);
 		stm = (StructureTrackModel) config;
@@ -77,10 +75,17 @@ public class StructureTrack extends Track {
 		// this.addMouseMotionListener(this);
 		// model.addObserver(this);
 	}
+
 	@Override
-	protected void paintDisplayName(Graphics2D g, int yOffset){
-		//Do nothing
+	protected int cogOffset() {
+		return 4 * lineHeight + tickHeight / 2 - 2;
 	}
+
+	@Override
+	protected void paintDisplayName(Graphics2D g, int yOffset) {
+		// Do nothing
+	}
+
 	private int lineHeight = Configuration.getInt("geneStructureLineHeight");
 
 	/* The height of the ticks and coordinate drawing */
@@ -117,7 +122,8 @@ public class StructureTrack extends Track {
 	 */
 	private void paintNucleotideTicks(Graphics g, Location r, int yOffset) {
 		g.setColor(Color.BLACK);
-		g.drawLine(0, 4 * lineHeight + 15 + yOffset, (int) screenWidth, 4 * lineHeight + 15 + yOffset);
+		g.drawLine(0, 4 * lineHeight + 15 + yOffset, (int) screenWidth,
+				4 * lineHeight + 15 + yOffset);
 
 		if (r.start() == r.end()) {
 			return;
@@ -136,14 +142,17 @@ public class StructureTrack extends Track {
 		boolean up = true;
 		while (currentTick < r.end()) {
 			// System.out.println("tick: " + currentTick);
-			int xpos = Convert.translateGenomeToScreen(currentTick, r, screenWidth);
+			int xpos = Convert.translateGenomeToScreen(currentTick, r,
+					screenWidth);
 			String s = "" + currentTick;
 
 			if (up) {
-				g.drawLine(xpos, 4 * lineHeight + 2 + yOffset, xpos, 4 * lineHeight + 28 + yOffset);
+				g.drawLine(xpos, 4 * lineHeight + 2 + yOffset, xpos,
+						4 * lineHeight + 28 + yOffset);
 				g.drawString(s, xpos + 2, 4 * lineHeight + 14 + yOffset);
 			} else {
-				g.drawLine(xpos, 4 * lineHeight + 2 + yOffset, xpos, 4 * lineHeight + 28 + yOffset);
+				g.drawLine(xpos, 4 * lineHeight + 2 + yOffset, xpos,
+						4 * lineHeight + 28 + yOffset);
 				g.drawString(s, xpos + 2, 4 * lineHeight + 26 + yOffset);
 			}
 			up = !up;
@@ -154,13 +163,14 @@ public class StructureTrack extends Track {
 
 	}
 
-	private void paintHighlights(Graphics2D g, List<Highlight> highlights, int yOffset) {
+	private void paintHighlights(Graphics2D g, List<Highlight> highlights,
+			int yOffset) {
 		for (Highlight h : highlights) {
 			Color c = h.color;
 			g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 100));
-		
-			int startIdx=h.location.start();
-			int endIdx=h.location.end();
+
+			int startIdx = h.location.start();
+			int endIdx = h.location.end();
 			int top = 0;
 			int high = 0;
 			switch (h.strand) {
@@ -180,11 +190,11 @@ public class StructureTrack extends Track {
 				high = 4 * lineHeight;
 				break;
 			}
-			int start = Convert.translateGenomeToScreen(startIdx, model.vlm.getAnnotationLocationVisible(),
-					screenWidth);
-			int end = Convert.translateGenomeToScreen(endIdx, model.vlm.getAnnotationLocationVisible(),
-					screenWidth);
-			
+			int start = Convert.translateGenomeToScreen(startIdx,
+					model.vlm.getAnnotationLocationVisible(), screenWidth);
+			int end = Convert.translateGenomeToScreen(endIdx,
+					model.vlm.getAnnotationLocationVisible(), screenWidth);
+
 			g.fillRect(start, top + yOffset, end - start, high);
 		}
 
@@ -194,57 +204,72 @@ public class StructureTrack extends Track {
 		if (model.getSelectedRegion() != null) {
 			int track = model.getPressTrack();
 			g.setColor(new Color(0f, 0, 1, 0.5f));
-			int start = Convert.translateGenomeToScreen(model.getSelectedRegion().start, r, screenWidth);
-			int end = Convert.translateGenomeToScreen(model.getSelectedRegion().end + 1, r, screenWidth);
+			int start = Convert.translateGenomeToScreen(
+					model.getSelectedRegion().start, r, screenWidth);
+			int end = Convert.translateGenomeToScreen(
+					model.getSelectedRegion().end + 1, r, screenWidth);
 			end--;
 			switch (track) {
 			case 0:
-				g.fillRect(start, 0, end - start + yOffset, g.getClipBounds().height);
+				g.fillRect(start, 0, end - start + yOffset,
+						g.getClipBounds().height);
 				break;
 			case 1:
-				g.fillRect(start, 3 * lineHeight + yOffset, end - start, lineHeight);
+				g.fillRect(start, 3 * lineHeight + yOffset, end - start,
+						lineHeight);
 				break;
 			case -1:
-				g.fillRect(start, 4 * lineHeight + tickHeight + yOffset, end - start, lineHeight);
+				g.fillRect(start, 4 * lineHeight + tickHeight + yOffset,
+						end - start, lineHeight);
 				break;
 			case -2:
 			case -3:
 			case -4:
 				end += 2;
 
-				g.fillRect(start, (3 - track) * lineHeight + tickHeight + yOffset, end - start, lineHeight);
+				g.fillRect(start,
+						(3 - track) * lineHeight + tickHeight + yOffset,
+						end - start, lineHeight);
 				break;
 			case 2:
 			case 3:
 			case 4:
 				end += 2;
 
-				g.fillRect(start, (4 - track) * lineHeight + yOffset, end - start, lineHeight);
+				g.fillRect(start, (4 - track) * lineHeight + yOffset,
+						end - start, lineHeight);
 				break;
 			}
 
 		}
 	}
 
-	private void paintPotentialEdit(Graphics2D g, Location annotationLocationVisible, int yOffset) {
+	private void paintPotentialEdit(Graphics2D g,
+			Location annotationLocationVisible, int yOffset) {
 		int end = Convert.translateGenomeToScreen(
-				pressGenomeX > currentGenomeX ? pressGenomeX + 1 : currentGenomeX + 1, annotationLocationVisible,
-				screenWidth);
-		int start = Convert.translateGenomeToScreen(pressGenomeX < currentGenomeX ? pressGenomeX : currentGenomeX,
+				pressGenomeX > currentGenomeX ? pressGenomeX + 1
+						: currentGenomeX + 1,
+				annotationLocationVisible, screenWidth);
+		int start = Convert.translateGenomeToScreen(
+				pressGenomeX < currentGenomeX ? pressGenomeX : currentGenomeX,
 				annotationLocationVisible, screenWidth);
 		if (dragging && borderHit != null && Math.abs(pressTrack) >= 2) {
 			g.setColor(Color.GRAY);
 			if (pressTrack > 0) {
-				g.drawRect(start, (4 - pressTrack) * lineHeight + yOffset, end - start, lineHeight);
+				g.drawRect(start, (4 - pressTrack) * lineHeight + yOffset,
+						end - start, lineHeight);
 			} else {
-				g.drawRect(start, (3 - pressTrack) * lineHeight + tickHeight + yOffset, end - start, lineHeight);
+				g.drawRect(start,
+						(3 - pressTrack) * lineHeight + tickHeight + yOffset,
+						end - start, lineHeight);
 			}
 
 		}
 
 	}
 
-	private void paintPotentialSelection(Graphics2D g, Location r, int yOffset) {
+	private void paintPotentialSelection(Graphics2D g, Location r,
+			int yOffset) {
 		if (model.getSelectedRegion() == null) {
 			if (borderHit == null && dragging) {
 				g.setColor(new Color(0f, 0, 1, 0.5f));
@@ -257,35 +282,49 @@ public class StructureTrack extends Track {
 					start = pressGenomeX;
 					end = currentGenomeX + 1;
 				}
-				int screenStart = Convert.translateGenomeToScreen(start, r, screenWidth);
-				int screenEnd = Convert.translateGenomeToScreen(end, r, screenWidth);
+				int screenStart = Convert.translateGenomeToScreen(start, r,
+						screenWidth);
+				int screenEnd = Convert.translateGenomeToScreen(end, r,
+						screenWidth);
 				switch (pressTrack) {
 				case 0:
-					g.fillRect(screenStart, 0 + yOffset, screenEnd - screenStart, g.getClipBounds().height);
+					g.fillRect(screenStart, 0 + yOffset,
+							screenEnd - screenStart, g.getClipBounds().height);
 					break;
 				case 1:
-					g.fillRect(screenStart, 3 * lineHeight + yOffset, screenEnd - screenStart, lineHeight);
+					g.fillRect(screenStart, 3 * lineHeight + yOffset,
+							screenEnd - screenStart, lineHeight);
 					break;
 				case -1:
-					g.fillRect(screenStart, 4 * lineHeight + tickHeight + yOffset, screenEnd - screenStart, lineHeight);
+					g.fillRect(screenStart,
+							4 * lineHeight + tickHeight + yOffset,
+							screenEnd - screenStart, lineHeight);
 					break;
 				case -2:
 				case -3:
 				case -4:
 					end += 2;
-					screenStart = Convert.translateGenomeToScreen(snapStartAA(start, -pressTrack - 2), r, screenWidth);
-					screenEnd = Convert.translateGenomeToScreen(snapEndAA(end, -pressTrack - 2), r, screenWidth);
-					g.fillRect(screenStart, (3 - pressTrack) * lineHeight + tickHeight + yOffset, screenEnd
-							- screenStart, lineHeight);
+					screenStart = Convert.translateGenomeToScreen(
+							snapStartAA(start, -pressTrack - 2), r,
+							screenWidth);
+					screenEnd = Convert.translateGenomeToScreen(
+							snapEndAA(end, -pressTrack - 2), r, screenWidth);
+					g.fillRect(screenStart,
+							(3 - pressTrack) * lineHeight + tickHeight
+									+ yOffset,
+							screenEnd - screenStart, lineHeight);
 					break;
 				case 2:
 				case 3:
 				case 4:
 					end += 2;
-					screenStart = Convert.translateGenomeToScreen(snapStartAA(start, pressTrack - 2), r, screenWidth);
-					screenEnd = Convert.translateGenomeToScreen(snapEndAA(end, pressTrack - 2), r, screenWidth);
-					g.fillRect(screenStart, (4 - pressTrack) * lineHeight + yOffset, screenEnd - screenStart,
-							lineHeight);
+					screenStart = Convert.translateGenomeToScreen(
+							snapStartAA(start, pressTrack - 2), r, screenWidth);
+					screenEnd = Convert.translateGenomeToScreen(
+							snapEndAA(end, pressTrack - 2), r, screenWidth);
+					g.fillRect(screenStart,
+							(4 - pressTrack) * lineHeight + yOffset,
+							screenEnd - screenStart, lineHeight);
 					break;
 				}
 			}
@@ -321,8 +360,10 @@ public class StructureTrack extends Track {
 		Graphics2D g = (Graphics2D) g1;
 		Location r = model.vlm.getAnnotationLocationVisible();
 		double width = screenWidth / (double) r.length();
-		boolean spliceSitePaint = Configuration.getBoolean("showSpliceSiteColor");
-		boolean nucleotidePaint = Configuration.getBoolean("showNucleotideColor");
+		boolean spliceSitePaint = Configuration
+				.getBoolean("showSpliceSiteColor");
+		boolean nucleotidePaint = Configuration
+				.getBoolean("showNucleotideColor");
 		for (int i = r.start(); i <= r.end(); i++) {
 			char nt = bs.getNucleotide(i);
 			if (!forward) {
@@ -335,22 +376,27 @@ public class StructureTrack extends Track {
 				if (spliceSite != null) {
 					g.setColor(spliceSite);
 					g.fillRect((int) ((i - r.start()) * width), 3 * lineHeight
-							+ (forward ? 0 : tickHeight + lineHeight) + yOffset, (int) (2 * width) + 1, lineHeight);
+							+ (forward ? 0 : tickHeight + lineHeight) + yOffset,
+							(int) (2 * width) + 1, lineHeight);
 				}
 			} else if (nucleotidePaint) {
 				g.setColor(Configuration.getNucleotideColor(nt));
-				g.fillRect((int) ((i - r.start()) * width), 3 * lineHeight + (forward ? 0 : tickHeight + lineHeight)
-						+ yOffset, (int) width + 1, lineHeight);
+				g.fillRect((int) ((i - r.start()) * width), 3 * lineHeight
+						+ (forward ? 0 : tickHeight + lineHeight) + yOffset,
+						(int) width + 1, lineHeight);
 
 			}
 
 			if (model.vlm.getAnnotationLocationVisible().length() < 100) {
-				Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
+				Rectangle2D stringSize = g.getFontMetrics()
+						.getStringBounds("" + nt, g);
 				g.setColor(Color.black);
-				g.drawString(
-						"" + nt,
-						(int) (((i - r.start()) * width - stringSize.getWidth() / 2) + (width / 2)),
-						(int) (3 * lineHeight + (forward ? 0 : tickHeight + lineHeight) + lineHeight + yOffset - letterSpacing));
+				g.drawString("" + nt,
+						(int) (((i - r.start()) * width
+								- stringSize.getWidth() / 2) + (width / 2)),
+						(int) (3 * lineHeight
+								+ (forward ? 0 : tickHeight + lineHeight)
+								+ lineHeight + yOffset - letterSpacing));
 			}
 		}
 
@@ -419,7 +465,8 @@ public class StructureTrack extends Track {
 		return null;
 	}
 
-	private void paintAminoAcidReadingFrame(Graphics g, boolean forward, int yOffset) {
+	private void paintAminoAcidReadingFrame(Graphics g, boolean forward,
+			int yOffset) {
 		Location r = model.vlm.getAnnotationLocationVisible();
 		/* The width of a single nucleotide */
 		double width = screenWidth / (double) r.length();
@@ -448,22 +495,28 @@ public class StructureTrack extends Track {
 			int aa_width = (int) (width * 3);
 
 			/* Only color start and stop codons. */
-			if (Configuration.getBoolean("colorStopCodons") && model.getAAMapping().isStop(aa)) {
+			if (Configuration.getBoolean("colorStopCodons")
+					&& model.getAAMapping().isStop(aa)) {
 				g.setColor(Configuration.getAminoAcidColor('*'));
-				g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width, lineHeight);
+				g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width,
+						lineHeight);
 			}
 
-			if (Configuration.getBoolean("colorStartCodons") && model.getAAMapping().isStart(codon)) {
+			if (Configuration.getBoolean("colorStartCodons")
+					&& model.getAAMapping().isStart(codon)) {
 				g.setColor(Configuration.getAminoAcidColor('M'));
 				if (!Configuration.getBoolean("general:onlyMethionineAsStart")
 						|| model.getAAMapping().get(codon) == 'M')
-					g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width, lineHeight);
+					g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width,
+							lineHeight);
 			}
 
-			if (model.vlm.getAnnotationLocationVisible().length() < Configuration
-					.getInt("geneStructureAminoAcidWindowVerticalBars")) {
+			if (model.vlm.getAnnotationLocationVisible()
+					.length() < Configuration.getInt(
+							"geneStructureAminoAcidWindowVerticalBars")) {
 				g.setColor(Colors.LIGHEST_GRAY);
-				g.drawLine(x + aa_width, y + yOffset, x + aa_width, y + yOffset + lineHeight);
+				g.drawLine(x + aa_width, y + yOffset, x + aa_width,
+						y + yOffset + lineHeight);
 
 			}
 
@@ -471,13 +524,16 @@ public class StructureTrack extends Track {
 			 * Only show the actual letters when there is less than x bp
 			 * visible.
 			 */
-			if (model.vlm.getAnnotationLocationVisible().length() < Configuration
-					.getInt("geneStructureAminoAcidWindowLetters")) {
+			if (model.vlm.getAnnotationLocationVisible()
+					.length() < Configuration
+							.getInt("geneStructureAminoAcidWindowLetters")) {
 				if (!aaStringBoundsCache.containsKey(aa))
-					aaStringBoundsCache.put(aa, g.getFontMetrics().getStringBounds("" + aa, g));
+					aaStringBoundsCache.put(aa,
+							g.getFontMetrics().getStringBounds("" + aa, g));
 				Rectangle2D sb = aaStringBoundsCache.get(aa);
 				/* draw amino acid letter */
-				x = (int) (((i - r.start()) * width - sb.getWidth() / 2) + (width * 3 / 2));
+				x = (int) (((i - r.start()) * width - sb.getWidth() / 2)
+						+ (width * 3 / 2));
 				y += lineHeight;
 				g.setColor(Color.BLACK);
 				g.drawString("" + aa, x, (int) (y + yOffset - letterSpacing));
@@ -492,14 +548,18 @@ public class StructureTrack extends Track {
 
 	private void paintLines(Graphics g, int yOffset) {
 		g.setColor(Color.LIGHT_GRAY);
-		g.drawLine(0, lineHeight + yOffset, (int) screenWidth, lineHeight + yOffset);
-		g.drawLine(0, 2 * lineHeight + yOffset, (int) screenWidth, 2 * lineHeight + yOffset);
+		g.drawLine(0, lineHeight + yOffset, (int) screenWidth,
+				lineHeight + yOffset);
+		g.drawLine(0, 2 * lineHeight + yOffset, (int) screenWidth,
+				2 * lineHeight + yOffset);
 		// g.drawLine(0, 3 * lineHeight + yOffset, (int) screenWidth, 3 *
 		// lineHeight + yOffset);
 		// g.drawLine(0, 5 * lineHeight + tickHeight + yOffset, (int)
 		// screenWidth, 5 * lineHeight + tickHeight + yOffset);
-		g.drawLine(0, 6 * lineHeight + tickHeight + yOffset, (int) screenWidth, 6 * lineHeight + tickHeight + yOffset);
-		g.drawLine(0, 7 * lineHeight + tickHeight + yOffset, (int) screenWidth, 7 * lineHeight + tickHeight + yOffset);
+		g.drawLine(0, 6 * lineHeight + tickHeight + yOffset, (int) screenWidth,
+				6 * lineHeight + tickHeight + yOffset);
+		g.drawLine(0, 7 * lineHeight + tickHeight + yOffset, (int) screenWidth,
+				7 * lineHeight + tickHeight + yOffset);
 
 	}
 
@@ -508,17 +568,21 @@ public class StructureTrack extends Track {
 		for (Type type : Type.values()) {
 			if (stm.isTypeVisible(type)) {
 				Location l = model.vlm.getAnnotationLocationVisible();
-				FeatureAnnotation annot = (FeatureAnnotation) model.vlm.getSelectedEntry().get(type);
+				FeatureAnnotation annot = (FeatureAnnotation) model.vlm
+						.getSelectedEntry().get(type);
 				if (annot != null) {
 					Iterable<Feature> trackData = annot.get(l.start, l.end);
-					if (annot.getEstimateCount(l) <= Configuration.getInt("structureview:maximumNoVisibleFeatures")) {
+					if (annot.getEstimateCount(l) <= Configuration
+							.getInt("structureview:maximumNoVisibleFeatures")) {
 						for (Feature rf : trackData) {
 							g.setColor(Color.BLACK);
 							renderCDS(g, rf, yOffset);
 
 						}
 					} else {
-						g.drawString(type + ": Too many structures to paint, please zoom in", 2, yOffset+y+3*lineHeight);
+						g.drawString(type
+								+ ": Too many structures to paint, please zoom in",
+								2, yOffset + y + 3 * lineHeight);
 						y += lineHeight;
 					}
 				}
@@ -554,7 +618,8 @@ public class StructureTrack extends Track {
 	 */
 	private void renderCDS(Graphics2D g, Feature rf, int yOffset) {
 		int middle = 4 * lineHeight + tickHeight / 2;
-		boolean featureSelected = model.selectionModel().getFeatureSelection().contains(rf);
+		boolean featureSelected = model.selectionModel().getFeatureSelection()
+				.contains(rf);
 		Location last = null;
 		int lastY = 0;
 		// for (Location l : rf.location()) {
@@ -563,26 +628,32 @@ public class StructureTrack extends Track {
 			Location l = rf.location()[i];
 			int drawFrame = getDrawFrame(i, l, rf);
 			/* Start of the block */
-			int lmin = Convert.translateGenomeToScreen(l.start(), model.vlm.getAnnotationLocationVisible(), screenWidth);
+			int lmin = Convert.translateGenomeToScreen(l.start(),
+					model.vlm.getAnnotationLocationVisible(), screenWidth);
 			/* End of the block */
-			int lmax = Convert.translateGenomeToScreen(l.end() + 1, model.vlm.getAnnotationLocationVisible(), screenWidth);
+			int lmax = Convert.translateGenomeToScreen(l.end() + 1,
+					model.vlm.getAnnotationLocationVisible(), screenWidth);
 			/* Horizontal position */
 			int hor;
 			if (rf.strand() == Strand.REVERSE)
 				hor = middle + (drawFrame * lineHeight) + tickHeight / 2;
 			else
-				hor = middle - lineHeight - (drawFrame * lineHeight) - tickHeight / 2;
+				hor = middle - lineHeight - (drawFrame * lineHeight)
+						- tickHeight / 2;
 			int height = lineHeight;
 			/* Create box */
-			Rectangle r = new Rectangle(lmin, hor + yOffset, lmax - lmin, height);
+			Rectangle r = new Rectangle(lmin, hor + yOffset, lmax - lmin,
+					height);
 			/* Draw box */
 			Color cdsColor = Configuration.getColor("TYPE_CDS");
-			g.setColor(new Color(cdsColor.getRed(), cdsColor.getGreen(), cdsColor.getBlue(), 20));
+			g.setColor(new Color(cdsColor.getRed(), cdsColor.getGreen(),
+					cdsColor.getBlue(), 20));
 			g.fill(r);
 			/* Draw black box outline */
 			g.setColor(Color.BLACK);
 			g.draw(r);
-			boolean locationSelected = model.selectionModel().getLocationSelection().contains(l);
+			boolean locationSelected = model.selectionModel()
+					.getLocationSelection().contains(l);
 			/* Selected locations have bold outline and orange background */
 			if (locationSelected) {
 				g.setStroke(new BasicStroke(2.0f));
@@ -599,16 +670,17 @@ public class StructureTrack extends Track {
 			}
 			/* Draw line between boxes */
 			if (last != null) {
-				int lastX = Convert.translateGenomeToScreen(last.end() + 1, model.vlm.getAnnotationLocationVisible(),
-						screenWidth);
-				int currentX = Convert.translateGenomeToScreen(l.start(), model.vlm.getAnnotationLocationVisible(),
-						screenWidth);
+				int lastX = Convert.translateGenomeToScreen(last.end() + 1,
+						model.vlm.getAnnotationLocationVisible(), screenWidth);
+				int currentX = Convert.translateGenomeToScreen(l.start(),
+						model.vlm.getAnnotationLocationVisible(), screenWidth);
 				int currentY = hor + height / 2;
 				int maxY = Math.min(currentY, lastY) - height / 2;
 				int middleX = (lastX + currentX) / 2;
 				g.setColor(Color.BLACK);
 				g.drawLine(lastX, lastY + yOffset, middleX, maxY + yOffset);
-				g.drawLine(middleX, maxY + yOffset, currentX, currentY + yOffset);
+				g.drawLine(middleX, maxY + yOffset, currentX,
+						currentY + yOffset);
 			}
 			r.y -= yOffset;
 			collisionMap.addLocation(r, l);
@@ -648,8 +720,9 @@ public class StructureTrack extends Track {
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
 		super.mouseClicked(x, y, e);
 		if (!e.isConsumed()) {
-			System.out.println("Clicked: "
-					+ Convert.translateScreenToGenome(e.getX(), model.vlm.getAnnotationLocationVisible(), screenWidth));
+			System.out.println("Clicked: " + Convert.translateScreenToGenome(
+					e.getX(), model.vlm.getAnnotationLocationVisible(),
+					screenWidth));
 			Location rf = collisionMap.uniqueLocation(e.getX(), e.getY());
 
 			if (Mouse.button1(e)) {
@@ -658,7 +731,8 @@ public class StructureTrack extends Track {
 					model.selectionModel().clearLocationSelection();
 				} else if (rf != null && e.isShiftDown()) {
 					// boolean rfs = model.getFeatureSelection().contains(rf);
-					boolean rls = model.selectionModel().getLocationSelection().contains(rf);
+					boolean rls = model.selectionModel().getLocationSelection()
+							.contains(rf);
 					if (rls) {
 						// model.removeFeatureSelection(rf);
 						model.selectionModel().removeLocationSelection(rf);
@@ -672,7 +746,8 @@ public class StructureTrack extends Track {
 						int l = f.length();
 						int st = f.start() - (l / 20);
 						int en = f.end() + (l / 20);
-						model.vlm.setAnnotationLocationVisible(new Location(st, en));
+						model.vlm.setAnnotationLocationVisible(
+								new Location(st, en));
 					}
 
 				}
@@ -710,14 +785,18 @@ public class StructureTrack extends Track {
 				@Override
 				public void run() {
 					while (dragging && outside) {
-						int start = model.vlm.getAnnotationLocationVisible().start();
-						int end = model.vlm.getAnnotationLocationVisible().end();
+						int start = model.vlm.getAnnotationLocationVisible()
+								.start();
+						int end = model.vlm.getAnnotationLocationVisible()
+								.end();
 						int move = (int) ((end - start + 1) / 10.0);
 						if (e.getX() < 0) {// left exit
-							model.vlm.setAnnotationLocationVisible(new Location(start - move, end - move));
+							model.vlm.setAnnotationLocationVisible(
+									new Location(start - move, end - move));
 						}
 						if (e.getX() > screenWidth) {// right exit
-							model.vlm.setAnnotationLocationVisible(new Location(start + move, end + move));
+							model.vlm.setAnnotationLocationVisible(
+									new Location(start + move, end + move));
 						}
 						try {
 							Thread.sleep(500);
@@ -737,23 +816,27 @@ public class StructureTrack extends Track {
 
 	@Override
 	public boolean mousePressed(int x, int y, MouseEvent e) {
-		currentGenomeX = Convert.translateScreenToGenome(e.getX(), model.vlm.getAnnotationLocationVisible(), screenWidth);
+		currentGenomeX = Convert.translateScreenToGenome(e.getX(),
+				model.vlm.getAnnotationLocationVisible(), screenWidth);
 		// if (Mouse.button1(e) && !Mouse.modifier(e)) {
 		if (Mouse.button1(e)) {
 			if (!Mouse.modifier(e)) {
 				borderHit = collisionMap.borderHit(e.getX(), e.getY());
 
 				if (borderHit != null) {
-					int genome = Convert.translateScreenToGenome(e.getX(), model.vlm.getAnnotationLocationVisible(),
+					int genome = Convert.translateScreenToGenome(e.getX(),
+							model.vlm.getAnnotationLocationVisible(),
 							screenWidth);
-					if (Math.abs(genome - borderHit.start()) < Math.abs(genome - borderHit.end())) {
+					if (Math.abs(genome - borderHit.start()) < Math
+							.abs(genome - borderHit.end())) {
 						modifyCoordinate = borderHit.start();
 					} else {
 						modifyCoordinate = borderHit.end();
 					}
 				}
 			}
-			pressGenomeX = Convert.translateScreenToGenome(e.getX(), model.vlm.getAnnotationLocationVisible(), screenWidth);
+			pressGenomeX = Convert.translateScreenToGenome(e.getX(),
+					model.vlm.getAnnotationLocationVisible(), screenWidth);
 			// pressX = e.getX();
 			pressTrack = getTrack(e.getY());
 
@@ -803,12 +886,14 @@ public class StructureTrack extends Track {
 	@Override
 	public boolean mouseReleased(int x, int y, MouseEvent e) {
 
-		currentGenomeX = Convert.translateScreenToGenome(e.getX(), model.vlm.getAnnotationLocationVisible(), screenWidth);
+		currentGenomeX = Convert.translateScreenToGenome(e.getX(),
+				model.vlm.getAnnotationLocationVisible(), screenWidth);
 		if (Mouse.button1(e) && dragging) {
 			if (borderHit == null) {
 				updateSelectedRegion();
 			} else {
-				model.change(modifyCoordinate(borderHit, modifyCoordinate, currentGenomeX));
+				model.change(modifyCoordinate(borderHit, modifyCoordinate,
+						currentGenomeX));
 			}
 		}
 		// pressX = -1;
@@ -826,7 +911,8 @@ public class StructureTrack extends Track {
 		int selectionStart = 0;
 		int selectionEnd = 0;
 
-		int start = pressGenomeX < currentGenomeX ? pressGenomeX : currentGenomeX;
+		int start = pressGenomeX < currentGenomeX ? pressGenomeX
+				: currentGenomeX;
 		int end = pressGenomeX < currentGenomeX ? currentGenomeX : pressGenomeX;
 		selectionStart = start;
 		selectionEnd = end + 1;
@@ -852,44 +938,52 @@ public class StructureTrack extends Track {
 		}
 
 		model.setSelectedTrack(pressTrack);
-		if(selectionStart<1)
-			selectionStart=1;
-		if(selectionEnd>model.vlm.getSelectedEntry().getMaximumLength())
-			selectionEnd=model.vlm.getSelectedEntry().getMaximumLength();
-		model.selectionModel().setSelectedRegion(new Location(selectionStart, selectionEnd));
+		if (selectionStart < 1)
+			selectionStart = 1;
+		if (selectionEnd > model.vlm.getSelectedEntry().getMaximumLength())
+			selectionEnd = model.vlm.getSelectedEntry().getMaximumLength();
+		model.selectionModel()
+				.setSelectedRegion(new Location(selectionStart, selectionEnd));
 	}
 
-	private ChangeEvent modifyCoordinate(Location y, int oldCoord, int newCoordinate) {
-		int max=model.vlm.getSelectedEntry().getMaximumLength();
-		if(newCoordinate<1)
-			newCoordinate=1;
-		if(newCoordinate>max)
-			newCoordinate=max;
-		
-		if(y.start() == oldCoord&&y.end() == oldCoord){
-			if(newCoordinate<y.start())
-				return y.setStart(newCoordinate<max?newCoordinate + 1:newCoordinate);
+	private ChangeEvent modifyCoordinate(Location y, int oldCoord,
+			int newCoordinate) {
+		int max = model.vlm.getSelectedEntry().getMaximumLength();
+		if (newCoordinate < 1)
+			newCoordinate = 1;
+		if (newCoordinate > max)
+			newCoordinate = max;
+
+		if (y.start() == oldCoord && y.end() == oldCoord) {
+			if (newCoordinate < y.start())
+				return y.setStart(newCoordinate < max ? newCoordinate + 1
+						: newCoordinate);
 			else
-				return y.setEnd(newCoordinate>1?newCoordinate - 1:newCoordinate);
-		}else if (y.start() == oldCoord) {
+				return y.setEnd(
+						newCoordinate > 1 ? newCoordinate - 1 : newCoordinate);
+		} else if (y.start() == oldCoord) {
 			if (oldCoord <= newCoordinate)
-				return y.setStart(newCoordinate<max?newCoordinate + 1:newCoordinate);
+				return y.setStart(newCoordinate < max ? newCoordinate + 1
+						: newCoordinate);
 			else
 				return y.setStart(newCoordinate);
 		} else if (y.end() == oldCoord) {
 			if (oldCoord < newCoordinate)
 				return y.setEnd(newCoordinate);
 			else
-				return y.setEnd(newCoordinate>1?newCoordinate - 1:newCoordinate);
+				return y.setEnd(
+						newCoordinate > 1 ? newCoordinate - 1 : newCoordinate);
 		} else
-			throw new RuntimeException("This should not happen, sorry, I'm done!");
+			throw new RuntimeException(
+					"This should not happen, sorry, I'm done!");
 		// borderHit = null;
 
 	}
 
 	@Override
 	public boolean mouseDragged(int x, int y, MouseEvent e) {
-		currentGenomeX = Convert.translateScreenToGenome(e.getX(), model.vlm.getAnnotationLocationVisible(), screenWidth);
+		currentGenomeX = Convert.translateScreenToGenome(e.getX(),
+				model.vlm.getAnnotationLocationVisible(), screenWidth);
 		// don't change selection if we're dealing with a borderHit (dragging a
 		// feature to resize it)
 		if (e.isShiftDown() || borderHit != null) {
@@ -910,9 +1004,11 @@ public class StructureTrack extends Track {
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent e) {
 		if (!collisionMap.nearBorder(x, y) || Mouse.modifier(e))
-			model.getGUIManager().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			model.getGUIManager().getMainWindow().setCursor(
+					Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		else
-			model.getGUIManager().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+			model.getGUIManager().getMainWindow().setCursor(
+					Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 		// setChanged();
 		// notifyObservers();
 		model.refresh();
@@ -922,12 +1018,15 @@ public class StructureTrack extends Track {
 	private BufferSeq bs;
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double width, JViewport view, TrackCommunicationModel tcm) {
+	public int paintTrack(Graphics2D g, int yOffset, double width,
+			JViewport view, TrackCommunicationModel tcm) {
 		if (entry instanceof DummyEntry)
 			entry = model.vlm.getSelectedEntry();
 		bs = null;
-		GlyphVector gv = g.getFont().createGlyphVector(g.getFontRenderContext(), new char[] { 'A' });
-		letterSpacing = Math.floor((lineHeight - gv.getVisualBounds().getHeight()) / 2);
+		GlyphVector gv = g.getFont().createGlyphVector(g.getFontRenderContext(),
+				new char[] { 'A' });
+		letterSpacing = Math
+				.floor((lineHeight - gv.getVisualBounds().getHeight()) / 2);
 		this.screenWidth = width;
 		// super.paintComponent(g1);
 		collisionMap.clear();
@@ -943,9 +1042,11 @@ public class StructureTrack extends Track {
 		// }
 
 		/* paint amino acids */
-		if (model.vlm.getAnnotationLocationVisible().length() < Configuration.getInt("geneStructureAminoAcidWindow")) {
+		if (model.vlm.getAnnotationLocationVisible().length() < Configuration
+				.getInt("geneStructureAminoAcidWindow")) {
 			if (bs == null)
-				bs = new BufferSeq(entry.sequence(), new Location(visibleRegion.start - 3, visibleRegion.end + 3));
+				bs = new BufferSeq(entry.sequence(), new Location(
+						visibleRegion.start - 3, visibleRegion.end + 3));
 			// forward strand
 			paintAminoAcidReadingFrame(g, true, yOffset);
 			// reverse strand
@@ -955,12 +1056,15 @@ public class StructureTrack extends Track {
 		/* Fill sequence background */
 		g.setColor(Colors.LIGHEST_GRAY);
 		g.fillRect(0, 3 * lineHeight + yOffset, (int) screenWidth, lineHeight);
-		g.fillRect(0, tickHeight + 4 * lineHeight + yOffset, (int) screenWidth, lineHeight);
+		g.fillRect(0, tickHeight + 4 * lineHeight + yOffset, (int) screenWidth,
+				lineHeight);
 
 		/* paint sequence */
-		if (model.vlm.getAnnotationLocationVisible().length() < Configuration.getInt("geneStructureNucleotideWindow")) {
+		if (model.vlm.getAnnotationLocationVisible().length() < Configuration
+				.getInt("geneStructureNucleotideWindow")) {
 			if (bs == null)
-				bs = new BufferSeq(entry.sequence(), new Location(visibleRegion.start - 3, visibleRegion.end + 3));
+				bs = new BufferSeq(entry.sequence(), new Location(
+						visibleRegion.start - 3, visibleRegion.end + 3));
 			// forward strand sequence
 			paintSequence(g, true, yOffset);
 			// reverse strand sequence
@@ -970,16 +1074,22 @@ public class StructureTrack extends Track {
 		paintLines(g, yOffset);
 
 		/* paint tick marks and coordinates */
-		paintNucleotideTicks(g, model.vlm.getAnnotationLocationVisible(), yOffset);
+		paintNucleotideTicks(g, model.vlm.getAnnotationLocationVisible(),
+				yOffset);
 
 		/* paint CDS */
 		paintCDS(g, yOffset);
 
-		paintPotentialSelection(g, model.vlm.getAnnotationLocationVisible(), yOffset);
-		paintPotentialEdit(g, model.vlm.getAnnotationLocationVisible(), yOffset);
-		paintSelectedLocation(g, model.vlm.getAnnotationLocationVisible(), yOffset);
+		paintPotentialSelection(g, model.vlm.getAnnotationLocationVisible(),
+				yOffset);
+		paintPotentialEdit(g, model.vlm.getAnnotationLocationVisible(),
+				yOffset);
+		paintSelectedLocation(g, model.vlm.getAnnotationLocationVisible(),
+				yOffset);
 
-		paintHighlights(g, model.getHighlight(model.vlm.getAnnotationLocationVisible()), yOffset);
+		paintHighlights(g,
+				model.getHighlight(model.vlm.getAnnotationLocationVisible()),
+				yOffset);
 		return 8 * lineHeight + tickHeight;
 	}
 

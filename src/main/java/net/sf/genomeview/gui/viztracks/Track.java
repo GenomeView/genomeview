@@ -38,6 +38,7 @@ import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
+import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
@@ -53,12 +54,48 @@ public abstract class Track {
 	final protected Model model;
 
 	final protected DataKey dataKey;
+	/**
+	 * entry contains the actual data to be shown in this track. so it should be
+	 * the proper data type, eg FeatureAnnotation, AlignmentAnnotation etc. But
+	 * initially it's set at DummyEntry. entry thus is mutable field, set to
+	 * copy model.vlm.getVisibleEntry which is usually set to the first entry
+	 * loaded
+	 */
 	protected Entry entry;
 
 	/**
 	 * Model for track configuration
 	 */
 	final protected TrackConfig config;
+
+	/**
+	 * 
+	 * @param key     the {@link DataKey}, this is needed to access the
+	 *                {@link Data} using Model#get.
+	 * @param model   the {@link Model} containing all data
+	 * @param visible true iff this track is currently visible
+	 * @param config  the {@link TrackConfig}
+	 */
+	protected Track(DataKey key, Model model, boolean visible,
+			TrackConfig config) {
+		this.model = model;
+		this.dataKey = key;
+		this.config = config;
+		TrackConfigWindow tcw = new TrackConfigWindow(model, config);
+		log.debug("Creating track\t" + key + "\t" + visible);
+		this.entry = model.vlm.getVisibleEntry();
+		// FIXME what is this for?? WHY is this not model.get(key)?
+		// config.setCollapsible(collapsible);
+		// this.collapsible = collapsible;
+		config.addObserver(model);
+
+	}
+
+	@Deprecated
+	protected Track(DataKey key, Model model, boolean visible,
+			boolean collapsible) {
+		this(key, model, visible, new TrackConfig(model, key));
+	}
 
 	public static void paintStatus(Graphics g, Iterable<Status> status, int y,
 			int returnTrackHeight, Location visible, double screenWidth) {
@@ -81,34 +118,6 @@ public abstract class Track {
 
 			}
 		}
-
-	}
-
-	@Deprecated
-	protected Track(DataKey key, Model model, boolean visible,
-			boolean collapsible) {
-		this(key, model, visible, new TrackConfig(model, key));
-	}
-
-	/**
-	 * 
-	 * @param key     the {@link DataKey}, maybe this refers to the name of this
-	 *                data {@link Entry} in the model.
-	 * @param model   the model containing all data
-	 * @param visible true iff this track is currently visible
-	 * @param config  the {@link TrackConfig}
-	 */
-	protected Track(DataKey key, Model model, boolean visible,
-			TrackConfig config) {
-		this.model = model;
-		this.dataKey = key;
-		this.config = config;
-		TrackConfigWindow tcw = new TrackConfigWindow(model, config);
-		log.debug("Creating track\t" + key + "\t" + visible);
-		this.entry = model.vlm.getSelectedEntry();
-		// config.setCollapsible(collapsible);
-		// this.collapsible = collapsible;
-		config.addObserver(model);
 
 	}
 
