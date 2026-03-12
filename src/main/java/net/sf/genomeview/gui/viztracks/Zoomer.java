@@ -20,7 +20,8 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.jannot.Location;
 
-public class Zoomer extends JLabel implements Observer, MouseMotionListener, MouseListener {
+public class Zoomer extends JLabel
+		implements Observer, MouseMotionListener, MouseListener {
 
 	private static final long serialVersionUID = -6554830611969076297L;
 
@@ -36,15 +37,20 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		if (e.getY() > visibleRec.y && e.getY() < visibleRec.y + visibleRec.height) {
+		if (e.getY() > visibleRec.y
+				&& e.getY() < visibleRec.y + visibleRec.height) {
 			if (Math.abs(e.getX() - visibleRec.x) < closeness) {
-				model.getGUIManager().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+				model.getGUIManager().getMainWindow().setCursor(
+						Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 				left = true;
-			} else if (Math.abs(e.getX() - (visibleRec.x + visibleRec.width)) < closeness) {
-				model.getGUIManager().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+			} else if (Math.abs(
+					e.getX() - (visibleRec.x + visibleRec.width)) < closeness) {
+				model.getGUIManager().getMainWindow().setCursor(
+						Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 				right = true;
 			} else {
-				model.getGUIManager().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				model.getGUIManager().getMainWindow().setCursor(
+						Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				left = false;
 				right = false;
 
@@ -68,29 +74,41 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		Location full = new Location(1, model.vlm.getSelectedEntry().getMaximumLength());
-		int pressedX = Convert.translateScreenToGenome(pressed.getX(), full, this.getWidth());
+		Location full = new Location(1,
+				model.vlm.getVisibleEntry().getMaximumLength());
+		int pressedX = Convert.translateScreenToGenome(pressed.getX(), full,
+				this.getWidth());
 		if (left) {
-			int mouseX = Convert.translateScreenToGenome(e.getX(), full, this.getWidth());
+			int mouseX = Convert.translateScreenToGenome(e.getX(), full,
+					this.getWidth());
 			int diff = mouseX - pressedX;
 			if (pressLocation.start() + diff > 0)
-				currentLocation = (new Location(pressLocation.start() + diff, pressLocation.end()));
+				currentLocation = (new Location(pressLocation.start() + diff,
+						pressLocation.end()));
 		}
 		if (right) {
-			int mouseX = Convert.translateScreenToGenome(e.getX(), full, this.getWidth());
+			int mouseX = Convert.translateScreenToGenome(e.getX(), full,
+					this.getWidth());
 			int diff = mouseX - pressedX;
 			if (pressLocation.end() + diff <= full.end())
-				currentLocation = (new Location(pressLocation.start(), pressLocation.end() + diff));
+				currentLocation = (new Location(pressLocation.start(),
+						pressLocation.end() + diff));
 		}
 		if (inside) {
-			int mouseX = Convert.translateScreenToGenome(e.getX(), full, this.getWidth());
+			int mouseX = Convert.translateScreenToGenome(e.getX(), full,
+					this.getWidth());
 			int diff = mouseX - pressedX;
-			if (pressLocation.start() + diff > 0 && pressLocation.end() + diff <= full.end())
-				currentLocation = (new Location(pressLocation.start() + diff, pressLocation.end() + diff));
+			if (pressLocation.start() + diff > 0
+					&& pressLocation.end() + diff <= full.end())
+				currentLocation = (new Location(pressLocation.start() + diff,
+						pressLocation.end() + diff));
 			else if (pressLocation.start() + diff <= 0) {
-				currentLocation = (new Location(1, model.vlm.getAnnotationLocationVisible().length()));
+				currentLocation = (new Location(1,
+						model.vlm.getAnnotationLocationVisible().length()));
 			} else if (pressLocation.end() + diff > full.end())
-				currentLocation = (new Location(full.end() - model.vlm.getAnnotationLocationVisible().length() - 1, full.end()));
+				currentLocation = (new Location(full.end()
+						- model.vlm.getAnnotationLocationVisible().length() - 1,
+						full.end()));
 		}
 		repaint();
 	}
@@ -114,7 +132,8 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 		super.paintComponent(g1);
 		Graphics2D g = (Graphics2D) g1;
 		/* Paint tick marks */
-		Location r = new Location(1, model.vlm.getSelectedEntry().getMaximumLength());
+		Location r = new Location(1,
+				model.vlm.getVisibleEntry().getMaximumLength());
 		g.setColor(Color.BLACK);
 		g.drawLine(0, 15, g.getClipBounds().width, 15);
 
@@ -129,7 +148,8 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 		int currentTick = (r.start() - r.start() % tickDistance) + 1;
 		boolean up = true;
 		while (currentTick < r.end()) {
-			int xpos = Convert.translateGenomeToScreen(currentTick, r, this.getWidth());
+			int xpos = Convert.translateGenomeToScreen(currentTick, r,
+					this.getWidth());
 			String s = "" + currentTick;
 
 			// if (up) {
@@ -145,24 +165,28 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 		}
 
-		
 		Location current = model.vlm.getAnnotationLocationVisible();
-		
-		loc(g,current,Color.CYAN,Color.BLUE);
+
+		loc(g, current, Color.CYAN, Color.BLUE);
 		if (currentLocation != null)
-			loc(g,currentLocation,new Color(200,200,200,75),new Color(100,100,100,75));
+			loc(g, currentLocation, new Color(200, 200, 200, 75),
+					new Color(100, 100, 100, 75));
 
 		String size = format(current);
 		g.setColor(Color.BLACK);
-		g.drawString(size, this.getSize().width / 2 - 50, this.getSize().height - 1);
+		g.drawString(size, this.getSize().width / 2 - 50,
+				this.getSize().height - 1);
 	}
 
-	private void loc(Graphics2D g,Location current,Color light,Color dark) {
+	private void loc(Graphics2D g, Location current, Color light, Color dark) {
 		Dimension dim = this.getSize();
-		Location full = new Location(1, model.vlm.getSelectedEntry().getMaximumLength());
-		int start = Convert.translateGenomeToScreen(current.start(), full, dim.width);
-		int end = Convert.translateGenomeToScreen(current.end(), full, dim.width);
-	
+		Location full = new Location(1,
+				model.vlm.getVisibleEntry().getMaximumLength());
+		int start = Convert.translateGenomeToScreen(current.start(), full,
+				dim.width);
+		int end = Convert.translateGenomeToScreen(current.end(), full,
+				dim.width);
+
 		// g.drawLine(0, 7, dim.width, 7);
 		visibleRec = new Rectangle(start, 0, end - start + 1, 14);
 		dragRec = new Rectangle(start - 15, 0, end - start + 31, 14);
@@ -180,16 +204,24 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 		g.setColor(dark);
 		g.draw(visibleRec);
 
-		CubicCurve2D.Double curveLeft = new CubicCurve2D.Double(0, this.getSize().height - 1,
-		// rec.x/2.0,this.getSize().height-1,
-				0, this.getSize().height - 10, visibleRec.x, visibleRec.y + visibleRec.height + 10, visibleRec.x, visibleRec.y + visibleRec.height);
+		CubicCurve2D.Double curveLeft = new CubicCurve2D.Double(0,
+				this.getSize().height - 1,
+				// rec.x/2.0,this.getSize().height-1,
+				0, this.getSize().height - 10, visibleRec.x,
+				visibleRec.y + visibleRec.height + 10, visibleRec.x,
+				visibleRec.y + visibleRec.height);
 		g.draw(curveLeft);
 
-		CubicCurve2D.Double curveRight = new CubicCurve2D.Double(visibleRec.x + visibleRec.width, visibleRec.y + visibleRec.height, visibleRec.x + visibleRec.width, visibleRec.y + visibleRec.height + 10,
-		// rec.x+rec.width+(this.getSize().width-rec.x-rec.width)/5.0,this.getSize().height-1,
-				this.getSize().width, this.getSize().height - 10, this.getSize().width, this.getSize().height - 1);
+		CubicCurve2D.Double curveRight = new CubicCurve2D.Double(
+				visibleRec.x + visibleRec.width,
+				visibleRec.y + visibleRec.height,
+				visibleRec.x + visibleRec.width,
+				visibleRec.y + visibleRec.height + 10,
+				// rec.x+rec.width+(this.getSize().width-rec.x-rec.width)/5.0,this.getSize().height-1,
+				this.getSize().width, this.getSize().height - 10,
+				this.getSize().width, this.getSize().height - 1);
 		g.draw(curveRight);
-		
+
 	}
 
 	private NumberFormat nf = NumberFormat.getInstance();
@@ -221,8 +253,10 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		Location full = new Location(1, model.vlm.getSelectedEntry().getMaximumLength());
-		int x = Convert.translateScreenToGenome(pressed.getX(), full, this.getWidth());
+		Location full = new Location(1,
+				model.vlm.getVisibleEntry().getMaximumLength());
+		int x = Convert.translateScreenToGenome(pressed.getX(), full,
+				this.getWidth());
 		model.vlm.center(x);
 	}
 
@@ -234,7 +268,8 @@ public class Zoomer extends JLabel implements Observer, MouseMotionListener, Mou
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		model.getGUIManager().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		model.getGUIManager().getMainWindow()
+				.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 	}
 

@@ -84,7 +84,7 @@ public class SplitFeatureDialog extends JDialog {
 				/* Create left feature */
 				Feature left = f.copy();
 				left.setLocation(upstream);
-				model.vlm.getSelectedEntry().getMemoryAnnotation(left.type())
+				model.vlm.getVisibleEntry().getMemoryAnnotation(left.type())
 						.add(left);// //.annotation.add(left);
 
 				/* Create right feature */
@@ -96,12 +96,12 @@ public class SplitFeatureDialog extends JDialog {
 				// }
 				Feature right = f.copy();
 				right.setLocation(downstream);
-				model.vlm.getSelectedEntry().getMemoryAnnotation(right.type())
+				model.vlm.getVisibleEntry().getMemoryAnnotation(right.type())
 						.add(right);
 
 				/* Remove original features if requested */
 				if (remove.isSelected()) {
-					model.vlm.getSelectedEntry().getMemoryAnnotation(f.type())
+					model.vlm.getVisibleEntry().getMemoryAnnotation(f.type())
 							.remove(f);
 				}
 

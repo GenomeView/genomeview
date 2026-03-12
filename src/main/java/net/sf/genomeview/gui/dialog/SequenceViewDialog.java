@@ -40,7 +40,7 @@ import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
-import net.sf.genomeview.BufferSeq;
+import be.abeel.io.ExtensionManager;
 import net.sf.genomeview.data.Blast;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
@@ -49,7 +49,6 @@ import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.utils.SequenceTools;
-import be.abeel.io.ExtensionManager;
 
 public class SequenceViewDialog extends JDialog implements Observer {
 
@@ -73,7 +72,8 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
 	private int viewMode = NUC_MODE;
 
-	private static final String LINE_BREAK = System.getProperty("line.separator");
+	private static final String LINE_BREAK = System
+			.getProperty("line.separator");
 
 	private Map<Feature, String> nucList;
 
@@ -82,37 +82,44 @@ public class SequenceViewDialog extends JDialog implements Observer {
 	private String subSequenceNuc;
 	private String subSequenceProt;
 
-	private final JButton toggleButton = new JButton(MessageManager.getString("sequenceviewdialog.protein_view"));
+	private final JButton toggleButton = new JButton(
+			MessageManager.getString("sequenceviewdialog.protein_view"));
 
 	private Sequence getseq() {
-		Sequence seq=null;
+		Sequence seq = null;
 		if (model.selectionModel().getLocationSelection() != null
 				&& model.selectionModel().getFeatureSelection().size() == 1) {
-			Feature rf = model.selectionModel().getLocationSelection().iterator().next().getParent();
-			seq = SequenceTools.extractSequence(model.vlm.getSelectedEntry().sequence(), rf);
+			Feature rf = model.selectionModel().getLocationSelection()
+					.iterator().next().getParent();
+			seq = SequenceTools.extractSequence(
+					model.vlm.getVisibleEntry().sequence(), rf);
 
 		} else if (model.getSelectedRegion() != null) {
 			Location l = model.getSelectedRegion();
-			seq =model.vlm.getSelectedEntry().sequence().subsequence(l.start,l.end+1);
-			if(model.getPressTrack()<0){
-				seq=SequenceTools.reverseComplement(seq);
+			seq = model.vlm.getVisibleEntry().sequence().subsequence(l.start,
+					l.end + 1);
+			if (model.getPressTrack() < 0) {
+				seq = SequenceTools.reverseComplement(seq);
 			}
 
 		}
 		return seq;
 	}
+
 	public SequenceViewDialog(final Model model) {
 		// this.setModal(true);
 
 		this.setLayout(new BorderLayout());
-		this.setTitle(MessageManager.getString("sequenceviewdialog.sequence_view"));
+		this.setTitle(
+				MessageManager.getString("sequenceviewdialog.sequence_view"));
 		this.setAlwaysOnTop(true);
 		this.model = model;
 		model.addObserver(this);
 
 		Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
 		Border bevelBorder = BorderFactory.createBevelBorder(1);
-		Border buttonBorder = BorderFactory.createCompoundBorder(bevelBorder, emptyBorder);
+		Border buttonBorder = BorderFactory.createCompoundBorder(bevelBorder,
+				emptyBorder);
 
 		JScrollPane scroll = new JScrollPane(sequenceText);
 		sequenceText.setLineWrap(true);
@@ -124,10 +131,13 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
 		// buttons
 
-		JButton closeButton = new JButton(MessageManager.getString("button.close"));
-		JButton exportButton = new JButton(MessageManager.getString("sequenceviewdialog.export_fasta"));
+		JButton closeButton = new JButton(
+				MessageManager.getString("button.close"));
+		JButton exportButton = new JButton(
+				MessageManager.getString("sequenceviewdialog.export_fasta"));
 
-		JButton clipboardButton = new JButton(MessageManager.getString("sequenceviewdialog.copy_clipboard"));
+		JButton clipboardButton = new JButton(
+				MessageManager.getString("sequenceviewdialog.copy_clipboard"));
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -139,20 +149,22 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonPanel.add(exportButton);
 		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-		buttonPanel.add(new JButton(new AbstractAction(MessageManager.getString("sequenceviewdialog.ncbi_blastp")) {
+		buttonPanel.add(new JButton(new AbstractAction(
+				MessageManager.getString("sequenceviewdialog.ncbi_blastp")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Sequence seq = getseq();
-				String protein = SequenceTools.translate(seq, model.getAAMapping());
+				String protein = SequenceTools.translate(seq,
+						model.getAAMapping());
 				Blast.blastp("GVquery", protein);
 
 			}
 
-			
 		}));
 		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-		buttonPanel.add(new JButton(new AbstractAction(MessageManager.getString("sequenceviewdialog.ncbi_blastn")) {
+		buttonPanel.add(new JButton(new AbstractAction(
+				MessageManager.getString("sequenceviewdialog.ncbi_blastn")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -162,7 +174,8 @@ public class SequenceViewDialog extends JDialog implements Observer {
 			}
 		}));
 		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-		buttonPanel.add(new JButton(new AbstractAction(MessageManager.getString("sequenceviewdialog.ncbi_blastx")) {
+		buttonPanel.add(new JButton(new AbstractAction(
+				MessageManager.getString("sequenceviewdialog.ncbi_blastx")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -203,7 +216,8 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+				Clipboard clip = Toolkit.getDefaultToolkit()
+						.getSystemClipboard();
 				StringWriter sw = new StringWriter();
 				if (viewMode == NUC_MODE) {
 					writeNucs(new PrintWriter(sw));
@@ -220,14 +234,16 @@ public class SequenceViewDialog extends JDialog implements Observer {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileDialog = new JFileChooser();
-				fileDialog.showSaveDialog(model.getGUIManager().getMainWindow());
+				fileDialog
+						.showSaveDialog(model.getGUIManager().getMainWindow());
 				File save = fileDialog.getSelectedFile();
 				if (save != null) {
 					save = ExtensionManager.extension(save, "fasta");
 					// TODO wrap on 80 chars
 					// create content and write to file
 					try {
-						PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(save)));
+						PrintWriter writer = new PrintWriter(
+								new BufferedWriter(new FileWriter(save)));
 						if (viewMode == NUC_MODE) {
 							writeNucs(writer);
 						} else if (viewMode == PROT_MODE) {
@@ -287,7 +303,10 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		// String nucs = new String();
 		Set<Feature> feats = model.selectionModel().getFeatureSelection();
 		for (Feature feat : feats) {
-			String nucs = SequenceTools.extractSequence(model.vlm.getSelectedEntry().sequence(), feat).stringRepresentation();
+			String nucs = SequenceTools
+					.extractSequence(model.vlm.getVisibleEntry().sequence(),
+							feat)
+					.stringRepresentation();
 			// SymbolList symbols = feat.getSymbols();
 			// nucs = symbols.seqString();
 			newList.put(feat, nucs);
@@ -299,7 +318,8 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		Map<Feature, String> newList = new HashMap<Feature, String>();
 		Set<Feature> feats = model.selectionModel().getFeatureSelection();
 		for (Feature feat : feats) {
-			Sequence seq = SequenceTools.extractSequence(model.vlm.getSelectedEntry().sequence(), feat);
+			Sequence seq = SequenceTools.extractSequence(
+					model.vlm.getVisibleEntry().sequence(), feat);
 			String prots = SequenceTools.translate(seq, model.getAAMapping());
 
 			newList.put(feat, prots);
@@ -337,7 +357,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		// model.getSelectedEntry().sequence().getSubSequence(l.start(),
 		// l.end()+1);
 //		String seq = new BufferSeq(model.getSelectedEntry().sequence(), l).toString();
-		
+
 		return SequenceTools.translate(getseq(), model.getAAMapping());
 	}
 
@@ -367,7 +387,8 @@ public class SequenceViewDialog extends JDialog implements Observer {
 			int line = 80;
 			while (cursor < subSequenceProt.length()) {
 				int offset = Math.min(80, subSequenceProt.length() - cursor);
-				writer.println(subSequenceProt.substring(cursor, cursor + offset));
+				writer.println(
+						subSequenceProt.substring(cursor, cursor + offset));
 				cursor += line;
 			}
 			writer.println();
@@ -393,14 +414,15 @@ public class SequenceViewDialog extends JDialog implements Observer {
 			}
 		} else if (model.getSelectedRegion() != null) {
 			if (subSequenceNuc == null) {
-				subSequenceNuc =getseq().stringRepresentation();
+				subSequenceNuc = getseq().stringRepresentation();
 			}
 			writer.println(">" + "selection");
 			int cursor = 0;
 			int line = 80;
 			while (cursor < subSequenceNuc.length()) {
 				int offset = Math.min(80, subSequenceNuc.length() - cursor);
-				writer.println(subSequenceNuc.substring(cursor, cursor + offset));
+				writer.println(
+						subSequenceNuc.substring(cursor, cursor + offset));
 				cursor += line;
 			}
 			writer.println();
@@ -420,10 +442,12 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		subSequenceProt = null;
 		if (viewMode == NUC_MODE) {
 			fillWithNucleotides();
-			toggleButton.setText(MessageManager.getString("sequenceviewdialog.protein_view"));
+			toggleButton.setText(MessageManager
+					.getString("sequenceviewdialog.protein_view"));
 		} else {
 			fillWithProteins();
-			toggleButton.setText(MessageManager.getString("sequenceviewdialog.nucleotide_view"));
+			toggleButton.setText(MessageManager
+					.getString("sequenceviewdialog.nucleotide_view"));
 		}
 		highlight(sequenceText);
 
@@ -446,14 +470,16 @@ public class SequenceViewDialog extends JDialog implements Observer {
 			while ((pos = text.indexOf("M", pos)) >= 0) {
 				// Create highlighter using private painter and apply around
 				// pattern
-				hilite.addHighlight(pos, pos + 1, new MyHighlightPainter(Color.green));
+				hilite.addHighlight(pos, pos + 1,
+						new MyHighlightPainter(Color.green));
 				pos++;
 			}
 			// Search for pattern
 			while ((pos = text.indexOf("*", pos)) >= 0) {
 				// Create highlighter using private painter and apply around
 				// pattern
-				hilite.addHighlight(pos, pos + 1, new MyHighlightPainter(Color.RED));
+				hilite.addHighlight(pos, pos + 1,
+						new MyHighlightPainter(Color.RED));
 				pos++;
 			}
 		} catch (BadLocationException e) {
@@ -462,7 +488,8 @@ public class SequenceViewDialog extends JDialog implements Observer {
 	}
 
 	// A private subclass of the default highlight painter
-	class MyHighlightPainter extends DefaultHighlighter.DefaultHighlightPainter {
+	class MyHighlightPainter
+			extends DefaultHighlighter.DefaultHighlightPainter {
 		public MyHighlightPainter(Color color) {
 			super(color);
 		}

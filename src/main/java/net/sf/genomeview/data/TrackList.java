@@ -238,7 +238,7 @@ public class TrackList implements Iterable<Track> {
 	 * Update the tracks for entry e. Creates the correct visualization
 	 * {@link Track} for all available {@link Data} in the entry
 	 * 
-	 * @param e the selected {@link Entry}
+	 * @param e the current {@link Entry} (selected chromosome)
 	 * @return true iff the final size equals the start size.
 	 */
 	public boolean update(Entry e) {

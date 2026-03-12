@@ -6,17 +6,13 @@ package net.sf.genomeview.gui.information;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 
-import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.NotificationTypes;
 import net.sf.jannot.Feature;
 import net.sf.jannot.MemoryFeatureAnnotation;
 import net.sf.jannot.Type;
-import net.sf.jannot.refseq.Sequence;
-import net.sf.jannot.utils.SequenceTools;
 
 /**
  * Wraps an instance of the Model interface and let it act like a ListModel.
@@ -27,11 +23,11 @@ import net.sf.jannot.utils.SequenceTools;
 public class FeatureTableModel extends AbstractTableModel implements Observer {
 
 	/**
-     * 
-     */
+	 * 
+	 */
 	private static final long serialVersionUID = 320228141380099074L;
 
-	private String[] columns = { "Name"};
+	private String[] columns = { "Name" };
 
 	@Override
 	public String getColumnName(int column) {
@@ -47,8 +43,10 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	}
 
 	public void update(Observable o, Object arg) {
-		if (arg == NotificationTypes.GENERAL || arg == NotificationTypes.TRANSLATIONTABLECHANGE
-				|| arg == NotificationTypes.ENTRYCHANGED || arg == NotificationTypes.JANNOTCHANGE) {
+		if (arg == NotificationTypes.GENERAL
+				|| arg == NotificationTypes.TRANSLATIONTABLECHANGE
+				|| arg == NotificationTypes.ENTRYCHANGED
+				|| arg == NotificationTypes.JANNOTCHANGE) {
 			fireTableDataChanged();
 		}
 
@@ -61,8 +59,9 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 
 	@Override
 	public int getRowCount() {
-		MemoryFeatureAnnotation fa = model.vlm.getSelectedEntry().getMemoryAnnotation(type);
-		if(fa==null)
+		MemoryFeatureAnnotation fa = model.vlm.getVisibleEntry()
+				.getMemoryAnnotation(type);
+		if (fa == null)
 			return 0;
 		return fa.cachedCount();// .noFeatures(type);
 	}
@@ -86,7 +85,8 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	}
 
 	public Feature getFeature(int row) {
-		return model.vlm.getSelectedEntry().getMemoryAnnotation(type).getCached(row);
+		return model.vlm.getVisibleEntry().getMemoryAnnotation(type)
+				.getCached(row);
 	}
 
 	@Override
@@ -96,7 +96,8 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	}
 
 	public int getRow(Feature first) {
-		return model.vlm.getSelectedEntry().getMemoryAnnotation(type).getCachedIndexOf(first);
+		return model.vlm.getVisibleEntry().getMemoryAnnotation(type)
+				.getCachedIndexOf(first);
 
 	}
 

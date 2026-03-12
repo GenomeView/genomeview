@@ -10,14 +10,21 @@ import net.sf.jannot.Location;
  */
 public class VisualLocationModel extends Observable {
 
+	/**
+	 * Currently selected Entry/chromosome
+	 */
 	private Entry visibleEntry = null;
+	/**
+	 * Current Range shown in the viewer
+	 */
 	private Location visibleLocation = new Location(0, 0);
 	private double screenWidth;
 
 	/**
 	 * 
-	 * @return the selected entry, or DummyEntry if nothing is loaded/selected.
-	 *         Often this is set to the first available entry in the model.
+	 * @return the selected entry/chromosome, or DummyEntry if nothing is
+	 *         loaded/selected. After loading multiple entries, this is usually
+	 *         set to the first available entry in the model.
 	 */
 	public Entry getVisibleEntry() {
 		if (visibleEntry == null)
@@ -28,7 +35,7 @@ public class VisualLocationModel extends Observable {
 	/**
 	 * set currently selected entry
 	 * 
-	 * @param visibleEntry the current Entry
+	 * @param visibleEntry the current {@link Entry}
 	 */
 	public void setVisibleEntry(Entry visibleEntry) {
 		this.visibleEntry = visibleEntry;
@@ -137,11 +144,11 @@ public class VisualLocationModel extends Observable {
 		return getVisibleLocation();
 	}
 
-	@Deprecated
-	public Entry getSelectedEntry() {
-		return getVisibleEntry();
-
-	}
+//	@Deprecated
+//	public Entry getSelectedEntry() {
+//		return getVisibleEntry();
+//
+//	}
 
 	public void setScreenWidth(double d) {
 		if (d != screenWidth) {

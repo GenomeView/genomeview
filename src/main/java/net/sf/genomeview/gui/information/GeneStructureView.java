@@ -60,10 +60,12 @@ public class GeneStructureView extends JLabel implements Observer {
 				Location l = collisionMap.uniqueLocation(e.getX(), e.getY());
 				if (e.getClickCount() > 1 && l != null) {
 					int gap = (int) (l.length() * 0.05);
-					_self.model.vlm.setAnnotationLocationVisible(new Location(l.start() - gap, l.end() + gap));
+					_self.model.vlm.setAnnotationLocationVisible(
+							new Location(l.start() - gap, l.end() + gap));
 				} else {
 					int hGap = (int) (_self.getWidth() * 0.05);
-					double posPixelRatio = (double) (_self.getWidth() * 0.90) / (double) rf.length();
+					double posPixelRatio = (double) (_self.getWidth() * 0.90)
+							/ (double) rf.length();
 					int pos = (int) ((e.getX() - hGap) / posPixelRatio);
 					System.out.println("CDSView click:" + pos);
 					if (rf != null)
@@ -88,10 +90,11 @@ public class GeneStructureView extends JLabel implements Observer {
 		super.paintComponent(g);
 
 		if (model.selectionModel().getFeatureSelection().size() == 1
-				&& Configuration.getTypeSet("geneStructures").contains(
-						model.selectionModel().getFeatureSelection().first().type())) {
+				&& Configuration.getTypeSet("geneStructures")
+						.contains(model.selectionModel().getFeatureSelection()
+								.first().type())) {
 			rf = model.selectionModel().getFeatureSelection().first();
-			entry = model.vlm.getSelectedEntry();
+			entry = model.vlm.getVisibleEntry();
 		}
 		if (rf != null) {
 			renderCDS((Graphics2D) g, rf);
@@ -102,13 +105,11 @@ public class GeneStructureView extends JLabel implements Observer {
 	/**
 	 * Calculates the draw frame of the location. Can be 1, 2 or 3.
 	 * 
-	 * @param l
-	 *            location to calculate frame for
-	 * @param rf
-	 *            the feature to which the location belongs
+	 * @param l  location to calculate frame for
+	 * @param rf the feature to which the location belongs
 	 * @return the drawing frame index, can be 1, 2 or 3
 	 */
-	private int getDrawFrame(int idx,Location l, Feature rf) {
+	private int getDrawFrame(int idx, Location l, Feature rf) {
 		int locFrame;
 		if (rf.strand() == Strand.REVERSE)
 			locFrame = (l.end() + 1) % 3;
@@ -130,8 +131,6 @@ public class GeneStructureView extends JLabel implements Observer {
 		else
 			return drawFrame;
 	}
-
-	
 
 	/**
 	 * Will render a CDS based on a feature.
@@ -156,15 +155,16 @@ public class GeneStructureView extends JLabel implements Observer {
 	 * +-----------------------+
 	 * | reverse frame 2       |
 	 * +-----------------------+
-     * </code>
+	 * </code>
 	 */
 	private void renderCDS(Graphics2D g, Feature rf) {
-		Color[] background = new Color[] { new Color(204, 238, 255, 100), new Color(255, 255, 204, 100),
-				new Color(204, 238, 255, 100) };
+		Color[] background = new Color[] { new Color(204, 238, 255, 100),
+				new Color(255, 255, 204, 100), new Color(204, 238, 255, 100) };
 
 		int lineHeight = (int) (0.9 * (this.getHeight() / 3.0));
 
-		double posPixelRatio = (double) (this.getWidth() * 0.90) / (double) rf.length();
+		double posPixelRatio = (double) (this.getWidth() * 0.90)
+				/ (double) rf.length();
 		int hGap = (int) (this.getWidth() * 0.05);
 		int vGap = (int) (this.getHeight() * 0.05);
 
@@ -173,18 +173,20 @@ public class GeneStructureView extends JLabel implements Observer {
 		g.setColor(background[1]);
 		g.fillRect(0, lineHeight + vGap, this.getWidth(), lineHeight);
 		g.setColor(background[0]);
-		g.fillRect(0, 2 * lineHeight + vGap, this.getWidth(), lineHeight + vGap);
+		g.fillRect(0, 2 * lineHeight + vGap, this.getWidth(),
+				lineHeight + vGap);
 
 		Location last = null;
 		int lastY = 0;
 		int arrowDrawFrame = -1;
-		AnalyzedFeature af = new AnalyzedFeature(entry.sequence(), rf, model.getAAMapping());
+		AnalyzedFeature af = new AnalyzedFeature(entry.sequence(), rf,
+				model.getAAMapping());
 		HashMap<Location, Integer> drawFrameMapping = new HashMap<Location, Integer>();
-		//for (Location l : rf.location()) {
-		Location[]arr=rf.location();
-		for(int i=0;i<arr.length;i++){
-			Location l=arr[i];
-			int drawFrame = getDrawFrame(i,l, rf);
+		// for (Location l : rf.location()) {
+		Location[] arr = rf.location();
+		for (int i = 0; i < arr.length; i++) {
+			Location l = arr[i];
+			int drawFrame = getDrawFrame(i, l, rf);
 			drawFrameMapping.put(l, drawFrame);
 			/* Keep track of the frame we have to draw the arrow in */
 			if (rf.strand() == Strand.REVERSE && last == null)
@@ -204,7 +206,8 @@ public class GeneStructureView extends JLabel implements Observer {
 			hor = ((drawFrame - 1) * lineHeight);
 
 			/* Create box */
-			Rectangle r = new Rectangle(lmin + hGap, hor + vGap, lmax - lmin, lineHeight);
+			Rectangle r = new Rectangle(lmin + hGap, hor + vGap, lmax - lmin,
+					lineHeight);
 			/* Draw box */
 			Color cdsColor = Configuration.getColor("TYPE_CDS");
 			g.setColor(cdsColor);
@@ -219,44 +222,51 @@ public class GeneStructureView extends JLabel implements Observer {
 			if (af.missingDonor(l)) {
 				g.setColor(Color.RED);
 				if (rf.strand() == Strand.FORWARD)
-					g.drawLine(r.x + r.width, r.y, r.x + r.width, r.y + r.height);
+					g.drawLine(r.x + r.width, r.y, r.x + r.width,
+							r.y + r.height);
 				else
 					g.drawLine(r.x, r.y, r.x, r.y + r.height);
 			}
 			if (af.missingAcceptor(l)) {
 				g.setColor(Color.RED);
 				if (rf.strand() == Strand.REVERSE)
-					g.drawLine(r.x + r.width, r.y, r.x + r.width, r.y + r.height);
+					g.drawLine(r.x + r.width, r.y, r.x + r.width,
+							r.y + r.height);
 				else
 					g.drawLine(r.x, r.y, r.x, r.y + r.height);
 			}
 			g.setColor(Color.RED);
-			Location[]rfl=rf.location();
+			Location[] rfl = rf.location();
 			/* Draw missing start codon */
 			if (af.hasMissingStartCodon()) {
 				if (rf.strand() == Strand.FORWARD && l.equals(rfl[0])) {
 					g.drawLine(r.x, r.y, r.x, r.y + r.height);
 				}
-				if (rf.strand() == Strand.REVERSE && l.equals(rfl[rfl.length-1])) {
-					g.drawLine(r.x + r.width, r.y, r.x + r.width, r.y + r.height);
+				if (rf.strand() == Strand.REVERSE
+						&& l.equals(rfl[rfl.length - 1])) {
+					g.drawLine(r.x + r.width, r.y, r.x + r.width,
+							r.y + r.height);
 				}
 			}
 			/* Draw missing stop codon */
 			if (af.hasMissingStopCodon()) {
-				if (rf.strand() == Strand.FORWARD && l.equals(rfl[rfl.length-1])) {
-					g.drawLine(r.x+ r.width, r.y, r.x+ r.width, r.y + r.height);
+				if (rf.strand() == Strand.FORWARD
+						&& l.equals(rfl[rfl.length - 1])) {
+					g.drawLine(r.x + r.width, r.y, r.x + r.width,
+							r.y + r.height);
 				}
 				if (rf.strand() == Strand.REVERSE && l.equals(rfl[0])) {
-					g.drawLine(r.x , r.y, r.x , r.y + r.height);
+					g.drawLine(r.x, r.y, r.x, r.y + r.height);
 				}
 			}
-			
+
 			g.setStroke(new BasicStroke(1.0f));
 
 			/* Draw line between boxes */
 			// FIXME may have stopcodon overlapping, make sure to indicate it
 			if (last != null) {
-				int lastX = (int) ((last.end() - rf.start() + 1) * posPixelRatio);// translateGenomeToScreen(last.end()
+				int lastX = (int) ((last.end() - rf.start() + 1)
+						* posPixelRatio);// translateGenomeToScreen(last.end()
 				// + 1,
 				// model.getAnnotationLocationVisible());
 				int currentX = (int) ((l.start() - rf.start()) * posPixelRatio);// translateGenomeToScreen(l.start(),
@@ -265,8 +275,10 @@ public class GeneStructureView extends JLabel implements Observer {
 				int maxY = Math.min(currentY, lastY) - lineHeight / 2;
 				int middleX = (lastX + currentX) / 2;
 				g.setColor(Color.BLACK);
-				g.drawLine(lastX + hGap, lastY + vGap, middleX + hGap, maxY + vGap);
-				g.drawLine(middleX + hGap, maxY + vGap, currentX + hGap, currentY + vGap);
+				g.drawLine(lastX + hGap, lastY + vGap, middleX + hGap,
+						maxY + vGap);
+				g.drawLine(middleX + hGap, maxY + vGap, currentX + hGap,
+						currentY + vGap);
 			}
 
 			collisionMap.addLocation(r, l);
@@ -281,11 +293,13 @@ public class GeneStructureView extends JLabel implements Observer {
 		if (rf.strand() == Strand.FORWARD) {
 			int x = (int) (this.getWidth() * 0.95);
 			g.drawLine(x, hor, x + arrowLenght, hor + (lineHeight / 2));
-			g.drawLine(x + arrowLenght, hor + (lineHeight / 2), x, hor + lineHeight);
+			g.drawLine(x + arrowLenght, hor + (lineHeight / 2), x,
+					hor + lineHeight);
 		} else {
 			int x = (int) (this.getWidth() * 0.05);
 			g.drawLine(x, hor, x - arrowLenght, hor + (lineHeight / 2));
-			g.drawLine(x - arrowLenght, hor + (lineHeight / 2), x, hor + lineHeight);
+			g.drawLine(x - arrowLenght, hor + (lineHeight / 2), x,
+					hor + lineHeight);
 		}
 		/* Draw inframe stop codons */
 		List<Location> list = af.getIternalStopCodons();
@@ -299,13 +313,15 @@ public class GeneStructureView extends JLabel implements Observer {
 			// if (rf.strand() == Strand.REVERSE)
 			// hor = middle + (drawFrame * lineHeight) + tickHeight / 2 + gap;
 			// else
-			for (java.util.Map.Entry<Location, Integer> en : drawFrameMapping.entrySet()) {
-				if (en.getKey().overlaps(l.start,l.end))
+			for (java.util.Map.Entry<Location, Integer> en : drawFrameMapping
+					.entrySet()) {
+				if (en.getKey().overlaps(l.start, l.end))
 					hor = ((en.getValue() - 1) * lineHeight);
 			}
 
 			/* Create box */
-			Rectangle r = new Rectangle(lmin + hGap, hor + vGap, lmax - lmin, lineHeight);
+			Rectangle r = new Rectangle(lmin + hGap, hor + vGap, lmax - lmin,
+					lineHeight);
 			/* Draw box */
 			g.setColor(Color.RED);
 
@@ -322,7 +338,8 @@ public class GeneStructureView extends JLabel implements Observer {
 		int lmax = (int) ((l.end() - rf.start() + 1) * posPixelRatio);
 
 		/* Create box */
-		Rectangle r = new Rectangle(lmin + hGap - 1, 0, lmax - lmin + 1, this.getHeight() - 1);
+		Rectangle r = new Rectangle(lmin + hGap - 1, 0, lmax - lmin + 1,
+				this.getHeight() - 1);
 		g.setColor(Color.RED);
 		g.draw(r);
 
@@ -330,7 +347,7 @@ public class GeneStructureView extends JLabel implements Observer {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if (!model.vlm.getSelectedEntry().equals(entry)) {
+		if (!model.vlm.getVisibleEntry().equals(entry)) {
 			rf = null;
 			entry = null;
 		}

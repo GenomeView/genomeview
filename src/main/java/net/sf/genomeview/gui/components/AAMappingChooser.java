@@ -13,10 +13,9 @@ import javax.swing.JComboBox;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.AminoAcidMapping;
 
-public class AAMappingChooser extends JComboBox implements ActionListener,
-		Observer {
+public class AAMappingChooser extends JComboBox
+		implements ActionListener, Observer {
 
-	
 	private static final long serialVersionUID = 8572963039431236614L;
 	private Model model;
 
@@ -32,7 +31,7 @@ public class AAMappingChooser extends JComboBox implements ActionListener,
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (!model.getAAMapping().equals(this.getSelectedItem()))
-			model.setAAMapping(model.vlm.getSelectedEntry(),
+			model.setAAMapping(model.vlm.getVisibleEntry(),
 					(AminoAcidMapping) this.getSelectedItem());
 	}
 

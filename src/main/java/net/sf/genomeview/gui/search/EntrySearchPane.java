@@ -16,10 +16,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import be.abeel.gui.TitledComponent;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.Entry;
-import be.abeel.gui.TitledComponent;
 
 /**
  * 
@@ -36,7 +36,8 @@ class EntrySearchPane extends SearchPanel {
 		gc.fill = GridBagConstraints.BOTH;
 		final JTextField text = new JTextField(40);
 		setFocusField(text);
-		JButton searchButton = new JButton(MessageManager.getString("button.search"));
+		JButton searchButton = new JButton(
+				MessageManager.getString("button.search"));
 
 		final EntrySearchResultModel srm = new EntrySearchResultModel(model);
 		final JTable resultTable = new JTable(srm);
@@ -45,7 +46,7 @@ class EntrySearchPane extends SearchPanel {
 			public void mouseClicked(MouseEvent e) {
 				int row = resultTable.getSelectedRow();
 				Entry entry = srm.getEntry(row);
-				if (model.vlm.getSelectedEntry() != entry)
+				if (model.vlm.getVisibleEntry() != entry)
 					model.setSelectedEntry(entry);
 
 			}
@@ -60,9 +61,9 @@ class EntrySearchPane extends SearchPanel {
 			 */
 			@Override
 			public void keyReleased(KeyEvent e) {
-				
+
 				int key = e.getKeyCode();
-			
+
 				if (key == KeyEvent.VK_ENTER) {
 					srm.clear();
 					srm.search(text.getText().trim());
@@ -85,7 +86,8 @@ class EntrySearchPane extends SearchPanel {
 		});
 
 		gc.gridwidth = 2;
-		add(new TitledComponent(MessageManager.getString("entrypane.entry"), text), gc);
+		add(new TitledComponent(MessageManager.getString("entrypane.entry"),
+				text), gc);
 		gc.gridy++;
 
 		add(searchButton, gc);

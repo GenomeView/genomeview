@@ -16,12 +16,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import be.abeel.gui.TitledComponent;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
-import be.abeel.gui.TitledComponent;
 
 /**
  * 
@@ -38,9 +38,11 @@ class KeywordSearchPane extends SearchPanel {
 		gc.fill = GridBagConstraints.BOTH;
 		final JTextField text = new JTextField(40);
 		setFocusField(text);
-		JButton searchButton = new JButton(MessageManager.getString("button.search"));
+		JButton searchButton = new JButton(
+				MessageManager.getString("button.search"));
 
-		final KeywordSearchResultModel srm = new KeywordSearchResultModel(model);
+		final KeywordSearchResultModel srm = new KeywordSearchResultModel(
+				model);
 		final JTable resultTable = new JTable(srm);
 		resultTable.addMouseListener(new MouseAdapter() {
 			@Override
@@ -48,11 +50,13 @@ class KeywordSearchPane extends SearchPanel {
 				int row = resultTable.getSelectedRow();
 				Feature f = srm.getFeature(row);
 				Entry entry = srm.getEntry(row);
-				if (model.vlm.getSelectedEntry() != entry)
+				if (model.vlm.getVisibleEntry() != entry)
 					model.setSelectedEntry(entry);
 				model.selectionModel().setLocationSelection(f);
 				double border = 0.05 * (f.end() - f.start());
-				model.vlm.setAnnotationLocationVisible(new Location((int) (f.start() - border), (int) (f.end() + border)),
+				model.vlm.setAnnotationLocationVisible(
+						new Location((int) (f.start() - border),
+								(int) (f.end() + border)),
 						true);
 
 			}
@@ -90,7 +94,8 @@ class KeywordSearchPane extends SearchPanel {
 		});
 
 		gc.gridwidth = 2;
-		add(new TitledComponent(MessageManager.getString("keywordpane.keyword"), text), gc);
+		add(new TitledComponent(MessageManager.getString("keywordpane.keyword"),
+				text), gc);
 		gc.gridy++;
 
 		add(searchButton, gc);

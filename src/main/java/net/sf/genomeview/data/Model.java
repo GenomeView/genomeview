@@ -57,6 +57,9 @@ public class Model extends Observable implements Observer {
 	private final Logger logger = LoggerFactory
 			.getLogger(Model.class.getCanonicalName());
 
+	/**
+	 * The EntrySet which contains all loaded 'chromosomes'.
+	 */
 	private final EntrySet entries = new EntrySet();
 
 	private final SelectionModel selectionModel = new SelectionModel();
@@ -187,6 +190,10 @@ public class Model extends Observable implements Observer {
 
 	}
 
+	/**
+	 * 
+	 * @return number of loaded entries (chromosomes)
+	 */
 	public int noEntries() {
 		return entries.size();
 	}
@@ -453,7 +460,7 @@ public class Model extends Observable implements Observer {
 	}
 
 	public AminoAcidMapping getAAMapping() {
-		return aamapping.get(vlm.getSelectedEntry());
+		return aamapping.get(vlm.getVisibleEntry());
 	}
 
 	public void setAAMapping(Entry e, AminoAcidMapping aamapping) {
@@ -482,7 +489,7 @@ public class Model extends Observable implements Observer {
 	public synchronized void updateTracks() {
 		try {
 
-			Entry e = vlm.getSelectedEntry();
+			Entry e = vlm.getVisibleEntry();
 			boolean changed = trackList.update(e);
 
 			if (changed)

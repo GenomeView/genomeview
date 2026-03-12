@@ -7,7 +7,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
-import javax.swing.table.AbstractTableModel;
+
+import com.eaio.stringsearch.BoyerMooreHorspoolRaita;
+import com.eaio.stringsearch.ShiftOrMismatches;
 
 import net.sf.genomeview.BufferSeq;
 import net.sf.genomeview.data.Model;
@@ -18,9 +20,6 @@ import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.utils.SequenceTools;
 
-import com.eaio.stringsearch.BoyerMooreHorspoolRaita;
-import com.eaio.stringsearch.ShiftOrMismatches;
-
 /**
  * 
  * @author Thomas Abeel
@@ -29,7 +28,7 @@ import com.eaio.stringsearch.ShiftOrMismatches;
 class SequenceSearchResultModel extends AbstractSearchResultModel {
 	public SequenceSearchResultModel(Model model) {
 		super(model);
-		
+
 	}
 
 	class StrandedLocation {
@@ -44,8 +43,8 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 	}
 
 	/**
-         * 
-         */
+	     * 
+	     */
 	private static final long serialVersionUID = 5974192617901951628L;
 
 	private ArrayList<StrandedLocation> locations = new ArrayList<StrandedLocation>();
@@ -103,7 +102,8 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 	 * @param mismatch
 	 * @param text
 	 */
-	void search(final Model model, String pattern, final int mismatch, final SequenceType type) {
+	void search(final Model model, String pattern, final int mismatch,
+			final SequenceType type) {
 		locations.clear();
 		model.clearHighlights();
 		final byte[] bytePattern = pattern.toUpperCase().getBytes();
@@ -121,11 +121,13 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 						performAminoAcidSearch();
 					}
 				} catch (IllegalArgumentException ie) {
-					JOptionPane
-							.showMessageDialog(
-									model.getGUIManager().getMainWindow(),
-									MessageManager.getString("searchsequenceresult.too_many_mismatches_warn"), MessageManager.getString("searchsequenceresult.too_many_mismatches"),
-									JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(
+							model.getGUIManager().getMainWindow(),
+							MessageManager.getString(
+									"searchsequenceresult.too_many_mismatches_warn"),
+							MessageManager.getString(
+									"searchsequenceresult.too_many_mismatches"),
+							JOptionPane.WARNING_MESSAGE);
 				}
 
 			}
@@ -133,8 +135,9 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 			private void performAminoAcidSearch() {
 				// byte[] byteSequence =
 				// model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
-				byte[] byteSequence = new BufferSeq(model.vlm.getSelectedEntry().sequence()).toString().toUpperCase()
-						.getBytes();
+				byte[] byteSequence = new BufferSeq(
+						model.vlm.getVisibleEntry().sequence()).toString()
+						.toUpperCase().getBytes();
 				byte[] translation = translate(byteSequence, 0);
 				forwardSearch(translation, 0);
 				translation = translate(byteSequence, 1);
@@ -144,7 +147,8 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 
 				reverseArray(byteSequence);
 				for (int i = 0; i < byteSequence.length; i++) {
-					byteSequence[i] = (byte) SequenceTools.complement((char) byteSequence[i]);
+					byteSequence[i] = (byte) SequenceTools
+							.complement((char) byteSequence[i]);
 				}
 
 				translation = translate(byteSequence, 0);
@@ -157,9 +161,12 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 
 			private byte[] translate(byte[] seq, int offset) {
 				byte[] out = new byte[seq.length / 3];
-				for (int i = 0; i < out.length && 3 * i + offset + 2 < seq.length; i++) {
-					AminoAcidMapping aamap = model.getAAMapping(model.vlm.getSelectedEntry());
-					out[i] = (byte) aamap.get("" + (char) seq[3 * i + offset] + (char) seq[3 * i + offset + 1]
+				for (int i = 0; i < out.length
+						&& 3 * i + offset + 2 < seq.length; i++) {
+					AminoAcidMapping aamap = model
+							.getAAMapping(model.vlm.getVisibleEntry());
+					out[i] = (byte) aamap.get("" + (char) seq[3 * i + offset]
+							+ (char) seq[3 * i + offset + 1]
 							+ (char) seq[3 * i + offset + 2]);
 					// System.out.println((char)out[i]);
 				}
@@ -176,9 +183,11 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 				int[] lastPos = { 0, 0 };
 				do {
 					if (mismatch == 0)
-						lastPos[0] = bm.searchBytes(byteSequence, lastPos[0], byteSequence.length, bytePattern);
+						lastPos[0] = bm.searchBytes(byteSequence, lastPos[0],
+								byteSequence.length, bytePattern);
 					else
-						lastPos = som.searchBytes(byteSequence, lastPos[0], byteSequence.length, bytePattern, mismatch);
+						lastPos = som.searchBytes(byteSequence, lastPos[0],
+								byteSequence.length, bytePattern, mismatch);
 
 					if (lastPos[0] >= 0) {
 
@@ -186,11 +195,13 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 						Location l = null;
 						switch (type) {
 						case Nucleotide:
-							l = new Location(lastPos[0], lastPos[0] + bytePattern.length);
+							l = new Location(lastPos[0],
+									lastPos[0] + bytePattern.length);
 							break;
 						case AminoAcid:
-							l = new Location(lastPos[0] * 3 + offset - 2, lastPos[0] * 3 + bytePattern.length * 3
-									+ offset - 2);
+							l = new Location(lastPos[0] * 3 + offset - 2,
+									lastPos[0] * 3 + bytePattern.length * 3
+											+ offset - 2);
 							break;
 						}
 
@@ -206,13 +217,15 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 			private void performNucleotideSearch() {
 				// byte[] byteSequence =
 				// model.getSelectedEntry().sequence().getSequence().toUpperCase().getBytes();
-				byte[] byteSequence = new BufferSeq(model.vlm.getSelectedEntry().sequence()).toString().toUpperCase()
-						.getBytes();
+				byte[] byteSequence = new BufferSeq(
+						model.vlm.getVisibleEntry().sequence()).toString()
+						.toUpperCase().getBytes();
 
 				forwardSearch(byteSequence, 0);
 				reverseArray(byteSequence);
 				for (int i = 0; i < byteSequence.length; i++) {
-					byteSequence[i] = (byte) SequenceTools.complement((char) byteSequence[i]);
+					byteSequence[i] = (byte) SequenceTools
+							.complement((char) byteSequence[i]);
 				}
 				reverseSearch(byteSequence, 0);
 
@@ -242,20 +255,30 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 				int lastPos[] = { 0, 0 };
 				do {
 					if (mismatch == 0)
-						lastPos[0] = bm.searchBytes(byteSequence, lastPos[0], byteSequence.length, bytePattern);
+						lastPos[0] = bm.searchBytes(byteSequence, lastPos[0],
+								byteSequence.length, bytePattern);
 					else
-						lastPos = som.searchBytes(byteSequence, lastPos[0], byteSequence.length, bytePattern, mismatch);
+						lastPos = som.searchBytes(byteSequence, lastPos[0],
+								byteSequence.length, bytePattern, mismatch);
 
 					if (lastPos[0] >= 0) {
 						Location l = null;
 						switch (type) {
 						case Nucleotide:
-							l = new Location(byteSequence.length - lastPos[0] + 1, byteSequence.length
-									- (lastPos[0] + bytePattern.length) + 1);
+							l = new Location(
+									byteSequence.length - lastPos[0] + 1,
+									byteSequence.length
+											- (lastPos[0] + bytePattern.length)
+											+ 1);
 							break;
 						case AminoAcid:
-							l = new Location(byteSequence.length * 3 - lastPos[0] * 3 + 2 - offset, byteSequence.length
-									* 3 - (lastPos[0] * 3 + bytePattern.length * 3) + 2 - offset);
+							l = new Location(
+									byteSequence.length * 3 - lastPos[0] * 3 + 2
+											- offset,
+									byteSequence.length * 3
+											- (lastPos[0] * 3
+													+ bytePattern.length * 3)
+											+ 2 - offset);
 							break;
 
 						}

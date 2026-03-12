@@ -42,6 +42,9 @@ public class ShortReadTrack extends Track {
 	// private ShortReadProvider provider;
 	private ShortReadTrackConfig srtc;
 
+	private InsertionTooltip tooltip = new InsertionTooltip();
+	private ReadInfo readinfo = new ReadInfo();
+
 	public ShortReadTrack(DataKey key, ShortReadProvider provider,
 			Model model) {
 		super(key, model, true, new ShortReadTrackConfig(model, key));
@@ -49,9 +52,6 @@ public class ShortReadTrack extends Track {
 		// this.provider = provider;
 		render = new srtRender(model, provider, srtc, key);
 	}
-
-	private InsertionTooltip tooltip = new InsertionTooltip();
-	private ReadInfo readinfo = new ReadInfo();
 
 	private static class InsertionTooltip extends JWindow {
 

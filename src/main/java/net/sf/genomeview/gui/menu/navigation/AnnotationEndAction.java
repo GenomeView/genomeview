@@ -20,15 +20,17 @@ public class AnnotationEndAction extends AbstractModelAction {
 	private static final long serialVersionUID = -8869862710635018773L;
 
 	public AnnotationEndAction(Model model) {
-        super(null, null, model);
-        
-    }
+		super(null, null, model);
 
-    @Override
-    public void actionPerformed(ActionEvent arg0) {
-        Location r = model.vlm.getAnnotationLocationVisible();
-        model.vlm.setAnnotationLocationVisible(new Location(model.vlm.getSelectedEntry().getMaximumLength()-r.length(),model.vlm.getSelectedEntry().getMaximumLength()));
+	}
 
-    }
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		Location r = model.vlm.getAnnotationLocationVisible();
+		model.vlm.setAnnotationLocationVisible(new Location(
+				model.vlm.getVisibleEntry().getMaximumLength() - r.length(),
+				model.vlm.getVisibleEntry().getMaximumLength()));
+
+	}
 
 }

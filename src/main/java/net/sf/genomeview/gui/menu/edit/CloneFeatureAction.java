@@ -16,19 +16,21 @@ public class CloneFeatureAction extends AbstractModelAction {
 	private static final long serialVersionUID = 4521376746707912717L;
 
 	public CloneFeatureAction(Model model) {
-		super(MessageManager.getString("editmenu.clone_selected_feature"), model);
-		
+		super(MessageManager.getString("editmenu.clone_selected_feature"),
+				model);
+
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		assert (model.selectionModel().getFeatureSelection() != null);
 		assert (model.selectionModel().getFeatureSelection().size() == 1);
-		Feature rf = model.selectionModel().getFeatureSelection().iterator().next();
+		Feature rf = model.selectionModel().getFeatureSelection().iterator()
+				.next();
 
 		// SimpleFeature rf = (SimpleFeature)
 		// model.getFeatureSelection().iterator().next();
 		Feature copy = rf.copy();
-		model.vlm.getSelectedEntry().getMemoryAnnotation(copy.type()).add(copy);
+		model.vlm.getVisibleEntry().getMemoryAnnotation(copy.type()).add(copy);
 		model.selectionModel().setLocationSelection(copy);
 		// SimpleFeature srf = new SimpleFeature(rf.getSequence(), rf
 		// .makeTemplate());

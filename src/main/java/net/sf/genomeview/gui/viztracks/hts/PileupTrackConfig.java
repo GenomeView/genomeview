@@ -25,28 +25,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Observable;
 import java.util.Observer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JCheckBox;
-
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 
+import org.broad.igv.track.WindowFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.abeel.gui.GridBagPanel;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.config.BooleanConfig;
 import net.sf.genomeview.gui.config.ConfigListener;
-
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.genomeview.gui.viztracks.TrackConfig;
 import net.sf.jannot.Data;
@@ -56,10 +54,6 @@ import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.pileup.PileNormalization;
 import net.sf.jannot.refseq.Sequence;
 
-import org.broad.igv.track.WindowFunction;
-
-import be.abeel.gui.GridBagPanel;
-
 /**
  * 
  * @author Thomas Abeel
@@ -67,7 +61,8 @@ import be.abeel.gui.GridBagPanel;
  */
 public class PileupTrackConfig extends TrackConfig {
 
-	private static Logger log = LoggerFactory.getLogger(PileupTrackConfig.class.getCanonicalName());
+	private static Logger log = LoggerFactory
+			.getLogger(PileupTrackConfig.class.getCanonicalName());
 
 	@Override
 	protected GridBagPanel getGUIContainer() {
@@ -94,18 +89,25 @@ public class PileupTrackConfig extends TrackConfig {
 		/*
 		 * Threshold line
 		 */
-		JButton item = new JButton(new AbstractAction(MessageManager.getString("pileuptrack.add_thereshold_line")) {
+		JButton item = new JButton(new AbstractAction(
+				MessageManager.getString("pileuptrack.add_thereshold_line")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String in = JOptionPane.showInputDialog(model.getGUIManager().getMainWindow(),
-						MessageManager.getString("pileuptrack.new_thereshold_line_height"), MessageManager.getString("pileuptrack.input_value"), JOptionPane.QUESTION_MESSAGE);
+				String in = JOptionPane.showInputDialog(
+						model.getGUIManager().getMainWindow(),
+						MessageManager.getString(
+								"pileuptrack.new_thereshold_line_height"),
+						MessageManager.getString("pileuptrack.input_value"),
+						JOptionPane.QUESTION_MESSAGE);
 				if (in != null) {
 					try {
 						Double d = Double.parseDouble(in);
 						addLine(new Line(d));
 					} catch (Exception ex) {
-						log.warn( MessageManager.getString("pileuptrack.unparseable_pileuptrack_warn") + in, ex);
+						log.warn(MessageManager.getString(
+								"pileuptrack.unparseable_pileuptrack_warn")
+								+ in, ex);
 					}
 				}
 
@@ -115,7 +117,8 @@ public class PileupTrackConfig extends TrackConfig {
 		out.gc.gridy++;
 		out.add(item, out.gc);
 
-		item = new JButton(new AbstractAction(MessageManager.getString("pileuptrack.clear_thereshold_lines")) {
+		item = new JButton(new AbstractAction(MessageManager
+				.getString("pileuptrack.clear_thereshold_lines")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -132,7 +135,8 @@ public class PileupTrackConfig extends TrackConfig {
 		 */
 		final JCheckBox itemGlobal = new JCheckBox();
 		itemGlobal.setSelected(isGlobalSettings());
-		itemGlobal.setAction(new AbstractAction(MessageManager.getString("pileuptrack.track_default")) {
+		itemGlobal.setAction(new AbstractAction(
+				MessageManager.getString("pileuptrack.track_default")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setGlobalSettings(itemGlobal.isSelected());
@@ -142,7 +146,9 @@ public class PileupTrackConfig extends TrackConfig {
 		out.gc.gridy++;
 		out.add(itemGlobal, out.gc);
 
-		final BooleanConfig normalize = new BooleanConfig("track:pile:normalize:" + dataKey, MessageManager.getString("pileuptrack.norm_by_mean"), model);
+		final BooleanConfig normalize = new BooleanConfig(
+				"track:pile:normalize:" + dataKey,
+				MessageManager.getString("pileuptrack.norm_by_mean"), model);
 		normalize.addConfigListener(new ConfigListener() {
 
 			@Override
@@ -158,7 +164,8 @@ public class PileupTrackConfig extends TrackConfig {
 		/* Log scaling of line graph */
 		final JCheckBox item4 = new JCheckBox();
 		item4.setSelected(isLogscaling());
-		item4.setAction(new AbstractAction(MessageManager.getString("pileuptrack.use_log_scaling")) {
+		item4.setAction(new AbstractAction(
+				MessageManager.getString("pileuptrack.use_log_scaling")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setLogscaling(item4.isSelected());
@@ -172,7 +179,8 @@ public class PileupTrackConfig extends TrackConfig {
 		/* Dynamic scaling for both plots */
 		final JCheckBox item3 = new JCheckBox();
 		item3.setSelected(isDynamicScaling());
-		item3.setAction(new AbstractAction(MessageManager.getString("pileuptrack.use_dynamic_scaling")) {
+		item3.setAction(new AbstractAction(
+				MessageManager.getString("pileuptrack.use_dynamic_scaling")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setDynamicScaling(item3.isSelected());
@@ -184,19 +192,24 @@ public class PileupTrackConfig extends TrackConfig {
 		out.add(item3, out.gc);
 
 		/* Maximum value */
-		final JButton item2 = new JButton(new AbstractAction(MessageManager.getString("pileuptrack.set_maximum")) {
+		final JButton item2 = new JButton(new AbstractAction(
+				MessageManager.getString("pileuptrack.set_maximum")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String in = JOptionPane.showInputDialog(model.getGUIManager().getMainWindow(),
-						MessageManager.getString("pileuptrack.input_max_info"), MessageManager.getString("pileuptrack.input_max"),
+				String in = JOptionPane.showInputDialog(
+						model.getGUIManager().getMainWindow(),
+						MessageManager.getString("pileuptrack.input_max_info"),
+						MessageManager.getString("pileuptrack.input_max"),
 						JOptionPane.QUESTION_MESSAGE);
 				if (in != null) {
 					try {
 						Double d = Double.parseDouble(in);
 						setMaxValue(d);
 					} catch (Exception ex) {
-						log.warn( MessageManager.getString("pileuptrack.unparseable_pileuptrack_warn") + in, ex);
+						log.warn(MessageManager.getString(
+								"pileuptrack.unparseable_pileuptrack_warn")
+								+ in, ex);
 					}
 				}
 
@@ -307,14 +320,15 @@ public class PileupTrackConfig extends TrackConfig {
 	}
 
 	boolean isNormalizationAvailable() {
-		return ((PileNormalization) model.vlm.getSelectedEntry().get(dataKey)).supportsNormalization();
+		return ((PileNormalization) model.vlm.getVisibleEntry().get(dataKey))
+				.supportsNormalization();
 	}
 
 	boolean isDynamicScaling() {
-		if (globalSettings){
-			dynamicScaling=Configuration.getBoolean("pileup:dynamicRange");
+		if (globalSettings) {
+			dynamicScaling = Configuration.getBoolean("pileup:dynamicRange");
 			return Configuration.getBoolean("pileup:dynamicRange");
-		}else
+		} else
 			return dynamicScaling;
 	}
 
@@ -348,13 +362,16 @@ public class PileupTrackConfig extends TrackConfig {
 					@Override
 					public void run() {
 						if (!isNormalizationAvailable()) {
-							throw new RuntimeException(
-									MessageManager.getString("pileuptrack.normalization_format_not_supported"));
+							throw new RuntimeException(MessageManager.getString(
+									"pileuptrack.normalization_format_not_supported"));
 						}
-						model.messageModel().setStatusBarMessage(MessageManager.getString("pileuptrack.calculating_normalization"));
+						model.messageModel()
+								.setStatusBarMessage(MessageManager.getString(
+										"pileuptrack.calculating_normalization"));
 						// model.getSelectedEntry().get(dataKey).get();
 
-						Data<Pile> dp = (Data<Pile>) model.vlm.getSelectedEntry().get(dataKey);
+						Data<Pile> dp = (Data<Pile>) model.vlm.getVisibleEntry()
+								.get(dataKey);
 						double[] sum = null;
 						int count = 0;
 						for (Pile p : dp.get()) {
@@ -370,7 +387,9 @@ public class PileupTrackConfig extends TrackConfig {
 							sum[i] /= count;
 						value = sum;
 						calculated = true;
-						model.messageModel().setStatusBarMessage(MessageManager.getString("pileuptrack.normalization_calculated"));
+						model.messageModel()
+								.setStatusBarMessage(MessageManager.getString(
+										"pileuptrack.normalization_calculated"));
 
 					}
 
@@ -424,7 +443,7 @@ public class PileupTrackConfig extends TrackConfig {
 	}
 
 	public Sequence sequence() {
-		return model.vlm.getSelectedEntry().sequence();
+		return model.vlm.getVisibleEntry().sequence();
 	}
 
 	public TrackCommunicationModel getTrackCommunication() {

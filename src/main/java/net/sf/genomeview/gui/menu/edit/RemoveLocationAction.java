@@ -23,7 +23,8 @@ import net.sf.jannot.MemoryFeatureAnnotation;
  * @author Thomas Abeel
  * 
  */
-public class RemoveLocationAction extends AbstractModelAction implements Observer {
+public class RemoveLocationAction extends AbstractModelAction
+		implements Observer {
 
 	private static final long serialVersionUID = -5857913546086864524L;
 
@@ -41,14 +42,17 @@ public class RemoveLocationAction extends AbstractModelAction implements Observe
 			/* If there are more locations, remove the selected one */
 			if (f.location().length > 1)
 				f.removeLocation(rf);
-			/* If this is the last location of the feature, remove the feature instead*/
+			/*
+			 * If this is the last location of the feature, remove the feature
+			 * instead
+			 */
 			else {
-				Data<?>d=model.vlm.getSelectedEntry().get(f.type());
-				if(d instanceof MemoryFeatureAnnotation){
-					MemoryFeatureAnnotation mf=(MemoryFeatureAnnotation)d;
+				Data<?> d = model.vlm.getVisibleEntry().get(f.type());
+				if (d instanceof MemoryFeatureAnnotation) {
+					MemoryFeatureAnnotation mf = (MemoryFeatureAnnotation) d;
 					mf.remove(f);
 				}
-				
+
 			}
 
 		}

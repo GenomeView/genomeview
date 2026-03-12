@@ -106,7 +106,7 @@ public class ExternalHelper {
 				int max = Integer.parseInt(arr[arr.length - 1]);
 				Entry e = null;
 				if (arr.length == 2)
-					e = model.vlm.getSelectedEntry();// model.entries().getEntry();
+					e = model.vlm.getVisibleEntry();// model.entries().getEntry();
 				else
 					e = model.entries().getEntry(arr[0]);
 				return max <= e.getMaximumLength();

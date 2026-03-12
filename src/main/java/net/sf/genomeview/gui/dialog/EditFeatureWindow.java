@@ -19,6 +19,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import be.abeel.gui.GridBagPanel;
+import be.abeel.gui.TitledComponent;
+import be.abeel.io.LineIterator;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.StrandCombo;
@@ -26,9 +29,6 @@ import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 import net.sf.jannot.MemoryFeatureAnnotation;
-import be.abeel.gui.GridBagPanel;
-import be.abeel.gui.TitledComponent;
-import be.abeel.io.LineIterator;
 
 /**
  * JFrame that allows to edit a feature
@@ -69,16 +69,25 @@ public class EditFeatureWindow extends JDialog {
 			location.setLineWrap(true);
 			strandSelection = new StrandCombo();
 			typeSelection = new TypeCombo(model);
-			this.add(new TitledComponent(MessageManager.getString("editfeature.type"), typeSelection), gc);
+			this.add(new TitledComponent(
+					MessageManager.getString("editfeature.type"),
+					typeSelection), gc);
 			gc.gridy++;
-			this.add(new TitledComponent(MessageManager.getString("editfeature.strand"), strandSelection), gc);
+			this.add(new TitledComponent(
+					MessageManager.getString("editfeature.strand"),
+					strandSelection), gc);
 
 			/* Notes legend */
 			gc.gridy++;
 			gc.gridwidth = 1;
-			this.add(new JLabel(MessageManager.getString("editfeature.notes")), gc);
+			this.add(new JLabel(MessageManager.getString("editfeature.notes")),
+					gc);
 			gc.gridx++;
-			this.add(new HelpButton(_self, MessageManager.getString("editfeature.help_one_qualifier_line")), gc);
+			this.add(
+					new HelpButton(_self,
+							MessageManager.getString(
+									"editfeature.help_one_qualifier_line")),
+					gc);
 
 			/* Notes text area */
 			gc.gridy++;
@@ -92,9 +101,14 @@ public class EditFeatureWindow extends JDialog {
 			gc.weighty = 0;
 			gc.gridy++;
 			gc.gridwidth = 1;
-			this.add(new JLabel(MessageManager.getString("editfeature.location")), gc);
+			this.add(
+					new JLabel(
+							MessageManager.getString("editfeature.location")),
+					gc);
 			gc.gridx++;
-			this.add(new HelpButton(_self, MessageManager.getString("editfeature.location_separator")), gc);
+			this.add(new HelpButton(_self,
+					MessageManager.getString("editfeature.location_separator")),
+					gc);
 
 			/* Location text area */
 			gc.gridy++;
@@ -106,7 +120,8 @@ public class EditFeatureWindow extends JDialog {
 
 			gc.gridy++;
 			gc.weighty = 0;
-			JButton ok = new JButton(MessageManager.getString("button.save_close"));
+			JButton ok = new JButton(
+					MessageManager.getString("button.save_close"));
 			ok.addActionListener(new ActionListener() {
 
 				public void actionPerformed(ActionEvent arg0) {
@@ -114,7 +129,8 @@ public class EditFeatureWindow extends JDialog {
 					try {
 						SortedSet<Location> loc = new TreeSet<Location>();
 						StringBuffer text = new StringBuffer();
-						for (String line : new LineIterator(new StringReader(location.getText()))) {
+						for (String line : new LineIterator(
+								new StringReader(location.getText()))) {
 							text.append(line.trim());
 						}
 						String[] arr = text.toString().split(",");
@@ -122,31 +138,40 @@ public class EditFeatureWindow extends JDialog {
 							String[] as = s.split("\\.\\.");
 							int start = Integer.parseInt(as[0].trim());
 							int end = Integer.parseInt(as[1].trim());
-							if(start<1)
-								start=1;
-							if(end>model.vlm.getSelectedEntry().getMaximumLength())
-								end=model.vlm.getSelectedEntry().getMaximumLength();
+							if (start < 1)
+								start = 1;
+							if (end > model.vlm.getVisibleEntry()
+									.getMaximumLength())
+								end = model.vlm.getVisibleEntry()
+										.getMaximumLength();
 							loc.add(new Location(start, end));
 						}
 						feature.setLocation(loc);
 					} catch (Exception e) {
 						e.printStackTrace();
-						JOptionPane.showMessageDialog(_self, MessageManager.getString("editfeature.location_failed_warn"), MessageManager.getString("editfeature.location_failed"), JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(_self,
+								MessageManager.getString(
+										"editfeature.location_failed_warn"),
+								MessageManager.getString(
+										"editfeature.location_failed"),
+								JOptionPane.WARNING_MESSAGE);
 						warning = true;
 					}
 					feature.setStrand(strandSelection.getStrand());
-					
+
 					/* Update qualifiers */
 					try {
 //						feature.setMute(true);
 						feature.clearQualifiers();
-						
+
 						/* Construct new qualifiers */
 //						List<Qualifier> list = new ArrayList<Qualifier>();
-						for (String line : new LineIterator(new StringReader(notes.getText()))) {
+						for (String line : new LineIterator(
+								new StringReader(notes.getText()))) {
 							if (line.trim().length() > 0) {
 								String[] arr = line.split("=");
-								feature.addQualifier(arr[0].trim(), arr[1].trim());
+								feature.addQualifier(arr[0].trim(),
+										arr[1].trim());
 							}
 						}
 //						/* Remove all qualifiers */
@@ -166,26 +191,33 @@ public class EditFeatureWindow extends JDialog {
 //						feature.setMute(false);
 					} catch (Exception e) {
 						e.printStackTrace();
-						JOptionPane.showMessageDialog(_self, MessageManager.getString("editfeature.notes_failed_warn"), MessageManager.getString("editfeature.notes_failed"), JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(_self,
+								MessageManager.getString(
+										"editfeature.notes_failed_warn"),
+								MessageManager
+										.getString("editfeature.notes_failed"),
+								JOptionPane.WARNING_MESSAGE);
 						warning = true;
 					}
-					
+
 					/* Update type if needed and notify annotation model */
-					if(feature.type()!=typeSelection.getTerm()){
-						MemoryFeatureAnnotation mf=model.vlm.getSelectedEntry().getMemoryAnnotation(feature.type());
+					if (feature.type() != typeSelection.getTerm()) {
+						MemoryFeatureAnnotation mf = model.vlm.getVisibleEntry()
+								.getMemoryAnnotation(feature.type());
 						mf.remove(feature);
 						feature.setType(typeSelection.getTerm());
-						mf=model.vlm.getSelectedEntry().getMemoryAnnotation(typeSelection.getTerm());
+						mf = model.vlm.getVisibleEntry()
+								.getMemoryAnnotation(typeSelection.getTerm());
 						mf.add(feature);
 						model.updateTracks();
-						
+
 						model.annotationModel().typeUpdated(feature.type());
-						model.annotationModel().typeUpdated(typeSelection.getTerm());
-					}else{
+						model.annotationModel()
+								.typeUpdated(typeSelection.getTerm());
+					} else {
 						model.annotationModel().typeUpdated(feature.type());
 					}
 
-					
 					if (!warning)
 						_self.setVisible(false);
 
@@ -212,7 +244,8 @@ public class EditFeatureWindow extends JDialog {
 	}
 
 	public EditFeatureWindow(Model model) {
-		super(model.getGUIManager().getMainWindow(), MessageManager.getString("editfeature.edit_structure"));
+		super(model.getGUIManager().getMainWindow(),
+				MessageManager.getString("editfeature.edit_structure"));
 		_self = this;
 		setModal(true);
 		this.model = model;
@@ -231,10 +264,9 @@ public class EditFeatureWindow extends JDialog {
 			StringBuffer text = new StringBuffer();
 			notes.setText("");
 			for (String key : feature.getQualifiersKeys()) {
-				
+
 				text.append(key + "=" + feature.qualifier(key) + "\n");
-				
-				
+
 			}
 			notes.setText(text.toString());
 			/* Fill in combo boxes */

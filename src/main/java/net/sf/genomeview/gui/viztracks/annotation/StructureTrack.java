@@ -569,7 +569,7 @@ public class StructureTrack extends Track {
 			if (stm.isTypeVisible(type)) {
 				Location l = model.vlm.getAnnotationLocationVisible();
 				FeatureAnnotation annot = (FeatureAnnotation) model.vlm
-						.getSelectedEntry().get(type);
+						.getVisibleEntry().get(type);
 				if (annot != null) {
 					Iterable<Feature> trackData = annot.get(l.start, l.end);
 					if (annot.getEstimateCount(l) <= Configuration
@@ -940,15 +940,15 @@ public class StructureTrack extends Track {
 		model.setSelectedTrack(pressTrack);
 		if (selectionStart < 1)
 			selectionStart = 1;
-		if (selectionEnd > model.vlm.getSelectedEntry().getMaximumLength())
-			selectionEnd = model.vlm.getSelectedEntry().getMaximumLength();
+		if (selectionEnd > model.vlm.getVisibleEntry().getMaximumLength())
+			selectionEnd = model.vlm.getVisibleEntry().getMaximumLength();
 		model.selectionModel()
 				.setSelectedRegion(new Location(selectionStart, selectionEnd));
 	}
 
 	private ChangeEvent modifyCoordinate(Location y, int oldCoord,
 			int newCoordinate) {
-		int max = model.vlm.getSelectedEntry().getMaximumLength();
+		int max = model.vlm.getVisibleEntry().getMaximumLength();
 		if (newCoordinate < 1)
 			newCoordinate = 1;
 		if (newCoordinate > max)
@@ -1021,7 +1021,7 @@ public class StructureTrack extends Track {
 	public int paintTrack(Graphics2D g, int yOffset, double width,
 			JViewport view, TrackCommunicationModel tcm) {
 		if (entry instanceof DummyEntry)
-			entry = model.vlm.getSelectedEntry();
+			entry = model.vlm.getVisibleEntry();
 		bs = null;
 		GlyphVector gv = g.getFont().createGlyphVector(g.getFontRenderContext(),
 				new char[] { 'A' });

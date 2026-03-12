@@ -67,7 +67,7 @@ public class NewFeatureDialog extends JDialog {
 				Feature f = new Feature(loc);
 				f.setType(typeCombo.getTerm());
 				f.setStrand(strandSelection.getStrand());
-				MemoryFeatureAnnotation fa = model.vlm.getSelectedEntry()
+				MemoryFeatureAnnotation fa = model.vlm.getVisibleEntry()
 						.getMemoryAnnotation(f.type());
 				fa.add(f);
 				model.selectionModel().setSelectedRegion(null);

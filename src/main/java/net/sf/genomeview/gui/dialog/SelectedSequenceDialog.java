@@ -29,123 +29,132 @@ import net.sf.jannot.utils.SequenceTools;
 
 public class SelectedSequenceDialog extends JDialog {
 
-    private static SelectedSequenceDialog diag = null;
+	private static SelectedSequenceDialog diag = null;
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 2529848844411398233L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2529848844411398233L;
 
-    private SelectedSequenceDialog(final Model model) {
-        super(model.getGUIManager().getMainWindow(), MessageManager.getString("selectedsequencedialog.which_seq"), true);
-        setLayout(new GridBagLayout());
-        GridBagConstraints gc = new GridBagConstraints();
-        gc.insets = new Insets(3, 3, 3, 3);
-        gc.gridx = 0;
-        gc.gridy = 0;
-        gc.gridwidth = 2;
-        gc.gridheight = 1;
-        add(new JLabel(MessageManager.getString("selectedsequencedialog.location_or_complete")), gc);
-        ButtonGroup loc = new ButtonGroup();
-        final JRadioButton location = new JRadioButton(MessageManager.getString("selectedsequencedialog.selected_locations"));
-        final JRadioButton feature = new JRadioButton(MessageManager.getString("selectedsequencedialog.completed_features"));
-        feature.setSelected(true);
-        loc.add(location);
-        loc.add(feature);
-        gc.gridy++;
-        add(location, gc);
-        gc.gridy++;
-        add(feature, gc);
-        gc.gridy++;
-        add(new JLabel(MessageManager.getString("selectedsequencedialog.nucleotides_or_amino")), gc);
+	private SelectedSequenceDialog(final Model model) {
+		super(model.getGUIManager().getMainWindow(),
+				MessageManager.getString("selectedsequencedialog.which_seq"),
+				true);
+		setLayout(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.insets = new Insets(3, 3, 3, 3);
+		gc.gridx = 0;
+		gc.gridy = 0;
+		gc.gridwidth = 2;
+		gc.gridheight = 1;
+		add(new JLabel(MessageManager
+				.getString("selectedsequencedialog.location_or_complete")), gc);
+		ButtonGroup loc = new ButtonGroup();
+		final JRadioButton location = new JRadioButton(MessageManager
+				.getString("selectedsequencedialog.selected_locations"));
+		final JRadioButton feature = new JRadioButton(MessageManager
+				.getString("selectedsequencedialog.completed_features"));
+		feature.setSelected(true);
+		loc.add(location);
+		loc.add(feature);
+		gc.gridy++;
+		add(location, gc);
+		gc.gridy++;
+		add(feature, gc);
+		gc.gridy++;
+		add(new JLabel(MessageManager
+				.getString("selectedsequencedialog.nucleotides_or_amino")), gc);
 
-        ButtonGroup trans = new ButtonGroup();
-        final JRadioButton nucleotides = new JRadioButton(MessageManager.getString("selectedsequencedialog.nucleotides"));
-        nucleotides.setSelected(true);
-        final JRadioButton aa = new JRadioButton(MessageManager.getString("selectedsequencedialog.amino"));
-        trans.add(nucleotides);
-        trans.add(aa);
-        gc.gridy++;
-        add(nucleotides, gc);
-        gc.gridy++;
-        add(aa, gc);
+		ButtonGroup trans = new ButtonGroup();
+		final JRadioButton nucleotides = new JRadioButton(
+				MessageManager.getString("selectedsequencedialog.nucleotides"));
+		nucleotides.setSelected(true);
+		final JRadioButton aa = new JRadioButton(
+				MessageManager.getString("selectedsequencedialog.amino"));
+		trans.add(nucleotides);
+		trans.add(aa);
+		gc.gridy++;
+		add(nucleotides, gc);
+		gc.gridy++;
+		add(aa, gc);
 
-        JButton ok = new JButton(MessageManager.getString("button.ok"));
-        ok.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                StringBuffer tmp = new StringBuffer();
-                Sequence seq = model.vlm.getSelectedEntry().sequence();
-                
-               
-                
-                if (location.isSelected()) {
-                    SortedSet<Location> locs = model.selectionModel().getLocationSelection();
-                    for (Location l : locs) {
-                    	 BufferSeq bs=new BufferSeq(seq,l);
-                        Strand s = l.getParent().strand();
-                        switch (s) {
-                        case FORWARD:
-                        case UNKNOWN:
-                            for (int i = l.start(); i <= l.end(); i++) {
-                                tmp.append(bs.getNucleotide(i));
-                            }
-                            break;
-                        case REVERSE:
-                            for (int i = l.end(); i >= l.start(); i--) {
-                                tmp.append(bs.getReverseNucleotide(i));
-                            }
-                            break;
-                        }
-                    }
+		JButton ok = new JButton(MessageManager.getString("button.ok"));
+		ok.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				StringBuffer tmp = new StringBuffer();
+				Sequence seq = model.vlm.getVisibleEntry().sequence();
 
-                } else {// features...
-                    SortedSet<Feature> feats = model.selectionModel().getFeatureSelection();
-                    for (Feature f : feats) {
-                        tmp.append(SequenceTools.extractSequence(seq, f));
+				if (location.isSelected()) {
+					SortedSet<Location> locs = model.selectionModel()
+							.getLocationSelection();
+					for (Location l : locs) {
+						BufferSeq bs = new BufferSeq(seq, l);
+						Strand s = l.getParent().strand();
+						switch (s) {
+						case FORWARD:
+						case UNKNOWN:
+							for (int i = l.start(); i <= l.end(); i++) {
+								tmp.append(bs.getNucleotide(i));
+							}
+							break;
+						case REVERSE:
+							for (int i = l.end(); i >= l.start(); i--) {
+								tmp.append(bs.getReverseNucleotide(i));
+							}
+							break;
+						}
+					}
 
-                    }
-                }
-                
-                if (aa.isSelected()) {
-                    selectedSequence = SequenceTools.translate(new MemorySequence(tmp),model.getAAMapping());
-                } else
-                    selectedSequence = tmp.toString();
-                setVisible(false);
-            }
+				} else {// features...
+					SortedSet<Feature> feats = model.selectionModel()
+							.getFeatureSelection();
+					for (Feature f : feats) {
+						tmp.append(SequenceTools.extractSequence(seq, f));
 
-        });
-        gc.gridy++;
-        gc.gridwidth = 1;
-        add(ok, gc);
-        JButton close = new JButton(MessageManager.getString("button.close"));
-        close.addActionListener(new ActionListener() {
+					}
+				}
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
+				if (aa.isSelected()) {
+					selectedSequence = SequenceTools.translate(
+							new MemorySequence(tmp), model.getAAMapping());
+				} else
+					selectedSequence = tmp.toString();
+				setVisible(false);
+			}
 
-            }
+		});
+		gc.gridy++;
+		gc.gridwidth = 1;
+		add(ok, gc);
+		JButton close = new JButton(MessageManager.getString("button.close"));
+		close.addActionListener(new ActionListener() {
 
-        });
-        gc.gridx++;
-        add(close, gc);
-        pack();
-        StaticUtils.center(model.getGUIManager().getMainWindow(),this);
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
 
-    }
+			}
 
-    private static String selectedSequence;
+		});
+		gc.gridx++;
+		add(close, gc);
+		pack();
+		StaticUtils.center(model.getGUIManager().getMainWindow(), this);
 
-    public static String getSequence() {
-        return selectedSequence;
-    }
+	}
 
-    public static void display(Model model) {
-        selectedSequence = null;
-        if (diag == null)
-            diag = new SelectedSequenceDialog(model);
-        diag.setVisible(true);
-    }
+	private static String selectedSequence;
+
+	public static String getSequence() {
+		return selectedSequence;
+	}
+
+	public static void display(Model model) {
+		selectedSequence = null;
+		if (diag == null)
+			diag = new SelectedSequenceDialog(model);
+		diag.setVisible(true);
+	}
 
 }

@@ -4,7 +4,6 @@
 package net.sf.genomeview.gui.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -27,12 +26,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JRadioButton;
 
+import be.abeel.gui.TitledComponent;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
-import be.abeel.gui.TitledComponent;
+
 /**
  * 
  * @author Thomas Abeel
@@ -42,11 +42,11 @@ public class MergeFeatureDialog extends JDialog {
 	private static final long serialVersionUID = -770863087750087961L;
 
 	public MergeFeatureDialog(final Model model) {
-		super(model.getGUIManager().getMainWindow(), MessageManager.getString("mergefeatures.title"));
+		super(model.getGUIManager().getMainWindow(),
+				MessageManager.getString("mergefeatures.title"));
 		final MergeFeatureDialog _self = this;
 		setModal(true);
 		setAlwaysOnTop(true);
-	
 
 		Container c = new Container();
 		c.setLayout(new GridBagLayout());
@@ -59,9 +59,11 @@ public class MergeFeatureDialog extends JDialog {
 		gc.fill = GridBagConstraints.BOTH;
 
 		ButtonGroup mergeType = new ButtonGroup();
-		final JRadioButton intron = new JRadioButton(MessageManager.getString("mergefeatures.merge_space_intron"));
+		final JRadioButton intron = new JRadioButton(
+				MessageManager.getString("mergefeatures.merge_space_intron"));
 		intron.setSelected(true);
-		final JRadioButton exon = new JRadioButton(MessageManager.getString("mergefeatures.merge_space_exon"));
+		final JRadioButton exon = new JRadioButton(
+				MessageManager.getString("mergefeatures.merge_space_exon"));
 		mergeType.add(intron);
 		mergeType.add(exon);
 		gc.gridwidth = 2;
@@ -69,7 +71,8 @@ public class MergeFeatureDialog extends JDialog {
 		cp.setLayout(new BorderLayout());
 		cp.add(intron, BorderLayout.NORTH);
 		cp.add(exon, BorderLayout.SOUTH);
-		c.add(new TitledComponent(MessageManager.getString("mergefeatures.merge_type"), cp), gc);
+		c.add(new TitledComponent(
+				MessageManager.getString("mergefeatures.merge_type"), cp), gc);
 		gc.gridy++;
 		setBackground(exon.getBackground());
 		// final TypeCombo select = new TypeCombo(model);
@@ -82,16 +85,16 @@ public class MergeFeatureDialog extends JDialog {
 		int index = 0;
 
 		for (Feature f : set) {
-			String label=f.toString();
-			if (f.getQualifiersKeys().contains("Name")){
-				label = f.qualifier("Name") +" ("+label+")";
-			} else if (f.getQualifiersKeys().contains("ID")){
-				label = f.qualifier("ID")  +" ("+label+")";
+			String label = f.toString();
+			if (f.getQualifiersKeys().contains("Name")) {
+				label = f.qualifier("Name") + " (" + label + ")";
+			} else if (f.getQualifiersKeys().contains("ID")) {
+				label = f.qualifier("ID") + " (" + label + ")";
 			}
-			if(label.length()>50)
-				label=label.substring(0, 50)+"...";
+			if (label.length() > 50)
+				label = label.substring(0, 50) + "...";
 			JRadioButton button = new JRadioButton(label);
-			button.setActionCommand(f.toString()+f.hashCode());
+			button.setActionCommand(f.toString() + f.hashCode());
 			if (index == 0)
 				button.setSelected(true);
 			bg.add(button);
@@ -101,11 +104,14 @@ public class MergeFeatureDialog extends JDialog {
 			// fs[index++] = f;
 		}
 		// System.out.println(mapping);
-		c.add(new TitledComponent(MessageManager.getString("mergefeatures.master_feature"), cp), gc);
+		c.add(new TitledComponent(
+				MessageManager.getString("mergefeatures.master_feature"), cp),
+				gc);
 		gc.gridy++;
 
 		// c.add(select, gc);
-		final JCheckBox remove = new JCheckBox(MessageManager.getString("mergefeatures.remove_original_after_merger"));
+		final JCheckBox remove = new JCheckBox(MessageManager
+				.getString("mergefeatures.remove_original_after_merger"));
 		gc.gridy++;
 		c.add(remove, gc);
 		gc.gridwidth = 1;
@@ -116,7 +122,7 @@ public class MergeFeatureDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 
 				List<Location> list = new ArrayList<Location>();
-				List<Feature>parents=new ArrayList<Feature>();
+				List<Feature> parents = new ArrayList<Feature>();
 				/* Create a deep copy of all locations */
 				for (Feature rf : set) {
 					for (Location l : rf.location()) {
@@ -126,16 +132,17 @@ public class MergeFeatureDialog extends JDialog {
 				}
 				SortedSet<Location> locations = new TreeSet<Location>();
 				if (exon.isSelected()) {
-					//System.out.println("EXON");
+					// System.out.println("EXON");
 					for (int i = 0; i < list.size(); i++) {
 						if (i == list.size() - 1) {
 							locations.add(list.get(i));
 						} else {
-							Feature c = parents.get(i);//.getParent();
-							Feature n = parents.get(i + 1);//.getParent();
-							//System.out.println("Parents: "+c+"\t"+n);
+							Feature c = parents.get(i);// .getParent();
+							Feature n = parents.get(i + 1);// .getParent();
+							// System.out.println("Parents: "+c+"\t"+n);
 							if (c != n) {
-								locations.add(new Location(list.get(i).start, list.get(i + 1).end));
+								locations.add(new Location(list.get(i).start,
+										list.get(i + 1).end));
 								i++;
 							} else {
 								locations.add(list.get(i));
@@ -152,20 +159,24 @@ public class MergeFeatureDialog extends JDialog {
 				 * Construct a deep copy of the first feature, this one will be
 				 * used as a frame for the new feature.
 				 */
-				Feature copy = mapping.get(bg.getSelection().getActionCommand()).copy();// model.selectionModel().getFeatureSelection().first().copy();
+				Feature copy = mapping.get(bg.getSelection().getActionCommand())
+						.copy();// model.selectionModel().getFeatureSelection().first().copy();
 
 				copy.setLocation(locations);
 				/* Add new feature to the annotation */
-				model.vlm.getSelectedEntry().getMemoryAnnotation(copy.type()).add(copy);
+				model.vlm.getVisibleEntry().getMemoryAnnotation(copy.type())
+						.add(copy);
 				// ((MemoryFeatureAnnotation)
 				// model.getSelectedEntry().get(copy.type())).add(copy);
 
 				/* If requested, the original features are deleted */
 				if (remove.isSelected()) {
 					Set<Feature> toRemove = new HashSet<Feature>();
-					toRemove.addAll(model.selectionModel().getFeatureSelection());
+					toRemove.addAll(
+							model.selectionModel().getFeatureSelection());
 					for (Feature rf : toRemove)
-						model.vlm.getSelectedEntry().getMemoryAnnotation(rf.type()).remove(rf);
+						model.vlm.getVisibleEntry()
+								.getMemoryAnnotation(rf.type()).remove(rf);
 				}
 				model.selectionModel().clearLocationSelection();
 
@@ -188,7 +199,7 @@ public class MergeFeatureDialog extends JDialog {
 		c.add(cancel, gc);
 		setContentPane(c);
 		pack();
-		StaticUtils.center(model.getGUIManager().getMainWindow(),this);
+		StaticUtils.center(model.getGUIManager().getMainWindow(), this);
 		setVisible(true);
 
 	}
