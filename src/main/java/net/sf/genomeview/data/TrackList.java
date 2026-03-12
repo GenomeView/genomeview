@@ -253,58 +253,47 @@ public class TrackList implements Iterable<Track> {
 						&& ((MemoryFeatureAnnotation) data).cachedCount() > 0)
 					this.add(key, new FeatureTrack(model, (Type) key));
 
-			}
-			if (data instanceof VCFWrapper) {
+			} else if (data instanceof VCFWrapper) {
 				if (!this.containsTrack(key))
 					this.add(key, new VariationTrack(model, (Type) key));
-			}
-			if (data instanceof GFFWrapper || data instanceof BEDWrapper) {
+			} else if (data instanceof GFFWrapper
+					|| data instanceof BEDWrapper) {
 				if (!this.containsTrack(key))
 					this.add(key, new FeatureTrack(model, (Type) key));
-
-			}
-
-			if (data instanceof PileupWrapper || data instanceof SWigWrapper) {
+			} else if (data instanceof PileupWrapper
+					|| data instanceof SWigWrapper) {
 				if (!this.containsTrack(key))
 					this.add(key, new PileupTrack(key,
 							new WiggleProvider(e, (Data<Pile>) data, model),
 							model));
-			}
-
-			if (data instanceof TDFData) {
+			} else if (data instanceof TDFData) {
 				if (!this.containsTrack(key))
 					this.add(key, new PileupTrack(key,
 							new TDFProvider(e, (TDFData) data, model), model));
-			}
-
-			if (data instanceof BigWigData) {
+			} else if (data instanceof BigWigData) {
 				if (!this.containsTrack(key))
 					this.add(key, new PileupTrack(key,
 							new BigWigProvider(e, (BigWigData) data, model),
 							model));
-			}
-
-			if (data instanceof Graph) {
+			} else if (data instanceof Graph) {
 				if (!this.containsTrack(key))
 					this.add(key, new WiggleTrack(key, model, true));
-			}
-			if (data instanceof AlignmentAnnotation) {
+			} else if (data instanceof AlignmentAnnotation) {
 				if (!this.containsTrack(key))
 					this.add(key, new MultipleAlignmentTrack(model, key));
-			}
-			if (data instanceof ReadGroup) {
+			} else if (data instanceof ReadGroup) {
 				if (!this.containsTrack(key)) {
 					this.add(key, new ShortReadTrack(key,
 							new ShortReadProvider(e, (ReadGroup) data, model),
 							model));
 				}
-			}
-			if (data instanceof AbstractMAFMultipleAlignment) {
+			} else if (data instanceof AbstractMAFMultipleAlignment) {
 				if (!this.containsTrack(key)) {
 					this.add(key, new MultipleAlignmentTrack2(model, key));
 					log.info("Added multiple alignment track " + key);
 				}
-			}
+			} else
+				log.error("unhandled data type Data type " + data.getClass());
 		}
 		/* Fix weight to make sure they are different */
 		for (int i = 1; i < order.size(); i++) {
