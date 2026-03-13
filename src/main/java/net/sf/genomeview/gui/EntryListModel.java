@@ -78,7 +78,7 @@ final class EntryListModel implements Observer, ComboBoxModel {
 
 	@Override
 	public synchronized void update(Observable arg0, Object arg1) {
-		int size = model.noEntries();
+		int size = model.entries().size();
 		if (size != lastSize) {
 			ArrayList<Entry> tmp = new ArrayList<Entry>();
 			for (Entry e : model.entries()) {
@@ -87,7 +87,7 @@ final class EntryListModel implements Observer, ComboBoxModel {
 			Collections.sort(tmp, new EntryComparator());
 			tmpList = tmp;
 			ListDataEvent le = new ListDataEvent(this,
-					ListDataEvent.CONTENTS_CHANGED, 0, model.noEntries());
+					ListDataEvent.CONTENTS_CHANGED, 0, model.entries().size());
 			for (ListDataListener l : listeners) {
 				l.contentsChanged(le);
 			}

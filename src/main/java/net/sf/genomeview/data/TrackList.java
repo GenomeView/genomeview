@@ -22,6 +22,7 @@ import net.sf.genomeview.gui.viztracks.annotation.FeatureTrack;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.genomeview.gui.viztracks.comparative.MultipleAlignmentTrack;
 import net.sf.genomeview.gui.viztracks.comparative.MultipleAlignmentTrack2;
+import net.sf.genomeview.gui.viztracks.comparative.SyntenicTrack;
 import net.sf.genomeview.gui.viztracks.graph.WiggleTrack;
 import net.sf.genomeview.gui.viztracks.hts.PileupTrack;
 import net.sf.genomeview.gui.viztracks.hts.ShortReadTrack;
@@ -30,6 +31,7 @@ import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.MemoryFeatureAnnotation;
+import net.sf.jannot.SyntenicData;
 import net.sf.jannot.Type;
 import net.sf.jannot.alignment.maf.AbstractMAFMultipleAlignment;
 import net.sf.jannot.alignment.mfa.AlignmentAnnotation;
@@ -235,8 +237,8 @@ public class TrackList implements Iterable<Track> {
 	}
 
 	/**
-	 * Update the tracks for entry e. Creates the correct visualization
-	 * {@link Track} for all available {@link Data} in the entry
+	 * Update the tracks to show all tracks for data in e. Creates the correct
+	 * visualization {@link Track} for all available {@link Data} in the entry
 	 * 
 	 * @param e the current {@link Entry} (selected chromosome)
 	 * @return true iff the final size equals the start size.
@@ -247,6 +249,7 @@ public class TrackList implements Iterable<Track> {
 		/* Graph tracks */
 		for (DataKey key : e) {
 			Data<?> data = e.get(key);
+			System.out.println("Data " + key + " of type " + data.getClass());
 
 			if (data instanceof MemoryFeatureAnnotation) {
 				if (!this.containsTrack(key)
@@ -291,6 +294,10 @@ public class TrackList implements Iterable<Track> {
 				if (!this.containsTrack(key)) {
 					this.add(key, new MultipleAlignmentTrack2(model, key));
 					log.info("Added multiple alignment track " + key);
+				}
+			} else if (data instanceof SyntenicData) {
+				if (!this.containsTrack(key)) {
+					this.add(key, new SyntenicTrack(model, key));
 				}
 			} else
 				log.error("unhandled data type Data type " + data.getClass());

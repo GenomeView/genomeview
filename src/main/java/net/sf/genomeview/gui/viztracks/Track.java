@@ -68,6 +68,10 @@ public abstract class Track {
 	 */
 	final protected TrackConfig config;
 
+	// private boolean visible;
+	static final protected Logger log = LoggerFactory
+			.getLogger(Track.class.getCanonicalName());
+
 	/**
 	 * 
 	 * @param key     the {@link DataKey}, this is needed to access the
@@ -120,10 +124,6 @@ public abstract class Track {
 		}
 
 	}
-
-	// private boolean visible;
-	private static final Logger log = LoggerFactory
-			.getLogger(Track.class.getCanonicalName());
 
 	/**
 	 * To pass along mouse clicks from the original panel.

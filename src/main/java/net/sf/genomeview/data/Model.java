@@ -137,17 +137,6 @@ public class Model extends Observable implements Observer {
 	 * 
 	 * 
 	 */
-	/**
-	 * @return the {@link MessageModel} for statusbar
-	 * 
-	 */
-	public MessageModel messageModel() {
-		return messageModel;
-	}
-
-	public MouseModel mouseModel() {
-		return mouseModel;
-	}
 
 	public Model(String id) {
 
@@ -191,11 +180,15 @@ public class Model extends Observable implements Observer {
 	}
 
 	/**
+	 * @return the {@link MessageModel} for statusbar
 	 * 
-	 * @return number of loaded entries (chromosomes)
 	 */
-	public int noEntries() {
-		return entries.size();
+	public MessageModel messageModel() {
+		return messageModel;
+	}
+
+	public MouseModel mouseModel() {
+		return mouseModel;
 	}
 
 	public void update(Observable arg0, Object arg) {

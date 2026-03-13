@@ -9,10 +9,11 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.JViewport;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
@@ -31,51 +32,31 @@ public class PileupTrack extends Track {
 	private NumberFormat nf = NumberFormat.getInstance(Locale.US);
 
 	private PileProvider provider;
-	
-	
-	protected int cogOffset(){
-		return 10;
-	}
-	// private String label;
-	static class PTMObserver implements Observer {
-
-		private Model model;
-		private PileupTrackConfig ptm;
-
-		private PTMObserver(PileupTrackConfig ptm,Model model){
-			this.ptm=ptm;
-			ptm.addObserver(this);
-			this.model=model;
-		}
-		
-		@Override
-		public void update(Observable o, Object arg) {
-			System.out.println("\tInvalidating track vizbuffers");
-			ptm.lastQuery = null;
-			/* Force repaint */
-			model.refresh();
-
-		}
-	}
-
-	public PileupTrack(DataKey key, PileProvider provider, final Model model) {
-		super(key, model, true, new PileupTrackConfig(model,key,provider));
-		ptm = (PileupTrackConfig)config;
-		tooltip = new PileupTooltip(ptm);
-		this.provider=provider;
-//		provider.addObserver(new PTMObserver(ptm, model));
-		nf.setMaximumFractionDigits(0);
-
-	}
 
 	private PileupTrackConfig ptm;
 
 	private PileupTooltip tooltip;
 
+	private Logger log = LoggerFactory.getLogger(PileupTrack.class.toString());
+
+	public PileupTrack(DataKey key, PileProvider provider, final Model model) {
+		super(key, model, true, new PileupTrackConfig(model, key, provider));
+		ptm = (PileupTrackConfig) config;
+		tooltip = new PileupTooltip(ptm);
+		this.provider = provider;
+//		provider.addObserver(new PTMObserver(ptm, model));
+		nf.setMaximumFractionDigits(0);
+
+	}
+
 	@Override
 	public boolean mouseExited(int x, int y, MouseEvent source) {
 		tooltip.setVisible(false);
 		return false;
+	}
+
+	protected int cogOffset() {
+		return 10;
 	}
 
 	@Override
@@ -84,15 +65,14 @@ public class PileupTrack extends Track {
 		return false;
 	}
 
-	private Logger log = LoggerFactory.getLogger(PileupTrack.class.toString());
-
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,
+			JViewport view, TrackCommunicationModel tcm) {
 
 		ptm.setScreenWidth(screenWidth);
 		ptm.setTrackCommunication(tcm);
 		// System.out.println("- drawing track "+this);
-		Location visible = model.vlm.getAnnotationLocationVisible();
+		Location visible = model.vlm.getVisibleLocation();
 		/* Status messages for data queuing an retrieval */
 		// Iterable<Status> status = provider.getStatus(visible.start,
 		// visible.end);
@@ -104,8 +84,8 @@ public class PileupTrack extends Track {
 			// Iterable<Pile> piles = provider.get(visible.start, visible.end);
 
 //			if (model.vlm.getAnnotationLocationVisible().length() < Configuration.getInt("pileup:switchBarLine")) {
-				// System.out.println("Track: "+this+"\t"+provider);
-				ptm.setVizBuffer(new BarChartBuffer(model,visible, provider, ptm));
+			// System.out.println("Track: "+this+"\t"+provider);
+			ptm.setVizBuffer(new BarChartBuffer(model, visible, provider, ptm));
 //			} else
 //				ptm.setVizBuffer(new LineChartBuffer(visible, provider, ptm));
 
@@ -119,11 +99,31 @@ public class PileupTrack extends Track {
 
 	}
 
-	
-
 	public PileupTrackConfig getTrackModel() {
 		return ptm;
 
+	}
+
+	// private String label;
+	static class PTMObserver implements Observer {
+
+		private Model model;
+		private PileupTrackConfig ptm;
+
+		private PTMObserver(PileupTrackConfig ptm, Model model) {
+			this.ptm = ptm;
+			ptm.addObserver(this);
+			this.model = model;
+		}
+
+		@Override
+		public void update(Observable o, Object arg) {
+			System.out.println("\tInvalidating track vizbuffers");
+			ptm.lastQuery = null;
+			/* Force repaint */
+			model.refresh();
+
+		}
 	}
 
 }

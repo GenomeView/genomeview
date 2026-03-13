@@ -43,6 +43,9 @@ public class VisualLocationModel extends Observable {
 		notifyObservers(visibleEntry);
 	}
 
+	/**
+	 * @return the visible range currently shown in the viewer
+	 */
 	public Location getVisibleLocation() {
 		return visibleLocation;
 	}

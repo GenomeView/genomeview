@@ -33,6 +33,7 @@ import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 
 /**
+ * The main panel where the gene tracks are painted in
  * 
  * @author Thomas Abeel
  * 

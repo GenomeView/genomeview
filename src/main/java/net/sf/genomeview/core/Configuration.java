@@ -15,19 +15,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.zip.GZIPInputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.abeel.io.GZIPPrintWriter;
+import be.abeel.io.LineIterator;
+import be.abeel.net.URIFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Type;
 import net.sf.jannot.parser.Parser;
 import net.sf.nameservice.NameService;
-import be.abeel.io.GZIPPrintWriter;
-import be.abeel.io.LineIterator;
-import be.abeel.net.URIFactory;
 
 /**
  * Low level access to the configuration.
@@ -54,22 +55,28 @@ public class Configuration {
 	}
 
 	public static char[] getAminoAcids() {
-		return new char[] { 'M', '*', 'X', 'Y', 'W', 'V', 'U', 'T', 'S', 'R', 'Q', 'P', 'N', 'L', 'K', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'A' };
+		return new char[] { 'M', '*', 'X', 'Y', 'W', 'V', 'U', 'T', 'S', 'R',
+				'Q', 'P', 'N', 'L', 'K', 'I', 'H', 'G', 'F', 'E', 'D', 'C',
+				'A' };
 
 	}
 
-	private static Logger logger = LoggerFactory.getLogger(Configuration.class.getCanonicalName());
+	private static Logger logger = LoggerFactory
+			.getLogger(Configuration.class.getCanonicalName());
 
 	static {
 		String s = System.getProperty("user.home");
 		confDir = new File(s + "/.genomeview");
 		if (!confDir.exists()) {
 			if (!confDir.mkdir()) {
-				logger.warn("Could not create configuration in user directory: " + confDir + ", let's try run folder.");
+				logger.warn("Could not create configuration in user directory: "
+						+ confDir + ", let's try run folder.");
 				confDir = new File(".genomeview");
 				if (!confDir.exists()) {
 					if (!confDir.mkdir()) {
-						logger.error("Could not create configuration in runtime directory directory: " + confDir);
+						logger.error(
+								"Could not create configuration in runtime directory directory: "
+										+ confDir);
 						confDir = null;
 					}
 				}
@@ -130,10 +137,12 @@ public class Configuration {
 	private static void load() throws IOException {
 		InputStream is = null;
 		try {
-			is = Configuration.class.getResourceAsStream("/genomeview.properties");
+			is = Configuration.class
+					.getResourceAsStream("/genomeview.properties");
 			gvProperties.load(is);
 		} catch (Exception e1) {
-			logger.warn("genomeview.properties file could not be loaded! GenomeView assumes you are a developer and know why you can ignore this.");
+			logger.warn(
+					"genomeview.properties file could not be loaded! GenomeView assumes you are a developer and know why you can ignore this.");
 
 		} finally {
 			if (is != null)
@@ -146,34 +155,40 @@ public class Configuration {
 		LineIterator it;
 
 		try {
-			it = new LineIterator(Configuration.class.getResourceAsStream("/conf/default.conf"), true, true);
+			it = new LineIterator(Configuration.class
+					.getResourceAsStream("/conf/default.conf"), true, true);
 			for (String line : it) {
 				String key = line.substring(0, line.indexOf('='));
 				String value = line.substring(line.indexOf('=') + 1);
 				defaultMap.put(key.trim(), value.trim());
 
 			}
-			
+
 			it.close();
-			it = new LineIterator(Configuration.class.getResourceAsStream("/conf/resources.conf"), true, true);
+			it = new LineIterator(Configuration.class
+					.getResourceAsStream("/conf/resources.conf"), true, true);
 			for (String line : it) {
 				String key = line.substring(0, line.indexOf('='));
 				String value = line.substring(line.indexOf('=') + 1);
 				resourceMap.put(key.trim(), value.trim());
 			}
 			it.close();
-			
+
 			updateSynonyms();
-			
+
 		} catch (Exception e) {
 			/*
 			 * Do not I18N this message String as the error indicates that the
 			 * folder where it resides is missing.
 			 */
-			CrashHandler.crash("Could not find default configuration file.\n\n\tIf you're encountering this error as a developer, \n"
-					+ "you must make sure that the 'resource' folder is on your classpath.\n"
-					+ "In Eclipse you can easily do this by adding the 'resource' folder as\n" + "a 'source' folder."
-					+ "\n\n\tIf you're seeing this message as a user, \n" + "you're in trouble and you'll need to get in touch with us.\n\n", e);
+			CrashHandler.crash(
+					"Could not find default configuration file.\n\n\tIf you're encountering this error as a developer, \n"
+							+ "you must make sure that the 'resource' folder is on your classpath.\n"
+							+ "In Eclipse you can easily do this by adding the 'resource' folder as\n"
+							+ "a 'source' folder."
+							+ "\n\n\tIf you're seeing this message as a user, \n"
+							+ "you're in trouble and you'll need to get in touch with us.\n\n",
+					e);
 		}
 
 		/* look for local configuration and load it if present */
@@ -182,14 +197,16 @@ public class Configuration {
 		configFile = new File(confDir, "personal.conf.gz");
 		if (!configFile.exists()) {
 			if (!configFile.createNewFile()) {
-				logger.warn("Cannot create your personal configuration file sure GenomeView has write access to you home directory!");
+				logger.warn(
+						"Cannot create your personal configuration file sure GenomeView has write access to you home directory!");
 			}
 		} else if (configFile.length() == 0) {
 			// Empty config file, don't load it.
 			logger.warn("Config file has size zero!");
 		} else {
 			try {
-				it = new LineIterator(new GZIPInputStream(new FileInputStream(configFile)));
+				it = new LineIterator(
+						new GZIPInputStream(new FileInputStream(configFile)));
 				it.setSkipBlanks(true);
 				it.setSkipComments(true);
 				for (String line : it) {
@@ -198,13 +215,16 @@ public class Configuration {
 						String value = line.substring(line.indexOf('=') + 1);
 						localMap.put(key.trim(), value.trim());
 					} else {
-						logger.warn("Invalid line in configuration file! '" + line + "'");
+						logger.warn("Invalid line in configuration file! '"
+								+ line + "'");
 					}
 
 				}
 				it.close();
 			} catch (Exception e) {
-				logger.error("Something went horribly wrong while loading the configuration.", e);
+				logger.error(
+						"Something went horribly wrong while loading the configuration.",
+						e);
 			}
 		}
 		updateSynonyms();
@@ -216,11 +236,12 @@ public class Configuration {
 			/**
 			 * Default synonyms
 			 */
-			logger.info("Updating default synonyms for :" + Arrays.toString(get("synonyms.default").split(",")));
+			logger.info("Updating default synonyms for :"
+					+ Arrays.toString(get("synonyms.default").split(",")));
 			for (String s : get("synonyms.default").split(",")) {
 
 				try {
-					if(s.length()>0)
+					if (s.length() > 0)
 						NameService.addSynonyms(URIFactory.url(s).openStream());
 					else
 						logger.info("Default synonyms URL is empty");
@@ -232,22 +253,25 @@ public class Configuration {
 			/**
 			 * User configured additional synonyms
 			 */
-			logger.info("Updating additional synonyms for :" + Arrays.toString(get("synonyms.additional").split(",")));
+			logger.info("Updating additional synonyms for :"
+					+ Arrays.toString(get("synonyms.additional").split(",")));
 			for (String s : get("synonyms.additional").split(",")) {
 
 				try {
-					if(s.length()>0)
+					if (s.length() > 0)
 						NameService.addSynonyms(URIFactory.url(s).openStream());
 					else
 						logger.info("Additional synonyms URL is empty");
 				} catch (Exception e) {
-					logger.warn("Failed to load additional synonyms for: " + s, e);
+					logger.warn("Failed to load additional synonyms for: " + s,
+							e);
 				}
 
 			}
 
 		} catch (Exception e) {
-			logger.warn("Failed to load additional synonyms for option: " + get("synonyms"), e);
+			logger.warn("Failed to load additional synonyms for option: "
+					+ get("synonyms"), e);
 		}
 	}
 
@@ -376,7 +400,8 @@ public class Configuration {
 		File modules = new File(confDir, "plugin");
 		if (!modules.exists()) {
 			if (!modules.mkdir())
-				logger.warn("Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
+				logger.warn(
+						"Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
 		}
 
 		return modules;
@@ -386,7 +411,8 @@ public class Configuration {
 		File modules = new File(confDir, "session_plugin");
 		if (!modules.exists()) {
 			if (!modules.mkdir())
-				logger.warn("Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
+				logger.warn(
+						"Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
 		}
 
 		return modules;
@@ -441,6 +467,13 @@ public class Configuration {
 		return Double.parseDouble(get(string));
 	}
 
+	/**
+	 * some data keys have a track:weight:[datakey] value. Higher weight means
+	 * further down the visual track list.
+	 * 
+	 * @param dk the {@link DataKey}
+	 * @return the weight of dk.
+	 */
 	public static int getWeight(DataKey dk) {
 		if (get("track:weight:" + dk) == null)
 			return 1000;

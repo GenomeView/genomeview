@@ -53,6 +53,107 @@ public class ShortReadTrack extends Track {
 		render = new srtRender(model, provider, srtc, key);
 	}
 
+	@Override
+	public boolean mouseExited(int x, int y, MouseEvent source) {
+		tooltip.setVisible(false);
+		readinfo.setVisible(false);
+		return false;
+	}
+
+	@Override
+	public boolean mouseClicked(int x, int y, MouseEvent source) {
+		super.mouseClicked(x, y, source);
+		if (source.isConsumed())
+			return true;
+
+		// System.out.println("Click: " + x + " " + y);
+		if (source.getClickCount() > 1) {
+			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render
+					.meta().hitMap.entrySet()) {
+				if (e.getKey().contains(x, y)) {
+					System.out.println("2*Click: " + e.getValue());
+					if (e.getValue().getReadPairedFlag()
+							&& !e.getValue().getMateUnmappedFlag())
+						model.vlm.center(e.getValue().getMateAlignmentStart());
+				}
+			}
+		} else {
+			readinfo.textual();
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean mouseDragged(int x, int y, MouseEvent source) {
+		tooltip.setVisible(false);
+		readinfo.setVisible(false);
+		return false;
+
+	}
+
+	@Override
+	public boolean mouseMoved(int x, int y, MouseEvent source) {
+		if (model.vlm.getAnnotationLocationVisible().length() < Configuration
+				.getInt("geneStructureNucleotideWindow")) {
+			ShortReadInsertion sri = null;
+			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : render
+					.meta().paintedBlocks.entrySet()) {
+				if (e.getKey().contains(x, y)) {
+					sri = e.getValue();
+					break;
+				}
+			}
+
+			if (sri != null) {
+				if (!tooltip.isVisible())
+					tooltip.setVisible(true);
+				tooltip.set(source, sri);
+			} else {
+				if (tooltip.isVisible())
+					tooltip.setVisible(false);
+			}
+			//
+			// System.out.println("Moved: " + x + " " + y);
+			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render
+					.meta().hitMap.entrySet()) {
+				if (e.getKey().contains(x, y)) {
+					// System.out.println("Prijs: " + e.getValue());
+					readinfo.set(source, e.getValue());
+				}
+			}
+			//
+			return false;
+
+		} else {
+			if (tooltip.isVisible())
+				tooltip.setVisible(false);
+		}
+		return false;
+	}
+
+	@Override
+	public int paintTrack(Graphics2D gGlobal, int yOffset, double screenWidth,
+			JViewport view, TrackCommunicationModel tcm) {
+//		Location bufferedLocation = render.location();
+//		Location visible = model.vlm.getVisibleLocation();
+//		int x = 0;
+//		if (bufferedLocation != null)
+//			x = Convert.translateGenomeToScreen(bufferedLocation.start, visible, screenWidth);
+		gGlobal.drawImage(render.buffer(), 0, yOffset, null);
+		return render.buffer().getHeight();
+	}
+
+	private static String rerun(String arg) {
+		StringBuffer out = new StringBuffer();
+		int i = 0;
+		for (; i < arg.length() - 80; i += 80)
+			out.append(arg.substring(i, i + 80) + "<br/>");
+		out.append(arg.substring(i, arg.length()));
+		return out.toString();
+
+	}
+
 	private static class InsertionTooltip extends JWindow {
 
 		private static final long serialVersionUID = -7416732151483650659L;
@@ -199,107 +300,6 @@ public class ShortReadTrack extends Track {
 			j.setVisible(true);
 		}
 
-	}
-
-	private static String rerun(String arg) {
-		StringBuffer out = new StringBuffer();
-		int i = 0;
-		for (; i < arg.length() - 80; i += 80)
-			out.append(arg.substring(i, i + 80) + "<br/>");
-		out.append(arg.substring(i, arg.length()));
-		return out.toString();
-
-	}
-
-	@Override
-	public boolean mouseExited(int x, int y, MouseEvent source) {
-		tooltip.setVisible(false);
-		readinfo.setVisible(false);
-		return false;
-	}
-
-	@Override
-	public boolean mouseClicked(int x, int y, MouseEvent source) {
-		super.mouseClicked(x, y, source);
-		if (source.isConsumed())
-			return true;
-
-		// System.out.println("Click: " + x + " " + y);
-		if (source.getClickCount() > 1) {
-			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render
-					.meta().hitMap.entrySet()) {
-				if (e.getKey().contains(x, y)) {
-					System.out.println("2*Click: " + e.getValue());
-					if (e.getValue().getReadPairedFlag()
-							&& !e.getValue().getMateUnmappedFlag())
-						model.vlm.center(e.getValue().getMateAlignmentStart());
-				}
-			}
-		} else {
-			readinfo.textual();
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean mouseDragged(int x, int y, MouseEvent source) {
-		tooltip.setVisible(false);
-		readinfo.setVisible(false);
-		return false;
-
-	}
-
-	@Override
-	public boolean mouseMoved(int x, int y, MouseEvent source) {
-		if (model.vlm.getAnnotationLocationVisible().length() < Configuration
-				.getInt("geneStructureNucleotideWindow")) {
-			ShortReadInsertion sri = null;
-			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : render
-					.meta().paintedBlocks.entrySet()) {
-				if (e.getKey().contains(x, y)) {
-					sri = e.getValue();
-					break;
-				}
-			}
-
-			if (sri != null) {
-				if (!tooltip.isVisible())
-					tooltip.setVisible(true);
-				tooltip.set(source, sri);
-			} else {
-				if (tooltip.isVisible())
-					tooltip.setVisible(false);
-			}
-			//
-			// System.out.println("Moved: " + x + " " + y);
-			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render
-					.meta().hitMap.entrySet()) {
-				if (e.getKey().contains(x, y)) {
-					// System.out.println("Prijs: " + e.getValue());
-					readinfo.set(source, e.getValue());
-				}
-			}
-			//
-			return false;
-
-		} else {
-			if (tooltip.isVisible())
-				tooltip.setVisible(false);
-		}
-		return false;
-	}
-
-	@Override
-	public int paintTrack(Graphics2D gGlobal, int yOffset, double screenWidth,
-			JViewport view, TrackCommunicationModel tcm) {
-//		Location bufferedLocation = render.location();
-//		Location visible = model.vlm.getVisibleLocation();
-//		int x = 0;
-//		if (bufferedLocation != null)
-//			x = Convert.translateGenomeToScreen(bufferedLocation.start, visible, screenWidth);
-		gGlobal.drawImage(render.buffer(), 0, yOffset, null);
-		return render.buffer().getHeight();
 	}
 
 }
