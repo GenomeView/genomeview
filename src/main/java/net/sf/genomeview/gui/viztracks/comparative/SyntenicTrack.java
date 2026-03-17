@@ -12,8 +12,6 @@ import java.util.HashMap;
 
 import javax.swing.JViewport;
 
-import com.lowagie.text.pdf.GrayColor;
-
 import net.sf.genomeview.core.ColorGradient;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.viztracks.Track;
@@ -81,7 +79,6 @@ public class SyntenicTrack extends Track {
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double width,
 			JViewport view, TrackCommunicationModel tcm) {
-		log.info("painting syntenic track");
 		hitmap.clear();
 
 //		if (!e.getId().equals(ref)) 
@@ -105,11 +102,12 @@ public class SyntenicTrack extends Track {
 			// paint syntenic gradient graph for all available targets
 
 			if (target.equals(reference)) {
-				paintGradient(row, 0d, 1d, refrange, width, g);
+				paintGradient(yOffset, 0d, 1d, refrange, width, g);
 			} else {
 				for (SyntenicBlock d : data.get(reference, target)) {
 					final Location refloc = d.refLocation();
-					paintGradient(row, refrange.fraction(refloc.start),
+					paintGradient(yOffset + row * ROW_HEIGHT + 5,
+							refrange.fraction(refloc.start),
 							refrange.fraction(refloc.end), d.targetLocation(),
 							width, g);
 				}
@@ -190,26 +188,27 @@ public class SyntenicTrack extends Track {
 //
 //				}
 //			}
+
 		return ROW_HEIGHT * row;
 
 	}
 
 	/**
-	 * paint gradient, at row, going from color i to color j inside the given
-	 * range. Only the visible part can actually be painted so this has to be
-	 * clipped appropriately
+	 * paint gradient, at yoffset from the top, going from color sc to color ec
+	 * inside the given range. Only the visible part can actually be painted so
+	 * this has to be clipped appropriately
 	 * 
-	 * @param row   row number
-	 * @param sc    the start color, a number in [0,1] 0 the start and 1 the end
-	 *              color
-	 * @param ec    the endcolor a number in [0,1] 0 the start and 1 the end
-	 *              color
-	 * @param range the genome positions to paint this gradient over.
-	 * @param width the width of the view area. FIXME this should be int??
-	 * @param g     graphics context {@link Graphics2D}
+	 * @param yoffset the y-offset, distance pixels down from the top
+	 * @param sc      the start color, a number in [0,1] 0 the start and 1 the
+	 *                end color
+	 * @param ec      the endcolor a number in [0,1] 0 the start and 1 the end
+	 *                color
+	 * @param range   the genome positions to paint this gradient over.
+	 * @param width   the width of the view area. FIXME this should be int??
+	 * @param g       graphics context {@link Graphics2D}
 	 */
-	private void paintGradient(int row, double sc, double ec, Location range,
-			double width, Graphics2D g) {
+	private void paintGradient(int yoffset, double sc, double ec,
+			Location range, double width, Graphics2D g) {
 		final Location visible = model.vlm.getVisibleLocation();
 		double start = visible.fraction(range.start);
 		if (start > 1.0)
@@ -234,12 +233,15 @@ public class SyntenicTrack extends Track {
 			endColor = sc + (ec - sc) * range.fraction(visible.end);
 		}
 
+		// interpolating between start and end is bad because
+		// it will linearly interpolate in RGB space which goes through
+		// grey instead of "around the color circle".
 		GradientPaint gp = new GradientPaint(barStart, 0,
-				new GrayColor((float) startColor), barEnd, 0,
-				new GrayColor((float) endColor));
+				Color.getHSBColor((float) startColor, 1, 1), barEnd, 0,
+				Color.getHSBColor((float) endColor, 1, 1));
 		g.setPaint(gp);
-		Rectangle r = new Rectangle(barStart, row * ROW_HEIGHT + 5,
-				barEnd - barStart + 1, 10);
+		Rectangle r = new Rectangle(barStart, yoffset, barEnd - barStart + 1,
+				10);
 		g.fill(r);
 	}
 

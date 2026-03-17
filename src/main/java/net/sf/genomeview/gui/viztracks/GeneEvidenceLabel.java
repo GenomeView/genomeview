@@ -53,6 +53,27 @@ public class GeneEvidenceLabel extends JLabel
 
 	private TrackCommunicationModel tcm = new TrackCommunicationModel();
 
+	protected boolean drag = false;
+
+	/**
+	 * Keeps track of how many pixels are already used in the Y direction
+	 */
+	protected int framePixelsUsed = 0;
+
+	protected double screenWidth = 0;
+
+	private TrackMap tracks = new TrackMap();
+
+	private Location pressLoc = null;
+
+	private int pressX;
+
+	private int currentMouseX;
+
+	private Track last = null;
+
+	private JViewport viewport;
+
 	public GeneEvidenceLabel(final Model model) {
 		// super(model);
 		this.model = model;
@@ -120,6 +141,7 @@ public class GeneEvidenceLabel extends JLabel
 	}
 
 	public void paintTracks(Graphics g, JViewport view) {
+		// System.out.println("repaining all tracks");
 		tracks.clear();
 		framePixelsUsed = 0;
 		screenWidth = this.getSize().width + 1;
@@ -155,14 +177,6 @@ public class GeneEvidenceLabel extends JLabel
 			repaint();
 		}
 	}
-
-	protected boolean drag = false;
-
-	/**
-	 * Keeps track of how many pixels are already used in the Y direction
-	 */
-	protected int framePixelsUsed = 0;
-	protected double screenWidth = 0;
 
 	public void setScrollPaneListener(MouseWheelListener scrollPaneListener) {
 		this.scrollPaneListener = scrollPaneListener;
@@ -296,8 +310,6 @@ public class GeneEvidenceLabel extends JLabel
 		}
 	}
 
-	private TrackMap tracks = new TrackMap();
-
 	@Override
 	public void mouseExited(MouseEvent e) {
 		model.mouseModel().setCurrentCoord(-1);
@@ -307,12 +319,6 @@ public class GeneEvidenceLabel extends JLabel
 		/* Specific mouse code for this label */
 
 	}
-
-	private Location pressLoc = null;
-
-	private int pressX;
-
-	private int currentMouseX;
 
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -347,6 +353,7 @@ public class GeneEvidenceLabel extends JLabel
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
+
 		currentMouseX = e.getX();
 		int currentGenomeX = Convert.translateScreenToGenome(currentMouseX,
 				model.vlm.getAnnotationLocationVisible(), screenWidth);
@@ -418,10 +425,6 @@ public class GeneEvidenceLabel extends JLabel
 
 	}
 
-	private Track last = null;
-
-	private JViewport viewport;
-
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		currentMouseX = e.getX();
@@ -440,18 +443,24 @@ public class GeneEvidenceLabel extends JLabel
 
 		boolean consumed = false;
 		if (mouseTrack != null) {
+
 			if (last != mouseTrack) {
 				mouseTrack.mouseEntered(e.getX(), e.getY(), e);
 			}
-			consumed = mouseTrack.mouseMoved(e.getX(), e.getY(), e);
+			// this is called way too often. #80. Disabled for now....
+			// consumed = mouseTrack.mouseMoved(e.getX(), e.getY(), e);
 			if (!(mouseTrack instanceof StructureTrack))
 				model.getGUIManager().getMainWindow().setCursor(
 						Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
+
 		if (consumed)
 			return;
+		// DANGER if user is just moving mouse pointer, this results
+		// in excess repaint events. This must be done differently.
+		// Not just repaint the entire area?
 		/* Specific mouse code for this label */
-		repaint();
+		// repaint();
 	}
 
 	@Override
