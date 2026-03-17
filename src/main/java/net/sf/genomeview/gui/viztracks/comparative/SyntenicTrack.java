@@ -32,6 +32,8 @@ import net.sf.jannot.parser.SyntenicParser;
 public class SyntenicTrack extends Track {
 	private static final int ROW_HEIGHT = 25;
 
+	private static final float STEPS = 8;
+
 	/**
 	 * hitmap : key=a painted Rectangle and value=matching SyntenicBlock. Used
 	 * to select when user clicks on it.
@@ -100,14 +102,14 @@ public class SyntenicTrack extends Track {
 			// paint syntenic gradient graph for all available targets
 
 			if (target.equals(reference)) {
-				paintGradient(yOffset, 0d, 1d, refrange, width, g);
+				paintGradient(yOffset, 0f, 1f, refrange, (float) width, g);
 			} else {
 				for (SyntenicBlock d : data.get(reference, target)) {
 					final Location refloc = d.refLocation();
 					paintGradient(yOffset + row * ROW_HEIGHT + 5,
-							refrange.fraction(refloc.start),
-							refrange.fraction(refloc.end), d.targetLocation(),
-							width, g);
+							(float) refrange.fraction(refloc.start),
+							(float) refrange.fraction(refloc.end),
+							d.targetLocation(), (float) width, g);
 				}
 
 			}
@@ -205,38 +207,56 @@ public class SyntenicTrack extends Track {
 	 * @param width   the width of the view area. FIXME this should be int??
 	 * @param g       graphics context {@link Graphics2D}
 	 */
-	private void paintGradient(int yoffset, double sc, double ec,
-			Location range, double width, Graphics2D g) {
+	private void paintGradient(int yoffset, float sc, float ec, Location range,
+			float width, Graphics2D g) {
 		final Location visible = model.vlm.getVisibleLocation();
-		double start = visible.fraction(range.start);
+		float start = (float) visible.fraction(range.start);
 		if (start > 1.0)
 			return; // entirely outside visible
-		double end = visible.fraction(range.end);
+		float end = (float) visible.fraction(range.end);
 		if (end < 0.0)
 			return; // entirely outside visible
 		int barStart, barEnd;
-		double startColor, endColor;
+		float startColor, endColor;
 		if (start >= 0.0) { // in visible range
 			barStart = (int) (width * start);
 			startColor = sc;
 		} else {
 			barStart = 0;
-			startColor = sc + (ec - sc) * range.fraction(visible.start);
+			startColor = (float) (sc
+					+ (ec - sc) * range.fraction(visible.start));
 		}
 		if (end <= 1.0) {
 			barEnd = (int) (width * end);
 			endColor = ec;
 		} else {
 			barEnd = (int) width;
-			endColor = sc + (ec - sc) * range.fraction(visible.end);
+			endColor = (float) (sc + (ec - sc) * range.fraction(visible.end));
 		}
 
 		// interpolating between start and end is bad because
 		// it will linearly interpolate in RGB space which goes through
 		// grey instead of "around the color circle".
+		// to get around this
+		float delta = (barEnd - barStart) / STEPS;
+		float dcol = (float) (endColor - startColor) / STEPS;
+
+		if (dcol < 0.01 | delta < 4) {
+			paintPiece(yoffset, g, barStart, barEnd, startColor, endColor);
+		} else {
+			for (int n = 0; n < STEPS; n++) {
+				paintPiece(yoffset, g, (int) (barStart + n * delta),
+						(int) (barStart + (n + 1) * delta),
+						startColor + n * dcol, startColor + (n + 1) * dcol);
+			}
+		}
+	}
+
+	private void paintPiece(int yoffset, Graphics2D g, int barStart, int barEnd,
+			float startColor, float endColor) {
 		GradientPaint gp = new GradientPaint(barStart, 0,
-				ColorGradient1.DEFAULT.get((float) startColor), barEnd, 0,
-				ColorGradient1.DEFAULT.get((float) endColor));
+				ColorGradient1.DEFAULT.get(startColor), barEnd, 0,
+				ColorGradient1.DEFAULT.get(endColor));
 		g.setPaint(gp);
 		Rectangle r = new Rectangle(barStart, yoffset, barEnd - barStart + 1,
 				10);

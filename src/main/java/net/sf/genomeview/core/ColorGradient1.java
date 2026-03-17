@@ -15,8 +15,9 @@ import java.util.List;
  */
 public class ColorGradient1 {
 
-	public static ColorGradient1 DEFAULT = new ColorGradient1(
-			Arrays.asList(Color.red, Color.yellow, Color.green, Color.blue));
+	public final static ColorGradient1 DEFAULT = new ColorGradient1(
+			Arrays.asList(Color.red, Color.yellow, Color.green, Color.blue,
+					Color.black));
 
 	private List<Color> colors = new ArrayList<>();
 
@@ -50,9 +51,17 @@ public class ColorGradient1 {
 		return interpolate(colors.get(i), colors.get(i + 1), frac);
 	}
 
+	/**
+	 * 
+	 * @param cA   color A
+	 * @param cB   color B
+	 * @param frac the fraction from cA to cB.
+	 * @return color at frac above cA to cB. 0.1 means 0.1 above cA, so 0.9cA +
+	 *         0.1 cB
+	 */
 	private Color interpolate(Color cA, Color cB, float frac) {
-		float a = frac;
-		float b = 1f - a;
+		float b = frac;
+		float a = 1f - b;
 		a = a / 255;
 		b = b / 255;
 		return new Color(a * cA.getRed() + b * cB.getRed(),
