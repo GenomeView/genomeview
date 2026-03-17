@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 import javax.swing.JViewport;
 
-import net.sf.genomeview.core.ColorGradient;
+import net.sf.genomeview.core.ColorGradient1;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
@@ -30,8 +30,6 @@ import net.sf.jannot.parser.SyntenicParser;
  * 
  */
 public class SyntenicTrack extends Track {
-	private static final int colors = 512;
-	private static final ColorGradient gradient = makeGradient();
 	private static final int ROW_HEIGHT = 25;
 
 	/**
@@ -237,8 +235,8 @@ public class SyntenicTrack extends Track {
 		// it will linearly interpolate in RGB space which goes through
 		// grey instead of "around the color circle".
 		GradientPaint gp = new GradientPaint(barStart, 0,
-				Color.getHSBColor((float) startColor, 1, 1), barEnd, 0,
-				Color.getHSBColor((float) endColor, 1, 1));
+				ColorGradient1.DEFAULT.get((float) startColor), barEnd, 0,
+				ColorGradient1.DEFAULT.get((float) endColor));
 		g.setPaint(gp);
 		Rectangle r = new Rectangle(barStart, yoffset, barEnd - barStart + 1,
 				10);
@@ -260,16 +258,6 @@ public class SyntenicTrack extends Track {
 			}
 		}
 		return null;
-	}
-
-	private static ColorGradient makeGradient() {
-		ColorGradient gradient = new ColorGradient();
-		gradient.addPoint(Color.red);
-		gradient.addPoint(Color.yellow);
-		gradient.addPoint(Color.green);
-		gradient.addPoint(Color.blue);
-		gradient.createGradient(colors);
-		return gradient;
 	}
 
 }
