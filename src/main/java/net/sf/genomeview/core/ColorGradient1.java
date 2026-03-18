@@ -16,8 +16,8 @@ import java.util.List;
 public class ColorGradient1 {
 
 	public final static ColorGradient1 DEFAULT = new ColorGradient1(
-			Arrays.asList(Color.red, Color.yellow, Color.green, Color.blue,
-					Color.black));
+			Arrays.asList(Color.red, Color.black, Color.yellow, Color.blue,
+					Color.green, Color.pink, Color.cyan));
 
 	private List<Color> colors = new ArrayList<>();
 

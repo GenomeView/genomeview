@@ -32,7 +32,8 @@ import net.sf.jannot.parser.SyntenicParser;
 public class SyntenicTrack extends Track {
 	private static final int ROW_HEIGHT = 25;
 
-	private static final float STEPS = 8;
+	// #paint steps for gradients
+	private static final float PAINT_STEPS = 8;
 
 	/**
 	 * hitmap : key=a painted Rectangle and value=matching SyntenicBlock. Used
@@ -119,75 +120,6 @@ public class SyntenicTrack extends Track {
 
 			row++;
 		}
-//
-//
-//				/* Reference color scheme in 20 steps */
-//				for (int i = 0; i <= 20; i++) {
-//					final int start = visible.start()
-//							+ (int) (length / 20.0 * i);
-//					int end = visible.start() + (int) (length / 20.0 * (i + 1));
-//					Color startColor = gradient
-//							.getColor((int) (start / colorBlockLength));
-//					Color endColor = gradient
-//							.getColor((int) (end / colorBlockLength));
-//					int screenStart = Convert.translateGenomeToScreen(start,
-//							visible, width);
-//					int screenEnd = Convert.translateGenomeToScreen(end,
-//							visible, width);
-//
-//					GradientPaint gp = new GradientPaint(screenStart, 0,
-//							startColor, screenEnd, 0, endColor);
-//					g.setPaint(gp);
-//					g.fillRect(screenStart, yOffset + 15,
-//							screenEnd - screenStart + 1, 10);
-//
-//				}
-//
-//			} else {
-//				for (SyntenicBlock sb : data.get(reference, target)) {
-//
-//					Location targetLoc = sb.targetLocation();
-//					Location refLoc = sb.refLocation();
-//					if (refLoc.overlaps(visible.start, visible.end)) {
-//
-//						try {
-//							// Color startColor = gradient.getColor((int)
-//							// (refLoc.start() / colorBlockLength));
-//							// Color endColor = gradient.getColor((int)
-//							// (refLoc.end() / colorBlockLength));
-//							//
-//							// int screenStart =
-//							// Convert.translateGenomeToScreen(targetLoc.start(),
-//							// model.getAnnotationLocationVisible(), width);
-//							// int screenEnd =
-//							// Convert.translateGenomeToScreen(targetLoc.end(),
-//							// model.getAnnotationLocationVisible(), width);
-//							Color startColor = gradient
-//									.getColor((int) (targetLoc.start()
-//											/ colorBlockLength));
-//							Color endColor = gradient.getColor(
-//									(int) (targetLoc.end() / colorBlockLength));
-//
-//							int screenStart = Convert.translateGenomeToScreen(
-//									refLoc.start(), visible, width);
-//							int screenEnd = Convert.translateGenomeToScreen(
-//									refLoc.end(), visible, width);
-//							GradientPaint gp = new GradientPaint(screenStart, 0,
-//									startColor, screenEnd, 0, endColor);
-//							g.setPaint(gp);
-//							Rectangle r = new Rectangle(screenStart,
-//									yOffset + 15, screenEnd - screenStart + 1,
-//									10);
-//							g.fill(r);
-//							r.translate(0, -yOffset);
-//							hitmap.put(r, sb);
-//						} catch (Exception x) {
-//							log.error("syntenic paint error at " + refLoc, x);
-//						}
-//					}
-//
-//				}
-//			}
 
 		return ROW_HEIGHT * row;
 
@@ -234,17 +166,20 @@ public class SyntenicTrack extends Track {
 			endColor = (float) (sc + (ec - sc) * range.fraction(visible.end));
 		}
 
-		// interpolating between start and end is bad because
-		// it will linearly interpolate in RGB space which goes through
-		// grey instead of "around the color circle".
-		// to get around this
-		float delta = (barEnd - barStart) / STEPS;
-		float dcol = (float) (endColor - startColor) / STEPS;
+		float delta = (barEnd - barStart) / PAINT_STEPS;
+		float dcol = (float) (endColor - startColor) / PAINT_STEPS;
 
 		if (dcol < 0.01 | delta < 4) {
 			paintPiece(yoffset, g, barStart, barEnd, startColor, endColor);
 		} else {
-			for (int n = 0; n < STEPS; n++) {
+			/*
+			 * interpolating between start and end is bad if color distance is
+			 * large, because it will skip our inbetween colors. To get around
+			 * this we make a number of smaller steps so that we can compute the
+			 * proper intermediate colors. A better solution would be a better
+			 * GradientPaint class but that's beyond the current scope
+			 */
+			for (int n = 0; n < PAINT_STEPS; n++) {
 				paintPiece(yoffset, g, (int) (barStart + n * delta),
 						(int) (barStart + (n + 1) * delta),
 						startColor + n * dcol, startColor + (n + 1) * dcol);
