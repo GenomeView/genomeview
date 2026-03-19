@@ -95,7 +95,6 @@ public class SyntenicTrack extends Track {
 //				/ colors;
 		// the syntenic data may be shorter than the entire genome
 		final Location visible = model.vlm.getVisibleLocation();
-		final int length = visible.length();
 		final Location refrange = data.getRange(reference);
 
 		int row = 0;
@@ -107,9 +106,17 @@ public class SyntenicTrack extends Track {
 			} else {
 				for (SyntenicBlock d : data.get(reference, target)) {
 					final Location refloc = d.refLocation();
-					paintGradient(yOffset + row * ROW_HEIGHT + 5,
-							(float) refrange.fraction(refloc.start),
-							(float) refrange.fraction(refloc.end),
+					float startf = (float) refrange.fraction(refloc.start);
+					float endf = (float) refrange.fraction(refloc.end);
+					if (!d.getRefStrand().equals(d.getTargetStrand())) {
+						// direction is reversed or unknown. Swap the srart, end
+						// colors
+						float tmp = startf;
+						startf = endf;
+						endf = tmp;
+					}
+
+					paintGradient(yOffset + row * ROW_HEIGHT + 5, startf, endf,
 							d.targetLocation(), (float) width, g);
 				}
 
