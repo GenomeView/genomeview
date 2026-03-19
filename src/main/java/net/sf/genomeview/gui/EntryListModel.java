@@ -20,13 +20,15 @@ import be.abeel.util.NaturalOrderComparator;
 import net.sf.genomeview.data.DummyEntry;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Entry;
+import net.sf.jannot.EntrySet;
 
 /**
+ * A list model (MVC) for the keys in the {@link EntrySet} of {@link Model}
  * 
  * @author Thomas Abeel
  * 
  */
-final class EntryListModel implements Observer, ComboBoxModel {
+final class EntryListModel implements Observer, ComboBoxModel<Entry> {
 
 	private Model model;
 
@@ -42,7 +44,7 @@ final class EntryListModel implements Observer, ComboBoxModel {
 	private List<Entry> tmpList = new ArrayList<Entry>();
 
 	@Override
-	public Object getElementAt(int i) {
+	public Entry getElementAt(int i) {
 		if (tmpList.size() == 0 || i >= tmpList.size())
 			return DummyEntry.dummy;
 		else
@@ -84,6 +86,8 @@ final class EntryListModel implements Observer, ComboBoxModel {
 			for (Entry e : model.entries()) {
 				tmp.add(e);
 			}
+			// CHECK why sort again, the entries are already as it's a
+			// ConcurrentSkipListSet
 			Collections.sort(tmp, new EntryComparator());
 			tmpList = tmp;
 			ListDataEvent le = new ListDataEvent(this,
