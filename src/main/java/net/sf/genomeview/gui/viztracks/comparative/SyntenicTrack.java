@@ -30,7 +30,7 @@ import net.sf.jannot.parser.SyntenicParser;
  * 
  */
 public class SyntenicTrack extends Track {
-	private static final int ROW_HEIGHT = 25;
+	private static final int ROW_HEIGHT = 15;
 
 	// #paint steps for gradients
 	private static final float PAINT_STEPS = 8;
@@ -94,10 +94,9 @@ public class SyntenicTrack extends Track {
 //		final double colorBlockLength = (data.getLength(reference) + 1.0)
 //				/ colors;
 		// the syntenic data may be shorter than the entire genome
-		final Location visible = model.vlm.getVisibleLocation();
 		final Location refrange = data.getRange(reference);
 
-		int row = 0;
+		int row = 1; // row number excluding the reference row at top
 		for (String target : data.getReferences()) {
 			// paint syntenic gradient graph for all available targets
 
@@ -116,16 +115,15 @@ public class SyntenicTrack extends Track {
 						endf = tmp;
 					}
 
-					paintGradient(yOffset + row * ROW_HEIGHT + 5, startf, endf,
+					paintGradient(yOffset + row * ROW_HEIGHT, startf, endf,
 							d.targetLocation(), (float) width, g);
+					g.setColor(Color.black);
+					g.drawString(target, 10, yOffset + 5 + row * ROW_HEIGHT);
 				}
+				row++;
 
 			}
 
-			g.setColor(Color.black);
-			g.drawString(target, 10, yOffset + 13 + row * ROW_HEIGHT);
-
-			row++;
 		}
 
 		return ROW_HEIGHT * row;
