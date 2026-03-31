@@ -30,6 +30,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
+import org.apache.commons.io.FileExistsException;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.abeel.io.ExtensionManager;
+import be.abeel.net.URIFactory;
 import net.miginfocom.swing.MigLayout;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.ClientHttpUpload;
@@ -42,13 +49,7 @@ import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.parser.EMBLParser;
 import net.sf.jannot.parser.GFF3Parser;
 import net.sf.jannot.parser.Parser;
-
-import org.apache.commons.io.FileExistsException;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import be.abeel.io.ExtensionManager;
-import be.abeel.net.URIFactory;
+import net.sf.jannot.parser.ParserFactory;
 
 /**
  * 
@@ -57,13 +58,16 @@ import be.abeel.net.URIFactory;
  */
 public class SaveDialog extends JDialog {
 
-	private static final Logger log = LoggerFactory.getLogger(SaveDialog.class.getCanonicalName());
+	private static final Logger log = LoggerFactory
+			.getLogger(SaveDialog.class.getCanonicalName());
 
 	private static final long serialVersionUID = -5209291628487502687L;
 
 	private String file(Model model) {
-		JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
-		int returnVal = chooser.showSaveDialog(model.getGUIManager().getMainWindow());
+		JFileChooser chooser = new JFileChooser(
+				Configuration.getFile("lastDirectory"));
+		int returnVal = chooser
+				.showSaveDialog(model.getGUIManager().getMainWindow());
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File files = chooser.getSelectedFile();
 			return files.toString();
@@ -77,9 +81,9 @@ public class SaveDialog extends JDialog {
 		private static final long serialVersionUID = -5487911457275295620L;
 
 		private class TCheckBox extends JCheckBox {
-			
+
 			private static final long serialVersionUID = -5606344815979542381L;
-			
+
 			private T data;
 
 			public TCheckBox(T e) {
@@ -112,9 +116,9 @@ public class SaveDialog extends JDialog {
 			}
 			return out;
 		}
-		
-		public void selectAllItems(boolean select){
-			for (TCheckBox item : dss){
+
+		public void selectAllItems(boolean select) {
+			for (TCheckBox item : dss) {
 				item.setSelected(select);
 			}
 		}
@@ -127,17 +131,20 @@ public class SaveDialog extends JDialog {
 	}
 
 	public SaveDialog(final Model model) {
-		super(model.getGUIManager().getMainWindow(), MessageManager.getString("savedialog.title"), true);
+		super(model.getGUIManager().getMainWindow(),
+				MessageManager.getString("savedialog.title"), true);
 		setLayout(new MigLayout("wrap 2"));
 
 		/*
 		 * Save location
 		 */
-		addSeparator(MessageManager.getString("savedialog.location_to_save_to"));
+		addSeparator(
+				MessageManager.getString("savedialog.location_to_save_to"));
 		final JTextField locationField = new JTextField();
 		add(locationField, "growx");
 
-		JButton browseButton = new JButton(MessageManager.getString("savedialog.browse"));
+		JButton browseButton = new JButton(
+				MessageManager.getString("savedialog.browse"));
 		browseButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -166,9 +173,10 @@ public class SaveDialog extends JDialog {
 		/*
 		 * Parser selection
 		 */
-		addSeparator(MessageManager.getString("savedialog.file_format_options"));
+		addSeparator(
+				MessageManager.getString("savedialog.file_format_options"));
 		Parser defaultParser = Configuration.getParser("save:defaultParser");
-		Parser[] arr = new Parser[] { Parser.GFF3, Parser.EMBL };
+		Parser[] arr = new Parser[] { ParserFactory.GFF3, ParserFactory.EMBL };
 
 		final JComboBox parserList = new JComboBox(arr);
 		if (defaultParser != null) {
@@ -176,60 +184,64 @@ public class SaveDialog extends JDialog {
 			parserList.setEnabled(false);
 		}
 		add(parserList);
-		
 
 		/*
 		 * Include sequence
 		 */
-		final boolean enableIncludeSequenceFlag = Configuration.getBoolean("save:enableIncludeSequence");
+		final boolean enableIncludeSequenceFlag = Configuration
+				.getBoolean("save:enableIncludeSequence");
 		final JCheckBox includeSequence = new JCheckBox("Include sequence");
 		includeSequence.setEnabled(enableIncludeSequenceFlag);
 		add(includeSequence);
-		
-		Parser p = (Parser)parserList.getSelectedItem();
-		if (p instanceof GFF3Parser){
-			includeSequence.setEnabled(false);					
+
+		Parser p = (Parser) parserList.getSelectedItem();
+		if (p instanceof GFF3Parser) {
+			includeSequence.setEnabled(false);
 		}
-		parserList.addActionListener(new ActionListener() {	
+		parserList.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Parser p = (Parser)parserList.getSelectedItem();
-				if (p instanceof GFF3Parser){
-					includeSequence.setEnabled(false);					
+				Parser p = (Parser) parserList.getSelectedItem();
+				if (p instanceof GFF3Parser) {
+					includeSequence.setEnabled(false);
 				} else {
-					includeSequence.setEnabled(true);					
+					includeSequence.setEnabled(true);
 				}
 			}
 		});
 
 		/* Entries list */
-		addSeparator(MessageManager.getString("savedialog.select_entries_to_save"));
-		boolean entrySelectionEnabledFlag = Configuration.getBoolean("save:enableEntrySelection");
-		final MultiSelectionArray<Entry> entriesList = new MultiSelectionArray<Entry>(model.entries(),entrySelectionEnabledFlag);
+		addSeparator(
+				MessageManager.getString("savedialog.select_entries_to_save"));
+		boolean entrySelectionEnabledFlag = Configuration
+				.getBoolean("save:enableEntrySelection");
+		final MultiSelectionArray<Entry> entriesList = new MultiSelectionArray<Entry>(
+				model.entries(), entrySelectionEnabledFlag);
 		add(new JScrollPane(entriesList), "growx,growy,span 1 2");
 
-		JButton selectAllEntries = new JButton(MessageManager.getString("savedialog.select_all_entries"));
+		JButton selectAllEntries = new JButton(
+				MessageManager.getString("savedialog.select_all_entries"));
 		add(selectAllEntries);
 
-		
-		selectAllEntries.addActionListener(new ActionListener(){
+		selectAllEntries.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				entriesList.selectAllItems(true);				
+				entriesList.selectAllItems(true);
 			}
-			
+
 		});
-		
-		JButton selectNoneEntries = new JButton(MessageManager.getString("savedialog.deselect_all_entries"));
+
+		JButton selectNoneEntries = new JButton(
+				MessageManager.getString("savedialog.deselect_all_entries"));
 		add(selectNoneEntries);
 		selectNoneEntries.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				entriesList.selectAllItems(false);
-				
+
 			}
 		});
-	
+
 		entriesList.setEnabled(entrySelectionEnabledFlag);
 		selectAllEntries.setEnabled(entrySelectionEnabledFlag);
 		selectNoneEntries.setEnabled(entrySelectionEnabledFlag);
@@ -237,37 +249,40 @@ public class SaveDialog extends JDialog {
 		 * Type selection
 		 */
 		addSeparator(MessageManager.getString("savedialog.annotation_types"));
-		boolean typeSelectionEnabledFlag = Configuration.getBoolean("save:enableTypeSelection");
-		final MultiSelectionArray<net.sf.jannot.Type> typesList = new MultiSelectionArray<net.sf.jannot.Type>(Arrays.asList(net.sf.jannot.Type.values()),typeSelectionEnabledFlag);
+		boolean typeSelectionEnabledFlag = Configuration
+				.getBoolean("save:enableTypeSelection");
+		final MultiSelectionArray<net.sf.jannot.Type> typesList = new MultiSelectionArray<net.sf.jannot.Type>(
+				Arrays.asList(net.sf.jannot.Type.values()),
+				typeSelectionEnabledFlag);
 		add(new JScrollPane(typesList), "growx,growy,span 1 2");
 
-		JButton selectAllTypes = new JButton(MessageManager.getString("savedialog.select_all_types"));
+		JButton selectAllTypes = new JButton(
+				MessageManager.getString("savedialog.select_all_types"));
 		add(selectAllTypes);
 
-		JButton selectNoneTypes = new JButton(MessageManager.getString("savedialog.deselect_all_types"));
+		JButton selectNoneTypes = new JButton(
+				MessageManager.getString("savedialog.deselect_all_types"));
 		add(selectNoneTypes);
 
-		
 		typesList.setEnabled(typeSelectionEnabledFlag);
 		selectAllTypes.setEnabled(typeSelectionEnabledFlag);
 		selectNoneTypes.setEnabled(typeSelectionEnabledFlag);
-		
-		
+
 		selectAllTypes.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				typesList.selectAllItems(true);
-				
+
 			}
 		});
 		selectNoneTypes.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				typesList.selectAllItems(false);
-				
+
 			}
 		});
-		
+
 		/*
 		 * Actions
 		 */
@@ -282,24 +297,28 @@ public class SaveDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				model.messageModel().setStatusBarMessage(MessageManager.getString("savedialog.saving_data"));
+				model.messageModel().setStatusBarMessage(
+						MessageManager.getString("savedialog.saving_data"));
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						try {
 
-							Collection<net.sf.jannot.Type> selectedTypes = Arrays.asList(net.sf.jannot.Type.values());
+							Collection<net.sf.jannot.Type> selectedTypes = Arrays
+									.asList(net.sf.jannot.Type.values());
 							if (typesList.selectedItems().size() > 0)
 								selectedTypes = typesList.selectedItems();
 
-							Parser parser = (Parser) parserList.getSelectedItem();
+							Parser parser = (Parser) parserList
+									.getSelectedItem();
 							if (parser instanceof EMBLParser) {
 								((EMBLParser) parser).storeSequence = false;
-								if (enableIncludeSequenceFlag && includeSequence.isSelected())
+								if (enableIncludeSequenceFlag
+										&& includeSequence.isSelected())
 									((EMBLParser) parser).storeSequence = true;
 
 							}
-							
+
 							File tmp = File.createTempFile("GV_", ".save");
 							tmp.deleteOnExit();
 
@@ -307,73 +326,107 @@ public class SaveDialog extends JDialog {
 
 							for (Entry e : entriesList.selectedItems()) {
 								System.out.println(selectedTypes);
-								parser.write(fos, e, selectedTypes.toArray(new net.sf.jannot.Type[0]));
+								parser.write(fos, e, selectedTypes
+										.toArray(new net.sf.jannot.Type[0]));
 							}
 							fos.close();
 							setVisible(false);
 							String location = locationField.getText().trim();
-							if (location.startsWith("http://") || location.startsWith("https://")) {
+							if (location.startsWith("http://")
+									|| location.startsWith("https://")) {
 								try {
 									URL url = URIFactory.url(location);
-									System.out.println(url.getProtocol() + "://" + url.getHost() + ":" + url.getPort() + url.getPath());
-									url = URIFactory.url(url.getProtocol() + "://" + url.getHost() + ":" + url.getPort() + url.getPath());
+									System.out.println(url.getProtocol() + "://"
+											+ url.getHost() + ":"
+											+ url.getPort() + url.getPath());
+									url = URIFactory.url(url.getProtocol()
+											+ "://" + url.getHost() + ":"
+											+ url.getPort() + url.getPath());
 
-									log.info("File size and location: " + tmp.length() + "\t" + tmp.getCanonicalPath());
+									log.info("File size and location: "
+											+ tmp.length() + "\t"
+											+ tmp.getCanonicalPath());
 
-									String reply = ClientHttpUpload.upload(tmp, url);
+									String reply = ClientHttpUpload.upload(tmp,
+											url);
 
 									if (reply.equals("")) {
-										showServerMessage(MessageManager.getString("savedialog.empty_reply_server"));
+										showServerMessage(
+												MessageManager.getString(
+														"savedialog.empty_reply_server"));
 //										throw new SaveFailedException();
-									}else if (reply.toLowerCase().contains("error")) {
+									} else if (reply.toLowerCase()
+											.contains("error")) {
 										showServerMessage(reply);
 //										throw new SaveFailedException(MessageManager.getString("savedialog.save_failed"));
 
-									}else {
+									} else {
 										showServerMessage(reply);
 									}
 
 								} catch (IOException ex) {
 
 									ex.printStackTrace();
-									throw new SaveFailedException("IOException");
+									throw new SaveFailedException(
+											"IOException");
 								}
 							} else {
-								if ((location==null) || (location.trim().length()==0)){
-									JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), 
-												MessageManager.getString("savedialog.provided_path_emtpy"),
-												MessageManager.getString("savedialog.save_failed"),
-												JOptionPane.ERROR_MESSAGE);
-								}else{
+								if ((location == null)
+										|| (location.trim().length() == 0)) {
+									JOptionPane.showMessageDialog(
+											model.getGUIManager()
+													.getMainWindow(),
+											MessageManager.getString(
+													"savedialog.provided_path_emtpy"),
+											MessageManager.getString(
+													"savedialog.save_failed"),
+											JOptionPane.ERROR_MESSAGE);
+								} else {
 									File out = new File(location);
 									if (parser instanceof GFF3Parser)
-										out = ExtensionManager.extension(out, "gff");
-	
+										out = ExtensionManager.extension(out,
+												"gff");
+
 									if (parser instanceof EMBLParser)
-										out = ExtensionManager.extension(out, "embl");
-	
+										out = ExtensionManager.extension(out,
+												"embl");
+
 									boolean tryToSave = true;
-									while (tryToSave){
+									while (tryToSave) {
 										try {
 											FileUtils.moveFile(tmp, out);
-											JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("savedialog.save_succeeded"));
+											JOptionPane.showMessageDialog(
+													model.getGUIManager()
+															.getMainWindow(),
+													MessageManager.getString(
+															"savedialog.save_succeeded"));
 											tryToSave = false;
-										} catch (FileExistsException fee){
+										} catch (FileExistsException fee) {
 											fee.printStackTrace();
-											int answer = JOptionPane.showOptionDialog(model.getGUIManager().getMainWindow(),
-													MessageManager.getString("savedialog.file_exists"),
-													MessageManager.getString("savedialog.file_exists_title"),
-													JOptionPane.YES_NO_OPTION, 
-													JOptionPane.QUESTION_MESSAGE,
-													null, 
-													null, null);
-											if (answer==JOptionPane.YES_OPTION){
+											int answer = JOptionPane
+													.showOptionDialog(model
+															.getGUIManager()
+															.getMainWindow(),
+															MessageManager
+																	.getString(
+																			"savedialog.file_exists"),
+															MessageManager
+																	.getString(
+																			"savedialog.file_exists_title"),
+															JOptionPane.YES_NO_OPTION,
+															JOptionPane.QUESTION_MESSAGE,
+															null, null, null);
+											if (answer == JOptionPane.YES_OPTION) {
 												out.delete();
 											} else {
 												tryToSave = false;
 											}
 										} catch (IOException e) {
-											JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("savedialog.save_failed"));
+											JOptionPane.showMessageDialog(
+													model.getGUIManager()
+															.getMainWindow(),
+													MessageManager.getString(
+															"savedialog.save_failed"));
 											tryToSave = false;
 											e.printStackTrace();
 										}
@@ -389,24 +442,29 @@ public class SaveDialog extends JDialog {
 					}
 
 					private void showServerMessage(String reply) {
-						final JDialog diag = new JDialog(model.getGUIManager().getMainWindow());
+						final JDialog diag = new JDialog(
+								model.getGUIManager().getMainWindow());
 						JEditorPaneLabel txt = new JEditorPaneLabel();
 						txt.setEditable(false);
 						txt.setText(reply);
 						txt.setPreferredSize(new Dimension(300, 200));
 						diag.setTitle("Server reply");
 						diag.getContentPane().setLayout(new BorderLayout());
-						diag.getContentPane().add(new JScrollPane(txt), BorderLayout.CENTER);
-						diag.getContentPane().add(new JButton(new AbstractAction(MessageManager.getString("button.ok")) {
+						diag.getContentPane().add(new JScrollPane(txt),
+								BorderLayout.CENTER);
+						diag.getContentPane()
+								.add(new JButton(new AbstractAction(
+										MessageManager.getString("button.ok")) {
 
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								diag.dispose();
-							}
+									@Override
+									public void actionPerformed(ActionEvent e) {
+										diag.dispose();
+									}
 
-						}), BorderLayout.SOUTH);
+								}), BorderLayout.SOUTH);
 						diag.pack();
-						StaticUtils.center(model.getGUIManager().getMainWindow(), diag);
+						StaticUtils.center(
+								model.getGUIManager().getMainWindow(), diag);
 						diag.setVisible(true);
 
 					}
@@ -430,6 +488,5 @@ public class SaveDialog extends JDialog {
 		StaticUtils.center(model.getGUIManager().getMainWindow(), this);
 		setVisible(true);
 	}
-	
-	
+
 }

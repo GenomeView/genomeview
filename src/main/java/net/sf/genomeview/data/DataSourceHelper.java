@@ -29,6 +29,7 @@ import net.sf.jannot.ConvertWig2TDF;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.mafix.MafixFactory;
 import net.sf.jannot.parser.Parser;
+import net.sf.jannot.parser.ParserFactory;
 import net.sf.jannot.source.AbstractStreamDataSource;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
@@ -433,8 +434,8 @@ public class DataSourceHelper {
 				MessageManager
 						.getString("datasourcehelper.couldnt_detect_file"),
 				MessageManager.getString("datasourcehelper.parser_detection"),
-				JOptionPane.QUESTION_MESSAGE, null, Parser.parsers(l),
-				Parser.parsers(l)[0]);
+				JOptionPane.QUESTION_MESSAGE, null, ParserFactory.parsers(l),
+				ParserFactory.parsers(l)[0]);
 		return p;
 	}
 }
