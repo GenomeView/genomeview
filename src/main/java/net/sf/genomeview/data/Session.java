@@ -12,11 +12,9 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
@@ -34,22 +32,29 @@ import net.sf.nameservice.NameService;
  * 
  * @author Thomas Abeel
  * 
+ *         FIXME another singleton- apparent utility class.
  */
 public class Session {
 
+//	private static Logger log = LoggerFactory
+//			.getLogger(Session.class.getCanonicalName());
+
+	/**
+	 * 
+	 * @param model
+	 * @param in
+	 * @return
+	 * @throws IOException
+	 */
 	public static Thread loadSession(Model model, String in)
 			throws IOException {
-		log.debug("Loading session from String: " + in);
+		model.getLog().log(Level.INFO, "Loading session from String: " + in);
 		if (in.startsWith("http://") || in.startsWith("https://")) {
 			try {
 				return loadSession(model, URIFactory.url(in));
-			} catch (MalformedURLException e) {
-				CrashHandler.showErrorMessage("Failed to load from URL: " + in,
-						e);
-				return null;
-			} catch (URISyntaxException e) {
-				CrashHandler.showErrorMessage("Failed to load from URL: " + in,
-						e);
+			} catch (MalformedURLException | URISyntaxException e) {
+				model.getLog().log(Level.WARNING,
+						"Failed to load from URL " + in, e);
 				return null;
 			}
 		} else {
@@ -59,18 +64,16 @@ public class Session {
 
 	public static Thread loadSession(Model model, File selectedFile)
 			throws FileNotFoundException {
-		log.debug("Loading session from File: " + selectedFile);
+		model.getLog().log(Level.INFO,
+				"Loading session from File: " + selectedFile);
 		return loadSession(model, new FileInputStream(selectedFile));
 
 	}
 
 	public static Thread loadSession(Model model, URL url) throws IOException {
-		log.debug("Loading session from URL: " + url);
+		model.getLog().log(Level.INFO, "Loading session from URL: " + url);
 		return loadSession(model, url.openStream());
 	}
-
-	private static Logger log = LoggerFactory
-			.getLogger(Session.class.getCanonicalName());
 
 	enum SessionInstruction {
 		PREFIX, CONFIG, DATA, OPTION, LOCATION, ALIAS, C, U, F, EXTRA;
@@ -124,9 +127,11 @@ public class Session {
 									si = SessionInstruction
 											.valueOf(arr[0].toUpperCase());
 								} catch (Exception e) {
-									log.warn("Could not parse: " + arr[0]
-											+ "\n Unknown instruction.\nCould not load session line: "
-											+ line, e);
+									model.getLog().log(Level.WARNING,
+											"Could not parse: " + arr[0]
+													+ "\n Unknown instruction.\nCould not load session line: "
+													+ line,
+											e);
 								}
 
 								if (si != null) {
@@ -141,7 +146,8 @@ public class Session {
 										case EXTRA:
 											model.getExtraSessionFiles()
 													.addElement(arr[1]);
-											log.warn("Extra file: " + arr[1]);
+											model.getLog().log(Level.WARNING,
+													"Extra file: " + arr[1]);
 											break;
 										case U:
 										case F:
@@ -155,7 +161,7 @@ public class Session {
 												TryAgainHandler.ask(model,
 														"Something went wrong while loading line: "
 																+ line
-																+ "\n\tfrom the session file.\n\tTo recover GenomeView skipped this file.",
+																+ " from the session file.\n\tTo recover GenomeView skipped this file.",
 														new Runnable() {
 															public void run() {
 																try {
@@ -168,10 +174,11 @@ public class Session {
 																}
 															}
 														});
-												log.error(
+												model.getLog().log(
+														Level.WARNING,
 														"Something went wrong while loading line: "
 																+ line
-																+ "\n\tfrom the session file.\n\tAsked the user to try again.",
+																+ " from the session file.\n\tAsked the user to try again.",
 														re);
 											}
 											break;
@@ -235,7 +242,8 @@ public class Session {
 
 	public static void save(File f, Model model) throws IOException {
 		PrintWriter out = new PrintWriter(f);
-		log.info("Saving session for:" + model.loadedSources());
+		model.getLog().log(Level.INFO,
+				"Saving session for:" + model.loadedSources());
 
 		out.println("##GenomeView session       ##");
 		out.println("##Do not remove header lines##");

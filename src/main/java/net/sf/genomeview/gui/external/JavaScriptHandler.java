@@ -14,15 +14,14 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import be.abeel.concurrency.DaemonThreadFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.MessageManager;
-import be.abeel.concurrency.DaemonThreadFactory;
 
 /**
  * Javascript Handler for GenomeView
@@ -30,13 +29,13 @@ import be.abeel.concurrency.DaemonThreadFactory;
  * @author Thomas Abeel
  * 
  */
-public class JavaScriptHandler  {
+public class JavaScriptHandler {
 
-	
+	private Logger log = LoggerFactory
+			.getLogger(JavaScriptHandler.class.getCanonicalName());
 
-	private Logger log = LoggerFactory.getLogger(JavaScriptHandler.class.getCanonicalName());
-
-	private ExecutorService es = Executors.newSingleThreadExecutor(new DaemonThreadFactory());
+	private ExecutorService es = Executors
+			.newSingleThreadExecutor(new DaemonThreadFactory());
 
 	public JavaScriptHandler(final Model model, final String id) {
 
@@ -58,7 +57,7 @@ public class JavaScriptHandler  {
 
 			@Override
 			public void update(Observable o, Object arg) {
-				if(model.isExitRequested())
+				if (model.isExitRequested())
 					try {
 						ss.close();
 					} catch (IOException e) {
@@ -80,14 +79,18 @@ public class JavaScriptHandler  {
 				while (true && !ss.isClosed()) {
 					try {
 						Socket s = ss.accept();
-						InstructionWorker ws = new InstructionWorker(model, id, s);
+						InstructionWorker ws = new InstructionWorker(model, id,
+								s, model.getLog());
 						es.execute(ws);
 
 					} catch (SocketException e) {
-						log.debug( "This is normal when closing the socket", e);
+						log.debug("This is normal when closing the socket", e);
 
 					} catch (IOException e) {
-						CrashHandler.showErrorMessage(MessageManager.getString("jshandler.failed_to_accept_socket"), e);
+						CrashHandler.showErrorMessage(
+								MessageManager.getString(
+										"jshandler.failed_to_accept_socket"),
+								e);
 					}
 				}
 
@@ -95,8 +98,10 @@ public class JavaScriptHandler  {
 
 			private void notifyMainHandler(int localPort) {
 				try {
-					Socket clientSocket = new Socket(InetAddress.getLocalHost(), 2223);
-					PrintWriter out = new PrintWriter(clientSocket.getOutputStream());
+					Socket clientSocket = new Socket(InetAddress.getLocalHost(),
+							2223);
+					PrintWriter out = new PrintWriter(
+							clientSocket.getOutputStream());
 					out.println("GenomeViewJavaScriptHandler-" + localPort);
 					out.close();
 					clientSocket.close();
@@ -116,5 +121,4 @@ public class JavaScriptHandler  {
 
 	}
 
-	
 }

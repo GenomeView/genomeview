@@ -3,17 +3,16 @@
  */
 package net.sf.genomeview.gui.explorer;
 
+import static java.awt.Container.log;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -110,6 +109,11 @@ public class RecentDataPanel extends GridBagPanel {
 	//
 	// }
 
+	/**
+	 * 
+	 * @param model the {@link Model}
+	 * @param log   the reporter to use when loading new models
+	 */
 	public RecentDataPanel(final Model model) {
 		// this.model = model;
 		// this.repos = new NCBIRepository();
@@ -118,8 +122,10 @@ public class RecentDataPanel extends GridBagPanel {
 		gc.weighty = 0;
 		gc.gridheight = 3;
 		gc.weightx = 0;
-		Rectangle wh = WindowManager.getNiceWindowSize((int)(0.9*WindowManager.MAX_WIDTH), 480);
-		setPreferredSize(new Dimension((int)wh.getWidth(),(int) wh.getHeight()));
+		Rectangle wh = WindowManager
+				.getNiceWindowSize((int) (0.9 * WindowManager.MAX_WIDTH), 480);
+		setPreferredSize(
+				new Dimension((int) wh.getWidth(), (int) wh.getHeight()));
 		setBackground(Color.WHITE);
 		add(new JLabel(Icons.MINILOGO_ICON), gc);
 
@@ -139,12 +145,14 @@ public class RecentDataPanel extends GridBagPanel {
 		JEditorPaneLabel msgLabel = new JEditorPaneLabel();
 		msgLabel.setText("");
 
-		msgLabel.setPreferredSize(new Dimension(Icons.MINILOGO_ICON.getIconWidth(), 50));
+		msgLabel.setPreferredSize(
+				new Dimension(Icons.MINILOGO_ICON.getIconWidth(), 50));
 		add(msgLabel, gc);
 
 		gc.weighty = 0;
 		gc.gridy++;
-		JButton box = new JButton(MessageManager.getString("button.dismiss_dialog"));
+		JButton box = new JButton(
+				MessageManager.getString("button.dismiss_dialog"));
 		box.setBackground(Color.WHITE);
 		box.addActionListener(new ActionListener() {
 
@@ -177,13 +185,18 @@ public class RecentDataPanel extends GridBagPanel {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() > 1) {
 
-					List<String> selectionList = recentJList.getSelectedValuesList();
+					List<String> selectionList = recentJList
+							.getSelectedValuesList();
 					for (String selection : selectionList) {
 						try {
 
-							DataSourceHelper.load(model, new Locator(selection));
+							DataSourceHelper.load(model, new Locator(selection),
+									log);
 						} catch (Exception e1) {
-							CrashHandler.showErrorMessage(MessageManager.getString("genome.couldnt_load_this_session"), e1);
+							CrashHandler.showErrorMessage(
+									MessageManager.getString(
+											"genome.couldnt_load_this_session"),
+									e1);
 						}
 					}
 
@@ -201,13 +214,18 @@ public class RecentDataPanel extends GridBagPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() > 1) {
-					List<String> selectionList = extraJList.getSelectedValuesList();
+					List<String> selectionList = extraJList
+							.getSelectedValuesList();
 					for (String selection : selectionList) {
 						try {
 
-							DataSourceHelper.load(model, new Locator(selection));
+							DataSourceHelper.load(model, new Locator(selection),
+									log);
 						} catch (Exception e1) {
-							CrashHandler.showErrorMessage(MessageManager.getString("genome.couldnt_load_this_session"), e1);
+							CrashHandler.showErrorMessage(
+									MessageManager.getString(
+											"genome.couldnt_load_this_session"),
+									e1);
 						}
 					}
 

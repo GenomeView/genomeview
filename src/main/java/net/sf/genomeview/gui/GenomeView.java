@@ -3,20 +3,20 @@
  */
 package net.sf.genomeview.gui;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Authenticator;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 import javax.swing.SwingUtilities;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import be.abeel.concurrency.DaemonThread;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.DistributingReporter;
 import net.sf.genomeview.data.Model;
 
 /**
@@ -25,7 +25,8 @@ import net.sf.genomeview.data.Model;
  * 
  */
 public class GenomeView {
-	private static Logger logger = LoggerFactory.getLogger(GenomeView.class.getCanonicalName());
+//	private static Logger logger = LoggerFactory
+//			.getLogger(GenomeView.class.getCanonicalName());
 
 	private static WindowManager mw;
 
@@ -46,10 +47,15 @@ public class GenomeView {
 		return mw.getModel();
 	}
 
-	public static void main(final String[] args) {
-		LogConfigurator.config();
-		logger.info("Starting GenomeView " + Configuration.version());
-		logger.info("Using language: "+MessageManager.getLocale());
+	public static void main(final String[] args) throws IOException {
+		// FIXME maybe logger can be moved into Model?
+		// why are we not initializing model first?
+		final DistributingReporter log = new DistributingReporter();
+
+// FIXME do something about the original config?
+//		LogConfigurator.config();
+		log.log(Level.INFO, "Starting GenomeView " + Configuration.version());
+		log.log(Level.INFO, "Using language: " + MessageManager.getLocale());
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -59,48 +65,64 @@ public class GenomeView {
 					splash = new Splash();
 				}
 			});
-		} catch (InterruptedException e1) {
-			// Ignore, it's not like we really care
-		} catch (InvocationTargetException e1) {
-			// Ignore, it's not like we really care
+		} catch (InterruptedException | InvocationTargetException e1) {
+			log.log(Level.WARNING, "Splash screen failed", e1);
 		}
 
 		/* Rewrite JNLP arguments */
 		jnlprewrite(args);
-		
 
 		new DaemonThread(new Runnable() {
 
 			@Override
 			public void run() {
-				
+
 				/*
-				 * The configuration class needs to be called at least once before we
-				 * can start the logger
+				 * The configuration class needs to be called at least once
+				 * before we can start the logger
 				 */
-				
-				
-				
-				logger.info("Configuration summary: \n\tGenomeView version: " + Configuration.version() + "\n\t" + "Current date and time: " + new Date() + "\n\t"
-						+ "Command line instructions: " + Arrays.toString(args) + "\n\t" + "Number of processors: "
-						+ Integer.toString(Runtime.getRuntime().availableProcessors()) + "\n\t" + "Free memory :"
-						+ Long.toString(Runtime.getRuntime().freeMemory()) + "\n\t" + "Max memory: " + Long.toString(Runtime.getRuntime().maxMemory()) + "\n\t"
-						+ "Total JVM: " + Long.toString(Runtime.getRuntime().totalMemory()) + "\n\t" + "OS: "
-						+ ManagementFactory.getOperatingSystemMXBean().getName() + " " + ManagementFactory.getOperatingSystemMXBean().getVersion() + "\n\t"
-						+ "Architecture: " + ManagementFactory.getOperatingSystemMXBean().getArch() + "\n\t" + "JVM version: "
-						+ System.getProperty("java.version")
+
+				log.log(Level.INFO,
+						"Configuration summary: \n\tGenomeView version: "
+								+ Configuration.version() + "\n\t"
+								+ "Current date and time: " + new Date()
+								+ "\n\t" + "Command line instructions: "
+								+ Arrays.toString(args) + "\n\t"
+								+ "Number of processors: "
+								+ Integer.toString(Runtime.getRuntime()
+										.availableProcessors())
+								+ "\n\t" + "Free memory :"
+								+ Long.toString(
+										Runtime.getRuntime().freeMemory())
+								+ "\n\t" + "Max memory: "
+								+ Long.toString(
+										Runtime.getRuntime().maxMemory())
+								+ "\n\t" + "Total JVM: "
+								+ Long.toString(
+										Runtime.getRuntime().totalMemory())
+								+ "\n\t" + "OS: "
+								+ ManagementFactory
+										.getOperatingSystemMXBean().getName()
+								+ " "
+								+ ManagementFactory.getOperatingSystemMXBean()
+										.getVersion()
+								+ "\n\t" + "Architecture: "
+								+ ManagementFactory.getOperatingSystemMXBean()
+										.getArch()
+								+ "\n\t" + "JVM version: "
+								+ System.getProperty("java.version")
 
 				);
 
-				
-
-				CommandLineOptions.init(args);
+				CommandLineOptions.init(args, log);
 				/* Single instance manager */
-				boolean singleInstance = Configuration.getBoolean("general:singleInstance");
+				boolean singleInstance = Configuration
+						.getBoolean("general:singleInstance");
 				if (singleInstance) {
 					if (!ApplicationInstanceManager.registerInstance(args)) {
 						// instance already running.
-						System.out.println("Another instance of this application is already running.  Exiting.");
+						log.log(Level.WARNING,
+								"Another instance of this application is already running.  Exiting.");
 						splash.dispose();
 						StaticUtils.forceExit();
 						return;
@@ -111,12 +133,11 @@ public class GenomeView {
 				Authenticator.setDefault(new MyAuthenticator());
 
 				try {
-					mw = new WindowManager(args, splash);
+					mw = new WindowManager(args, splash, log);
 					ApplicationInstanceManager.setCallback(mw);
-				} catch (InterruptedException e) {
-					logger.error( "main window initialization", e);
-				} catch (ExecutionException e) {
-					logger.error( "main window initialization", e);
+				} catch (InterruptedException | ExecutionException e) {
+					log.log(Level.WARNING, "main window initialization", e);
+					// FIXME seems this should be fatal??
 				}
 				splash.dispose();
 			}

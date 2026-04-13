@@ -18,15 +18,14 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.logging.Level;
 
 import javax.swing.DefaultListModel;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import be.abeel.io.LineIterator;
 import be.abeel.util.DefaultHashMap;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.DistributingReporter;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.GUIManager;
 import net.sf.genomeview.gui.StaticUtils;
@@ -54,8 +53,12 @@ import net.sf.jannot.source.DataSource;
  * 
  */
 public class Model extends Observable implements Observer {
-	private final Logger logger = LoggerFactory
-			.getLogger(Model.class.getCanonicalName());
+
+	// the main logger for the system.
+	private final DistributingReporter log;
+
+//	private final Logger logger = LoggerFactory
+//			.getLogger(Model.class.getCanonicalName());
 
 	/**
 	 * The EntrySet which contains all loaded 'chromosomes'.
@@ -129,21 +132,26 @@ public class Model extends Observable implements Observer {
 
 	private WorkerManager wm = new WorkerManager();
 
-	/**
+	/*
 	 * 
 	 * 
 	 * FIELDS ABOVE THIS POINT. CODE STARTS HERE.
 	 * 
-	 * 
-	 * 
+	 */
+	/**
+	 * @param id  the name of this
+	 * @param log a {@link DistributingReporter} to be used for general logging.
+	 *            Not null
 	 */
 
-	public Model(String id) {
-
+	public Model(String id, DistributingReporter log) {
+		if (log == null)
+			throw new NullPointerException("log must not be null");
+		this.log = log;
 		guimanager = new GUIManager();
 
 		new JavaScriptHandler(this, id);
-		logger.info("JavaScriptHandler started");
+		log.log(Level.INFO, "JavaScriptHandler started");
 
 		GenomeViewScheduler.start(this);
 
@@ -177,6 +185,10 @@ public class Model extends Observable implements Observer {
 					"Could not retrieve recently used files", e);
 		}
 
+	}
+
+	public DistributingReporter getLog() {
+		return log;
 	}
 
 	/**
@@ -291,7 +303,7 @@ public class Model extends Observable implements Observer {
 							"previous.gvs"), this);
 			}
 		} catch (IOException e) {
-			logger.error("Problem saving last session", e);
+			log.log(Level.WARNING, "Problem saving last session", e);
 		}
 		loadedSources.clear();
 		refresh();
@@ -415,7 +427,7 @@ public class Model extends Observable implements Observer {
 	void addData(DataSource f) throws ReadFailedException {
 		if (entries.size() == 0)
 			vlm.setAnnotationLocationVisible(new Location(1, 51));
-		logger.info("Reading source:" + f);
+		log.log(Level.INFO, "Reading source:" + f);
 		recentFiles.removeElement(f.getLocator().toString());
 		recentFiles.add(0, f.getLocator().toString());
 		try {
@@ -428,7 +440,7 @@ public class Model extends Observable implements Observer {
 				if (len > 5000) {
 					int randomStart = StaticUtils.rg.nextInt((len / 2) - 1000)
 							+ len / 4;
-					logger.info("Setting random location at data load: "
+					log.log(Level.INFO, "Setting random location at data load: "
 							+ selected + "\t" + randomStart);
 					vlm.setAnnotationLocationVisible(
 							new Location(randomStart, randomStart + 1000));
@@ -438,8 +450,8 @@ public class Model extends Observable implements Observer {
 		} catch (Exception e) {
 			throw new ReadFailedException(e);
 		}
-		logger.info("Entries: " + entries.size());
-		logger.info("Model adding data done!");
+		log.log(Level.INFO, "Entries: " + entries.size());
+		log.log(Level.INFO, "Model adding data done!");
 		loadedSources.add(f);
 		updateTracks();
 		refresh(NotificationTypes.GENERAL);
@@ -457,7 +469,7 @@ public class Model extends Observable implements Observer {
 	}
 
 	public void setAAMapping(Entry e, AminoAcidMapping aamapping) {
-		logger.info("setting amino acid mapping: " + aamapping);
+		log.log(Level.INFO, "setting amino acid mapping: " + aamapping);
 		this.aamapping.put(e, aamapping);
 		refresh(NotificationTypes.TRANSLATIONTABLECHANGE);
 
@@ -488,8 +500,8 @@ public class Model extends Observable implements Observer {
 			if (changed)
 				refresh(NotificationTypes.UPDATETRACKS);
 		} catch (ConcurrentModificationException e) {
-			logger.error("Update tracks interrupted, tracks already changed",
-					e);
+			log.log(Level.WARNING,
+					"Update tracks interrupted, tracks already changed", e);
 			refresh(NotificationTypes.UPDATETRACKS);
 		}
 
@@ -580,7 +592,7 @@ public class Model extends Observable implements Observer {
 	 * @param entry the selected {@link Entry}
 	 */
 	public synchronized void setSelectedEntry(Entry entry) {
-		logger.info("Setting selected entry: " + entry);
+		log.log(Level.INFO, "Setting selected entry: " + entry);
 		vlm.setVisibleEntry(entry);
 		// entries.setDefault(entry);
 		selectionModel.clear();
@@ -639,7 +651,7 @@ public class Model extends Observable implements Observer {
 	 */
 	public synchronized void daemonException(Throwable e) {
 		exceptionStack.push(e);
-		logger.error("Exception in daemon thread", e);
+		log.log(Level.SEVERE, "Exception in daemon thread", e);
 		setChanged();
 		notifyObservers(NotificationTypes.EXCEPTION);
 

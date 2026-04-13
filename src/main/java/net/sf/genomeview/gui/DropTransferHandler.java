@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
@@ -22,6 +23,7 @@ import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -30,7 +32,7 @@ import net.sf.jannot.source.Locator;
  */
 class DropTransferHandler extends TransferHandler {
 
-	private Model model;
+	private final Model model;
 	private DataFlavor urlFlavor;
 	private DataFlavor uriFlavor;
 
@@ -41,7 +43,8 @@ class DropTransferHandler extends TransferHandler {
 					"application/x-java-url;class=java.net.URL");
 			uriFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
 		} catch (ClassNotFoundException cnfe) {
-			cnfe.printStackTrace();
+			model.getLog().log(Level.SEVERE, "Can't load drop transfer handler",
+					cnfe);
 		}
 	}
 
@@ -66,33 +69,35 @@ class DropTransferHandler extends TransferHandler {
 
 	@Override
 	public boolean importData(JComponent comp, Transferable t) {
+		final Reporter log = model.getLog();
 		DataFlavor[] flavors = t.getTransferDataFlavors();
 		for (int i = 0; i < flavors.length; i++) {
 			DataFlavor flavor = flavors[i];
 			try {
 				if (flavor.equals(urlFlavor)) {
 					URL url = (URL) t.getTransferData(urlFlavor);
-					System.out.println("URL dropped: " + url);
-					DataSourceHelper.load(model, new Locator(url.toString()));
+					log.log(Level.INFO, "URL dropped: " + url);
+					DataSourceHelper.load(model, new Locator(url.toString()),
+							log);
 					return true;
 				} else if (flavor.equals(uriFlavor)) {
 					String uriString = (String) t.getTransferData(uriFlavor);
-					System.out.println("URI String dropped: " + uriString);
-					DataSourceHelper.load(model, new Locator(uriString));
+					log.log(Level.INFO, "URI String dropped: " + uriString);
+					DataSourceHelper.load(model, new Locator(uriString), log);
 					return true;
 				} else if (flavor.equals(DataFlavor.stringFlavor)) {
 					String initString = (String) t
 							.getTransferData(DataFlavor.stringFlavor);
-					System.out.println("String dropped: " + initString);
+					log.log(Level.INFO, "String dropped: " + initString);
 					String[] lines = initString
 							.split(System.getProperty("line.separator"));
 					for (String s : lines) {
-						System.out.println("String '" + s + "'");
-						DataSourceHelper.load(model, new Locator(s));
+						log.log(Level.INFO, "String '" + s + "'");
+						DataSourceHelper.load(model, new Locator(s), log);
 					}
 					return true;
 				} else if (flavor.equals(DataFlavor.javaFileListFlavor)) {
-					System.out.println("importData: FileListFlavor");
+					log.log(Level.INFO, "importData: FileListFlavor");
 
 					List<File> l = (List<File>) t
 							.getTransferData(DataFlavor.javaFileListFlavor);
@@ -100,31 +105,24 @@ class DropTransferHandler extends TransferHandler {
 					Iterator<File> iter = l.iterator();
 					while (iter.hasNext()) {
 						File file = (File) iter.next();
-						System.out.println(
+						log.log(Level.INFO,
 								"File dropped: " + file.getCanonicalPath());
 						DataSourceHelper.load(model,
-								new Locator(file.toString()));
+								new Locator(file.toString()), log);
 					}
 					if (l.size() != 0) {
 						return true;
 					} else {
-						System.out.println(
+						log.log(Level.INFO,
 								"FileList was empty... (trying next flavor)");
 					}
 				} else {
-					System.out.println("Data rejected: " + flavor);
+					log.log(Level.WARNING, "Data rejected: " + flavor);
 					// Don't return; try next flavor.
 				}
-			} catch (IOException ex) {
-				System.err.println("IOError getting data: " + ex);
-			} catch (UnsupportedFlavorException e) {
-				System.err.println("Unsupported Flavor: " + e);
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ReadFailedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (IOException | URISyntaxException | ReadFailedException
+					| UnsupportedFlavorException ex) {
+				log.log(Level.INFO, "Problem handling drop" + ex);
 			}
 		}
 		return false;

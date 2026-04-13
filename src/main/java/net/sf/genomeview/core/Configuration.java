@@ -102,6 +102,8 @@ public class Configuration {
 
 	private static Properties gvProperties = new Properties();
 
+	private static File configFile;
+
 	static {
 		try {
 			load();
@@ -116,6 +118,12 @@ public class Configuration {
 		}
 	}
 
+	/**
+	 * @param key the key to search for
+	 * @return the value of key, contained in {@link #resourceMap},
+	 *         {@link #extraMap}, {@link #localMap} or {@link #defaultMap} (in
+	 *         this order), or null if none of these contains the key
+	 */
 	public static String get(String key) {
 		if (resourceMap.containsKey(key)) {
 			return resourceMap.get(key);
@@ -132,8 +140,6 @@ public class Configuration {
 		}
 
 	}
-
-	private static File configFile;
 
 	private static void load() throws IOException {
 		InputStream is = null;

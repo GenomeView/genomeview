@@ -3,43 +3,54 @@ package net.sf.genomeview.gui;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.data.ReadWorker;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.explorer.DataExplorerManager;
 import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.jannot.exception.ReadFailedException;
-import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
 import net.sf.jannot.source.cache.SourceCache;
-import be.abeel.net.URIFactory;
+import tudelft.utilities.logging.Reporter;
 
+/**
+ * This seems initialization functionality for the {@link Model}
+ */
 public class InitDataLoader {
 
 	private Model model;
-	private Logger logger;
 
 	public InitDataLoader(Model model) {
 		this.model = model;
-		logger = LoggerFactory.getLogger(InitDataLoader.class.getCanonicalName());
 	}
 
-	public void init(String cmdUrl, String cmdFile, String[] remArgs, String position, String session)
+	/**
+	 * Process commandline options and command file
+	 * 
+	 * @param cmdUrl
+	 * @param cmdFile
+	 * @param remArgs
+	 * @param position
+	 * @param session
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 */
+	public void init(String cmdUrl, String cmdFile, String[] remArgs,
+			String position, String session)
 			throws InterruptedException, ExecutionException {
 
 		SourceCache.cacheDir = new File(Configuration.getDirectory(), "cache");
 		IndexManager.cacheDir = new File(Configuration.getDirectory(), "index");
-		DataSourceFactory.disableURLCaching = Configuration.getBoolean("general:disableURLCaching");
+		DataSourceFactory.disableURLCaching = Configuration
+				.getBoolean("general:disableURLCaching");
+		final Reporter log = model.getLog();
 
 		/*
 		 * Initialize session, all other arguments will override what the
@@ -49,7 +60,9 @@ public class InitDataLoader {
 			if (session != null)
 				Session.loadSession(model, session);
 		} catch (IOException e1) {
-			CrashHandler.showErrorMessage(MessageManager.getString("crashhandler.failed_to_propertly_load_requested_session"), e1);
+			CrashHandler.showErrorMessage(MessageManager.getString(
+					"crashhandler.failed_to_propertly_load_requested_session"),
+					e1);
 		}
 
 		/*
@@ -61,76 +74,54 @@ public class InitDataLoader {
 		 */
 		// DataSource[] data = null;
 		if (cmdFile == null && cmdUrl == null) {
-			logger.info("File and url options are null!");
+			log.log(Level.INFO, "File and url options are null!");
 			// do nothing
 
 		} else if (cmdUrl != null) {
-			logger.info("URL commandline option is set: " + cmdUrl);
+			log.log(Level.INFO, "URL commandline option is set: " + cmdUrl);
 
 			try {
-				DataSourceHelper.load(model, new Locator(cmdUrl), true);
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ReadFailedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				DataSourceHelper.load(model, new Locator(cmdUrl), true, log);
+			} catch (URISyntaxException | IOException | ReadFailedException e) {
+				log.log(Level.WARNING, "problem loading url " + cmdUrl, e);
 			}
 
 		} else if (cmdFile != null) {
-			logger.info("File commandline option is set: " + cmdFile);
+			log.log(Level.INFO, "File commandline option is set: " + cmdFile);
 
 			try {
-				DataSourceHelper.load(model, new Locator(cmdFile), true);
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ReadFailedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				DataSourceHelper.load(model, new Locator(cmdFile), true, log);
+			} catch (URISyntaxException | IOException | ReadFailedException e) {
+				log.log(Level.WARNING, "problem loading file " + cmdFile, e);
 			}
 
 		}
 
-		
-
 		/* Load additional files */
 		for (String s : remArgs) {
-			logger.info("loading additional from commandline: " + s);
+			log.log(Level.INFO, "loading additional from commandline: " + s);
 			try {
-				if (!s.startsWith("http:") && !s.startsWith("ftp:") && !s.startsWith("https:")) {
-					DataSourceHelper.load(model, new Locator(s));
+				if (!s.startsWith("http:") && !s.startsWith("ftp:")
+						&& !s.startsWith("https:")) {
+					DataSourceHelper.load(model, new Locator(s), log);
 					//
 					// ReadWorker rf = new ReadWorker(ds, model);
 					// rf.execute();
 
 				} else {
-					DataSourceHelper.load(model, new Locator(s));
+					DataSourceHelper.load(model, new Locator(s), log);
 					// ReadWorker rf = new ReadWorker(ds, model);
 					// rf.execute();
 
 				}
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.log(Level.WARNING, "problem loading  " + s, e);
 			}
 
 		}
 
 		if (position != null) {
-			logger.info("Initial position requested to "+position);
+			log.log(Level.INFO, "Initial position requested to " + position);
 			ExternalHelper.setPosition(position, model);
 
 		}

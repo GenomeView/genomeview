@@ -31,6 +31,7 @@ import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -40,15 +41,16 @@ import net.sf.jannot.source.Locator;
 public class OpenDialog extends JDialog {
 
 	private static final long serialVersionUID = -9176452114031190911L;
+	private final Reporter log;
 
+	private final String[] exts = new String[] { "fasta", "fa", "fas", "embl",
+			"fna", "gtf", "gff", "gff3", "maln", "syn", "wig", "mfa", "bed",
+			"mapview", "bam", "maf", "snp", "tbl", "gb", "gbk", "pileup", "con",
+			"peaks", "tdf", "bw", "bigwig" };
 
-	private final String[] exts = new String[] { "fasta", "fa", "fas", "embl", "fna", "gtf", "gff", "gff3", "maln",
-			"syn", "wig", "mfa", "bed", "mapview", "bam", "maf", "snp", "tbl", "gb", "gbk", "pileup", "con", "peaks",
-			"tdf","bw","bigwig" };
-
-
-	public OpenDialog(Window parent, final Model model) {
+	public OpenDialog(Window parent, final Model model, Reporter log) {
 		super(parent, "Load data", ModalityType.APPLICATION_MODAL);
+		this.log = log;
 		this.setIconImage(Icons.MINILOGO);
 
 		setResizable(false);
@@ -68,16 +70,17 @@ public class OpenDialog extends JDialog {
 		// public void run() {
 		GridBagPanel gp = new GridBagPanel();
 		_self.setContentPane(gp);
-		JButton file = new JButton(MessageManager.getString("opendialog.local_files"), Icons.get("Hard Disk_48x48.png"));
+		JButton file = new JButton(
+				MessageManager.getString("opendialog.local_files"),
+				Icons.get("Hard Disk_48x48.png"));
 		configButton(file);
 		gp.add(file, gp.gc);
 		gp.gc.gridx++;
-		JButton url = new JButton(MessageManager.getString("opendialog.url"), Icons.get("Globe_48x48.png"));
+		JButton url = new JButton(MessageManager.getString("opendialog.url"),
+				Icons.get("Globe_48x48.png"));
 		configButton(url);
 		gp.add(url, gp.gc);
 		gp.gc.gridx++;
-	
-		
 
 		/** Add logic to buttons */
 		file.addActionListener(new ActionListener() {
@@ -85,7 +88,8 @@ public class OpenDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
-				JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
+				JFileChooser chooser = new JFileChooser(
+						Configuration.getFile("lastDirectory"));
 				chooser.resetChoosableFileFilters();
 				for (final String ext : exts) {
 					chooser.addChoosableFileFilter(new FileFilter() {
@@ -96,8 +100,10 @@ public class OpenDialog extends JDialog {
 								return true;
 
 							if (f.getName().toLowerCase().endsWith(ext)
-									|| f.getName().toLowerCase().endsWith(ext + ".gz")
-									|| f.getName().toLowerCase().endsWith(ext + ".bgz")) {
+									|| f.getName().toLowerCase()
+											.endsWith(ext + ".gz")
+									|| f.getName().toLowerCase()
+											.endsWith(ext + ".bgz")) {
 								return true;
 							}
 
@@ -120,8 +126,10 @@ public class OpenDialog extends JDialog {
 						for (String ext : exts) {
 
 							if (f.getName().toLowerCase().endsWith(ext)
-									|| f.getName().toLowerCase().endsWith(ext + ".gz")
-									|| f.getName().toLowerCase().endsWith(ext + ".bgz")) {
+									|| f.getName().toLowerCase()
+											.endsWith(ext + ".gz")
+									|| f.getName().toLowerCase()
+											.endsWith(ext + ".bgz")) {
 								return true;
 							}
 						}
@@ -136,21 +144,24 @@ public class OpenDialog extends JDialog {
 				});
 
 				chooser.setMultiSelectionEnabled(true);
-				int returnVal = chooser.showOpenDialog(model.getGUIManager().getMainWindow());
+				int returnVal = chooser
+						.showOpenDialog(model.getGUIManager().getMainWindow());
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					File[] files = chooser.getSelectedFiles();
 //					DataSource[] out = new DataSource[files.length];
 					try {
 						for (int i = 0; i < files.length; i++) {
-						DataSourceHelper.load(model,new Locator(files[i].toString()));
+							DataSourceHelper.load(model,
+									new Locator(files[i].toString()), log);
 
 						}
-						Configuration.set("lastDirectory", files[0].getParentFile());
+						Configuration.set("lastDirectory",
+								files[0].getParentFile());
 //						load(out);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					}  catch (URISyntaxException e1) {
+					} catch (URISyntaxException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					} catch (ReadFailedException e2) {
@@ -168,14 +179,16 @@ public class OpenDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
 				try {
-					String input = JOptionPane.showInputDialog(model.getGUIManager().getMainWindow(),
+					String input = JOptionPane.showInputDialog(
+							model.getGUIManager().getMainWindow(),
 							"Give the URL of the data");
 					if (input != null && input.trim().length() > 0) {
-						
-						DataSourceHelper.load(model,new Locator(input.trim()));
+
+						DataSourceHelper.load(model, new Locator(input.trim()),
+								log);
 					}
 
-				}  catch (MalformedURLException e2) {
+				} catch (MalformedURLException e2) {
 					// TODO Auto-generated catch block
 					e2.printStackTrace();
 				} catch (IOException e2) {
@@ -192,15 +205,9 @@ public class OpenDialog extends JDialog {
 			}
 		});
 
-		
-		
-
-
 		pack();
-		StaticUtils.center(model.getGUIManager().getMainWindow(),_self);
+		StaticUtils.center(model.getGUIManager().getMainWindow(), _self);
 		setVisible(true);
-
-		
 
 	}
 
@@ -209,7 +216,5 @@ public class OpenDialog extends JDialog {
 		button.setHorizontalTextPosition(SwingConstants.CENTER);
 
 	}
-
-	
 
 }

@@ -6,17 +6,14 @@ package net.sf.genomeview.data;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitorInputStream;
 import javax.swing.filechooser.FileFilter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import be.abeel.gui.MemoryWidget;
 import be.abeel.io.ExtensionManager;
@@ -35,6 +32,7 @@ import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -42,18 +40,33 @@ import net.sf.jannot.source.Locator;
  */
 public class DataSourceHelper {
 
+	// singleton utility class.
+	// FIXME maybe this should be a real class with a real Reporter
+
 	// shortcuts to often used constants, to make code readable
 	private final static int warn = JOptionPane.WARNING_MESSAGE;
 	private final static int error = JOptionPane.ERROR_MESSAGE;
 
-	private static Logger log = LoggerFactory
-			.getLogger(DataSourceHelper.class.getCanonicalName());
+//	private static Logger log = LoggerFactory
+//			.getLogger(DataSourceHelper.class.getCanonicalName());
 
+	/**
+	 * 
+	 * @param model the {@link Model}
+	 * @param data  the data to load
+	 * @param log   a {@link Reporter} to log problems to.
+	 * @throws URISyntaxException
+	 * @throws IOException
+	 * @throws ReadFailedException
+	 */
 	public static void load(Model model, Locator data)
 			throws URISyntaxException, IOException, ReadFailedException {
 		load(model, data, false);
 	}
 
+	/**
+	 * FIXME this shouldn't throw?
+	 */
 	public static void load(final Model model, Locator data, boolean wait)
 			throws URISyntaxException, IOException, ReadFailedException {
 
@@ -127,7 +140,7 @@ public class DataSourceHelper {
 							.getString("datasourcehelper.wig_not_recommended"),
 					JOptionPane.YES_NO_OPTION);
 			if (res == JOptionPane.YES_OPTION) {
-				convertWig2TDF(model, data);
+				convertWig2TDF(model, data, model.getLog());
 				return;
 			}
 		}
@@ -148,7 +161,7 @@ public class DataSourceHelper {
 				int res = yesno(model, "preprocessing_warn",
 						"preprocessing_available", data.getName());
 				if (res == JOptionPane.YES_OPTION) {
-					mafprocess(model, data);
+					mafprocess(model, data, model.getLog());
 					return;
 				}
 			} else {
@@ -173,7 +186,7 @@ public class DataSourceHelper {
 			problem(model, "large_file_warn", "large_file",
 					JOptionPane.ERROR_MESSAGE);
 		}
-		DataSource ds = DataSourceFactory.create(data, index);
+		DataSource ds = DataSourceFactory.create(data, index, model.getLog());
 		if (ds instanceof AbstractStreamDataSource) {
 			AbstractStreamDataSource asd = ((AbstractStreamDataSource) ds);
 			if (asd.getParser() == null) {
@@ -248,7 +261,8 @@ public class DataSourceHelper {
 				JOptionPane.YES_NO_OPTION);
 	}
 
-	private static void convertWig2TDF(final Model model, final Locator data) {
+	private static void convertWig2TDF(final Model model, final Locator data,
+			final Reporter log) {
 		JFileChooser chooser = new JFileChooser(
 				Configuration.getFile("lastDirectory"));
 		chooser.resetChoosableFileFilters();
@@ -290,7 +304,8 @@ public class DataSourceHelper {
 						File extFile = ExtensionManager.extension(files, "tdf");
 						ConvertWig2TDF.convertWig2TDF(data, extFile);
 						Locator mafdata = new Locator(extFile.toString());
-						log.info("Load newly create tdf file as: " + mafdata);
+						log.log(Level.INFO,
+								"Load newly create tdf file as: " + mafdata);
 						load(model, mafdata);
 					} catch (Exception e) {
 						model.daemonException(e);
@@ -303,7 +318,8 @@ public class DataSourceHelper {
 
 	}
 
-	private static void mafprocess(final Model model, final Locator data) {
+	private static void mafprocess(final Model model, final Locator data,
+			Reporter log) {
 		GenomeViewScheduler.submit(new Task() {
 
 			@Override
@@ -371,7 +387,8 @@ public class DataSourceHelper {
 							MafixFactory.generateIndex(spmis,
 									new File(file + ".mfi"));
 							Locator mafdata = new Locator(file.toString());
-							log.info("Load newly create mafix as: " + mafdata);
+							log.log(Level.INFO,
+									"Load newly create mafix as: " + mafdata);
 							load(model, mafdata);
 
 							// load(out);
@@ -397,6 +414,7 @@ public class DataSourceHelper {
 	 * 
 	 * @param model
 	 * @param prep
+	 * @param log   the logger to use for the indexing
 	 */
 	private static void index(final Model model, final Locator prep) {
 
@@ -408,20 +426,11 @@ public class DataSourceHelper {
 				try {
 					if (IndexManager.createIndex(prep))
 						load(model, prep);
-				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ReadFailedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				} catch (IOException | URISyntaxException
+						| ReadFailedException e) {
+					model.getLog().log(Level.SEVERE,
+							"can not create index for " + prep, e);
 				}
-
 			}
 
 		});

@@ -16,16 +16,15 @@ import java.lang.management.ThreadMXBean;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.DistributingReporter;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
@@ -43,14 +42,28 @@ public class WindowManager extends WindowAdapter implements Observer {
 	public static final int MAX_WIDTH = 1920;
 	public static final int MAX_HEIGHT = 1080;
 
-	private static Logger logger = LoggerFactory
-			.getLogger(WindowManager.class.getCanonicalName());
+//	private static Logger logger = LoggerFactory
+//			.getLogger(WindowManager.class.getCanonicalName());
 
 	private GenomeViewWindow window = null;
 
 	private GenomeViewWindow helper = null;
 
 	private Model model = null;
+
+	public WindowManager(String args[], Splash splash, DistributingReporter log)
+			throws InterruptedException, ExecutionException {
+		running++;
+		log.log(Level.INFO, "Started running instance" + running);
+		init(args, splash, log);
+	}
+
+	public void dispose() {
+		window.dispose();
+		if (helper != null)
+			helper.dispose();
+
+	}
 
 	Model getModel() {
 		return model;
@@ -64,20 +77,6 @@ public class WindowManager extends WindowAdapter implements Observer {
 	 */
 	void addInstanceObserver(Observer o) {
 		model.addObserver(o);
-	}
-
-	public WindowManager(String args[], Splash splash)
-			throws InterruptedException, ExecutionException {
-		running++;
-		logger.info("Started running instance" + running);
-		init(args, splash);
-	}
-
-	public void dispose() {
-		window.dispose();
-		if (helper != null)
-			helper.dispose();
-
 	}
 
 	/**
@@ -111,18 +110,21 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 		if (model.isExitRequested()) {
 			model.deleteObserver(this);
-			logger.info("Disposing the window in MainWindow.update()");
+			model.getLog().log(Level.INFO,
+					"Disposing the window in MainWindow.update()");
 			dispose();
 			try {
 				Configuration.save();
 			} catch (IOException e) {
-				logger.error("Problem saving configuration", e);
+				model.getLog().log(Level.WARNING,
+						"Problem saving configuration", e);
 			}
 
 			running--;
-			logger.info("Instances still running: " + running);
+			model.getLog().log(Level.INFO,
+					"Instances still running: " + running);
 			if (running < 1) {
-				logger.info("No instances left, exiting VM");
+				model.getLog().log(Level.INFO, "No instances left, exiting VM");
 				Cleaner.exit();
 
 				// System.exit(0);
@@ -173,14 +175,15 @@ public class WindowManager extends WindowAdapter implements Observer {
 		return java.util.Arrays.copyOf(threads, n);
 	}
 
-	public void init(String[] args, Splash splash)
+	public void init(String[] args, Splash splash, DistributingReporter log)
 			throws InterruptedException, ExecutionException {
 		// FIXME special handling if this is not the first time the application
 		// is initialized
+
 		if (splash != null)
 			splash.setText(
 					MessageManager.getString("windowmanager.parsing_params"));
-		CommandLineOptions.init(args);
+		CommandLineOptions.init(args, log);
 
 		if (splash != null)
 			splash.setText(
@@ -191,7 +194,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 		boolean freshwindow = false;
 
 		if (model == null) {
-			model = new Model(CommandLineOptions.id());
+			model = new Model(CommandLineOptions.id(), log);
 			model.addObserver(this);
 			KeyboardFocusManager.getCurrentKeyboardFocusManager()
 					.addKeyEventDispatcher(new Hotkeys(model));
@@ -199,7 +202,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 		if (window == null) {
 			freshwindow = true;
-			logger.info(MessageManager
+			model.getLog().log(Level.INFO, MessageManager
 					.getString("windowmanager.creating_new_window"));
 			window = new GenomeViewWindow(model,
 					"GenomeView :: " + Configuration.version(),

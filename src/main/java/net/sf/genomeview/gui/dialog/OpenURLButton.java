@@ -19,23 +19,26 @@ import net.sf.jannot.source.Locator;
 
 public class OpenURLButton extends JButton {
 
-	
 	private static final long serialVersionUID = -1666800247496691936L;
 
 	public OpenURLButton(final Model gvModel) {
-		super(MessageManager.getString("opendialog.url"), Icons.get("Globe_48x48.png"));
+		super(MessageManager.getString("opendialog.url"),
+				Icons.get("Globe_48x48.png"));
 		setVerticalTextPosition(SwingConstants.BOTTOM);
 		setHorizontalTextPosition(SwingConstants.CENTER);
 		addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				try {
-					String input = JOptionPane.showInputDialog(gvModel.getGUIManager().getMainWindow(), "Give the URL of the data");
+					String input = JOptionPane.showInputDialog(
+							gvModel.getGUIManager().getMainWindow(),
+							"Give the URL of the data");
 					if (input != null && input.trim().length() > 0) {
 
-						DataSourceHelper.load(gvModel, new Locator(input.trim()));
+						DataSourceHelper.load(gvModel,
+								new Locator(input.trim()), gvModel.getLog());
 					}
 
 				} catch (MalformedURLException e2) {
