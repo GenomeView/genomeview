@@ -23,9 +23,11 @@ import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
-import tudelft.utilities.logging.Reporter;
 
 /**
+ * This is a service listening on a socket for incoming instructions. These
+ * instructions are then executed on the model, effectively controlling
+ * GenomeView remotely through a socket.
  * 
  * @author Thomas Abeel
  * 
@@ -39,8 +41,6 @@ class InstructionWorker implements Runnable {
 
 	private final String id;
 
-	private final Reporter log;
-
 	private static final HashSet<Port> otherPorts = new HashSet<Port>();
 
 	/**
@@ -49,18 +49,18 @@ class InstructionWorker implements Runnable {
 	 * @param model the model to control
 	 * @param id
 	 * @param s
-	 * @param log   the {@link Reporter} to log problems with the requests to
 	 */
-	InstructionWorker(Model model, String id, Socket s, Reporter log) {
+	InstructionWorker(Model model, String id, Socket s) {
+		if (model == null)
+			throw new NullPointerException("model must be non-null");
 		this.model = model;
 		this.id = id;
 		this.s = s;
-		this.log = log;
 	}
 
 	public void run() {
 
-		log.log(Level.INFO, "Running worker");
+		model.getLog().log(Level.INFO, "Running worker");
 		try {
 			handleClient();
 		} catch (Exception e) {
@@ -78,7 +78,7 @@ class InstructionWorker implements Runnable {
 			return;
 		s.setSoTimeout(5000);
 		s.setTcpNoDelay(true);
-		log.log(Level.INFO, "Handling client");
+		model.getLog().log(Level.INFO, "Handling client");
 		// InputStream is = new BufferedInputStream(s.getInputStream());
 		BufferedReader it = new BufferedReader(
 				new InputStreamReader(s.getInputStream()));
@@ -94,7 +94,7 @@ class InstructionWorker implements Runnable {
 
 			}
 			StringBuffer others = writeOther(line);
-			log.log(Level.INFO, "Reply from others: " + others);
+			model.getLog().log(Level.INFO, "Reply from others: " + others);
 			if (others.length() > 0) {
 				PrintWriter pw = new PrintWriter(s.getOutputStream());
 				pw.print(others.toString());
@@ -139,12 +139,13 @@ class InstructionWorker implements Runnable {
 							pw.close();
 
 						} else {
-							log.log(Level.WARNING, "Instruction " + line
+							model.getLog().log(Level.WARNING, "Instruction "
+									+ line
 									+ " was not understood by GenomeView");
 
 						}
 					} else {
-						log.log(Level.WARNING,
+						model.getLog().log(Level.WARNING,
 								"This instruction doesn't belong to GenomeView, I'll ignore it.");
 					}
 				}
@@ -201,7 +202,7 @@ class InstructionWorker implements Runnable {
 				bis.close();
 				clientSocket.close();
 			} catch (IOException e) {
-				log.log(Level.SEVERE, "Write failed to " + port, e);
+				model.getLog().log(Level.SEVERE, "Write failed to " + port, e);
 				otherPorts.remove(port);
 			}
 		}
@@ -213,7 +214,9 @@ class InstructionWorker implements Runnable {
 		try {
 			Session.loadSession(model, URIFactory.url(string));
 		} catch (IOException | URISyntaxException e) {
-			log.log(Level.SEVERE, "Failed to load session " + string, e);
+			// FIXME unreachable? load should not crash
+			model.getLog().log(Level.SEVERE, "Failed to load session " + string,
+					e);
 		}
 
 	}
@@ -230,9 +233,10 @@ class InstructionWorker implements Runnable {
 
 	private void doLoad(String s) {
 		try {
-			DataSourceHelper.load(model, new Locator(s), log);
+			DataSourceHelper.load(model, new Locator(s));
 		} catch (URISyntaxException | IOException | ReadFailedException e) {
-			log.log(Level.SEVERE, "Failed to load " + s, e);
+			// FIXME unreachable? load should not crash
+			model.getLog().log(Level.SEVERE, "Failed to load " + s, e);
 		}
 
 	}

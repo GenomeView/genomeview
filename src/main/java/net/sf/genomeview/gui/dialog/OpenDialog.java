@@ -10,9 +10,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -31,7 +31,6 @@ import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -41,16 +40,14 @@ import tudelft.utilities.logging.Reporter;
 public class OpenDialog extends JDialog {
 
 	private static final long serialVersionUID = -9176452114031190911L;
-	private final Reporter log;
 
 	private final String[] exts = new String[] { "fasta", "fa", "fas", "embl",
 			"fna", "gtf", "gff", "gff3", "maln", "syn", "wig", "mfa", "bed",
 			"mapview", "bam", "maf", "snp", "tbl", "gb", "gbk", "pileup", "con",
 			"peaks", "tdf", "bw", "bigwig" };
 
-	public OpenDialog(Window parent, final Model model, Reporter log) {
+	public OpenDialog(Window parent, final Model model) {
 		super(parent, "Load data", ModalityType.APPLICATION_MODAL);
-		this.log = log;
 		this.setIconImage(Icons.MINILOGO);
 
 		setResizable(false);
@@ -152,7 +149,7 @@ public class OpenDialog extends JDialog {
 					try {
 						for (int i = 0; i < files.length; i++) {
 							DataSourceHelper.load(model,
-									new Locator(files[i].toString()), log);
+									new Locator(files[i].toString()));
 
 						}
 						Configuration.set("lastDirectory",
@@ -178,28 +175,17 @@ public class OpenDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
-				try {
-					String input = JOptionPane.showInputDialog(
-							model.getGUIManager().getMainWindow(),
-							"Give the URL of the data");
-					if (input != null && input.trim().length() > 0) {
-
-						DataSourceHelper.load(model, new Locator(input.trim()),
-								log);
+				final String input = JOptionPane.showInputDialog(
+						model.getGUIManager().getMainWindow(),
+						"Give the URL of the data");
+				if (input != null && input.trim().length() > 0) {
+					try {
+						DataSourceHelper.load(model, new Locator(input.trim()));
+					} catch (IOException | URISyntaxException
+							| ReadFailedException e2) {
+						model.getLog().log(Level.SEVERE,
+								"load failed of " + input, e2);
 					}
-
-				} catch (MalformedURLException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				} catch (IOException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				} catch (URISyntaxException e3) {
-					// TODO Auto-generated catch block
-					e3.printStackTrace();
-				} catch (ReadFailedException e4) {
-					// TODO Auto-generated catch block
-					e4.printStackTrace();
 				}
 
 			}

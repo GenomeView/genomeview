@@ -27,8 +27,6 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Type;
-import net.sf.jannot.parser.Parser;
-import net.sf.jannot.parser.ParserFactory;
 import net.sf.nameservice.NameService;
 
 /**
@@ -506,17 +504,19 @@ public class Configuration {
 
 	}
 
-	public static Parser getParser(String string) {
-		String pKey = Configuration.get(string);
-		if (pKey.equals("EMBL")) {
-			return ParserFactory.EMBL;
-		}
-		if (pKey.equals("GFF")) {
-			return ParserFactory.GFF3;
-		}
-
-		return null;
-	}
+//	public static String getParser(String string) {
+//		String pKey = Configuration.get(string);
+//		if (pKey.equals("EMBL")) {
+//			return new EMBLParser(log);
+//			// return ParserFactory.EMBL;
+//		}
+//		if (pKey.equals("GFF")) {
+//			return new GFF3Parser(log);
+//			// return ParserFactory.GFF3;
+//		}
+//
+//		return null;
+//	}
 
 	public static void unset(String string) {
 		extraMap.remove(string);

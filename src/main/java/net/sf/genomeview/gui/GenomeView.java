@@ -84,33 +84,27 @@ public class GenomeView {
 
 				log.log(Level.INFO,
 						"Configuration summary: \n\tGenomeView version: "
-								+ Configuration.version() + "\n\t"
-								+ "Current date and time: " + new Date()
-								+ "\n\t" + "Command line instructions: "
-								+ Arrays.toString(args) + "\n\t"
-								+ "Number of processors: "
-								+ Integer.toString(Runtime.getRuntime()
-										.availableProcessors())
-								+ "\n\t" + "Free memory :"
-								+ Long.toString(
-										Runtime.getRuntime().freeMemory())
-								+ "\n\t" + "Max memory: "
-								+ Long.toString(
-										Runtime.getRuntime().maxMemory())
-								+ "\n\t" + "Total JVM: "
-								+ Long.toString(
-										Runtime.getRuntime().totalMemory())
-								+ "\n\t" + "OS: "
-								+ ManagementFactory
-										.getOperatingSystemMXBean().getName()
-								+ " "
+								+ Configuration.version());
+				log.log(Level.INFO, "Current date and time: " + new Date());
+				log.log(Level.INFO,
+						"Command line instructions: " + Arrays.toString(args));
+				log.log(Level.INFO, "Number of processors: " + Integer
+						.toString(Runtime.getRuntime().availableProcessors()));
+				log.log(Level.INFO, "Free memory :"
+						+ Long.toString(Runtime.getRuntime().freeMemory()));
+				log.log(Level.INFO, "Max memory: "
+						+ Long.toString(Runtime.getRuntime().maxMemory()));
+				log.log(Level.INFO, "Total JVM: "
+						+ Long.toString(Runtime.getRuntime().totalMemory()));
+				log.log(Level.INFO,
+						"OS: " + ManagementFactory.getOperatingSystemMXBean()
+								.getName() + " "
 								+ ManagementFactory.getOperatingSystemMXBean()
-										.getVersion()
-								+ "\n\t" + "Architecture: "
-								+ ManagementFactory.getOperatingSystemMXBean()
-										.getArch()
-								+ "\n\t" + "JVM version: "
-								+ System.getProperty("java.version")
+										.getVersion());
+				log.log(Level.INFO, "Architecture: " + ManagementFactory
+						.getOperatingSystemMXBean().getArch());
+				log.log(Level.INFO,
+						"JVM version: " + System.getProperty("java.version")
 
 				);
 
@@ -119,7 +113,8 @@ public class GenomeView {
 				boolean singleInstance = Configuration
 						.getBoolean("general:singleInstance");
 				if (singleInstance) {
-					if (!ApplicationInstanceManager.registerInstance(args)) {
+					if (!ApplicationInstanceManager.registerInstance(args,
+							log)) {
 						// instance already running.
 						log.log(Level.WARNING,
 								"Another instance of this application is already running.  Exiting.");

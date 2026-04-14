@@ -80,7 +80,7 @@ public class JavaScriptHandler {
 					try {
 						Socket s = ss.accept();
 						InstructionWorker ws = new InstructionWorker(model, id,
-								s, model.getLog());
+								s);
 						es.execute(ws);
 
 					} catch (SocketException e) {

@@ -3,8 +3,6 @@
  */
 package net.sf.genomeview.gui.explorer;
 
-import static java.awt.Container.log;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -190,8 +188,8 @@ public class RecentDataPanel extends GridBagPanel {
 					for (String selection : selectionList) {
 						try {
 
-							DataSourceHelper.load(model, new Locator(selection),
-									log);
+							DataSourceHelper.load(model,
+									new Locator(selection));
 						} catch (Exception e1) {
 							CrashHandler.showErrorMessage(
 									MessageManager.getString(
@@ -219,8 +217,8 @@ public class RecentDataPanel extends GridBagPanel {
 					for (String selection : selectionList) {
 						try {
 
-							DataSourceHelper.load(model, new Locator(selection),
-									log);
+							DataSourceHelper.load(model,
+									new Locator(selection));
 						} catch (Exception e1) {
 							CrashHandler.showErrorMessage(
 									MessageManager.getString(

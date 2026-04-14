@@ -81,7 +81,7 @@ public class InitDataLoader {
 			log.log(Level.INFO, "URL commandline option is set: " + cmdUrl);
 
 			try {
-				DataSourceHelper.load(model, new Locator(cmdUrl), true, log);
+				DataSourceHelper.load(model, new Locator(cmdUrl), true);
 			} catch (URISyntaxException | IOException | ReadFailedException e) {
 				log.log(Level.WARNING, "problem loading url " + cmdUrl, e);
 			}
@@ -90,7 +90,7 @@ public class InitDataLoader {
 			log.log(Level.INFO, "File commandline option is set: " + cmdFile);
 
 			try {
-				DataSourceHelper.load(model, new Locator(cmdFile), true, log);
+				DataSourceHelper.load(model, new Locator(cmdFile), true);
 			} catch (URISyntaxException | IOException | ReadFailedException e) {
 				log.log(Level.WARNING, "problem loading file " + cmdFile, e);
 			}
@@ -103,13 +103,13 @@ public class InitDataLoader {
 			try {
 				if (!s.startsWith("http:") && !s.startsWith("ftp:")
 						&& !s.startsWith("https:")) {
-					DataSourceHelper.load(model, new Locator(s), log);
+					DataSourceHelper.load(model, new Locator(s));
 					//
 					// ReadWorker rf = new ReadWorker(ds, model);
 					// rf.execute();
 
 				} else {
-					DataSourceHelper.load(model, new Locator(s), log);
+					DataSourceHelper.load(model, new Locator(s));
 					// ReadWorker rf = new ReadWorker(ds, model);
 					// rf.execute();
 

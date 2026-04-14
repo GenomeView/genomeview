@@ -26,6 +26,7 @@ import net.sf.jannot.source.Locator;
 import tudelft.utilities.logging.Reporter;
 
 /**
+ * Probably a handler for drag&drop actions
  * 
  * @author Thomas Abeel
  * 
@@ -77,13 +78,12 @@ class DropTransferHandler extends TransferHandler {
 				if (flavor.equals(urlFlavor)) {
 					URL url = (URL) t.getTransferData(urlFlavor);
 					log.log(Level.INFO, "URL dropped: " + url);
-					DataSourceHelper.load(model, new Locator(url.toString()),
-							log);
+					DataSourceHelper.load(model, new Locator(url.toString()));
 					return true;
 				} else if (flavor.equals(uriFlavor)) {
 					String uriString = (String) t.getTransferData(uriFlavor);
 					log.log(Level.INFO, "URI String dropped: " + uriString);
-					DataSourceHelper.load(model, new Locator(uriString), log);
+					DataSourceHelper.load(model, new Locator(uriString));
 					return true;
 				} else if (flavor.equals(DataFlavor.stringFlavor)) {
 					String initString = (String) t
@@ -93,7 +93,7 @@ class DropTransferHandler extends TransferHandler {
 							.split(System.getProperty("line.separator"));
 					for (String s : lines) {
 						log.log(Level.INFO, "String '" + s + "'");
-						DataSourceHelper.load(model, new Locator(s), log);
+						DataSourceHelper.load(model, new Locator(s));
 					}
 					return true;
 				} else if (flavor.equals(DataFlavor.javaFileListFlavor)) {
@@ -108,7 +108,7 @@ class DropTransferHandler extends TransferHandler {
 						log.log(Level.INFO,
 								"File dropped: " + file.getCanonicalPath());
 						DataSourceHelper.load(model,
-								new Locator(file.toString()), log);
+								new Locator(file.toString()));
 					}
 					if (l.size() != 0) {
 						return true;

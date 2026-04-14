@@ -57,7 +57,7 @@ public class DataSourceHelper {
 	 * @param log   a {@link Reporter} to log problems to.
 	 * @throws URISyntaxException
 	 * @throws IOException
-	 * @throws ReadFailedException
+	 * @throws ReadFailedException FIXME this can't throw, ?
 	 */
 	public static void load(Model model, Locator data)
 			throws URISyntaxException, IOException, ReadFailedException {
@@ -437,14 +437,21 @@ public class DataSourceHelper {
 
 	}
 
+	/**
+	 * Gives the option to select a parser from a list.
+	 * 
+	 * @param model
+	 * @param l
+	 * @return a parser as selected.
+	 */
 	private static Parser offerParserChoice(Model model, Locator l) {
+		Parser[] list = ParserFactory.parsers(l, model.getLog());
 		Parser p = (Parser) JOptionPane.showInputDialog(
 				model.getGUIManager().getMainWindow(),
 				MessageManager
 						.getString("datasourcehelper.couldnt_detect_file"),
 				MessageManager.getString("datasourcehelper.parser_detection"),
-				JOptionPane.QUESTION_MESSAGE, null, ParserFactory.parsers(l),
-				ParserFactory.parsers(l)[0]);
+				JOptionPane.QUESTION_MESSAGE, null, list, list[0]);
 		return p;
 	}
 }

@@ -49,7 +49,6 @@ import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.parser.EMBLParser;
 import net.sf.jannot.parser.GFF3Parser;
 import net.sf.jannot.parser.Parser;
-import net.sf.jannot.parser.ParserFactory;
 
 /**
  * 
@@ -175,12 +174,13 @@ public class SaveDialog extends JDialog {
 		 */
 		addSeparator(
 				MessageManager.getString("savedialog.file_format_options"));
-		Parser defaultParser = Configuration.getParser("save:defaultParser");
-		Parser[] arr = new Parser[] { ParserFactory.GFF3, ParserFactory.EMBL };
+		String defaultParserName = Configuration.get("save:defaultParser");
+		// Parser defaultParser = Configuration.getParser("save:defaultParser");
+		String[] arr = new String[] { "GFF3", "EMBL" };
 
-		final JComboBox parserList = new JComboBox(arr);
-		if (defaultParser != null) {
-			parserList.setSelectedItem(defaultParser);
+		final JComboBox<String> parserList = new JComboBox(arr);
+		if (defaultParserName != null) {
+			parserList.setSelectedItem(defaultParserName);
 			parserList.setEnabled(false);
 		}
 		add(parserList);
@@ -194,7 +194,9 @@ public class SaveDialog extends JDialog {
 		includeSequence.setEnabled(enableIncludeSequenceFlag);
 		add(includeSequence);
 
-		Parser p = (Parser) parserList.getSelectedItem();
+		final Parser p = "GFF3".equals(parserList.getSelectedItem())
+				? new GFF3Parser(model.getLog())
+				: new EMBLParser(model.getLog());
 		if (p instanceof GFF3Parser) {
 			includeSequence.setEnabled(false);
 		}
