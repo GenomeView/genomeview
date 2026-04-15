@@ -18,7 +18,6 @@ import java.util.zip.GZIPInputStream;
 
 import be.abeel.io.GZIPPrintWriter;
 import be.abeel.io.LineIterator;
-import be.abeel.net.URIFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.jannot.DataKey;
@@ -160,18 +159,14 @@ public class Configuration {
 	 * @throws IOException
 	 */
 	private void load() throws IOException {
-		InputStream is = null;
-		try {
-			is = Configuration.class
-					.getResourceAsStream("/genomeview.properties");
+		// InputStream is = null;
+		try (InputStream is = Configuration.class
+				.getResourceAsStream("/conf/genomeview.properties")) {
 			gvProperties.load(is);
 		} catch (Exception e1) {
 			throw new IOException(
 					"genomeview.properties file could not be loaded! ", e1);
 
-		} finally {
-			if (is != null)
-				is.close();
 		}
 
 		/* loading default configuration from the jar */
@@ -179,19 +174,24 @@ public class Configuration {
 //		logger.info("Loading default configuration...");
 		LineIterator it;
 
-		try {
-			it = new LineIterator(Configuration.class
-					.getResourceAsStream("/conf/default.conf"), true, true);
+		try (InputStream is = Configuration.class
+				.getResourceAsStream("/conf/default.conf")) {
+			it = new LineIterator(is, true, true);
 			for (String line : it) {
 				String key = line.substring(0, line.indexOf('='));
 				String value = line.substring(line.indexOf('=') + 1);
 				defaultMap.put(key.trim(), value.trim());
 
 			}
-
 			it.close();
-			it = new LineIterator(Configuration.class
-					.getResourceAsStream("/conf/resources.conf"), true, true);
+		} catch (Exception e) {
+			throw new IOException("Could not find default configuration file.",
+					e);
+		}
+
+		try (InputStream is = Configuration.class
+				.getResourceAsStream("/conf/resources.conf")) {
+			it = new LineIterator(is, true, true);
 			for (String line : it) {
 				String key = line.substring(0, line.indexOf('='));
 				String value = line.substring(line.indexOf('=') + 1);
@@ -200,10 +200,9 @@ public class Configuration {
 			it.close();
 
 			updateSynonyms();
-
 		} catch (Exception e) {
-			throw new IOException("Could not find default configuration file.",
-					e);
+			throw new IOException(
+					"Could not find resources configuration file.", e);
 		}
 
 		/* look for local configuration and load it if present */
@@ -246,45 +245,46 @@ public class Configuration {
 
 	}
 
+	/**
+	 * The resources.conf file has strings pointing to synonym files. Read them
+	 * 
+	 * @throws IOException
+	 */
 	private void updateSynonyms() throws IOException {
-		try {
-			/**
-			 * Default synonyms
-			 */
-//			logger.info("Updating default synonyms for :"
-//					+ Arrays.toString(get("synonyms.default").split(",")));
-			for (String s : get("synonyms.default").split(",")) {
+		/**
+		 * Default synonyms
+		 */
+		String deflt = get("synonyms.default");
 
-				try {
-					if (s.length() > 0)
-						NameService.addSynonyms(URIFactory.url(s).openStream());
-//					else
-//						logger.info("Default synonyms URL is empty");
+		if (deflt != null && !deflt.isEmpty()) {
+			for (String s : deflt.split(",")) {
+				try (InputStream is = Configuration.class
+						.getResourceAsStream(s)) {
+					NameService.addSynonyms(is);
 				} catch (Exception e) {
 					throw new IOException(
 							"Failed to load default synonyms for: " + s, e);
 				}
 
 			}
-			/**
-			 * User configured additional synonyms
-			 */
-//			logger.info("Updating additional synonyms for :"
-//					+ Arrays.toString(get("synonyms.additional").split(",")));
-			for (String s : get("synonyms.additional").split(",")) {
+		}
 
-				if (s.length() > 0)
-					NameService.addSynonyms(URIFactory.url(s).openStream());
-//					else
-//						logger.info("Additional synonyms URL is empty");
+		/**
+		 * User configured additional synonyms
+		 */
+		String add = get("synonyms.additional");
+		if (add != null && !add.isEmpty()) {
+			for (String s : add.split(",")) {
 
+				try (InputStream is = Configuration.class
+						.getResourceAsStream(s)) {
+					NameService.addSynonyms(is);
+				} catch (Exception e) {
+					throw new IOException(
+							"Failed to load default synonyms for: " + s, e);
+				}
 			}
 
-		} catch (Exception e) {
-			throw new IOException(
-					"Failed to load additional synonyms for option: "
-							+ get("synonyms"),
-					e);
 		}
 	}
 
