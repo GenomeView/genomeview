@@ -12,6 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -548,8 +549,7 @@ public class ConfigurationDialog extends JDialog {
 					Configuration.instance().save();
 					model.refresh(NotificationTypes.CONFIGURATION_CHANGE);
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					model.getLog().log(Level.WARNING, "window close issue", e1);
 				}
 				setVisible(false);
 				super.windowClosing(e);
@@ -595,8 +595,8 @@ public class ConfigurationDialog extends JDialog {
 					Configuration.instance().save();
 					model.refresh(NotificationTypes.CONFIGURATION_CHANGE);
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					model.getLog().log(Level.WARNING, "config change issue",
+							e1);
 				}
 				setVisible(false);
 

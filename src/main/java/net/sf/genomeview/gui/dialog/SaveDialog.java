@@ -403,7 +403,9 @@ public class SaveDialog extends JDialog {
 															"savedialog.save_succeeded"));
 											tryToSave = false;
 										} catch (FileExistsException fee) {
-											fee.printStackTrace();
+											model.getLog().log(Level.WARNING,
+													MessageManager.getString(
+															"savedialog.file_exists"));
 											int answer = JOptionPane
 													.showOptionDialog(model
 															.getGUIManager()
@@ -423,13 +425,17 @@ public class SaveDialog extends JDialog {
 												tryToSave = false;
 											}
 										} catch (IOException e) {
+											model.getLog().log(Level.SEVERE,
+													MessageManager.getString(
+															"savedialog.save_failed"),
+													e);
+											// FIXME remove popup
 											JOptionPane.showMessageDialog(
 													model.getGUIManager()
 															.getMainWindow(),
 													MessageManager.getString(
 															"savedialog.save_failed"));
 											tryToSave = false;
-											e.printStackTrace();
 										}
 									}
 								}

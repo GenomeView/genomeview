@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -130,14 +131,13 @@ public class ExportPdfDialog extends JDialog {
 						document.close();
 
 					} catch (IOException ex) {
-						// TODO fix
-						ex.printStackTrace();
+						model.getLog().log(Level.SEVERE, "Image export failed",
+								ex);
 					}
 					Configuration.instance().set("lastDirectory",
 							ef.getParentFile());
 				} catch (Exception ex) {
-					// TODO fix
-					ex.printStackTrace();
+					model.getLog().log(Level.SEVERE, "Image export failed", ex);
 				}
 				h.dispose();
 			}

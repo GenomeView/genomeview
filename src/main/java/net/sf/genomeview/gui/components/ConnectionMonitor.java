@@ -192,7 +192,8 @@ public class ConnectionMonitor extends Observable {
 							}
 
 					} catch (Exception e) {
-						e.printStackTrace();
+						log.log(Level.WARNING,
+								"network monitoring deamon failed", e);
 						networkInterface = false;
 					}
 					if (previous != networkInterface) {

@@ -10,6 +10,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -148,7 +149,11 @@ public class EditFeatureWindow extends JDialog {
 						}
 						feature.setLocation(loc);
 					} catch (Exception e) {
-						e.printStackTrace();
+						model.getLog().log(Level.WARNING, MessageManager
+								.getString("editfeature.location_failed_warn"),
+								e);
+						// FIXME do we really need a popup now?
+						// the log warning should draw attention
 						JOptionPane.showMessageDialog(_self,
 								MessageManager.getString(
 										"editfeature.location_failed_warn"),
@@ -190,7 +195,9 @@ public class EditFeatureWindow extends JDialog {
 //						}
 //						feature.setMute(false);
 					} catch (Exception e) {
-						e.printStackTrace();
+						model.getLog().log(Level.WARNING, MessageManager
+								.getString("editfeature.notes_failed_warn"), e);
+						// FIXME remove popup
 						JOptionPane.showMessageDialog(_self,
 								MessageManager.getString(
 										"editfeature.notes_failed_warn"),

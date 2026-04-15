@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -27,10 +28,12 @@ public class OpenFileButton extends JButton {
 			"fna", "gtf", "gff", "gff3", "maln", "syn", "wig", "mfa", "bed",
 			"mapview", "bam", "maf", "snp", "tbl", "gb", "gbk", "pileup", "con",
 			"peaks", "tdf", "bw", "bigwig" };
+	private final Model m;
 
 	public OpenFileButton(final Model gvModel) {
 		super(MessageManager.getString("opendialog.local_files"),
 				Icons.get("Hard Disk_48x48.png"));
+		this.m = gvModel;
 		setVerticalTextPosition(SwingConstants.BOTTOM);
 		setHorizontalTextPosition(SwingConstants.CENTER);
 		addActionListener(new ActionListener() {
@@ -108,15 +111,10 @@ public class OpenFileButton extends JButton {
 						Configuration.instance().set("lastDirectory",
 								files[0].getParentFile());
 						// load(out);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (URISyntaxException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (ReadFailedException e2) {
-						// TODO Auto-generated catch block
-						e2.printStackTrace();
+					} catch (IOException | URISyntaxException
+							| ReadFailedException e1) {
+						m.getLog().log(Level.WARNING, MessageManager.getString(
+								"editfeature.notes_failed_warn"), e1);
 					}
 				}
 

@@ -155,15 +155,9 @@ public class OpenDialog extends JDialog {
 						Configuration.instance().set("lastDirectory",
 								files[0].getParentFile());
 //						load(out);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (URISyntaxException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (ReadFailedException e2) {
-						// TODO Auto-generated catch block
-						e2.printStackTrace();
+					} catch (IOException | URISyntaxException
+							| ReadFailedException e1) {
+						model.getLog().log(Level.WARNING, "open failed", e1);
 					}
 				}
 
