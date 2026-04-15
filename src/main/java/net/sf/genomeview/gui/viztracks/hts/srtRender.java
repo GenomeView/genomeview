@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
+import java.util.logging.Level;
 
 import htsjdk.samtools.CigarElement;
 import htsjdk.samtools.CigarOperator;
@@ -480,8 +481,9 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 				&& rf.getReferenceIndex().intValue() != rf
 						.getMateReferenceIndex().intValue()
 				&& rf.getMateReferenceIndex() != -1) {
-			System.out.println("Different indices: " + rf.getReferenceIndex()
-					+ "\t" + rf.getMateReferenceIndex());
+			model.getLog().log(Level.INFO,
+					"Different indices: " + rf.getReferenceIndex() + "\t"
+							+ rf.getMateReferenceIndex());
 			c = ReadColor.MATE_DIFFERENT_CHROMOSOME;
 		} else if (rf.getReadPairedFlag()) {
 			if (rf.getFirstOfPairFlag()) {

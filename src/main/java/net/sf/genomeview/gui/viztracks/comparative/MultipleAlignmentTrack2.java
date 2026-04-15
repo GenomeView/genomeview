@@ -24,9 +24,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import be.abeel.util.LRUCache;
 import net.sf.genomeview.core.BiMap;
 import net.sf.genomeview.core.Configuration;
@@ -113,9 +110,6 @@ public class MultipleAlignmentTrack2 extends Track {
 		return false;
 	}
 
-	private static final Logger log = LoggerFactory
-			.getLogger(MultipleAlignmentTrack2.class.getCanonicalName());
-
 	public boolean mouseExited(int x, int y, MouseEvent e) {
 		lastMouse = null;
 		return false;
@@ -153,7 +147,7 @@ public class MultipleAlignmentTrack2 extends Track {
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
-			log.debug("Multiple alignment track consumes button2||button3");
+			// log.debug("Multiple alignment track consumes button2||button3");
 			new MultipleAlignmentPopUp().show(e.getComponent(), e.getX(),
 					currentYOffset + e.getY());
 			e.consume();

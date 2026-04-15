@@ -45,7 +45,7 @@ import be.abeel.gui.TitledComponent;
  */
 public class MyAuthenticator extends Authenticator {
 
-	private static HashMap<String, PasswordAuthentication> mapping = new HashMap<String, PasswordAuthentication>();
+	private static final HashMap<String, PasswordAuthentication> mapping = new HashMap<String, PasswordAuthentication>();
 
 	private static void addURL(URL url) {
 		System.out.println(url.getUserInfo());

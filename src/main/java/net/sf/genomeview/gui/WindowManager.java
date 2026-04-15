@@ -137,8 +137,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 				model.getLog().log(Level.INFO, "Dumping all running threads");
 				Thread[] threads = getAllThreads();
 				for (Thread id : threads) {
-					System.out.println(id.getName() + "\t" + id.isDaemon()
-							+ "\t" + id.isAlive());
+					model.getLog().log(Level.INFO, id.getName() + "\t"
+							+ id.isDaemon() + "\t" + id.isAlive());
 
 				}
 

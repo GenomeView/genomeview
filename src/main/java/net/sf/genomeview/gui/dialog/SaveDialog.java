@@ -17,6 +17,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -32,8 +33,6 @@ import javax.swing.JTextField;
 
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import be.abeel.io.ExtensionManager;
 import be.abeel.net.URIFactory;
@@ -56,9 +55,6 @@ import net.sf.jannot.parser.Parser;
  * 
  */
 public class SaveDialog extends JDialog {
-
-	private static final Logger log = LoggerFactory
-			.getLogger(SaveDialog.class.getCanonicalName());
 
 	private static final long serialVersionUID = -5209291628487502687L;
 
@@ -340,16 +336,19 @@ public class SaveDialog extends JDialog {
 									|| location.startsWith("https://")) {
 								try {
 									URL url = URIFactory.url(location);
-									System.out.println(url.getProtocol() + "://"
-											+ url.getHost() + ":"
-											+ url.getPort() + url.getPath());
+									model.getLog().log(Level.INFO,
+											url.getProtocol() + "://"
+													+ url.getHost() + ":"
+													+ url.getPort()
+													+ url.getPath());
 									url = URIFactory.url(url.getProtocol()
 											+ "://" + url.getHost() + ":"
 											+ url.getPort() + url.getPath());
 
-									log.info("File size and location: "
-											+ tmp.length() + "\t"
-											+ tmp.getCanonicalPath());
+									model.getLog().log(Level.INFO,
+											"File size and location: "
+													+ tmp.length() + "\t"
+													+ tmp.getCanonicalPath());
 
 									String reply = ClientHttpUpload.upload(tmp,
 											url);
@@ -369,10 +368,8 @@ public class SaveDialog extends JDialog {
 									}
 
 								} catch (IOException ex) {
-
-									ex.printStackTrace();
-									throw new SaveFailedException(
-											"IOException");
+									throw new SaveFailedException("IOException",
+											ex);
 								}
 							} else {
 								if ((location == null)
@@ -438,7 +435,7 @@ public class SaveDialog extends JDialog {
 								}
 							}
 						} catch (Exception ex) {
-							ex.printStackTrace();
+							model.getLog().log(Level.SEVERE, "Save failed", ex);
 						} finally {
 							model.messageModel().setStatusBarMessage(null);
 						}

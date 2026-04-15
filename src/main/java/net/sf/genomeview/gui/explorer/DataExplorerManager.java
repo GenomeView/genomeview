@@ -12,7 +12,6 @@ import javax.swing.JOptionPane;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
-import net.sf.genomeview.gui.components.ConnectionMonitor;
 
 /**
  * 
@@ -44,14 +43,17 @@ public class DataExplorerManager implements Observer {
 
 	}
 
-//	private boolean firstUse = true;
-
+	/**
+	 * If set to visible and network not available, throw a message to the user.
+	 * 
+	 * @param vis true iff data explorer becomes visible now.
+	 */
 	private void visi(final boolean vis) {
 		EventQueue.invokeLater(new Runnable() {
 
 			@Override
 			public void run() {
-				if (vis && ConnectionMonitor.instance.offline()) {
+				if (vis && model.getConnectionMonitor().offline()) {
 					autoMode = false;
 					JOptionPane.showMessageDialog(
 							model.getGUIManager().getMainWindow(),

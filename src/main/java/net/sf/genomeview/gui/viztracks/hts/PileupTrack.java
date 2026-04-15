@@ -12,9 +12,6 @@ import java.util.Observer;
 
 import javax.swing.JViewport;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
 import net.sf.genomeview.gui.viztracks.Track;
@@ -36,8 +33,6 @@ public class PileupTrack extends Track {
 	private PileupTrackConfig ptm;
 
 	private PileupTooltip tooltip;
-
-	private Logger log = LoggerFactory.getLogger(PileupTrack.class.toString());
 
 	public PileupTrack(DataKey key, PileProvider provider, final Model model) {
 		super(key, model, true, new PileupTrackConfig(model, key, provider));
@@ -118,7 +113,7 @@ public class PileupTrack extends Track {
 
 		@Override
 		public void update(Observable o, Object arg) {
-			System.out.println("\tInvalidating track vizbuffers");
+			// System.out.println("\tInvalidating track vizbuffers");
 			ptm.lastQuery = null;
 			/* Force repaint */
 			model.refresh();

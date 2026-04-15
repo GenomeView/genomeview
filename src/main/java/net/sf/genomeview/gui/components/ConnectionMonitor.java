@@ -6,20 +6,21 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import be.abeel.concurrency.DaemonThread;
 import be.abeel.io.LineIterator;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.gui.MessageManager;
+import tudelft.utilities.logging.Reporter;
 
 /**
+ * Monitors whether the network connection can connect to the main data
+ * repositories. Note, this runs 3 threads that don't terminate ever
  * 
  * @author Thomas Abeel
  * 
@@ -32,16 +33,21 @@ public class ConnectionMonitor extends Observable {
 	private boolean webstartOnline = false;
 	private boolean reposOnline = false;
 	private boolean networkInterface = false;
-	private Logger log = LoggerFactory
-			.getLogger(ConnectionMonitor.class.getCanonicalName());
-
-	public static final ConnectionMonitor instance = new ConnectionMonitor();
 
 	public JLabel networkLabel = new JLabel();
 	public JLabel webLabel = new JLabel();
 	public JLabel reposLabel = new JLabel();
+	private final Reporter log;
 
-	private ConnectionMonitor() {
+	/**
+	 * One instance of this is created in the Model at startup. No need to
+	 * create more instances.
+	 * 
+	 * @param log the {@link Reporter} to log issues to
+	 */
+	public ConnectionMonitor(Reporter log) {
+		this.log = log;
+		// FIXME this monitor should not manipulate GUI labels?
 		networkLabel.setPreferredSize(
 				new Dimension(online.getIconWidth(), online.getIconHeight()));
 		webLabel.setPreferredSize(
@@ -86,7 +92,7 @@ public class ConnectionMonitor extends Observable {
 					networkLabel.setToolTipText(
 							"<html>" + text.toString() + "</html>");
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.log(Level.WARNING, "update of network label failed", e);
 				}
 
 				if (networkInterface) {
@@ -122,14 +128,14 @@ public class ConnectionMonitor extends Observable {
 						webstartOnline = true;
 					} catch (Exception e) {
 						// Failed, try again later;
-						log.debug("Connection failed", e);
+						// don't even log, this is very irrelevant
 					}
 					setChanged();
 					notifyObservers();
 					try {
 						Thread.sleep(10 * 1000);
 					} catch (InterruptedException e) {
-						log.debug("interrupted", e);
+						// don't even log, this is very irrelevant
 					}
 
 				}
@@ -153,14 +159,14 @@ public class ConnectionMonitor extends Observable {
 						reposOnline = true;
 					} catch (Exception e) {
 						// Failed, try again later;
-						log.debug("Connection failed", e);
+						// don't even log, this is very irrelevant
 					}
 					setChanged();
 					notifyObservers();
 					try {
 						Thread.sleep(10 * 1000);
 					} catch (InterruptedException e) {
-						log.debug("interrupted", e);
+						// don't even log, this is very irrelevant
 					}
 				}
 
@@ -196,7 +202,7 @@ public class ConnectionMonitor extends Observable {
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
-						log.debug("interrupted", e);
+						// don't even log, this is very irrelevant
 					}
 
 				}

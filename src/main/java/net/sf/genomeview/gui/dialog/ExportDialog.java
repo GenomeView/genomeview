@@ -31,9 +31,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ProgressMonitorInputStream;
 import javax.swing.filechooser.FileFilter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
@@ -79,8 +76,8 @@ public class ExportDialog extends JDialog {
 			if (loc == null)
 				return null;
 			try {
-				System.out.println("Loc: " + loc + ", " + location);
-				System.out.println(loc.getName());
+				m.getLog().log(Level.INFO, "Loc: " + loc + ", " + location);
+				m.getLog().log(Level.INFO, loc.getName());
 				File out = new File(location, loc.getName());
 				InputStream r = null;
 				if (loc.isURL())
@@ -118,7 +115,8 @@ public class ExportDialog extends JDialog {
 						out.close();
 						in.close();
 					} catch (Exception e) {
-						log.error("Error while copying file", e);
+						m.getLog().log(Level.SEVERE, "Error while copying file",
+								e);
 					}
 
 				}
@@ -131,9 +129,6 @@ public class ExportDialog extends JDialog {
 		}
 
 	}
-
-	private static final Logger log = LoggerFactory
-			.getLogger(ExportDialog.class.getCanonicalName());
 
 	private ExportDialog(final Model model, final boolean useDefault) {
 		super(model.getGUIManager().getMainWindow(), "Export dialog", true);
@@ -222,8 +217,8 @@ public class ExportDialog extends JDialog {
 										try {
 											t.join();
 										} catch (InterruptedException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
+											model.getLog().log(Level.WARNING,
+													"threads did not join", e);
 										}
 									}
 
@@ -244,7 +239,8 @@ public class ExportDialog extends JDialog {
 											"exportdialog.export_started"));
 
 						} catch (Exception ex) {
-							log.error("Save failed", ex);
+							model.getLog().log(Level.SEVERE, MessageManager
+									.getString("exportdialog.save_failed"), ex);
 							JOptionPane.showMessageDialog(
 									model.getGUIManager().getMainWindow(),
 									MessageManager.getString(

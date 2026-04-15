@@ -16,14 +16,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
@@ -45,9 +43,6 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 	 * 
 	 */
 	private static final long serialVersionUID = -5266511180264863028L;
-
-	private static Logger log = LoggerFactory.getLogger(
-			NewFeatureFromCoordinatesDialog.class.getCanonicalName());
 
 	public NewFeatureFromCoordinatesDialog(final Model model) {
 		super(model.getGUIManager().getMainWindow(),
@@ -147,8 +142,9 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 						out.add(new Location(Integer.parseInt(a2[0].trim()),
 								Integer.parseInt(a2[1].trim())));
 					} catch (NumberFormatException ne) {
-						log.warn("Error while parsing '" + l + "' in "
-								+ Arrays.toString(arr));
+						model.getLog().log(Level.WARNING,
+								"Error while parsing '" + l + "' in "
+										+ Arrays.toString(arr));
 						throw ne;
 					}
 

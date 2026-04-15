@@ -7,12 +7,9 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 
 import net.sf.genomeview.data.Model;
@@ -35,7 +32,6 @@ import net.sf.jannot.Feature;
  * 
  */
 public class PopUpMenu extends JPopupMenu {
-	private Logger log = LoggerFactory.getLogger(PopUpMenu.class.toString());
 	private static final long serialVersionUID = 2573433669184123608L;
 
 	private int count = 0;
@@ -88,19 +84,16 @@ public class PopUpMenu extends JPopupMenu {
 			addSeparator();
 		count = 0;
 
-		
-		add(new AbstractAction(MessageManager.getString("mainmenu.configure_track")) {
-			
+		add(new AbstractAction(
+				MessageManager.getString("mainmenu.configure_track")) {
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				t.config().setConfigVisible(true);
-				
+
 			}
 		});
-		
-		
-		
 
 	}
 

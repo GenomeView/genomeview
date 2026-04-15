@@ -224,12 +224,12 @@ public class TrackList implements Iterable<Track> {
 		};
 	}
 
-	public void printDebug() {
-		System.out.println("Tracklist debug:");
-		System.out.println("Order:" + order);
-		System.out.println("Mapping: " + mapping);
-
-	}
+//	public void printDebug() {
+//		System.out.println("Tracklist debug:");
+//		System.out.println("Order:" + order);
+//		System.out.println("Mapping: " + mapping);
+//
+//	}
 
 	/**
 	 * Update the tracks to show all tracks for data in e. Creates the correct
@@ -244,7 +244,8 @@ public class TrackList implements Iterable<Track> {
 		/* Graph tracks */
 		for (DataKey key : e) {
 			Data<?> data = e.get(key);
-			System.out.println("Data " + key + " of type " + data.getClass());
+			model.getLog().log(Level.INFO,
+					"Data " + key + " of type " + data.getClass());
 
 			if (data instanceof MemoryFeatureAnnotation) {
 				if (!this.containsTrack(key)

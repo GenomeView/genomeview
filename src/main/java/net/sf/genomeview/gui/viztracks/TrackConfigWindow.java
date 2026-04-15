@@ -20,11 +20,11 @@
  */
 package net.sf.genomeview.gui.viztracks;
 
-import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
 
 import javax.swing.JDialog;
 
@@ -41,14 +41,15 @@ public class TrackConfigWindow implements Observer {
 
 	private JDialog window;
 	private TrackConfig config;
-	
+
 	public TrackConfigWindow(Model model, final TrackConfig config) {
 		window = new JDialog(model.getGUIManager().getMainWindow());
-		
+
 		window.setModal(false);
-		window.setTitle(MessageManager.getString("trackconfig.configure_track"));
+		window.setTitle(
+				MessageManager.getString("trackconfig.configure_track"));
 		this.config = config;
-		System.out.println(config);
+		model.getLog().log(Level.INFO, config.toString());
 		window.add(config.getGUIContainer());
 		window.pack();
 		StaticUtils.center(model.getGUIManager().getMainWindow(), window);
@@ -62,7 +63,6 @@ public class TrackConfigWindow implements Observer {
 			}
 
 		});
-		
 
 	}
 
@@ -73,12 +73,11 @@ public class TrackConfigWindow implements Observer {
 //		 window.setLocation(nl);
 //		if(config.getConfigOffset()!=window.getY())
 //			window.setY
-		if (config.isConfigVisible() != window.isVisible()){
+		if (config.isConfigVisible() != window.isVisible()) {
 			window.setVisible(config.isConfigVisible());
-			
+
 		}
-			
-		
+
 	}
 
 }

@@ -25,11 +25,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.util.logging.Level;
 
 import javax.swing.JViewport;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
@@ -69,8 +67,6 @@ public abstract class Track {
 	final protected TrackConfig config;
 
 	// private boolean visible;
-	static final protected Logger log = LoggerFactory
-			.getLogger(Track.class.getCanonicalName());
 
 	/**
 	 * 
@@ -86,7 +82,7 @@ public abstract class Track {
 		this.dataKey = key;
 		this.config = config;
 		TrackConfigWindow tcw = new TrackConfigWindow(model, config);
-		log.debug("Creating track\t" + key + "\t" + visible);
+		model.getLog().log(Level.INFO, "Creating track " + key + ":" + visible);
 		this.entry = model.vlm.getVisibleEntry();
 		// FIXME what is this for?? WHY is this not model.get(key)?
 		// config.setCollapsible(collapsible);
@@ -130,7 +126,7 @@ public abstract class Track {
 	 */
 	public boolean mouseClicked(int x, int y, MouseEvent source) {
 		if (configCog != null && configCog.contains(x, y)) {
-			log.debug("Track consumes click");
+			// model.getLog().log(Level.INFO"Track consumes click");
 			config.setConfigVisible(true);
 			// this.setCollapsed(!this.isCollapsed());
 			source.consume();

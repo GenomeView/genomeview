@@ -13,9 +13,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.lowagie.text.Document;
 import com.lowagie.text.pdf.DefaultFontMapper;
 import com.lowagie.text.pdf.PdfContentByte;
@@ -35,8 +32,8 @@ public class ExportPdfDialog extends JDialog {
 
 	private static final long serialVersionUID = -4051977836796905816L;
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ExportPdfDialog.class.getCanonicalName());
+//	private static final Logger log = LoggerFactory
+//			.getLogger(ExportPdfDialog.class.getCanonicalName());
 
 	private final Model model;
 

@@ -12,9 +12,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
@@ -144,9 +141,6 @@ class DataExplorer extends EscapeDialog {
 		pack();
 		StaticUtils.center(model.getGUIManager().getMainWindow(), this);
 	}
-
-	private Logger log = LoggerFactory
-			.getLogger(DataExplorer.class.getCanonicalName());
 
 //	private void parse(HashMap<String, ArrayList<Genome>> list, InputStream resourceAsStream) {
 //		LineIterator it = new LineIterator(resourceAsStream, true, true);

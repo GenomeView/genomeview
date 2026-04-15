@@ -9,8 +9,6 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -79,7 +77,8 @@ public class WiggleTrack extends Track {
 	private class WigglePopup extends JPopupMenu {
 		public WigglePopup() {
 			if (!logScaled)
-				add(new AbstractAction(MessageManager.getString("wiggletrack.use_log_scaling")) {
+				add(new AbstractAction(MessageManager
+						.getString("wiggletrack.use_log_scaling")) {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -90,7 +89,8 @@ public class WiggleTrack extends Track {
 
 				});
 			else {
-				add(new AbstractAction(MessageManager.getString("wiggletrack.use_normal_scaling")) {
+				add(new AbstractAction(MessageManager
+						.getString("wiggletrack.use_normal_scaling")) {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -101,7 +101,8 @@ public class WiggleTrack extends Track {
 
 				});
 			}
-			add(new AbstractAction(MessageManager.getString("wiggletrack.toggle_plot_mode")) {
+			add(new AbstractAction(
+					MessageManager.getString("wiggletrack.toggle_plot_mode")) {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -114,17 +115,14 @@ public class WiggleTrack extends Track {
 		}
 	}
 
-	private static final Logger log = LoggerFactory.getLogger(WiggleTrack.class
-			.getCanonicalName());
-
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
 		super.mouseClicked(x, y, e);
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
-			log.debug("Wiggle track consumes button2||button3");
-			new WigglePopup().show(e.getComponent(), e.getX(), currentYOffset
-					+ e.getY());
+			// log.debug("Wiggle track consumes button2||button3");
+			new WigglePopup().show(e.getComponent(), e.getX(),
+					currentYOffset + e.getY());
 			e.consume();
 			return true;
 		}
@@ -189,7 +187,7 @@ public class WiggleTrack extends Track {
 
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,
-			JViewport view,TrackCommunicationModel tcm) {
+			JViewport view, TrackCommunicationModel tcm) {
 		this.currentVisible = model.vlm.getAnnotationLocationVisible();
 		this.currentYOffset = yOffset;
 		this.screenWidth = screenWidth;
@@ -210,12 +208,12 @@ public class WiggleTrack extends Track {
 		if (yOffset < rec.y + rec.height && yOffset + graphLineHeigh > rec.y) {
 
 			double width = screenWidth / (double) currentVisible.length();
-			
-			double min=graph.min();
-			if(min>0)
-				min=0;
-			double max=graph.max();
-			
+
+			double min = graph.min();
+			if (min > 0)
+				min = 0;
+			double max = graph.max();
+
 			int scale = 1;
 			int scaleIndex = 0;
 			while (scale < (int) Math.ceil(1.0 / width)) {
@@ -239,8 +237,7 @@ public class WiggleTrack extends Track {
 					val = graph.max();
 
 				if (logScaled) {
-					double logrange = log2(max + 1)
-							- log2(min + 1);
+					double logrange = log2(max + 1) - log2(min + 1);
 					val -= log2(min + 1);
 					val = log2(val + 1);
 					val /= logrange;
@@ -254,12 +251,12 @@ public class WiggleTrack extends Track {
 					/* Draw lines */
 					if (plotType == 0) {
 						if (i == 0) {
-							conservationGP.moveTo(x - 1, yOffset + (1 - val)
-									* (graphLineHeigh - 4) + 2);
+							conservationGP.moveTo(x - 1, yOffset
+									+ (1 - val) * (graphLineHeigh - 4) + 2);
 						}
 
-						conservationGP.lineTo(x, yOffset + (1 - val)
-								* (graphLineHeigh - 4) + 2);
+						conservationGP.lineTo(x,
+								yOffset + (1 - val) * (graphLineHeigh - 4) + 2);
 					} else {
 						int top = (int) (yOffset + (1 - val) * graphLineHeigh);
 						g.fillRect(x, top, (int) Math.ceil(2 * width * scale),
@@ -281,7 +278,6 @@ public class WiggleTrack extends Track {
 
 			}
 
-	
 		}
 
 		return graphLineHeigh;

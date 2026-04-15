@@ -30,6 +30,7 @@ import net.sf.genomeview.core.DistributingReporter;
 import net.sf.genomeview.gui.GUIManager;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.genomeview.gui.components.ConnectionMonitor;
 import net.sf.genomeview.gui.explorer.FilteredListModel;
 import net.sf.genomeview.gui.external.JavaScriptHandler;
 import net.sf.genomeview.gui.menu.file.ExitAction;
@@ -130,6 +131,8 @@ public class Model extends Observable implements Observer {
 
 	private WorkerManager wm = new WorkerManager();
 
+	private final ConnectionMonitor connectionMonitor;
+
 	/*
 	 * 
 	 * 
@@ -146,6 +149,7 @@ public class Model extends Observable implements Observer {
 		if (log == null)
 			throw new NullPointerException("log must not be null");
 		this.log = log;
+		this.connectionMonitor = new ConnectionMonitor(log);
 		guimanager = new GUIManager();
 
 		new JavaScriptHandler(this, id);
@@ -763,6 +767,10 @@ public class Model extends Observable implements Observer {
 			}
 		});
 		t.start();
+	}
+
+	public ConnectionMonitor getConnectionMonitor() {
+		return connectionMonitor;
 	}
 
 }

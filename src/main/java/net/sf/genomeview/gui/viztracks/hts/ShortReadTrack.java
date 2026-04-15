@@ -71,7 +71,7 @@ public class ShortReadTrack extends Track {
 			for (java.util.Map.Entry<Rectangle, SAMRecord> e : render
 					.meta().hitMap.entrySet()) {
 				if (e.getKey().contains(x, y)) {
-					System.out.println("2*Click: " + e.getValue());
+					// System.out.println("2*Click: " + e.getValue());
 					if (e.getValue().getReadPairedFlag()
 							&& !e.getValue().getMateUnmappedFlag())
 						model.vlm.center(e.getValue().getMateAlignmentStart());

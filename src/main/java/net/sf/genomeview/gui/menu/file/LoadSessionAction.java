@@ -13,9 +13,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
@@ -37,8 +34,8 @@ public class LoadSessionAction extends AbstractAction {
 		this.model = model;
 	}
 
-	private static Logger log = LoggerFactory
-			.getLogger(LoadSessionAction.class.getCanonicalName());
+//	private static Logger log = LoggerFactory
+//			.getLogger(LoadSessionAction.class.getCanonicalName());
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
