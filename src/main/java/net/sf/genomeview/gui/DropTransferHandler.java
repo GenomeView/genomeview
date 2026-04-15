@@ -78,12 +78,13 @@ class DropTransferHandler extends TransferHandler {
 				if (flavor.equals(urlFlavor)) {
 					URL url = (URL) t.getTransferData(urlFlavor);
 					log.log(Level.INFO, "URL dropped: " + url);
-					DataSourceHelper.load(model, new Locator(url.toString()));
+					DataSourceHelper.load(model,
+							new Locator(url.toString(), log));
 					return true;
 				} else if (flavor.equals(uriFlavor)) {
 					String uriString = (String) t.getTransferData(uriFlavor);
 					log.log(Level.INFO, "URI String dropped: " + uriString);
-					DataSourceHelper.load(model, new Locator(uriString));
+					DataSourceHelper.load(model, new Locator(uriString, log));
 					return true;
 				} else if (flavor.equals(DataFlavor.stringFlavor)) {
 					String initString = (String) t
@@ -93,7 +94,7 @@ class DropTransferHandler extends TransferHandler {
 							.split(System.getProperty("line.separator"));
 					for (String s : lines) {
 						log.log(Level.INFO, "String '" + s + "'");
-						DataSourceHelper.load(model, new Locator(s));
+						DataSourceHelper.load(model, new Locator(s, log));
 					}
 					return true;
 				} else if (flavor.equals(DataFlavor.javaFileListFlavor)) {
@@ -108,7 +109,7 @@ class DropTransferHandler extends TransferHandler {
 						log.log(Level.INFO,
 								"File dropped: " + file.getCanonicalPath());
 						DataSourceHelper.load(model,
-								new Locator(file.toString()));
+								new Locator(file.toString(), log));
 					}
 					if (l.size() != 0) {
 						return true;

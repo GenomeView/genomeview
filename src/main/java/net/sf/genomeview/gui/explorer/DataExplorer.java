@@ -6,15 +6,8 @@ package net.sf.genomeview.gui.explorer;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
@@ -22,8 +15,6 @@ import javax.swing.border.Border;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import be.abeel.io.LineIterator;
-import be.abeel.net.URIFactory;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
@@ -42,7 +33,8 @@ class DataExplorer extends EscapeDialog {
 //	private JTabbedPane tabs;
 
 	DataExplorer(final Model model) {
-		super(model.getGUIManager().getMainWindow(), "GenomeView :: " + Configuration.version() + " - Data Explorer",
+		super(model.getGUIManager().getMainWindow(), "GenomeView :: "
+				+ Configuration.instance().version() + " - Data Explorer",
 				ModalityType.APPLICATION_MODAL);
 		setIconImage(Icons.MINILOGO);
 		this.model = model;
@@ -59,7 +51,7 @@ class DataExplorer extends EscapeDialog {
 
 //		tabs = new JTabbedPane();
 
-		JPanel c=new RecentDataPanel(model);
+		JPanel c = new RecentDataPanel(model);
 //		HashMap<String, ArrayList<Genome>> list = new HashMap<String, ArrayList<Genome>>();
 
 //		LineIterator it = new LineIterator(DataExplorer.class.getResourceAsStream("/conf/repositories.txt"), true,
@@ -116,8 +108,6 @@ class DataExplorer extends EscapeDialog {
 //				"<html>Welcome to the GenomeView mammalian genomes section. This is your portal to the GenomeView animal genomes."
 //						+ common, list.get("animal")));
 
-		
-
 //		tabs.addTab(
 //				"Archived genomes",
 //				new GenomesPanel(
@@ -144,7 +134,8 @@ class DataExplorer extends EscapeDialog {
 
 		Border emptyBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 		Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
-		c.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+		c.setBorder(
+				BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
 		c.setBackground(Color.WHITE);
 
 		setContentPane(c);
@@ -154,7 +145,8 @@ class DataExplorer extends EscapeDialog {
 		StaticUtils.center(model.getGUIManager().getMainWindow(), this);
 	}
 
-	private Logger log = LoggerFactory.getLogger(DataExplorer.class.getCanonicalName());
+	private Logger log = LoggerFactory
+			.getLogger(DataExplorer.class.getCanonicalName());
 
 //	private void parse(HashMap<String, ArrayList<Genome>> list, InputStream resourceAsStream) {
 //		LineIterator it = new LineIterator(resourceAsStream, true, true);

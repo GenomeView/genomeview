@@ -29,7 +29,8 @@ public class AnalyzedFeature {
 	private Sequence dna;
 	private String startCodon;
 
-	public AnalyzedFeature(Sequence sequence, Feature rf, AminoAcidMapping aminoAcidMapping) {
+	public AnalyzedFeature(Sequence sequence, Feature rf,
+			AminoAcidMapping aminoAcidMapping) {
 		this.seq = sequence;
 		this.f = rf;
 		this.aa = aminoAcidMapping;
@@ -49,11 +50,14 @@ public class AnalyzedFeature {
 	 */
 	public boolean missingAcceptor(Location l) {
 		if (!l.equals(f.location()[0]) && f.strand() == Strand.FORWARD) {
-			String s = seq.subsequence(l.start - 2, l.start).stringRepresentation();
+			String s = seq.subsequence(l.start - 2, l.start)
+					.stringRepresentation();
 			return !(s.equalsIgnoreCase("ag"));
 		}
-		if (!l.equals(f.location()[f.location().length-1]) && f.strand() == Strand.REVERSE) {
-			String s = seq.subsequence(l.end + 1, l.end + 3).stringRepresentation();
+		if (!l.equals(f.location()[f.location().length - 1])
+				&& f.strand() == Strand.REVERSE) {
+			String s = seq.subsequence(l.end + 1, l.end + 3)
+					.stringRepresentation();
 			return !(s.equalsIgnoreCase("ct"));
 		}
 		return false;
@@ -63,30 +67,32 @@ public class AnalyzedFeature {
 	/**
 	 * Checks whether the provided location misses a donor (GT).
 	 * 
-	 * @param seq
-	 *            sequence to which the feature maps
-	 * @param f
-	 *            feature to which the location belongs
-	 * @param l
-	 *            location to check for missing donor
+	 * @param seq sequence to which the feature maps
+	 * @param f   feature to which the location belongs
+	 * @param l   location to check for missing donor
 	 * @return
 	 */
 	public boolean missingDonor(Location l) {
 
-		if (!l.equals(f.location()[f.location().length-1]) && f.strand() == Strand.FORWARD) {
-			String s = seq.subsequence(l.end + 1, l.end + 3).stringRepresentation();
+		if (!l.equals(f.location()[f.location().length - 1])
+				&& f.strand() == Strand.FORWARD) {
+			String s = seq.subsequence(l.end + 1, l.end + 3)
+					.stringRepresentation();
 			return !(s.equalsIgnoreCase("gt") || s.equalsIgnoreCase("gc"));
 		}
 		if (!l.equals(f.location()[0]) && f.strand() == Strand.REVERSE) {
-			String s = seq.subsequence(l.start - 2, l.start).stringRepresentation();
+			String s = seq.subsequence(l.start - 2, l.start)
+					.stringRepresentation();
 			return !(s.equalsIgnoreCase("ac") || s.equalsIgnoreCase("gc"));
 		}
 		return false;
 	}
 
 	public boolean hasMissingStartCodon() {
-		if(aa.isStart(startCodon))
-			if (!Configuration.getBoolean("general:onlyMethionineAsStart") || aa.get(startCodon) == 'M')
+		if (aa.isStart(startCodon))
+			if (!Configuration.instance()
+					.getBoolean("general:onlyMethionineAsStart")
+					|| aa.get(startCodon) == 'M')
 				return false;
 		return true;
 

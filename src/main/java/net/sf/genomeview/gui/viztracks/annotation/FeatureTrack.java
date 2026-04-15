@@ -109,7 +109,7 @@ public class FeatureTrack extends Track {
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double width,
 			JViewport view, TrackCommunicationModel tcm) {
-		boolean forceLabels = Configuration
+		boolean forceLabels = Configuration.instance()
 				.getBoolean("track:forceFeatureLabels");
 		boolean collision = false;
 		hitmap.clear();
@@ -131,7 +131,7 @@ public class FeatureTrack extends Track {
 		/* Get feature estimate */
 		boolean manyFeature = false;
 		int estimate = annot.getEstimateCount(visible);
-		if (estimate > 25 * Configuration
+		if (estimate > 25 * Configuration.instance()
 				.getInt("annotationview:maximumNoVisibleFeatures")) {
 
 			g.setColor(Color.BLACK);
@@ -141,7 +141,7 @@ public class FeatureTrack extends Track {
 									"featuretrack.too_many_to_display_warn"),
 					10, yOffset + 10);
 			return 20 + 5;
-		} else if (estimate > Configuration
+		} else if (estimate > Configuration.instance()
 				.getInt("annotationview:maximumNoVisibleFeatures")) {
 			manyFeature = true;
 		}
@@ -149,7 +149,8 @@ public class FeatureTrack extends Track {
 		g.translate(0, yOffset + 2);
 		CollisionMap fullBlockMap = new CollisionMap(model);
 
-		int lineThickness = Configuration.getInt("evidenceLineHeight");
+		int lineThickness = Configuration.instance()
+				.getInt("evidenceLineHeight");
 
 		int lines = 0;
 
@@ -162,7 +163,7 @@ public class FeatureTrack extends Track {
 				continue;
 			int thisLine = 0;
 
-			Color c = Configuration.getColor("TYPE_" + rf.type());
+			Color c = Configuration.instance().getColor("TYPE_" + rf.type());
 			// if (ftc.isColorQualifier() && rf.getColor() != null) {
 			String color = rf.getColor();
 			if (color != null) {
@@ -190,7 +191,8 @@ public class FeatureTrack extends Track {
 				 * How close can items be together before they are considered
 				 * overlapping?
 				 */
-				int closenessOverlap = Configuration.getInt("closenessOverlap");
+				int closenessOverlap = Configuration.instance()
+						.getInt("closenessOverlap");
 				Rectangle r = new Rectangle(x1 - closenessOverlap,
 						thisLine * lineThickness,
 						maxX - x1 + 2 * closenessOverlap, lineThickness);
@@ -678,7 +680,7 @@ public class FeatureTrack extends Track {
 		}
 
 		public boolean isScoreColorGradient() {
-			return Configuration
+			return Configuration.instance()
 					.getBoolean("feature:scoreColorGradient_" + type());
 
 		}
@@ -686,7 +688,8 @@ public class FeatureTrack extends Track {
 		public void setScoreColorGradient(boolean scoreColorGradient) {
 			// this.scoreColorGradient = scoreColorGradient;
 			if (isScoreColorGradient() != scoreColorGradient) {
-				Configuration.set("feature:scoreColorGradient_" + type(),
+				Configuration.instance().set(
+						"feature:scoreColorGradient_" + type(),
 						scoreColorGradient);
 				model.refresh(this);
 			}

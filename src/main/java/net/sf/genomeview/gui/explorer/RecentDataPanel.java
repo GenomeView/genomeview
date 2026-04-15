@@ -189,7 +189,7 @@ public class RecentDataPanel extends GridBagPanel {
 						try {
 
 							DataSourceHelper.load(model,
-									new Locator(selection));
+									new Locator(selection, model.getLog()));
 						} catch (Exception e1) {
 							CrashHandler.showErrorMessage(
 									MessageManager.getString(
@@ -218,7 +218,7 @@ public class RecentDataPanel extends GridBagPanel {
 						try {
 
 							DataSourceHelper.load(model,
-									new Locator(selection));
+									new Locator(selection, model.getLog()));
 						} catch (Exception e1) {
 							CrashHandler.showErrorMessage(
 									MessageManager.getString(

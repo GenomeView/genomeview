@@ -66,7 +66,8 @@ public class StructureTrack extends Track {
 	public static final StringKey key = new StringKey("GV::STRUCTURE");
 
 	public StructureTrack(Model model) {
-		super(key, model, Configuration.getBoolean("track:showStructure"),
+		super(key, model,
+				Configuration.instance().getBoolean("track:showStructure"),
 				new StructureTrackModel(model, key));
 
 		collisionMap = new CollisionMap(model);
@@ -86,7 +87,8 @@ public class StructureTrack extends Track {
 		// Do nothing
 	}
 
-	private int lineHeight = Configuration.getInt("geneStructureLineHeight");
+	private int lineHeight = Configuration.instance()
+			.getInt("geneStructureLineHeight");
 
 	/* The height of the ticks and coordinate drawing */
 	private static final int tickHeight = 32;
@@ -360,9 +362,9 @@ public class StructureTrack extends Track {
 		Graphics2D g = (Graphics2D) g1;
 		Location r = model.vlm.getAnnotationLocationVisible();
 		double width = screenWidth / (double) r.length();
-		boolean spliceSitePaint = Configuration
+		boolean spliceSitePaint = Configuration.instance()
 				.getBoolean("showSpliceSiteColor");
-		boolean nucleotidePaint = Configuration
+		boolean nucleotidePaint = Configuration.instance()
 				.getBoolean("showNucleotideColor");
 		for (int i = r.start(); i <= r.end(); i++) {
 			char nt = bs.getNucleotide(i);
@@ -380,7 +382,7 @@ public class StructureTrack extends Track {
 							(int) (2 * width) + 1, lineHeight);
 				}
 			} else if (nucleotidePaint) {
-				g.setColor(Configuration.getNucleotideColor(nt));
+				g.setColor(Configuration.instance().getNucleotideColor(nt));
 				g.fillRect((int) ((i - r.start()) * width), 3 * lineHeight
 						+ (forward ? 0 : tickHeight + lineHeight) + yOffset,
 						(int) width + 1, lineHeight);
@@ -495,24 +497,25 @@ public class StructureTrack extends Track {
 			int aa_width = (int) (width * 3);
 
 			/* Only color start and stop codons. */
-			if (Configuration.getBoolean("colorStopCodons")
+			if (Configuration.instance().getBoolean("colorStopCodons")
 					&& model.getAAMapping().isStop(aa)) {
-				g.setColor(Configuration.getAminoAcidColor('*'));
+				g.setColor(Configuration.instance().getAminoAcidColor('*'));
 				g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width,
 						lineHeight);
 			}
 
-			if (Configuration.getBoolean("colorStartCodons")
+			if (Configuration.instance().getBoolean("colorStartCodons")
 					&& model.getAAMapping().isStart(codon)) {
-				g.setColor(Configuration.getAminoAcidColor('M'));
-				if (!Configuration.getBoolean("general:onlyMethionineAsStart")
+				g.setColor(Configuration.instance().getAminoAcidColor('M'));
+				if (!Configuration.instance()
+						.getBoolean("general:onlyMethionineAsStart")
 						|| model.getAAMapping().get(codon) == 'M')
 					g.fillRect(x, y + yOffset, aa_width == 0 ? 1 : aa_width,
 							lineHeight);
 			}
 
 			if (model.vlm.getAnnotationLocationVisible()
-					.length() < Configuration.getInt(
+					.length() < Configuration.instance().getInt(
 							"geneStructureAminoAcidWindowVerticalBars")) {
 				g.setColor(Colors.LIGHEST_GRAY);
 				g.drawLine(x + aa_width, y + yOffset, x + aa_width,
@@ -525,7 +528,7 @@ public class StructureTrack extends Track {
 			 * visible.
 			 */
 			if (model.vlm.getAnnotationLocationVisible()
-					.length() < Configuration
+					.length() < Configuration.instance()
 							.getInt("geneStructureAminoAcidWindowLetters")) {
 				if (!aaStringBoundsCache.containsKey(aa))
 					aaStringBoundsCache.put(aa,
@@ -572,7 +575,7 @@ public class StructureTrack extends Track {
 						.getVisibleEntry().get(type);
 				if (annot != null) {
 					Iterable<Feature> trackData = annot.get(l.start, l.end);
-					if (annot.getEstimateCount(l) <= Configuration
+					if (annot.getEstimateCount(l) <= Configuration.instance()
 							.getInt("structureview:maximumNoVisibleFeatures")) {
 						for (Feature rf : trackData) {
 							g.setColor(Color.BLACK);
@@ -645,7 +648,7 @@ public class StructureTrack extends Track {
 			Rectangle r = new Rectangle(lmin, hor + yOffset, lmax - lmin,
 					height);
 			/* Draw box */
-			Color cdsColor = Configuration.getColor("TYPE_CDS");
+			Color cdsColor = Configuration.instance().getColor("TYPE_CDS");
 			g.setColor(new Color(cdsColor.getRed(), cdsColor.getGreen(),
 					cdsColor.getBlue(), 20));
 			g.fill(r);
@@ -1043,7 +1046,7 @@ public class StructureTrack extends Track {
 
 		/* paint amino acids */
 		if (model.vlm.getAnnotationLocationVisible().length() < Configuration
-				.getInt("geneStructureAminoAcidWindow")) {
+				.instance().getInt("geneStructureAminoAcidWindow")) {
 			if (bs == null)
 				bs = new BufferSeq(entry.sequence(), new Location(
 						visibleRegion.start - 3, visibleRegion.end + 3));
@@ -1061,7 +1064,7 @@ public class StructureTrack extends Track {
 
 		/* paint sequence */
 		if (model.vlm.getAnnotationLocationVisible().length() < Configuration
-				.getInt("geneStructureNucleotideWindow")) {
+				.instance().getInt("geneStructureNucleotideWindow")) {
 			if (bs == null)
 				bs = new BufferSeq(entry.sequence(), new Location(
 						visibleRegion.start - 3, visibleRegion.end + 3));

@@ -15,7 +15,9 @@ import tudelft.utilities.logging.Reporter;
  */
 public class DistributingReporter implements Reporter {
 
-	private static final File GENOMEVIEW_LOGFILE = new File("genomeview.log");
+	// FIXME check if this works on windows
+	private static final File GENOMEVIEW_LOGFILE = new File(
+			System.getProperty("user.home") + "/.genomeview/genomeview.log");
 	private final List<Reporter> children = new ArrayList<>();
 
 	/**

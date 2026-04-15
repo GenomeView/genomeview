@@ -21,13 +21,16 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
 
 public class OpenFileButton extends JButton {
-	
+
 	private static final long serialVersionUID = 869265859335849511L;
-	private final String[] exts = new String[] { "fasta", "fa", "fas", "embl", "fna", "gtf", "gff", "gff3", "maln", "syn", "wig", "mfa", "bed", "mapview", "bam", "maf", "snp", "tbl", "gb", "gbk",
-			"pileup", "con", "peaks", "tdf", "bw", "bigwig" };
+	private final String[] exts = new String[] { "fasta", "fa", "fas", "embl",
+			"fna", "gtf", "gff", "gff3", "maln", "syn", "wig", "mfa", "bed",
+			"mapview", "bam", "maf", "snp", "tbl", "gb", "gbk", "pileup", "con",
+			"peaks", "tdf", "bw", "bigwig" };
 
 	public OpenFileButton(final Model gvModel) {
-		super(MessageManager.getString("opendialog.local_files"), Icons.get("Hard Disk_48x48.png"));
+		super(MessageManager.getString("opendialog.local_files"),
+				Icons.get("Hard Disk_48x48.png"));
 		setVerticalTextPosition(SwingConstants.BOTTOM);
 		setHorizontalTextPosition(SwingConstants.CENTER);
 		addActionListener(new ActionListener() {
@@ -35,7 +38,8 @@ public class OpenFileButton extends JButton {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
+				JFileChooser chooser = new JFileChooser(
+						Configuration.instance().getFile("lastDirectory"));
 				chooser.resetChoosableFileFilters();
 				for (final String ext : exts) {
 					chooser.addChoosableFileFilter(new FileFilter() {
@@ -45,7 +49,11 @@ public class OpenFileButton extends JButton {
 							if (f.isDirectory())
 								return true;
 
-							if (f.getName().toLowerCase().endsWith(ext) || f.getName().toLowerCase().endsWith(ext + ".gz") || f.getName().toLowerCase().endsWith(ext + ".bgz")) {
+							if (f.getName().toLowerCase().endsWith(ext)
+									|| f.getName().toLowerCase()
+											.endsWith(ext + ".gz")
+									|| f.getName().toLowerCase()
+											.endsWith(ext + ".bgz")) {
 								return true;
 							}
 
@@ -67,7 +75,11 @@ public class OpenFileButton extends JButton {
 							return true;
 						for (String ext : exts) {
 
-							if (f.getName().toLowerCase().endsWith(ext) || f.getName().toLowerCase().endsWith(ext + ".gz") || f.getName().toLowerCase().endsWith(ext + ".bgz")) {
+							if (f.getName().toLowerCase().endsWith(ext)
+									|| f.getName().toLowerCase()
+											.endsWith(ext + ".gz")
+									|| f.getName().toLowerCase()
+											.endsWith(ext + ".bgz")) {
 								return true;
 							}
 						}
@@ -82,16 +94,19 @@ public class OpenFileButton extends JButton {
 				});
 
 				chooser.setMultiSelectionEnabled(true);
-				int returnVal = chooser.showOpenDialog(gvModel.getGUIManager().getMainWindow());
+				int returnVal = chooser.showOpenDialog(
+						gvModel.getGUIManager().getMainWindow());
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					File[] files = chooser.getSelectedFiles();
 					// DataSource[] out = new DataSource[files.length];
 					try {
 						for (int i = 0; i < files.length; i++) {
-							DataSourceHelper.load(gvModel, new Locator(files[i].toString()));
+							DataSourceHelper.load(gvModel, new Locator(
+									files[i].toString(), gvModel.getLog()));
 
 						}
-						Configuration.set("lastDirectory", files[0].getParentFile());
+						Configuration.instance().set("lastDirectory",
+								files[0].getParentFile());
 						// load(out);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
@@ -107,8 +122,6 @@ public class OpenFileButton extends JButton {
 
 			}
 		});
-
-		
 
 	}
 

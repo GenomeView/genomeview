@@ -134,14 +134,14 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 	@Override
 	public void dataReady(Location currentVisible, List<SAMRecord> reads) {
 		RenderingMetaData newMeta = new RenderingMetaData();
-		int maxReads = Configuration.getInt("shortread:maxReads");
+		int maxReads = Configuration.instance().getInt("shortread:maxReads");
 
-		int maxStack = Configuration.getInt("shortread:maxStack");
+		int maxStack = Configuration.instance().getInt("shortread:maxStack");
 
 		int readLineHeight = 3;
 
 		// Location currentVisible=;
-		if (currentVisible.length() < Configuration
+		if (currentVisible.length() < Configuration.instance()
 				.getInt("geneStructureNucleotideWindow")) {
 			/*
 			 * Make some room for the SNP track. Although it's painted last, it
@@ -182,7 +182,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) bi.getGraphics();
 		boolean stackExceeded = false;
-		boolean enablePairing = Configuration
+		boolean enablePairing = Configuration.instance()
 				.getBoolean("shortread:enablepairing");
 		lines = 0;
 
@@ -389,7 +389,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		// this.currentVisible = currentVisible;
 		this.srtc = srtc;
 
-		int maxRegion = Configuration.getInt("shortread:maxRegion");
+		int maxRegion = Configuration.instance().getInt("shortread:maxRegion");
 
 		if (currentVisible.length() > maxRegion) {
 			BufferedImage bi = new BufferedImage((int) screenWidth, 20,
@@ -564,7 +564,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		/*
 		 * == Detailed mode ==
 		 */
-		if (annotationVisible.length() < Configuration
+		if (annotationVisible.length() < Configuration.instance()
 				.getInt("geneStructureNucleotideWindow")) {
 
 			newMeta.hitMap.put(r, rf);

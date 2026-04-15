@@ -54,7 +54,8 @@ public class GenomeView {
 
 // FIXME do something about the original config?
 //		LogConfigurator.config();
-		log.log(Level.INFO, "Starting GenomeView " + Configuration.version());
+		log.log(Level.INFO,
+				"Starting GenomeView " + Configuration.instance().version());
 		log.log(Level.INFO, "Using language: " + MessageManager.getLocale());
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
@@ -82,9 +83,9 @@ public class GenomeView {
 				 * before we can start the logger
 				 */
 
-				log.log(Level.INFO,
-						"Configuration summary: \n\tGenomeView version: "
-								+ Configuration.version());
+				log.log(Level.INFO, "Configuration summary:");
+				log.log(Level.INFO, "GenomeView version: "
+						+ Configuration.instance().version());
 				log.log(Level.INFO, "Current date and time: " + new Date());
 				log.log(Level.INFO,
 						"Command line instructions: " + Arrays.toString(args));
@@ -110,7 +111,7 @@ public class GenomeView {
 
 				CommandLineOptions.init(args, log);
 				/* Single instance manager */
-				boolean singleInstance = Configuration
+				boolean singleInstance = Configuration.instance()
 						.getBoolean("general:singleInstance");
 				if (singleInstance) {
 					if (!ApplicationInstanceManager.registerInstance(args,

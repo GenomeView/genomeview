@@ -6,19 +6,18 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Observable;
 import java.util.Observer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.abeel.concurrency.DaemonThread;
+import be.abeel.io.LineIterator;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.gui.MessageManager;
-import be.abeel.concurrency.DaemonThread;
-import be.abeel.io.LineIterator;
 
 /**
  * 
@@ -33,7 +32,8 @@ public class ConnectionMonitor extends Observable {
 	private boolean webstartOnline = false;
 	private boolean reposOnline = false;
 	private boolean networkInterface = false;
-	private Logger log = LoggerFactory.getLogger(ConnectionMonitor.class.getCanonicalName());
+	private Logger log = LoggerFactory
+			.getLogger(ConnectionMonitor.class.getCanonicalName());
 
 	public static final ConnectionMonitor instance = new ConnectionMonitor();
 
@@ -42,38 +42,49 @@ public class ConnectionMonitor extends Observable {
 	public JLabel reposLabel = new JLabel();
 
 	private ConnectionMonitor() {
-		networkLabel.setPreferredSize(new Dimension(online.getIconWidth(), online.getIconHeight()));
-		webLabel.setPreferredSize(new Dimension(online.getIconWidth(), online.getIconHeight()));
-		reposLabel.setPreferredSize(new Dimension(online.getIconWidth(), online.getIconHeight()));
+		networkLabel.setPreferredSize(
+				new Dimension(online.getIconWidth(), online.getIconHeight()));
+		webLabel.setPreferredSize(
+				new Dimension(online.getIconWidth(), online.getIconHeight()));
+		reposLabel.setPreferredSize(
+				new Dimension(online.getIconWidth(), online.getIconHeight()));
 		this.addObserver(new Observer() {
 
 			@Override
 			public void update(Observable o, Object arg) {
 				if (webstartOnline) {
 					webLabel.setIcon(online);
-					webLabel.setToolTipText(MessageManager.getString("connectionmonitor.genomeview_online"));
+					webLabel.setToolTipText(MessageManager
+							.getString("connectionmonitor.genomeview_online"));
 				} else {
 					webLabel.setIcon(offline);
-					webLabel.setToolTipText(MessageManager.getString("connectionmonitor.cannot_connect_genomeview"));
+					webLabel.setToolTipText(MessageManager.getString(
+							"connectionmonitor.cannot_connect_genomeview"));
 				}
 				if (reposOnline) {
 					reposLabel.setIcon(online);
-					reposLabel.setToolTipText(MessageManager.getString("connectionmonitor.data_repository_online"));
+					reposLabel.setToolTipText(MessageManager.getString(
+							"connectionmonitor.data_repository_online"));
 				} else {
 					reposLabel.setIcon(offline);
-					reposLabel.setToolTipText(MessageManager.getString("connectionmonitor.cannot_connect_data_repository"));
+					reposLabel.setToolTipText(MessageManager.getString(
+							"connectionmonitor.cannot_connect_data_repository"));
 				}
 
 				StringBuffer text = new StringBuffer();
 				try {
-					Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+					Enumeration<NetworkInterface> nets = NetworkInterface
+							.getNetworkInterfaces();
 					for (NetworkInterface netint : Collections.list(nets))
 						if (!netint.isLoopback()) {
-							text.append((netint.isUp() ? "online" : "offline") + " - " + netint.getName() + " - "
-									+ netint.getInterfaceAddresses().toString() + "<br/>");
+							text.append((netint.isUp() ? "online" : "offline")
+									+ " - " + netint.getName() + " - "
+									+ netint.getInterfaceAddresses().toString()
+									+ "<br/>");
 
 						}
-					networkLabel.setToolTipText("<html>" + text.toString() + "</html>");
+					networkLabel.setToolTipText(
+							"<html>" + text.toString() + "</html>");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -100,23 +111,25 @@ public class ConnectionMonitor extends Observable {
 					webstartOnline = false;
 
 					try {
-						if (Configuration.getBoolean("general:monitorConnection")) {
-							LineIterator it = new LineIterator("http://genomeview.org/online.php");
-							//log.info("Reply from web: " + it.next());
+						if (Configuration.instance()
+								.getBoolean("general:monitorConnection")) {
+							LineIterator it = new LineIterator(
+									"http://genomeview.org/online.php");
+							// log.info("Reply from web: " + it.next());
 							it.close();
 
 						}
 						webstartOnline = true;
 					} catch (Exception e) {
 						// Failed, try again later;
-						log.debug( "Connection failed", e);
+						log.debug("Connection failed", e);
 					}
 					setChanged();
 					notifyObservers();
 					try {
 						Thread.sleep(10 * 1000);
 					} catch (InterruptedException e) {
-						log.debug( "interrupted", e);
+						log.debug("interrupted", e);
 					}
 
 				}
@@ -130,22 +143,24 @@ public class ConnectionMonitor extends Observable {
 				while (true) {
 					reposOnline = false;
 					try {
-						if (Configuration.getBoolean("general:monitorConnection")) {
-							LineIterator it = new LineIterator("http://www.broadinstitute.org/software/genomeview/online.php");
-							//log.info("Reply from repository: " + it.next());
+						if (Configuration.instance()
+								.getBoolean("general:monitorConnection")) {
+							LineIterator it = new LineIterator(
+									"http://www.broadinstitute.org/software/genomeview/online.php");
+							// log.info("Reply from repository: " + it.next());
 							it.close();
 						}
 						reposOnline = true;
 					} catch (Exception e) {
 						// Failed, try again later;
-						log.debug( "Connection failed", e);
+						log.debug("Connection failed", e);
 					}
 					setChanged();
 					notifyObservers();
 					try {
 						Thread.sleep(10 * 1000);
 					} catch (InterruptedException e) {
-						log.debug( "interrupted", e);
+						log.debug("interrupted", e);
 					}
 				}
 
@@ -161,7 +176,8 @@ public class ConnectionMonitor extends Observable {
 					networkInterface = false;
 
 					try {
-						Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+						Enumeration<NetworkInterface> nets = NetworkInterface
+								.getNetworkInterfaces();
 						for (NetworkInterface netint : Collections.list(nets))
 							if (!netint.isLoopback()) {
 								if (netint.isUp())
@@ -180,7 +196,7 @@ public class ConnectionMonitor extends Observable {
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
-						log.debug( "interrupted", e);
+						log.debug("interrupted", e);
 					}
 
 				}

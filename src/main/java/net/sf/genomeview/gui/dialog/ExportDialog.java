@@ -13,18 +13,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -35,6 +30,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ProgressMonitorInputStream;
 import javax.swing.filechooser.FileFilter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
@@ -71,9 +69,9 @@ public class ExportDialog extends JDialog {
 		}
 
 		public Thread[] export(File location) {
-			Thread t=save(data, location);
-			Thread s=save(idx, location);
-			return new Thread[]{t,s};
+			Thread t = save(data, location);
+			Thread s = save(idx, location);
+			return new Thread[] { t, s };
 
 		}
 
@@ -81,32 +79,23 @@ public class ExportDialog extends JDialog {
 			if (loc == null)
 				return null;
 			try {
-				System.out.println("Loc: "+loc+", "+location);
+				System.out.println("Loc: " + loc + ", " + location);
 				System.out.println(loc.getName());
 				File out = new File(location, loc.getName());
-				InputStream r=null;
-				if(loc.isURL())
-					r=loc.url().openStream();
+				InputStream r = null;
+				if (loc.isURL())
+					r = loc.url().openStream();
 				else
-					r=new FileInputStream(loc.file());
-				
-				InputStream in = new ProgressMonitorInputStream(m.getGUIManager().getMainWindow(), "Downloading file "
-						+ loc.getName(), r);
+					r = new FileInputStream(loc.file());
+
+				InputStream in = new ProgressMonitorInputStream(
+						m.getGUIManager().getMainWindow(),
+						"Downloading file " + loc.getName(), r);
 				FileOutputStream fos = new FileOutputStream(out);
 				return copy(in, fos);
 
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (URISyntaxException | IOException e) {
+				m.getLog().log(Level.WARNING, "save failed to " + loc, e);
 			}
 			return null;
 
@@ -120,7 +109,7 @@ public class ExportDialog extends JDialog {
 
 					// Read bytes and write to destination until eof
 					try {
-						byte[] buf = new byte[16 *1024* 1024];
+						byte[] buf = new byte[16 * 1024 * 1024];
 						int len = 0;
 						while ((len = in.read(buf)) >= 0) {
 							out.write(buf, 0, len);
@@ -129,9 +118,9 @@ public class ExportDialog extends JDialog {
 						out.close();
 						in.close();
 					} catch (Exception e) {
-						log.error( "Error while copying file", e);
+						log.error("Error while copying file", e);
 					}
-					
+
 				}
 
 			});
@@ -143,11 +132,12 @@ public class ExportDialog extends JDialog {
 
 	}
 
-	private static final Logger log = LoggerFactory.getLogger(ExportDialog.class.getCanonicalName());
+	private static final Logger log = LoggerFactory
+			.getLogger(ExportDialog.class.getCanonicalName());
 
 	private ExportDialog(final Model model, final boolean useDefault) {
 		super(model.getGUIManager().getMainWindow(), "Export dialog", true);
-		final ExportDialog _self=this;
+		final ExportDialog _self = this;
 		setLayout(new GridBagLayout());
 
 		GridBagConstraints gc = new GridBagConstraints();
@@ -161,7 +151,8 @@ public class ExportDialog extends JDialog {
 		gc.fill = GridBagConstraints.BOTH;
 
 		final ArrayList<DataSourceCheckbox> dss = new ArrayList<DataSourceCheckbox>();
-		add(new JLabel(MessageManager.getString("exportdialog.select_sources")), gc);
+		add(new JLabel(MessageManager.getString("exportdialog.select_sources")),
+				gc);
 
 		gc.gridy++;
 		Container cp = new Container();
@@ -173,7 +164,7 @@ public class ExportDialog extends JDialog {
 			Locator idx = null;
 
 			if (ds.isIndexed()) {
-				idx = IndexManager.getIndex(data);
+				idx = IndexManager.getIndex(data, model.getLog());
 			}
 
 			DataSourceCheckbox dsb = new DataSourceCheckbox(model, data, idx);
@@ -198,7 +189,8 @@ public class ExportDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				final Hider h = new Hider(model, MessageManager.getString("exportdialog.saving_data"));
+				final Hider h = new Hider(model,
+						MessageManager.getString("exportdialog.saving_data"));
 
 				EventQueue.invokeLater(new Runnable() {
 					@Override
@@ -207,26 +199,26 @@ public class ExportDialog extends JDialog {
 
 							File location = file();
 
-							if (location == null){
+							if (location == null) {
 								h.dispose();
 								return;
 							}
 
-							final ArrayList<Thread>monitor=new ArrayList<Thread>();
+							final ArrayList<Thread> monitor = new ArrayList<Thread>();
 							for (DataSourceCheckbox dsb : dss) {
 								if (dsb.isSelected()) {
-									Thread[]a=dsb.export(location);
-									for(int i=0;i<a.length;i++)
-										if(a[i]!=null)
-										monitor.add(a[i]);
+									Thread[] a = dsb.export(location);
+									for (int i = 0; i < a.length; i++)
+										if (a[i] != null)
+											monitor.add(a[i]);
 
 								}
 							}
-							Thread moni=new Thread(new Runnable(){
+							Thread moni = new Thread(new Runnable() {
 
 								@Override
 								public void run() {
-									for(Thread t:monitor){
+									for (Thread t : monitor) {
 										try {
 											t.join();
 										} catch (InterruptedException e) {
@@ -234,20 +226,29 @@ public class ExportDialog extends JDialog {
 											e.printStackTrace();
 										}
 									}
-									
-									
-									JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("exportdialog.export_complete"));
-									
+
+									JOptionPane.showMessageDialog(
+											model.getGUIManager()
+													.getMainWindow(),
+											MessageManager.getString(
+													"exportdialog.export_complete"));
+
 								}
-								
+
 							});
 							moni.setDaemon(true);
 							moni.start();
-							JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("exportdialog.export_started"));
-						
+							JOptionPane.showMessageDialog(
+									model.getGUIManager().getMainWindow(),
+									MessageManager.getString(
+											"exportdialog.export_started"));
+
 						} catch (Exception ex) {
-							log.error( "Save failed", ex);
-							JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("exportdialog.save_failed"));
+							log.error("Save failed", ex);
+							JOptionPane.showMessageDialog(
+									model.getGUIManager().getMainWindow(),
+									MessageManager.getString(
+											"exportdialog.save_failed"));
 						}
 						h.dispose();
 						_self.dispose();
@@ -279,7 +280,8 @@ public class ExportDialog extends JDialog {
 			}
 
 			private File file() {
-				JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
+				JFileChooser chooser = new JFileChooser(
+						Configuration.instance().getFile("lastDirectory"));
 				chooser.addChoosableFileFilter(new FileFilter() {
 
 					@Override
@@ -293,7 +295,8 @@ public class ExportDialog extends JDialog {
 					}
 				});
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				int returnVal = chooser.showSaveDialog(model.getGUIManager().getMainWindow());
+				int returnVal = chooser
+						.showSaveDialog(model.getGUIManager().getMainWindow());
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					File files = chooser.getSelectedFile();
 					return files;
@@ -315,7 +318,7 @@ public class ExportDialog extends JDialog {
 		});
 
 		pack();
-		StaticUtils.center(model.getGUIManager().getMainWindow(),this);
+		StaticUtils.center(model.getGUIManager().getMainWindow(), this);
 		setVisible(true);
 	}
 

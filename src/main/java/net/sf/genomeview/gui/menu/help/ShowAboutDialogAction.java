@@ -13,7 +13,6 @@ import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 
-
 /**
  * Action to show the about dialog.
  * 
@@ -23,22 +22,27 @@ import net.sf.genomeview.gui.MessageManager;
  */
 public class ShowAboutDialogAction extends AbstractAction {
 
-    private Model model;
+	private Model model;
 
-    private static final long serialVersionUID = 4182067300462615334L;
+	private static final long serialVersionUID = 4182067300462615334L;
 
-    public ShowAboutDialogAction(Model model) {
-        super(MessageManager.getString("helpmenu.about"));
-        this.model = model;
-    }
+	public ShowAboutDialogAction(Model model) {
+		super(MessageManager.getString("helpmenu.about"));
+		this.model = model;
+	}
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+	@Override
+	public void actionPerformed(ActionEvent e) {
 
-        String message = MessageManager.formatMessage("helpmenu.message", new Object[]{Configuration.version(),Configuration.getDirectory().toString()});
-        
-        JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), message, MessageManager.formatMessage("helpmenu.version", new Object[]{Configuration.version()}),
-                JOptionPane.INFORMATION_MESSAGE,Icons.MINILOGO_ICON);
-    }
+		String message = MessageManager.formatMessage("helpmenu.message",
+				new Object[] { Configuration.instance().version(),
+						Configuration.instance().getDirectory().toString() });
+
+		JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
+				message,
+				MessageManager.formatMessage("helpmenu.version",
+						new Object[] { Configuration.instance().version() }),
+				JOptionPane.INFORMATION_MESSAGE, Icons.MINILOGO_ICON);
+	}
 
 }

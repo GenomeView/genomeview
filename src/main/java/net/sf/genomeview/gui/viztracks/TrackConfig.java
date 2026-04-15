@@ -67,7 +67,7 @@ public class TrackConfig extends Observable {
 				MessageManager.getString("trackconfig.track_alias"), model),
 				guicontainer.gc);
 		guicontainer.gc.gridy++;
-		Configuration.getVisible(dataKey);
+		Configuration.instance().getVisible(dataKey);
 		guicontainer.add(new BooleanConfig("track:visible:" + dataKey,
 				MessageManager.getString("trackconfig.track_visible"), model),
 				guicontainer.gc);
@@ -89,7 +89,7 @@ public class TrackConfig extends Observable {
 	}
 
 	final public String shortDisplayName() {
-		String alias = Configuration.get("track:alias:" + dataKey);
+		String alias = Configuration.instance().get("track:alias:" + dataKey);
 		if (alias != null && alias.length() > 0)
 			return alias;
 		else {
@@ -106,7 +106,7 @@ public class TrackConfig extends Observable {
 	}
 
 	final public String displayName() {
-		String alias = Configuration.get("track:alias:" + dataKey);
+		String alias = Configuration.instance().get("track:alias:" + dataKey);
 		if (alias != null && alias.length() > 0)
 			return alias;
 		else
@@ -126,17 +126,17 @@ public class TrackConfig extends Observable {
 	}
 
 	public boolean isVisible() {
-		return Configuration.getVisible(dataKey);
+		return Configuration.instance().getVisible(dataKey);
 	}
 
 	public void setVisible(boolean visible) {
-		Configuration.setVisible(dataKey, visible);
+		Configuration.instance().setVisible(dataKey, visible);
 		setChanged();
 		notifyObservers("TrackConfig::setVisible");
 	}
 
 	public void setCollapsed(boolean collapsed) {
-		Configuration.set("track:collapsed:" + dataKey, collapsed);
+		Configuration.instance().set("track:collapsed:" + dataKey, collapsed);
 		setChanged();
 		notifyObservers("TrackConfig::setCollapsed");
 	}
@@ -146,7 +146,8 @@ public class TrackConfig extends Observable {
 	}
 
 	public boolean isCollapsed() {
-		return Configuration.getBoolean("track:collapsed:" + dataKey);
+		return Configuration.instance()
+				.getBoolean("track:collapsed:" + dataKey);
 	}
 
 	public void setConfigVisible(boolean b) {

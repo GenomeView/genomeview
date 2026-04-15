@@ -9,16 +9,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import be.abeel.io.GZIPPrintWriter;
 import be.abeel.io.LineIterator;
@@ -37,54 +33,10 @@ import net.sf.nameservice.NameService;
  */
 public class Configuration {
 
-	public static Set<String> keySet() {
-		Set<String> tmp = new HashSet<String>();
-		tmp.addAll(extraMap.keySet());
-		tmp.addAll(localMap.keySet());
-		tmp.addAll(defaultMap.keySet());
-		return tmp;
-	}
-
-	public static final Color green = new Color(0, 128, 0);
-
 	private static File confDir;
 
-	public static char[] getNucleotides() {
-		return new char[] { 'a', 't', 'g', 'c', 'A', 'T', 'G', 'C', 'n', 'N' };
-	}
-
-	public static char[] getAminoAcids() {
-		return new char[] { 'M', '*', 'X', 'Y', 'W', 'V', 'U', 'T', 'S', 'R',
-				'Q', 'P', 'N', 'L', 'K', 'I', 'H', 'G', 'F', 'E', 'D', 'C',
-				'A' };
-
-	}
-
-	private static Logger logger = LoggerFactory
-			.getLogger(Configuration.class.getCanonicalName());
-
-	static {
-		String s = System.getProperty("user.home");
-		confDir = new File(s + "/.genomeview");
-		if (!confDir.exists()) {
-			if (!confDir.mkdir()) {
-				logger.warn("Could not create configuration in user directory: "
-						+ confDir + ", let's try run folder.");
-				confDir = new File(".genomeview");
-				if (!confDir.exists()) {
-					if (!confDir.mkdir()) {
-						logger.error(
-								"Could not create configuration in runtime directory directory: "
-										+ confDir);
-						confDir = null;
-					}
-				}
-			}
-
-		}
-		logger.info("User config: " + confDir);
-
-	}
+//	private static Logger logger = LoggerFactory
+//			.getLogger(Configuration.class.getCanonicalName());
 
 	/* Map with resource configuration */
 	private static HashMap<String, String> resourceMap = new HashMap<String, String>();
@@ -102,7 +54,36 @@ public class Configuration {
 
 	private static File configFile;
 
-	static {
+	private static Configuration instance;
+
+	/**
+	 * @throws IllegalStateException if the Configuration can not be created or
+	 *                               read. This is a nasty RuntimeException that
+	 *                               we don't catch anywhere, assuming
+	 *                               GenomeView will die instantly at startup if
+	 *                               this happens.
+	 */
+	private Configuration() {
+		String s = System.getProperty("user.home");
+		confDir = new File(s + "/.genomeview");
+		if (!confDir.exists()) {
+			if (!confDir.mkdir()) {
+//				logger.warn("Could not create configuration in user directory: "
+//						+ confDir + ", let's try run folder.");
+				confDir = new File(".genomeview");
+				if (!confDir.exists()) {
+					if (!confDir.mkdir()) {
+//						logger.error(
+//								"Could not create configuration in runtime directory directory: "
+//										+ confDir);
+						confDir = null;
+					}
+				}
+			}
+
+		}
+		// logger.info("User config: " + confDir);
+
 		try {
 			load();
 			/*
@@ -111,9 +92,20 @@ public class Configuration {
 			 */
 			save();
 		} catch (IOException e) {
-			CrashHandler.crash("IOException while loading configuration", e);
-
+			throw new IllegalStateException("Failed to load configuration", e);
 		}
+
+	}
+
+	/**
+	 * 
+	 * @return the instance of this Configuration.
+	 */
+	public static Configuration instance() {
+		if (instance == null) {
+			instance = new Configuration();
+		}
+		return instance;
 	}
 
 	/**
@@ -122,7 +114,7 @@ public class Configuration {
 	 *         {@link #extraMap}, {@link #localMap} or {@link #defaultMap} (in
 	 *         this order), or null if none of these contains the key
 	 */
-	public static String get(String key) {
+	public String get(String key) {
 		if (resourceMap.containsKey(key)) {
 			return resourceMap.get(key);
 		} else if (extraMap.containsKey(key)) {
@@ -139,15 +131,43 @@ public class Configuration {
 
 	}
 
-	private static void load() throws IOException {
+	public char[] getNucleotides() {
+		return new char[] { 'a', 't', 'g', 'c', 'A', 'T', 'G', 'C', 'n', 'N' };
+	}
+
+	public char[] getAminoAcids() {
+		return new char[] { 'M', '*', 'X', 'Y', 'W', 'V', 'U', 'T', 'S', 'R',
+				'Q', 'P', 'N', 'L', 'K', 'I', 'H', 'G', 'F', 'E', 'D', 'C',
+				'A' };
+
+	}
+
+	public Set<String> keySet() {
+		Set<String> tmp = new HashSet<String>();
+		tmp.addAll(extraMap.keySet());
+		tmp.addAll(localMap.keySet());
+		tmp.addAll(defaultMap.keySet());
+		return tmp;
+	}
+
+	/**
+	 * load various versious of configuration.
+	 * <ol>
+	 * <li>In classpath in /genomeview.properties
+	 * <li>In classpath in /conf/default.conf
+	 * <li>In classpath in /conf/resources.conf
+	 * 
+	 * @throws IOException
+	 */
+	private void load() throws IOException {
 		InputStream is = null;
 		try {
 			is = Configuration.class
 					.getResourceAsStream("/genomeview.properties");
 			gvProperties.load(is);
 		} catch (Exception e1) {
-			logger.warn(
-					"genomeview.properties file could not be loaded! GenomeView assumes you are a developer and know why you can ignore this.");
+			throw new IOException(
+					"genomeview.properties file could not be loaded! ", e1);
 
 		} finally {
 			if (is != null)
@@ -156,7 +176,7 @@ public class Configuration {
 
 		/* loading default configuration from the jar */
 
-		logger.info("Loading default configuration...");
+//		logger.info("Loading default configuration...");
 		LineIterator it;
 
 		try {
@@ -182,32 +202,23 @@ public class Configuration {
 			updateSynonyms();
 
 		} catch (Exception e) {
-			/*
-			 * Do not I18N this message String as the error indicates that the
-			 * folder where it resides is missing.
-			 */
-			CrashHandler.crash(
-					"Could not find default configuration file.\n\n\tIf you're encountering this error as a developer, \n"
-							+ "you must make sure that the 'resource' folder is on your classpath.\n"
-							+ "In Eclipse you can easily do this by adding the 'resource' folder as\n"
-							+ "a 'source' folder."
-							+ "\n\n\tIf you're seeing this message as a user, \n"
-							+ "you're in trouble and you'll need to get in touch with us.\n\n",
+			throw new IOException("Could not find default configuration file.",
 					e);
 		}
 
 		/* look for local configuration and load it if present */
-		logger.info("Configuration directory: " + confDir);
+		// logger.info("Configuration directory: " + confDir);
 
 		configFile = new File(confDir, "personal.conf.gz");
 		if (!configFile.exists()) {
 			if (!configFile.createNewFile()) {
-				logger.warn(
-						"Cannot create your personal configuration file sure GenomeView has write access to you home directory!");
+				throw new IOException(
+						"Cannot create your personal configuration file. GenomeView seems to have no write access to you home directory!");
 			}
 		} else if (configFile.length() == 0) {
 			// Empty config file, don't load it.
-			logger.warn("Config file has size zero!");
+			throw new IOException(
+					"Failed to load Config file, the file is empty!");
 		} else {
 			try {
 				it = new LineIterator(
@@ -220,63 +231,60 @@ public class Configuration {
 						String value = line.substring(line.indexOf('=') + 1);
 						localMap.put(key.trim(), value.trim());
 					} else {
-						logger.warn("Invalid line in configuration file! '"
-								+ line + "'");
+						throw new IOException(
+								"Invalid line in configuration file! '" + line
+										+ "'");
 					}
 
 				}
 				it.close();
 			} catch (Exception e) {
-				logger.error(
-						"Something went horribly wrong while loading the configuration.",
-						e);
+				throw new IOException("Failed loading the config file.", e);
 			}
 		}
 		updateSynonyms();
 
 	}
 
-	private static void updateSynonyms() {
+	private void updateSynonyms() throws IOException {
 		try {
 			/**
 			 * Default synonyms
 			 */
-			logger.info("Updating default synonyms for :"
-					+ Arrays.toString(get("synonyms.default").split(",")));
+//			logger.info("Updating default synonyms for :"
+//					+ Arrays.toString(get("synonyms.default").split(",")));
 			for (String s : get("synonyms.default").split(",")) {
 
 				try {
 					if (s.length() > 0)
 						NameService.addSynonyms(URIFactory.url(s).openStream());
-					else
-						logger.info("Default synonyms URL is empty");
+//					else
+//						logger.info("Default synonyms URL is empty");
 				} catch (Exception e) {
-					logger.warn("Failed to load default synonyms for: " + s, e);
+					throw new IOException(
+							"Failed to load default synonyms for: " + s, e);
 				}
 
 			}
 			/**
 			 * User configured additional synonyms
 			 */
-			logger.info("Updating additional synonyms for :"
-					+ Arrays.toString(get("synonyms.additional").split(",")));
+//			logger.info("Updating additional synonyms for :"
+//					+ Arrays.toString(get("synonyms.additional").split(",")));
 			for (String s : get("synonyms.additional").split(",")) {
 
-				try {
-					if (s.length() > 0)
-						NameService.addSynonyms(URIFactory.url(s).openStream());
-					else
-						logger.info("Additional synonyms URL is empty");
-				} catch (Exception e) {
-					logger.warn("Failed to load additional synonyms for: " + s,
-							e);
-				}
+				if (s.length() > 0)
+					NameService.addSynonyms(URIFactory.url(s).openStream());
+//					else
+//						logger.info("Additional synonyms URL is empty");
 
 			}
 
 		} catch (Exception e) {
-			logger.warn("Failed to load additional synonyms for option: "
-					+ get("synonyms"), e);
+			throw new IOException(
+					"Failed to load additional synonyms for option: "
+							+ get("synonyms"),
+					e);
 		}
 	}
 
@@ -285,8 +293,8 @@ public class Configuration {
 	 * 
 	 * @throws IOException
 	 */
-	public static void save() throws IOException {
-		logger.info("Saving config");
+	public void save() throws IOException {
+		// logger.info("Saving config");
 
 		GZIPPrintWriter out = new GZIPPrintWriter(configFile);
 		out.println("time=" + System.currentTimeMillis());
@@ -297,50 +305,50 @@ public class Configuration {
 
 	}
 
-	public static File getDirectory() {
+	public File getDirectory() {
 		return confDir;
 	}
 
-	public static Color getColor(Type t) {
+	public Color getColor(Type t) {
 		return getColor("TYPE_" + t);
 	}
 
-	public static Color getColor(String string) {
+	public Color getColor(String string) {
 		String tmp = get(string);
 		if (tmp == null)
 			tmp = "GRAY";
 		return Colors.decodeColor(get(string));
 	}
 
-	public static int getInt(String string) {
+	public int getInt(String string) {
 		String s = get(string);
 		if (s == null)
 			return 0;
 		return Integer.parseInt(s);
 	}
 
-	public static boolean getBoolean(String string) {
+	public boolean getBoolean(String string) {
 		return Boolean.parseBoolean(get(string));
 	}
 
-	public static Color getNucleotideColor(char nt) {
+	public Color getNucleotideColor(char nt) {
 
 		return getColor("N_" + nt);
 	}
 
-	public static Color getAminoAcidColor(char aa) {
+	public Color getAminoAcidColor(char aa) {
 		return getColor("AA_" + aa);
 	}
 
-	public static void set(String string, boolean b) {
+	public void set(String string, boolean b) {
 		set(string, "" + b);
 	}
 
-	public static void set(String key, File value) {
+	public void set(String key, File value) {
 		set(key, value.toString());
 	}
 
-	public static void set(String key, String value) {
+	public void set(String key, String value) {
 		if (extraMap.containsKey(key))
 			extraMap.put(key, value);
 		else
@@ -348,7 +356,7 @@ public class Configuration {
 
 	}
 
-	public static List<String> getStringList(String key) {
+	public List<String> getStringList(String key) {
 		String tmp = get(key);
 		List<String> out = new ArrayList<String>();
 		for (String s : tmp.split(",")) {
@@ -357,7 +365,7 @@ public class Configuration {
 		return out;
 	}
 
-	public static Set<String> getStringSet(String key) {
+	public Set<String> getStringSet(String key) {
 		String tmp = get(key);
 		Set<String> out = new HashSet<String>();
 		for (String s : tmp.split(",")) {
@@ -366,7 +374,7 @@ public class Configuration {
 		return out;
 	}
 
-	public static Set<Type> getTypeSet(String string) {
+	public Set<Type> getTypeSet(String string) {
 		String tmp = get(string);
 		Set<Type> out = new HashSet<Type>();
 		for (String s : tmp.split(",")) {
@@ -375,12 +383,12 @@ public class Configuration {
 		return out;
 	}
 
-	public static String version() {
+	public String version() {
 		return gvProperties.getProperty("version", "developer version");
 	}
 
-	public static void loadExtra(InputStream ios) throws IOException {
-		logger.info("Loading extra config...");
+	public void loadExtra(InputStream ios) throws IOException {
+		// logger.info("Loading extra config...");
 		LineIterator it = new LineIterator(ios);
 		it.setSkipBlanks(true);
 		it.setSkipComments(true);
@@ -393,7 +401,7 @@ public class Configuration {
 					extraMap.put(key.trim(), value.trim());
 				}
 			} catch (Exception e) {
-				logger.warn("Failed to parse line: " + line, e);
+				throw new IOException("Failed to parse line: " + line, e);
 			}
 		}
 		it.close();
@@ -401,43 +409,43 @@ public class Configuration {
 
 	}
 
-	public static File getPluginDirectory() {
-		File modules = new File(confDir, "plugin");
-		if (!modules.exists()) {
-			if (!modules.mkdir())
-				logger.warn(
-						"Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
-		}
+//	public File getPluginDirectory() {
+//		File modules = new File(confDir, "plugin");
+//		if (!modules.exists()) {
+//			if (!modules.mkdir())
+//				logger.warn(
+//						"Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
+//		}
+//
+//		return modules;
+//	}
 
-		return modules;
-	}
+//	public File getSessionPluginDirectory() {
+//		File modules = new File(confDir, "session_plugin");
+//		if (!modules.exists()) {
+//			if (!modules.mkdir())
+//				logger.warn(
+//						"Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
+//		}
+//
+//		return modules;
+//	}
 
-	public static File getSessionPluginDirectory() {
-		File modules = new File(confDir, "session_plugin");
-		if (!modules.exists()) {
-			if (!modules.mkdir())
-				logger.warn(
-						"Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
-		}
-
-		return modules;
-	}
-
-	public static void set(String key, int value) {
+	public void set(String key, int value) {
 		set(key, "" + value);
 
 	}
 
-	public static void setColor(String key, Color newColor) {
+	public void setColor(String key, Color newColor) {
 		set(key, Colors.encode(newColor));
 	}
 
-	public static void setColor(Type type, Color newColor) {
+	public void setColor(Type type, Color newColor) {
 		setColor("TYPE_" + type, newColor);
 
 	}
 
-	public static void reset(Model model) {
+	public void reset(Model model) {
 		if (!configFile.delete()) {
 			System.err.println("Could not reset configuration!");
 		}
@@ -452,7 +460,7 @@ public class Configuration {
 		model.refresh();
 	}
 
-	public static File getFile(String key) {
+	public File getFile(String key) {
 		String val = get(key);
 		if (val != null)
 			return new File(val);
@@ -460,7 +468,7 @@ public class Configuration {
 			return null;
 	}
 
-	public static double getDouble(String string, double defaultValue) {
+	public double getDouble(String string, double defaultValue) {
 		String s = get(string);
 		if (s == null)
 			return defaultValue;
@@ -468,7 +476,7 @@ public class Configuration {
 			return Double.parseDouble(get(string));
 	}
 
-	public static double getDouble(String string) {
+	public double getDouble(String string) {
 		return Double.parseDouble(get(string));
 	}
 
@@ -479,23 +487,23 @@ public class Configuration {
 	 * @param dk the {@link DataKey}
 	 * @return the weight of dk.
 	 */
-	public static int getWeight(DataKey dk) {
+	public int getWeight(DataKey dk) {
 		if (get("track:weight:" + dk) == null)
 			return 1000;
 		return getInt("track:weight:" + dk);
 
 	}
 
-	public static void setWeight(DataKey dk, int weight) {
+	public void setWeight(DataKey dk, int weight) {
 		set("track:weight:" + dk, weight);
 
 	}
 
-	public static void setVisible(DataKey dk, boolean b) {
+	public void setVisible(DataKey dk, boolean b) {
 		set("track:visible:" + dk, b);
 	}
 
-	public static boolean getVisible(DataKey dk) {
+	public boolean getVisible(DataKey dk) {
 		if (get("track:visible:" + dk) == null) {
 			set("track:visible:" + dk, true);
 			return true;
@@ -518,7 +526,7 @@ public class Configuration {
 //		return null;
 //	}
 
-	public static void unset(String string) {
+	public void unset(String string) {
 		extraMap.remove(string);
 		localMap.remove(string);
 

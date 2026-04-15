@@ -153,7 +153,8 @@ public class Session {
 										case F:
 										case DATA:
 											final Locator loc = new Locator(
-													prefix + arr[1].trim());
+													prefix + arr[1].trim(),
+													model.getLog());
 											try {
 												DataSourceHelper.load(model,
 														loc);
@@ -184,16 +185,19 @@ public class Session {
 											break;
 										case C:
 										case CONFIG:
-											Configuration.loadExtra(new Locator(
-													prefix + arr[1].trim())
-													.stream());
+											Configuration.instance()
+													.loadExtra(new Locator(
+															prefix + arr[1]
+																	.trim(),
+															model.getLog())
+															.stream());
 											// Configuration.loadExtra(URIFactory.url(arr[1]).openStream());
 											break;
 										case OPTION:
 											String[] ap = arr[1].trim()
 													.split("=", 2);
-											Configuration.set(ap[0].trim(),
-													ap[1].trim());
+											Configuration.instance().set(
+													ap[0].trim(), ap[1].trim());
 											break;
 										case ALIAS:
 											String[] al = arr[1].trim()
@@ -251,8 +255,9 @@ public class Session {
 			Locator l = ds.getLocator();
 			out.println("DATA:" + l);
 		}
-		for (String key : Configuration.keySet()) {
-			out.println("OPTION:" + key + "=" + Configuration.get(key));
+		for (String key : Configuration.instance().keySet()) {
+			out.println(
+					"OPTION:" + key + "=" + Configuration.instance().get(key));
 
 		}
 

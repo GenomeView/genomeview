@@ -15,29 +15,35 @@ import net.sf.jannot.Location;
 
 public class AnnotationZoomInAction extends AbstractModelAction {
 
-    private static final long serialVersionUID = -1125623416282373487L;
+	private static final long serialVersionUID = -1125623416282373487L;
 
-    public AnnotationZoomInAction(Model model) {
-        super(null, new ImageIcon(model.getClass().getResource("/images/zoom_in.png")), model);
+	public AnnotationZoomInAction(Model model) {
+		super(null,
+				new ImageIcon(
+						model.getClass().getResource("/images/zoom_in.png")),
+				model);
 
-    }
+	}
 
-    public void actionPerformed(ActionEvent arg0) {
-        Location r = model.vlm.getAnnotationLocationVisible();
-        double start = r.start();
-        double end = r.end();
-        double center = end - (end - start) / 2;
-        int newStart = (int) (center - (end - start) * 0.25);
-        int newEnd = (int) (center + (end - start) * 0.25);
-        if(enabled)
-        	model.vlm.setAnnotationLocationVisible(new Location(newStart, newEnd));
+	public void actionPerformed(ActionEvent arg0) {
+		Location r = model.vlm.getAnnotationLocationVisible();
+		double start = r.start();
+		double end = r.end();
+		double center = end - (end - start) / 2;
+		int newStart = (int) (center - (end - start) * 0.25);
+		int newEnd = (int) (center + (end - start) * 0.25);
+		if (enabled)
+			model.vlm.setAnnotationLocationVisible(
+					new Location(newStart, newEnd));
 
-    }
+	}
 
-    @Override
-    public void update(Observable arg0, Object arg1) {
-        setEnabled(model.vlm.getAnnotationLocationVisible().length() > Configuration.getInt("minimumNucleotides"));
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		setEnabled(model.vlm.getAnnotationLocationVisible()
+				.length() > Configuration.instance()
+						.getInt("minimumNucleotides"));
 
-    }
+	}
 
 }

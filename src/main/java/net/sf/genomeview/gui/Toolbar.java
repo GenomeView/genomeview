@@ -58,7 +58,7 @@ public class Toolbar extends JToolBar {
 		});
 		add(cb);
 
-		if (Configuration.getBoolean("geneticCodeSelection")) {
+		if (Configuration.instance().getBoolean("geneticCodeSelection")) {
 			add(new JLabel(MessageManager.getString("toolbar.code")));
 			add(new AAMappingChooser(model));
 		}

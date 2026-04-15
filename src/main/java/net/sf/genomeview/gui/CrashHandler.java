@@ -27,15 +27,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import be.abeel.net.URIFactory;
 
@@ -48,22 +47,28 @@ import be.abeel.net.URIFactory;
  */
 public class CrashHandler {
 
-	private static Logger log = LoggerFactory.getLogger(CrashHandler.class.getCanonicalName());
+	private static Logger log = LoggerFactory
+			.getLogger(CrashHandler.class.getCanonicalName());
 
 	public static void showErrorMessage(String message, Throwable cause) {
 		log.error(message, cause);
-		JOptionPane.showMessageDialog(null, message + "\n\n" + MessageManager.getString("crashhandler.error_logged"),
-				MessageManager.getString("crashhandler.error "), JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(null,
+				message + "\n\n"
+						+ MessageManager.getString("crashhandler.error_logged"),
+				MessageManager.getString("crashhandler.error"),
+				JOptionPane.ERROR_MESSAGE);
 
 	}
 
 	private CrashHandler() {
 		try {
-			final JFrame window = new JFrame(MessageManager.getString("crashhandler.error"));
+			final JFrame window = new JFrame(
+					MessageManager.getString("crashhandler.error"));
 			window.setAlwaysOnTop(true);
 			window.setResizable(false);
 			JTextArea ll = new JTextArea(10, 30);
-			ll.setText(MessageManager.getString("crashhandler.unrecoverable_error"));
+			ll.setText(MessageManager
+					.getString("crashhandler.unrecoverable_error"));
 			ll.setWrapStyleWord(true);
 			ll.setLineWrap(true);
 			ll.setEditable(false);
@@ -75,7 +80,8 @@ public class CrashHandler {
 
 			// gc.grid
 			window.add(ll, gc);
-			JButton open = new JButton(MessageManager.getString("crashhandler.open_logs"));
+			JButton open = new JButton(
+					MessageManager.getString("crashhandler.open_logs"));
 			open.addActionListener(new ActionListener() {
 
 				@Override
@@ -89,29 +95,35 @@ public class CrashHandler {
 						File confDir = new File(s + "/.genomeview");
 						Desktop.getDesktop().open(confDir);
 					} catch (IOException e1) {
-						JOptionPane.showMessageDialog(window, MessageManager.getString("crashhandler.couldnt_open_log_folder"));
+						JOptionPane.showMessageDialog(window,
+								MessageManager.getString(
+										"crashhandler.couldnt_open_log_folder"));
 					}
 
 				}
 			});
 			window.add(open, gc);
 
-			JButton report = new JButton(MessageManager.getString("crashhandler.report"));
+			JButton report = new JButton(
+					MessageManager.getString("crashhandler.report"));
 			report.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-						Desktop.getDesktop().browse(URIFactory.uri("https://sourceforge.net/tracker/?func=add&group_id=208107&atid=1004368"));
+						Desktop.getDesktop().browse(URIFactory.uri(
+								"https://sourceforge.net/tracker/?func=add&group_id=208107&atid=1004368"));
 					} catch (Exception e1) {
-						JOptionPane.showMessageDialog(window, MessageManager.getString("crashhandler.couldnt_bugtrack"));
+						JOptionPane.showMessageDialog(window, MessageManager
+								.getString("crashhandler.couldnt_bugtrack"));
 					}
 
 				}
 			});
 			window.add(report, gc);
 
-			JButton close = new JButton(MessageManager.getString("crashhandler.close_window"));
+			JButton close = new JButton(
+					MessageManager.getString("crashhandler.close_window"));
 			close.addActionListener(new ActionListener() {
 
 				@Override

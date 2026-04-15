@@ -295,7 +295,7 @@ public class PileupTrackConfig extends TrackConfig {
 
 	boolean isLogscaling() {
 		if (globalSettings)
-			return Configuration.getBoolean("pileup:logScale");
+			return Configuration.instance().getBoolean("pileup:logScale");
 		else
 			return logscaling;
 	}
@@ -326,8 +326,9 @@ public class PileupTrackConfig extends TrackConfig {
 
 	boolean isDynamicScaling() {
 		if (globalSettings) {
-			dynamicScaling = Configuration.getBoolean("pileup:dynamicRange");
-			return Configuration.getBoolean("pileup:dynamicRange");
+			dynamicScaling = Configuration.instance()
+					.getBoolean("pileup:dynamicRange");
+			return Configuration.instance().getBoolean("pileup:dynamicRange");
 		} else
 			return dynamicScaling;
 	}
@@ -405,9 +406,10 @@ public class PileupTrackConfig extends TrackConfig {
 
 	public boolean isNormalizeMean() {
 		if (isGlobalSettings()) {
-			return Configuration.getBoolean("pileup:normalize");
+			return Configuration.instance().getBoolean("pileup:normalize");
 		} else {
-			return Configuration.getBoolean("track:pile:normalize:" + dataKey);
+			return Configuration.instance()
+					.getBoolean("track:pile:normalize:" + dataKey);
 		}
 	}
 
@@ -426,7 +428,7 @@ public class PileupTrackConfig extends TrackConfig {
 
 	public double maxValue() {
 		if (globalSettings)
-			return Configuration.getDouble("pileup:maxPile");
+			return Configuration.instance().getDouble("pileup:maxPile");
 		else
 			return maxValue;
 	}
@@ -457,11 +459,11 @@ public class PileupTrackConfig extends TrackConfig {
 	}
 
 	public boolean isCrossTrackScaling() {
-		return Configuration.getBoolean("pileup:crossTrackScaling");
+		return Configuration.instance().getBoolean("pileup:crossTrackScaling");
 	}
 
 	public void setCrossTrackScaling(boolean b) {
-		Configuration.set("pileup:crossTrackScaling", "" + b);
+		Configuration.instance().set("pileup:crossTrackScaling", "" + b);
 		setChanged();
 		notifyObservers();
 	}

@@ -26,6 +26,8 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 
+import be.abeel.gui.GridBagPanel;
+import be.abeel.util.DefaultHashMap;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
@@ -33,8 +35,6 @@ import net.sf.genomeview.gui.dialog.StructureTrackConfig;
 import net.sf.genomeview.gui.viztracks.TrackConfig;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.Type;
-import be.abeel.gui.GridBagPanel;
-import be.abeel.util.DefaultHashMap;
 
 /**
  * 
@@ -42,12 +42,14 @@ import be.abeel.util.DefaultHashMap;
  * 
  */
 public class StructureTrackModel extends TrackConfig {
-	private DefaultHashMap<Type, Boolean> visibleTypes = new DefaultHashMap<Type, Boolean>(Boolean.FALSE);
+	private DefaultHashMap<Type, Boolean> visibleTypes = new DefaultHashMap<Type, Boolean>(
+			Boolean.FALSE);
 
 	public StructureTrackModel(Model model, StringKey key) {
 		super(model, key);
 
-		Set<Type> tmp1 = Configuration.getTypeSet("visibleTypesStructure");
+		Set<Type> tmp1 = Configuration.instance()
+				.getTypeSet("visibleTypesStructure");
 		for (Type t : tmp1)
 			setTypeVisible(t, true);
 	}
@@ -69,7 +71,8 @@ public class StructureTrackModel extends TrackConfig {
 		GridBagPanel out = super.getGUIContainer();
 		final StructureTrackModel _self = this;
 		out.gc.gridy++;
-		out.add(new JButton(new AbstractAction(MessageManager.getString("structuretrack.configure")) {
+		out.add(new JButton(new AbstractAction(
+				MessageManager.getString("structuretrack.configure")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -81,7 +84,5 @@ public class StructureTrackModel extends TrackConfig {
 
 		return out;
 	}
-
-	
 
 }

@@ -39,8 +39,8 @@ import net.sf.genomeview.data.Model;
 public class StringConfig extends Container {
 
 	/**
-         * 
-         */
+	     * 
+	     */
 	private static final long serialVersionUID = -1460525692768168573L;
 
 	private JLabel label = new JLabel();
@@ -49,14 +49,13 @@ public class StringConfig extends Container {
 
 	@Deprecated
 	public StringConfig(final String key, final String title) {
-		this(key,title,null);
+		this(key, title, null);
 	}
-	
-	
-	public StringConfig(final String key, final String title,final Model model) {
-		
-			
-		valueField.setText(Configuration.get(key));
+
+	public StringConfig(final String key, final String title,
+			final Model model) {
+
+		valueField.setText(Configuration.instance().get(key));
 		label.setText(title);
 		setLayout(new BorderLayout());
 		add(label, BorderLayout.WEST);
@@ -66,8 +65,8 @@ public class StringConfig extends Container {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				super.keyReleased(e);
-				Configuration.set(key, valueField.getText());
-				if(model!=null)
+				Configuration.instance().set(key, valueField.getText());
+				if (model != null)
 					model.refresh();
 			}
 

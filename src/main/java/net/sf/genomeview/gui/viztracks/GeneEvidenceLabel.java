@@ -94,7 +94,7 @@ public class GeneEvidenceLabel extends JLabel
 					double fractionL = (center - start) / length;
 					double fractionR = (end - center) / length;
 					// System.out.println(fractionL+"\t"+fractionR);
-					if (rot < 0 && length < Configuration
+					if (rot < 0 && length < Configuration.instance()
 							.getInt("minimumNucleotides")) {
 						return;
 					}

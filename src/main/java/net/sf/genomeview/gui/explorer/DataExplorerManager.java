@@ -23,7 +23,8 @@ public class DataExplorerManager implements Observer {
 	DataExplorer bg;
 	private Model model;
 
-	private boolean autoMode = Configuration.getBoolean("general:enableGenomeExplorer");
+	private boolean autoMode = Configuration.instance()
+			.getBoolean("general:enableGenomeExplorer");
 
 	public DataExplorerManager(Model model) {
 		bg = new DataExplorer(model);
@@ -34,8 +35,9 @@ public class DataExplorerManager implements Observer {
 	}
 
 	public void setVisible(final boolean vis) {
-		if(vis)
-			autoMode = Configuration.getBoolean("general:enableGenomeExplorer");
+		if (vis)
+			autoMode = Configuration.instance()
+					.getBoolean("general:enableGenomeExplorer");
 		else
 			autoMode = false;
 		visi(vis);
@@ -49,10 +51,15 @@ public class DataExplorerManager implements Observer {
 
 			@Override
 			public void run() {
-				if(vis&&ConnectionMonitor.instance.offline()){
-					autoMode=false;
-					JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(), MessageManager.getString("explorermanager.offline_warn"),MessageManager.getString("explorermanager.offline"),JOptionPane.WARNING_MESSAGE);
-				}else{
+				if (vis && ConnectionMonitor.instance.offline()) {
+					autoMode = false;
+					JOptionPane.showMessageDialog(
+							model.getGUIManager().getMainWindow(),
+							MessageManager
+									.getString("explorermanager.offline_warn"),
+							MessageManager.getString("explorermanager.offline"),
+							JOptionPane.WARNING_MESSAGE);
+				} else {
 					bg.setVisible(vis);
 				}
 			}
@@ -76,7 +83,8 @@ public class DataExplorerManager implements Observer {
 		if (!autoMode)
 			return;
 
-		if (model.getWorkerManager().runningJobs()>0||model.entries().size() > 0) {
+		if (model.getWorkerManager().runningJobs() > 0
+				|| model.entries().size() > 0) {
 			if (bg.isVisible())
 				visi(false);
 		} else {

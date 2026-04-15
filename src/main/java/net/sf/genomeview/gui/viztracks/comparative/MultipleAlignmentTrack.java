@@ -44,7 +44,8 @@ public class MultipleAlignmentTrack extends Track {
 
 	public MultipleAlignmentTrack(Model model, DataKey key) {
 		super(key, model, true, false);
-		AlignmentAnnotation entireAlignment = (AlignmentAnnotation) entry.get(dataKey);
+		AlignmentAnnotation entireAlignment = (AlignmentAnnotation) entry
+				.get(dataKey);
 		mat = new MultipleAlignmentTrackModel(entireAlignment);
 
 	}
@@ -60,7 +61,8 @@ public class MultipleAlignmentTrack extends Track {
 			List<WeightedAlignment> set = new ArrayList<WeightedAlignment>();
 
 			for (Alignment a : aa.get()) {
-				double d = Configuration.getDouble("MAWEIGHT_" + a.name(), 0);
+				double d = Configuration.instance()
+						.getDouble("MAWEIGHT_" + a.name(), 0);
 				set.add(new WeightedAlignment(d, a));
 			}
 			Collections.sort(set);
@@ -86,7 +88,8 @@ public class MultipleAlignmentTrack extends Track {
 			@Override
 			public int compareTo(WeightedAlignment o) {
 				int d = Double.compare(weight, o.weight);
-				System.out.println("Compare: " + weight + "\t" + o.weight + "\t" + d);
+				System.out.println(
+						"Compare: " + weight + "\t" + o.weight + "\t" + d);
 				return Double.compare(weight, o.weight);
 			}
 
@@ -114,14 +117,18 @@ public class MultipleAlignmentTrack extends Track {
 	}
 
 	@Override
-	public int paintTrack(Graphics2D g, int yOffset, double screenWidth, JViewport view, TrackCommunicationModel tcm) {
+	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,
+			JViewport view, TrackCommunicationModel tcm) {
 		Location r = model.vlm.getAnnotationLocationVisible();
 		int lineHeigh = 20;
 
 		if (mat.hasData()) {
 			if (r.length() > 10000000) {
 				g.setColor(Color.BLACK);
-				g.drawString(MessageManager.getString("multiplealignmenttrack.too_much_data_warn"), 5, yOffset + lineHeigh - 2);
+				g.drawString(
+						MessageManager.getString(
+								"multiplealignmenttrack.too_much_data_warn"),
+						5, yOffset + lineHeigh - 2);
 				return lineHeigh;
 			}
 			if (r.length() < 1000) {
@@ -160,20 +167,29 @@ public class MultipleAlignmentTrack extends Track {
 							g.setColor(Color.RED);
 						}
 
-						g.fillRect((int) ((i - r.start()) * width), yOffset, (int) (width * grouping) + 1, lineHeigh);
+						g.fillRect((int) ((i - r.start()) * width), yOffset,
+								(int) (width * grouping) + 1, lineHeigh);
 						if (alignment.sizeGapAfter(i) > 0) {
 							g.setColor(Color.ORANGE);
-							g.fillRect((int) ((i - r.start()) * width + width * 3 / 4), yOffset, (int) (width * grouping) / 2 + 1,
+							g.fillRect(
+									(int) ((i - r.start()) * width
+											+ width * 3 / 4),
+									yOffset, (int) (width * grouping) / 2 + 1,
 									lineHeigh);
 						}
-						if (model.vlm.getAnnotationLocationVisible().length() < 100) {
-							Rectangle2D stringSize = g.getFontMetrics().getStringBounds("" + nt, g);
+						if (model.vlm.getAnnotationLocationVisible()
+								.length() < 100) {
+							Rectangle2D stringSize = g.getFontMetrics()
+									.getStringBounds("" + nt, g);
 							if (conservation > 0.75) {
 								g.setColor(Color.WHITE);
 							} else
 								g.setColor(Color.BLACK);
-							g.drawString("" + nt, (int) (((i - r.start()) * width - stringSize.getWidth() / 2) + (width / 2)), yOffset
-									+ lineHeigh - 2);
+							g.drawString("" + nt,
+									(int) (((i - r.start()) * width
+											- stringSize.getWidth() / 2)
+											+ (width / 2)),
+									yOffset + lineHeigh - 2);
 						}
 					}
 
@@ -198,11 +214,15 @@ public class MultipleAlignmentTrack extends Track {
 						pips.put(alignment, percentIdentify(alignment));
 					float[] b = pips.get(alignment);
 
-					int stepSize = (int) Math.max(1, Math.floor((r.length() / screenWidth) / 2));
+					int stepSize = (int) Math.max(1,
+							Math.floor((r.length() / screenWidth) / 2));
 
 					for (int i = r.start; i <= r.end; i += stepSize) {
-						int x = Convert.translateGenomeToScreen(i, r, screenWidth);
-						int width = Math.max(1, Convert.translateGenomeToScreen(i + stepSize, r, screenWidth) - x);
+						int x = Convert.translateGenomeToScreen(i, r,
+								screenWidth);
+						int width = Math.max(1,
+								Convert.translateGenomeToScreen(i + stepSize, r,
+										screenWidth) - x);
 						float min = 1;
 						float max = 0;
 						for (int j = 0; j < stepSize; j++) {
@@ -233,26 +253,31 @@ public class MultipleAlignmentTrack extends Track {
 				for (int i = r.start(); i <= r.end(); i += grouping) {
 					// TODO do something with zoom-out
 
-					SortedMap<Integer, String> map = new TreeMap<Integer, String>(Collections.reverseOrder());
+					SortedMap<Integer, String> map = new TreeMap<Integer, String>(
+							Collections.reverseOrder());
 
 					map.put(mat.getNucleotideCount('a', i), "A");
 
 					if (map.containsKey(mat.getNucleotideCount('c', i))) {
-						map.put(mat.getNucleotideCount('c', i), map.get(mat.getNucleotideCount('c', i)) + "C");
+						map.put(mat.getNucleotideCount('c', i),
+								map.get(mat.getNucleotideCount('c', i)) + "C");
 					} else {
 						map.put(mat.getNucleotideCount('c', i), "C");
 					}
 					if (map.containsKey(mat.getNucleotideCount('g', i))) {
-						map.put(mat.getNucleotideCount('g', i), map.get(mat.getNucleotideCount('g', i)) + "G");
+						map.put(mat.getNucleotideCount('g', i),
+								map.get(mat.getNucleotideCount('g', i)) + "G");
 					} else {
 						map.put(mat.getNucleotideCount('g', i), "G");
 					}
 					if (map.containsKey(mat.getNucleotideCount('t', i))) {
-						map.put(mat.getNucleotideCount('t', i), map.get(mat.getNucleotideCount('t', i)) + "T");
+						map.put(mat.getNucleotideCount('t', i),
+								map.get(mat.getNucleotideCount('t', i)) + "T");
 					} else {
 						map.put(mat.getNucleotideCount('t', i), "T");
 					}
-					draw(map, g, mat.numAlignments(), i, logoLineHeight, model, width, yOffset);
+					draw(map, g, mat.numAlignments(), i, logoLineHeight, model,
+							width, yOffset);
 				}
 			} else {
 				double width = screenWidth / (double) r.length() / 10.0;
@@ -262,7 +287,8 @@ public class MultipleAlignmentTrack extends Track {
 				GeneralPath footprintGP = new GeneralPath();
 				conservationGP.moveTo(0, yOffset);
 				footprintGP.moveTo(0, yOffset);
-				for (int i = r.start(); i <= r.end() + grouping; i += grouping) {
+				for (int i = r.start(); i <= r.end()
+						+ grouping; i += grouping) {
 
 					double conservation = 0;
 					double footprint = 0;
@@ -272,15 +298,18 @@ public class MultipleAlignmentTrack extends Track {
 					}
 					conservation /= grouping;
 					footprint /= grouping;
-					conservationGP.lineTo((int) ((i - r.start()) * width * 10), yOffset + (1 - conservation) * lineHeigh);
-					footprintGP.lineTo((int) ((i - r.start()) * width * 10), yOffset + (1 - footprint) * logoLineHeight);
+					conservationGP.lineTo((int) ((i - r.start()) * width * 10),
+							yOffset + (1 - conservation) * lineHeigh);
+					footprintGP.lineTo((int) ((i - r.start()) * width * 10),
+							yOffset + (1 - footprint) * logoLineHeight);
 
 				}
 				g.setColor(Color.BLUE);
 				g.draw(conservationGP);
 				g.setColor(Color.RED);
 				g.draw(footprintGP);
-				g.drawString(this.config.displayName() + " (" + grouping + ")", 10, yOffset + logoLineHeight - 2);
+				g.drawString(this.config.displayName() + " (" + grouping + ")",
+						10, yOffset + logoLineHeight - 2);
 				// return 3 * lineHeigh;
 			}
 			return mat.numAlignments() * lineHeigh + logoLineHeight;
@@ -294,7 +323,8 @@ public class MultipleAlignmentTrack extends Track {
 
 		int reflen = alignment.refLength();
 		for (int i = 1; i <= reflen; i++) {
-			if (alignment.getReferenceNucleotide(i) == alignment.getNucleotide(i))
+			if (alignment.getReferenceNucleotide(i) == alignment
+					.getNucleotide(i))
 				rollingBuffer.set(i - 1);
 		}
 		float[] out = new float[reflen];
@@ -324,23 +354,29 @@ public class MultipleAlignmentTrack extends Track {
 		// Do nothing
 	}
 
-	private void draw(Map<Integer, String> map, Graphics2D g, int numAlign, int position, int lineHeight, Model m, double width, int yOffset) {
+	private void draw(Map<Integer, String> map, Graphics2D g, int numAlign,
+			int position, int lineHeight, Model m, double width, int yOffset) {
 
 		int left = lineHeight;
 		for (int key : map.keySet()) {
 			for (char c : map.get(key).toCharArray()) {
-				Color ntColor = Configuration.getNucleotideColor(c);
+				Color ntColor = Configuration.instance().getNucleotideColor(c);
 				// System.out.println(c + "\t" + key);
 				double fraction = key / (double) numAlign;
 
 				Font font = new Font("Sans serif", 1, lineHeight);
 
-				Font font2 = font.deriveFont(AffineTransform.getScaleInstance(width / lineHeight * 1.2, fraction * 1.4));
+				Font font2 = font.deriveFont(AffineTransform.getScaleInstance(
+						width / lineHeight * 1.2, fraction * 1.4));
 
-				GlyphVector glyphvector = font2.createGlyphVector(g.getFontRenderContext(), "" + c);
+				GlyphVector glyphvector = font2
+						.createGlyphVector(g.getFontRenderContext(), "" + c);
 				//
-				Rectangle2D stringSize = font2.getStringBounds("" + c, g.getFontRenderContext());
-				int x = (int) (((position - model.vlm.getAnnotationLocationVisible().start()) * width) + (width - stringSize.getWidth()) / 2);
+				Rectangle2D stringSize = font2.getStringBounds("" + c,
+						g.getFontRenderContext());
+				int x = (int) (((position
+						- model.vlm.getAnnotationLocationVisible().start())
+						* width) + (width - stringSize.getWidth()) / 2);
 				int y = (int) (yOffset + left);
 				g.translate(x, y);
 				left -= fraction * lineHeight;

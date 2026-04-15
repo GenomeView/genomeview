@@ -26,22 +26,27 @@ public class ShortReadTrackConfig extends TrackConfig {
 		model.addObserver(new ReadColorObserver());
 	}
 
-	
 	private class ReadColorObserver implements Observer {
 		@Override
 		public void update(Observable o, Object arg) {
 			if (arg == NotificationTypes.CONFIGURATION_CHANGE) {
-				for(ReadColor c: ReadColor.values()){
+				for (ReadColor c : ReadColor.values()) {
 					c.reset();
 				}
 			}
 
 		}
 	}
+
 	enum ReadColor {
-		FORWARD_SENSE("shortread:forwardColor"), FORWARD_ANTISENSE("shortread:forwardAntiColor"), REVERSE_SENSE("shortread:reverseColor"), REVERSE_ANTISENSE(
-				"shortread:reverseAntiColor"), MATE_DIFFERENT_CHROMOSOME(
-						"shortread:mateDifferentChromosome"), PAIRING("shortread:pairingColor"), MISSING_MATE("shortread:missingMateColor"), SPLICING("shortread:splicingColor");
+		FORWARD_SENSE("shortread:forwardColor"),
+		FORWARD_ANTISENSE("shortread:forwardAntiColor"),
+		REVERSE_SENSE("shortread:reverseColor"),
+		REVERSE_ANTISENSE("shortread:reverseAntiColor"),
+		MATE_DIFFERENT_CHROMOSOME("shortread:mateDifferentChromosome"),
+		PAIRING("shortread:pairingColor"),
+		MISSING_MATE("shortread:missingMateColor"),
+		SPLICING("shortread:splicingColor");
 
 		private Color c;
 		private ColorGradient cg;
@@ -54,7 +59,7 @@ public class ShortReadTrackConfig extends TrackConfig {
 		}
 
 		private void reset() {
-			c = Configuration.getColor(cfg);
+			c = Configuration.instance().getColor(cfg);
 			cg = new ColorGradient();
 			cg.addPoint(Color.WHITE);
 			cg.addPoint(c);
@@ -62,11 +67,10 @@ public class ShortReadTrackConfig extends TrackConfig {
 
 		}
 
-		
-
 	}
 
-	private boolean simplifiedColors = Configuration.getBoolean("track:htsreads:simplifiedColors:" + dataKey);
+	private boolean simplifiedColors = Configuration.instance()
+			.getBoolean("track:htsreads:simplifiedColors:" + dataKey);
 
 	public boolean isSimplifiedColors() {
 		return simplifiedColors;// Configuration.getBoolean("track:htsreads:simplifiedColors:"
@@ -77,12 +81,15 @@ public class ShortReadTrackConfig extends TrackConfig {
 	protected GridBagPanel getGUIContainer() {
 		GridBagPanel out = super.getGUIContainer();
 		out.gc.gridy++;
-		final BooleanConfig simplifiedColorsConfig = new BooleanConfig("track:htsreads:simplifiedColors:" + dataKey, "Use simplified color scheme", model);
+		final BooleanConfig simplifiedColorsConfig = new BooleanConfig(
+				"track:htsreads:simplifiedColors:" + dataKey,
+				"Use simplified color scheme", model);
 		simplifiedColorsConfig.addConfigListener(new ConfigListener() {
 
 			@Override
 			public void configurationChanged() {
-				simplifiedColors = Configuration.getBoolean("track:htsreads:simplifiedColors:" + dataKey);
+				simplifiedColors = Configuration.instance().getBoolean(
+						"track:htsreads:simplifiedColors:" + dataKey);
 
 			}
 		});

@@ -84,23 +84,27 @@ public class DataSourceHelper {
 		data.stripIndex();
 
 		if (!data.exists()) {
-			JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
-					MessageManager.formatMessage(
-							"datasourcehelper.data_missing_warn",
-							new Object[] { data.getName() }),
-					MessageManager.getString("datasourcehelper.data_missing"),
-					error);
+			String msg = MessageManager.formatMessage(
+					"datasourcehelper.data_missing_warn",
+					new Object[] { data.getName() });
+			model.getLog().log(Level.WARNING, msg);
+//			JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),...)
 			return;
 		}
 
 		if (!data.isWebservice())
-			index = IndexManager.getIndex(data);
+			index = IndexManager.getIndex(data, model.getLog());
 
 		/* Check for stale index */
 		if (index != null && index.lastModified() < data.lastModified()) {
 			if (IndexManager.canBuildIndex(data)) {
-				problem(model, "index_outdated_warn_message",
-						"index_outdated_warn_title", warn);
+				String msg = MessageManager.formatMessage(
+						"index_outdated_warn_message",
+						new Object[] { data.getName() });
+
+				model.getLog().log(Level.WARNING, msg);
+				// problem(model, "index_outdated_warn_message",
+				// "index_outdated_warn_title", warn);
 				index(model, data);
 
 				return;
@@ -264,7 +268,7 @@ public class DataSourceHelper {
 	private static void convertWig2TDF(final Model model, final Locator data,
 			final Reporter log) {
 		JFileChooser chooser = new JFileChooser(
-				Configuration.getFile("lastDirectory"));
+				Configuration.instance().getFile("lastDirectory"));
 		chooser.resetChoosableFileFilters();
 
 		chooser.addChoosableFileFilter(new FileFilter() {
@@ -299,11 +303,11 @@ public class DataSourceHelper {
 				@Override
 				public void run() {
 					try {
-						Configuration.set("lastDirectory",
+						Configuration.instance().set("lastDirectory",
 								files.getParentFile());
 						File extFile = ExtensionManager.extension(files, "tdf");
-						ConvertWig2TDF.convertWig2TDF(data, extFile);
-						Locator mafdata = new Locator(extFile.toString());
+						ConvertWig2TDF.convertWig2TDF(data, extFile, log);
+						Locator mafdata = new Locator(extFile.toString(), log);
 						log.log(Level.INFO,
 								"Load newly create tdf file as: " + mafdata);
 						load(model, mafdata);
@@ -326,7 +330,7 @@ public class DataSourceHelper {
 			public void run() {
 				try {
 					JFileChooser chooser = new JFileChooser(
-							Configuration.getFile("lastDirectory"));
+							Configuration.instance().getFile("lastDirectory"));
 					chooser.resetChoosableFileFilters();
 
 					chooser.addChoosableFileFilter(new FileFilter() {
@@ -362,7 +366,7 @@ public class DataSourceHelper {
 						File files = chooser.getSelectedFile();
 						// DataSource[] out = new DataSource[files.length];
 						try {
-							Configuration.set("lastDirectory",
+							Configuration.instance().set("lastDirectory",
 									files.getParentFile());
 							File file = ExtensionManager.extension(files,
 									"maf.bgz");
@@ -386,7 +390,7 @@ public class DataSourceHelper {
 									.setMaximum((int) file.length());
 							MafixFactory.generateIndex(spmis,
 									new File(file + ".mfi"));
-							Locator mafdata = new Locator(file.toString());
+							Locator mafdata = new Locator(file.toString(), log);
 							log.log(Level.INFO,
 									"Load newly create mafix as: " + mafdata);
 							load(model, mafdata);
@@ -424,7 +428,7 @@ public class DataSourceHelper {
 			@Override
 			public void run() {
 				try {
-					if (IndexManager.createIndex(prep))
+					if (IndexManager.createIndex(prep, model.getLog()))
 						load(model, prep);
 				} catch (IOException | URISyntaxException
 						| ReadFailedException e) {

@@ -54,7 +54,7 @@ public class ExportPdfDialog extends JDialog {
 	 */
 	public void display() {
 		final JFileChooser chooser = new JFileChooser(
-				Configuration.getFile("lastDirectory"));
+				Configuration.instance().getFile("lastDirectory"));
 		chooser.setMultiSelectionEnabled(false);
 
 		int result = chooser
@@ -136,7 +136,8 @@ public class ExportPdfDialog extends JDialog {
 						// TODO fix
 						ex.printStackTrace();
 					}
-					Configuration.set("lastDirectory", ef.getParentFile());
+					Configuration.instance().set("lastDirectory",
+							ef.getParentFile());
 				} catch (Exception ex) {
 					// TODO fix
 					ex.printStackTrace();

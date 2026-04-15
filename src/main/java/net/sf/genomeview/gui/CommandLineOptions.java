@@ -69,10 +69,11 @@ class CommandLineOptions {
 		if (config != null) {
 			try {
 				if (config.startsWith("http") || config.startsWith("ftp")) {
-					Configuration
+					Configuration.instance()
 							.loadExtra(URIFactory.url(config).openStream());
 				} else {
-					Configuration.loadExtra(new FileInputStream(config));
+					Configuration.instance()
+							.loadExtra(new FileInputStream(config));
 				}
 			} catch (IOException | URISyntaxException e) {
 				log.log(Level.WARNING, "Failed loading extra configuration", e);

@@ -114,7 +114,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 					"Disposing the window in MainWindow.update()");
 			dispose();
 			try {
-				Configuration.save();
+				Configuration.instance().save();
 			} catch (IOException e) {
 				model.getLog().log(Level.WARNING,
 						"Problem saving configuration", e);
@@ -205,7 +205,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 			model.getLog().log(Level.INFO, MessageManager
 					.getString("windowmanager.creating_new_window"));
 			window = new GenomeViewWindow(model,
-					"GenomeView :: " + Configuration.version(),
+					"GenomeView :: " + Configuration.instance().version(),
 					gs[0].getDefaultConfiguration());
 			model.getGUIManager().registerMainWindow(window);
 			window.setIconImage(Icons.MINILOGO);
@@ -222,7 +222,9 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 		if (freshwindow) {
 			JPanel[] content = MainContent.createContent(model,
-					Configuration.getBoolean("dualscreen") ? gs.length : 1);
+					Configuration.instance().getBoolean("dualscreen")
+							? gs.length
+							: 1);
 			window.setContentPane(content[0]);
 			window.setJMenuBar(new MainMenu(model));
 
@@ -234,7 +236,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 			if (content.length > 1) {
 				for (int i = 1; i < content.length; i++) {
 					helper = new GenomeViewWindow(model,
-							"GenomeView :: " + Configuration.version(),
+							"GenomeView :: "
+									+ Configuration.instance().version(),
 							gs[i].getDefaultConfiguration());
 					helper.setJMenuBar(new MainMenu(model));
 					helper.setIconImage(new ImageIcon(

@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
 
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.provider.BigWigProvider;
@@ -54,10 +52,7 @@ import net.sf.jannot.wiggle.Graph;
  */
 public class TrackList implements Iterable<Track> {
 
-	private Logger log = LoggerFactory
-			.getLogger(TrackList.class.getCanonicalName());
-
-	private Model model;
+	private final Model model;
 
 	/**
 	 * The order of the tracks. I suppose this list must always match
@@ -94,7 +89,7 @@ public class TrackList implements Iterable<Track> {
 		add(ticks.getDataKey(), ticks);
 		StructureTrack strack = new StructureTrack(model);
 		add(strack.getDataKey(), strack);
-		if (!Configuration.getBoolean("track:showStructure")) {
+		if (!Configuration.instance().getBoolean("track:showStructure")) {
 			strack.config().setVisible(false);
 
 		}
@@ -128,11 +123,11 @@ public class TrackList implements Iterable<Track> {
 	 *         the preferences track:weight for all {@link DataKey}s
 	 */
 	private int findIndex(DataKey dk) {
-		int w = Configuration.getWeight(dk);
+		int w = Configuration.instance().getWeight(dk);
 
 		int count = 0;
 		while (count < order.size()
-				&& Configuration.getWeight(order.get(count)) <= w) {
+				&& Configuration.instance().getWeight(order.get(count)) <= w) {
 			count++;
 		}
 
@@ -153,9 +148,9 @@ public class TrackList implements Iterable<Track> {
 		if (row < order.size() - 1) {
 			DataKey tmp = order.get(row);
 
-			int tmpWeight = Configuration.getWeight(order.get(row));
-			Configuration.setWeight(order.get(row), tmpWeight + 1);
-			Configuration.setWeight(order.get(row + 1), tmpWeight);
+			int tmpWeight = Configuration.instance().getWeight(order.get(row));
+			Configuration.instance().setWeight(order.get(row), tmpWeight + 1);
+			Configuration.instance().setWeight(order.get(row + 1), tmpWeight);
 
 			order.set(row, order.get(row + 1));
 			order.set(row + 1, tmp);
@@ -171,10 +166,10 @@ public class TrackList implements Iterable<Track> {
 			DataKey tmp = order.get(row);
 
 			// int tmpWeight = Configuration.getWeight(order.get(row));
-			Configuration.setWeight(order.get(row),
-					Configuration.getWeight(order.get(row - 1)));
-			Configuration.setWeight(order.get(row - 1),
-					Configuration.getWeight(order.get(row - 1)) + 1);
+			Configuration.instance().setWeight(order.get(row),
+					Configuration.instance().getWeight(order.get(row - 1)));
+			Configuration.instance().setWeight(order.get(row - 1),
+					Configuration.instance().getWeight(order.get(row - 1)) + 1);
 
 			order.set(row, order.get(row - 1));
 			order.set(row - 1, tmp);
@@ -244,7 +239,7 @@ public class TrackList implements Iterable<Track> {
 	 * @return true iff the final size equals the start size.
 	 */
 	public boolean update(Entry e) {
-		System.out.println("Updating tracks for " + e);
+		model.getLog().log(Level.INFO, "Updating tracks for " + e);
 		int startSize = this.size();
 		/* Graph tracks */
 		for (DataKey key : e) {
@@ -293,14 +288,16 @@ public class TrackList implements Iterable<Track> {
 			} else if (data instanceof AbstractMAFMultipleAlignment) {
 				if (!this.containsTrack(key)) {
 					this.add(key, new MultipleAlignmentTrack2(model, key));
-					log.info("Added multiple alignment track " + key);
+					model.getLog().log(Level.INFO,
+							"Added multiple alignment track " + key);
 				}
 			} else if (data instanceof SyntenicData) {
 				if (!this.containsTrack(key)) {
 					this.add(key, new SyntenicTrack(model, key));
 				}
 			} else
-				log.error("unhandled data type Data type " + data.getClass());
+				model.getLog().log(Level.WARNING,
+						"unhandled data type Data type " + data.getClass());
 		}
 		/* Fix weight to make sure they are different */
 		for (int i = 1; i < order.size(); i++) {
@@ -310,10 +307,12 @@ public class TrackList implements Iterable<Track> {
 			// .println("This is not supposed to happen, why are we
 			// sorting?!!?");
 			// }
-			if (Configuration.getWeight(order.get(i - 1)) >= Configuration
-					.getWeight(order.get(i))) {
-				Configuration.setWeight(order.get(i),
-						Configuration.getWeight(order.get(i - 1)) + 1);
+			if (Configuration.instance()
+					.getWeight(order.get(i - 1)) >= Configuration.instance()
+							.getWeight(order.get(i))) {
+				Configuration.instance().setWeight(order.get(i),
+						Configuration.instance().getWeight(order.get(i - 1))
+								+ 1);
 
 			}
 		}

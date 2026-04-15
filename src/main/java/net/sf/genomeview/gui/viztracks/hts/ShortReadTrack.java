@@ -95,7 +95,7 @@ public class ShortReadTrack extends Track {
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
 		if (model.vlm.getAnnotationLocationVisible().length() < Configuration
-				.getInt("geneStructureNucleotideWindow")) {
+				.instance().getInt("geneStructureNucleotideWindow")) {
 			ShortReadInsertion sri = null;
 			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : render
 					.meta().paintedBlocks.entrySet()) {

@@ -90,7 +90,7 @@ public class GeneStructureView extends JLabel implements Observer {
 		super.paintComponent(g);
 
 		if (model.selectionModel().getFeatureSelection().size() == 1
-				&& Configuration.getTypeSet("geneStructures")
+				&& Configuration.instance().getTypeSet("geneStructures")
 						.contains(model.selectionModel().getFeatureSelection()
 								.first().type())) {
 			rf = model.selectionModel().getFeatureSelection().first();
@@ -209,7 +209,7 @@ public class GeneStructureView extends JLabel implements Observer {
 			Rectangle r = new Rectangle(lmin + hGap, hor + vGap, lmax - lmin,
 					lineHeight);
 			/* Draw box */
-			Color cdsColor = Configuration.getColor("TYPE_CDS");
+			Color cdsColor = Configuration.instance().getColor("TYPE_CDS");
 			g.setColor(cdsColor);
 			g.fill(r);
 

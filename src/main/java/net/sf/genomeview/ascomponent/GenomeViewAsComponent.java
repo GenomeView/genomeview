@@ -21,6 +21,11 @@ import net.sf.jannot.source.Locator;
  */
 public class GenomeViewAsComponent {
 
+	// example files to load
+	private static final String BAM_EX = " http://www.broadinstitute.org/software/genomeview/demo_c_elegans/uwgs-rw_L2_FC6218_3.CHROMOSOME_IV.sorted.bam";
+	private static final String GFF_EX = "http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.gff.gz ";
+	private static final String FASTA_EX = "http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.fasta.gz";
+
 	public static void main(String[] args) throws MalformedURLException,
 			IOException, ReadFailedException, URISyntaxException {
 		// quick workaround, logger needs to be redirected to a console
@@ -34,14 +39,9 @@ public class GenomeViewAsComponent {
 		frame.pack();
 		frame.setVisible(true);
 
-		DataSourceHelper.load(model, new Locator(
-				"http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.fasta.gz"));
-
-		DataSourceHelper.load(model, new Locator(
-				"http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.gff.gz "));
-
-		DataSourceHelper.load(model, new Locator(
-				" http://www.broadinstitute.org/software/genomeview/demo_c_elegans/uwgs-rw_L2_FC6218_3.CHROMOSOME_IV.sorted.bam"));
+		DataSourceHelper.load(model, new Locator(FASTA_EX, log));
+		DataSourceHelper.load(model, new Locator(GFF_EX, log));
+		DataSourceHelper.load(model, new Locator(BAM_EX, log));
 
 	}
 }

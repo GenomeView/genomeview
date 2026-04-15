@@ -231,7 +231,8 @@ public abstract class Track {
 	 */
 	private void paintHighlight(Graphics2D g, int yOffset, int used,
 			double width) {
-		if (Configuration.getBoolean("track:highlight:" + config.dataKey)) {
+		if (Configuration.instance()
+				.getBoolean("track:highlight:" + config.dataKey)) {
 			g.setColor(new Color(255, 0, 0, 25));
 			g.fillRect(0, yOffset, (int) width, used);
 		}

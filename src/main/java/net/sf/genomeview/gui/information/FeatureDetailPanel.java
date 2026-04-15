@@ -3,6 +3,7 @@
  */
 package net.sf.genomeview.gui.information;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -16,20 +17,19 @@ import java.util.Observer;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.text.html.StyleSheet;
 
+import be.abeel.gui.GridBagPanel;
+import be.abeel.util.NaturalOrderComparator;
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import net.sf.jannot.Feature;
-import be.abeel.gui.GridBagPanel;
-import be.abeel.util.NaturalOrderComparator;
 
 /**
  * Panel with detailed information about a single Feature. (bottom -right in
@@ -52,7 +52,8 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 		StyleSheet css = name.getStyleSheet();
 		css.addRule("body {color:#000; margin-left: 4px; margin-right: 4px; }");
 		css.addRule("p {margin:0px;padding:0px;}");
-		css.addRule("h3 {font-size:115%;color: " + Colors.encode(Configuration.green) + ";margin:0px;padding:0px;}");
+		css.addRule("h3 {font-size:115%;color: " + Colors.encode(Color.green)
+				+ ";margin:0px;padding:0px;}");
 
 		name.setEditable(false);
 		name.addMouseListener(new MouseAdapter() {
@@ -91,13 +92,14 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 
 					popupMenu.add(wrapMenu(Query.plaza));
 
-					String extra = Configuration.get("extraqueries");
+					String extra = Configuration.instance().get("extraqueries");
 					if (extra != null) {
 						popupMenu.addSeparator();
 						String[] arr = extra.split(";");
 						for (String s : arr) {
 							String[] tmp = s.split(",");
-							JMenuItem extramenu = wrapMenu(new Query(tmp[0], tmp[1], null));
+							JMenuItem extramenu = wrapMenu(
+									new Query(tmp[0], tmp[1], null));
 							popupMenu.add(extramenu);
 						}
 					}
@@ -108,17 +110,18 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 			}
 
 			private JMenuItem wrapMenu(final Query q) {
-				return new JMenuItem(new AbstractAction(q.getLabel(), q.getIcon()) {
+				return new JMenuItem(
+						new AbstractAction(q.getLabel(), q.getIcon()) {
 
-					private static final long serialVersionUID = -3208849232821620577L;
+							private static final long serialVersionUID = -3208849232821620577L;
 
-					@Override
-					public void actionPerformed(ActionEvent e) {
+							@Override
+							public void actionPerformed(ActionEvent e) {
 
-						q.query(name.getSelectedText());
+								q.query(name.getSelectedText());
 
-					}
-				});
+							}
+						});
 			}
 
 		});
@@ -148,17 +151,23 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 			for (Feature rf : set) {
 				// text += "Data origin: " + rf.getSource() + "\n";
 				if (rf.location() != null)
-					text.append("Location: " + StaticUtils.escapeHTML(Arrays.toString(rf.location())) + "<br/>");
+					text.append(
+							"Location: "
+									+ StaticUtils.escapeHTML(
+											Arrays.toString(rf.location()))
+									+ "<br/>");
 				text.append("Strand: " + rf.strand() + "<br/>");
 				text.append("Score: " + rf.getScore() + "<br/>");
-				List<String>list=new ArrayList<String>();
+				List<String> list = new ArrayList<String>();
 				list.addAll(rf.getQualifiersKeys());
-				Collections.sort(list, NaturalOrderComparator.NUMERICAL_ORDER_IGNORE_CASE);
+				Collections.sort(list,
+						NaturalOrderComparator.NUMERICAL_ORDER_IGNORE_CASE);
 				for (String key : list) {
 					if (key.equals("url")) {
 						String[] urls = rf.qualifier(key).split(",");
 						for (String url : urls)
-							text.append("<a href='" + url + "'>" + url + "</a><br/>");
+							text.append("<a href='" + url + "'>" + url
+									+ "</a><br/>");
 					} else
 						text.append(key + "=" + rf.qualifier(key) + "<br/>");
 

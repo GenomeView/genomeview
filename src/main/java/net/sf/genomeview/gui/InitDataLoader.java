@@ -46,9 +46,11 @@ public class InitDataLoader {
 			String position, String session)
 			throws InterruptedException, ExecutionException {
 
-		SourceCache.cacheDir = new File(Configuration.getDirectory(), "cache");
-		IndexManager.cacheDir = new File(Configuration.getDirectory(), "index");
-		DataSourceFactory.disableURLCaching = Configuration
+		SourceCache.cacheDir = new File(Configuration.instance().getDirectory(),
+				"cache");
+		IndexManager.cacheDir = new File(
+				Configuration.instance().getDirectory(), "index");
+		DataSourceFactory.disableURLCaching = Configuration.instance()
 				.getBoolean("general:disableURLCaching");
 		final Reporter log = model.getLog();
 
@@ -81,7 +83,7 @@ public class InitDataLoader {
 			log.log(Level.INFO, "URL commandline option is set: " + cmdUrl);
 
 			try {
-				DataSourceHelper.load(model, new Locator(cmdUrl), true);
+				DataSourceHelper.load(model, new Locator(cmdUrl, log), true);
 			} catch (URISyntaxException | IOException | ReadFailedException e) {
 				log.log(Level.WARNING, "problem loading url " + cmdUrl, e);
 			}
@@ -90,7 +92,7 @@ public class InitDataLoader {
 			log.log(Level.INFO, "File commandline option is set: " + cmdFile);
 
 			try {
-				DataSourceHelper.load(model, new Locator(cmdFile), true);
+				DataSourceHelper.load(model, new Locator(cmdFile, log), true);
 			} catch (URISyntaxException | IOException | ReadFailedException e) {
 				log.log(Level.WARNING, "problem loading file " + cmdFile, e);
 			}
@@ -101,23 +103,10 @@ public class InitDataLoader {
 		for (String s : remArgs) {
 			log.log(Level.INFO, "loading additional from commandline: " + s);
 			try {
-				if (!s.startsWith("http:") && !s.startsWith("ftp:")
-						&& !s.startsWith("https:")) {
-					DataSourceHelper.load(model, new Locator(s));
-					//
-					// ReadWorker rf = new ReadWorker(ds, model);
-					// rf.execute();
-
-				} else {
-					DataSourceHelper.load(model, new Locator(s));
-					// ReadWorker rf = new ReadWorker(ds, model);
-					// rf.execute();
-
-				}
+				DataSourceHelper.load(model, new Locator(s, log));
 			} catch (Exception e) {
 				log.log(Level.WARNING, "problem loading  " + s, e);
 			}
-
 		}
 
 		if (position != null) {

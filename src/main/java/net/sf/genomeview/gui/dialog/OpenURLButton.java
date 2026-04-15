@@ -38,7 +38,7 @@ public class OpenURLButton extends JButton {
 					if (input != null && input.trim().length() > 0) {
 
 						DataSourceHelper.load(gvModel,
-								new Locator(input.trim()));
+								new Locator(input.trim(), gvModel.getLog()));
 					}
 
 				} catch (MalformedURLException e2) {

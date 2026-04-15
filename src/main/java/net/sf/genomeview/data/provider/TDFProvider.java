@@ -5,8 +5,9 @@ package net.sf.genomeview.data.provider;
 
 import java.util.ArrayList;
 
+import org.broad.igv.track.WindowFunction;
+
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.NoFailIterable;
 import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Task;
@@ -14,8 +15,6 @@ import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.tdf.TDFData;
-
-import org.broad.igv.track.WindowFunction;
 
 /**
  * 
@@ -26,16 +25,17 @@ public class TDFProvider extends PileProvider {
 
 	private TDFData source;
 
-
 	public TDFProvider(Entry e, TDFData source, Model model) {
 //		super(model);
 		this.source = source;
 		/* Select default window function */
-		WindowFunction wf=WindowFunction.getWindowFunction(Configuration.get("pileup:defaultWindowFunction"));
-		System.out.println("requesting: "+Configuration.get("pileup:defaultWindowFunction")+"\t"+wf);
-		if(source.availableWindowFunctions().contains(wf))
+		WindowFunction wf = WindowFunction.getWindowFunction(
+				Configuration.instance().get("pileup:defaultWindowFunction"));
+		System.out.println("requesting: "
+				+ Configuration.instance().get("pileup:defaultWindowFunction")
+				+ "\t" + wf);
+		if (source.availableWindowFunctions().contains(wf))
 			source.requestWindowFunction(wf);
-		
 
 	}
 
@@ -47,12 +47,13 @@ public class TDFProvider extends PileProvider {
 	private float maxPile;
 
 	@Override
-	public void get(final int start, final int end,final DataCallback<Pile>cb) {
+	public void get(final int start, final int end,
+			final DataCallback<Pile> cb) {
 		/* Check whether request can be fulfilled by buffer */
 		if (start >= lastStart && end <= lastEnd
 				&& (lastEnd - lastStart) <= 2 * (end - start))
 //			return new NoFailIterable<Pile>(buffer);
-			cb.dataReady(new Location(start,end),buffer);
+			cb.dataReady(new Location(start, end), buffer);
 
 		/* New request */
 
@@ -63,7 +64,7 @@ public class TDFProvider extends PileProvider {
 		buffer.clear();
 		status.clear();
 		status.add(new Status(false, true, false, start, end));
-		final Status thisJob=status.get(0);
+		final Status thisJob = status.get(0);
 		// queue up retrieval
 		Task t = new Task(new Location(start, end)) {
 
@@ -71,11 +72,12 @@ public class TDFProvider extends PileProvider {
 			public void run() {
 				// When actually running, check again whether we actually need
 				// this data
-				if (!(start >= lastStart && end <= lastEnd && (lastEnd - lastStart) <= 2 * (end - start)))
+				if (!(start >= lastStart && end <= lastEnd
+						&& (lastEnd - lastStart) <= 2 * (end - start)))
 					return;
 				thisJob.setRunning();
-				Iterable<Pile> fresh = source.get(start, end+1);
-				
+				Iterable<Pile> fresh = source.get(start, end + 1);
+
 				for (Pile p : fresh) {
 					float val = p.getTotal();
 
@@ -86,7 +88,7 @@ public class TDFProvider extends PileProvider {
 				}
 				thisJob.setFinished();
 //				notifyListeners();
-				cb.dataReady(new Location(start,end),buffer);
+				cb.dataReady(new Location(start, end), buffer);
 			}
 
 		};
@@ -98,8 +100,6 @@ public class TDFProvider extends PileProvider {
 
 	}
 
-	
-	
 	@Override
 	public double getMaxPile() {
 		return maxPile;
@@ -139,8 +139,6 @@ public class TDFProvider extends PileProvider {
 	public boolean isCurrentWindowFunction(WindowFunction wf) {
 		return source.isCurrentWindowFunction(wf);
 	}
-
-
 
 //	@Override
 //	public String label() {

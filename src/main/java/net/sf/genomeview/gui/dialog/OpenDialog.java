@@ -86,7 +86,7 @@ public class OpenDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
 				JFileChooser chooser = new JFileChooser(
-						Configuration.getFile("lastDirectory"));
+						Configuration.instance().getFile("lastDirectory"));
 				chooser.resetChoosableFileFilters();
 				for (final String ext : exts) {
 					chooser.addChoosableFileFilter(new FileFilter() {
@@ -148,11 +148,11 @@ public class OpenDialog extends JDialog {
 //					DataSource[] out = new DataSource[files.length];
 					try {
 						for (int i = 0; i < files.length; i++) {
-							DataSourceHelper.load(model,
-									new Locator(files[i].toString()));
+							DataSourceHelper.load(model, new Locator(
+									files[i].toString(), model.getLog()));
 
 						}
-						Configuration.set("lastDirectory",
+						Configuration.instance().set("lastDirectory",
 								files[0].getParentFile());
 //						load(out);
 					} catch (IOException e1) {
@@ -180,7 +180,8 @@ public class OpenDialog extends JDialog {
 						"Give the URL of the data");
 				if (input != null && input.trim().length() > 0) {
 					try {
-						DataSourceHelper.load(model, new Locator(input.trim()));
+						DataSourceHelper.load(model,
+								new Locator(input.trim(), model.getLog()));
 					} catch (IOException | URISyntaxException
 							| ReadFailedException e2) {
 						model.getLog().log(Level.SEVERE,

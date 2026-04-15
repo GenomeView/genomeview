@@ -125,8 +125,8 @@ public class Model extends Observable implements Observer {
 	 * amino-acid mapping - names of std sequences. See {@link AminoAcidMapping}
 	 */
 	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(
-			AminoAcidMapping
-					.valueOf(Configuration.get("translationTable:default")));
+			AminoAcidMapping.valueOf(
+					Configuration.instance().get("translationTable:default")));
 
 	private final GUIManager guimanager;
 
@@ -169,12 +169,13 @@ public class Model extends Observable implements Observer {
 		this.trackList = new TrackList(this);
 		// entries.addObserver(this);
 
-		Configuration.getTypeSet("visibleTypes");
+		Configuration.instance().getTypeSet("visibleTypes");
 		updateTracks();
 
 		try {
 
-			File recent = new File(Configuration.getDirectory(), "recent.gv");
+			File recent = new File(Configuration.instance().getDirectory(),
+					"recent.gv");
 			if (recent.exists() && recent.length() > 0) {
 				LineIterator it = new LineIterator(recent);
 				while (it.hasNext())
@@ -283,13 +284,14 @@ public class Model extends Observable implements Observer {
 		this.exitRequested = true;
 
 		try {
-			if (Configuration.getBoolean("session:enableRememberLast")) {
+			if (Configuration.instance()
+					.getBoolean("session:enableRememberLast")) {
 
 				/*
 				 * Write recent files to disk
 				 */
-				PrintWriter pw = new PrintWriter(
-						new File(Configuration.getDirectory(), "recent.gv"));
+				PrintWriter pw = new PrintWriter(new File(
+						Configuration.instance().getDirectory(), "recent.gv"));
 
 				for (int i = 0; i < recentFiles.getSize(); i++) {
 
@@ -299,8 +301,10 @@ public class Model extends Observable implements Observer {
 
 				/* Only store session if there is something to store */
 				if (this.loadedSources().size() > 0)
-					Session.save(new File(Configuration.getDirectory(),
-							"previous.gvs"), this);
+					Session.save(
+							new File(Configuration.instance().getDirectory(),
+									"previous.gvs"),
+							this);
 			}
 		} catch (IOException e) {
 			log.log(Level.WARNING, "Problem saving last session", e);

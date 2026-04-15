@@ -92,7 +92,8 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 				.getVisibleEntry().sequence().subsequence(start, start + 3))
 				.stringRepresentation();
 		if (model.getAAMapping().isStart(codon)) {
-			if (!Configuration.getBoolean("general:onlyMethionineAsStart")
+			if (!Configuration.instance()
+					.getBoolean("general:onlyMethionineAsStart")
 					|| model.getAAMapping().get(codon) == 'M')
 				return true;
 		}
@@ -104,7 +105,8 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 		String codon = model.vlm.getVisibleEntry().sequence()
 				.subsequence(start, start + 3).stringRepresentation();
 		if (model.getAAMapping().isStart(codon)) {
-			if (!Configuration.getBoolean("general:onlyMethionineAsStart")
+			if (!Configuration.instance()
+					.getBoolean("general:onlyMethionineAsStart")
 					|| model.getAAMapping().get(codon) == 'M')
 				return true;
 		}

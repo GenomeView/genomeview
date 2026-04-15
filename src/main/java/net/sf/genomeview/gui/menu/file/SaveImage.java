@@ -3,10 +3,7 @@
  */
 package net.sf.genomeview.gui.menu.file;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -14,18 +11,12 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JWindow;
 import javax.swing.RepaintManager;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
 
 import be.abeel.io.ExtensionManager;
-
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
@@ -47,18 +38,20 @@ public class SaveImage extends AbstractAction {
 		this.model = model;
 	}
 
-	
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		final JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
+		final JFileChooser chooser = new JFileChooser(
+				Configuration.instance().getFile("lastDirectory"));
 		chooser.setMultiSelectionEnabled(false);
 
-		int result = chooser.showSaveDialog(model.getGUIManager().getMainWindow());
+		int result = chooser
+				.showSaveDialog(model.getGUIManager().getMainWindow());
 		if (result == JFileChooser.APPROVE_OPTION) {
-			final File ef = ExtensionManager.extension(chooser.getSelectedFile(), ExtensionManager.PNG);
+			final File ef = ExtensionManager
+					.extension(chooser.getSelectedFile(), ExtensionManager.PNG);
 			if (ef.exists()) {
-				int confirm = JOptionPane.showConfirmDialog(model.getGUIManager().getMainWindow(),
+				int confirm = JOptionPane.showConfirmDialog(
+						model.getGUIManager().getMainWindow(),
 						MessageManager.getString("filemenu.save_image_warn"));
 				if (confirm != JOptionPane.YES_OPTION) {
 					return;
@@ -66,21 +59,25 @@ public class SaveImage extends AbstractAction {
 
 			}
 
-			
-			final Hider h = new Hider(model,MessageManager.getString("filemenu.exporting_image"));
+			final Hider h = new Hider(model,
+					MessageManager.getString("filemenu.exporting_image"));
 			SwingUtilities.invokeLater(new Runnable() {
 
 				@Override
 				public void run() {
 					try {
-						GeneEvidenceLabel mw = model.getGUIManager().getEvidenceLabel();
-						int factor = Configuration.getInt("general:exportMagnifyFactor");
-						BufferedImage bi = new BufferedImage(mw.getWidth() * factor, mw.getHeight() * factor,
+						GeneEvidenceLabel mw = model.getGUIManager()
+								.getEvidenceLabel();
+						int factor = Configuration.instance()
+								.getInt("general:exportMagnifyFactor");
+						BufferedImage bi = new BufferedImage(
+								mw.getWidth() * factor, mw.getHeight() * factor,
 								BufferedImage.TYPE_INT_RGB);
 						Graphics2D g = (Graphics2D) bi.getGraphics();
 
 						try {
-							RepaintManager currentManager = RepaintManager.currentManager(mw);
+							RepaintManager currentManager = RepaintManager
+									.currentManager(mw);
 							currentManager.setDoubleBufferingEnabled(false);
 							g.scale(factor, factor);
 							mw.paintTracks(g, null);
@@ -90,7 +87,8 @@ public class SaveImage extends AbstractAction {
 							// TODO fix
 							ex.printStackTrace();
 						}
-						Configuration.set("lastDirectory", ef.getParentFile());
+						Configuration.instance().set("lastDirectory",
+								ef.getParentFile());
 					} catch (Exception ex) {
 						// TODO fix
 						ex.printStackTrace();

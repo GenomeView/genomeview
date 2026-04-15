@@ -64,7 +64,7 @@ public class SaveDialog extends JDialog {
 
 	private String file(Model model) {
 		JFileChooser chooser = new JFileChooser(
-				Configuration.getFile("lastDirectory"));
+				Configuration.instance().getFile("lastDirectory"));
 		int returnVal = chooser
 				.showSaveDialog(model.getGUIManager().getMainWindow());
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -161,7 +161,8 @@ public class SaveDialog extends JDialog {
 		 * Handle default location
 		 */
 
-		String defaultLocation = Configuration.get("save:defaultLocation");
+		String defaultLocation = Configuration.instance()
+				.get("save:defaultLocation");
 		if (!defaultLocation.equals("null")) {
 			locationField.setText(defaultLocation);
 			locationField.setEditable(false);
@@ -174,7 +175,8 @@ public class SaveDialog extends JDialog {
 		 */
 		addSeparator(
 				MessageManager.getString("savedialog.file_format_options"));
-		String defaultParserName = Configuration.get("save:defaultParser");
+		String defaultParserName = Configuration.instance()
+				.get("save:defaultParser");
 		// Parser defaultParser = Configuration.getParser("save:defaultParser");
 		String[] arr = new String[] { "GFF3", "EMBL" };
 
@@ -188,7 +190,7 @@ public class SaveDialog extends JDialog {
 		/*
 		 * Include sequence
 		 */
-		final boolean enableIncludeSequenceFlag = Configuration
+		final boolean enableIncludeSequenceFlag = Configuration.instance()
 				.getBoolean("save:enableIncludeSequence");
 		final JCheckBox includeSequence = new JCheckBox("Include sequence");
 		includeSequence.setEnabled(enableIncludeSequenceFlag);
@@ -215,7 +217,7 @@ public class SaveDialog extends JDialog {
 		/* Entries list */
 		addSeparator(
 				MessageManager.getString("savedialog.select_entries_to_save"));
-		boolean entrySelectionEnabledFlag = Configuration
+		boolean entrySelectionEnabledFlag = Configuration.instance()
 				.getBoolean("save:enableEntrySelection");
 		final MultiSelectionArray<Entry> entriesList = new MultiSelectionArray<Entry>(
 				model.entries(), entrySelectionEnabledFlag);
@@ -251,7 +253,7 @@ public class SaveDialog extends JDialog {
 		 * Type selection
 		 */
 		addSeparator(MessageManager.getString("savedialog.annotation_types"));
-		boolean typeSelectionEnabledFlag = Configuration
+		boolean typeSelectionEnabledFlag = Configuration.instance()
 				.getBoolean("save:enableTypeSelection");
 		final MultiSelectionArray<net.sf.jannot.Type> typesList = new MultiSelectionArray<net.sf.jannot.Type>(
 				Arrays.asList(net.sf.jannot.Type.values()),

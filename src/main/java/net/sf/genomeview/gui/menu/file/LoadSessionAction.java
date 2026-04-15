@@ -6,26 +6,20 @@ package net.sf.genomeview.gui.menu.file;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.data.ReadWorker;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.MessageManager;
-import net.sf.jannot.source.DataSource;
-import net.sf.jannot.source.DataSourceFactory;
-import be.abeel.io.LineIterator;
 
 /**
  * Action to handle loading sessions.
@@ -43,12 +37,14 @@ public class LoadSessionAction extends AbstractAction {
 		this.model = model;
 	}
 
-	private static Logger log = LoggerFactory.getLogger(LoadSessionAction.class.getCanonicalName());
+	private static Logger log = LoggerFactory
+			.getLogger(LoadSessionAction.class.getCanonicalName());
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		JFileChooser chooser = new JFileChooser(Configuration.getFile("lastDirectory"));
+		JFileChooser chooser = new JFileChooser(
+				Configuration.instance().getFile("lastDirectory"));
 		chooser.setMultiSelectionEnabled(false);
 		chooser.setFileFilter(new FileFilter() {
 
@@ -64,25 +60,32 @@ public class LoadSessionAction extends AbstractAction {
 
 		});
 
-		int result = chooser.showOpenDialog(model.getGUIManager().getMainWindow());
+		int result = chooser
+				.showOpenDialog(model.getGUIManager().getMainWindow());
 
 		if (result == JFileChooser.APPROVE_OPTION) {
 			if (model.loadedSources().size() != 0) {
-				result = JOptionPane.showConfirmDialog(model.getGUIManager().getMainWindow(),
+				result = JOptionPane.showConfirmDialog(
+						model.getGUIManager().getMainWindow(),
 						MessageManager.getString("filemenu.load_session_warn"),
-						MessageManager.getString("filemenu.clear_session"), JOptionPane.YES_NO_OPTION);
+						MessageManager.getString("filemenu.clear_session"),
+						JOptionPane.YES_NO_OPTION);
 				if (result != JOptionPane.YES_OPTION) {
 					return;
 				}
 			}
-			
+
 			try {
-				Session.loadSession(model,chooser.getSelectedFile());
+				Session.loadSession(model, chooser.getSelectedFile());
 			} catch (FileNotFoundException e1) {
-				CrashHandler.showErrorMessage(MessageManager.getString("loadsessionaction.couldnt_load_session_file"), e1);
+				CrashHandler.showErrorMessage(
+						MessageManager.getString(
+								"loadsessionaction.couldnt_load_session_file"),
+						e1);
 			}
-			
-			Configuration.set("lastDirectory", chooser.getSelectedFile().getParentFile());
+
+			Configuration.instance().set("lastDirectory",
+					chooser.getSelectedFile().getParentFile());
 		}
 
 	}

@@ -33,6 +33,7 @@ import net.sf.genomeview.gui.menu.file.LoadFeaturesAction;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+
 /**
  * 
  * @author Thomas Abeel
@@ -45,13 +46,14 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 	private Model model;
 	private boolean dismissed = false;
 	private JScrollPane jp;
-	private static ReferenceMissingMonitor rmm=null;
-	public static void init(Model model){
-		if(rmm==null)
-			rmm=new ReferenceMissingMonitor(model);
-		
+	private static ReferenceMissingMonitor rmm = null;
+
+	public static void init(Model model) {
+		if (rmm == null)
+			rmm = new ReferenceMissingMonitor(model);
+
 	}
-	
+
 	private ReferenceMissingMonitor(Model model) {
 		super(model.getGUIManager().getMainWindow(), ModalityType.MODELESS);
 		setTitle(MessageManager.getString("referencemissing.title"));
@@ -60,32 +62,35 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				dismissed=true;
+				dismissed = true;
 				super.windowClosing(e);
 			}
-			
+
 		});
-		
+
 		final JDialog _self = this;
 
 		this.model = model;
 		model.addObserver(this);
 		model.getWorkerManager().addObserver(this);
 		Rectangle bounds = model.getGUIManager().getMainWindow().getBounds();
-		
-		this.setPreferredSize(new Dimension(bounds.width / 3, bounds.height / 5));
-		
-		this.setLocation(bounds.x + bounds.width / 3, bounds.y + bounds.height / 5);
+
+		this.setPreferredSize(
+				new Dimension(bounds.width / 3, bounds.height / 5));
+
+		this.setLocation(bounds.x + bounds.width / 3,
+				bounds.y + bounds.height / 5);
 
 		floater.setOpaque(true);
 		floater.setText("");
 		floater.setForeground(Color.BLACK);
 		Border emptyBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 		Border colorBorder = BorderFactory.createLineBorder(Color.RED);
-		floater.setBorder(BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+		floater.setBorder(
+				BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
 		floater.setBackground(new Color(255, 0, 0, 100));
 		setLayout(new BorderLayout());
-		jp=new JScrollPane(floater);
+		jp = new JScrollPane(floater);
 		jp.getVerticalScrollBar().addAdjustmentListener(new ScrollFixer(jp));
 		add(jp, BorderLayout.CENTER);
 
@@ -93,7 +98,8 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 		buttons.setLayout(new BorderLayout());
 		add(buttons, BorderLayout.SOUTH);
 
-		JButton dismiss = new JButton(MessageManager.getString("referencemissing.dismiss"));
+		JButton dismiss = new JButton(
+				MessageManager.getString("referencemissing.dismiss"));
 		dismiss.addActionListener(new ActionListener() {
 
 			@Override
@@ -106,37 +112,32 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 
 		buttons.add(dismiss, BorderLayout.WEST);
 
-		JButton data = new JButton(MessageManager.getString("referencemissing.load_data"));
+		JButton data = new JButton(
+				MessageManager.getString("referencemissing.load_data"));
 		data.addActionListener(new LoadFeaturesAction(model));
 		buttons.add(data, BorderLayout.EAST);
 		pack();
 	}
 
-	
-
-
-
 	private int lastMissing = -1;
 
-	class ScrollFixer implements AdjustmentListener{
+	class ScrollFixer implements AdjustmentListener {
 
 		private JScrollPane jp;
 
 		public ScrollFixer(JScrollPane jp) {
-			this.jp=jp;
+			this.jp = jp;
 		}
 
 		@Override
 		public void adjustmentValueChanged(AdjustmentEvent e) {
-			if(!e.getValueIsAdjusting())
+			if (!e.getValueIsAdjusting())
 				jp.repaint();
-			
+
 		}
 
-	
-		
 	}
-	
+
 	@Override
 	public void update(Observable o, Object arg) {
 		final JDialog _self = this;
@@ -160,7 +161,7 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 		ArrayList<String> missing = new ArrayList<String>();
 		for (Entry e : es) {
 			if (e.sequence().size() == 0) {
-				//System.out.println(e.sequence().getClass());
+				// System.out.println(e.sequence().getClass());
 				int dataCount = 0;
 				for (DataKey dk : e)
 					dataCount++;
@@ -170,10 +171,10 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 				}
 			}
 		}
-		
+
 		if (missingReference > 0 && lastMissing != missingReference) {
-			StringBuffer msg = new StringBuffer(
-					MessageManager.getString("referencemissing.not_every_entry_has_reference"));
+			StringBuffer msg = new StringBuffer(MessageManager.getString(
+					"referencemissing.not_every_entry_has_reference"));
 			for (String s : missing) {
 				msg.append("\n" + s);
 			}
@@ -184,7 +185,8 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 
 				@Override
 				public void run() {
-					if(!Configuration.getBoolean("general:ignoreMissingReferences"))
+					if (!Configuration.instance()
+							.getBoolean("general:ignoreMissingReferences"))
 						_self.setVisible(true);
 
 				}
@@ -199,7 +201,7 @@ public class ReferenceMissingMonitor extends JDialog implements Observer {
 				}
 			});
 
-		} else if(missingReference == 0){
+		} else if (missingReference == 0) {
 			this.setVisible(false);
 
 		}

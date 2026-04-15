@@ -223,7 +223,7 @@ class InstructionWorker implements Runnable {
 
 	private void doConfig(String string) {
 		String[] arr = string.trim().split("=", 2);
-		Configuration.set(arr[0], arr[1]);
+		Configuration.instance().set(arr[0], arr[1]);
 	}
 
 	private void doPosition(String string) {
@@ -233,7 +233,7 @@ class InstructionWorker implements Runnable {
 
 	private void doLoad(String s) {
 		try {
-			DataSourceHelper.load(model, new Locator(s));
+			DataSourceHelper.load(model, new Locator(s, model.getLog()));
 		} catch (URISyntaxException | IOException | ReadFailedException e) {
 			// FIXME unreachable? load should not crash
 			model.getLog().log(Level.SEVERE, "Failed to load " + s, e);
