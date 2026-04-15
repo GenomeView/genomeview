@@ -34,9 +34,6 @@ public class Configuration {
 
 	private static File confDir;
 
-//	private static Logger logger = LoggerFactory
-//			.getLogger(Configuration.class.getCanonicalName());
-
 	/* Map with resource configuration */
 	private static HashMap<String, String> resourceMap = new HashMap<String, String>();
 

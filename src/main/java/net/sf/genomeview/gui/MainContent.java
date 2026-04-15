@@ -8,8 +8,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -24,8 +22,6 @@ import net.sf.genomeview.gui.viztracks.AnnotationFrame;
  * 
  */
 public class MainContent {
-
-	private static Logger logger = LoggerFactory.getLogger(MainContent.class.getCanonicalName());
 
 	private static final long serialVersionUID = -2304899922750491897L;
 
@@ -82,7 +78,8 @@ public class MainContent {
 
 		leftRight.setLeftComponent(leftContainer);
 		leftRight.setRightComponent(new InformationFrame(model));
-		Rectangle rec = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		Rectangle rec = GraphicsEnvironment.getLocalGraphicsEnvironment()
+				.getMaximumWindowBounds();
 		leftRight.setPreferredSize(new Dimension(rec.width, rec.height));
 		leftRight.setResizeWeight(0.99);
 

@@ -25,8 +25,6 @@ import net.sf.genomeview.data.Model;
  * 
  */
 public class GenomeView {
-//	private static Logger logger = LoggerFactory
-//			.getLogger(GenomeView.class.getCanonicalName());
 
 	private static WindowManager mw;
 

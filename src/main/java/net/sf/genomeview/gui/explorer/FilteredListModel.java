@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListModel;
-import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
@@ -22,8 +21,7 @@ public class FilteredListModel<T> extends AbstractListModel<T> {
 
 	public void addElement(T string) {
 		_source.addElement(string);
-		
-		
+
 	}
 
 	public FilteredListModel(DefaultListModel<T> source) {
@@ -71,11 +69,8 @@ public class FilteredListModel<T> extends AbstractListModel<T> {
 			}
 			// fireIntervalRemoved(this, 0, _source.getSize() - 1);
 			// fireIntervalAdded(this, 0, _source.getSize() - 1);
-			
-			
 
 		}
-		System.out.println("FIRE");
 		fireContentsChanged(this, 0, getSize() - 1);
 	}
 
@@ -84,17 +79,18 @@ public class FilteredListModel<T> extends AbstractListModel<T> {
 	}
 
 	public T getElementAt(int index) {
-		return (_filter != null) ? _source.getElementAt(_indices.get(index)) : _source.getElementAt(index);
+		return (_filter != null) ? _source.getElementAt(_indices.get(index))
+				: _source.getElementAt(index);
 	}
 
 	public void removeElement(T string) {
 		_source.removeElement(string);
-		
+
 	}
 
 	public void add(int i, T string) {
-		_source.add(i,string);
-		
+		_source.add(i, string);
+
 	}
 
 }

@@ -42,9 +42,6 @@ public class WindowManager extends WindowAdapter implements Observer {
 	public static final int MAX_WIDTH = 1920;
 	public static final int MAX_HEIGHT = 1080;
 
-//	private static Logger logger = LoggerFactory
-//			.getLogger(WindowManager.class.getCanonicalName());
-
 	private GenomeViewWindow window = null;
 
 	private GenomeViewWindow helper = null;
@@ -128,15 +125,16 @@ public class WindowManager extends WindowAdapter implements Observer {
 				Cleaner.exit();
 
 				// System.exit(0);
-				System.out.println(
+				model.getLog().log(Level.INFO,
 						"We should be exiting here, if it doesn't happen, we will need to do some work...");
 
 				for (Frame f : Frame.getFrames()) {
-					System.out.println("Disposing loose frame: " + f);
+					model.getLog().log(Level.INFO,
+							"Disposing loose frame: " + f);
 					f.dispose();
 				}
 				// Dumping all running threads that are holding up the show
-				System.out.println("Dumping all running threads");
+				model.getLog().log(Level.INFO, "Dumping all running threads");
 				Thread[] threads = getAllThreads();
 				for (Thread id : threads) {
 					System.out.println(id.getName() + "\t" + id.isDaemon()

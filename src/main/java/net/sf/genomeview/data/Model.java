@@ -58,9 +58,6 @@ public class Model extends Observable implements Observer {
 	// the main logger for the system.
 	private final DistributingReporter log;
 
-//	private final Logger logger = LoggerFactory
-//			.getLogger(Model.class.getCanonicalName());
-
 	/**
 	 * The EntrySet which contains all loaded 'chromosomes'.
 	 */

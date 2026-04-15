@@ -9,15 +9,11 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import be.abeel.concurrency.DaemonThreadFactory;
 import net.sf.genomeview.data.Model;
@@ -30,9 +26,6 @@ import net.sf.genomeview.gui.MessageManager;
  * 
  */
 public class JavaScriptHandler {
-
-	private Logger log = LoggerFactory
-			.getLogger(JavaScriptHandler.class.getCanonicalName());
 
 	private ExecutorService es = Executors
 			.newSingleThreadExecutor(new DaemonThreadFactory());
@@ -47,7 +40,8 @@ public class JavaScriptHandler {
 			try {
 				tmp = new ServerSocket(port);
 			} catch (IOException e) {
-				System.out.println("failed on port " + port);
+				// not serious, we just try the next port
+				model.getLog().log(Level.INFO, "failed on port " + port);
 			}
 			port++;
 		}
@@ -75,7 +69,8 @@ public class JavaScriptHandler {
 				if (localPort != 2223)
 					notifyMainHandler(localPort);
 
-				System.out.println("listening on port: " + ss.getLocalPort());
+				model.getLog().log(Level.INFO,
+						"listening on port: " + ss.getLocalPort());
 				while (true && !ss.isClosed()) {
 					try {
 						Socket s = ss.accept();
@@ -84,7 +79,8 @@ public class JavaScriptHandler {
 						es.execute(ws);
 
 					} catch (SocketException e) {
-						log.debug("This is normal when closing the socket", e);
+						model.getLog().log(Level.INFO,
+								"Normal close-down exception received, closing sockets");
 
 					} catch (IOException e) {
 						model.getLog().log(Level.SEVERE,
@@ -98,6 +94,7 @@ public class JavaScriptHandler {
 
 			private void notifyMainHandler(int localPort) {
 				try {
+					// what is this doing?
 					Socket clientSocket = new Socket(InetAddress.getLocalHost(),
 							2223);
 					PrintWriter out = new PrintWriter(
@@ -105,12 +102,11 @@ public class JavaScriptHandler {
 					out.println("GenomeViewJavaScriptHandler-" + localPort);
 					out.close();
 					clientSocket.close();
-				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					model.getLog().log(Level.WARNING,
+							"Failure sending javascripthandler info to port "
+									+ localPort,
+							e);
 				}
 
 			}

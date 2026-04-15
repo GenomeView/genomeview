@@ -28,8 +28,7 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.util.HashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -52,14 +51,17 @@ public class MyAuthenticator extends Authenticator {
 		System.out.println(url.getUserInfo());
 		if (url.getUserInfo() != null) {
 			String[] arr = url.getUserInfo().split(":");
-			mapping.put(url.toString(), new PasswordAuthentication(arr[0], arr[1].toCharArray()));
+			mapping.put(url.toString(),
+					new PasswordAuthentication(arr[0], arr[1].toCharArray()));
 			System.out.println(mapping);
 		}
 	}
 
 	protected PasswordAuthentication getPasswordAuthentication() {
-
-		Logger logger = LoggerFactory.getLogger(MyAuthenticator.class.getCanonicalName());
+		// FIXME we may want to log at specific place
+		// depending on standard practice?
+		Logger logger = Logger
+				.getLogger(MyAuthenticator.class.getCanonicalName());
 		logger.info("Requesting Host  : " + getRequestingHost());
 		logger.info("Requesting Port  : " + getRequestingPort());
 		logger.info("Requesting Prompt : " + getRequestingPrompt());
@@ -96,27 +98,34 @@ public class MyAuthenticator extends Authenticator {
 		gc.gridy = 0;
 		gc.fill = GridBagConstraints.BOTH;
 
-		JLabel jl = new JLabel(MessageManager.getString("authenticator.enter_details")+ " "+ getRequestingPrompt() + " at "
-				+ getRequestingHost());
+		JLabel jl = new JLabel(
+				MessageManager.getString("authenticator.enter_details") + " "
+						+ getRequestingPrompt() + " at " + getRequestingHost());
 		jd.add(jl, gc);
 		gc.gridy++;
 		JTextField username = new JTextField();
 		username.addActionListener(dps);
-		jd.add(new TitledComponent(MessageManager.getString("authenticator.user_name"), username), gc);
+		jd.add(new TitledComponent(
+				MessageManager.getString("authenticator.user_name"), username),
+				gc);
 		gc.gridy++;
 		JPasswordField password = new JPasswordField();
 		password.addActionListener(dps);
-		jd.add(new TitledComponent(MessageManager.getString("authenticator.password"), password), gc);
+		jd.add(new TitledComponent(
+				MessageManager.getString("authenticator.password"), password),
+				gc);
 		gc.gridy++;
 		JButton jb = new JButton(MessageManager.getString("button.ok"));
 		jb.addActionListener(dps);
 		jd.add(jb, gc);
 
 		jd.pack();
-		StaticUtils.center(null,jd);
+		StaticUtils.center(null, jd);
 		jd.setVisible(true);
-		if (username.getText().length() > 0 || password.getPassword().length > 0)
-			return new PasswordAuthentication(username.getText(), password.getPassword());
+		if (username.getText().length() > 0
+				|| password.getPassword().length > 0)
+			return new PasswordAuthentication(username.getText(),
+					password.getPassword());
 		else
 			return null;
 	}
