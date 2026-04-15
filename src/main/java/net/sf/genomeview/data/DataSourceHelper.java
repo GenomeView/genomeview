@@ -47,9 +47,6 @@ public class DataSourceHelper {
 	private final static int warn = JOptionPane.WARNING_MESSAGE;
 	private final static int error = JOptionPane.ERROR_MESSAGE;
 
-//	private static Logger log = LoggerFactory
-//			.getLogger(DataSourceHelper.class.getCanonicalName());
-
 	/**
 	 * 
 	 * @param model the {@link Model}

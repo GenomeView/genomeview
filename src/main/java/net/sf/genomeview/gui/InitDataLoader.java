@@ -12,7 +12,6 @@ import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.explorer.DataExplorerManager;
-import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.IndexManager;
@@ -111,7 +110,7 @@ public class InitDataLoader {
 
 		if (position != null) {
 			log.log(Level.INFO, "Initial position requested to " + position);
-			ExternalHelper.setPosition(position, model);
+			model.setPosition(position);
 
 		}
 		EventQueue.invokeLater(new Runnable() {

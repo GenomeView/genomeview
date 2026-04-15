@@ -675,7 +675,8 @@ public class Model extends Observable implements Observer {
 
 	/**
 	 * 
-	 * @param position the position to set to.
+	 * @param position the position to set to. This string can contain ":-" and
+	 *                 is a special format (TODO reverse engineer this)
 	 */
 	public void setPosition(final String position) {
 

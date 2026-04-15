@@ -21,7 +21,6 @@ import be.abeel.net.URIFactory;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.TryAgainHandler;
-import net.sf.genomeview.gui.external.ExternalHelper;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
@@ -205,8 +204,7 @@ public class Session {
 													al[0].trim());
 											break;
 										case LOCATION:
-											ExternalHelper.setPosition(
-													arr[1].trim(), model);
+											model.setPosition(arr[1].trim());
 
 										}
 									} catch (Exception e) {

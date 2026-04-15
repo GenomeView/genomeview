@@ -227,7 +227,7 @@ class InstructionWorker implements Runnable {
 	}
 
 	private void doPosition(String string) {
-		ExternalHelper.setPosition(string, model);
+		model.setPosition(string);
 
 	}
 
