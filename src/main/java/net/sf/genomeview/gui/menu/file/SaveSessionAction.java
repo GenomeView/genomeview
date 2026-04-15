@@ -5,6 +5,7 @@ package net.sf.genomeview.gui.menu.file;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
@@ -13,7 +14,6 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
-import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.MessageManager;
 
 /**
@@ -67,7 +67,7 @@ public class SaveSessionAction extends AbstractAction {
 						f.getParentFile());
 
 			} catch (Exception ex) {
-				CrashHandler.crash(MessageManager
+				model.getLog().log(Level.SEVERE, MessageManager
 						.getString("filemenu.could_not_save_session"), ex);
 			}
 		}

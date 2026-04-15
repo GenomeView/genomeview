@@ -6,6 +6,7 @@ package net.sf.genomeview.gui.menu.file;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
@@ -18,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
-import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.MessageManager;
 
 /**
@@ -78,7 +78,7 @@ public class LoadSessionAction extends AbstractAction {
 			try {
 				Session.loadSession(model, chooser.getSelectedFile());
 			} catch (FileNotFoundException e1) {
-				CrashHandler.showErrorMessage(
+				model.getLog().log(Level.WARNING,
 						MessageManager.getString(
 								"loadsessionaction.couldnt_load_session_file"),
 						e1);

@@ -19,7 +19,6 @@ import javax.swing.JOptionPane;
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.TryAgainHandler;
 import net.sf.genomeview.gui.external.ExternalHelper;
@@ -211,16 +210,16 @@ public class Session {
 
 										}
 									} catch (Exception e) {
-										CrashHandler.showErrorMessage(
+										model.getLog().log(Level.WARNING,
 												"Problem while executing this instruction: "
 														+ line
-														+ "\nSkipping this line and continuing.",
+														+ ". Skipping this line and continuing.",
 												e);
 
 									}
 								}
 							} catch (Exception e) {
-								CrashHandler.showErrorMessage(
+								model.getLog().log(Level.WARNING,
 										"Problem while parsing this line: "
 												+ line
 												+ "\nSkipping this line and continuing.",
@@ -231,7 +230,7 @@ public class Session {
 						}
 					}
 				} catch (Exception ex) {
-					CrashHandler.crash(MessageManager.getString(
+					model.getLog().log(Level.WARNING, MessageManager.getString(
 							"crashhandler.couldnt_load_session"), ex);
 				}
 				it.close();

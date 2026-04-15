@@ -82,19 +82,22 @@ class CommandLineOptions {
 
 	}
 
+	/**
+	 * 
+	 * @param parser
+	 * @param args
+	 * @param log
+	 * @return true iff successful
+	 */
 	private static boolean parse(AutoHelpCmdLineParser parser, String[] args,
 			Reporter log) {
 		try {
 			parser.parse(args);
 			return true;
 		} catch (IllegalOptionValueException | UnknownOptionException e) {
-			log.log(Level.SEVERE, "parsing commandline options failed", e);
-			// FIXME remove the following?
-			CrashHandler.showErrorMessage(MessageManager
-					.getString("commandlineoptions.parsing_command_line_error")
-					+ " " + e.getMessage() + "\n\n"
-					+ MessageManager.getString(
-							"commandlineoptions.will_continue_without_args"),
+			log.log(Level.SEVERE,
+					MessageManager.getString(
+							"commandlineoptions.parsing_command_line_error"),
 					e);
 		}
 		return false;

@@ -3,12 +3,10 @@
  */
 package net.sf.genomeview.gui.external;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
 
 import htsjdk.samtools.util.StringUtil;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
@@ -22,9 +20,6 @@ import net.sf.jannot.Location;
  * 
  */
 public class ExternalHelper {
-
-	private static Logger log = LoggerFactory
-			.getLogger(ExternalHelper.class.getCanonicalName());
 
 	public static void setPosition(final String position, final Model model) {
 
@@ -44,12 +39,10 @@ public class ExternalHelper {
 						 * If the location is not 2 or 3 tokens long, just stop
 						 */
 						if (arr.length > 3 || arr.length < 2) {
-							CrashHandler.showErrorMessage(
+							model.getLog().log(Level.WARNING,
 									MessageManager.getString(
 											"externalhelper.couldnt_parse_location")
-											+ " " + position,
-									new NumberFormatException(
-											"Unknown format"));
+											+ " " + position);
 							return;
 
 						}
@@ -79,14 +72,17 @@ public class ExternalHelper {
 							// Nothing to do in this case
 						}
 						if (!success) {
-							log.info("Failed to move to location: " + position
-									+ ". This instruction has been requeued and will be retried.");
+							model.getLog().log(Level.WARNING,
+									"Failed to move to location: " + position
+											+ ". This instruction has been requeued and will be retried.");
 						}
 					}
 				} catch (NumberFormatException ne) {
-					CrashHandler.showErrorMessage(MessageManager
-							.getString("externalhelper.couldnt_parse_location")
-							+ " " + position, ne);
+					model.getLog().log(Level.WARNING,
+							MessageManager.getString(
+									"externalhelper.couldnt_parse_location")
+									+ " " + position,
+							ne);
 				}
 			}
 

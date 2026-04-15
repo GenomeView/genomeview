@@ -14,13 +14,13 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import be.abeel.concurrency.DaemonThreadFactory;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.MessageManager;
 
 /**
@@ -87,7 +87,7 @@ public class JavaScriptHandler {
 						log.debug("This is normal when closing the socket", e);
 
 					} catch (IOException e) {
-						CrashHandler.showErrorMessage(
+						model.getLog().log(Level.SEVERE,
 								MessageManager.getString(
 										"jshandler.failed_to_accept_socket"),
 								e);

@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -21,7 +22,6 @@ import be.abeel.gui.GridBagPanel;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.WindowManager;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
@@ -191,7 +191,7 @@ public class RecentDataPanel extends GridBagPanel {
 							DataSourceHelper.load(model,
 									new Locator(selection, model.getLog()));
 						} catch (Exception e1) {
-							CrashHandler.showErrorMessage(
+							model.getLog().log(Level.WARNING,
 									MessageManager.getString(
 											"genome.couldnt_load_this_session"),
 									e1);
@@ -220,7 +220,7 @@ public class RecentDataPanel extends GridBagPanel {
 							DataSourceHelper.load(model,
 									new Locator(selection, model.getLog()));
 						} catch (Exception e1) {
-							CrashHandler.showErrorMessage(
+							model.getLog().log(Level.WARNING,
 									MessageManager.getString(
 											"genome.couldnt_load_this_session"),
 									e1);

@@ -62,7 +62,7 @@ public class InitDataLoader {
 			if (session != null)
 				Session.loadSession(model, session);
 		} catch (IOException e1) {
-			CrashHandler.showErrorMessage(MessageManager.getString(
+			model.getLog().log(Level.WARNING, MessageManager.getString(
 					"crashhandler.failed_to_propertly_load_requested_session"),
 					e1);
 		}

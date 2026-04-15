@@ -14,12 +14,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
 
 import be.abeel.io.GZIPPrintWriter;
 import be.abeel.io.LineIterator;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.CrashHandler;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Type;
 import net.sf.nameservice.NameService;
@@ -156,7 +156,7 @@ public class Configuration {
 	 * <li>In classpath in /conf/default.conf
 	 * <li>In classpath in /conf/resources.conf
 	 * 
-	 * @throws IOException
+	 * @throws IOException if problem occurs
 	 */
 	private void load() throws IOException {
 		// InputStream is = null;
@@ -446,16 +446,17 @@ public class Configuration {
 	}
 
 	public void reset(Model model) {
-		if (!configFile.delete()) {
-			System.err.println("Could not reset configuration!");
-		}
+		if (!configFile.delete())
+			model.getLog().log(Level.WARNING, "Could not reset configuration!");
+
 		localMap.clear();
 		extraMap.clear();
 		defaultMap.clear();
 		try {
 			load();
 		} catch (IOException e) {
-			CrashHandler.crash("IOException while loading configuration", e);
+			model.getLog().log(Level.WARNING,
+					"IOException while loading configuration", e);
 		}
 		model.refresh();
 	}

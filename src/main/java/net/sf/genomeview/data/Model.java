@@ -24,10 +24,11 @@ import javax.swing.DefaultListModel;
 
 import be.abeel.io.LineIterator;
 import be.abeel.util.DefaultHashMap;
+import htsjdk.samtools.util.StringUtil;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.DistributingReporter;
-import net.sf.genomeview.gui.CrashHandler;
 import net.sf.genomeview.gui.GUIManager;
+import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.explorer.FilteredListModel;
 import net.sf.genomeview.gui.external.JavaScriptHandler;
@@ -182,8 +183,7 @@ public class Model extends Observable implements Observer {
 					recentFiles.addElement(it.next());
 			}
 		} catch (Exception e) {
-			CrashHandler.showErrorMessage(
-					"Could not retrieve recently used files", e);
+			log.log(Level.WARNING, "Could not retrieve recently used files", e);
 		}
 
 	}
@@ -672,4 +672,99 @@ public class Model extends Observable implements Observer {
 	public FilteredListModel<String> getExtraSessionFiles() {
 		return extraFiles;
 	}
+
+	/**
+	 * 
+	 * @param position the position to set to.
+	 */
+	public void setPosition(final String position) {
+
+		Thread t = new Thread(new Runnable() {
+
+			public void run() {
+				try {
+					boolean success = false;
+					while (!success) {
+						String[] tmp = StringUtil.reverseString(position)
+								.split("[:-]", 3);
+						String[] arr = new String[Math.min(tmp.length, 3)];
+						for (int i = 0; i < arr.length; i++)
+							arr[i] = StringUtil
+									.reverseString(tmp[(arr.length - 1) - i]);
+						/*
+						 * If the location is not 2 or 3 tokens long, just stop
+						 */
+						if (arr.length > 3 || arr.length < 2) {
+							getLog().log(Level.WARNING,
+									MessageManager.getString(
+											"externalhelper.couldnt_parse_location")
+											+ " " + position);
+							return;
+
+						}
+						if (hasEntry(arr)) {
+							if (inRange(arr)) {
+								if (arr.length == 3) {
+									setSelectedEntry(
+											entries().getEntry(arr[0]));
+									vlm.setAnnotationLocationVisible(
+											new Location(
+													Integer.parseInt(arr[1]),
+													Integer.parseInt(arr[2])));
+
+								} else if (arr.length == 2) {
+									vlm.setAnnotationLocationVisible(
+											new Location(
+													Integer.parseInt(arr[0]),
+													Integer.parseInt(arr[1])));
+								}
+								success = true;
+
+							}
+						}
+						try {
+							Thread.sleep(250);
+						} catch (InterruptedException e) {
+							// Nothing to do in this case
+						}
+						if (!success) {
+							getLog().log(Level.WARNING,
+									"Failed to move to location: " + position
+											+ ". This instruction has been requeued and will be retried.");
+						}
+					}
+				} catch (NumberFormatException ne) {
+					getLog().log(Level.WARNING,
+							MessageManager.getString(
+									"externalhelper.couldnt_parse_location")
+									+ " " + position,
+							ne);
+				}
+			}
+
+			private boolean hasEntry(String[] arr) {
+				if (entries().size() == 0)
+					return false;
+
+				if (arr.length == 2)
+					return true;
+
+				return (arr.length == 3 && entries().getEntry(arr[0]) != null);
+
+			}
+
+			private boolean inRange(String[] arr) {
+				int max = Integer.parseInt(arr[arr.length - 1]);
+				Entry e = null;
+				if (arr.length == 2)
+					e = vlm.getVisibleEntry();// model.entries().getEntry();
+				else
+					e = entries().getEntry(arr[0]);
+				return max <= e.getMaximumLength();
+
+			}
+		});
+		t.start();
+	}
+
 }
