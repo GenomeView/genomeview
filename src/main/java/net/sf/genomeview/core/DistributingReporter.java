@@ -39,4 +39,8 @@ public class DistributingReporter implements Reporter {
 		log(level, msg, null);
 	}
 
+	public void add(Reporter reporter) {
+		children.add(reporter);
+	}
+
 }

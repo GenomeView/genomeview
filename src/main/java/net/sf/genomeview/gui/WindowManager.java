@@ -46,13 +46,17 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 	private GenomeViewWindow helper = null;
 
+	private final LogWindow logwindow;
+
 	private Model model = null;
 
 	public WindowManager(String args[], Splash splash, DistributingReporter log)
 			throws InterruptedException, ExecutionException {
 		running++;
-		log.log(Level.INFO, "Started running instance" + running);
+		logwindow = new LogWindow(log);
+		logwindow.setVisible(true);
 		init(args, splash, log);
+		log.log(Level.INFO, "Started running instance" + running);
 	}
 
 	public void dispose() {

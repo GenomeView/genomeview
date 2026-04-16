@@ -17,7 +17,6 @@ import javax.swing.SwingUtilities;
 import be.abeel.concurrency.DaemonThread;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.DistributingReporter;
-import net.sf.genomeview.data.Model;
 
 /**
  * 
@@ -39,12 +38,6 @@ public class GenomeView {
 
 	private static Splash splash = null;
 
-	public static Model getModel() {
-		if (mw == null)
-			return null;
-		return mw.getModel();
-	}
-
 	public static void main(final String[] args) throws IOException {
 		// FIXME maybe logger can be moved into Model?
 		// why are we not initializing model first?
@@ -52,6 +45,7 @@ public class GenomeView {
 
 // FIXME do something about the original config?
 //		LogConfigurator.config();
+
 		log.log(Level.INFO,
 				"Starting GenomeView " + Configuration.instance().version());
 		log.log(Level.INFO, "Using language: " + MessageManager.getLocale());

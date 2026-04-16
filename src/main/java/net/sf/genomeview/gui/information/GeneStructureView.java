@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
 
 import javax.swing.JLabel;
 
@@ -57,19 +58,25 @@ public class GeneStructureView extends JLabel implements Observer {
 		this.addMouseListener(new MouseAdapter() {
 
 			public void mouseClicked(MouseEvent e) {
-				Location l = collisionMap.uniqueLocation(e.getX(), e.getY());
-				if (e.getClickCount() > 1 && l != null) {
-					int gap = (int) (l.length() * 0.05);
-					_self.model.vlm.setAnnotationLocationVisible(
-							new Location(l.start() - gap, l.end() + gap));
-				} else {
-					int hGap = (int) (_self.getWidth() * 0.05);
-					double posPixelRatio = (double) (_self.getWidth() * 0.90)
-							/ (double) rf.length();
-					int pos = (int) ((e.getX() - hGap) / posPixelRatio);
-					System.out.println("CDSView click:" + pos);
-					if (rf != null)
-						_self.model.vlm.center(rf.start() + pos);
+				try {
+					Location l = collisionMap.uniqueLocation(e.getX(),
+							e.getY());
+					if (e.getClickCount() > 1 && l != null) {
+						int gap = (int) (l.length() * 0.05);
+						_self.model.vlm.setAnnotationLocationVisible(
+								new Location(l.start() - gap, l.end() + gap));
+					} else {
+						int hGap = (int) (_self.getWidth() * 0.05);
+						double posPixelRatio = (double) (_self.getWidth()
+								* 0.90) / (double) rf.length();
+						int pos = (int) ((e.getX() - hGap) / posPixelRatio);
+						System.out.println("CDSView click:" + pos);
+						if (rf != null)
+							_self.model.vlm.center(rf.start() + pos);
+					}
+				} catch (Exception err) {
+					model.getLog().log(Level.WARNING,
+							"Failed handling mouse click", err);
 				}
 			}
 
