@@ -1,6 +1,8 @@
 package net.sf.genomeview.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -15,6 +18,7 @@ import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -43,6 +47,21 @@ public class LogWindow extends JFrame implements Reporter {
 		// set panel content
 		JSplitPane splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		JTable table = new JTable(logs);
+		table.setDefaultRenderer(Level.class, new TableCellRenderer() {
+			@Override
+			public Component getTableCellRendererComponent(JTable table,
+					Object value, boolean isSelected, boolean hasFocus, int row,
+					int column) {
+				Level level = (Level) value;
+				JLabel label = new JLabel(level.toString());
+				label.setOpaque(true);
+				if (level == Level.WARNING)
+					label.setBackground(Color.yellow);
+				else if (level == Level.SEVERE)
+					label.setBackground(Color.red);
+				return label;
+			}
+		});
 		JTextArea stacktrace = new JTextArea(10, 80);
 		// scrollpane around table needed to get headers
 		splitpane.add(new JScrollPane(table), JSplitPane.TOP);
@@ -56,9 +75,13 @@ public class LogWindow extends JFrame implements Reporter {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				int row = table.getSelectedRow();
-				stacktrace.setText(row >= 0
-						? ExceptionUtils.getStackTrace(logs.getStacktrace(row))
-						: "No stacktrace");
+				// message also to text panel so long messages can be read
+				stacktrace
+						.setText(row >= 0
+								? logs.getMessage(row) + "\n"
+										+ ExceptionUtils.getStackTrace(
+												logs.getStacktrace(row))
+								: "No stacktrace");
 			}
 		};
 		table.getSelectionModel().addListSelectionListener(selListener);
@@ -110,6 +133,10 @@ class LogTableModel implements TableModel {
 		this.maxsize = maxsize;
 	}
 
+	public String getMessage(int row) {
+		return logs.get(row).getMessage();
+	}
+
 	public Throwable getStacktrace(int row) {
 		return logs.get(row).getThrown();
 	}
@@ -158,7 +185,7 @@ class LogTableModel implements TableModel {
 
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		return String.class;
+		return columnIndex == 0 ? Level.class : String.class;
 	}
 
 	@Override
@@ -167,11 +194,11 @@ class LogTableModel implements TableModel {
 	}
 
 	@Override
-	public String getValueAt(int rowIndex, int columnIndex) {
+	public Object getValueAt(int rowIndex, int columnIndex) {
 		LogRecord record = logs.get(rowIndex);
 		switch (columnIndex) {
 		case 0:
-			return record.getLevel().toString();
+			return record.getLevel();
 		case 1:
 			return record.getMessage();
 		}
