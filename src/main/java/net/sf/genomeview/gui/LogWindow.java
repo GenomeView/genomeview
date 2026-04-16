@@ -26,6 +26,9 @@ import tudelft.utilities.logging.Reporter;
 public class LogWindow extends JFrame implements Reporter {
 
 	private final LogTableModel logs = new LogTableModel(40);
+	// special log message that makes the LogWindow pop to front
+	// this can be used to handle user requests to see LogWindow
+	public static final String MAKE_LOG_VISIBLE_REQUEST = "show log window";
 
 	/**
 	 * 
@@ -66,6 +69,19 @@ public class LogWindow extends JFrame implements Reporter {
 		LogRecord record = new LogRecord(level, msg);
 		record.setThrown(thrown);
 		logs.add(record);
+		if (level.intValue() >= Level.WARNING.intValue()
+				|| msg.equals(MAKE_LOG_VISIBLE_REQUEST))
+			showOnTop();
+	}
+
+	/**
+	 * show the window, force it to front.
+	 */
+	public void showOnTop() {
+		setAlwaysOnTop(true);
+		setVisible(true);
+		setAlwaysOnTop(false);
+
 	}
 
 	@Override
@@ -101,13 +117,13 @@ class LogTableModel implements TableModel {
 	/**
 	 * This needs to handle multi-threading
 	 * 
-	 * @param record a new logrecord to add as last item
+	 * @param record a new logrecord to add as first item
 	 */
 	public synchronized void add(LogRecord record) {
 		while (logs.size() > maxsize) {
-			logs.remove(0);
+			logs.remove(logs.size() - 1); // remove last
 		}
-		logs.add(record);
+		logs.add(0, record);
 		notifyListeners();
 	}
 

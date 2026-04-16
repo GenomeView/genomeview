@@ -54,7 +54,6 @@ public class WindowManager extends WindowAdapter implements Observer {
 			throws InterruptedException, ExecutionException {
 		running++;
 		logwindow = new LogWindow(log);
-		logwindow.setVisible(true);
 		init(args, splash, log);
 		log.log(Level.INFO, "Started running instance" + running);
 	}
@@ -64,6 +63,10 @@ public class WindowManager extends WindowAdapter implements Observer {
 		if (helper != null)
 			helper.dispose();
 
+	}
+
+	public LogWindow getLogWindow() {
+		return logwindow;
 	}
 
 	Model getModel() {
@@ -97,11 +100,9 @@ public class WindowManager extends WindowAdapter implements Observer {
 	private static int running = 0;
 
 	/**
-	 * Keeps an eye on the model (used to detect exitRequested) and to detect
-	 * whether the used has not loaded any data.
-	 * 
-	 * 
-	 * 
+	 * Keeps an eye on the model (used to detect
+	 * {@link Model#isExitRequested()}) and to detect whether the used has not
+	 * loaded any data.
 	 * 
 	 * @param o
 	 * @param arg

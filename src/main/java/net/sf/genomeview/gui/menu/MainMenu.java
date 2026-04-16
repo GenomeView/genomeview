@@ -33,6 +33,7 @@ import net.sf.genomeview.gui.menu.file.SaveSessionAction;
 import net.sf.genomeview.gui.menu.file.ShowConfigurationAction;
 import net.sf.genomeview.gui.menu.file.ShowGenomeExplorerAction;
 import net.sf.genomeview.gui.menu.help.ShowAboutDialogAction;
+import net.sf.genomeview.gui.menu.help.ShowLogWindow;
 import net.sf.genomeview.gui.menu.navigation.GotoPosition;
 import net.sf.genomeview.gui.menu.navigation.GotoTrack;
 import net.sf.genomeview.gui.menu.navigation.SearchAction;
@@ -123,6 +124,7 @@ public class MainMenu extends JMenuBar {
 				"https://github.com/GenomeView/genomeview/issues"));
 
 		help.addSeparator();
+		help.add(new ShowLogWindow(model));
 		help.add(new ShowAboutDialogAction(model));
 
 		add(help);

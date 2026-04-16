@@ -35,6 +35,8 @@ public class ApplicationInstanceManager {
 	/** Must end with newline */
 	public static final String SINGLE_INSTANCE_SHARED_KEY = "$$GenomeViewInstance$$";
 
+	private static WindowManager wm;
+
 	/**
 	 * Registers this instance of the application.
 	 * 
@@ -135,8 +137,6 @@ public class ApplicationInstanceManager {
 		}
 		return true;
 	}
-
-	private static WindowManager wm;
 
 	public static void setCallback(WindowManager mw) {
 		wm = mw;

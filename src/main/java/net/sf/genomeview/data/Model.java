@@ -30,6 +30,7 @@ import net.sf.genomeview.core.DistributingReporter;
 import net.sf.genomeview.gui.GUIManager;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
+import net.sf.genomeview.gui.WindowManager;
 import net.sf.genomeview.gui.components.ConnectionMonitor;
 import net.sf.genomeview.gui.explorer.FilteredListModel;
 import net.sf.genomeview.gui.external.JavaScriptHandler;
@@ -374,6 +375,11 @@ public class Model extends Observable implements Observer {
 	//
 	// }
 
+	/**
+	 * Used by the {@link WindowManager} to check if system is exiting
+	 * 
+	 * @return true iff user requested exit
+	 */
 	public boolean isExitRequested() {
 		return exitRequested;
 	}
