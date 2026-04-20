@@ -5,10 +5,12 @@ package net.sf.genomeview.gui.viztracks.hts;
 
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
 
 import javax.swing.JViewport;
 
@@ -80,7 +82,13 @@ public class PileupTrack extends Track {
 
 //			if (model.vlm.getAnnotationLocationVisible().length() < Configuration.getInt("pileup:switchBarLine")) {
 			// System.out.println("Track: "+this+"\t"+provider);
-			ptm.setVizBuffer(new BarChartBuffer(model, visible, provider, ptm));
+			try {
+				ptm.setVizBuffer(
+						new BarChartBuffer(model, visible, provider, ptm));
+			} catch (IOException e) {
+				model.getLog().log(Level.WARNING,
+						"Can't create bar chart buffer", e);
+			}
 //			} else
 //				ptm.setVizBuffer(new LineChartBuffer(visible, provider, ptm));
 

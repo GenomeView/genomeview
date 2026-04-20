@@ -29,8 +29,10 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.JViewport;
 
@@ -574,7 +576,13 @@ public class StructureTrack extends Track {
 				FeatureAnnotation annot = (FeatureAnnotation) model.vlm
 						.getVisibleEntry().get(type);
 				if (annot != null) {
-					Iterable<Feature> trackData = annot.get(l.start, l.end);
+					Iterable<Feature> trackData;
+					try {
+						trackData = annot.get(l.start, l.end);
+					} catch (IOException e) {
+						model.getLog().log(Level.WARNING, "Can't paint CDS", e);
+						continue;
+					}
 					if (annot.getEstimateCount(l) <= Configuration.instance()
 							.getInt("structureview:maximumNoVisibleFeatures")) {
 						for (Feature rf : trackData) {

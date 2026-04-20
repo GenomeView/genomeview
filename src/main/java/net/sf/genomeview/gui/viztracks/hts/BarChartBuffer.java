@@ -6,6 +6,7 @@ package net.sf.genomeview.gui.viztracks.hts;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -49,7 +50,7 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 	private Iterable<Status> status;
 
 	public BarChartBuffer(Model model, Location visible, PileProvider provider,
-			PileupTrackConfig ptm) {
+			PileupTrackConfig ptm) throws IOException {
 		this.visible = visible;
 		this.provider = provider;
 		this.ptm = ptm;
@@ -57,8 +58,8 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 
 		// status = provider.getStatus(visible.start, visible.end);
 
-		/* Iterable<Pile> itt = */provider.get(visible.start, visible.end + 1,
-				this);
+		/* Iterable<Pile> itt = */
+		provider.get(visible.start, visible.end + 1, this);
 
 		// System.out.println("Halt!");
 	}

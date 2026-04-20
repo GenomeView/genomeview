@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -421,7 +422,12 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 
 			buffer = bi;
 			/* Access to BAMread is through buffer for performance! */
-			provider.get(currentVisible.start, currentVisible.end, this);
+			try {
+				provider.get(currentVisible.start, currentVisible.end, this);
+			} catch (IOException e) {
+				model.getLog().log(Level.WARNING, "srt render can't get data",
+						e);
+			}
 
 		}
 

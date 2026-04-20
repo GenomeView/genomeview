@@ -3,6 +3,7 @@
  */
 package net.sf.genomeview.gui.search;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +30,7 @@ class OverlapSearchResultModel extends AbstractSearchResultModel {
 		super(model);
 	}
 
-	void search(Type source, Type target) {
+	void search(Type source, Type target) throws IOException {
 		for (Feature f : ((FeatureAnnotation) model.vlm.getVisibleEntry()
 				.get(source)).get()) {
 			for (Feature g : ((FeatureAnnotation) model.vlm.getVisibleEntry()

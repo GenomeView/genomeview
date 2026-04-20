@@ -8,18 +8,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 
+import be.abeel.gui.TitledComponent;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
-import be.abeel.gui.TitledComponent;
 
 /**
  * 
@@ -38,7 +40,8 @@ class OverlapSearchPane extends SearchPanel {
 		super.setFocusField(seq);
 		final TypeCombo sourceType = new TypeCombo(model);
 		final TypeCombo targetType = new TypeCombo(model);
-		final OverlapSearchResultModel srm = new OverlapSearchResultModel(model);
+		final OverlapSearchResultModel srm = new OverlapSearchResultModel(
+				model);
 		final JTable results = new JTable(srm);
 		results.addMouseListener(new MouseAdapter() {
 			@Override
@@ -50,27 +53,39 @@ class OverlapSearchPane extends SearchPanel {
 					model.vlm.center((f.end() + f.start()) / 2);
 				else {
 					double border = 0.05 * (f.end() - f.start());
-					model.vlm.setAnnotationLocationVisible(new Location((int) (f.start() - border), (int) (f.end() + border)), true);
+					model.vlm.setAnnotationLocationVisible(
+							new Location((int) (f.start() - border),
+									(int) (f.end() + border)),
+							true);
 				}
 
 			}
 		});
-		JButton searchButton = new JButton(MessageManager.getString("button.search"));
+		JButton searchButton = new JButton(
+				MessageManager.getString("button.search"));
 		searchButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				srm.clear();
-				srm.search(sourceType.getTerm(), targetType.getTerm());
+				try {
+					srm.search(sourceType.getTerm(), targetType.getTerm());
+				} catch (IOException e1) {
+					model.getLog().log(Level.WARNING, "Search failed", e1);
+				}
 
 			}
 
 		});
 
 		gc.gridwidth = 2;
-		add(new TitledComponent( MessageManager.getString("overlappane.overlap_1")+ " ", sourceType), gc);
+		add(new TitledComponent(
+				MessageManager.getString("overlappane.overlap_1") + " ",
+				sourceType), gc);
 		gc.gridy++;
-		add(new TitledComponent(MessageManager.getString("overlappane.overlap_2"), targetType), gc);
+		add(new TitledComponent(
+				MessageManager.getString("overlappane.overlap_2"), targetType),
+				gc);
 		gc.gridy++;
 
 		add(searchButton, gc);

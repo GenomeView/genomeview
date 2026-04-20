@@ -3,6 +3,7 @@
  */
 package net.sf.genomeview.data.provider;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import htsjdk.samtools.SAMRecord;
@@ -31,12 +32,13 @@ public class ShortReadProvider implements DataProvider<SAMRecord> {
 
 	@Override
 	public void get(final int start, final int end,
-			final DataCallback<SAMRecord> cb) {
+			final DataCallback<SAMRecord> cb) throws IOException {
 
 		/* New request */
 		lastStart = start;
 		lastEnd = end;
 
+		final Iterable<SAMRecord> fresh = source.get(start, end);
 		/* Queue up retrieval */
 		Task t = new Task(new Location(start, end)) {
 
@@ -47,7 +49,6 @@ public class ShortReadProvider implements DataProvider<SAMRecord> {
 				if (start != lastStart && end != lastEnd)
 					return;
 
-				Iterable<SAMRecord> fresh = source.get(start, end);
 				ArrayList<SAMRecord> tmp = new ArrayList<SAMRecord>();
 				for (SAMRecord p : fresh) {
 					tmp.add(p);

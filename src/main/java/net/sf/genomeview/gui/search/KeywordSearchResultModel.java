@@ -3,9 +3,11 @@
  */
 package net.sf.genomeview.gui.search;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.DataKey;
@@ -73,13 +75,17 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 		for (Entry e : model.entries()) {
 			for (DataKey d : e) {
 				if (e.get(d) instanceof FeatureAnnotation) {
-					for (Feature f : ((FeatureAnnotation) e.get(d)).get()) {
-						if (!featuresSet.contains(f)) {
-							for (String key : f.getQualifiersKeys()) {
-								String value=f.qualifier(key);
-								
-									if ((key!=null&&key.toLowerCase().contains(lowerCaseText))
-											|| (value!=null&&value.toLowerCase().contains(lowerCaseText))) {
+					try {
+						for (Feature f : ((FeatureAnnotation) e.get(d)).get()) {
+							if (!featuresSet.contains(f)) {
+								for (String key : f.getQualifiersKeys()) {
+									String value = f.qualifier(key);
+
+									if ((key != null && key.toLowerCase()
+											.contains(lowerCaseText))
+											|| (value != null && value
+													.toLowerCase()
+													.contains(lowerCaseText))) {
 										if (!featuresSet.contains(f)) {
 											features.add(f);
 											entries.add(e);
@@ -87,13 +93,17 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 										}
 									}
 
+								}
 							}
 						}
+					} catch (IOException e1) {
+						model.getLog().log(Level.WARNING,
+								"Failed to get annotations", e1);
 					}
 				}
 			}
 		}
-		
+
 		fireTableDataChanged();
 
 	}
@@ -101,6 +111,7 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 	Feature getFeature(int row) {
 		return features.get(row);
 	}
+
 	@Override
 	void clear() {
 		features.clear();

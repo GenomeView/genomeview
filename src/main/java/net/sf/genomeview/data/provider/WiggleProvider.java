@@ -3,21 +3,20 @@
  */
 package net.sf.genomeview.data.provider;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-import net.sf.genomeview.core.NoFailIterable;
+import org.broad.igv.track.WindowFunction;
+
 import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Task;
 import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
-import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.Pile;
-
-import org.broad.igv.track.WindowFunction;
 
 /**
  * 
@@ -46,10 +45,12 @@ public class WiggleProvider extends PileProvider implements Observer {
 	private float maxPile;
 
 	@Override
-	public void get(final int start, final int end, final DataCallback<Pile> cb) {
+	public void get(final int start, final int end, final DataCallback<Pile> cb)
+			throws IOException {
 		/* Check whether request can be fulfilled by buffer */
-		if (start >= lastStart && end <= lastEnd && (lastEnd - lastStart) <= 2 * (end - start))
-			cb.dataReady(new Location(start,end),buffer);
+		if (start >= lastStart && end <= lastEnd
+				&& (lastEnd - lastStart) <= 2 * (end - start))
+			cb.dataReady(new Location(start, end), buffer);
 
 		/* New request */
 
@@ -64,6 +65,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 
 			status.add(new Status(false, true, false, start, end));
 			final Status thisJob = status.get(0);
+			final Iterable<Pile> data = source.get(start, end);
 			// queue up retrieval
 			Task t = new Task(new Location(start, end)) {
 
@@ -72,7 +74,8 @@ public class WiggleProvider extends PileProvider implements Observer {
 					// When actually running, check again whether we actually
 					// need
 					// this data
-					if (!(start >= lastStart && end <= lastEnd && (lastEnd - lastStart) <= 2 * (end - start)))
+					if (!(start >= lastStart && end <= lastEnd
+							&& (lastEnd - lastStart) <= 2 * (end - start)))
 						return;
 					thisJob.setRunning();
 					// FIXME hard coded arbitrary value
@@ -83,7 +86,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 					// fresh = summary.get(source, start, end);
 					//
 					// }
-					for (Pile p : source.get(start, end)) {
+					for (Pile p : data) {
 						float val = p.getTotal();// .getCoverage();
 						// int len = p.getLength();
 						// if (len > 1 && val > maxSummary)
@@ -95,7 +98,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 					}
 
 					thisJob.setFinished();
-					cb.dataReady(new Location(start,end),buffer);
+					cb.dataReady(new Location(start, end), buffer);
 					// notifyListeners();
 				}
 
@@ -113,7 +116,7 @@ public class WiggleProvider extends PileProvider implements Observer {
 
 				buffer.add(p);
 			}
-			cb.dataReady(new Location(start,end),buffer);
+			cb.dataReady(new Location(start, end), buffer);
 		}
 
 		// System.out.println("\tServing new request from provider");

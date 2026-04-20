@@ -3,14 +3,15 @@
  */
 package net.sf.genomeview.data.provider;
 
+import java.io.IOException;
+
 import net.sf.genomeview.data.GenomeViewScheduler;
 
-
 /**
- * Data provider for visualization tracks. 
+ * Data provider for visualization tracks.
  * 
- * Methods should return immediately,
- * data fetching should be done in background threads.
+ * Methods should return immediately, data fetching should be done in background
+ * threads.
  * 
  * @see GenomeViewScheduler
  * 
@@ -21,20 +22,18 @@ import net.sf.genomeview.data.GenomeViewScheduler;
 public interface DataProvider<T> {
 
 	/**
-	 * Get data. The selected data should cover [start,end[. The coordinates
-	 * are one based.
+	 * Get data. The selected data should cover [start,end[. The coordinates are
+	 * one based.
 	 * 
-	 * @param start
-	 *            the start coordinate, this one will be included. This is a
-	 *            one-based coordinate.
-	 * @param end
-	 *            the end coordinate, this one will not be included. This is a
-	 *            one-based coordinate.
+	 * @param start the start coordinate, this one will be included. This is a
+	 *              one-based coordinate.
+	 * @param end   the end coordinate, this one will not be included. This is a
+	 *              one-based coordinate.
+	 * @param cb    a callback entry to call when data is available
 	 * @return the selected data.
 	 */
-	public void get(int start, int end,DataCallback<T> cb);
+	public void get(int start, int end, DataCallback<T> cb) throws IOException;
 
 //	public Iterable<Status> getStatus(int start, int end);
-
 
 }

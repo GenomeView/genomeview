@@ -28,12 +28,14 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -145,7 +147,13 @@ public class FeatureTrack extends Track {
 				.getInt("annotationview:maximumNoVisibleFeatures")) {
 			manyFeature = true;
 		}
-		Iterable<Feature> list = annot.get(visible.start, visible.end);
+		Iterable<Feature> list;
+		try {
+			list = annot.get(visible.start, visible.end);
+		} catch (IOException e) {
+			model.getLog().log(Level.WARNING, "Can't get annotations", e);
+			return 25;
+		}
 		g.translate(0, yOffset + 2);
 		CollisionMap fullBlockMap = new CollisionMap(model);
 
@@ -384,9 +392,13 @@ public class FeatureTrack extends Track {
 
 			model.annotationModel().addObserver(this);
 			if (annot instanceof MemoryFeatureAnnotation)
-				for (Feature f : annot.get())
-					update(f);
-
+				try {
+					for (Feature f : annot.get())
+						update(f);
+				} catch (IOException e) {
+					model.getLog().log(Level.WARNING, "Can't update features",
+							e);
+				}
 		}
 
 		void update(Feature f) {

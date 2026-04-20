@@ -21,6 +21,7 @@
 package net.sf.genomeview.gui.viztracks.hts;
 
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Observable;
@@ -375,22 +376,27 @@ public class PileupTrackConfig extends TrackConfig {
 								.get(dataKey);
 						double[] sum = null;
 						int count = 0;
-						for (Pile p : dp.get()) {
-							if (sum == null) {
-								sum = new double[p.getValueCount()];
-							}
-							for (int i = 0; i < p.getValueCount(); i++)
-								sum[i] += p.getValue(i);
-							count++;
+						try {
+							for (Pile p : dp.get()) {
+								if (sum == null) {
+									sum = new double[p.getValueCount()];
+								}
+								for (int i = 0; i < p.getValueCount(); i++)
+									sum[i] += p.getValue(i);
+								count++;
 
+							}
+							for (int i = 0; i < sum.length; i++)
+								sum[i] /= count;
+							value = sum;
+							calculated = true;
+							model.messageModel().setStatusBarMessage(
+									MessageManager.getString(
+											"pileuptrack.normalization_calculated"));
+						} catch (IOException e) {
+							model.getLog().log(Level.WARNING,
+									"normalization failed", e);
 						}
-						for (int i = 0; i < sum.length; i++)
-							sum[i] /= count;
-						value = sum;
-						calculated = true;
-						model.messageModel()
-								.setStatusBarMessage(MessageManager.getString(
-										"pileuptrack.normalization_calculated"));
 
 					}
 
