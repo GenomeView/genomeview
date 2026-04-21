@@ -5,6 +5,7 @@ package net.sf.genomeview.data.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import htsjdk.samtools.SAMRecord;
 import net.sf.genomeview.data.GenomeViewScheduler;
@@ -24,9 +25,11 @@ public class ShortReadProvider implements DataProvider<SAMRecord> {
 	private ReadGroup source;
 	private int lastStart;
 	private int lastEnd;
+	private Model model;
 
 	public ShortReadProvider(Entry e, ReadGroup source, Model model) {
 		this.source = source;
+		this.model = model;
 
 	}
 
@@ -44,17 +47,22 @@ public class ShortReadProvider implements DataProvider<SAMRecord> {
 
 			@Override
 			public void run() {
-				// When actually running, check again whether we still need
-				// this data
-				if (start != lastStart && end != lastEnd)
-					return;
+				try {
+					// When actually running, check again whether we still need
+					// this data
+					if (start != lastStart && end != lastEnd)
+						return;
 
-				ArrayList<SAMRecord> tmp = new ArrayList<SAMRecord>();
-				for (SAMRecord p : fresh) {
-					tmp.add(p);
+					ArrayList<SAMRecord> tmp = new ArrayList<SAMRecord>();
+					for (SAMRecord p : fresh) {
+						tmp.add(p);
+					}
+					/* Notify rendered that the data is ready */
+					cb.dataReady(new Location(start, end), tmp);
+				} catch (Throwable e) {
+					model.getLog().log(Level.SEVERE, "failed to load SAM data",
+							e);
 				}
-				/* Notify rendered that the data is ready */
-				cb.dataReady(new Location(start, end), tmp);
 			}
 
 		};

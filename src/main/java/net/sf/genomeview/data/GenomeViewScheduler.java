@@ -35,8 +35,6 @@ public class GenomeViewScheduler {
 	 */
 	public static void submit(Task t) {
 		worker.execute(t);
-		// System.out.println("Queuesize: " + gvs.size());
-
 	}
 
 	private static void boost(Location visible) {

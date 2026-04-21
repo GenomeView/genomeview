@@ -427,8 +427,9 @@ public class DataSourceHelper {
 				try {
 					if (IndexManager.createIndex(prep, model.getLog()))
 						load(model, prep);
-				} catch (IOException | URISyntaxException
-						| ReadFailedException e) {
+				} catch (Throwable e) {
+					// catch ALL errors, otherwise they end up in threadpool
+					// which will dump error to stderr
 					model.getLog().log(Level.SEVERE,
 							"can not create index for " + prep, e);
 				}

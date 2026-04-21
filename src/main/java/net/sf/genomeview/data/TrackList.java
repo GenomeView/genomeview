@@ -224,13 +224,6 @@ public class TrackList implements Iterable<Track> {
 		};
 	}
 
-//	public void printDebug() {
-//		System.out.println("Tracklist debug:");
-//		System.out.println("Order:" + order);
-//		System.out.println("Mapping: " + mapping);
-//
-//	}
-
 	/**
 	 * Update the tracks to show all tracks for data in e. Creates the correct
 	 * visualization {@link Track} for all available {@link Data} in the entry

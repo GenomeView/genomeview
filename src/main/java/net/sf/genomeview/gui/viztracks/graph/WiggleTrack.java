@@ -9,6 +9,8 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
+import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -145,7 +147,11 @@ public class WiggleTrack extends Track {
 			if (g != null) {
 				int pos = Convert.translateScreenToGenome(e.getX(),
 						currentVisible, screenWidth);
-				tooltip.set(g.value(pos), e);
+				try {
+					tooltip.set(g.value(pos), e);
+				} catch (IOException e1) {
+					model.getLog().log(Level.WARNING, "No tooltip info", e1);
+				}
 
 			}
 		}
@@ -224,7 +230,13 @@ public class WiggleTrack extends Track {
 			int start = currentVisible.start / scale * scale;
 			int end = ((currentVisible.end / scale) + 1) * scale;
 
-			float[] f = graph.get(start - 1, end, scaleIndex);
+			float[] f;
+			try {
+				f = graph.get(start - 1, end, scaleIndex);
+			} catch (IOException e) {
+				model.getLog().log(Level.WARNING, "Can't get wiggle data", e);
+				return graphLineHeigh;
+			}
 
 			int lastX = 0;
 			GeneralPath conservationGP = new GeneralPath();
