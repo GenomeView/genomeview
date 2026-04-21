@@ -17,6 +17,8 @@ import javax.swing.SwingUtilities;
 import be.abeel.concurrency.DaemonThread;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.DistributingReporter;
+import net.sf.jannot.exception.ReadFailedException;
+import net.sf.nameservice.NameService;
 
 /**
  * 
@@ -43,21 +45,20 @@ public class GenomeView {
 		// why are we not initializing model first?
 		final DistributingReporter log = new DistributingReporter();
 
-// FIXME do something about the original config?
-//		LogConfigurator.config();
+		try {
+			NameService.init(log);
+		} catch (ReadFailedException e) {
+			// FIXME should this be fatal?
+			log.log(Level.WARNING, "Failed to initialize NameService.", e);
+		}
 
+		// FIXME do something about the original config?
+		// LogConfigurator.config();
 		log.log(Level.INFO,
 				"Starting GenomeView " + Configuration.instance().version());
 		log.log(Level.INFO, "Using language: " + MessageManager.getLocale());
 		try {
-			SwingUtilities.invokeAndWait(new Runnable() {
-
-				@Override
-				public void run() {
-
-					splash = new Splash();
-				}
-			});
+			SwingUtilities.invokeAndWait(() -> splash = new Splash());
 		} catch (InterruptedException | InvocationTargetException e1) {
 			log.log(Level.WARNING, "Splash screen failed", e1);
 		}

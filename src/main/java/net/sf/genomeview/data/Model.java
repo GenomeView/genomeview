@@ -150,6 +150,7 @@ public class Model extends Observable implements Observer {
 		if (log == null)
 			throw new NullPointerException("log must not be null");
 		this.log = log;
+
 		this.connectionMonitor = new ConnectionMonitor(log);
 		guimanager = new GUIManager();
 

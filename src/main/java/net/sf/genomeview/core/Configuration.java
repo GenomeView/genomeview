@@ -257,7 +257,7 @@ public class Configuration {
 			for (String s : deflt.split(",")) {
 				try (InputStream is = Configuration.class
 						.getResourceAsStream(s)) {
-					NameService.addSynonyms(is);
+					NameService.instance().addSynonyms(is);
 				} catch (Exception e) {
 					throw new IOException(
 							"Failed to load default synonyms for: " + s, e);
@@ -275,7 +275,7 @@ public class Configuration {
 
 				try (InputStream is = Configuration.class
 						.getResourceAsStream(s)) {
-					NameService.addSynonyms(is);
+					NameService.instance().addSynonyms(is);
 				} catch (Exception e) {
 					throw new IOException(
 							"Failed to load default synonyms for: " + s, e);

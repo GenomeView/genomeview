@@ -200,8 +200,8 @@ public class Session {
 										case ALIAS:
 											String[] al = arr[1].trim()
 													.split("=", 2);
-											NameService.addSynonym(al[1].trim(),
-													al[0].trim());
+											NameService.instance().addSynonym(
+													al[1].trim(), al[0].trim());
 											break;
 										case LOCATION:
 											model.setPosition(arr[1].trim());
