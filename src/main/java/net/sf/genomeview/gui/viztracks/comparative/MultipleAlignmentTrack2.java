@@ -33,6 +33,7 @@ import net.sf.genomeview.data.Task;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.Mouse;
+import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.CollisionMap;
 import net.sf.genomeview.gui.dialog.MultipleAlignmentOrderingDialog;
 import net.sf.genomeview.gui.viztracks.Track;
@@ -58,21 +59,20 @@ import net.sf.jannot.utils.SequenceTools;
  * 
  */
 public class MultipleAlignmentTrack2 extends Track {
+	/* Contains chopped versions of the species names */
+	final private ChopChopMap ordering = new ChopChopMap();
 
+	private MouseEvent lastMouse;
+
+	/**
+	 * Popup menu when button2 or button3 clicked in track area.
+	 */
+	@SuppressWarnings("serial")
 	private class MultipleAlignmentPopUp extends JPopupMenu {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1103364926466070222L;
 
 		public MultipleAlignmentPopUp() {
 			add(new AbstractAction(MessageManager
 					.getString("multiplealignmenttrack.toggle_all_entries")) {
-
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = 3910281037023553159L;
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -83,11 +83,6 @@ public class MultipleAlignmentTrack2 extends Track {
 			});
 			add(new AbstractAction(MessageManager
 					.getString("multiplealignmenttrack.rearrange_ordering")) {
-
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = 8906163594262830307L;
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -102,8 +97,6 @@ public class MultipleAlignmentTrack2 extends Track {
 		}
 	}
 
-	private MouseEvent lastMouse;
-
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
 		lastMouse = source;
@@ -115,31 +108,24 @@ public class MultipleAlignmentTrack2 extends Track {
 		return false;
 	}
 
-	private static String chopchop(String as) {
-		if (as.indexOf('.') >= 0)
-			return as.substring(0, as.indexOf('.'));
-		else
-			return as;
-	}
-
 	static private class ChopChopMap extends BiMap<String, Integer> {
 		@Override
 		public Integer getForward(String key) {
-			return super.getForward(chopchop(key));
+			return super.getForward(StaticUtils.chopchop(key));
 		}
 
 		@Override
 		public void putForward(String e, Integer i) {
-			super.putForward(chopchop(e), i);
+			super.putForward(StaticUtils.chopchop(e), i);
 		}
 
 		@Override
 		public void putReverse(Integer i, String e) {
-			super.putReverse(i, chopchop(e));
+			super.putReverse(i, StaticUtils.chopchop(e));
 		}
 
 		public boolean contains(String e) {
-			return super.containsForward(chopchop(e));
+			return super.containsForward(StaticUtils.chopchop(e));
 		}
 
 	}
@@ -175,9 +161,6 @@ public class MultipleAlignmentTrack2 extends Track {
 		Rectangle rec;
 		public int x1;
 	}
-
-	/* Contains chopped versions of the species names */
-	final private ChopChopMap ordering = new ChopChopMap();
 
 	class MAComparator implements Comparator<AbstractAlignmentSequence> {
 		private BiMap<String, Integer> ordering;
@@ -659,7 +642,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 					arr[ordering.getForward(e)] = fullNames
 							? arr[ordering.getForward(e)]
-							: chopchop(arr[ordering.getForward(e)]);
+							: StaticUtils.chopchop(arr[ordering.getForward(e)]);
 
 					Rectangle2D stringSize = g.getFontMetrics()
 							.getStringBounds(arr[ordering.getForward(e)], g);
@@ -752,10 +735,5 @@ public class MultipleAlignmentTrack2 extends Track {
 		}
 		return st;
 	}
-
-	// @Override
-	// public String displayName() {
-	// return "Multiple alignment";
-	// }
 
 }

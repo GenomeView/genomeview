@@ -76,7 +76,7 @@ public class TrackList implements Iterable<Track> {
 	/**
 	 * 
 	 * @param index 0-based track number
-	 * @return the track[index].
+	 * @return the track[index] or null if index=-1 (??).
 	 */
 	public Track get(int index) {
 		if (index == -1)
@@ -84,6 +84,10 @@ public class TrackList implements Iterable<Track> {
 		return mapping.get(order.get(index));
 	}
 
+	/**
+	 * Adds the default {@link TickmarkTrack} and {@link StructureTrack} to the
+	 * tracklist.
+	 */
 	private void init() {
 		TickmarkTrack ticks = new TickmarkTrack(model);
 		add(ticks.getDataKey(), ticks);
@@ -91,7 +95,6 @@ public class TrackList implements Iterable<Track> {
 		add(strack.getDataKey(), strack);
 		if (!Configuration.instance().getBoolean("track:showStructure")) {
 			strack.config().setVisible(false);
-
 		}
 
 	}
@@ -135,6 +138,9 @@ public class TrackList implements Iterable<Track> {
 
 	}
 
+	/**
+	 * reset tracks to the default
+	 */
 	@Deprecated
 	public void clear() {
 		mapping.clear();
@@ -144,6 +150,12 @@ public class TrackList implements Iterable<Track> {
 
 	private static final long serialVersionUID = 6716276343672660196L;
 
+	/**
+	 * Change weight of row and the row after that. Nothing happens if row >=
+	 * last row
+	 * 
+	 * @param row the row number.
+	 */
 	public void down(int row) {
 		if (row < order.size() - 1) {
 			DataKey tmp = order.get(row);
@@ -179,6 +191,11 @@ public class TrackList implements Iterable<Track> {
 
 	}
 
+	/**
+	 * remove key from the mapping and ordering.
+	 * 
+	 * @param key the key to remove.
+	 */
 	public void remove(DataKey key) {
 		order.remove(key);
 		mapping.remove(key);
@@ -224,7 +241,8 @@ public class TrackList implements Iterable<Track> {
 	 * Update the tracks to show all tracks for data in e. Creates the correct
 	 * visualization {@link Track} for all available {@link Data} in the entry
 	 * 
-	 * @param e the current {@link Entry} (selected chromosome)
+	 * @param e the current {@link Entry} (usually this is the currently
+	 *          selected chromosome)
 	 * @return true iff the final size equals the start size.
 	 */
 	public boolean update(Entry e) {

@@ -36,7 +36,7 @@ public class TrackListTest {
 		Iterator<Track> it = tracklist.iterator();
 		assertTrue(it.next() instanceof TickmarkTrack);
 		assertTrue(it.next() instanceof StructureTrack);
-		tracklist.clear();
+		tracklist.clear(); // remove tne entry that we added previously
 		it.next();
 	}
 

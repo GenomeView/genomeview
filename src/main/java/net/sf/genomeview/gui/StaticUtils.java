@@ -146,4 +146,15 @@ public final class StaticUtils {
 
 	}
 
+	/**
+	 * @param as a string
+	 * @return substring of as up to the first "." char
+	 */
+	public static String chopchop(String as) {
+		if (as.indexOf('.') >= 0)
+			return as.substring(0, as.indexOf('.'));
+		else
+			return as;
+	}
+
 }
