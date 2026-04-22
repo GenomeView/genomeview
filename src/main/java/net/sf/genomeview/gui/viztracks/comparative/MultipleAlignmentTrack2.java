@@ -543,63 +543,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				}
 
 			}
-			/* Mouse is over a block and there is some information to display */
-			if (mh != null) {
-				boolean fullNames = Configuration.instance()
-						.getBoolean("maf:extendedNames");
-				HashMap<String, AbstractAlignmentSequence> shown = new HashMap<String, AbstractAlignmentSequence>();
-				if (showAll.get()) {
-					for (String e : ma.species()) {
-						shown.put(e, null);
-
-					}
-				}
-
-				for (AbstractAlignmentSequence as : mh.ab) {
-					shown.put(as.getName(), as);
-//					System.out.println("AS: "+as.getName());
-
-				}
-
-				String[] arr = new String[ma.species().size()];
-				Rectangle2D[] size = new Rectangle2D[ma.species().size()];
-				int maxWidth = 0;
-				for (String e : shown.keySet()) {
-					// String s = e.getID();
-					arr[ordering.getForward(e)] = e;
-					AbstractAlignmentSequence as = shown.get(e);
-					if (as != null)
-						arr[ordering.getForward(e)] = shown.get(e).toString();
-
-					arr[ordering.getForward(e)] = fullNames
-							? arr[ordering.getForward(e)]
-							: StaticUtils.chopchop(arr[ordering.getForward(e)]);
-
-					Rectangle2D stringSize = g.getFontMetrics()
-							.getStringBounds(arr[ordering.getForward(e)], g);
-					size[ordering.getForward(e)] = stringSize;
-					if (stringSize.getWidth() > maxWidth)
-						maxWidth = (int) stringSize.getWidth();
-				}
-
-				g.setColor(new Color(192, 192, 192, 175));
-				g.fillRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y,
-						maxWidth, ordering.size() * lineHeight);
-				g.setColor(Color.DARK_GRAY);
-				g.drawRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y,
-						maxWidth, ordering.size() * lineHeight);
-				g.setColor(Color.black);
-				int index = 0;
-				for (int i = 0; i < arr.length; i++) {
-					if (arr[i] != null) {
-						g.drawString(arr[i],
-								(int) Math.max(mh.x1 - size[i].getWidth(), 5),
-								mh.rec.y + (index + 1) * lineHeight);
-						index++;
-					}
-
-				}
-			}
+			addMouseOverInfo(g, ma, mh);
 			return yMax - yOffset;
 		} else {/* More than 500 blocks on screen */
 
@@ -610,6 +554,74 @@ public class MultipleAlignmentTrack2 extends Track {
 			}
 			return mvb.draw(g, yOffset, lineHeight);
 
+		}
+	}
+
+	/**
+	 * Add info about where the mouse is over
+	 * 
+	 * @param g
+	 * @param ma
+	 * @param mh
+	 */
+	private void addMouseOverInfo(Graphics2D g, AbstractMAFMultipleAlignment ma,
+			MouseHit mh) {
+		/* Mouse is over a block and there is some information to display */
+		if (mh != null) {
+			boolean fullNames = Configuration.instance()
+					.getBoolean("maf:extendedNames");
+			HashMap<String, AbstractAlignmentSequence> shown = new HashMap<String, AbstractAlignmentSequence>();
+			if (showAll.get()) {
+				for (String e : ma.species()) {
+					shown.put(e, null);
+
+				}
+			}
+
+			for (AbstractAlignmentSequence as : mh.ab) {
+				shown.put(as.getName(), as);
+//					System.out.println("AS: "+as.getName());
+
+			}
+
+			String[] arr = new String[ma.species().size()];
+			Rectangle2D[] size = new Rectangle2D[ma.species().size()];
+			int maxWidth = 0;
+			for (String e : shown.keySet()) {
+				// String s = e.getID();
+				arr[ordering.getForward(e)] = e;
+				AbstractAlignmentSequence as = shown.get(e);
+				if (as != null)
+					arr[ordering.getForward(e)] = shown.get(e).toString();
+
+				arr[ordering.getForward(e)] = fullNames
+						? arr[ordering.getForward(e)]
+						: StaticUtils.chopchop(arr[ordering.getForward(e)]);
+
+				Rectangle2D stringSize = g.getFontMetrics()
+						.getStringBounds(arr[ordering.getForward(e)], g);
+				size[ordering.getForward(e)] = stringSize;
+				if (stringSize.getWidth() > maxWidth)
+					maxWidth = (int) stringSize.getWidth();
+			}
+
+			g.setColor(new Color(192, 192, 192, 175));
+			g.fillRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth,
+					ordering.size() * lineHeight);
+			g.setColor(Color.DARK_GRAY);
+			g.drawRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth,
+					ordering.size() * lineHeight);
+			g.setColor(Color.black);
+			int index = 0;
+			for (int i = 0; i < arr.length; i++) {
+				if (arr[i] != null) {
+					g.drawString(arr[i],
+							(int) Math.max(mh.x1 - size[i].getWidth(), 5),
+							mh.rec.y + (index + 1) * lineHeight);
+					index++;
+				}
+
+			}
 		}
 	}
 
