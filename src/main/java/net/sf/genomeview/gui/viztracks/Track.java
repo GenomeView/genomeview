@@ -241,7 +241,8 @@ public abstract class Track {
 	}
 
 	/**
-	 * Paint the actual track
+	 * Paint the actual track. This presumably is called only from the swing
+	 * render thread.
 	 * 
 	 * @param g       graphics environment
 	 * @param e       the currently visible entry

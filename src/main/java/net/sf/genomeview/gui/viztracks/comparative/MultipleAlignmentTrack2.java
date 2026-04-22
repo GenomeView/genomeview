@@ -60,25 +60,39 @@ import net.sf.jannot.utils.SequenceTools;
  * 
  */
 public class MultipleAlignmentTrack2 extends Track {
+	private static final int LINE_HEIGHT = 15;
+
+	/*
+	 * RENDER SETTINGS
+	 */
 	/* Contains chopped versions of the species names */
 	final private ChopChopMap ordering = new ChopChopMap();
+	/* Indicates whether all entries should be shown */
+	final private AtomicBoolean showAll = new AtomicBoolean(true);;
 
-	private int lineHeight = 15;
+	/**
+	 * SOME CACHE FOR PRECOMPUTED VALUES.
+	 */
+	private LRUCache<String, SequenceTranslator> stCache = new LRUCache<String, SequenceTranslator>(
+			20000, 5 * 60000);
 
+	/*
+	 * BELOW THIS ARE RENDERING VARIABLES. THEY ARE SET ACCORDING TO LATEST
+	 * RENDER CYCLE = call to {@link #paintTrack(Graphics2D, int, double,
+	 * JViewport, TrackCommunicationModel)}. THIS CLASS IS NOT THREAD SAFE AND
+	 * RELIES ON paintTrack to be called only by swing thread.
+	 */
 	private Map<Rectangle, AbstractAlignmentBlock> paintedBlocks = new HashMap<Rectangle, AbstractAlignmentBlock>();
 
 	private MouseEvent lastMouse;
-
-	private LRUCache<String, SequenceTranslator> stCache = new LRUCache<String, SequenceTranslator>(
-			20000, 5 * 60000);
 
 	private Set<AbstractAlignmentSequence> translatorQueue = Collections
 			.synchronizedSet(new HashSet<AbstractAlignmentSequence>());
 
 	final private MAComparator macomp = new MAComparator(ordering);
-	/* Indicates whether all entries should be shown */
-	private AtomicBoolean showAll;
 
+	// last encountered yOffset. Used to correlate mouse clicks to render
+	// positions
 	private int currentYOffset;
 
 	private Location lastBuffer = null;
@@ -86,6 +100,26 @@ public class MultipleAlignmentTrack2 extends Track {
 
 	private int speciesCount = -1;
 
+	private Graphics2D g;
+
+	private int yOffset;
+
+	private double screenWidth;
+
+	private Location visible;
+
+	private int maximumVisibleRange;
+
+	private boolean comparativeAnnotation;
+
+	private Type comparativeAnnotationType;
+
+	private AbstractMAFMultipleAlignment ma;
+
+	/**
+	 * @param model the {@link Model}
+	 * @param key   the {@link DataKey} for the track to render
+	 */
 	public MultipleAlignmentTrack2(Model model, DataKey key) {
 		super(key, model, true, true);
 	}
@@ -127,16 +161,18 @@ public class MultipleAlignmentTrack2 extends Track {
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,
 			JViewport view, TrackCommunicationModel tcm) {
-		boolean comparativeAnnotation = Configuration.instance()
+		this.g = g;
+		this.yOffset = yOffset;
+		this.screenWidth = screenWidth;
+		comparativeAnnotation = Configuration.instance()
 				.getBoolean("maf:enableAnnotation");
-		Type comparativeAnnotationType = Type
+		comparativeAnnotationType = Type
 				.get(Configuration.instance().get("maf:annotationType"));
-		int maximumVisibleRange = Configuration.instance()
+		maximumVisibleRange = Configuration.instance()
 				.getInt("maf:maximumVisibleRange");
 
 		currentYOffset = yOffset;
-		AbstractMAFMultipleAlignment ma = (AbstractMAFMultipleAlignment) entry
-				.get(dataKey);
+		ma = (AbstractMAFMultipleAlignment) entry.get(dataKey);
 		if (ma == null) {
 			g.drawString(MessageManager.getString(
 					"multiplealignmenttrack.no_multiple_alignment_loaded_warn"),
@@ -166,7 +202,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 		paintedBlocks.clear();
 		g.setColor(Color.BLACK);
-		Location visible = model.vlm.getAnnotationLocationVisible();
+		visible = model.vlm.getAnnotationLocationVisible();
 
 		double frac = model.vlm.getAnnotationLocationVisible().length()
 				/ (double) entry.getMaximumLength();
@@ -184,388 +220,344 @@ public class MultipleAlignmentTrack2 extends Track {
 		}
 
 		if (estCount < 250) {
-			int yMax = 0;
-			CollisionMap hitmap = new CollisionMap(model);
-			MouseHit mh = null;
-			for (AbstractAlignmentBlock ab : abs) {
-				SequenceTranslator st = getSequenceTranslator(
-						ab.getAlignmentSequence(0));
-				int abCount = 0;
-
-				int start = ab.start();
-				int end = ab.end();
-
-				for (AbstractAlignmentSequence as : ab) {
-					abCount++;
-
-				}
-
-				int blockScreenStart = Convert.translateGenomeToScreen(start,
-						visible, screenWidth);
-				int blockScreenEnd = Convert.translateGenomeToScreen(end,
-						visible, screenWidth);
-				if (showAll.get())
-					abCount = ordering.size();
-
-				Rectangle rec = new Rectangle(start, yOffset, end - start - 1,
-						abCount * lineHeight);
-				while (hitmap.collision(rec)) {
-					rec.y += lineHeight;
-				}
-				if (rec.y + rec.height > yMax)
-					yMax = rec.y + rec.height;
-				hitmap.addLocation(rec, null);
-				paintedBlocks.put(
-						new Rectangle(blockScreenStart, rec.y - yOffset,
-								blockScreenEnd - blockScreenStart, rec.height),
-						ab);
-				// rec.x=x1;
-				// rec.width=x2-x1;
-				g.setColor(Color.BLACK);
-				g.drawRect(blockScreenStart, rec.y,
-						blockScreenEnd - blockScreenStart, rec.height);
-
-				/*
-				 * Reorder the alignment sequences to whatever the user wants
-				 */
-				TreeSet<AbstractAlignmentSequence> ab2 = new TreeSet<AbstractAlignmentSequence>(
-						macomp);
-				for (AbstractAlignmentSequence as : ab) {
-					assert as != null;
-					ab2.add(as);
-				}
-				// System.out.println(ab2);
-
-				BitSet lines = new BitSet(ordering.size());
-
-				/* Very detailed view */
-				char[] ref = null;
-				if (visible.length() < 1000) {
-					// char[] ref =
-					// entry.sequence().getSubSequence(visible.start,
-					// visible.end + 1).toCharArray();
-					Iterable<Character> bufferedSeq = entry.sequence()
-							.get(visible.start, visible.end + 1);
-
-					ref = new char[visible.length()];
-
-					int idx = 0;
-					for (char c : bufferedSeq) {
-						ref[idx++] = c;
-					}
-				}
-
-				int line = 1;
-				Font font = g.getFont();
-				Font tmpFont = font.deriveFont(10f);
-				g.setFont(tmpFont);
-//				System.out.println("Tree: "+Arrays.toString(ab2.toArray()));
-				for (AbstractAlignmentSequence as : ab2) {
-//					System.out.println("\tAS: "+as);
-					if (showAll.get()) {
-						line = ordering.getForward(as.getName()) + 1;
-						// System.out.println("ASLINES: "+as+"\t"+line);
-						lines.set(line - 1);
-					}
-
-					if (visible.length() < 1000) {
-
-						if (st != null) {
-
-							for (int i = visible.start; i <= visible.end; i++) {
-								if (i >= start && i < end) {
-									double width = screenWidth
-											/ (double) visible.length();
-									int translated = st.translate(i - start)
-											+ 1;
-
-									char nt;
-
-									if (as.strand() == Strand.FORWARD)
-										nt = as.seq()
-												.get(translated, translated + 1)
-												.iterator().next();
-									else
-										nt = SequenceTools.complement(as.seq()
-												.get(as.seq().size()
-														- translated + 1,
-														as.seq().size()
-																- translated
-																+ 2)
-												.iterator().next());
-
-									// System.out.println("NT:
-									// "+translated+"\t"+nt);
-									if (ref[i - visible.start] != nt) {
-										if (nt == '-')
-											g.setColor(Color.RED);
-										else
-											g.setColor(Color.DARK_GRAY);
-										g.fillRect(
-												(int) ((i - visible.start)
-														* width),
-												rec.y + (line - 1) * lineHeight,
-												(int) Math.ceil(width),
-												lineHeight);
-										if (visible.length() < 100) {
-											Rectangle2D stringSize = g
-													.getFontMetrics()
-													.getStringBounds("" + nt,
-															g);
-											if (nt == '-')
-												g.setColor(Color.BLACK);
-											else
-												g.setColor(Configuration
-														.instance()
-														.getNucleotideColor(nt)
-														.brighter());
-											g.drawString("" + nt,
-													(int) (((i - visible.start)
-															* width
-															- stringSize
-																	.getWidth()
-																	/ 2)
-															+ (width / 2)),
-													rec.y + line * lineHeight
-															- 2);
-										}
-									}
-								}
-							}
-						} else {
-							Color or = Color.orange;
-							g.setColor(new Color(or.getRed(), or.getGreen(),
-									or.getBlue(), 100));
-							g.fillRect(blockScreenStart,
-									rec.y + (line - 1) * lineHeight,
-									blockScreenEnd - blockScreenStart,
-									lineHeight);
-						}
-					} else {
-						// FIXME redundant?
-						if (showAll.get()) {
-							line = ordering.getForward(as.getName()) + 1;
-							lines.set(line - 1);
-						}
-						if (as.strand() == Strand.FORWARD) {
-							Color or = Configuration.instance()
-									.getColor("ma:forwardColor");
-							g.setColor(new Color(or.getRed(), or.getGreen(),
-									or.getBlue(), 100));
-
-						} else {
-							Color or = Configuration.instance()
-									.getColor("ma:reverseColor");
-							g.setColor(new Color(or.getRed(), or.getGreen(),
-									or.getBlue(), 100));
-						}
-
-						g.fillRect(blockScreenStart,
-								rec.y + (line - 1) * lineHeight,
-								blockScreenEnd - blockScreenStart, lineHeight);
-
-					}
-
-					if (comparativeAnnotation && st == null) {
-						Color or = Color.orange;
-						g.setColor(new Color(or.getRed(), or.getGreen(),
-								or.getBlue(), 100));
-						g.fillRect(blockScreenStart,
-								rec.y + (line - 1) * lineHeight,
-								blockScreenEnd - blockScreenStart, lineHeight);
-					} else if (comparativeAnnotation && st != null
-							&& visible.length() >= maximumVisibleRange) {
-						g.setColor(Color.BLACK);
-						g.drawString("Zoom in to see comparative annotation",
-								15, yOffset + 10);
-					} else if (comparativeAnnotation && st != null
-							&& visible.length() < maximumVisibleRange) {
-						SequenceTranslator localTranslator = getSequenceTranslator(
-								as);
-
-						if (localTranslator != null) {
-							Entry e = model.entries().getEntry(as.getName());
-							if (e != null) {
-								int[] revtable = st
-										.getReverseTranslationTable();
-								MemoryFeatureAnnotation mfa = e
-										.getMemoryAnnotation(
-												comparativeAnnotationType);
-								for (Feature f : mfa.get(as.start(),
-										as.end())) {
-
-									Location[] larr = f.location();
-									for (int i = 0; i < 2 * larr.length
-											- 1; i++) {
-										// for (Location l : f.location()) {
-
-										int featureStart, featureEnd;
-
-										if (i % 2 == 0) {/* feature */
-											featureStart = larr[i / 2].start();
-											featureEnd = larr[i / 2].end();
-										} else {/* connection */
-											featureStart = larr[i / 2].end();
-											featureEnd = larr[i / 2 + 1]
-													.start();
-										}
-										/*
-										 * Reverse coordinates in reversed
-										 * sections
-										 */
-										if (as.strand() == Strand.REVERSE) {
-											featureStart = as.end() - f.end()
-													+ as.start() - 1;
-											featureEnd = as.end() - f.start()
-													+ as.start() - 1;
-
-										}
-
-										if (featureStart < as.start())
-											featureStart = as.start();
-										if (featureStart > as.end())
-											featureStart = as.end();
-
-										if (featureEnd > as.end())
-											featureEnd = as.end();
-
-										if (featureEnd < as.start()) {
-											featureEnd = as.start();
-										}
-
-										featureStart = localTranslator
-												.translate(featureStart
-														- as.start());
-										featureEnd = localTranslator.translate(
-												featureEnd - as.start());
-
-										/*
-										 * Translate back to reference genome
-										 * space
-										 */
-										featureStart = revtable[featureStart];
-										featureEnd = revtable[featureEnd] + 1;
-
-										int featureScreenStart = Convert
-												.translateGenomeToScreen(
-														featureStart
-																+ ab.start(),
-														visible, screenWidth);
-										int featureScreenEnd = Convert
-												.translateGenomeToScreen(
-														featureEnd + ab.start(),
-														visible, screenWidth);
-
-										if (featureScreenStart < blockScreenStart) {
-											featureScreenStart = blockScreenStart;
-
-										}
-
-										if (featureScreenEnd > blockScreenEnd)
-											featureScreenEnd = blockScreenEnd;
-
-										if (featureScreenEnd > featureScreenStart
-												&& featureScreenEnd >= 0
-												&& featureScreenStart <= screenWidth) {
-											Color c = Color.CYAN;
-											g.setColor(new Color(c.getRed(),
-													c.getGreen(), c.getBlue(),
-													150));
-											if (i % 2 == 0) {
-												g.fillRect(featureScreenStart,
-														rec.y + (line - 1)
-																* lineHeight
-																+ 3,
-														featureScreenEnd
-																- featureScreenStart,
-														lineHeight - 6);
-												if (visible.length() < 10000) {
-													g.setColor(Color.CYAN
-															.darker().darker());
-													g.drawString(FeatureUtils
-															.displayName(f),
-															(int) featureScreenStart,
-															rec.y + (line)
-																	* lineHeight
-																	- 4);
-												}
-											} else {
-												g.drawLine(featureScreenStart,
-														rec.y + (line - 1)
-																* lineHeight
-																+ lineHeight
-																		/ 2,
-														featureScreenEnd,
-														rec.y + (line - 1)
-																* lineHeight
-																+ lineHeight
-																		/ 2);
-											}
-
-										}
-									}
-
-								}
-
-							}
-						}
-					}
-
-					line++;
-				}
-
-				g.setFont(font);
-
-				/* Fill in the blanks when showing all */
-				if (showAll.get()) {
-					for (int i = 0; i < ordering.size(); i++) {
-						if (!lines.get(i)) {
-							g.setColor(new Color(255, 255, 0, 100));
-							g.fillRect(blockScreenStart, rec.y + i * lineHeight,
-									blockScreenEnd - blockScreenStart,
-									lineHeight);
-						}
-					}
-				}
-				if (lastMouse != null) {
-
-					int xMouse = Convert.translateScreenToGenome(
-							lastMouse.getX(), visible, screenWidth);
-					// System.out.println(rec + "\t" + xMouse + "\t" +
-					// rec.contains(xMouse, lastMouse.getY() + yOffset));
-					if (rec.contains(xMouse, lastMouse.getY() + yOffset)) {
-						mh = new MouseHit();
-						mh.ab = ab;
-						mh.rec = rec;
-						mh.x1 = blockScreenStart;
-
-					}
-				}
-
-			}
-			addMouseOverInfo(g, ma, mh);
-			return yMax - yOffset;
-		} else {/* More than 500 blocks on screen */
+			return paintBlocks(abs);
+		} else {/* Many blocks on screen */
 
 			if (lastBuffer == null || mvb == null
 					|| !lastBuffer.equals(visible)) {
 				mvb = new MAFVizBuffer(abs, screenWidth, visible);
 				lastBuffer = visible;
 			}
-			return mvb.draw(g, yOffset, lineHeight);
+			return mvb.draw(g, yOffset, LINE_HEIGHT);
 
 		}
 	}
 
 	/**
+	 * paints the blocks in abs,
+	 * 
+	 * @param abs the iterator of blocks to paint
+	 * @return height of painted area
+	 */
+	private int paintBlocks(Iterable<AbstractAlignmentBlock> abs) {
+		int yMax = 0;
+		final CollisionMap hitmap = new CollisionMap(model);
+		MouseHit mh = null;
+
+		for (final AbstractAlignmentBlock ab : abs) {
+			SequenceTranslator st = getSequenceTranslator(
+					ab.getAlignmentSequence(0));
+			int abCount = 0;
+
+			int start = ab.start();
+			int end = ab.end();
+
+			for (AbstractAlignmentSequence as : ab) {
+				abCount++;
+
+			}
+
+			int blockScreenStart = Convert.translateGenomeToScreen(start,
+					visible, screenWidth);
+			int blockScreenEnd = Convert.translateGenomeToScreen(end, visible,
+					screenWidth);
+			if (showAll.get())
+				abCount = ordering.size();
+
+			Rectangle rec = new Rectangle(start, yOffset, end - start - 1,
+					abCount * LINE_HEIGHT);
+			while (hitmap.collision(rec)) {
+				rec.y += LINE_HEIGHT;
+			}
+			if (rec.y + rec.height > yMax)
+				yMax = rec.y + rec.height;
+			hitmap.addLocation(rec, null);
+			paintedBlocks.put(new Rectangle(blockScreenStart, rec.y - yOffset,
+					blockScreenEnd - blockScreenStart, rec.height), ab);
+			g.setColor(Color.BLACK);
+			g.drawRect(blockScreenStart, rec.y,
+					blockScreenEnd - blockScreenStart, rec.height);
+
+			/*
+			 * Reorder the alignment sequences to whatever the user wants
+			 */
+			TreeSet<AbstractAlignmentSequence> ab2 = new TreeSet<AbstractAlignmentSequence>(
+					macomp);
+			for (AbstractAlignmentSequence as : ab) {
+				assert as != null;
+				ab2.add(as);
+			}
+
+			BitSet lines = new BitSet(ordering.size());
+
+			/* Very detailed view */
+			char[] ref = null;
+			if (visible.length() < 1000) {
+				Iterable<Character> bufferedSeq = entry.sequence()
+						.get(visible.start, visible.end + 1);
+
+				ref = new char[visible.length()];
+
+				int idx = 0;
+				for (char c : bufferedSeq) {
+					ref[idx++] = c;
+				}
+			}
+
+			int line = 1;
+			Font font = g.getFont();
+			Font tmpFont = font.deriveFont(10f);
+			g.setFont(tmpFont);
+
+			for (AbstractAlignmentSequence as : ab2) {
+				if (showAll.get()) {
+					line = ordering.getForward(as.getName()) + 1;
+					// System.out.println("ASLINES: "+as+"\t"+line);
+					lines.set(line - 1);
+				}
+
+				line = paintAS(st, start, end, blockScreenStart, blockScreenEnd,
+						rec, lines, ref, line, as);
+
+				if (comparativeAnnotation && st == null) {
+					Color or = Color.orange;
+					g.setColor(new Color(or.getRed(), or.getGreen(),
+							or.getBlue(), 100));
+					g.fillRect(blockScreenStart,
+							rec.y + (line - 1) * LINE_HEIGHT,
+							blockScreenEnd - blockScreenStart, LINE_HEIGHT);
+				} else if (comparativeAnnotation && st != null
+						&& visible.length() >= maximumVisibleRange) {
+					g.setColor(Color.BLACK);
+					g.drawString("Zoom in to see comparative annotation", 15,
+							yOffset + 10);
+				} else if (comparativeAnnotation && st != null
+						&& visible.length() < maximumVisibleRange) {
+					SequenceTranslator localTranslator = getSequenceTranslator(
+							as);
+
+					if (localTranslator != null) {
+						Entry e = model.entries().getEntry(as.getName());
+						if (e != null) {
+							int[] revtable = st.getReverseTranslationTable();
+							MemoryFeatureAnnotation mfa = e.getMemoryAnnotation(
+									comparativeAnnotationType);
+							for (Feature f : mfa.get(as.start(), as.end())) {
+
+								paintFeature(ab, blockScreenStart,
+										blockScreenEnd, rec, line, as,
+										localTranslator, revtable, f);
+							}
+						}
+					}
+				}
+
+				line++;
+			}
+
+			g.setFont(font);
+
+			/* Fill in the blanks when showing all */
+			if (showAll.get()) {
+				for (int i = 0; i < ordering.size(); i++) {
+					if (!lines.get(i)) {
+						g.setColor(new Color(255, 255, 0, 100));
+						g.fillRect(blockScreenStart, rec.y + i * LINE_HEIGHT,
+								blockScreenEnd - blockScreenStart, LINE_HEIGHT);
+					}
+				}
+			}
+
+			// check if mouse clicked on this ab
+			if (lastMouse != null) {
+				int xMouse = Convert.translateScreenToGenome(lastMouse.getX(),
+						visible, screenWidth);
+				// System.out.println(rec + "\t" + xMouse + "\t" +
+				// rec.contains(xMouse, lastMouse.getY() + yOffset));
+				if (rec.contains(xMouse, lastMouse.getY() + yOffset)) {
+					mh = new MouseHit(ab, rec, blockScreenStart);
+				}
+			}
+
+		}
+		paintMouseOverInfo(mh);
+		return yMax - yOffset;
+	}
+
+	private void paintFeature(final AbstractAlignmentBlock ab,
+			int blockScreenStart, int blockScreenEnd, Rectangle rec, int line,
+			AbstractAlignmentSequence as, SequenceTranslator localTranslator,
+			int[] revtable, Feature f) {
+		Location[] larr = f.location();
+		for (int i = 0; i < 2 * larr.length - 1; i++) {
+			// for (Location l : f.location()) {
+
+			int featureStart, featureEnd;
+
+			if (i % 2 == 0) {/* feature */
+				featureStart = larr[i / 2].start();
+				featureEnd = larr[i / 2].end();
+			} else {/* connection */
+				featureStart = larr[i / 2].end();
+				featureEnd = larr[i / 2 + 1].start();
+			}
+			/*
+			 * Reverse coordinates in reversed sections
+			 */
+			if (as.strand() == Strand.REVERSE) {
+				featureStart = as.end() - f.end() + as.start() - 1;
+				featureEnd = as.end() - f.start() + as.start() - 1;
+
+			}
+
+			if (featureStart < as.start())
+				featureStart = as.start();
+			if (featureStart > as.end())
+				featureStart = as.end();
+
+			if (featureEnd > as.end())
+				featureEnd = as.end();
+
+			if (featureEnd < as.start()) {
+				featureEnd = as.start();
+			}
+
+			featureStart = localTranslator.translate(featureStart - as.start());
+			featureEnd = localTranslator.translate(featureEnd - as.start());
+
+			/*
+			 * Translate back to reference genome space
+			 */
+			featureStart = revtable[featureStart];
+			featureEnd = revtable[featureEnd] + 1;
+
+			int featureScreenStart = Convert.translateGenomeToScreen(
+					featureStart + ab.start(), visible, screenWidth);
+			int featureScreenEnd = Convert.translateGenomeToScreen(
+					featureEnd + ab.start(), visible, screenWidth);
+
+			if (featureScreenStart < blockScreenStart) {
+				featureScreenStart = blockScreenStart;
+
+			}
+
+			if (featureScreenEnd > blockScreenEnd)
+				featureScreenEnd = blockScreenEnd;
+
+			if (featureScreenEnd > featureScreenStart && featureScreenEnd >= 0
+					&& featureScreenStart <= screenWidth) {
+				Color c = Color.CYAN;
+				g.setColor(
+						new Color(c.getRed(), c.getGreen(), c.getBlue(), 150));
+				if (i % 2 == 0) {
+					g.fillRect(featureScreenStart,
+							rec.y + (line - 1) * LINE_HEIGHT + 3,
+							featureScreenEnd - featureScreenStart,
+							LINE_HEIGHT - 6);
+					if (visible.length() < 10000) {
+						g.setColor(Color.CYAN.darker().darker());
+						g.drawString(FeatureUtils.displayName(f),
+								(int) featureScreenStart,
+								rec.y + (line) * LINE_HEIGHT - 4);
+					}
+				} else {
+					g.drawLine(featureScreenStart,
+							rec.y + (line - 1) * LINE_HEIGHT + LINE_HEIGHT / 2,
+							featureScreenEnd,
+							rec.y + (line - 1) * LINE_HEIGHT + LINE_HEIGHT / 2);
+				}
+
+			}
+		}
+	}
+
+	private int paintAS(SequenceTranslator st, int start, int end,
+			int blockScreenStart, int blockScreenEnd, Rectangle rec,
+			BitSet lines, char[] ref, int line, AbstractAlignmentSequence as) {
+		if (visible.length() < 1000) {
+
+			if (st != null) {
+
+				for (int i = visible.start; i <= visible.end; i++) {
+					if (i >= start && i < end) {
+						double width = screenWidth / (double) visible.length();
+						int translated = st.translate(i - start) + 1;
+
+						char nt;
+
+						if (as.strand() == Strand.FORWARD)
+							nt = as.seq().get(translated, translated + 1)
+									.iterator().next();
+						else
+							nt = SequenceTools.complement(as.seq()
+									.get(as.seq().size() - translated + 1,
+											as.seq().size() - translated + 2)
+									.iterator().next());
+
+						// System.out.println("NT:
+						// "+translated+"\t"+nt);
+						if (ref[i - visible.start] != nt) {
+							if (nt == '-')
+								g.setColor(Color.RED);
+							else
+								g.setColor(Color.DARK_GRAY);
+							g.fillRect((int) ((i - visible.start) * width),
+									rec.y + (line - 1) * LINE_HEIGHT,
+									(int) Math.ceil(width), LINE_HEIGHT);
+							if (visible.length() < 100) {
+								Rectangle2D stringSize = g.getFontMetrics()
+										.getStringBounds("" + nt, g);
+								if (nt == '-')
+									g.setColor(Color.BLACK);
+								else
+									g.setColor(Configuration.instance()
+											.getNucleotideColor(nt).brighter());
+								g.drawString("" + nt,
+										(int) (((i - visible.start) * width
+												- stringSize.getWidth() / 2)
+												+ (width / 2)),
+										rec.y + line * LINE_HEIGHT - 2);
+							}
+						}
+					}
+				}
+			} else {
+				Color or = Color.orange;
+				g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(),
+						100));
+				g.fillRect(blockScreenStart, rec.y + (line - 1) * LINE_HEIGHT,
+						blockScreenEnd - blockScreenStart, LINE_HEIGHT);
+			}
+		} else {
+			// FIXME redundant?
+			if (showAll.get()) {
+				line = ordering.getForward(as.getName()) + 1;
+				lines.set(line - 1);
+			}
+			if (as.strand() == Strand.FORWARD) {
+				Color or = Configuration.instance().getColor("ma:forwardColor");
+				g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(),
+						100));
+
+			} else {
+				Color or = Configuration.instance().getColor("ma:reverseColor");
+				g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(),
+						100));
+			}
+
+			g.fillRect(blockScreenStart, rec.y + (line - 1) * LINE_HEIGHT,
+					blockScreenEnd - blockScreenStart, LINE_HEIGHT);
+
+		}
+		return line;
+	}
+
+	/**
 	 * Add info about where the mouse is over
 	 * 
-	 * @param g
-	 * @param ma
 	 * @param mh
 	 */
-	private void addMouseOverInfo(Graphics2D g, AbstractMAFMultipleAlignment ma,
-			MouseHit mh) {
+	private void paintMouseOverInfo(MouseHit mh) {
 		/* Mouse is over a block and there is some information to display */
 		if (mh != null) {
 			boolean fullNames = Configuration.instance()
@@ -607,17 +599,17 @@ public class MultipleAlignmentTrack2 extends Track {
 
 			g.setColor(new Color(192, 192, 192, 175));
 			g.fillRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth,
-					ordering.size() * lineHeight);
+					ordering.size() * LINE_HEIGHT);
 			g.setColor(Color.DARK_GRAY);
 			g.drawRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth,
-					ordering.size() * lineHeight);
+					ordering.size() * LINE_HEIGHT);
 			g.setColor(Color.black);
 			int index = 0;
 			for (int i = 0; i < arr.length; i++) {
 				if (arr[i] != null) {
 					g.drawString(arr[i],
 							(int) Math.max(mh.x1 - size[i].getWidth(), 5),
-							mh.rec.y + (index + 1) * lineHeight);
+							mh.rec.y + (index + 1) * LINE_HEIGHT);
 					index++;
 				}
 
@@ -697,10 +689,21 @@ class ChopChopMap extends BiMap<String, Integer> {
 
 }
 
+/**
+ * records info about last known mouse position
+ */
 class MouseHit {
-	AbstractAlignmentBlock ab;
-	Rectangle rec;
-	public int x1;
+
+	final AbstractAlignmentBlock ab;
+	final Rectangle rec;
+	final int x1;
+
+	public MouseHit(AbstractAlignmentBlock ab, Rectangle rec, int x1) {
+		this.ab = ab;
+		this.rec = rec;
+		this.x1 = x1;
+	}
+
 }
 
 class MAComparator implements Comparator<AbstractAlignmentSequence> {
@@ -728,6 +731,13 @@ class MultipleAlignmentPopUp extends JPopupMenu {
 	private final BiMap<String, Integer> ordering;
 	private final AtomicBoolean showAll;
 
+	/**
+	 * 
+	 * @param model          the {@link Model}, used to force refresh after
+	 *                       changes.
+	 * @param ordering       {@link BiMap}, can be changed by this popup
+	 * @param showAll,{@link AtomicBoolean}, can be changed by this popup
+	 */
 	public MultipleAlignmentPopUp(Model model, BiMap<String, Integer> ordering,
 			AtomicBoolean showAll) {
 		this.model = model;

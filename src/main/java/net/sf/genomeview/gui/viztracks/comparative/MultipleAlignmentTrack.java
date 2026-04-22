@@ -88,8 +88,8 @@ public class MultipleAlignmentTrack extends Track {
 			@Override
 			public int compareTo(WeightedAlignment o) {
 				int d = Double.compare(weight, o.weight);
-				System.out.println(
-						"Compare: " + weight + "\t" + o.weight + "\t" + d);
+//				System.out.println(
+//						"Compare: " + weight + "\t" + o.weight + "\t" + d);
 				return Double.compare(weight, o.weight);
 			}
 
