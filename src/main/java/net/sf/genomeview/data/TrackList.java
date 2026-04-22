@@ -188,10 +188,6 @@ public class TrackList implements Iterable<Track> {
 		return mapping.keySet().contains(key);
 	}
 
-	// public boolean containsTrack(String string) {
-	// return containsTrack(new StringKey(string));
-	// }
-
 	/**
 	 * 
 	 * @return the number of {@link Track}s in this list..
@@ -295,12 +291,6 @@ public class TrackList implements Iterable<Track> {
 		}
 		/* Fix weight to make sure they are different */
 		for (int i = 1; i < order.size(); i++) {
-			// if (Configuration.getWeight(order.get(i - 1)) < Configuration
-			// .getWeight(order.get(i))) {
-			// System.err
-			// .println("This is not supposed to happen, why are we
-			// sorting?!!?");
-			// }
 			if (Configuration.instance()
 					.getWeight(order.get(i - 1)) >= Configuration.instance()
 							.getWeight(order.get(i))) {
