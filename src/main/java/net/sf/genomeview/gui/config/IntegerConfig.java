@@ -10,12 +10,8 @@ import javax.swing.JLabel;
 import be.abeel.gui.JIntegerField;
 import net.sf.genomeview.core.Configuration;
 
+@SuppressWarnings("serial")
 class IntegerConfig extends Container {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1460525692768168573L;
 
 	private JLabel label = new JLabel();
 

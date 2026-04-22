@@ -31,9 +31,8 @@ import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.dialog.HelpButton;
 
+@SuppressWarnings("serial")
 public class ConfigurationDialog extends JDialog {
-
-	private static final long serialVersionUID = 3226397962717512578L;
 
 	private static ConfigurationDialog dialog = null;
 
@@ -125,26 +124,10 @@ public class ConfigurationDialog extends JDialog {
 	 * @author Thomas Abeel
 	 * 
 	 */
+	@SuppressWarnings("serial")
 	static class ShortReadConfigPanel extends GridBagPanel {
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -628553625113038258L;
-
 		public ShortReadConfigPanel(Model model) {
-
-			// this.add(ConfigBox.booleanInstance("shortread:logScaling",
-			// "Use logarithmic scaling"), gc);
-			// gc.gridy++;
-			//
-			// this.add(ConfigBox.doubleInstance("shortread:bottomValue",
-			// "Bottom value"), gc);
-			// gc.gridy++;
-			//
-			// this.add(ConfigBox.doubleInstance("shortread:topValue",
-			// "Top value, use negative value for unlimited"), gc);
-			// gc.gridy++;
 
 			this.add(ConfigBox.integerInstance("shortread:graphLineHeight",
 					MessageManager
@@ -249,40 +232,6 @@ public class ConfigurationDialog extends JDialog {
 			gc.gridy++;
 		}
 	}
-
-	// /**
-	// * Options for the AnnotationView
-	// *
-	// * @author Thomas Abeel
-	// *
-	// */
-	// static class AnnotationConfigPanel extends GridBagPanel {
-	//
-	// /**
-	// *
-	// */
-	// private static final long serialVersionUID = -628553625113038258L;
-	//
-	// public AnnotationConfigPanel(Model model) {
-	// // this.add(ConfigBox.integerInstance("evidenceLineHeight",
-	// "Height of a track in pixels"), gc);
-	// // gc.gridy++;
-	// // this.add(ConfigBox.booleanInstance(model,"showTrackName",
-	// "Show evidence track names"), gc);
-	// // gc.gridy++;
-	// this.add(ConfigBox.booleanInstance(model,"useColorQualifierTag",
-	// "Use the /color qualifier tag"), gc);
-	// gc.gridy++;
-	// // this.add(ConfigBox.stringInstance("visibleTypes",
-	// "Visible types on start-up"), gc);
-	// // gc.gridy++;
-	// //
-	// this.add(ConfigBox.integerInstance("annotationview:maximumNoVisibleFeatures",
-	// "Maximum number of features of each type to display on the
-	// AnnotationView"),
-	// gc);
-	// }
-	// }
 
 	class StructureConfigPanel extends GridBagPanel {
 		/**
@@ -461,15 +410,11 @@ public class ConfigurationDialog extends JDialog {
 			gc.gridy++;
 
 			this.add(
-					ConfigBox
-							.dropDownInstance(
-									Configuration.instance()
-											.getStringSet(
-													"resource:lang:available")
-											.toArray(new String[0]),
-									"lang:current",
-									MessageManager.getString(
-											"configdialog.select_language")),
+					ConfigBox.dropDownInstance(model, Configuration
+							.instance().getStringSet("resource:lang:available")
+							.toArray(new String[0]), "lang:current",
+							MessageManager
+									.getString("configdialog.select_language")),
 					gc);
 
 			gc.gridy++;
@@ -515,7 +460,8 @@ public class ConfigurationDialog extends JDialog {
 							"cache");
 					;
 					for (File f : dir.listFiles()) {
-						System.out.println("Marking for deletion:" + f);
+						model.getLog().log(Level.INFO,
+								"Marking for deletion:" + f);
 						f.deleteOnExit();
 					}
 					JOptionPane.showMessageDialog(
@@ -530,7 +476,6 @@ public class ConfigurationDialog extends JDialog {
 
 			});
 			gc.gridy++;
-			// gc.gridy++;
 			this.add(resetCache, gc);
 
 		}

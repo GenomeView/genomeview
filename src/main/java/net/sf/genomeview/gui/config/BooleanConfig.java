@@ -23,6 +23,7 @@ package net.sf.genomeview.gui.config;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import javax.swing.JCheckBox;
 
@@ -30,18 +31,13 @@ import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 
 /**
+ * Editor for a boolean field in the {@link Configuration}
  * 
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class BooleanConfig extends JCheckBox {
-
-	private static final long serialVersionUID = 9081788377933556296L;
-
-	// @Deprecated
-	// public BooleanConfig(final String key, final String title) {
-	// this(key,title,null);
-	// }
 
 	public BooleanConfig(final String key, final String title,
 			final Model model) {
@@ -51,7 +47,8 @@ public class BooleanConfig extends JCheckBox {
 		this.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Setting: " + key + "\t" + isSelected());
+				model.getLog().log(Level.INFO,
+						"Setting: " + key + "\t" + isSelected());
 				Configuration.instance().set(key, isSelected());
 				model.refresh();
 				for (ConfigListener cl : listenerList) {

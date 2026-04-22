@@ -13,12 +13,8 @@ import javax.swing.JTextField;
 
 import net.sf.genomeview.core.Configuration;
 
+@SuppressWarnings("serial")
 class DoubleConfig extends Container {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1460525692768168573L;
 
 	private JLabel label = new JLabel();
 

@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
@@ -62,39 +63,31 @@ public class MultipleAlignmentTrack2 extends Track {
 	/* Contains chopped versions of the species names */
 	final private ChopChopMap ordering = new ChopChopMap();
 
+	private int lineHeight = 15;
+
+	private Map<Rectangle, AbstractAlignmentBlock> paintedBlocks = new HashMap<Rectangle, AbstractAlignmentBlock>();
+
 	private MouseEvent lastMouse;
 
-	/**
-	 * Popup menu when button2 or button3 clicked in track area.
-	 */
-	@SuppressWarnings("serial")
-	private class MultipleAlignmentPopUp extends JPopupMenu {
+	private LRUCache<String, SequenceTranslator> stCache = new LRUCache<String, SequenceTranslator>(
+			20000, 5 * 60000);
 
-		public MultipleAlignmentPopUp() {
-			add(new AbstractAction(MessageManager
-					.getString("multiplealignmenttrack.toggle_all_entries")) {
+	private Set<AbstractAlignmentSequence> translatorQueue = Collections
+			.synchronizedSet(new HashSet<AbstractAlignmentSequence>());
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					showAll = !showAll;
-					model.refresh();
-				}
+	final private MAComparator macomp = new MAComparator(ordering);
+	/* Indicates whether all entries should be shown */
+	private AtomicBoolean showAll;
 
-			});
-			add(new AbstractAction(MessageManager
-					.getString("multiplealignmenttrack.rearrange_ordering")) {
+	private int currentYOffset;
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					MultipleAlignmentOrderingDialog mad = new MultipleAlignmentOrderingDialog(
-							model, ordering);
-					mad.pack();
-					mad.setVisible(true);
-					model.refresh();
-				}
+	private Location lastBuffer = null;
+	private MAFVizBuffer mvb = null;
 
-			});
-		}
+	private int speciesCount = -1;
+
+	public MultipleAlignmentTrack2(Model model, DataKey key) {
+		super(key, model, true, true);
 	}
 
 	@Override
@@ -108,34 +101,12 @@ public class MultipleAlignmentTrack2 extends Track {
 		return false;
 	}
 
-	static private class ChopChopMap extends BiMap<String, Integer> {
-		@Override
-		public Integer getForward(String key) {
-			return super.getForward(StaticUtils.chopchop(key));
-		}
-
-		@Override
-		public void putForward(String e, Integer i) {
-			super.putForward(StaticUtils.chopchop(e), i);
-		}
-
-		@Override
-		public void putReverse(Integer i, String e) {
-			super.putReverse(i, StaticUtils.chopchop(e));
-		}
-
-		public boolean contains(String e) {
-			return super.containsForward(StaticUtils.chopchop(e));
-		}
-
-	}
-
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
 			// log.debug("Multiple alignment track consumes button2||button3");
-			new MultipleAlignmentPopUp().show(e.getComponent(), e.getX(),
-					currentYOffset + e.getY());
+			new MultipleAlignmentPopUp(model, ordering, showAll).show(
+					e.getComponent(), e.getX(), currentYOffset + e.getY());
 			e.consume();
 			return true;
 		}
@@ -147,46 +118,6 @@ public class MultipleAlignmentTrack2 extends Track {
 		lastMouse = source;
 		return false;
 	}
-
-	public MultipleAlignmentTrack2(Model model, DataKey key) {
-		super(key, model, true, true);
-	}
-
-	private int lineHeight = 15;
-
-	private Map<Rectangle, AbstractAlignmentBlock> paintedBlocks = new HashMap<Rectangle, AbstractAlignmentBlock>();
-
-	class MouseHit {
-		AbstractAlignmentBlock ab;
-		Rectangle rec;
-		public int x1;
-	}
-
-	class MAComparator implements Comparator<AbstractAlignmentSequence> {
-		private BiMap<String, Integer> ordering;
-
-		public MAComparator(BiMap<String, Integer> ordering) {
-			this.ordering = ordering;
-		}
-
-		@Override
-		public int compare(AbstractAlignmentSequence o1,
-				AbstractAlignmentSequence o2) {
-			return ordering.getForward(o1.getName())
-					.compareTo(ordering.getForward(o2.getName()));
-		}
-	}
-
-	final private MAComparator macomp = new MAComparator(ordering);
-	/* Indicates whether all entries should be shown */
-	private boolean showAll;
-
-	private int currentYOffset;
-
-	private Location lastBuffer = null;
-	private MAFVizBuffer mvb = null;
-
-	private int speciesCount = -1;
 
 	@Override
 	protected void paintDisplayName(Graphics2D g, int yOffset) {
@@ -273,7 +204,7 @@ public class MultipleAlignmentTrack2 extends Track {
 						visible, screenWidth);
 				int blockScreenEnd = Convert.translateGenomeToScreen(end,
 						visible, screenWidth);
-				if (showAll)
+				if (showAll.get())
 					abCount = ordering.size();
 
 				Rectangle rec = new Rectangle(start, yOffset, end - start - 1,
@@ -331,7 +262,7 @@ public class MultipleAlignmentTrack2 extends Track {
 //				System.out.println("Tree: "+Arrays.toString(ab2.toArray()));
 				for (AbstractAlignmentSequence as : ab2) {
 //					System.out.println("\tAS: "+as);
-					if (showAll) {
+					if (showAll.get()) {
 						line = ordering.getForward(as.getName()) + 1;
 						// System.out.println("ASLINES: "+as+"\t"+line);
 						lines.set(line - 1);
@@ -412,7 +343,7 @@ public class MultipleAlignmentTrack2 extends Track {
 						}
 					} else {
 						// FIXME redundant?
-						if (showAll) {
+						if (showAll.get()) {
 							line = ordering.getForward(as.getName()) + 1;
 							lines.set(line - 1);
 						}
@@ -586,7 +517,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				g.setFont(font);
 
 				/* Fill in the blanks when showing all */
-				if (showAll) {
+				if (showAll.get()) {
 					for (int i = 0; i < ordering.size(); i++) {
 						if (!lines.get(i)) {
 							g.setColor(new Color(255, 255, 0, 100));
@@ -617,7 +548,7 @@ public class MultipleAlignmentTrack2 extends Track {
 				boolean fullNames = Configuration.instance()
 						.getBoolean("maf:extendedNames");
 				HashMap<String, AbstractAlignmentSequence> shown = new HashMap<String, AbstractAlignmentSequence>();
-				if (showAll) {
+				if (showAll.get()) {
 					for (String e : ma.species()) {
 						shown.put(e, null);
 
@@ -682,12 +613,6 @@ public class MultipleAlignmentTrack2 extends Track {
 		}
 	}
 
-	private LRUCache<String, SequenceTranslator> stCache = new LRUCache<String, SequenceTranslator>(
-			20000, 5 * 60000);
-
-	private Set<AbstractAlignmentSequence> translatorQueue = Collections
-			.synchronizedSet(new HashSet<AbstractAlignmentSequence>());
-
 	private synchronized SequenceTranslator getSequenceTranslator(
 			final AbstractAlignmentSequence ab) {
 		final String key = ab.getName() + ":" + ab.start() + "-" + ab.end();
@@ -736,4 +661,89 @@ public class MultipleAlignmentTrack2 extends Track {
 		return st;
 	}
 
+}
+
+class ChopChopMap extends BiMap<String, Integer> {
+	@Override
+	public Integer getForward(String key) {
+		return super.getForward(StaticUtils.chopchop(key));
+	}
+
+	@Override
+	public void putForward(String e, Integer i) {
+		super.putForward(StaticUtils.chopchop(e), i);
+	}
+
+	@Override
+	public void putReverse(Integer i, String e) {
+		super.putReverse(i, StaticUtils.chopchop(e));
+	}
+
+	public boolean contains(String e) {
+		return super.containsForward(StaticUtils.chopchop(e));
+	}
+
+}
+
+class MouseHit {
+	AbstractAlignmentBlock ab;
+	Rectangle rec;
+	public int x1;
+}
+
+class MAComparator implements Comparator<AbstractAlignmentSequence> {
+	private BiMap<String, Integer> ordering;
+
+	public MAComparator(BiMap<String, Integer> ordering) {
+		this.ordering = ordering;
+	}
+
+	@Override
+	public int compare(AbstractAlignmentSequence o1,
+			AbstractAlignmentSequence o2) {
+		return ordering.getForward(o1.getName())
+				.compareTo(ordering.getForward(o2.getName()));
+	}
+}
+
+/**
+ * Popup menu when button2 or button3 clicked in track area.
+ */
+@SuppressWarnings("serial")
+class MultipleAlignmentPopUp extends JPopupMenu {
+
+	private final Model model;
+	private final BiMap<String, Integer> ordering;
+	private final AtomicBoolean showAll;
+
+	public MultipleAlignmentPopUp(Model model, BiMap<String, Integer> ordering,
+			AtomicBoolean showAll) {
+		this.model = model;
+		this.ordering = ordering;
+		this.showAll = showAll;
+
+		add(new AbstractAction(MessageManager
+				.getString("multiplealignmenttrack.toggle_all_entries")) {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showAll.set(!showAll.get());
+				model.refresh();
+			}
+
+		});
+		add(new AbstractAction(MessageManager
+				.getString("multiplealignmenttrack.rearrange_ordering")) {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MultipleAlignmentOrderingDialog mad = new MultipleAlignmentOrderingDialog(
+						model, ordering);
+				mad.pack();
+				mad.setVisible(true);
+				model.refresh();
+			}
+
+		});
+	}
 }

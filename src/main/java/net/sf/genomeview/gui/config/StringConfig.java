@@ -36,12 +36,8 @@ import net.sf.genomeview.data.Model;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class StringConfig extends Container {
-
-	/**
-	     * 
-	     */
-	private static final long serialVersionUID = -1460525692768168573L;
 
 	private JLabel label = new JLabel();
 
