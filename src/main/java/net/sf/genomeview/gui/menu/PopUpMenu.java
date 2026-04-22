@@ -70,7 +70,7 @@ public class PopUpMenu extends JPopupMenu {
 						url = q;
 						name = "Web query";
 					}
-					actions.add(new OpenURLAction(name, url));
+					actions.add(new OpenURLAction(name, url, model.getLog()));
 				}
 			}
 		}

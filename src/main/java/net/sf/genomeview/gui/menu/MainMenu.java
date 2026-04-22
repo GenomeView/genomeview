@@ -118,10 +118,11 @@ public class MainMenu extends JMenuBar {
 		JMenu help = new JMenu(MessageManager.getString("mainmenu.help"));
 		help.add(new OpenURLAction(
 				MessageManager.getString("mainmenu.user_documentation"),
-				"http://genomeview.org/manual"));
+				"http://genomeview.org/manual", model.getLog()));
 		help.add(new OpenURLAction(
 				MessageManager.getString("mainmenu.post_bug_request"),
-				"https://github.com/GenomeView/genomeview/issues"));
+				"https://github.com/GenomeView/genomeview/issues",
+				model.getLog()));
 
 		help.addSeparator();
 		help.add(new ShowLogWindow(model));

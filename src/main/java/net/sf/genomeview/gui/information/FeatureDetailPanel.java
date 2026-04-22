@@ -117,8 +117,7 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 
 							@Override
 							public void actionPerformed(ActionEvent e) {
-
-								q.query(name.getSelectedText());
+								q.query(name.getSelectedText(), model.getLog());
 
 							}
 						});

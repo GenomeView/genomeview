@@ -4,13 +4,11 @@
 package net.sf.genomeview.gui.menu;
 
 import java.awt.event.ActionEvent;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 
 import javax.swing.AbstractAction;
 
 import net.sf.genomeview.gui.StaticUtils;
-import be.abeel.net.URIFactory;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Opens a URL in a browser window.
@@ -18,32 +16,22 @@ import be.abeel.net.URIFactory;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class OpenURLAction extends AbstractAction {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -5857826271738146666L;
-    private String url;
+	private final String url;
+	private final Reporter log;
 
-    public OpenURLAction(String title, String url) {
-        super(title);
-        this.url=url;
-    }
+	public OpenURLAction(String title, String url, Reporter log) {
+		super(title);
+		this.url = url;
+		this.log = log;
+	}
 
-    @Override
-    public void actionPerformed(ActionEvent arg0) {
-    	try {
-			StaticUtils.browse(URIFactory.uri(url));
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		StaticUtils.browse(url, log);
 
-    }
+	}
 
 }

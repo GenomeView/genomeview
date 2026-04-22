@@ -41,7 +41,6 @@ public class ShortReadProvider implements DataProvider<SAMRecord> {
 		lastStart = start;
 		lastEnd = end;
 
-		final Iterable<SAMRecord> fresh = source.get(start, end);
 		/* Queue up retrieval */
 		Task t = new Task(new Location(start, end)) {
 
@@ -54,7 +53,7 @@ public class ShortReadProvider implements DataProvider<SAMRecord> {
 						return;
 
 					ArrayList<SAMRecord> tmp = new ArrayList<SAMRecord>();
-					for (SAMRecord p : fresh) {
+					for (SAMRecord p : source.get(start, end)) {
 						tmp.add(p);
 					}
 					/* Notify rendered that the data is ready */

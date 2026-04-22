@@ -157,8 +157,8 @@ public class SequenceViewDialog extends JDialog implements Observer {
 				Sequence seq = getseq();
 				String protein = SequenceTools.translate(seq,
 						model.getAAMapping());
-				Blast.blastp("GVquery", protein);
-
+				StaticUtils.browse(Blast.blastp("GVquery", protein),
+						model.getLog());
 			}
 
 		}));
@@ -169,7 +169,8 @@ public class SequenceViewDialog extends JDialog implements Observer {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String seq = getseq().stringRepresentation();
-				Blast.blastn("GVquery", seq);
+				StaticUtils.browse(Blast.blastn("GVquery", seq),
+						model.getLog());
 
 			}
 		}));
@@ -180,7 +181,8 @@ public class SequenceViewDialog extends JDialog implements Observer {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String seq = getseq().stringRepresentation();
-				Blast.blastx("GVquery", seq);
+				StaticUtils.browse(Blast.blastx("GVquery", seq),
+						model.getLog());
 
 			}
 		}));

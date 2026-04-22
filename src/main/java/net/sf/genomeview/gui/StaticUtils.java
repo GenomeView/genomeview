@@ -11,15 +11,14 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.io.IOException;
-import java.net.URI;
 import java.util.Random;
+import java.util.logging.Level;
 
-import javax.swing.JOptionPane;
-
+import be.abeel.net.URIFactory;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.EditFeatureWindow;
 import net.sf.genomeview.gui.dialog.SplitFeatureDialog;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -34,9 +33,8 @@ public final class StaticUtils {
 	private StaticUtils() {
 	};
 
-	
-	public static final Random rg=new Random(System.currentTimeMillis());
-	
+	public static final Random rg = new Random(System.currentTimeMillis());
+
 	private static EditFeatureWindow editStructure = null;
 
 	public static EditFeatureWindow getEditStructure(Model model) {
@@ -53,15 +51,15 @@ public final class StaticUtils {
 	 * Centers the window on the screen. This method should always be called
 	 * after pack().
 	 * 
-	 * @param window
-	 *            the window to center
+	 * @param window the window to center
 	 */
 	public static void center(Window parent, Window window) {
 		Rectangle bounds = null;
 		if (parent != null)
 			bounds = parent.getBounds();
 		else
-			bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+			bounds = GraphicsEnvironment.getLocalGraphicsEnvironment()
+					.getMaximumWindowBounds();
 
 		window.setLocation(bounds.x + bounds.width / 2 - window.getWidth() / 2,
 				bounds.y + bounds.height / 2 - window.getHeight() / 2);
@@ -105,26 +103,32 @@ public final class StaticUtils {
 
 	}
 
-	public static void browse(URI uri) {
+	/**
+	 * Opens a browser window at specified URI. In case of a problem a warning
+	 * is logged to provided logger.
+	 * 
+	 * @param uri the uri to open, as string. The string will be converted using
+	 *            {@link URIFactory#uri(String)}, which also handles special
+	 *            characters
+	 * @param log the {@link Reporter} to log issues
+	 */
+	public static void browse(String uristring, Reporter log) {
 		try {
-			Desktop.getDesktop().browse(uri);
-		} catch (IOException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, MessageManager.formatMessage("staticutils.couldnt_open_url_warn", new Object[]{uri.getPath()}), MessageManager.getString("staticutils.url_open_failed"),
-					JOptionPane.ERROR_MESSAGE);
-		} catch (UnsupportedOperationException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, MessageManager.formatMessage("staticutils.couldnt_open_url_warn", new Object[]{uri.getPath()}), MessageManager.getString("staticutils.url_open_failed"),
-					JOptionPane.ERROR_MESSAGE);
-
+			Desktop.getDesktop().browse(URIFactory.uri(uristring));
+		} catch (Throwable e) {
+			log.log(Level.WARNING,
+					MessageManager.formatMessage(
+							"staticutils.couldnt_open_url_warn",
+							new Object[] { uristring }),
+					e);
 		}
 
 	}
 
 	public static void forceExit() {
 		/*
-		 * Due to some bugs in AWT, Swing and some other stuff, we need
-		 * to force webstart applications to shut down
+		 * Due to some bugs in AWT, Swing and some other stuff, we need to force
+		 * webstart applications to shut down
 		 * 
 		 * http://stackoverflow.com/questions/212009/do-i-have-to-explicitly
 		 * -call-system-exit-in-a-webstart-application
@@ -132,13 +136,14 @@ public final class StaticUtils {
 		 * http://stackoverflow.com/questions/216315/what-is-the-best-way
 		 * -to-detect-whether-an-application-is-launched-by-webstart
 		 */
-		if (!Environment.isApplet() ||(Environment.isApplet()&& !Environment.isMac())) {
+		if (!Environment.isApplet()
+				|| (Environment.isApplet() && !Environment.isMac())) {
 			// This will make sure the application exits.
 			// We don't want to do this on Mac because it will exit the
 			// browser as well if running as an Applet.
 			System.exit(0);
 		}
-		
+
 	}
 
 }
