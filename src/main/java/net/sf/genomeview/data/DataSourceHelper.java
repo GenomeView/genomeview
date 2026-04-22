@@ -7,7 +7,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import javax.swing.JFileChooser;
@@ -217,12 +216,9 @@ public class DataSourceHelper {
 		if (wait)
 			try {
 				rw.get();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (Exception e) {
+				model.getLog().log(Level.WARNING,
+						"datasource read worker problem", e);
 			}
 
 	}
@@ -393,17 +389,13 @@ public class DataSourceHelper {
 							load(model, mafdata);
 
 							// load(out);
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						} catch (URISyntaxException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+						} catch (IOException | URISyntaxException e1) {
+							model.getLog().log(Level.WARNING,
+									"Failed to load " + files, e1);
 						}
 					}
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					model.getLog().log(Level.WARNING, "MAF loader failed", e1);
 				}
 			}
 		});

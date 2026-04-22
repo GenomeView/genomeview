@@ -92,7 +92,7 @@ public class MultipleAlignmentTrack2 extends Track {
 	final private MAComparator macomp = new MAComparator(ordering);
 
 	// last encountered yOffset. Used to correlate mouse clicks to render
-	// positions
+	// positions. FIXME this is always equal to yOffset?
 	private int currentYOffset;
 
 	private Location lastBuffer = null;
@@ -281,11 +281,11 @@ public class MultipleAlignmentTrack2 extends Track {
 			/*
 			 * Reorder the alignment sequences to whatever the user wants
 			 */
-			TreeSet<AbstractAlignmentSequence> ab2 = new TreeSet<AbstractAlignmentSequence>(
+			TreeSet<AbstractAlignmentSequence> sortedblocks = new TreeSet<AbstractAlignmentSequence>(
 					macomp);
 			for (AbstractAlignmentSequence as : ab) {
 				assert as != null;
-				ab2.add(as);
+				sortedblocks.add(as);
 			}
 
 			BitSet lines = new BitSet(ordering.size());
@@ -309,7 +309,7 @@ public class MultipleAlignmentTrack2 extends Track {
 			Font tmpFont = font.deriveFont(10f);
 			g.setFont(tmpFont);
 
-			for (AbstractAlignmentSequence as : ab2) {
+			for (AbstractAlignmentSequence as : sortedblocks) {
 				if (showAll.get()) {
 					line = ordering.getForward(as.getName()) + 1;
 					// System.out.println("ASLINES: "+as+"\t"+line);
@@ -667,6 +667,9 @@ public class MultipleAlignmentTrack2 extends Track {
 
 }
 
+/**
+ * {@link BiMap} but uses only the names up to the first ".".
+ */
 class ChopChopMap extends BiMap<String, Integer> {
 	@Override
 	public Integer getForward(String key) {
@@ -709,6 +712,11 @@ class MouseHit {
 class MAComparator implements Comparator<AbstractAlignmentSequence> {
 	private BiMap<String, Integer> ordering;
 
+	/**
+	 * @param ordering the ordering to use. The referred ordering is used, no
+	 *                 copy is made, so changes in the original map will be
+	 *                 tracked.
+	 */
 	public MAComparator(BiMap<String, Integer> ordering) {
 		this.ordering = ordering;
 	}

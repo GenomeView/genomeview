@@ -54,9 +54,8 @@ import net.sf.jannot.parser.Parser;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class SaveDialog extends JDialog {
-
-	private static final long serialVersionUID = -5209291628487502687L;
 
 	private String file(Model model) {
 		JFileChooser chooser = new JFileChooser(
@@ -68,54 +67,6 @@ public class SaveDialog extends JDialog {
 			return files.toString();
 		} else {
 			return null;
-		}
-	}
-
-	private class MultiSelectionArray<T> extends Container {
-
-		private static final long serialVersionUID = -5487911457275295620L;
-
-		private class TCheckBox extends JCheckBox {
-
-			private static final long serialVersionUID = -5606344815979542381L;
-
-			private T data;
-
-			public TCheckBox(T e) {
-				super(e.toString());
-				this.data = e;
-			}
-		}
-
-		private final ArrayList<TCheckBox> dss = new ArrayList<TCheckBox>();
-
-		private MultiSelectionArray(Iterable<T> arr, boolean enabledFlag) {
-
-			setLayout(new GridLayout(0, 1));
-			for (T t : arr) {
-				TCheckBox dsb = new TCheckBox(t);
-				dsb.setEnabled(enabledFlag);
-				dsb.setSelected(true);
-
-				dss.add(dsb);
-				add(dsb);
-
-			}
-		}
-
-		private Collection<T> selectedItems() {
-			ArrayList<T> out = new ArrayList<T>();
-			for (TCheckBox item : dss) {
-				if (item.isSelected())
-					out.add(item.data);
-			}
-			return out;
-		}
-
-		public void selectAllItems(boolean select) {
-			for (TCheckBox item : dss) {
-				item.setSelected(select);
-			}
 		}
 	}
 
@@ -451,7 +402,8 @@ public class SaveDialog extends JDialog {
 					private void showServerMessage(String reply) {
 						final JDialog diag = new JDialog(
 								model.getGUIManager().getMainWindow());
-						JEditorPaneLabel txt = new JEditorPaneLabel();
+						JEditorPaneLabel txt = new JEditorPaneLabel(
+								model.getLog());
 						txt.setEditable(false);
 						txt.setText(reply);
 						txt.setPreferredSize(new Dimension(300, 200));
@@ -496,4 +448,48 @@ public class SaveDialog extends JDialog {
 		setVisible(true);
 	}
 
+}
+
+@SuppressWarnings("serial")
+class MultiSelectionArray<T> extends Container {
+
+	private final ArrayList<TCheckBox> dss = new ArrayList<TCheckBox>();
+
+	private class TCheckBox extends JCheckBox {
+		private T data;
+
+		public TCheckBox(T e) {
+			super(e.toString());
+			this.data = e;
+		}
+	}
+
+	protected MultiSelectionArray(Iterable<T> arr, boolean enabledFlag) {
+
+		setLayout(new GridLayout(0, 1));
+		for (T t : arr) {
+			TCheckBox dsb = new TCheckBox(t);
+			dsb.setEnabled(enabledFlag);
+			dsb.setSelected(true);
+
+			dss.add(dsb);
+			add(dsb);
+
+		}
+	}
+
+	protected Collection<T> selectedItems() {
+		ArrayList<T> out = new ArrayList<T>();
+		for (TCheckBox item : dss) {
+			if (item.isSelected())
+				out.add(item.data);
+		}
+		return out;
+	}
+
+	public void selectAllItems(boolean select) {
+		for (TCheckBox item : dss) {
+			item.setSelected(select);
+		}
+	}
 }

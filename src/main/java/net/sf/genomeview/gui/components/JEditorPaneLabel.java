@@ -3,16 +3,15 @@
  */
 package net.sf.genomeview.gui.components;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 import javax.swing.JEditorPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
+
+import net.sf.genomeview.gui.StaticUtils;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -23,23 +22,10 @@ public class JEditorPaneLabel extends JEditorPane {
 
 	private static final long serialVersionUID = 7954185710654053247L;
 
-	class Hyperactive implements HyperlinkListener {
-
-		public void hyperlinkUpdate(HyperlinkEvent e) {
-			if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-				try {
-					Desktop.getDesktop().browse(e.getURL().toURI());
-				} catch (IOException | URISyntaxException e1) {
-					e1.printStackTrace();
-				}
-			}
-		}
-	}
-
-	public JEditorPaneLabel() {
+	public JEditorPaneLabel(Reporter log) {
 		super("text/html", null);
 		setEditable(false);
-		super.addHyperlinkListener(new Hyperactive());
+		super.addHyperlinkListener(new Hyperactive(log));
 		// ## Fix for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6993691
 		setEditorKit(new HTMLEditorKit() {
 
@@ -64,5 +50,20 @@ public class JEditorPaneLabel extends JEditorPane {
 		StyleSheet css = ((HTMLDocument) this.getDocument()).getStyleSheet();
 		return css;
 
+	}
+}
+
+class Hyperactive implements HyperlinkListener {
+
+	private Reporter log;
+
+	public Hyperactive(Reporter log) {
+		this.log = log;
+	}
+
+	public void hyperlinkUpdate(HyperlinkEvent e) {
+		if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+			StaticUtils.browse(e.getURL().toString(), log);
+		}
 	}
 }

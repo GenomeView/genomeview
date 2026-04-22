@@ -3,8 +3,8 @@ package net.sf.genomeview.gui.dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -31,28 +31,20 @@ public class OpenURLButton extends JButton {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				try {
-					String input = JOptionPane.showInputDialog(
-							gvModel.getGUIManager().getMainWindow(),
-							"Give the URL of the data");
-					if (input != null && input.trim().length() > 0) {
-
+				String input = JOptionPane.showInputDialog(
+						gvModel.getGUIManager().getMainWindow(),
+						"Give the URL of the data");
+				if (input != null && input.trim().length() > 0) {
+					try {
 						DataSourceHelper.load(gvModel,
 								new Locator(input.trim(), gvModel.getLog()));
-					}
 
-				} catch (MalformedURLException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				} catch (IOException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				} catch (URISyntaxException e3) {
-					// TODO Auto-generated catch block
-					e3.printStackTrace();
-				} catch (ReadFailedException e4) {
-					// TODO Auto-generated catch block
-					e4.printStackTrace();
+					} catch (IOException | URISyntaxException
+							| ReadFailedException e2) {
+						// pretty nasty if this would fail to open.
+						gvModel.getLog().log(Level.WARNING,
+								"Failed to open " + input, e2);
+					}
 				}
 
 			}

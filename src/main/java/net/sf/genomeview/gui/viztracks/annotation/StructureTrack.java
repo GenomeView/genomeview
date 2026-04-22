@@ -731,9 +731,9 @@ public class StructureTrack extends Track {
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
 		super.mouseClicked(x, y, e);
 		if (!e.isConsumed()) {
-			System.out.println("Clicked: " + Convert.translateScreenToGenome(
-					e.getX(), model.vlm.getAnnotationLocationVisible(),
-					screenWidth));
+//			System.out.println("Clicked: " + Convert.translateScreenToGenome(
+//					e.getX(), model.vlm.getAnnotationLocationVisible(),
+//					screenWidth));
 			Location rf = collisionMap.uniqueLocation(e.getX(), e.getY());
 
 			if (Mouse.button1(e)) {

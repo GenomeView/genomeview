@@ -14,7 +14,6 @@ import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -22,6 +21,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -69,16 +69,12 @@ public class SequenceViewDialog extends JDialog implements Observer {
 	private static final String TO_PROT_CAPTION = "Protein view";
 
 	private static final String TO_NUC_CAPTION = "Nucleotide view";
-
 	private int viewMode = NUC_MODE;
-
 	private static final String LINE_BREAK = System
 			.getProperty("line.separator");
 
 	private Map<Feature, String> nucList;
-
 	private Map<Feature, String> protList;
-
 	private String subSequenceNuc;
 	private String subSequenceProt;
 
@@ -252,8 +248,10 @@ public class SequenceViewDialog extends JDialog implements Observer {
 							writeProts(writer);
 						}
 						writer.close();
-					} catch (IOException ioe) {
-						ioe.printStackTrace();
+					} catch (Exception ioe) {
+						// severe, export failures require attention of user
+						model.getLog().log(Level.SEVERE,
+								"Failed to export fasta", ioe);
 					}
 				}
 
@@ -291,14 +289,6 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		}
 		this.sequenceText.setText(nucs);
 	}
-
-//	private String createSubSequenceNuc() {
-//		Location l = model.getSelectedRegion();
-//		String seq = new BufferSeq(model.getSelectedEntry().sequence(), l).toString();
-//		return seq;
-//		// return model.getSelectedEntry().sequence().getSubSequence(l.start(),
-//		// l.end()+1);
-//	}
 
 	private Map<Feature, String> createNucList() {
 		Map<Feature, String> newList = new HashMap<Feature, String>();
@@ -355,10 +345,6 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
 	private String createSubSequenceProt() {
 		Location l = model.getSelectedRegion();
-		// String seq =
-		// model.getSelectedEntry().sequence().getSubSequence(l.start(),
-		// l.end()+1);
-//		String seq = new BufferSeq(model.getSelectedEntry().sequence(), l).toString();
 
 		return SequenceTools.translate(getseq(), model.getAAMapping());
 	}

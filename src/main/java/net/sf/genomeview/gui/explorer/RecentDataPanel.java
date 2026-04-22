@@ -140,7 +140,7 @@ public class RecentDataPanel extends GridBagPanel {
 
 		gc.gridy++;
 		gc.weighty = 1;
-		JEditorPaneLabel msgLabel = new JEditorPaneLabel();
+		JEditorPaneLabel msgLabel = new JEditorPaneLabel(model.getLog());
 		msgLabel.setText("");
 
 		msgLabel.setPreferredSize(

@@ -38,16 +38,15 @@ import net.sf.jannot.Feature;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class FeatureDetailPanel extends GridBagPanel implements Observer {
+	private final JEditorPaneLabel name;
 
-	private static final long serialVersionUID = 1214531303733670258L;
-
-	private JEditorPaneLabel name = new JEditorPaneLabel();
-
-	private Model model;
+	private final Model model;
 
 	public FeatureDetailPanel(Model model) {
 		this.model = model;
+		name = new JEditorPaneLabel(model.getLog());
 
 		StyleSheet css = name.getStyleSheet();
 		css.addRule("body {color:#000; margin-left: 4px; margin-right: 4px; }");
