@@ -63,13 +63,13 @@ public class Model extends Observable implements Observer {
 	/**
 	 * The EntrySet which contains all loaded 'chromosomes'.
 	 */
-	private final EntrySet entries = new EntrySet();
+	private final EntrySet entries;
 
 	private final SelectionModel selectionModel = new SelectionModel();
 	private final MouseModel mouseModel = new MouseModel();
 	private final MessageModel messageModel = new MessageModel(this);
 
-	public final VisualLocationModel vlm = new VisualLocationModel();
+	public final VisualLocationModel vlm;
 
 	/**
 	 * List of all available tracks. Some might be hidden from view.
@@ -147,9 +147,12 @@ public class Model extends Observable implements Observer {
 	 */
 
 	public Model(String id, DistributingReporter log) {
-		if (log == null)
+		if (log == null) {
 			throw new NullPointerException("log must not be null");
+		}
 		this.log = log;
+		vlm = new VisualLocationModel(log);
+		entries = new EntrySet(log);
 
 		this.connectionMonitor = new ConnectionMonitor(log);
 		guimanager = new GUIManager();
@@ -182,8 +185,9 @@ public class Model extends Observable implements Observer {
 					"recent.gv");
 			if (recent.exists() && recent.length() > 0) {
 				LineIterator it = new LineIterator(recent);
-				while (it.hasNext())
+				while (it.hasNext()) {
 					recentFiles.addElement(it.next());
+				}
 			}
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Could not retrieve recently used files", e);
@@ -207,12 +211,14 @@ public class Model extends Observable implements Observer {
 		return mouseModel;
 	}
 
+	@Override
 	public void update(Observable arg0, Object arg) {
 		if (arg instanceof ChangeEvent) {
 			undoStack.push((ChangeEvent) arg);
 			redoStack.clear();
-			while (undoStack.size() > 100)
+			while (undoStack.size() > 100) {
 				undoStack.remove(0);
+			}
 			refresh(NotificationTypes.JANNOTCHANGE);
 		} else {
 			refresh(arg);
@@ -223,7 +229,6 @@ public class Model extends Observable implements Observer {
 	public void clearEntries() {
 		selectionModel.clear();
 		vlm.clear();
-		// visible=new Location(0,0);
 		loadedSources.clear();
 		entries.clear();
 		undoStack.clear();
@@ -231,19 +236,6 @@ public class Model extends Observable implements Observer {
 		trackList.clear();
 		refresh(NotificationTypes.GENERAL);
 	}
-
-	// private void clearTrackList(TrackList tracklist) {
-	// List<Track> remove = new ArrayList<Track>();
-	// for (Track t : tracklist) {
-	//
-	// if (!(t instanceof FeatureTrack || t instanceof StructureTrack || t
-	// instanceof TickmarkTrack))
-	// remove.add(t);
-	// }
-	// tracklist.removeAll(remove);
-	// refresh();
-	//
-	// }
 
 	public EntrySet entries() {
 		return entries;
@@ -303,11 +295,12 @@ public class Model extends Observable implements Observer {
 				pw.close();
 
 				/* Only store session if there is something to store */
-				if (this.loadedSources().size() > 0)
+				if (this.loadedSources().size() > 0) {
 					Session.save(
 							new File(Configuration.instance().getDirectory(),
 									"previous.gvs"),
 							this);
+				}
 			}
 		} catch (IOException e) {
 			log.log(Level.WARNING, "Problem saving last session", e);
@@ -316,65 +309,6 @@ public class Model extends Observable implements Observer {
 		refresh();
 
 	}
-
-	// public Location getAnnotationLocationVisible() {
-	// return visible;
-	// }
-
-	// private Location visible=new Location(0,0);
-	// private int annotationStart = 0, annotationEnd = 0;
-
-	// /**
-	// * Set the visible area in the evidence and structure frame to the given
-	// * Location.
-	// *
-	// * start and end one-based [start,end]
-	// *
-	// * @param start
-	// * @param annotationEnd
-	// */
-	//
-	// public void setAnnotationLocationVisible(Location r) {
-	// setAnnotationLocationVisible(r, false);
-	//
-	// }
-
-	// /**
-	// * Provides implementation to do/undo zoom changes.
-	// *
-	// * @author Thomas Abeel
-	// *
-	// */
-	// class ZoomChange implements ChangeEvent {
-	// /* The original zoom */
-	// private Location orig;
-	//
-	// /* The new zoom */
-	// private Location neww;
-	//
-	// public ZoomChange(Location location, Location newZoom) {
-	// this.orig = location;
-	// this.neww = newZoom;
-	// }
-	//
-	// @Override
-	// public void doChange() {
-	// // annotationStart = neww.start();
-	// // annotationEnd = neww.end();
-	// visible=neww;
-	//
-	// }
-	//
-	// @Override
-	// public void undoChange() {
-	// assert (visible.start == neww.start());
-	// assert (visible.end == neww.end());
-	// visible=orig;
-	//
-	//
-	// }
-	//
-	// }
 
 	/**
 	 * Used by the {@link WindowManager} to check if system is exiting
@@ -409,8 +343,9 @@ public class Model extends Observable implements Observer {
 		ArrayList<Highlight> out = new ArrayList<Highlight>();
 		for (Highlight f : highlights) {
 			if (f.location.end() > region.start()
-					&& f.location.start() < region.end())
+					&& f.location.start() < region.end()) {
 				out.add(f);
+			}
 		}
 		return Collections.unmodifiableList(out);
 	}
@@ -437,8 +372,9 @@ public class Model extends Observable implements Observer {
 	 *                             FIXME move to read worker
 	 */
 	void addData(DataSource f) throws ReadFailedException {
-		if (entries.size() == 0)
+		if (entries.size() == 0) {
 			vlm.setAnnotationLocationVisible(new Location(1, 51));
+		}
 		log.log(Level.INFO, "Reading source:" + f);
 		recentFiles.removeElement(f.getLocator().toString());
 		recentFiles.add(0, f.getLocator().toString());
@@ -509,8 +445,9 @@ public class Model extends Observable implements Observer {
 			Entry e = vlm.getVisibleEntry();
 			boolean changed = trackList.update(e);
 
-			if (changed)
+			if (changed) {
 				refresh(NotificationTypes.UPDATETRACKS);
+			}
 		} catch (ConcurrentModificationException e) {
 			log.log(Level.WARNING,
 					"Update tracks interrupted, tracks already changed", e);
@@ -542,17 +479,19 @@ public class Model extends Observable implements Observer {
 	}
 
 	public String getUndoDescription() {
-		if (hasUndo())
+		if (hasUndo()) {
 			return "Undo: " + undoStack.peek();
-		else
+		} else {
 			return "";
+		}
 	}
 
 	public String getRedoDescription() {
-		if (hasRedo())
+		if (hasRedo()) {
 			return "Redo: " + redoStack.peek();
-		else
+		} else {
 			return "";
+		}
 	}
 
 	public Set<DataSource> loadedSources() {
@@ -690,6 +629,7 @@ public class Model extends Observable implements Observer {
 
 		Thread t = new Thread(new Runnable() {
 
+			@Override
 			public void run() {
 				try {
 					boolean success = false;
@@ -697,9 +637,10 @@ public class Model extends Observable implements Observer {
 						String[] tmp = StringUtil.reverseString(position)
 								.split("[:-]", 3);
 						String[] arr = new String[Math.min(tmp.length, 3)];
-						for (int i = 0; i < arr.length; i++)
+						for (int i = 0; i < arr.length; i++) {
 							arr[i] = StringUtil
 									.reverseString(tmp[(arr.length - 1) - i]);
+						}
 						/*
 						 * If the location is not 2 or 3 tokens long, just stop
 						 */
@@ -752,11 +693,13 @@ public class Model extends Observable implements Observer {
 			}
 
 			private boolean hasEntry(String[] arr) {
-				if (entries().size() == 0)
+				if (entries().size() == 0) {
 					return false;
+				}
 
-				if (arr.length == 2)
+				if (arr.length == 2) {
 					return true;
+				}
 
 				return (arr.length == 3 && entries().getEntry(arr[0]) != null);
 
@@ -765,10 +708,11 @@ public class Model extends Observable implements Observer {
 			private boolean inRange(String[] arr) {
 				int max = Integer.parseInt(arr[arr.length - 1]);
 				Entry e = null;
-				if (arr.length == 2)
+				if (arr.length == 2) {
 					e = vlm.getVisibleEntry();// model.entries().getEntry();
-				else
+				} else {
 					e = entries().getEntry(arr[0]);
+				}
 				return max <= e.getMaximumLength();
 
 			}

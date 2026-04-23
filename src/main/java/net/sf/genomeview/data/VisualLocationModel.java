@@ -4,6 +4,7 @@ import java.util.Observable;
 
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * Model (MVC) where user is currently looking at.
@@ -19,6 +20,14 @@ public class VisualLocationModel extends Observable {
 	 */
 	private Location visibleLocation = new Location(0, 0);
 	private double screenWidth;
+	private final Reporter log;
+
+	/**
+	 * @param log needed to create {@link DummyEntry}
+	 */
+	public VisualLocationModel(Reporter log) {
+		this.log = log;
+	}
 
 	/**
 	 * 
@@ -27,8 +36,9 @@ public class VisualLocationModel extends Observable {
 	 *         set to the first available entry in the model.
 	 */
 	public Entry getVisibleEntry() {
-		if (visibleEntry == null)
-			return DummyEntry.dummy;
+		if (visibleEntry == null) {
+			return new DummyEntry(log);
+		}
 		return visibleEntry;
 	}
 
@@ -93,8 +103,9 @@ public class VisualLocationModel extends Observable {
 		} else {
 			modEnd = chromLength;
 			modStart = modEnd - r.length();
-			if (modStart < 1)
+			if (modStart < 1) {
 				modStart = 1;
+			}
 		}
 		Location newZoom = new Location(modStart, modEnd);
 		/* When trying to zoom to something really small */
@@ -103,13 +114,15 @@ public class VisualLocationModel extends Observable {
 					new Location(modStart - 25, modEnd + 25));
 		}
 		if (newZoom.length() != visibleLocation.end - visibleLocation.start + 1
-				&& newZoom.length() < 50)
+				&& newZoom.length() < 50) {
 			return;
+		}
 		// if (newZoom.length() != annotationEnd - annotationStart + 1
 		// && newZoom.length() > Configuration.getInt("general:zoomout"))
 		// return;
-		if (newZoom.start < 1 || newZoom.end < 1)
+		if (newZoom.start < 1 || newZoom.end < 1) {
 			return;
+		}
 
 		this.visibleLocation = newZoom;
 		setChanged();

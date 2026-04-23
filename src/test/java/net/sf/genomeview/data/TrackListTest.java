@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import net.sf.genomeview.core.DistributingReporter;
@@ -19,12 +20,16 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.nameservice.NameService;
 
 public class TrackListTest {
+	DistributingReporter log;
+
+	@Before
+	public void before() throws IOException, ReadFailedException {
+		log = new DistributingReporter();
+		NameService.init(log);
+	}
 
 	@Test
-	public void testThreadSafeIterator()
-			throws IOException, ReadFailedException {
-		DistributingReporter log = new DistributingReporter();
-		NameService.init(log);
+	public void testThreadSafeIterator() {
 		Model model = new Model("id", log);
 
 		TrackList tracklist = new TrackList(model);
@@ -44,8 +49,8 @@ public class TrackListTest {
 	 * @return a test entry
 	 */
 	private Entry getEntry() {
-		Entry e = new Entry("entry");
-		SyntenicData syntenic = new SyntenicData(new ArrayList<>());
+		Entry e = new Entry("entry", log);
+		SyntenicData syntenic = new SyntenicData(new ArrayList<>(), log);
 		e.add(new StringKey("data1"), syntenic);
 		return e;
 	}
