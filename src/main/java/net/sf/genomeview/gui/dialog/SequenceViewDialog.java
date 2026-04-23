@@ -441,9 +441,13 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
 	}
 
-	// Highlight the occurrences of the word "public"
-
-	// Creates highlights around all occurrences of pattern in textComp
+	/**
+	 * Highlight the occurrences of the word "public"
+	 * 
+	 * Creates highlights around all occurrences of pattern in textComp
+	 * 
+	 * @param textComp
+	 */
 	private void highlight(JTextComponent textComp) {
 		// First remove all old highlights
 		removeHighlights(textComp);
@@ -471,7 +475,8 @@ public class SequenceViewDialog extends JDialog implements Observer {
 				pos++;
 			}
 		} catch (BadLocationException e) {
-			e.printStackTrace();
+			throw new RuntimeException("bug in highlighter", e);
+			// should never happen
 		}
 	}
 

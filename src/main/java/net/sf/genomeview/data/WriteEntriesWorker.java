@@ -3,10 +3,6 @@
  */
 package net.sf.genomeview.data;
 
-import javax.swing.JOptionPane;
-
-import net.sf.jannot.Entry;
-import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.source.DataSource;
 
 /**
@@ -17,21 +13,13 @@ import net.sf.jannot.source.DataSource;
  */
 public class WriteEntriesWorker extends DataSourceWorker {
 
-    public WriteEntriesWorker(DataSource source, Model model) {
-        super(source, model);
-    }
+	public WriteEntriesWorker(DataSource source, Model model) {
+		super(source, model);
+	}
 
-    @Override
-    protected Void doInBackground() {
-//        try {
-//            source.saveOwn(model.entries());
-//        } catch (Throwable e) {
-//        	  pb.done();
-//        	JOptionPane.showMessageDialog(model.getGUIManager().getParent(), "<html>"+e.getMessage()+"<br/></html>", "Error!",JOptionPane.ERROR_MESSAGE);
-//        	e.printStackTrace();
-//        }
-//        pb.done();
-        return null;
-    }
+	@Override
+	protected Void doInBackground() {
+		return null;
+	}
 
 }

@@ -33,6 +33,10 @@ import net.sf.jannot.source.Locator;
  * 
  */
 class InstructionWorker implements Runnable {
+	// special message header indicating another genomeview port
+	private static final String OTHER_GENOMEVIEW = "GenomeViewJavaScriptHandler-";
+	private static final HashSet<Port> otherPorts = new HashSet<Port>();
+	private static String lastLoad = null;
 
 	/* Socket to client we're handling */
 	private final Socket s;
@@ -41,14 +45,16 @@ class InstructionWorker implements Runnable {
 
 	private final String id;
 
-	private static final HashSet<Port> otherPorts = new HashSet<Port>();
+	private static LRUSet<String> lastID = new LRUSet<String>(20);
 
 	/**
-	 * this handles incoming socket requests remotely controlling GenomeView
+	 * this handles one requests for remotely controlling GenomeView. The
+	 * request comes in as a HTTP GET on {@link #s}s
 	 * 
 	 * @param model the model to control
-	 * @param id
-	 * @param s
+	 * @param id    our ID. Only incoming requests containing this ID are
+	 *              handled by us.
+	 * @param s     a socket on which an instruction came in
 	 */
 	InstructionWorker(Model model, String id, Socket s) {
 		if (model == null)
@@ -64,34 +70,43 @@ class InstructionWorker implements Runnable {
 		try {
 			handleClient();
 		} catch (Exception e) {
-			e.printStackTrace();
+			model.getLog().log(Level.SEVERE,
+					"failed to handle instruction " + id, e);
 		}
 	}
 
-	private static String lastLoad = null;
-
-	private static LRUSet<String> lastID = new LRUSet<String>(20);
-
+	/**
+	 * Reads the input on the socket and handles it. if the line starts with
+	 * {@link #OTHER_GENOMEVIEW} we register the other genomeview port.
+	 * 
+	 * Otherwise, we read lines till a line is found starting with "GET". This
+	 * line is first sent to all {@link #otherPorts} and if someone replies, the
+	 * result is taken and considered done.
+	 * 
+	 * Otherwise, we handle the task ourself.
+	 * 
+	 * Requests are only responded to if someone handles it.
+	 * 
+	 * @throws IOException
+	 */
 	void handleClient() throws IOException {
-		/* This happens when exiting */
 		if (s == null)
-			return;
+			return; // This happens when exiting
 		s.setSoTimeout(5000);
 		s.setTcpNoDelay(true);
-		model.getLog().log(Level.INFO, "Handling client");
-		// InputStream is = new BufferedInputStream(s.getInputStream());
 		BufferedReader it = new BufferedReader(
 				new InputStreamReader(s.getInputStream()));
-		// LineIterator it = new LineIterator(s.getInputStream());
 		String line = it.readLine();
-		if (line.startsWith("GenomeViewJavaScriptHandler-")) {
+		model.getLog().log(Level.INFO,
+				"Handling socket service request: " + line);
+
+		if (line.startsWith(OTHER_GENOMEVIEW)) {
 			otherPorts.add(new Port(Integer.parseInt(line.split("-")[1])));
 		} else {
 			while (!line.startsWith("GET") && line != null) {
 				// System.out.println("Handler: GET: " + line);
 				line = it.readLine();
 				// System.out.println(line);
-
 			}
 			StringBuffer others = writeOther(line);
 			model.getLog().log(Level.INFO, "Reply from others: " + others);
@@ -100,57 +115,7 @@ class InstructionWorker implements Runnable {
 				pw.print(others.toString());
 				pw.close();
 			}
-			if (line.startsWith("GET /genomeview-" + id + "/")
-					|| line.startsWith("GET /genomeview-ALL/")) {
-				String[] id = line.split("\\$\\$");
-				if (id.length == 1 || !lastID.contains(id[1])) {
-					if (id.length > 1)
-						lastID.add(id[1]);
-
-					line = id[0];
-					String[] arr = line.split(" ")[1].split("/", 4);
-					if (arr[1].startsWith("genomeview")) {
-						if (arr[2].toLowerCase().equals("position")) {
-							doPosition(arr[3]);
-						} else if (arr[2].toLowerCase().equals("load")) {
-							if (!arr[3].equals(lastLoad)) {
-								lastLoad = arr[3];
-								doLoad(arr[3]);
-							}
-
-						} else if (arr[2].toLowerCase().equals("track")) {
-							doTrack(arr[3]);
-						} else if (arr[2].toLowerCase().equals("config")) {
-							doConfig(arr[3]);
-						} else if (arr[2].toLowerCase().equals("session")) {
-							doSession(arr[3]);
-
-						} else if (arr[2].toLowerCase().equals("unload")) {
-							model.clearEntries();
-							lastLoad = null;
-						} else if (arr[2].toLowerCase().equals("heartbeat")) {
-							PrintWriter pw = new PrintWriter(
-									s.getOutputStream());
-							pw.println("HTTP/1.1 200 OK");
-							pw.println("Content-Type: text/plain");
-							pw.println();
-							pw.println("isGenomeViewAlive=true;");
-							pw.flush();
-							pw.close();
-
-						} else {
-							model.getLog().log(Level.WARNING, "Instruction "
-									+ line
-									+ " was not understood by GenomeView");
-
-						}
-					} else {
-						model.getLog().log(Level.WARNING,
-								"This instruction doesn't belong to GenomeView, I'll ignore it.");
-					}
-				}
-
-			}
+			weHandleRequest(line);
 
 		}
 		s.close();
@@ -158,9 +123,65 @@ class InstructionWorker implements Runnable {
 	}
 
 	/**
+	 * We handle the request ourselves
+	 * 
+	 * @param line the request staring with "GET".
+	 * @throws IOException
+	 */
+	private void weHandleRequest(String line) throws IOException {
+		if (line.startsWith("GET /genomeview-" + id + "/")
+				|| line.startsWith("GET /genomeview-ALL/")) {
+			String[] id = line.split("\\$\\$");
+			if (id.length == 1 || !lastID.contains(id[1])) {
+				if (id.length > 1)
+					lastID.add(id[1]);
+
+				line = id[0];
+				String[] arr = line.split(" ")[1].split("/", 4);
+				if (arr[1].startsWith("genomeview")) {
+					if (arr[2].toLowerCase().equals("position")) {
+						doPosition(arr[3]);
+					} else if (arr[2].toLowerCase().equals("load")) {
+						if (!arr[3].equals(lastLoad)) {
+							lastLoad = arr[3];
+							doLoad(arr[3]);
+						}
+
+					} else if (arr[2].toLowerCase().equals("track")) {
+						doTrack(arr[3]);
+					} else if (arr[2].toLowerCase().equals("config")) {
+						doConfig(arr[3]);
+					} else if (arr[2].toLowerCase().equals("session")) {
+						doSession(arr[3]);
+
+					} else if (arr[2].toLowerCase().equals("unload")) {
+						model.clearEntries();
+						lastLoad = null;
+					} else if (arr[2].toLowerCase().equals("heartbeat")) {
+						PrintWriter pw = new PrintWriter(s.getOutputStream());
+						pw.println("HTTP/1.1 200 OK");
+						pw.println("Content-Type: text/plain");
+						pw.println();
+						pw.println("isGenomeViewAlive=true;");
+						pw.flush();
+						pw.close();
+
+					} else {
+						model.getLog().log(Level.WARNING, "Instruction " + line
+								+ " was not understood by GenomeView");
+
+					}
+				} else {
+					model.getLog().log(Level.WARNING,
+							"This instruction doesn't belong to GenomeView, I'll ignore it.");
+				}
+			}
+
+		}
+	}
+
+	/**
 	 * Scroll to track
-	 * 
-	 * 
 	 * 
 	 * @param trackName
 	 */
@@ -177,6 +198,14 @@ class InstructionWorker implements Runnable {
 			model.getGUIManager().getEvidenceLabel().scroll2track(hits.get(0));
 	}
 
+	/**
+	 * There is a connection to {@link #otherPorts} that also run GenomeView. It
+	 * is assumed we can communicate quickly with them. This method writes the
+	 * line to each of them and joins all the replies
+	 * 
+	 * @param line the line to write to all others
+	 * @return the collected responses,
+	 */
 	private StringBuffer writeOther(String line) {
 		StringBuffer buffer = new StringBuffer();
 		for (Port port : otherPorts) {
