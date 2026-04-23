@@ -27,7 +27,7 @@ import net.sf.genomeview.gui.MessageManager;
  */
 public class JavaScriptHandler {
 
-	private ExecutorService es = Executors
+	private final ExecutorService es = Executors
 			.newSingleThreadExecutor(new DaemonThreadFactory());
 
 	public JavaScriptHandler(final Model model, final String id) {
@@ -55,8 +55,8 @@ public class JavaScriptHandler {
 					try {
 						ss.close();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						model.getLog().log(Level.WARNING,
+								"javascripthandler close failed", e);
 					}
 
 			}

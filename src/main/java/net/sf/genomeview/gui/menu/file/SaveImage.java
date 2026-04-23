@@ -7,7 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -75,25 +75,20 @@ public class SaveImage extends AbstractAction {
 								BufferedImage.TYPE_INT_RGB);
 						Graphics2D g = (Graphics2D) bi.getGraphics();
 
-						try {
-							RepaintManager currentManager = RepaintManager
-									.currentManager(mw);
-							currentManager.setDoubleBufferingEnabled(false);
-							g.scale(factor, factor);
-							mw.paintTracks(g, null);
-							ImageIO.write(bi, "PNG", ef);
-							currentManager.setDoubleBufferingEnabled(true);
-						} catch (IOException ex) {
-							// TODO fix
-							ex.printStackTrace();
-						}
+						RepaintManager currentManager = RepaintManager
+								.currentManager(mw);
+						currentManager.setDoubleBufferingEnabled(false);
+						g.scale(factor, factor);
+						mw.paintTracks(g, null);
+						ImageIO.write(bi, "PNG", ef);
+						currentManager.setDoubleBufferingEnabled(true);
 						Configuration.instance().set("lastDirectory",
 								ef.getParentFile());
+						h.dispose();
 					} catch (Exception ex) {
-						// TODO fix
-						ex.printStackTrace();
+						model.getLog().log(Level.SEVERE, "save failed", ex);
 					}
-					h.dispose();
+
 				}
 			});
 

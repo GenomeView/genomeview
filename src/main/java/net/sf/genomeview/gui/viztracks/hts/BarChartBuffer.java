@@ -192,9 +192,16 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 					if (total > snpTrackMinimumCoverage) {
 						for (int j = 0; j < 4; j++) {
 							if (nucs[j] != refNt) {
-								double fraction = nc.getCount(nucs[j],
-										i - visible.start) / total;
-								fraction *= snpTrackHeight;
+								double fraction = 0;
+								try {
+									fraction = snpTrackHeight
+											* nc.getCount(nucs[j],
+													i - visible.start)
+											/ total;
+								} catch (IndexOutOfBoundsException e) {
+									model.getLog().log(Level.WARNING,
+											"bad index", e);
+								}
 
 								g.setColor(color[j]);
 
@@ -587,6 +594,12 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 
 	}
 
+	/**
+	 * 
+	 * @param count
+	 * @param total
+	 * @return string with ratio of count/total if total>0, else just the count
+	 */
 	private String format(int count, int total) {
 		if (total > 0)
 			return count + " (" + nf.format(count / (double) total) + ")";
@@ -620,12 +633,15 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 			int total = nc.getTotalCount(ntPosition);
 
 			if (nc.hasData()) {
-
+				int count = 0;
+				try {
+					count = nc.getCount('.', ntPosition);
+				} catch (IndexOutOfBoundsException e) {
+					// leave count at 0 then
+				}
 				text.append("<strong>"
 						+ MessageManager.getString("barchartbuffer.matches")
-						+ "</strong> "
-						+ format(nc.getCount('.', ntPosition), total)
-						+ "<br/>");
+						+ "</strong> " + format(count, total) + "<br/>");
 				text.append("<strong>"
 						+ MessageManager.getString("barchartbuffer.mismatches")
 						+ "</strong><br/>");

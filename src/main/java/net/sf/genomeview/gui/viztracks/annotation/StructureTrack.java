@@ -812,8 +812,7 @@ public class StructureTrack extends Track {
 						try {
 							Thread.sleep(500);
 						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+							// sleep was interrupted, we're in a loop anyway
 						}
 					}
 				}
