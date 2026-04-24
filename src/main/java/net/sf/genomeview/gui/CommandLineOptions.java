@@ -11,7 +11,6 @@ import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 import net.sf.genomeview.core.Configuration;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -45,7 +44,7 @@ class CommandLineOptions {
 	 * @throws IOException                 if loading extra fails
 	 * @throws MalformedURLException       if loading extra fails
 	 */
-	public CommandLineOptions(String[] args, Reporter log)
+	public CommandLineOptions(String[] args)
 			throws IllegalOptionValueException, UnknownOptionException,
 			MalformedURLException, IOException, URISyntaxException {
 

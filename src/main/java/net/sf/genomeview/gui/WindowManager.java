@@ -211,7 +211,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 		CommandLineOptions options;
 		try {
-			options = new CommandLineOptions(args, log);
+			options = new CommandLineOptions(args);
 		} catch (IllegalOptionValueException | UnknownOptionException e) {
 			throw new ExecutionException(
 					MessageManager.getString(
