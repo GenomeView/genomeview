@@ -17,13 +17,13 @@
  */
 package be.abeel.jargs;
 
-import jargs.gnu.CmdLineParser;
-
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import jargs.gnu.CmdLineParser;
 
 /**
  * Command line parser with basic output for a -h/--help option. This option is
@@ -32,45 +32,49 @@ import java.util.List;
  * @author Thomas Abeel
  */
 public class AutoHelpCmdLineParser extends CmdLineParser {
-    List<String> optionHelpStrings = new ArrayList<String>();
+	private final List<String> optionHelpStrings = new ArrayList<String>();
 
-    public Option addHelp(Option option, String helpString) {
-        if(option.shortForm()!=null)
-            optionHelpStrings.add(" -" + option.shortForm() + "/--" + option.longForm() + ": " + helpString);
-        else
-            optionHelpStrings.add(" --" + option.longForm() + ": " + helpString);
-        return option;
-    }
+	public AutoHelpCmdLineParser() {
+		helpO = this.addHelp(this.addBooleanOption('h', "help"),
+				"Shows this help message");
+	}
 
-    public boolean checkHelp() {
-        Boolean help = (Boolean) this.getOptionValue(helpO, Boolean.FALSE);
-        if (help) {
-            printUsage();
-            return true;
-        }
-        return false;
-    }
+	public Option addHelp(Option option, String helpString) {
+		if (option.shortForm() != null) {
+			optionHelpStrings.add(" -" + option.shortForm() + "/--"
+					+ option.longForm() + ": " + helpString);
+		} else {
+			optionHelpStrings
+					.add(" --" + option.longForm() + ": " + helpString);
+		}
+		return option;
+	}
 
-    public void printUsage() {
-        printUsage(System.err);
-    }
+	public boolean checkHelp() {
+		Boolean help = (Boolean) getOptionValue(helpO, Boolean.FALSE);
+		if (help) {
+			printUsage();
+			return true;
+		}
+		return false;
+	}
 
-    public void printUsage(OutputStream out) {
-        printUsage(new PrintWriter(out));
-    }
+	public void printUsage() {
+		printUsage(System.err);
+	}
 
-    public void printUsage(PrintWriter out) {
-        out.println("Usage: program [options]");
-        for (Iterator<String> i = optionHelpStrings.iterator(); i.hasNext();) {
-            out.println(i.next());
-        }
-        out.flush();
-    }
+	public void printUsage(OutputStream out) {
+		printUsage(new PrintWriter(out));
+	}
 
-    private Option helpO = null;
+	public void printUsage(PrintWriter out) {
+		out.println("Usage: program [options]");
+		for (Iterator<String> i = optionHelpStrings.iterator(); i.hasNext();) {
+			out.println(i.next());
+		}
+		out.flush();
+	}
 
-    public AutoHelpCmdLineParser() {
-        helpO = this.addHelp(this.addBooleanOption('h', "help"), "Shows this help message");
-    }
+	private Option helpO = null;
 
 }

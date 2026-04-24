@@ -59,6 +59,7 @@ public class ApplicationInstanceManager {
 					+ SINGLE_INSTANCE_NETWORK_SOCKET);
 			DaemonThread instanceListenerThread = new DaemonThread(
 					new Runnable() {
+						@Override
 						public void run() {
 							boolean socketClosed = false;
 							while (!socketClosed) {
@@ -85,7 +86,7 @@ public class ApplicationInstanceManager {
 											wm.init(s
 													.substring(1,
 															s.length() - 1)
-													.split(", "), null, log);
+													.split(", "), null);
 										}
 										in.close();
 										client.close();

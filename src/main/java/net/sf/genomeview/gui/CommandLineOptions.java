@@ -2,8 +2,8 @@ package net.sf.genomeview.gui;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
 
 import be.abeel.jargs.AutoHelpCmdLineParser;
 import be.abeel.net.URIFactory;
@@ -24,19 +24,30 @@ import tudelft.utilities.logging.Reporter;
  */
 class CommandLineOptions {
 
-	private static Option idO;
-	private static Option sessionO;
-	private static Option positionO;
-	private static Option configurationO;
-	private static Option fileO;
-	private static Option urlO;
+	private final Option idO;
+	private final Option sessionO;
+	private final Option positionO;
+	private final Option configurationO;
+	private final Option fileO;
+	private final Option urlO;
 
-	// private static Logger
-	// logger=LoggerFactory.getLogger(CommandLineOptions.class.getCanonicalName());
-	private static boolean goodParse;
-	private static AutoHelpCmdLineParser parser;
+	private boolean goodParse; // default false initially
+	private final AutoHelpCmdLineParser parser;
 
-	static void init(String[] args, Reporter log) {
+	/**
+	 * parse command line options
+	 * 
+	 * @param args the original command line args
+	 * @param log  the logger to log issues to
+	 * @throws UnknownOptionException      if parser fails
+	 * @throws IllegalOptionValueException if parser fails
+	 * @throws URISyntaxException          if loading extra fails
+	 * @throws IOException                 if loading extra fails
+	 * @throws MalformedURLException       if loading extra fails
+	 */
+	public CommandLineOptions(String[] args, Reporter log)
+			throws IllegalOptionValueException, UnknownOptionException,
+			MalformedURLException, IOException, URISyntaxException {
 
 		/* Initialize the command line options */
 		parser = new AutoHelpCmdLineParser();
@@ -58,7 +69,8 @@ class CommandLineOptions {
 		idO = parser.addHelp(parser.addStringOption("id"),
 				"Instance ID for this GenomeView instance, useful to control multiple GVs at once.");
 
-		goodParse = parse(parser, args, log);
+		parser.parse(args);
+		goodParse = true; // slightly hacky, if parse fails this remains false
 
 		if (parser.checkHelp()) {
 			System.exit(0);
@@ -67,68 +79,41 @@ class CommandLineOptions {
 		/* Load the additional configuration */
 		String config = (String) parser.getOptionValue(configurationO);
 		if (config != null) {
-			try {
-				if (config.startsWith("http") || config.startsWith("ftp")) {
-					Configuration.instance()
-							.loadExtra(URIFactory.url(config).openStream());
-				} else {
-					Configuration.instance()
-							.loadExtra(new FileInputStream(config));
-				}
-			} catch (IOException | URISyntaxException e) {
-				log.log(Level.WARNING, "Failed loading extra configuration", e);
+			if (config.startsWith("http") || config.startsWith("ftp")) {
+				Configuration.instance()
+						.loadExtra(URIFactory.url(config).openStream());
+			} else {
+				Configuration.instance().loadExtra(new FileInputStream(config));
 			}
 		}
 
 	}
 
-	/**
-	 * 
-	 * @param parser
-	 * @param args
-	 * @param log
-	 * @return true iff successful
-	 */
-	private static boolean parse(AutoHelpCmdLineParser parser, String[] args,
-			Reporter log) {
-		try {
-			parser.parse(args);
-			return true;
-		} catch (IllegalOptionValueException | UnknownOptionException e) {
-			log.log(Level.SEVERE,
-					MessageManager.getString(
-							"commandlineoptions.parsing_command_line_error"),
-					e);
-		}
-		return false;
-
-	}
-
-	public static boolean goodParse() {
+	public boolean goodParse() {
 		return goodParse;
 	}
 
-	public static String position() {
+	public String position() {
 		return (String) parser.getOptionValue(positionO);
 	}
 
-	public static String file() {
+	public String file() {
 		return (String) parser.getOptionValue(fileO);
 	}
 
-	public static String url() {
+	public String url() {
 		return (String) parser.getOptionValue(urlO);
 	}
 
-	public static String session() {
+	public String session() {
 		return (String) parser.getOptionValue(sessionO);
 	}
 
-	public static String[] remaining() {
+	public String[] remaining() {
 		return parser.getRemainingArgs();
 	}
 
-	public static String id() {
+	public String id() {
 		return (String) parser.getOptionValue(idO);
 	}
 

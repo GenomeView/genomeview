@@ -23,16 +23,18 @@ public class AAMappingChooser extends JComboBox
 		this.model = model;
 		model.addObserver(this);
 		setEditable(false);
-		for (AminoAcidMapping aamap : AminoAcidMapping.values())
+		for (AminoAcidMapping aamap : AminoAcidMapping.values()) {
 			this.addItem(aamap);
+		}
 		this.addActionListener(this);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (!model.getAAMapping().equals(this.getSelectedItem()))
+		if (!model.getAAMapping().equals(this.getSelectedItem())) {
 			model.setAAMapping(model.vlm.getVisibleEntry(),
 					(AminoAcidMapping) this.getSelectedItem());
+		}
 	}
 
 	@Override

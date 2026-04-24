@@ -55,11 +55,12 @@ public final class StaticUtils {
 	 */
 	public static void center(Window parent, Window window) {
 		Rectangle bounds = null;
-		if (parent != null)
+		if (parent != null) {
 			bounds = parent.getBounds();
-		else
+		} else {
 			bounds = GraphicsEnvironment.getLocalGraphicsEnvironment()
 					.getMaximumWindowBounds();
+		}
 
 		window.setLocation(bounds.x + bounds.width / 2 - window.getWidth() / 2,
 				bounds.y + bounds.height / 2 - window.getHeight() / 2);
@@ -72,16 +73,18 @@ public final class StaticUtils {
 	}
 
 	public static SplitFeatureDialog splitFeature(Model model) {
-		if (splitFeature == null)
+		if (splitFeature == null) {
 			splitFeature = new SplitFeatureDialog(model);
+		}
 		return splitFeature;
 	}
 
 	public static String shortify(String in) {
 		String s = in.replace('\\', '/');
 		int idx = s.lastIndexOf('/');
-		if (idx > 0)
+		if (idx > 0) {
 			s = s.substring(idx);
+		}
 		return s;
 	}
 
@@ -151,10 +154,30 @@ public final class StaticUtils {
 	 * @return substring of as up to the first "." char
 	 */
 	public static String chopchop(String as) {
-		if (as.indexOf('.') >= 0)
+		if (as.indexOf('.') >= 0) {
 			return as.substring(0, as.indexOf('.'));
-		else
+		} else {
 			return as;
+		}
+	}
+
+	/**
+	 * sand box the run of f and log any {@link Throwable}. Input arguments for
+	 * f can be put in the direct context of the call. f can not return anything
+	 * directly because there is no return value incase of an exception.
+	 * 
+	 * @param f          the {@link Runnable} to run in the sandbox
+	 * @param r          the reporter to log any exceptions to
+	 * @param errorlevel the level to use when logging
+	 * @param errormsg   the error message to use when logging an exception
+	 */
+	public static void run(Runnable f, Reporter r, Level errorlevel,
+			String errormsg) {
+		try {
+			f.run();
+		} catch (Throwable e) {
+			r.log(errorlevel, errormsg, e);
+		}
 	}
 
 }

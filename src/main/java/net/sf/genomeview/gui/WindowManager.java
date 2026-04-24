@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.net.URISyntaxException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutionException;
@@ -23,12 +24,15 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import jargs.gnu.CmdLineParser.IllegalOptionValueException;
+import jargs.gnu.CmdLineParser.UnknownOptionException;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.DistributingReporter;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.jannot.Cleaner;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * MainWindow is the container for a single GenomeView instance.
@@ -49,19 +53,30 @@ public class WindowManager extends WindowAdapter implements Observer {
 	private final LogWindow logwindow;
 
 	private Model model = null;
+	private final DistributingReporter log;
 
+	/**
+	 * 
+	 * @param args   the init args, usually from the commandline
+	 * @param splash splash screen to show info on, can be null
+	 * @param log    must be non null {@link Reporter}
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 */
 	public WindowManager(String args[], Splash splash, DistributingReporter log)
 			throws InterruptedException, ExecutionException {
+		this.log = log;
 		running++;
 		logwindow = new LogWindow(log);
-		init(args, splash, log);
+		init(args, splash);
 		log.log(Level.INFO, "Started running instance" + running);
 	}
 
 	public void dispose() {
 		window.dispose();
-		if (helper != null)
+		if (helper != null) {
 			helper.dispose();
+		}
 
 	}
 
@@ -93,8 +108,9 @@ public class WindowManager extends WindowAdapter implements Observer {
 		int result = JOptionPane.showConfirmDialog(
 				model.getGUIManager().getMainWindow(),
 				MessageManager.getString("windowmanager.exit"));
-		if (result == JOptionPane.YES_OPTION)
+		if (result == JOptionPane.YES_OPTION) {
 			this.model.exit();
+		}
 	}
 
 	private static int running = 0;
@@ -159,8 +175,9 @@ public class WindowManager extends WindowAdapter implements Observer {
 		// return rootThreadGroup;
 		ThreadGroup tg = Thread.currentThread().getThreadGroup();
 		ThreadGroup ptg;
-		while ((ptg = tg.getParent()) != null)
+		while ((ptg = tg.getParent()) != null) {
 			tg = ptg;
+		}
 		return tg;
 	}
 
@@ -178,26 +195,42 @@ public class WindowManager extends WindowAdapter implements Observer {
 		return java.util.Arrays.copyOf(threads, n);
 	}
 
-	public void init(String[] args, Splash splash, DistributingReporter log)
+	/**
+	 * 
+	 * @param args
+	 * @param splash a splash window. If not null, some messages are shown there
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 */
+	public void init(String[] args, Splash splash)
 			throws InterruptedException, ExecutionException {
 		// FIXME special handling if this is not the first time the application
 		// is initialized
 
-		if (splash != null)
-			splash.setText(
-					MessageManager.getString("windowmanager.parsing_params"));
-		CommandLineOptions.init(args, log);
+		info(MessageManager.getString("windowmanager.parsing_params"), splash);
 
-		if (splash != null)
-			splash.setText(
-					MessageManager.getString("windowmanager.creating_windows"));
+		CommandLineOptions options;
+		try {
+			options = new CommandLineOptions(args, log);
+		} catch (IllegalOptionValueException | UnknownOptionException e) {
+			throw new ExecutionException(
+					MessageManager.getString(
+							"commandlineoptions.parsing_command_line_error"),
+					e);
+		} catch (IOException | URISyntaxException e) {
+			throw new ExecutionException("Loading extra options failed", e);
+		}
+
+		info(MessageManager.getString("windowmanager.creating_windows"),
+				splash);
+
 		GraphicsEnvironment ge = GraphicsEnvironment
 				.getLocalGraphicsEnvironment();
 		GraphicsDevice[] gs = ge.getScreenDevices();
 		boolean freshwindow = false;
 
 		if (model == null) {
-			model = new Model(CommandLineOptions.id(), log);
+			model = new Model(options.id(), log);
 			model.addObserver(this);
 			KeyboardFocusManager.getCurrentKeyboardFocusManager()
 					.addKeyEventDispatcher(new Hotkeys(model));
@@ -253,26 +286,19 @@ public class WindowManager extends WindowAdapter implements Observer {
 				}
 			}
 			window.setVisible(true);
-			if (splash != null)
-				splash.setText(MessageManager
-						.getString("windowmanager.installing_plugins"));
+			info(MessageManager.getString("windowmanager.installing_plugins"),
+					splash);
 
 		}
-		if (splash != null)
-			splash.setText(
-					MessageManager.getString("windowmanager.loading_data"));
+		info(MessageManager.getString("windowmanager.loading_data"), splash);
 		/* Data specified on command line */
 		InitDataLoader idl = new InitDataLoader(model);
-		if (CommandLineOptions.goodParse()) {
-			String cmdUrl = CommandLineOptions.url();// (String)
-														// parser.getOptionValue(urlO);
-			String cmdFile = CommandLineOptions.file();// (String)
-														// parser.getOptionValue(fileO);
-			String session = CommandLineOptions.session();// (String)
-															// parser.getOptionValue(sessionO);
-			String[] remArgs = CommandLineOptions.remaining();// parser.getRemainingArgs();
-			String initialLocation = CommandLineOptions.position();// (String)
-																	// parser.getOptionValue(positionO);
+		if (options.goodParse()) {
+			String cmdUrl = options.url();
+			String cmdFile = options.file();
+			String session = options.session();
+			String[] remArgs = options.remaining();
+			String initialLocation = options.position();
 
 			idl.init(cmdUrl, cmdFile, remArgs, initialLocation, session);
 		} else {
@@ -283,6 +309,13 @@ public class WindowManager extends WindowAdapter implements Observer {
 		/* Start acting */
 		model.setSilent(false);
 
+	}
+
+	private void info(String message, Splash splash) {
+		log.log(Level.INFO, message);
+		if (splash != null) {
+			splash.setText(message);
+		}
 	}
 
 	/**

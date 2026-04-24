@@ -84,12 +84,12 @@ public class DataSourceHelper {
 					"datasourcehelper.data_missing_warn",
 					new Object[] { data.getName() });
 			model.getLog().log(Level.WARNING, msg);
-//			JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),...)
 			return;
 		}
 
-		if (!data.isWebservice())
+		if (!data.isWebservice()) {
 			index = IndexManager.getIndex(data, model.getLog());
+		}
 
 		/* Check for stale index */
 		if (index != null && index.lastModified() < data.lastModified()) {
@@ -176,8 +176,9 @@ public class DataSourceHelper {
 							MessageManager.getString(
 									"datasourcehelper.index_missing"),
 							JOptionPane.WARNING_MESSAGE);
-					if (!ok)
+					if (!ok) {
 						return;
+					}
 				}
 			}
 
@@ -193,8 +194,9 @@ public class DataSourceHelper {
 				Parser tmp = offerParserChoice(model, data);
 				if (tmp != null) {
 					asd.setParser(tmp);
-				} else
+				} else {
 					return;
+				}
 			}
 			asd.setIos(new ProgressMonitorInputStream(
 					model.getGUIManager().getMainWindow(),
@@ -213,13 +215,14 @@ public class DataSourceHelper {
 
 		final ReadWorker rw = new ReadWorker(ds, model);
 		rw.execute();
-		if (wait)
+		if (wait) {
 			try {
 				rw.get();
 			} catch (Exception e) {
 				model.getLog().log(Level.WARNING,
 						"datasource read worker problem", e);
 			}
+		}
 
 	}
 
@@ -268,8 +271,9 @@ public class DataSourceHelper {
 
 			@Override
 			public boolean accept(File f) {
-				if (f.isDirectory())
+				if (f.isDirectory()) {
 					return true;
+				}
 
 				if (f.getName().toLowerCase().endsWith("tdf")) {
 					return true;
@@ -330,8 +334,9 @@ public class DataSourceHelper {
 
 						@Override
 						public boolean accept(File f) {
-							if (f.isDirectory())
+							if (f.isDirectory()) {
 								return true;
+							}
 
 							if (f.getName().toLowerCase().endsWith("maf")
 									|| f.getName().toLowerCase()
@@ -417,8 +422,9 @@ public class DataSourceHelper {
 			@Override
 			public void run() {
 				try {
-					if (IndexManager.createIndex(prep, model.getLog()))
+					if (IndexManager.createIndex(prep, model.getLog())) {
 						load(model, prep);
+					}
 				} catch (Throwable e) {
 					// catch ALL errors, otherwise they end up in threadpool
 					// which will dump error to stderr
