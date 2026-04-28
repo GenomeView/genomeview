@@ -65,8 +65,6 @@ public class TrackList implements Iterable<Track> {
 	 */
 	private Map<DataKey, Track> mapping = new HashMap<DataKey, Track>();
 
-	// private List<DataKey> order = new ArrayList<DataKey>();
-
 	public TrackList(Model model) {
 		this.model = model;
 		init();
@@ -79,8 +77,9 @@ public class TrackList implements Iterable<Track> {
 	 * @return the track[index] or null if index=-1 (??).
 	 */
 	public Track get(int index) {
-		if (index == -1)
+		if (index == -1) {
 			return null;
+		}
 		return mapping.get(order.get(index));
 	}
 
@@ -93,7 +92,7 @@ public class TrackList implements Iterable<Track> {
 		add(ticks.getDataKey(), ticks);
 		StructureTrack strack = new StructureTrack(model);
 		add(strack.getDataKey(), strack);
-		if (!Configuration.instance().getBoolean("track:showStructure")) {
+		if (!model.getConfiguration().getBoolean("track:showStructure")) {
 			strack.config().setVisible(false);
 		}
 
@@ -126,11 +125,11 @@ public class TrackList implements Iterable<Track> {
 	 *         the preferences track:weight for all {@link DataKey}s
 	 */
 	private int findIndex(DataKey dk) {
-		int w = Configuration.instance().getWeight(dk);
+		int w = model.getConfiguration().getWeight(dk);
 
 		int count = 0;
 		while (count < order.size()
-				&& Configuration.instance().getWeight(order.get(count)) <= w) {
+				&& model.getConfiguration().getWeight(order.get(count)) <= w) {
 			count++;
 		}
 
@@ -148,8 +147,6 @@ public class TrackList implements Iterable<Track> {
 		init();
 	}
 
-	private static final long serialVersionUID = 6716276343672660196L;
-
 	/**
 	 * Change weight of row and the row after that. Nothing happens if row >=
 	 * last row
@@ -158,11 +155,12 @@ public class TrackList implements Iterable<Track> {
 	 */
 	public void down(int row) {
 		if (row < order.size() - 1) {
+			final Configuration conf = model.getConfiguration();
 			DataKey tmp = order.get(row);
 
-			int tmpWeight = Configuration.instance().getWeight(order.get(row));
-			Configuration.instance().setWeight(order.get(row), tmpWeight + 1);
-			Configuration.instance().setWeight(order.get(row + 1), tmpWeight);
+			int tmpWeight = conf.getWeight(order.get(row));
+			conf.setWeight(order.get(row), tmpWeight + 1);
+			conf.setWeight(order.get(row + 1), tmpWeight);
 
 			order.set(row, order.get(row + 1));
 			order.set(row + 1, tmp);
@@ -175,13 +173,13 @@ public class TrackList implements Iterable<Track> {
 
 	public synchronized void up(int row) {
 		if (row > 0) {
+			final Configuration conf = model.getConfiguration();
 			DataKey tmp = order.get(row);
 
 			// int tmpWeight = Configuration.getWeight(order.get(row));
-			Configuration.instance().setWeight(order.get(row),
-					Configuration.instance().getWeight(order.get(row - 1)));
-			Configuration.instance().setWeight(order.get(row - 1),
-					Configuration.instance().getWeight(order.get(row - 1)) + 1);
+			conf.setWeight(order.get(row), conf.getWeight(order.get(row - 1)));
+			conf.setWeight(order.get(row - 1),
+					conf.getWeight(order.get(row - 1)) + 1);
 
 			order.set(row, order.get(row - 1));
 			order.set(row - 1, tmp);
@@ -256,37 +254,45 @@ public class TrackList implements Iterable<Track> {
 
 			if (data instanceof MemoryFeatureAnnotation) {
 				if (!this.containsTrack(key)
-						&& ((MemoryFeatureAnnotation) data).cachedCount() > 0)
+						&& ((MemoryFeatureAnnotation) data).cachedCount() > 0) {
 					this.add(key, new FeatureTrack(model, (Type) key));
+				}
 
 			} else if (data instanceof VCFWrapper) {
-				if (!this.containsTrack(key))
+				if (!this.containsTrack(key)) {
 					this.add(key, new VariationTrack(model, (Type) key));
+				}
 			} else if (data instanceof GFFWrapper
 					|| data instanceof BEDWrapper) {
-				if (!this.containsTrack(key))
+				if (!this.containsTrack(key)) {
 					this.add(key, new FeatureTrack(model, (Type) key));
+				}
 			} else if (data instanceof PileupWrapper
 					|| data instanceof SWigWrapper) {
-				if (!this.containsTrack(key))
+				if (!this.containsTrack(key)) {
 					this.add(key, new PileupTrack(key,
 							new WiggleProvider(e, (Data<Pile>) data, model),
 							model));
+				}
 			} else if (data instanceof TDFData) {
-				if (!this.containsTrack(key))
+				if (!this.containsTrack(key)) {
 					this.add(key, new PileupTrack(key,
 							new TDFProvider(e, (TDFData) data, model), model));
+				}
 			} else if (data instanceof BigWigData) {
-				if (!this.containsTrack(key))
+				if (!this.containsTrack(key)) {
 					this.add(key, new PileupTrack(key,
 							new BigWigProvider(e, (BigWigData) data, model),
 							model));
+				}
 			} else if (data instanceof Graph) {
-				if (!this.containsTrack(key))
+				if (!this.containsTrack(key)) {
 					this.add(key, new WiggleTrack(key, model, true));
+				}
 			} else if (data instanceof AlignmentAnnotation) {
-				if (!this.containsTrack(key))
+				if (!this.containsTrack(key)) {
 					this.add(key, new MultipleAlignmentTrack(model, key));
+				}
 			} else if (data instanceof ReadGroup) {
 				if (!this.containsTrack(key)) {
 					this.add(key, new ShortReadTrack(key,
@@ -303,18 +309,18 @@ public class TrackList implements Iterable<Track> {
 				if (!this.containsTrack(key)) {
 					this.add(key, new SyntenicTrack(model, key));
 				}
-			} else
+			} else {
 				model.getLog().log(Level.WARNING,
 						"unhandled data type Data type " + data.getClass());
+			}
 		}
 		/* Fix weight to make sure they are different */
+		final Configuration conf = model.getConfiguration();
 		for (int i = 1; i < order.size(); i++) {
-			if (Configuration.instance()
-					.getWeight(order.get(i - 1)) >= Configuration.instance()
-							.getWeight(order.get(i))) {
-				Configuration.instance().setWeight(order.get(i),
-						Configuration.instance().getWeight(order.get(i - 1))
-								+ 1);
+			if (conf.getWeight(order.get(i - 1)) >= conf
+					.getWeight(order.get(i))) {
+				conf.setWeight(order.get(i),
+						conf.getWeight(order.get(i - 1)) + 1);
 
 			}
 		}

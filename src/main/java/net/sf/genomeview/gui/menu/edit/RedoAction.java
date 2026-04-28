@@ -12,29 +12,29 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
-
 /**
  * Action to zoom in on the chromosome view.
  * 
  * @author thpar
  *
  */
-public class RedoAction extends AbstractModelAction{
+@SuppressWarnings("serial")
+public class RedoAction extends AbstractModelAction {
 
+	public RedoAction(Model model) {
+		super(MessageManager.getString("editmenu.redo"),
+				new ImageIcon(model.getClass().getResource("/images/redo.png")),
+				model);
+	}
 
-    private static final long serialVersionUID = -1318894389028565654L;
+	@Override
+	public void actionPerformedSafe(ActionEvent arg0) {
+		model.redo();
+	}
 
-    public RedoAction(Model model) {
-        super(MessageManager.getString("editmenu.redo"), new ImageIcon(model.getClass().getResource("/images/redo.png")), model);
-    }
-
-    public void actionPerformed(ActionEvent arg0) {
-        model.redo();
-    }
-    
-    @Override
-    public void update(Observable o, Object arg) {
-        setEnabled(model.hasRedo());
-        super.putValue(SHORT_DESCRIPTION, model.getRedoDescription());
-    }
+	@Override
+	public void updateSafe(Observable o, Object arg) {
+		setEnabled(model.hasRedo());
+		super.putValue(SHORT_DESCRIPTION, model.getRedoDescription());
+	}
 }

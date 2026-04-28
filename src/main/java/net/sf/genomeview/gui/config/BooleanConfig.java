@@ -42,14 +42,14 @@ public class BooleanConfig extends JCheckBox {
 	public BooleanConfig(final String key, final String title,
 			final Model model) {
 		super(title);
-		this.setSelected(Configuration.instance().getBoolean(key));
+		this.setSelected(model.getConfiguration().getBoolean(key));
 
 		this.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				model.getLog().log(Level.INFO,
 						"Setting: " + key + "\t" + isSelected());
-				Configuration.instance().set(key, isSelected());
+				model.getConfiguration().set(key, isSelected());
 				model.refresh();
 				for (ConfigListener cl : listenerList) {
 					cl.configurationChanged();

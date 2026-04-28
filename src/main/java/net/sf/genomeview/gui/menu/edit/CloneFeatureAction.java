@@ -11,9 +11,8 @@ import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
 
+@SuppressWarnings("serial")
 public class CloneFeatureAction extends AbstractModelAction {
-
-	private static final long serialVersionUID = 4521376746707912717L;
 
 	public CloneFeatureAction(Model model) {
 		super(MessageManager.getString("editmenu.clone_selected_feature"),
@@ -21,7 +20,8 @@ public class CloneFeatureAction extends AbstractModelAction {
 
 	}
 
-	public void actionPerformed(ActionEvent e) {
+	@Override
+	public void actionPerformedSafe(ActionEvent e) {
 		assert (model.selectionModel().getFeatureSelection() != null);
 		assert (model.selectionModel().getFeatureSelection().size() == 1);
 		Feature rf = model.selectionModel().getFeatureSelection().iterator()
@@ -43,7 +43,7 @@ public class CloneFeatureAction extends AbstractModelAction {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
+	public void updateSafe(Observable o, Object arg) {
 		setEnabled(model.selectionModel().getFeatureSelection() != null
 				&& model.selectionModel().getFeatureSelection().size() == 1);
 

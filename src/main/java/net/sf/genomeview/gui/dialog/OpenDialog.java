@@ -22,7 +22,6 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 
 import be.abeel.gui.GridBagPanel;
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
@@ -86,15 +85,16 @@ public class OpenDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
 				JFileChooser chooser = new JFileChooser(
-						Configuration.instance().getFile("lastDirectory"));
+						model.getConfiguration().getFile("lastDirectory"));
 				chooser.resetChoosableFileFilters();
 				for (final String ext : exts) {
 					chooser.addChoosableFileFilter(new FileFilter() {
 
 						@Override
 						public boolean accept(File f) {
-							if (f.isDirectory())
+							if (f.isDirectory()) {
 								return true;
+							}
 
 							if (f.getName().toLowerCase().endsWith(ext)
 									|| f.getName().toLowerCase()
@@ -118,8 +118,9 @@ public class OpenDialog extends JDialog {
 
 					@Override
 					public boolean accept(File f) {
-						if (f.isDirectory())
+						if (f.isDirectory()) {
 							return true;
+						}
 						for (String ext : exts) {
 
 							if (f.getName().toLowerCase().endsWith(ext)
@@ -152,7 +153,7 @@ public class OpenDialog extends JDialog {
 									files[i].toString(), model.getLog()));
 
 						}
-						Configuration.instance().set("lastDirectory",
+						model.getConfiguration().set("lastDirectory",
 								files[0].getParentFile());
 //						load(out);
 					} catch (IOException | URISyntaxException

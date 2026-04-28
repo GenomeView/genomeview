@@ -25,7 +25,6 @@ import java.util.Observable;
 import javax.swing.JLabel;
 
 import be.abeel.gui.GridBagPanel;
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.config.BooleanConfig;
@@ -67,7 +66,7 @@ public class TrackConfig extends Observable {
 				MessageManager.getString("trackconfig.track_alias"), model),
 				guicontainer.gc);
 		guicontainer.gc.gridy++;
-		Configuration.instance().getVisible(dataKey);
+		model.getConfiguration().getVisible(dataKey);
 		guicontainer.add(new BooleanConfig("track:visible:" + dataKey,
 				MessageManager.getString("trackconfig.track_visible"), model),
 				guicontainer.gc);
@@ -89,15 +88,16 @@ public class TrackConfig extends Observable {
 	}
 
 	final public String shortDisplayName() {
-		String alias = Configuration.instance().get("track:alias:" + dataKey);
-		if (alias != null && alias.length() > 0)
+		String alias = model.getConfiguration().get("track:alias:" + dataKey);
+		if (alias != null && alias.length() > 0) {
 			return alias;
-		else {
+		} else {
 			String dn = "" + dataKey;
 			int sepIdx = Math.max(dn.lastIndexOf('/'), dn.lastIndexOf('\\'))
 					+ 1;
-			if (sepIdx < 0)
+			if (sepIdx < 0) {
 				sepIdx = 0;
+			}
 			dn = dn.substring(sepIdx);
 			dn = dn.replaceAll("(\\.[a-zA-Z0-9]{3})+$", "");
 			return dn;
@@ -106,11 +106,12 @@ public class TrackConfig extends Observable {
 	}
 
 	final public String displayName() {
-		String alias = Configuration.instance().get("track:alias:" + dataKey);
-		if (alias != null && alias.length() > 0)
+		String alias = model.getConfiguration().get("track:alias:" + dataKey);
+		if (alias != null && alias.length() > 0) {
 			return alias;
-		else
+		} else {
 			return "" + dataKey;
+		}
 
 	}
 
@@ -126,17 +127,17 @@ public class TrackConfig extends Observable {
 	}
 
 	public boolean isVisible() {
-		return Configuration.instance().getVisible(dataKey);
+		return model.getConfiguration().getVisible(dataKey);
 	}
 
 	public void setVisible(boolean visible) {
-		Configuration.instance().setVisible(dataKey, visible);
+		model.getConfiguration().setVisible(dataKey, visible);
 		setChanged();
 		notifyObservers("TrackConfig::setVisible");
 	}
 
 	public void setCollapsed(boolean collapsed) {
-		Configuration.instance().set("track:collapsed:" + dataKey, collapsed);
+		model.getConfiguration().set("track:collapsed:" + dataKey, collapsed);
 		setChanged();
 		notifyObservers("TrackConfig::setCollapsed");
 	}
@@ -146,7 +147,7 @@ public class TrackConfig extends Observable {
 	}
 
 	public boolean isCollapsed() {
-		return Configuration.instance()
+		return model.getConfiguration()
 				.getBoolean("track:collapsed:" + dataKey);
 	}
 
@@ -162,4 +163,7 @@ public class TrackConfig extends Observable {
 
 	}
 
+	public Model getModel() {
+		return model;
+	}
 }

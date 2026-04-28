@@ -13,32 +13,32 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
-
 /**
  * Action to zoom in on the chromosome view.
  * 
  * @author thpar
  *
  */
-public class UndoAction extends AbstractModelAction{
+@SuppressWarnings("serial")
+public class UndoAction extends AbstractModelAction {
 
+	public UndoAction(Model model2) {
+		super(MessageManager.getString("editmenu.undo"),
+				new ImageIcon(
+						model2.getClass().getResource("/images/undo.png")),
+				model2);
+		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control Z"));
+	}
 
-    private static final long serialVersionUID = -1318894389028565654L;
+	@Override
+	public void actionPerformedSafe(ActionEvent arg0) {
+		model.undo();
+	}
 
+	@Override
+	public void updateSafe(Observable o, Object arg) {
+		setEnabled(model.hasUndo());
+		super.putValue(SHORT_DESCRIPTION, model.getUndoDescription());
+	}
 
-    public UndoAction(Model model2) {
-        super(MessageManager.getString("editmenu.undo"), new ImageIcon(model2.getClass().getResource("/images/undo.png")), model2);
-        super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control Z"));
-    }
-
-    public void actionPerformed(ActionEvent arg0) {
-    	model.undo();
-    }
-    
-    @Override
-    public void update(Observable o, Object arg) {
-        setEnabled(model.hasUndo());
-        super.putValue(SHORT_DESCRIPTION, model.getUndoDescription());
-    }
-    
 }

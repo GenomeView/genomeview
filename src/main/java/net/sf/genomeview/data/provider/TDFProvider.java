@@ -4,10 +4,10 @@
 package net.sf.genomeview.data.provider;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import org.broad.igv.track.WindowFunction;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Task;
@@ -24,21 +24,6 @@ import net.sf.jannot.tdf.TDFData;
 public class TDFProvider extends PileProvider {
 
 	private TDFData source;
-
-	public TDFProvider(Entry e, TDFData source, Model model) {
-//		super(model);
-		this.source = source;
-		/* Select default window function */
-		WindowFunction wf = WindowFunction.getWindowFunction(
-				Configuration.instance().get("pileup:defaultWindowFunction"));
-		System.out.println("requesting: "
-				+ Configuration.instance().get("pileup:defaultWindowFunction")
-				+ "\t" + wf);
-		if (source.availableWindowFunctions().contains(wf))
-			source.requestWindowFunction(wf);
-
-	}
-
 	private ArrayList<Pile> buffer = new ArrayList<Pile>();
 	private ArrayList<Status> status = new ArrayList<Status>();
 	private int lastStart = -1;
@@ -46,14 +31,29 @@ public class TDFProvider extends PileProvider {
 	// privFate float maxSummary;
 	private float maxPile;
 
+	public TDFProvider(Entry e, TDFData source, Model model) {
+//		super(model);
+		this.source = source;
+		/* Select default window function */
+		WindowFunction wf = WindowFunction.getWindowFunction(
+				model.getConfiguration().get("pileup:defaultWindowFunction"));
+		model.getLog().log(Level.INFO, "requesting: "
+				+ model.getConfiguration().get("pileup:defaultWindowFunction")
+				+ "\t" + wf);
+		if (source.availableWindowFunctions().contains(wf)) {
+			source.requestWindowFunction(wf);
+		}
+
+	}
+
 	@Override
 	public void get(final int start, final int end,
 			final DataCallback<Pile> cb) {
 		/* Check whether request can be fulfilled by buffer */
 		if (start >= lastStart && end <= lastEnd
-				&& (lastEnd - lastStart) <= 2 * (end - start))
-//			return new NoFailIterable<Pile>(buffer);
+				&& (lastEnd - lastStart) <= 2 * (end - start)) {
 			cb.dataReady(new Location(start, end), buffer);
+		}
 
 		/* New request */
 
@@ -73,21 +73,22 @@ public class TDFProvider extends PileProvider {
 				// When actually running, check again whether we actually need
 				// this data
 				if (!(start >= lastStart && end <= lastEnd
-						&& (lastEnd - lastStart) <= 2 * (end - start)))
+						&& (lastEnd - lastStart) <= 2 * (end - start))) {
 					return;
+				}
 				thisJob.setRunning();
 				Iterable<Pile> fresh = source.get(start, end + 1);
 
 				for (Pile p : fresh) {
 					float val = p.getTotal();
 
-					if (val > maxPile)
+					if (val > maxPile) {
 						maxPile = val;
+					}
 
 					buffer.add(p);
 				}
 				thisJob.setFinished();
-//				notifyListeners();
 				cb.dataReady(new Location(start, end), buffer);
 			}
 
@@ -95,8 +96,6 @@ public class TDFProvider extends PileProvider {
 		GenomeViewScheduler.submit(t);
 
 		// System.out.println("\tServing new request from provider");
-
-//		return new NoFailIterable<Pile>(buffer);
 
 	}
 
@@ -108,11 +107,6 @@ public class TDFProvider extends PileProvider {
 	public Iterable<Status> getStatus(int start, int end) {
 		return status;
 	}
-
-//	@Override
-//	public Data<Pile> getSourceData() {
-//		return source;
-//	}
 
 	@Override
 	public WindowFunction[] getWindowFunctions() {
@@ -129,8 +123,6 @@ public class TDFProvider extends PileProvider {
 			lastEnd = -1;
 			maxPile = 0;
 			buffer.clear();
-//			setChanged();
-//			notifyObservers();
 		}
 
 	}
@@ -139,10 +131,5 @@ public class TDFProvider extends PileProvider {
 	public boolean isCurrentWindowFunction(WindowFunction wf) {
 		return source.isCurrentWindowFunction(wf);
 	}
-
-//	@Override
-//	public String label() {
-//		return source.label();
-//	}
 
 }

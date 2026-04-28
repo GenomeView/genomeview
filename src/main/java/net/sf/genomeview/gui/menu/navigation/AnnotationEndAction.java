@@ -4,6 +4,7 @@
 package net.sf.genomeview.gui.menu.navigation;
 
 import java.awt.event.ActionEvent;
+import java.util.Observable;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
@@ -25,12 +26,17 @@ public class AnnotationEndAction extends AbstractModelAction {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	public void actionPerformedSafe(ActionEvent arg0) {
 		Location r = model.vlm.getAnnotationLocationVisible();
 		model.vlm.setAnnotationLocationVisible(new Location(
 				model.vlm.getVisibleEntry().getMaximumLength() - r.length(),
 				model.vlm.getVisibleEntry().getMaximumLength()));
 
+	}
+
+	@Override
+	public void updateSafe(Observable o, Object obj) {
+		// do nothing
 	}
 
 }

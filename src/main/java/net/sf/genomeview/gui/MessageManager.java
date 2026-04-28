@@ -18,9 +18,6 @@ public class MessageManager {
 
 	private static ResourceBundle rb;
 
-//	private static Logger log = LoggerFactory
-//			.getLogger(MessageManager.class.getCanonicalName());
-
 	private static Locale loc = Configuration.instance().get("lang:current")
 			.equals("automatic") ? Locale.getDefault()
 					: new Locale(Configuration.instance().get("lang:current"));

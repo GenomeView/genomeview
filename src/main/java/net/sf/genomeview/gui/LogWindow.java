@@ -23,7 +23,7 @@ import javax.swing.table.TableModel;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import net.sf.genomeview.core.DistributingReporter;
+import net.sf.jannot.DistributingReporter;
 import tudelft.utilities.logging.Reporter;
 
 @SuppressWarnings({ "serial" })
@@ -55,10 +55,11 @@ public class LogWindow extends JFrame implements Reporter {
 				Level level = (Level) value;
 				JLabel label = new JLabel(level.toString());
 				label.setOpaque(true);
-				if (level == Level.WARNING)
+				if (level == Level.WARNING) {
 					label.setBackground(Color.yellow);
-				else if (level == Level.SEVERE)
+				} else if (level == Level.SEVERE) {
 					label.setBackground(Color.red);
+				}
 				return label;
 			}
 		});
@@ -93,8 +94,9 @@ public class LogWindow extends JFrame implements Reporter {
 		record.setThrown(thrown);
 		logs.add(record);
 		if (level.intValue() >= Level.WARNING.intValue()
-				|| msg.equals(MAKE_LOG_VISIBLE_REQUEST))
+				|| msg.equals(MAKE_LOG_VISIBLE_REQUEST)) {
 			showOnTop();
+		}
 	}
 
 	/**

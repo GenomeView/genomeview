@@ -15,9 +15,9 @@ import javax.swing.SwingUtilities;
 
 import be.abeel.concurrency.DaemonThread;
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.DistributingReporter;
+import net.sf.jannot.Global;
 import net.sf.jannot.exception.ReadFailedException;
-import net.sf.nameservice.NameService;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -40,22 +40,13 @@ public class GenomeView {
 
 	}
 
-	public static void main(final String[] args) throws IOException {
-		// FIXME maybe logger can be moved into Model?
-		// why are we not initializing model first?
-		final DistributingReporter log = new DistributingReporter();
+	public static void main(final String[] args)
+			throws IOException, ReadFailedException {
+		Global global = new Global();
+		Reporter log = global.getLog();
+		Configuration configuration = new Configuration(global);
 
-		try {
-			NameService.init(log);
-		} catch (ReadFailedException e) {
-			// FIXME should this be fatal?
-			log.log(Level.WARNING, "Failed to initialize NameService.", e);
-		}
-
-		// FIXME do something about the original config?
-		// LogConfigurator.config();
-		log.log(Level.INFO,
-				"Starting GenomeView " + Configuration.instance().version());
+		log.log(Level.INFO, "Starting GenomeView " + configuration.version());
 		log.log(Level.INFO, "Using language: " + MessageManager.getLocale());
 		try {
 			SwingUtilities.invokeAndWait(() -> splash = new Splash());
@@ -77,8 +68,8 @@ public class GenomeView {
 					 */
 
 					log.log(Level.INFO, "Configuration summary:");
-					log.log(Level.INFO, "GenomeView version: "
-							+ Configuration.instance().version());
+					log.log(Level.INFO,
+							"GenomeView version: " + configuration.version());
 					log.log(Level.INFO, "Current date and time: " + new Date());
 					log.log(Level.INFO, "Command line instructions: "
 							+ Arrays.toString(args));
@@ -104,11 +95,11 @@ public class GenomeView {
 					);
 
 					/* Single instance manager */
-					boolean singleInstance = Configuration.instance()
+					boolean singleInstance = configuration
 							.getBoolean("general:singleInstance");
 					if (singleInstance) {
 						if (!ApplicationInstanceManager.registerInstance(args,
-								log)) {
+								global)) {
 							// instance already running.
 							log.log(Level.WARNING,
 									"Another instance of this application is already running.  Exiting.");
@@ -121,7 +112,7 @@ public class GenomeView {
 
 					Authenticator.setDefault(new MyAuthenticator());
 
-					mw = new WindowManager(args, splash, log);
+					mw = new WindowManager(args, splash, global, configuration);
 					ApplicationInstanceManager.setCallback(mw);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "main initialization failed", e);

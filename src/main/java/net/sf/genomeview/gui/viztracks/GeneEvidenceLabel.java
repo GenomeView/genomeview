@@ -21,7 +21,6 @@ import java.util.TreeMap;
 import javax.swing.JLabel;
 import javax.swing.JViewport;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.Mouse;
@@ -94,7 +93,7 @@ public class GeneEvidenceLabel extends JLabel
 					double fractionL = (center - start) / length;
 					double fractionR = (end - center) / length;
 					// System.out.println(fractionL+"\t"+fractionR);
-					if (rot < 0 && length < Configuration.instance()
+					if (rot < 0 && length < model.getConfiguration()
 							.getInt("minimumNucleotides")) {
 						return;
 					}
@@ -149,6 +148,7 @@ public class GeneEvidenceLabel extends JLabel
 
 		if (view == null) {
 			view = new JViewport() {
+				@Override
 				public Rectangle getViewRect() {
 					return new Rectangle(0, 0, (int) screenWidth,
 							Integer.MAX_VALUE);
@@ -167,8 +167,9 @@ public class GeneEvidenceLabel extends JLabel
 				// FIXME we shouldn't give each paint method the yOffset. We
 				// should use the Graphics translate function to make sure we
 				// are positioned correctly.
-				if (height > 0)
+				if (height > 0) {
 					tracks.put(framePixelsUsed, height, track);
+				}
 				framePixelsUsed += height;
 			}
 		}
@@ -208,8 +209,9 @@ public class GeneEvidenceLabel extends JLabel
 				highlight(l, g);
 			}
 		}
-		if (model.getSelectedRegion() != null)
+		if (model.getSelectedRegion() != null) {
 			highlight(model.getSelectedRegion(), g);
+		}
 
 		g.setColor(new Color(120, 120, 120, 120));
 		// draw guide line.
@@ -235,9 +237,10 @@ public class GeneEvidenceLabel extends JLabel
 		/* Transfer MouseEvent to corresponding track */
 
 		Track mouseTrack = tracks.get(e);
-		if (mouseTrack != null)
+		if (mouseTrack != null) {
 			mouseTrack.mouseEntered(e.getX(), e.getY(), e);
-		/* Specific mouse code for this label */
+			/* Specific mouse code for this label */
+		}
 
 	}
 
@@ -257,8 +260,9 @@ public class GeneEvidenceLabel extends JLabel
 			int y = e.getY();
 			int max = 0;
 			for (Integer i : tracks.keySet()) {
-				if (i < y && i > max)
+				if (i < y && i > max) {
 					max = i;
+				}
 			}
 			return max;
 		}
@@ -278,26 +282,29 @@ public class GeneEvidenceLabel extends JLabel
 		}
 
 		int getYOffset(Track t) {
-			if (reverseTrack.containsKey(t))
+			if (reverseTrack.containsKey(t)) {
 				return reverseTrack.get(t).intValue();
-			else
+			} else {
 				return 0;
+			}
 
 		}
 
 		public Track get(MouseEvent e) {
-			if (e.getY() > framePixelsUsed)
+			if (e.getY() > framePixelsUsed) {
 				return null;
+			}
 			int mouseOffset = getMouseOffset(e);
 			e.translatePoint(0, -mouseOffset);
 			return tracks.get(mouseOffset);
 		}
 
 		public int getHeight(Track t) {
-			if (heightMap.containsKey(t))
+			if (heightMap.containsKey(t)) {
 				return heightMap.get(t);
-			else
+			} else {
 				return 0;
+			}
 		}
 	}
 
@@ -314,9 +321,10 @@ public class GeneEvidenceLabel extends JLabel
 	public void mouseExited(MouseEvent e) {
 		model.mouseModel().setCurrentCoord(-1);
 		/* Transfer MouseEvent to corresponding track */
-		if (last != null)
+		if (last != null) {
 			last.mouseExited(e.getX(), e.getY(), e);
-		/* Specific mouse code for this label */
+			/* Specific mouse code for this label */
+		}
 
 	}
 
@@ -326,10 +334,12 @@ public class GeneEvidenceLabel extends JLabel
 
 		Track mouseTrack = tracks.get(e);
 		boolean consumed = false;
-		if (mouseTrack != null)
+		if (mouseTrack != null) {
 			consumed = mouseTrack.mousePressed(e.getX(), e.getY(), e);
-		if (consumed)
+		}
+		if (consumed) {
 			return;
+		}
 		/* Specific mouse code for this label */
 		pressLoc = model.vlm.getAnnotationLocationVisible();
 		pressX = e.getX();
@@ -342,10 +352,12 @@ public class GeneEvidenceLabel extends JLabel
 
 		Track mouseTrack = tracks.get(e);
 		boolean consumed = false;
-		if (mouseTrack != null)
+		if (mouseTrack != null) {
 			consumed = mouseTrack.mouseReleased(e.getX(), e.getY(), e);
-		if (consumed)
+		}
+		if (consumed) {
 			return;
+		}
 		/* Specific mouse code for this label */
 		pressLoc = null;
 
@@ -361,8 +373,9 @@ public class GeneEvidenceLabel extends JLabel
 		/* Transfer MouseEvent to corresponding track */
 		Track mouseTrack = tracks.get(e);
 		boolean consumed = false;
-		if (mouseTrack != null)
+		if (mouseTrack != null) {
 			consumed = mouseTrack.mouseDragged(e.getX(), e.getY(), e);
+		}
 		if (consumed) {
 			// even when consumed, update the mouse position before returning
 			model.mouseModel().setCurrentCoord(currentGenomeX);
@@ -436,8 +449,9 @@ public class GeneEvidenceLabel extends JLabel
 		Track mouseTrack = tracks.get(e);
 
 		if (last != mouseTrack) {
-			if (last != null)
+			if (last != null) {
 				last.mouseExited(e.getX(), e.getY(), e);
+			}
 			last = mouseTrack;
 		}
 
@@ -449,18 +463,20 @@ public class GeneEvidenceLabel extends JLabel
 			}
 			// this is called way too often. #80. Disabled for now....
 			// consumed = mouseTrack.mouseMoved(e.getX(), e.getY(), e);
-			if (!(mouseTrack instanceof StructureTrack))
+			if (!(mouseTrack instanceof StructureTrack)) {
 				model.getGUIManager().getMainWindow().setCursor(
 						Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			}
 		}
 
-		if (consumed)
+		if (consumed) {
 			return;
-		// DANGER if user is just moving mouse pointer, this results
-		// in excess repaint events. This must be done differently.
-		// Not just repaint the entire area?
-		/* Specific mouse code for this label */
-		// repaint();
+			// DANGER if user is just moving mouse pointer, this results
+			// in excess repaint events. This must be done differently.
+			// Not just repaint the entire area?
+			/* Specific mouse code for this label */
+			// repaint();
+		}
 	}
 
 	@Override
@@ -469,8 +485,9 @@ public class GeneEvidenceLabel extends JLabel
 		boolean consumed = false;
 		/* Transfer MouseEvent to corresponding track */
 		Track mouseTrack = tracks.get(e);
-		if (mouseTrack != null)
+		if (mouseTrack != null) {
 			consumed = mouseTrack.mouseClicked(e.getX(), e.getY(), e);
+		}
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
 			new PopUpMenu(model, mouseTrack).show(this, e.getX(), y);

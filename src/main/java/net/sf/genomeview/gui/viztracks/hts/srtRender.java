@@ -24,13 +24,11 @@ import java.util.logging.Level;
 import htsjdk.samtools.CigarElement;
 import htsjdk.samtools.CigarOperator;
 import htsjdk.samtools.SAMRecord;
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.LocationTools;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.DataCallback;
 import net.sf.genomeview.data.provider.ShortReadProvider;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.gui.viztracks.hts.ShortReadTrackConfig.ReadColor;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
@@ -44,28 +42,22 @@ import net.sf.jannot.shortread.ShortReadTools;
  */
 public class srtRender implements Observer, DataCallback<SAMRecord> {
 
-	class RenderingMetaData {
-		/* Keeps track of the short-read insertions */
-		Map<Rectangle, ShortReadInsertion> paintedBlocks = new HashMap<Rectangle, ShortReadInsertion>();
-
-		/*
-		 * Mapping of all painted reads, at least in detailed mode
-		 */
-		HashMap<Rectangle, SAMRecord> hitMap = new HashMap<Rectangle, SAMRecord>();
-		/*
-		 * Buffer that will contain the visible reference sequence as soon as it
-		 * has been used to paint mismatches
-		 */
-		char[] seqBuffer = null;
-	}
-
 	private RenderingMetaData meta = new RenderingMetaData();
-	private org.broad.LRUCache<SAMRecord, Integer> rowCache = new org.broad.LRUCache<SAMRecord, Integer>(
-			50000);
+//	private org.broad.LRUCache<SAMRecord, Integer> rowCache = new org.broad.LRUCache<SAMRecord, Integer>(
+//			50000);
 
 	private Model model;
 	private ShortReadProvider provider;
 	private DataKey dataKey;
+
+	private ShortReadTrackConfig srtc;
+	private BufferedImage buffer;
+	private Location bufferLocation;
+	/* Contains a copy of the actual render */
+	private BufferedImage backupBuffer = new BufferedImage(10, 20,
+			BufferedImage.TYPE_INT_ARGB);
+	/* Keep track of the last x-coordinate that has been used for painting */
+	private int lastX = 100;
 
 	public srtRender(Model model, ShortReadProvider provider,
 			ShortReadTrackConfig srtc, DataKey key) {
@@ -94,8 +86,6 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		for (CigarElement ce : list) {
 			switch (ce.getOperator()) {
 			case I:
-				// pos+=ce.getLength();
-				// System.out.println("I: "+pos);
 				break;
 			case N:
 				out[0][idx] = pos;
@@ -104,16 +94,12 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 				idx++;
 				break;
 			case D:
-				// System.out.println("D: "+pos);
 				pos += ce.getLength();
 				break;
 			case M:
 				pos += ce.getLength();
 				break;
 			case S:
-				// //out[pos] = readBases[superPos];
-				// //pos++;
-				// superPos++;
 				break;
 			case H:
 				// i++;
@@ -124,56 +110,38 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		return out;
 	}
 
-	// private Location currentVisible;
-	private ShortReadTrackConfig srtc;
-	private BufferedImage buffer;
-	private Location bufferLocation;
-
-	// private Location bufferedLocation;
-
-	// class srtDataCallback implements DataCallback<SAMRecord>{
-
 	@Override
 	public void dataReady(Location currentVisible, List<SAMRecord> reads) {
 		RenderingMetaData newMeta = new RenderingMetaData();
-		int maxReads = Configuration.instance().getInt("shortread:maxReads");
+		int maxReads = model.getConfiguration().getInt("shortread:maxReads");
 
-		int maxStack = Configuration.instance().getInt("shortread:maxStack");
+		int maxStack = model.getConfiguration().getInt("shortread:maxStack");
 
 		int readLineHeight = 3;
 
-		// Location currentVisible=;
-		if (currentVisible.length() < Configuration.instance()
+		if (currentVisible.length() < model.getConfiguration()
 				.getInt("geneStructureNucleotideWindow")) {
 			/*
 			 * Make some room for the SNP track. Although it's painted last, it
 			 * needs to be drawn above the reads
 			 */
 			readLineHeight = 14;
-			// yOffset += snpTrackHeight;
-			// nc.init(currentVisible.length());
 		}
 
-		// pairingColor = Configuration.getColor();
-
 		int yOffset = 0;
-		// int originalYOffset = yOffset;
-		// paintedBlocks.clear();
-		// hitMap.clear();
 		char[] newSeqBuffer = null;
-		// seqBuffer = null;
 
 		Entry entry = model.vlm.getVisibleEntry();
 
 		/*
 		 * Draw individual reads when possible
 		 */
-		// Iterable<SAMRecord> reads = null;
 
 		int readLength = provider.readLength();
 		int pairLength = readLength;
-		if (entry.get(dataKey) instanceof BAMreads)
+		if (entry.get(dataKey) instanceof BAMreads) {
 			pairLength = ((BAMreads) entry.get(dataKey)).getPairLength();
+		}
 
 		/* Paint reads */
 		// if (reads != null) {
@@ -184,7 +152,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) bi.getGraphics();
 		boolean stackExceeded = false;
-		boolean enablePairing = Configuration.instance()
+		boolean enablePairing = model.getConfiguration()
 				.getBoolean("shortread:enablepairing");
 		lines = 0;
 
@@ -225,8 +193,9 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 					int adv = metrics.stringWidth(msg);
 
 					int h = 25;
-					if ((lines + 1) * readLineHeight + 5 > h)
+					if ((lines + 1) * readLineHeight + 5 > h) {
 						h = (lines + 1) * readLineHeight + 5;
+					}
 
 					g.setColor(new Color(255, 0, 0, 100));
 					g.fillRect(lastX, yOffset, (int) screenWidth, h);
@@ -243,24 +212,18 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 					break;
 				}
 
-				// int x2 = Convert.translateGenomeToScreen(one.end() +
-				// 1,
-				// currentVisible, screenWidth);
-				// if (x2 > 0) {
 				/* Find empty line */
 				int pos = one.getAlignmentStart() - currentVisible.start;
 
 				int line = tilingCounter.getFreeLine(pos);
 
 				/* Paint read or read pair */
-				// boolean differentReference=true;
 				if (line < maxStack) {
 					int clearStart = one.getAlignmentStart();
 					int clearEnd = one.getAlignmentEnd();
 					SAMRecord two = null;
 					/* Modify empty space finder for paired reads */
 					if (enablePairing) {
-						// ShortReadTools esr = (ShortReadTools) one;
 						if (ShortReadTools.isPaired(one)
 								&& ShortReadTools.isFirstInPair(one)) {
 							two = provider.getSecondRead(one);
@@ -272,11 +235,6 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 								&& one.getReferenceIndex() == one
 										.getMateReferenceIndex()
 								&& one.getMateReferenceIndex() != -1) {
-							// if (two == null)
-							// System.out.println("Mate missing: " +
-							// one.getMateAlignmentStart());
-							// if (two.getAlignmentStart() <
-							// one.getAlignmentStart()) {
 							if (one.getMateAlignmentStart() < one
 									.getAlignmentStart()) {
 								pos = one.getMateAlignmentStart()
@@ -315,21 +273,24 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 						g.drawLine(subX1, yRec + (readLineHeight / 2) + yOffset,
 								subX2, yOffset + yRec + readLineHeight / 2);
 					}
-					if (line > lines)
+					if (line > lines) {
 						lines = line;
+					}
 					g.translate(0, yOffset);
 
 					boolean paintOne = paintRead(g, one, yRec, screenWidth,
 							readLineHeight, entry, null, yOffset, newMeta);
 					boolean paintTwo = false;
-					if (paintOne)
+					if (paintOne) {
 						visibleReadCount++;
+					}
 					if (two != null) {
 
 						paintTwo = paintRead(g, two, yRec, screenWidth,
 								readLineHeight, entry, one, yOffset, newMeta);
-						if (paintTwo)
+						if (paintTwo) {
 							visibleReadCount++;
+						}
 					}
 					g.translate(0, -yOffset);
 					/* Carve space out of hitmap */
@@ -340,10 +301,11 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 					// determine the size of the track, which is needed
 					// to
 					// properly set the scrollbars.
-					if (true || paintOne || paintTwo)
+					if (true || paintOne || paintTwo) {
 						tilingCounter.rangeSet(
 								clearStart - pairLength - currentVisible.start,
 								clearEnd + 4 - currentVisible.start, line);
+					}
 
 				} else {
 					stackExceeded = true;
@@ -381,28 +343,21 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		model.refresh();
 	}
 
-	/* Contains a copy of the actual render */
-	private BufferedImage backupBuffer = new BufferedImage(10, 20,
-			BufferedImage.TYPE_INT_ARGB);
-
 	public void requestNew(Entry entry, DataKey dataKey,
 			ShortReadProvider provider, Location currentVisible,
 			ShortReadTrackConfig srtc, double screenWidth) {
-		// this.currentVisible = currentVisible;
 		this.srtc = srtc;
 
-		int maxRegion = Configuration.instance().getInt("shortread:maxRegion");
+		int maxRegion = model.getConfiguration().getInt("shortread:maxRegion");
 
 		if (currentVisible.length() > maxRegion) {
 			BufferedImage bi = new BufferedImage((int) screenWidth, 20,
 					BufferedImage.TYPE_INT_ARGB);
-			// BufferedImage bi = (BufferedImage) createImage();
 			Graphics2D g = bi.createGraphics();
 			g.setColor(Color.BLACK);
 			g.drawString("Region too big (max " + maxRegion + " nt), zoom in",
 					(int) (screenWidth / 2), 10);
 			buffer = bi;
-			// yOffset += 20 + 5;
 		} else {
 			BufferedImage bi = new BufferedImage((int) screenWidth,
 					backupBuffer.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -411,9 +366,10 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			Location bufferedLocation = location();
 			Location visible = model.vlm.getVisibleLocation();
 			int x = 0;
-			if (bufferedLocation != null)
+			if (bufferedLocation != null) {
 				x = Convert.translateGenomeToScreen(bufferedLocation.start,
 						visible, screenWidth);
+			}
 			g.drawImage(backupBuffer, x, 0, null);
 
 			g.setColor(Color.BLACK);
@@ -432,9 +388,6 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		}
 
 	}
-
-	/* Keep track of the last x-coordinate that has been used for painting */
-	private int lastX = 100;
 
 	/**
 	 * Returns true if the read was actually painted.
@@ -456,30 +409,14 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			double screenWidth, int readLineHeight, Entry entry,
 			SAMRecord otherRead, double yOff, RenderingMetaData newMeta) {
 		Location annotationVisible = model.vlm.getVisibleLocation();
-		/* If outside vertical view, return immediately */
-
-		// if (yRec + yOff > viewRectangle.y + viewRectangle.height) {
-		// return false;
-		// }
-		// if (yRec + yOff < viewRectangle.y - 10) {
-		// double startY = viewRectangle.y - yOff;
-		// // System.out.println("\t" + yRec + "\t" + yOff + ")\t" +
-		// // view.getViewRect().y + "\t" + startY);
-		// return false;
-		// }
-
-		// System.out.print(",");
 		int subX1 = Convert.translateGenomeToScreen(rf.getAlignmentStart(),
 				annotationVisible, screenWidth);
 		int subX2 = Convert.translateGenomeToScreen(rf.getAlignmentEnd() + 1,
 				annotationVisible, screenWidth);
-		// System.out.println(rf.getAlignmentBlocks().size());
-		// System.out.println(rf.getAlignmentBlocks().get(0).)
-		// System.out.println("Start-End: "+rf.getAlignmentStart()+"
-		// "+rf.getAlignmentEnd()+"\t"+rf.getUnclippedStart()+"\t"+rf.getUnclippedEnd());
 		/* If outside of screen, return immediately */
-		if (subX1 > screenWidth || subX2 < 0)
+		if (subX1 > screenWidth || subX2 < 0) {
 			return false;
+		}
 
 		lastX = subX2;
 		ReadColor c = null;
@@ -533,8 +470,9 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 				readLineHeight - 1);
 		g.fill(r);
 		g.setColor(srtc.color(c));
-		if (rf.getReadPairedFlag() && rf.getMateUnmappedFlag())
+		if (rf.getReadPairedFlag() && rf.getMateUnmappedFlag()) {
 			g.setColor(srtc.color(ReadColor.MISSING_MATE));
+		}
 		g.setStroke(new BasicStroke(2));
 		g.drawRect(subX1, yRec + 1, subX2 - subX1, readLineHeight - 3);
 		g.setStroke(new BasicStroke(1));
@@ -551,14 +489,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			Location l2 = new Location(subX1, subX2);
 
 			if (l1.overlaps(subX1, subX2)) {
-				// System.out.println("L1: "+l1);
-				// System.out.println("L2: "+l2);
 				Location l = LocationTools.getOverlap(l1, l2);
-				// System.out.println("L="+l);
-				// int x1 = Convert.translateGenomeToScreen(l.start,
-				// currentVisible, screenWidth);
-				// int x2 = Convert.translateGenomeToScreen(l.end+ 1,
-				// currentVisible, screenWidth);
 				g.setColor(Color.BLACK);
 				g.fillRect(l.start, yRec, l.length(), readLineHeight - 1);
 
@@ -567,18 +498,20 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		}
 
 		/* Check mismatches */
-		if (entry.sequence().size() == 0)
+		if (entry.sequence().size() == 0) {
 			return true;
+		}
 		/*
 		 * == Detailed mode ==
 		 */
-		if (annotationVisible.length() < Configuration.instance()
+		if (annotationVisible.length() < model.getConfiguration()
 				.getInt("geneStructureNucleotideWindow")) {
 
 			newMeta.hitMap.put(r, rf);
 			/* If there is no sequence, return immediately */
-			if (entry.sequence().size() == 0)
+			if (entry.sequence().size() == 0) {
 				return true;
+			}
 			if (newMeta.seqBuffer == null) {
 
 				Iterable<Character> bufferedSeq = entry.sequence().get(
@@ -594,8 +527,9 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			byte[] readNts = ShortReadTools.construct(rf);
 			for (int j = rf.getAlignmentStart(); j <= rf
 					.getAlignmentEnd(); j++) {
-				if (j > annotationVisible.end || j < annotationVisible.start)
+				if (j > annotationVisible.end || j < annotationVisible.start) {
 					continue;
+				}
 				// FIXME Speed-up by putting code here...
 				// char readNt = ShortReadTools.getNucleotide(rf, j
 				// - rf.getAlignmentStart() + 1);
@@ -609,7 +543,6 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 						annotationVisible, screenWidth);
 
 				if (readNt != refNt) {
-					// if (readNt != '_') {
 					switch (readNt) {
 					case '-':/* Gap */
 						g.setColor(Color.RED);
@@ -619,12 +552,12 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 						break;
 					default:/* Mismatch */
 						g.setColor(Color.ORANGE);
-						// nc.count(readNt, j - currentVisible.start);
 						break;
 					}
 					int width = (int) (tx2 - tx1);
-					if (width < 1)
+					if (width < 1) {
 						width = 1;
+					}
 					g.fillRect((int) tx1, yRec, width, readLineHeight - 1);
 					/*
 					 * For spliced alignments, the connection is blanked with a
@@ -649,10 +582,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 				}
 			}
 
-			// if (rf instanceof ShortReadTools) {
-			// ShortReadTools esr = (ShortReadTools) rf;
 			int pos = 0;
-			// int esrPos = 0;
 			Set<CigarOperator> skip = new HashSet<CigarOperator>();
 			skip.add(CigarOperator.HARD_CLIP);
 			skip.add(CigarOperator.SOFT_CLIP);
@@ -663,10 +593,11 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 					double tx1 = Convert.translateGenomeToScreen(
 							rf.getAlignmentStart() + pos, annotationVisible,
 							screenWidth);
-					if (ce.getLength() % 3 == 0)
+					if (ce.getLength() % 3 == 0) {
 						g.setColor(Color.GRAY);
-					else
+					} else {
 						g.setColor(Color.BLACK);
+					}
 					Rectangle rec = new Rectangle((int) (tx1 - 1), yRec, 2,
 							readLineHeight - 1);
 					g.fill(rec);
@@ -679,11 +610,10 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 					in.len = ce.getLength();
 					newMeta.paintedBlocks.put(rec, in);
 				} else {
-					if (!skip.contains(ce.getOperator()))
+					if (!skip.contains(ce.getOperator())) {
 						pos += ce.getLength();
+					}
 				}
-				// if(!skip.contains(ce.getOperator()))
-				// esrPos += ce.getLength();
 			}
 		} else {
 
@@ -741,4 +671,19 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		return meta;
 	}
 
+}
+
+class RenderingMetaData {
+	/* Keeps track of the short-read insertions */
+	Map<Rectangle, ShortReadInsertion> paintedBlocks = new HashMap<Rectangle, ShortReadInsertion>();
+
+	/*
+	 * Mapping of all painted reads, at least in detailed mode
+	 */
+	HashMap<Rectangle, SAMRecord> hitMap = new HashMap<Rectangle, SAMRecord>();
+	/*
+	 * Buffer that will contain the visible reference sequence as soon as it has
+	 * been used to paint mismatches
+	 */
+	char[] seqBuffer = null;
 }

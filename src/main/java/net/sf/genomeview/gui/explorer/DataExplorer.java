@@ -12,7 +12,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
@@ -31,7 +30,7 @@ class DataExplorer extends EscapeDialog {
 
 	DataExplorer(final Model model) {
 		super(model.getGUIManager().getMainWindow(), "GenomeView :: "
-				+ Configuration.instance().version() + " - Data Explorer",
+				+ model.getConfiguration().version() + " - Data Explorer",
 				ModalityType.APPLICATION_MODAL);
 		setIconImage(Icons.MINILOGO);
 		this.model = model;

@@ -25,6 +25,7 @@ import net.sf.jannot.refseq.Sequence;
  * @author Thomas Abeel
  *
  */
+@SuppressWarnings("serial")
 public class CopySequenceAction extends AbstractModelAction {
 
 	public CopySequenceAction(Model model) {
@@ -32,10 +33,8 @@ public class CopySequenceAction extends AbstractModelAction {
 		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control C"));
 	}
 
-	private static final long serialVersionUID = -4864220753372131046L;
-
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformedSafe(ActionEvent e) {
 
 		if (model.getSelectedRegion() != null) {
 			Location l = model.getSelectedRegion();
@@ -49,25 +48,29 @@ public class CopySequenceAction extends AbstractModelAction {
 			switch (track) {
 			case 0:
 			case 1:
-				for (int i = l.start(); i <= l.end(); i++)
+				for (int i = l.start(); i <= l.end(); i++) {
 					sb.append(bs.getNucleotide(i));
+				}
 				break;
 			case 2:
 			case 3:
 			case 4:
-				for (int i = l.start(); i <= l.end(); i += 3)
+				for (int i = l.start(); i <= l.end(); i += 3) {
 					sb.append(bs.getAminoAcid(i, model.getAAMapping()));
+				}
 				break;
 			case -1:
-				for (int i = l.start(); i <= l.end(); i++)
+				for (int i = l.start(); i <= l.end(); i++) {
 					sb.append(bs.getReverseNucleotide(i));
+				}
 				break;
 			case -2:
 			case -3:
 			case -4:
-				for (int i = l.end(); i >= l.start(); i -= 3)
+				for (int i = l.end(); i >= l.start(); i -= 3) {
 					sb.append(bs.getReverseAminoAcid(i - 2,
 							model.getAAMapping()));
+				}
 				break;
 			}
 
@@ -91,7 +94,7 @@ public class CopySequenceAction extends AbstractModelAction {
 	}
 
 	@Override
-	public void update(Observable o, Object obn) {
+	public void updateSafe(Observable o, Object obn) {
 		setEnabled(model.selectionModel().getLocationSelection().size() > 0
 				|| model.getSelectedRegion() != null);
 	}

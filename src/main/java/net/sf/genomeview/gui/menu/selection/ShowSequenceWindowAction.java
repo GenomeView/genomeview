@@ -13,33 +13,35 @@ import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.SequenceViewDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
-
 /**
  * Action to display a dialog with nucleotide/protein sequence of the selected
  * CDS.
  * 
  * 
  */
+@SuppressWarnings("serial")
 public class ShowSequenceWindowAction extends AbstractModelAction {
 
-    private static final long serialVersionUID = 4601582100774522419L;
+	public ShowSequenceWindowAction(Model model) {
+		super(MessageManager.getString("selectionmenu.show_dna_protein"),
+				model);
+		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control Q"));
+	}
 
-    public ShowSequenceWindowAction(Model model) {
-        super(MessageManager.getString("selectionmenu.show_dna_protein"), model);
-        super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control Q"));
-    }
+	@Override
+	public void actionPerformedSafe(ActionEvent arg0) {
+		assert ((model.selectionModel().getFeatureSelection() != null
+				&& model.selectionModel().getFeatureSelection().size() > 0)
+				|| (model.getSelectedRegion() != null));
+		SequenceViewDialog dialog = new SequenceViewDialog(model);
+		dialog.showSequenceViewDialog();
 
-    public void actionPerformed(ActionEvent arg0) {
-        assert ((model.selectionModel().getFeatureSelection() != null  && model.selectionModel().getFeatureSelection().size() > 0) || 
-        		(model.getSelectedRegion() != null));
-        SequenceViewDialog dialog = new SequenceViewDialog(model);
-        dialog.showSequenceViewDialog();
+	}
 
-    }
-
-    @Override
-    public void update(Observable o, Object obj) {
-        setEnabled((model.selectionModel().getFeatureSelection() != null && model.selectionModel().getFeatureSelection().size() > 0) ||
-        		(model.getSelectedRegion() != null));
-    }
+	@Override
+	public void updateSafe(Observable o, Object obj) {
+		setEnabled((model.selectionModel().getFeatureSelection() != null
+				&& model.selectionModel().getFeatureSelection().size() > 0)
+				|| (model.getSelectedRegion() != null));
+	}
 }

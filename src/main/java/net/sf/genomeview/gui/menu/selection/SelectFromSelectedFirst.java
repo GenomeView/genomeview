@@ -11,30 +11,30 @@ import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
 
+@SuppressWarnings("serial")
 public class SelectFromSelectedFirst extends AbstractModelAction {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 3658234266201763591L;
+	public SelectFromSelectedFirst(Model model) {
+		super(MessageManager.getString("selectionmenu.select_first_location"),
+				model);
+		model.addObserver(this);
+		update(null, null);
+	}
 
-    public SelectFromSelectedFirst(Model model) {
-        super(MessageManager.getString("selectionmenu.select_first_location"), model);
-        model.addObserver(this);
-        update(null, null);
-    }
+	@Override
+	public void updateSafe(Observable o, Object obj) {
+		setEnabled(model.selectionModel().getFeatureSelection() != null
+				&& model.selectionModel().getFeatureSelection().size() == 1);
 
-    @Override
-    public void update(Observable o, Object obj) {
-        setEnabled(model.selectionModel().getFeatureSelection() != null && model.selectionModel().getFeatureSelection().size() == 1);
+	}
 
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Feature rf = model.selectionModel().getFeatureSelection().iterator().next();
-        model.selectionModel().setLocationSelection(rf.location()[0]);
-        model.vlm.center(rf.location()[0].start() / 2 + rf.location()[0].end() / 2);
-    }
+	@Override
+	public void actionPerformedSafe(ActionEvent e) {
+		Feature rf = model.selectionModel().getFeatureSelection().iterator()
+				.next();
+		model.selectionModel().setLocationSelection(rf.location()[0]);
+		model.vlm.center(
+				rf.location()[0].start() / 2 + rf.location()[0].end() / 2);
+	}
 
 }

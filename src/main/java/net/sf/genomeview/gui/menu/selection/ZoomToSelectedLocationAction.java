@@ -13,35 +13,38 @@ import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Location;
 
-public class ZoomToSelectedLocationAction extends AbstractModelAction implements Observer {
+@SuppressWarnings("serial")
+public class ZoomToSelectedLocationAction extends AbstractModelAction
+		implements Observer {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 8764835346246357318L;
+	public ZoomToSelectedLocationAction(Model model) {
+		super(MessageManager.getString("selectionmenu.zoom_to_location"),
+				model);
+	}
 
-    public ZoomToSelectedLocationAction(Model model) {
-        super(MessageManager.getString("selectionmenu.zoom_to_location"), model);
-    }
+	@Override
+	public void actionPerformedSafe(ActionEvent e) {
+		Set<Location> selected = model.selectionModel().getLocationSelection();
+		int min = Integer.MAX_VALUE;
+		int max = 0;
+		for (Location f : selected) {
+			if (min > f.start()) {
+				min = f.start();
+			}
+			if (max < f.end()) {
+				max = f.end();
+			}
 
-    public void actionPerformed(ActionEvent e) {
-        Set<Location> selected = model.selectionModel().getLocationSelection();
-        int min = Integer.MAX_VALUE;
-        int max = 0;
-        for (Location f : selected) {
-            if (min > f.start())
-                min = f.start();
-            if (max < f.end())
-                max = f.end();
+		}
+		double margin = (max - min) * 0.05;
+		model.vlm.setAnnotationLocationVisible(
+				new Location((int) (min - margin), (int) (max + margin)));
 
-        }
-        double margin = (max - min) * 0.05;
-        model.vlm.setAnnotationLocationVisible(new Location((int) (min - margin), (int) (max + margin)));
+	}
 
-    }
+	@Override
+	public void updateSafe(Observable o, Object arg) {
+		setEnabled(model.selectionModel().getFeatureSelection().size() > 0);
 
-    public void update(Observable o, Object arg) {
-        setEnabled(model.selectionModel().getFeatureSelection().size() > 0);
-
-    }
+	}
 }

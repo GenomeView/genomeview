@@ -39,7 +39,6 @@ import javax.swing.JRadioButton;
 import org.broad.igv.track.WindowFunction;
 
 import be.abeel.gui.GridBagPanel;
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
 import net.sf.genomeview.gui.MessageManager;
@@ -60,28 +59,18 @@ import net.sf.jannot.refseq.Sequence;
  * 
  */
 public class PileupTrackConfig extends TrackConfig {
+	private VizBuffer vizBuffer = null;
+
+	final private PileProvider provider;
+
+	private boolean dynamicScaling;// =
+									// Configuration.getBoolean("pileup:dynamicScaling");
+
+	private boolean logscaling;// = Configuration.getBoolean("pileup:logScale");
 
 	@Override
 	protected GridBagPanel getGUIContainer() {
 		GridBagPanel out = super.getGUIContainer();
-
-		// /*
-		// FIXME Find a proper way to embed global config options in local
-		// config.
-		// Scale across tracks
-		// */
-		// final JCheckBox itemCrossTrack = new JCheckBox();
-		// itemCrossTrack.setSelected(isCrossTrackScaling());
-		// itemCrossTrack.setAction(new AbstractAction("Scale across tracks") {
-		// @Override
-		// public void actionPerformed(ActionEvent e) {
-		// setCrossTrackScaling(itemCrossTrack.isSelected());
-		//
-		// }
-		//
-		// });
-		// out.gc.gridy++;
-		// out.add(itemCrossTrack, out.gc);
 
 		/*
 		 * Threshold line
@@ -231,8 +220,9 @@ public class PileupTrackConfig extends TrackConfig {
 					provider.requestWindowFunction(wf);
 				}
 			});
-			if (provider.isCurrentWindowFunction(wf))
+			if (provider.isCurrentWindowFunction(wf)) {
 				jbm.setSelected(true);
+			}
 			bg.add(jbm);
 
 			out.gc.gridy++;
@@ -259,10 +249,6 @@ public class PileupTrackConfig extends TrackConfig {
 		return out;
 	}
 
-	private VizBuffer vizBuffer = null;
-
-	final private PileProvider provider;
-
 	PileupTrackConfig(Model model, DataKey key, PileProvider provider) {
 		super(model, key);
 		this.provider = provider;
@@ -276,18 +262,6 @@ public class PileupTrackConfig extends TrackConfig {
 		return vizBuffer;
 	}
 
-	// boolean isDetailed() {
-	// return model.getAnnotationLocationVisible().length() < 16000;
-	// }
-
-	private boolean dynamicScaling;// =
-									// Configuration.getBoolean("pileup:dynamicScaling");
-
-	private boolean logscaling;// = Configuration.getBoolean("pileup:logScale");
-
-	// private boolean
-	// normalize;//=Configuration.getBoolean("pileup:normalize");
-
 	/*
 	 * Flag to keep track whether we want to use the global settings for scaling
 	 * and so on.
@@ -295,10 +269,11 @@ public class PileupTrackConfig extends TrackConfig {
 	private boolean globalSettings = true;
 
 	boolean isLogscaling() {
-		if (globalSettings)
-			return Configuration.instance().getBoolean("pileup:logScale");
-		else
+		if (globalSettings) {
+			return model.getConfiguration().getBoolean("pileup:logScale");
+		} else {
 			return logscaling;
+		}
 	}
 
 	private ArrayList<Line> lines = new ArrayList<Line>();
@@ -327,11 +302,12 @@ public class PileupTrackConfig extends TrackConfig {
 
 	boolean isDynamicScaling() {
 		if (globalSettings) {
-			dynamicScaling = Configuration.instance()
+			dynamicScaling = model.getConfiguration()
 					.getBoolean("pileup:dynamicRange");
-			return Configuration.instance().getBoolean("pileup:dynamicRange");
-		} else
+			return model.getConfiguration().getBoolean("pileup:dynamicRange");
+		} else {
 			return dynamicScaling;
+		}
 	}
 
 	Location lastQuery = null;
@@ -381,13 +357,15 @@ public class PileupTrackConfig extends TrackConfig {
 								if (sum == null) {
 									sum = new double[p.getValueCount()];
 								}
-								for (int i = 0; i < p.getValueCount(); i++)
+								for (int i = 0; i < p.getValueCount(); i++) {
 									sum[i] += p.getValue(i);
+								}
 								count++;
 
 							}
-							for (int i = 0; i < sum.length; i++)
+							for (int i = 0; i < sum.length; i++) {
 								sum[i] /= count;
+							}
 							value = sum;
 							calculated = true;
 							model.messageModel().setStatusBarMessage(
@@ -404,17 +382,18 @@ public class PileupTrackConfig extends TrackConfig {
 				return null;
 			} else if (!calculated) {
 				return null;
-			} else
+			} else {
 				return value;
+			}
 		}
 
 	}
 
 	public boolean isNormalizeMean() {
 		if (isGlobalSettings()) {
-			return Configuration.instance().getBoolean("pileup:normalize");
+			return model.getConfiguration().getBoolean("pileup:normalize");
 		} else {
-			return Configuration.instance()
+			return model.getConfiguration()
 					.getBoolean("track:pile:normalize:" + dataKey);
 		}
 	}
@@ -433,10 +412,11 @@ public class PileupTrackConfig extends TrackConfig {
 	private TrackCommunicationModel tcm;
 
 	public double maxValue() {
-		if (globalSettings)
-			return Configuration.instance().getDouble("pileup:maxPile");
-		else
+		if (globalSettings) {
+			return model.getConfiguration().getDouble("pileup:maxPile");
+		} else {
 			return maxValue;
+		}
 	}
 
 	public void setMaxValue(double d) {
@@ -465,11 +445,11 @@ public class PileupTrackConfig extends TrackConfig {
 	}
 
 	public boolean isCrossTrackScaling() {
-		return Configuration.instance().getBoolean("pileup:crossTrackScaling");
+		return model.getConfiguration().getBoolean("pileup:crossTrackScaling");
 	}
 
 	public void setCrossTrackScaling(boolean b) {
-		Configuration.instance().set("pileup:crossTrackScaling", "" + b);
+		model.getConfiguration().set("pileup:crossTrackScaling", "" + b);
 		setChanged();
 		notifyObservers();
 	}

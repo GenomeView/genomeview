@@ -6,31 +6,29 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.genomeview.core.DistributingReporter;
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.viztracks.TickmarkTrack;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.Entry;
+import net.sf.jannot.Global;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.SyntenicData;
 import net.sf.jannot.exception.ReadFailedException;
-import net.sf.nameservice.NameService;
 
 public class TrackListTest {
-	DistributingReporter log;
 
-	@Before
-	public void before() throws IOException, ReadFailedException {
-		log = new DistributingReporter();
-		NameService.init(log);
+	private final Global global;
+
+	public TrackListTest() throws IOException, ReadFailedException {
+		global = new Global();
 	}
 
 	@Test
 	public void testThreadSafeIterator() {
-		Model model = new Model("id", log);
+		Model model = new Model("id", global, new Configuration(global));
 
 		TrackList tracklist = new TrackList(model);
 		// add an extra entry
@@ -49,8 +47,9 @@ public class TrackListTest {
 	 * @return a test entry
 	 */
 	private Entry getEntry() {
-		Entry e = new Entry("entry", log);
-		SyntenicData syntenic = new SyntenicData(new ArrayList<>(), log);
+		Entry e = new Entry("entry", global);
+		SyntenicData syntenic = new SyntenicData(new ArrayList<>(),
+				global.getLog());
 		e.add(new StringKey("data1"), syntenic);
 		return e;
 	}

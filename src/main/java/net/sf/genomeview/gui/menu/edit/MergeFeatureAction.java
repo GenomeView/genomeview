@@ -18,27 +18,27 @@ import net.sf.genomeview.gui.menu.AbstractModelAction;
  * @author Thomas Abeel
  *
  */
+@SuppressWarnings("serial")
 public class MergeFeatureAction extends AbstractModelAction {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -3265609839659200956L;
+	public MergeFeatureAction(Model model) {
+		super(MessageManager.getString("editmenu.merge_feature"), model);
+		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control M"));
+	}
 
-    public MergeFeatureAction(Model model) {
-        super(MessageManager.getString("editmenu.merge_feature"), model);
-        super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control M"));
-    }
+	@Override
+	public void actionPerformedSafe(ActionEvent e) {
+		if (isEnabled()) {
+			new MergeFeatureDialog(model);
+		}
 
-    public void actionPerformed(ActionEvent e) {
-        if (isEnabled())
-        	new MergeFeatureDialog(model);
+	}
 
-    }
+	@Override
+	public void updateSafe(Observable o, Object arg) {
+		setEnabled(model.selectionModel().getFeatureSelection() != null
+				&& model.selectionModel().getFeatureSelection().size() > 1);
 
-    public void update(Observable o, Object arg) {
-        setEnabled(model.selectionModel().getFeatureSelection() != null && model.selectionModel().getFeatureSelection().size() > 1);
-
-    }
+	}
 
 }

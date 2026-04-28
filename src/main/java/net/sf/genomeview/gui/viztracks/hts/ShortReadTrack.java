@@ -22,7 +22,6 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
 import htsjdk.samtools.SAMRecord;
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.ShortReadProvider;
 import net.sf.genomeview.gui.MessageManager;
@@ -63,8 +62,9 @@ public class ShortReadTrack extends Track {
 	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent source) {
 		super.mouseClicked(x, y, source);
-		if (source.isConsumed())
+		if (source.isConsumed()) {
 			return true;
+		}
 
 		// System.out.println("Click: " + x + " " + y);
 		if (source.getClickCount() > 1) {
@@ -73,8 +73,9 @@ public class ShortReadTrack extends Track {
 				if (e.getKey().contains(x, y)) {
 					// System.out.println("2*Click: " + e.getValue());
 					if (e.getValue().getReadPairedFlag()
-							&& !e.getValue().getMateUnmappedFlag())
+							&& !e.getValue().getMateUnmappedFlag()) {
 						model.vlm.center(e.getValue().getMateAlignmentStart());
+					}
 				}
 			}
 		} else {
@@ -94,8 +95,8 @@ public class ShortReadTrack extends Track {
 
 	@Override
 	public boolean mouseMoved(int x, int y, MouseEvent source) {
-		if (model.vlm.getAnnotationLocationVisible().length() < Configuration
-				.instance().getInt("geneStructureNucleotideWindow")) {
+		if (model.vlm.getAnnotationLocationVisible().length() < model
+				.getConfiguration().getInt("geneStructureNucleotideWindow")) {
 			ShortReadInsertion sri = null;
 			for (java.util.Map.Entry<Rectangle, ShortReadInsertion> e : render
 					.meta().paintedBlocks.entrySet()) {
@@ -106,12 +107,14 @@ public class ShortReadTrack extends Track {
 			}
 
 			if (sri != null) {
-				if (!tooltip.isVisible())
+				if (!tooltip.isVisible()) {
 					tooltip.setVisible(true);
+				}
 				tooltip.set(source, sri);
 			} else {
-				if (tooltip.isVisible())
+				if (tooltip.isVisible()) {
 					tooltip.setVisible(false);
+				}
 			}
 			//
 			// System.out.println("Moved: " + x + " " + y);
@@ -126,8 +129,9 @@ public class ShortReadTrack extends Track {
 			return false;
 
 		} else {
-			if (tooltip.isVisible())
+			if (tooltip.isVisible()) {
 				tooltip.setVisible(false);
+			}
 		}
 		return false;
 	}
@@ -147,8 +151,9 @@ public class ShortReadTrack extends Track {
 	private static String rerun(String arg) {
 		StringBuffer out = new StringBuffer();
 		int i = 0;
-		for (; i < arg.length() - 80; i += 80)
+		for (; i < arg.length() - 80; i += 80) {
 			out.append(arg.substring(i, i + 80) + "<br/>");
+		}
 		out.append(arg.substring(i, arg.length()));
 		return out.toString();
 
@@ -172,8 +177,9 @@ public class ShortReadTrack extends Track {
 		}
 
 		public void set(MouseEvent e, ShortReadInsertion sri) {
-			if (sri == null)
+			if (sri == null) {
 				return;
+			}
 			StringBuffer text = new StringBuffer();
 			text.append("<html>");
 
@@ -219,8 +225,9 @@ public class ShortReadTrack extends Track {
 		}
 
 		public void set(MouseEvent e, SAMRecord sr) {
-			if (sr == null)
+			if (sr == null) {
 				return;
+			}
 			StringBuffer text = new StringBuffer();
 			text.append("<html>");
 
@@ -236,14 +243,15 @@ public class ShortReadTrack extends Track {
 				text.append(MessageManager.getString("shortreadtrack.paired")
 						+ " " + sr.getReadPairedFlag() + "<br/>");
 				if (sr.getReadPairedFlag()) {
-					if (!sr.getMateUnmappedFlag())
+					if (!sr.getMateUnmappedFlag()) {
 						text.append(
 								MessageManager.getString("shortreadtrack.mate")
 										+ " " + sr.getMateReferenceName() + ":"
 										+ sr.getMateAlignmentStart() + "<br/>");
-					else
+					} else {
 						text.append(MessageManager.getString(
 								"shortreadtrack.mate_missing") + "<br/>");
+					}
 					text.append(
 							MessageManager.getString("shortreadtrack.second")
 									+ " " + sr.getFirstOfPairFlag());
@@ -264,8 +272,9 @@ public class ShortReadTrack extends Track {
 		}
 
 		public void textual() {
-			if (!isVisible())
+			if (!isVisible()) {
 				return;
+			}
 			// create jeditorpane
 			JEditorPane jEditorPane = new JEditorPane();
 

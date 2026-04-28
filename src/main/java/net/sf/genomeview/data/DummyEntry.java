@@ -5,7 +5,7 @@ package net.sf.genomeview.data;
 
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.Entry;
-import tudelft.utilities.logging.Reporter;
+import net.sf.jannot.Global;
 
 /**
  * An Entry indicating nothing is loaded
@@ -15,8 +15,8 @@ import tudelft.utilities.logging.Reporter;
  */
 final public class DummyEntry extends Entry {
 
-	public DummyEntry(Reporter log) {
-		super(MessageManager.getString("dummyentry.nothing_loaded"), log);
+	public DummyEntry(Global global) {
+		super(MessageManager.getString("dummyentry.nothing_loaded"), global);
 	}
 
 }

@@ -22,13 +22,15 @@ public abstract class ConfigBox {
 		return new ComboBoxConfig(objects, valueKey, title, model);
 	}
 
-	public static Container stringInstance(String key, String title) {
-		return new StringConfig(key, title);
+	public static Container stringInstance(Model model, String key,
+			String title) {
+		return new StringConfig(key, title, model);
 
 	}
 
-	public static Container integerInstance(String key, String title) {
-		return new IntegerConfig(key, title);
+	public static Container integerInstance(String key, String title,
+			Model model) {
+		return new IntegerConfig(key, title, model.getConfiguration());
 
 	}
 
@@ -38,8 +40,9 @@ public abstract class ConfigBox {
 
 	}
 
-	public static Component doubleInstance(String key, String title) {
-		return new DoubleConfig(key, title);
+	public static Component doubleInstance(String key, String title,
+			Model model) {
+		return new DoubleConfig(key, title, model.getConfiguration());
 	}
 
 }

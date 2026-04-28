@@ -31,29 +31,25 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
 
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2143874687832094430L;
-
 	@Override
-	public void update(Observable o, Object obj) {
+	public void updateSafe(Observable o, Object obj) {
 		if (model.selectionModel().getFeatureSelection().size() == 1
 				&& model.selectionModel().getFeatureSelection().first()
 						.type() == Type.get("CDS")) {
 			AnalyzedFeature af = new AnalyzedFeature(
 					model.vlm.getVisibleEntry().sequence(),
 					model.selectionModel().getFeatureSelection().first(),
-					model.getAAMapping());
+					model.getAAMapping(), model.getConfiguration());
 
 			setEnabled(af.hasMissingStopCodon());
-		} else
+		} else {
 			setEnabled(false);
+		}
 
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	public void actionPerformedSafe(ActionEvent arg0) {
 		assert (model.selectionModel().getFeatureSelection() != null);
 		assert (model.selectionModel().getFeatureSelection().size() == 1);
 		Feature rf = model.selectionModel().getFeatureSelection().iterator()
@@ -64,7 +60,7 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
 		int rest = nt.length() % 3;
 		AnalyzedFeature af = new AnalyzedFeature(
 				model.vlm.getVisibleEntry().sequence(), rf,
-				model.getAAMapping());
+				model.getAAMapping(), model.getConfiguration());
 		assert (af.hasMissingStopCodon());
 		if (rf.strand() == Strand.FORWARD) {
 			int start = rf.end() - rest + 1;

@@ -28,7 +28,6 @@ import javax.swing.JButton;
 
 import be.abeel.gui.GridBagPanel;
 import be.abeel.util.DefaultHashMap;
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.StructureTrackConfig;
@@ -48,10 +47,11 @@ public class StructureTrackModel extends TrackConfig {
 	public StructureTrackModel(Model model, StringKey key) {
 		super(model, key);
 
-		Set<Type> tmp1 = Configuration.instance()
+		Set<Type> tmp1 = model.getConfiguration()
 				.getTypeSet("visibleTypesStructure");
-		for (Type t : tmp1)
+		for (Type t : tmp1) {
 			setTypeVisible(t, true);
+		}
 	}
 
 	public boolean isTypeVisible(Type ct) {

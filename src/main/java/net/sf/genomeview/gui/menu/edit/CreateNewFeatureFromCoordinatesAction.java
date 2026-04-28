@@ -4,6 +4,7 @@
 package net.sf.genomeview.gui.menu.edit;
 
 import java.awt.event.ActionEvent;
+import java.util.Observable;
 
 import javax.swing.KeyStroke;
 
@@ -12,19 +13,26 @@ import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.NewFeatureFromCoordinatesDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
-
+@SuppressWarnings("serial")
 public class CreateNewFeatureFromCoordinatesAction extends AbstractModelAction {
 
-    private static final long serialVersionUID = 4521376746707912717L;
+	public CreateNewFeatureFromCoordinatesAction(Model model) {
+		super(MessageManager.getString("editmenu.create_feature_coordinates"),
+				model);
+		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control N"));
+	}
 
-    public CreateNewFeatureFromCoordinatesAction(Model model) {
-        super(MessageManager.getString("editmenu.create_feature_coordinates"), model);
-        super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control N"));
-    }
+	@Override
+	public void actionPerformedSafe(ActionEvent e) {
+		NewFeatureFromCoordinatesDialog nfd = new NewFeatureFromCoordinatesDialog(
+				model);
+		nfd.setVisible(true);
+	}
 
-    public void actionPerformed(ActionEvent e) {
-        NewFeatureFromCoordinatesDialog nfd = new NewFeatureFromCoordinatesDialog(model);
-        nfd.setVisible(true);
-    }
+	@Override
+	public void updateSafe(Observable o, Object obj) {
+		// TODO Auto-generated method stub
+
+	}
 
 }

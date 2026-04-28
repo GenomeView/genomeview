@@ -44,7 +44,7 @@ class CommandLineOptions {
 	 * @throws IOException                 if loading extra fails
 	 * @throws MalformedURLException       if loading extra fails
 	 */
-	public CommandLineOptions(String[] args)
+	public CommandLineOptions(String[] args, Configuration configuration)
 			throws IllegalOptionValueException, UnknownOptionException,
 			MalformedURLException, IOException, URISyntaxException {
 
@@ -76,13 +76,13 @@ class CommandLineOptions {
 		}
 
 		/* Load the additional configuration */
-		String config = (String) parser.getOptionValue(configurationO);
-		if (config != null) {
-			if (config.startsWith("http") || config.startsWith("ftp")) {
-				Configuration.instance()
-						.loadExtra(URIFactory.url(config).openStream());
+		String configname = (String) parser.getOptionValue(configurationO);
+		if (configname != null) {
+			if (configname.startsWith("http") || configname.startsWith("ftp")) {
+				configuration
+						.loadExtra(URIFactory.url(configname).openStream());
 			} else {
-				Configuration.instance().loadExtra(new FileInputStream(config));
+				configuration.loadExtra(new FileInputStream(configname));
 			}
 		}
 

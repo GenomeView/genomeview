@@ -11,22 +11,23 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
+@SuppressWarnings("serial")
+public class ClearFeatureSelectionAction extends AbstractModelAction
+		implements Observer {
 
-public class ClearFeatureSelectionAction extends AbstractModelAction implements Observer {
+	public ClearFeatureSelectionAction(Model model) {
+		super(MessageManager.getString("selectionmenu.clear_feature"), model);
+	}
 
-    private static final long serialVersionUID = 3091007204195190317L;
+	@Override
+	public void actionPerformedSafe(ActionEvent e) {
+		model.selectionModel().clearLocationSelection();
 
-    public ClearFeatureSelectionAction(Model model) {
-        super(MessageManager.getString("selectionmenu.clear_feature"), model);
-    }
+	}
 
-    public void actionPerformed(ActionEvent e) {
-        model.selectionModel().clearLocationSelection();
+	@Override
+	public void updateSafe(Observable o, Object arg) {
+		setEnabled(model.selectionModel().getFeatureSelection().size() > 0);
 
-    }
-
-    public void update(Observable o, Object arg) {
-        setEnabled(model.selectionModel().getFeatureSelection().size() > 0);
-
-    }
+	}
 }

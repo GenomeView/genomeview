@@ -59,7 +59,7 @@ public class SaveDialog extends JDialog {
 
 	private String file(Model model) {
 		JFileChooser chooser = new JFileChooser(
-				Configuration.instance().getFile("lastDirectory"));
+				model.getConfiguration().getFile("lastDirectory"));
 		int returnVal = chooser
 				.showSaveDialog(model.getGUIManager().getMainWindow());
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -79,6 +79,7 @@ public class SaveDialog extends JDialog {
 	public SaveDialog(final Model model) {
 		super(model.getGUIManager().getMainWindow(),
 				MessageManager.getString("savedialog.title"), true);
+		Configuration config = model.getConfiguration();
 		setLayout(new MigLayout("wrap 2"));
 
 		/*
@@ -96,8 +97,9 @@ public class SaveDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String f = file(model);
-				if (f != null)
+				if (f != null) {
 					locationField.setText(f);
+				}
 
 			}
 		});
@@ -108,8 +110,7 @@ public class SaveDialog extends JDialog {
 		 * Handle default location
 		 */
 
-		String defaultLocation = Configuration.instance()
-				.get("save:defaultLocation");
+		String defaultLocation = config.get("save:defaultLocation");
 		if (!defaultLocation.equals("null")) {
 			locationField.setText(defaultLocation);
 			locationField.setEditable(false);
@@ -122,8 +123,7 @@ public class SaveDialog extends JDialog {
 		 */
 		addSeparator(
 				MessageManager.getString("savedialog.file_format_options"));
-		String defaultParserName = Configuration.instance()
-				.get("save:defaultParser");
+		String defaultParserName = config.get("save:defaultParser");
 		// Parser defaultParser = Configuration.getParser("save:defaultParser");
 		String[] arr = new String[] { "GFF3", "EMBL" };
 
@@ -137,15 +137,15 @@ public class SaveDialog extends JDialog {
 		/*
 		 * Include sequence
 		 */
-		final boolean enableIncludeSequenceFlag = Configuration.instance()
+		final boolean enableIncludeSequenceFlag = config
 				.getBoolean("save:enableIncludeSequence");
 		final JCheckBox includeSequence = new JCheckBox("Include sequence");
 		includeSequence.setEnabled(enableIncludeSequenceFlag);
 		add(includeSequence);
 
 		final Parser p = "GFF3".equals(parserList.getSelectedItem())
-				? new GFF3Parser(model.getLog())
-				: new EMBLParser(model.getLog());
+				? new GFF3Parser(model.getGlobal())
+				: new EMBLParser(model.getGlobal());
 		if (p instanceof GFF3Parser) {
 			includeSequence.setEnabled(false);
 		}
@@ -164,7 +164,7 @@ public class SaveDialog extends JDialog {
 		/* Entries list */
 		addSeparator(
 				MessageManager.getString("savedialog.select_entries_to_save"));
-		boolean entrySelectionEnabledFlag = Configuration.instance()
+		boolean entrySelectionEnabledFlag = config
 				.getBoolean("save:enableEntrySelection");
 		final MultiSelectionArray<Entry> entriesList = new MultiSelectionArray<Entry>(
 				model.entries(), entrySelectionEnabledFlag);
@@ -200,7 +200,7 @@ public class SaveDialog extends JDialog {
 		 * Type selection
 		 */
 		addSeparator(MessageManager.getString("savedialog.annotation_types"));
-		boolean typeSelectionEnabledFlag = Configuration.instance()
+		boolean typeSelectionEnabledFlag = config
 				.getBoolean("save:enableTypeSelection");
 		final MultiSelectionArray<net.sf.jannot.Type> typesList = new MultiSelectionArray<net.sf.jannot.Type>(
 				Arrays.asList(net.sf.jannot.Type.values()),
@@ -257,16 +257,18 @@ public class SaveDialog extends JDialog {
 
 							Collection<net.sf.jannot.Type> selectedTypes = Arrays
 									.asList(net.sf.jannot.Type.values());
-							if (typesList.selectedItems().size() > 0)
+							if (typesList.selectedItems().size() > 0) {
 								selectedTypes = typesList.selectedItems();
+							}
 
 							Parser parser = (Parser) parserList
 									.getSelectedItem();
 							if (parser instanceof EMBLParser) {
 								((EMBLParser) parser).storeSequence = false;
 								if (enableIncludeSequenceFlag
-										&& includeSequence.isSelected())
+										&& includeSequence.isSelected()) {
 									((EMBLParser) parser).storeSequence = true;
+								}
 
 							}
 
@@ -335,13 +337,15 @@ public class SaveDialog extends JDialog {
 											JOptionPane.ERROR_MESSAGE);
 								} else {
 									File out = new File(location);
-									if (parser instanceof GFF3Parser)
+									if (parser instanceof GFF3Parser) {
 										out = ExtensionManager.extension(out,
 												"gff");
+									}
 
-									if (parser instanceof EMBLParser)
+									if (parser instanceof EMBLParser) {
 										out = ExtensionManager.extension(out,
 												"embl");
+									}
 
 									boolean tryToSave = true;
 									while (tryToSave) {
@@ -481,8 +485,9 @@ class MultiSelectionArray<T> extends Container {
 	protected Collection<T> selectedItems() {
 		ArrayList<T> out = new ArrayList<T>();
 		for (TCheckBox item : dss) {
-			if (item.isSelected())
+			if (item.isSelected()) {
 				out.add(item.data);
+			}
 		}
 		return out;
 	}

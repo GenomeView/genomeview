@@ -166,12 +166,12 @@ public final class StaticUtils {
 	 * f can be put in the direct context of the call. f can not return anything
 	 * directly because there is no return value incase of an exception.
 	 * 
-	 * @param f          the {@link Runnable} to run in the sandbox
+	 * @param f          the {@link Executable} to run in the sandbox
 	 * @param r          the reporter to log any exceptions to
 	 * @param errorlevel the level to use when logging
 	 * @param errormsg   the error message to use when logging an exception
 	 */
-	public static void run(Runnable f, Reporter r, Level errorlevel,
+	public static void run(Executable f, Reporter r, Level errorlevel,
 			String errormsg) {
 		try {
 			f.run();

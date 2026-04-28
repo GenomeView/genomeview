@@ -46,7 +46,7 @@ final class EntryListModel implements Observer, ComboBoxModel<Entry> {
 	@Override
 	public Entry getElementAt(int i) {
 		if (tmpList.size() == 0 || i >= tmpList.size()) {
-			return new DummyEntry(model.getLog());
+			return new DummyEntry(model.getGlobal());
 		} else {
 			return tmpList.get(i);
 		}

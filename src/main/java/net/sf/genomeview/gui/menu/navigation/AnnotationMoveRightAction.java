@@ -18,18 +18,14 @@ import net.sf.jannot.Location;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class AnnotationMoveRightAction extends AbstractModelAction {
 
 	@Override
-	public void update(Observable o, Object obj) {
+	public void updateSafe(Observable o, Object obj) {
 		setEnabled(model.vlm.getAnnotationLocationVisible().end() < model.vlm
 				.getVisibleEntry().getMaximumLength());
 	}
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8307496875031190561L;
 
 	public AnnotationMoveRightAction(Model model) {
 		super(null, new ImageIcon(
@@ -39,12 +35,13 @@ public class AnnotationMoveRightAction extends AbstractModelAction {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	public void actionPerformedSafe(ActionEvent arg0) {
 		Location r = model.vlm.getAnnotationLocationVisible();
 		int halve = r.length() / 4;
-		if (enabled)
+		if (enabled) {
 			model.vlm.setAnnotationLocationVisible(
 					new Location(r.start() + halve, r.end() + halve));
+		}
 
 	}
 

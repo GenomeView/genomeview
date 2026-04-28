@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
@@ -35,13 +34,13 @@ public class ShowAboutDialogAction extends AbstractAction {
 	public void actionPerformed(ActionEvent e) {
 
 		String message = MessageManager.formatMessage("helpmenu.message",
-				new Object[] { Configuration.instance().version(),
-						Configuration.instance().getDirectory().toString() });
+				new Object[] { model.getConfiguration().version(),
+						model.getConfiguration().getDirectory().toString() });
 
 		JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
 				message,
 				MessageManager.formatMessage("helpmenu.version",
-						new Object[] { Configuration.instance().version() }),
+						new Object[] { model.getConfiguration().version() }),
 				JOptionPane.INFORMATION_MESSAGE, Icons.MINILOGO_ICON);
 	}
 

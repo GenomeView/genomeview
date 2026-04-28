@@ -12,9 +12,9 @@ import net.sf.jannot.Location;
  *
  */
 public class FeatureUtils {
-	public static String displayName(Feature f) {
+	public static String displayName(Feature f, Configuration config) {
 
-		List<String> identifiers = Configuration.instance()
+		List<String> identifiers = config
 				.getStringList("track:feature:labelIdentifiers");
 		String dpName = null;
 		int idx = 0;
@@ -24,12 +24,13 @@ public class FeatureUtils {
 		}
 
 		if (dpName == null) {
-			if (f.type() != null)
+			if (f.type() != null) {
 				dpName = f.type().toString() + " ["
 						+ new Location(f.start(), f.end()) + "]";
-			else
+			} else {
 				dpName = "[" + new Location(f.start(), f.end()).toString()
 						+ "]";
+			}
 		}
 
 		return dpName;

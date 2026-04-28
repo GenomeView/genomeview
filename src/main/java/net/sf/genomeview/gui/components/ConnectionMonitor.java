@@ -37,7 +37,8 @@ public class ConnectionMonitor extends Observable {
 	public JLabel networkLabel = new JLabel();
 	public JLabel webLabel = new JLabel();
 	public JLabel reposLabel = new JLabel();
-	private final Reporter log;
+	private Reporter log;
+	private Configuration config;
 
 	/**
 	 * One instance of this is created in the Model at startup. No need to
@@ -45,8 +46,9 @@ public class ConnectionMonitor extends Observable {
 	 * 
 	 * @param log the {@link Reporter} to log issues to
 	 */
-	public ConnectionMonitor(Reporter log) {
+	public ConnectionMonitor(Reporter log, Configuration config) {
 		this.log = log;
+		this.config = config;
 		// FIXME this monitor should not manipulate GUI labels?
 		networkLabel.setPreferredSize(
 				new Dimension(online.getIconWidth(), online.getIconHeight()));
@@ -81,7 +83,7 @@ public class ConnectionMonitor extends Observable {
 				try {
 					Enumeration<NetworkInterface> nets = NetworkInterface
 							.getNetworkInterfaces();
-					for (NetworkInterface netint : Collections.list(nets))
+					for (NetworkInterface netint : Collections.list(nets)) {
 						if (!netint.isLoopback()) {
 							text.append((netint.isUp() ? "online" : "offline")
 									+ " - " + netint.getName() + " - "
@@ -89,6 +91,7 @@ public class ConnectionMonitor extends Observable {
 									+ "<br/>");
 
 						}
+					}
 					networkLabel.setToolTipText(
 							"<html>" + text.toString() + "</html>");
 				} catch (Exception e) {
@@ -117,8 +120,7 @@ public class ConnectionMonitor extends Observable {
 					webstartOnline = false;
 
 					try {
-						if (Configuration.instance()
-								.getBoolean("general:monitorConnection")) {
+						if (config.getBoolean("general:monitorConnection")) {
 							LineIterator it = new LineIterator(
 									"http://genomeview.org/online.php");
 							// log.info("Reply from web: " + it.next());
@@ -149,8 +151,7 @@ public class ConnectionMonitor extends Observable {
 				while (true) {
 					reposOnline = false;
 					try {
-						if (Configuration.instance()
-								.getBoolean("general:monitorConnection")) {
+						if (config.getBoolean("general:monitorConnection")) {
 							LineIterator it = new LineIterator(
 									"http://www.broadinstitute.org/software/genomeview/online.php");
 							// log.info("Reply from repository: " + it.next());
@@ -184,12 +185,14 @@ public class ConnectionMonitor extends Observable {
 					try {
 						Enumeration<NetworkInterface> nets = NetworkInterface
 								.getNetworkInterfaces();
-						for (NetworkInterface netint : Collections.list(nets))
+						for (NetworkInterface netint : Collections.list(nets)) {
 							if (!netint.isLoopback()) {
-								if (netint.isUp())
+								if (netint.isUp()) {
 									networkInterface = true;
+								}
 
 							}
+						}
 
 					} catch (Exception e) {
 						log.log(Level.WARNING,

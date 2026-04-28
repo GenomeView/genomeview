@@ -32,20 +32,19 @@ public class ColorConfig extends GridBagPanel {
 		private static final long serialVersionUID = -290128964356729238L;
 
 		private ColorLabel(final Model model, final String configKey) {
-			super(new ColorIcon(Configuration.instance().getColor(configKey),
+			super(new ColorIcon(model.getConfiguration().getColor(configKey),
 					16));
 			this.addMouseListener(new MouseAdapter() {
+				@Override
 				public void mouseClicked(MouseEvent e) {
+					Configuration conf = model.getConfiguration();
 					Color newColor = JColorChooser.showDialog(
 							model.getGUIManager().getMainWindow(),
-							"Choose color",
-							Configuration.instance().getColor(configKey));
+							"Choose color", conf.getColor(configKey));
 
 					if (newColor != null) {
-						Configuration.instance().setColor(configKey, newColor);
-						setIcon(new ColorIcon(
-								Configuration.instance().getColor(configKey),
-								16));
+						conf.setColor(configKey, newColor);
+						setIcon(new ColorIcon(conf.getColor(configKey), 16));
 					}
 				}
 			});

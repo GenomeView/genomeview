@@ -17,8 +17,8 @@ class IntegerConfig extends Container {
 
 	private JIntegerField valueField = new JIntegerField("");
 
-	IntegerConfig(final String key, final String title) {
-		valueField.setText(Configuration.instance().get(key));
+	IntegerConfig(final String key, final String title, Configuration config) {
+		valueField.setText(config.get(key));
 		label.setText(title);
 		setLayout(new BorderLayout());
 		add(label, BorderLayout.WEST);
@@ -28,7 +28,7 @@ class IntegerConfig extends Container {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				super.keyReleased(e);
-				Configuration.instance().set(key, valueField.getValue());
+				config.set(key, valueField.getValue());
 
 			}
 

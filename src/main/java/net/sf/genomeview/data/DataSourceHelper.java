@@ -18,7 +18,6 @@ import be.abeel.gui.MemoryWidget;
 import be.abeel.io.ExtensionManager;
 import htsjdk.samtools.seekablestream.SeekableFileStream;
 import htsjdk.samtools.seekablestream.SeekableStream;
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.JOptionPaneX;
 import net.sf.jannot.ConvertWig2TDF;
@@ -187,7 +186,8 @@ public class DataSourceHelper {
 			problem(model, "large_file_warn", "large_file",
 					JOptionPane.ERROR_MESSAGE);
 		}
-		DataSource ds = DataSourceFactory.create(data, index, model.getLog());
+		DataSource ds = DataSourceFactory.create(data, index,
+				model.getGlobal());
 		if (ds instanceof AbstractStreamDataSource) {
 			AbstractStreamDataSource asd = ((AbstractStreamDataSource) ds);
 			if (asd.getParser() == null) {
@@ -264,7 +264,7 @@ public class DataSourceHelper {
 	private static void convertWig2TDF(final Model model, final Locator data,
 			final Reporter log) {
 		JFileChooser chooser = new JFileChooser(
-				Configuration.instance().getFile("lastDirectory"));
+				model.getConfiguration().getFile("lastDirectory"));
 		chooser.resetChoosableFileFilters();
 
 		chooser.addChoosableFileFilter(new FileFilter() {
@@ -300,7 +300,7 @@ public class DataSourceHelper {
 				@Override
 				public void run() {
 					try {
-						Configuration.instance().set("lastDirectory",
+						model.getConfiguration().set("lastDirectory",
 								files.getParentFile());
 						File extFile = ExtensionManager.extension(files, "tdf");
 						ConvertWig2TDF.convertWig2TDF(data, extFile, log);
@@ -309,7 +309,8 @@ public class DataSourceHelper {
 								"Load newly create tdf file as: " + mafdata);
 						load(model, mafdata);
 					} catch (Exception e) {
-						model.daemonException(e);
+						model.getLog().log(Level.WARNING, "failed to load tdf",
+								e);
 					}
 				}
 
@@ -327,7 +328,7 @@ public class DataSourceHelper {
 			public void run() {
 				try {
 					JFileChooser chooser = new JFileChooser(
-							Configuration.instance().getFile("lastDirectory"));
+							model.getConfiguration().getFile("lastDirectory"));
 					chooser.resetChoosableFileFilters();
 
 					chooser.addChoosableFileFilter(new FileFilter() {
@@ -364,7 +365,7 @@ public class DataSourceHelper {
 						File files = chooser.getSelectedFile();
 						// DataSource[] out = new DataSource[files.length];
 						try {
-							Configuration.instance().set("lastDirectory",
+							model.getConfiguration().set("lastDirectory",
 									files.getParentFile());
 							File file = ExtensionManager.extension(files,
 									"maf.bgz");
@@ -445,7 +446,7 @@ public class DataSourceHelper {
 	 * @return a parser as selected.
 	 */
 	private static Parser offerParserChoice(Model model, Locator l) {
-		Parser[] list = ParserFactory.parsers(l, model.getLog());
+		Parser[] list = ParserFactory.parsers(l, model.getGlobal());
 		Parser p = (Parser) JOptionPane.showInputDialog(
 				model.getGUIManager().getMainWindow(),
 				MessageManager

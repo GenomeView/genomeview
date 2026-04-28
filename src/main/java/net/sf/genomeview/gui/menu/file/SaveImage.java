@@ -40,8 +40,9 @@ public class SaveImage extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		final Configuration config = model.getConfiguration();
 		final JFileChooser chooser = new JFileChooser(
-				Configuration.instance().getFile("lastDirectory"));
+				config.getFile("lastDirectory"));
 		chooser.setMultiSelectionEnabled(false);
 
 		int result = chooser
@@ -68,7 +69,7 @@ public class SaveImage extends AbstractAction {
 					try {
 						GeneEvidenceLabel mw = model.getGUIManager()
 								.getEvidenceLabel();
-						int factor = Configuration.instance()
+						int factor = config
 								.getInt("general:exportMagnifyFactor");
 						BufferedImage bi = new BufferedImage(
 								mw.getWidth() * factor, mw.getHeight() * factor,
@@ -82,8 +83,7 @@ public class SaveImage extends AbstractAction {
 						mw.paintTracks(g, null);
 						ImageIO.write(bi, "PNG", ef);
 						currentManager.setDoubleBufferingEnabled(true);
-						Configuration.instance().set("lastDirectory",
-								ef.getParentFile());
+						config.set("lastDirectory", ef.getParentFile());
 						h.dispose();
 					} catch (Exception ex) {
 						model.getLog().log(Level.SEVERE, "save failed", ex);

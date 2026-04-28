@@ -11,7 +11,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import be.abeel.gui.GridBagPanel;
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 
 /**
@@ -29,7 +28,7 @@ public class ComboBoxConfig extends GridBagPanel {
 		gc.gridx++;
 
 		final JComboBox<String> jbc = new JComboBox<>(list);
-		jbc.setSelectedItem(Configuration.instance().get(selectedKey));
+		jbc.setSelectedItem(model.getConfiguration().get(selectedKey));
 
 		jbc.addActionListener(new ActionListener() {
 
@@ -37,7 +36,7 @@ public class ComboBoxConfig extends GridBagPanel {
 			public void actionPerformed(ActionEvent e) {
 				Object o = jbc.getSelectedItem();
 				model.getLog().log(Level.INFO, "Selected item: " + o);
-				Configuration.instance().set(selectedKey, o.toString());
+				model.getConfiguration().set(selectedKey, o.toString());
 
 			}
 

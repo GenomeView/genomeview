@@ -27,11 +27,12 @@ import javax.swing.JPanel;
 import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.DistributingReporter;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.jannot.Cleaner;
+import net.sf.jannot.DistributingReporter;
+import net.sf.jannot.Global;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -52,8 +53,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 	private final LogWindow logwindow;
 
-	private Model model = null;
-	private final DistributingReporter log;
+	private final Model model;
+	private final Global global;
 
 	/**
 	 * 
@@ -63,12 +64,33 @@ public class WindowManager extends WindowAdapter implements Observer {
 	 * @throws InterruptedException
 	 * @throws ExecutionException
 	 */
-	public WindowManager(String args[], Splash splash, DistributingReporter log)
+	public WindowManager(String args[], Splash splash, Global global,
+			Configuration configuration)
 			throws InterruptedException, ExecutionException {
-		this.log = log;
+		this.global = global;
+		DistributingReporter log = global.getLog();
 		running++;
 		logwindow = new LogWindow(log);
-		init(args, splash);
+
+		CommandLineOptions options;
+		try {
+			options = new CommandLineOptions(args, configuration);
+		} catch (IllegalOptionValueException | UnknownOptionException e) {
+			throw new ExecutionException(
+					MessageManager.getString(
+							"commandlineoptions.parsing_command_line_error"),
+					e);
+		} catch (IOException | URISyntaxException e) {
+			throw new ExecutionException("Loading extra options failed", e);
+		}
+
+		model = new Model(options.id(), global, configuration);
+
+		model.addObserver(this);
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+				.addKeyEventDispatcher(new Hotkeys(model));
+
+		init(args, splash, options);
 		log.log(Level.INFO, "Started running instance" + running);
 	}
 
@@ -132,7 +154,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 					"Disposing the window in MainWindow.update()");
 			dispose();
 			try {
-				Configuration.instance().save();
+				model.getConfiguration().save();
 			} catch (IOException e) {
 				model.getLog().log(Level.WARNING,
 						"Problem saving configuration", e);
@@ -198,28 +220,19 @@ public class WindowManager extends WindowAdapter implements Observer {
 	/**
 	 * 
 	 * @param args
-	 * @param splash a splash window. If not null, some messages are shown there
+	 * @param splash        a splash window. If not null, some messages are
+	 *                      shown there
+	 * @param options
+	 * @param configuration
 	 * @throws InterruptedException
 	 * @throws ExecutionException
 	 */
-	public void init(String[] args, Splash splash)
+	public void init(String[] args, Splash splash, CommandLineOptions options)
 			throws InterruptedException, ExecutionException {
 		// FIXME special handling if this is not the first time the application
 		// is initialized
 
 		info(MessageManager.getString("windowmanager.parsing_params"), splash);
-
-		CommandLineOptions options;
-		try {
-			options = new CommandLineOptions(args);
-		} catch (IllegalOptionValueException | UnknownOptionException e) {
-			throw new ExecutionException(
-					MessageManager.getString(
-							"commandlineoptions.parsing_command_line_error"),
-					e);
-		} catch (IOException | URISyntaxException e) {
-			throw new ExecutionException("Loading extra options failed", e);
-		}
 
 		info(MessageManager.getString("windowmanager.creating_windows"),
 				splash);
@@ -229,19 +242,12 @@ public class WindowManager extends WindowAdapter implements Observer {
 		GraphicsDevice[] gs = ge.getScreenDevices();
 		boolean freshwindow = false;
 
-		if (model == null) {
-			model = new Model(options.id(), log);
-			model.addObserver(this);
-			KeyboardFocusManager.getCurrentKeyboardFocusManager()
-					.addKeyEventDispatcher(new Hotkeys(model));
-		}
-
 		if (window == null) {
 			freshwindow = true;
 			model.getLog().log(Level.INFO, MessageManager
 					.getString("windowmanager.creating_new_window"));
 			window = new GenomeViewWindow(model,
-					"GenomeView :: " + Configuration.instance().version(),
+					"GenomeView :: " + model.getConfiguration().version(),
 					gs[0].getDefaultConfiguration());
 			model.getGUIManager().registerMainWindow(window);
 			window.setIconImage(Icons.MINILOGO);
@@ -258,7 +264,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 		if (freshwindow) {
 			JPanel[] content = MainContent.createContent(model,
-					Configuration.instance().getBoolean("dualscreen")
+					model.getConfiguration().getBoolean("dualscreen")
 							? gs.length
 							: 1);
 			window.setContentPane(content[0]);
@@ -273,7 +279,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 				for (int i = 1; i < content.length; i++) {
 					helper = new GenomeViewWindow(model,
 							"GenomeView :: "
-									+ Configuration.instance().version(),
+									+ model.getConfiguration().version(),
 							gs[i].getDefaultConfiguration());
 					helper.setJMenuBar(new MainMenu(model));
 					helper.setIconImage(new ImageIcon(
@@ -312,7 +318,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 	}
 
 	private void info(String message, Splash splash) {
-		log.log(Level.INFO, message);
+		global.getLog().log(Level.INFO, message);
 		if (splash != null) {
 			splash.setText(message);
 		}

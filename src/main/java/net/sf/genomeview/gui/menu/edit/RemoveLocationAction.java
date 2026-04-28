@@ -23,16 +23,16 @@ import net.sf.jannot.MemoryFeatureAnnotation;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class RemoveLocationAction extends AbstractModelAction
 		implements Observer {
-
-	private static final long serialVersionUID = -5857913546086864524L;
 
 	public RemoveLocationAction(Model model) {
 		super(MessageManager.getString("editmenu.remove_location"), model);
 	}
 
-	public void actionPerformed(ActionEvent arg0) {
+	@Override
+	public void actionPerformedSafe(ActionEvent arg0) {
 
 		Set<Location> toRemove = new HashSet<Location>();
 		toRemove.addAll(model.selectionModel().getLocationSelection());
@@ -40,13 +40,9 @@ public class RemoveLocationAction extends AbstractModelAction
 		for (Location rf : toRemove) {
 			Feature f = rf.getParent();
 			/* If there are more locations, remove the selected one */
-			if (f.location().length > 1)
+			if (f.location().length > 1) {
 				f.removeLocation(rf);
-			/*
-			 * If this is the last location of the feature, remove the feature
-			 * instead
-			 */
-			else {
+			} else {
 				Data<?> d = model.vlm.getVisibleEntry().get(f.type());
 				if (d instanceof MemoryFeatureAnnotation) {
 					MemoryFeatureAnnotation mf = (MemoryFeatureAnnotation) d;
@@ -59,7 +55,8 @@ public class RemoveLocationAction extends AbstractModelAction
 
 	}
 
-	public void update(Observable o, Object arg) {
+	@Override
+	public void updateSafe(Observable o, Object arg) {
 		SortedSet<Location> set = model.selectionModel().getLocationSelection();
 		setEnabled(set.size() > 0);
 

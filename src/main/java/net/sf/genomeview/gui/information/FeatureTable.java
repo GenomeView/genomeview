@@ -30,7 +30,6 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.genomeview.gui.viztracks.annotation.FeatureUtils;
 import net.sf.jannot.Feature;
-import net.sf.jannot.Location;
 
 /**
  * Provides an overview of all gene structures.
@@ -40,23 +39,65 @@ import net.sf.jannot.Location;
  */
 public class FeatureTable extends JTable implements Observer, ActionListener {
 
-	private static final long serialVersionUID = 8956245030328303086L;
-
 	final FeatureTableModel listModel;
 
 	private Model model;
 
+	public FeatureTable(final Model model) {
+		super(new FeatureTableModel(model));
+		FeatureTableSelectionModel ftsm = new FeatureTableSelectionModel();
+		setSelectionModel(ftsm);
+		setDefaultRenderer(String.class, new FeatureTableCellRenderer());
+		model.addObserver(this);
+		this.model = model;
+		listModel = (FeatureTableModel) this.getModel();
+
+		// setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		// getColumnModel().getColumn(0).setPreferredWidth(200);
+		for (int i = 1; i < this.getColumnCount(); i++) {
+			getColumnModel().getColumn(i).setPreferredWidth(30);
+			getColumnModel().getColumn(i).setMaxWidth(50);
+		}
+		getTableHeader()
+				.addMouseMotionListener(new ColumnHeaderToolTips(listModel));
+		getTableHeader().setReorderingAllowed(false);
+
+		ToolTipManager.sharedInstance().setInitialDelay(0);
+
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() > 0) {
+
+					Feature rf = listModel.getFeature(rowAtPoint(e.getPoint()));
+
+					model.selectionModel().setLocationSelection(rf);
+
+					if (e.getClickCount() > 1) {
+						int min = rf.start();
+						int max = rf.end();
+						model.vlm.center((min + max) / 2);
+					}
+				}
+
+			}
+		});
+	}
+
 	class FeatureTableCellRenderer extends DefaultTableCellRenderer {
 
-		public Component getTableCellRendererComponent(JTable tbl, Object v, boolean isSelected, boolean isFocused,
-				int row, int col) {
+		@Override
+		public Component getTableCellRendererComponent(JTable tbl, Object v,
+				boolean isSelected, boolean isFocused, int row, int col) {
 			this.setForeground(Color.DARK_GRAY);
-			Component c = super.getTableCellRendererComponent(tbl, v, isSelected, isFocused, row, col);
-			
-			Feature f=(Feature)v;
-			setText(FeatureUtils.displayName(f));
+			Component c = super.getTableCellRendererComponent(tbl, v,
+					isSelected, isFocused, row, col);
+
+			Feature f = (Feature) v;
+			setText(FeatureUtils.displayName(f, model.getConfiguration()));
 			if (tbl.getSelectionModel().isSelectedIndex(row)) {
-				c.setBackground(new Color((float)0.7, (float) 0.7, (float) 1.0));
+				c.setBackground(
+						new Color((float) 0.7, (float) 0.7, (float) 1.0));
 			} else {
 				c.setBackground(Color.white);
 			}
@@ -66,26 +107,26 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 
 	}
 
-	class FeatureTableSelectionModel extends DefaultListSelectionModel implements Observer {
+	class FeatureTableSelectionModel extends DefaultListSelectionModel
+			implements Observer {
 
-		private Model model;
-
-		public FeatureTableSelectionModel(Model model) {
-			this.model = model;
+		public FeatureTableSelectionModel() {
 			model.addObserver(this);
 		}
 
 		@Override
 		public int getMaxSelectionIndex() {
-			if(isSelectionEmpty())
+			if (isSelectionEmpty()) {
 				return -1;
+			}
 			return selection.last();
 		}
 
 		@Override
 		public int getMinSelectionIndex() {
-			if(isSelectionEmpty())
+			if (isSelectionEmpty()) {
 				return -1;
+			}
 			return selection.first();
 		}
 
@@ -107,7 +148,8 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 			Set<Integer> oldSelection = new HashSet<Integer>();
 			oldSelection.addAll(selection);
 
-			SortedSet<Feature> fs = model.selectionModel().getFeatureSelection();
+			SortedSet<Feature> fs = model.selectionModel()
+					.getFeatureSelection();
 			// System.out.println(fs);
 			// int prevIndex = selectedIndex;
 			if (fs.size() > 0) {
@@ -129,46 +171,6 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 
 	}
 
-	public FeatureTable(final Model model) {
-		super(new FeatureTableModel(model));
-		FeatureTableSelectionModel ftsm = new FeatureTableSelectionModel(model);
-		setSelectionModel(ftsm);
-		setDefaultRenderer(String.class, new FeatureTableCellRenderer());
-		model.addObserver(this);
-		this.model = model;
-		listModel = (FeatureTableModel) this.getModel();
-
-		// setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		// getColumnModel().getColumn(0).setPreferredWidth(200);
-		for (int i = 1; i < this.getColumnCount(); i++) {
-			getColumnModel().getColumn(i).setPreferredWidth(30);
-			getColumnModel().getColumn(i).setMaxWidth(50);
-		}
-		getTableHeader().addMouseMotionListener(new ColumnHeaderToolTips(listModel));
-		getTableHeader().setReorderingAllowed(false);
-
-		ToolTipManager.sharedInstance().setInitialDelay(0);
-
-		addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() > 0) {
-
-					Feature rf = listModel.getFeature(rowAtPoint(e.getPoint()));
-
-					model.selectionModel().setLocationSelection(rf);
-
-					if (e.getClickCount() > 1) {
-						int min = rf.start();
-						int max = rf.end();
-						model.vlm.center((min+max)/2);
-					}
-				}
-
-			}
-		});
-	}
-
 	class ColumnHeaderToolTips extends MouseMotionAdapter {
 		private int index = -1;
 
@@ -179,6 +181,7 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 
 		}
 
+		@Override
 		public void mouseMoved(MouseEvent evt) {
 
 			JTableHeader header = (JTableHeader) evt.getSource();
@@ -198,7 +201,7 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 		SortedSet<Feature> fs = model.selectionModel().getFeatureSelection();
 
 		if (fs.size() == 1) {
-			
+
 			if (fs.first().type() == listModel.getType()) {
 				int row = listModel.getRow(fs.first());
 				// getSelectionModel().setSelectionInterval(row, row);
@@ -218,7 +221,8 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 				int bottomVisible = viewport.getViewRect().height + topVisible;
 
 				/* When the cell is visible, don't do anything */
-				if (rect.y > topVisible && rect.y + rect.height < bottomVisible) {
+				if (rect.y > topVisible
+						&& rect.y + rect.height < bottomVisible) {
 					return;
 				}
 				// Translate the cell location so that it is relative
@@ -242,7 +246,7 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 
 				// Scroll the area into view.
 				viewport.scrollRectToVisible(rect);
-				
+
 			}
 		}
 

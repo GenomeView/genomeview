@@ -13,7 +13,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.MessageManager;
@@ -41,7 +40,7 @@ public class LoadSessionAction extends AbstractAction {
 	public void actionPerformed(ActionEvent e) {
 
 		JFileChooser chooser = new JFileChooser(
-				Configuration.instance().getFile("lastDirectory"));
+				model.getConfiguration().getFile("lastDirectory"));
 		chooser.setMultiSelectionEnabled(false);
 		chooser.setFileFilter(new FileFilter() {
 
@@ -81,7 +80,7 @@ public class LoadSessionAction extends AbstractAction {
 						e1);
 			}
 
-			Configuration.instance().set("lastDirectory",
+			model.getConfiguration().set("lastDirectory",
 					chooser.getSelectedFile().getParentFile());
 		}
 

@@ -7,12 +7,14 @@ import java.net.URISyntaxException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import net.sf.genomeview.core.DistributingReporter;
+import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MainContent;
+import net.sf.jannot.Global;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * 
@@ -29,16 +31,18 @@ public class GenomeViewAsComponent {
 	public static void main(String[] args) throws MalformedURLException,
 			IOException, ReadFailedException, URISyntaxException {
 		// quick workaround, logger needs to be redirected to a console
-		final DistributingReporter log = new DistributingReporter();
+		Global global = new Global();
 
 		JFrame frame = new JFrame("GenomeView as component demo");
-		Model model = new Model(null, log);
+		Configuration config = new Configuration(global);
+		Model model = new Model(null, global, config);
 		model.getGUIManager().registerMainWindow(frame);
 		JPanel[] content = MainContent.createContent(model, 1);
 		frame.setContentPane(content[0]);
 		frame.pack();
 		frame.setVisible(true);
 
+		Reporter log = global.getLog();
 		DataSourceHelper.load(model, new Locator(FASTA_EX, log));
 		DataSourceHelper.load(model, new Locator(GFF_EX, log));
 		DataSourceHelper.load(model, new Locator(BAM_EX, log));

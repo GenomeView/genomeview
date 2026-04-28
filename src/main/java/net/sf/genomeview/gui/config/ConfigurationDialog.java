@@ -37,8 +37,9 @@ public class ConfigurationDialog extends JDialog {
 	private static ConfigurationDialog dialog = null;
 
 	public static void showConfigurationDialog(Model model) {
-		if (dialog == null)
+		if (dialog == null) {
 			dialog = new ConfigurationDialog(model);
+		}
 		dialog.setVisible(true);
 	}
 
@@ -75,17 +76,16 @@ public class ConfigurationDialog extends JDialog {
 											"configdialog.tracks_log_scale")),
 					gc);
 			gc.gridy++;
-			this.add(
-					ConfigBox.doubleInstance("pileup:maxPile",
-							MessageManager.getString(
-									"configdialog.max_height_pileup_track")),
-					gc);
+			this.add(ConfigBox.doubleInstance("pileup:maxPile",
+					MessageManager.getString(
+							"configdialog.max_height_pileup_track"),
+					model), gc);
 			gc.gridy++;
 			this.add(
-					ConfigBox
-							.integerInstance("pileup:switchBarLine",
-									MessageManager.getString(
-											"configdialog.switch_bar_to_line")),
+					ConfigBox.integerInstance("pileup:switchBarLine",
+							MessageManager.getString(
+									"configdialog.switch_bar_to_line"),
+							model),
 					gc);
 
 		}
@@ -99,13 +99,13 @@ public class ConfigurationDialog extends JDialog {
 			setLayout(new BorderLayout());
 			Container aa = new Container();
 			aa.setLayout(new GridLayout(0, 8));
-			for (char c : Configuration.instance().getAminoAcids()) {
+			for (char c : model.getConfiguration().getAminoAcids()) {
 				aa.add(ConfigBox.colorInstance(model, "AA_" + c, "" + c));
 
 			}
 			Container nt = new Container();
 			nt.setLayout(new GridLayout(0, 8));
-			for (char c : Configuration.instance().getNucleotides()) {
+			for (char c : model.getConfiguration().getNucleotides()) {
 				nt.add(ConfigBox.colorInstance(model, "N_" + c, "" + c));
 			}
 			this.add(new TitledComponent(
@@ -129,45 +129,45 @@ public class ConfigurationDialog extends JDialog {
 
 		public ShortReadConfigPanel(Model model) {
 
-			this.add(ConfigBox.integerInstance("shortread:graphLineHeight",
-					MessageManager
-							.getString("configdialog.coverage_graph_height")),
-					gc);
-			gc.gridy++;
-
 			this.add(
-					ConfigBox
-							.integerInstance("shortread:snpTrackHeight",
-									MessageManager.getString(
-											"configdialog.snp_track_height")),
-					gc);
-			gc.gridy++;
-
-			this.add(
-					ConfigBox
-							.integerInstance(
-									"shortread:snpTrackMinimumCoverage",
-									MessageManager.getString(
-											"configdialog.snp_min_coverage")),
-					gc);
-			gc.gridy++;
-
-			this.add(
-					ConfigBox.integerInstance("shortread:maxReads",
+					ConfigBox.integerInstance("shortread:graphLineHeight",
 							MessageManager.getString(
-									"configdialog.max_number_displayed_reads")),
+									"configdialog.coverage_graph_height"),
+							model),
 					gc);
+			gc.gridy++;
+
+			this.add(
+					ConfigBox.integerInstance("shortread:snpTrackHeight",
+							MessageManager.getString(
+									"configdialog.snp_track_height"),
+							model),
+					gc);
+			gc.gridy++;
+
+			this.add(
+					ConfigBox.integerInstance(
+							"shortread:snpTrackMinimumCoverage",
+							MessageManager.getString(
+									"configdialog.snp_min_coverage"),
+							model),
+					gc);
+			gc.gridy++;
+
+			this.add(ConfigBox.integerInstance("shortread:maxReads",
+					MessageManager.getString(
+							"configdialog.max_number_displayed_reads"),
+					model), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("shortread:maxRegion",
 					MessageManager.getString(
-							"configdialog.max_range_nucleotides_reads")),
-					gc);
+							"configdialog.max_range_nucleotides_reads"),
+					model), gc);
 			gc.gridy++;
-			this.add(
-					ConfigBox.integerInstance("shortread:maxStack",
-							MessageManager.getString(
-									"configdialog.max_depth_stacked_reads")),
-					gc);
+			this.add(ConfigBox.integerInstance("shortread:maxStack",
+					MessageManager.getString(
+							"configdialog.max_depth_stacked_reads"),
+					model), gc);
 			gc.gridy++;
 			this.add(ConfigBox.booleanInstance(model, "shortread:enablepairing",
 					MessageManager.getString(
@@ -176,21 +176,20 @@ public class ConfigurationDialog extends JDialog {
 			gc.gridy++;
 			this.add(
 					ConfigBox.integerInstance("shortread:maximumCache",
-							MessageManager
-									.getString("configdialog.max_reads_cache")),
+							MessageManager.getString(
+									"configdialog.max_reads_cache"),
+							model),
 					gc);
 			gc.gridy++;
-			this.add(
-					ConfigBox.integerInstance("shortread:maximumPairing",
-							MessageManager.getString(
-									"configdialog.max_distance_paired_reads")),
-					gc);
+			this.add(ConfigBox.integerInstance("shortread:maximumPairing",
+					MessageManager.getString(
+							"configdialog.max_distance_paired_reads"),
+					model), gc);
 			gc.gridy++;
-			this.add(
-					ConfigBox.integerInstance("shortread:maximumPairing",
-							MessageManager.getString(
-									"configdialog.max_distance_paired_reads")),
-					gc);
+			this.add(ConfigBox.integerInstance("shortread:maximumPairing",
+					MessageManager.getString(
+							"configdialog.max_distance_paired_reads"),
+					model), gc);
 			gc.gridy++;
 			this.add(ConfigBox.colorInstance(model, "shortread:forwardColor",
 					MessageManager.getString(
@@ -250,9 +249,11 @@ public class ConfigurationDialog extends JDialog {
 							"configdialog.show_structure_track_on_startup")),
 					gc);
 			gc.gridy++;
-			this.add(ConfigBox.integerInstance("geneStructureLineHeight",
-					MessageManager
-							.getString("configdialog.track_height_pixels")),
+			this.add(
+					ConfigBox.integerInstance("geneStructureLineHeight",
+							MessageManager.getString(
+									"configdialog.track_height_pixels"),
+							model),
 					gc);
 			gc.gridy++;
 			this.add(
@@ -284,12 +285,10 @@ public class ConfigurationDialog extends JDialog {
 					gc);
 			gc.gridy++;
 
-			this.add(
-					ConfigBox.integerInstance(
-							"structureview:maximumNoVisibleFeatures",
-							MessageManager
-									.getString("configdialog.max_features")),
-					gc);
+			this.add(ConfigBox.integerInstance(
+					"structureview:maximumNoVisibleFeatures",
+					MessageManager.getString("configdialog.max_features"),
+					model), gc);
 
 		}
 	}
@@ -343,14 +342,16 @@ public class ConfigurationDialog extends JDialog {
 					gc);
 			gc.gridy++;
 			this.add(
-					ConfigBox.stringInstance("maf:annotationType",
+					ConfigBox.stringInstance(model, "maf:annotationType",
 							MessageManager.getString(
 									"configdialog.annotation_comparative")),
 					gc);
 			gc.gridy++;
-			this.add(ConfigBox.integerInstance("maf:maximumVisibleRange",
-					MessageManager
-							.getString("configdialog.maximum_visible_range")),
+			this.add(
+					ConfigBox.integerInstance("maf:maximumVisibleRange",
+							MessageManager.getString(
+									"configdialog.maximum_visible_range"),
+							model),
 					gc);
 			gc.gridy++;
 			this.add(
@@ -363,18 +364,14 @@ public class ConfigurationDialog extends JDialog {
 
 	class MiscellaneousPanel extends GridBagPanel {
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 511805592898297604L;
-
+// FIXME clean this up
 		public MiscellaneousPanel(final Model model) {
+			final Configuration config = model.getConfiguration();
 			gc.gridwidth = 2;
 			gc.weightx = 1;
 			this.add(
-					ConfigBox.integerInstance("general:zoomout",
-							MessageManager
-									.getString("configdialog.max_zoom_out")),
+					ConfigBox.integerInstance("general:zoomout", MessageManager
+							.getString("configdialog.max_zoom_out"), model),
 					gc);
 			gc.gridy++;
 			this.add(
@@ -405,16 +402,15 @@ public class ConfigurationDialog extends JDialog {
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("general:exportMagnifyFactor",
 					MessageManager.getString(
-							"configdialog.resultion_increase_export_images")),
-					gc);
+							"configdialog.resultion_increase_export_images"),
+					model), gc);
 			gc.gridy++;
 
-			this.add(
-					ConfigBox.dropDownInstance(model, Configuration
-							.instance().getStringSet("resource:lang:available")
-							.toArray(new String[0]), "lang:current",
-							MessageManager
-									.getString("configdialog.select_language")),
+			this.add(ConfigBox.dropDownInstance(model,
+					config.getStringSet("resource:lang:available")
+							.toArray(new String[0]),
+					"lang:current",
+					MessageManager.getString("configdialog.select_language")),
 					gc);
 
 			gc.gridy++;
@@ -443,7 +439,7 @@ public class ConfigurationDialog extends JDialog {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					Configuration.instance().reset(model);
+					config.reset(model);
 
 				}
 
@@ -456,8 +452,7 @@ public class ConfigurationDialog extends JDialog {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					File dir = new File(Configuration.instance().getDirectory(),
-							"cache");
+					File dir = new File(config.getDirectory(), "cache");
 					;
 					for (File f : dir.listFiles()) {
 						model.getLog().log(Level.INFO,
@@ -491,7 +486,7 @@ public class ConfigurationDialog extends JDialog {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				try {
-					Configuration.instance().save();
+					model.getConfiguration().save();
 					model.refresh(NotificationTypes.CONFIGURATION_CHANGE);
 				} catch (IOException e1) {
 					model.getLog().log(Level.WARNING, "window close issue", e1);
@@ -536,13 +531,11 @@ public class ConfigurationDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					Configuration.instance().save();
+				StaticUtils.run(() -> {
+					model.getConfiguration().save();
 					model.refresh(NotificationTypes.CONFIGURATION_CHANGE);
-				} catch (IOException e1) {
-					model.getLog().log(Level.WARNING, "config change issue",
-							e1);
-				}
+				}, model.getLog(), Level.WARNING, "config change issue");
+
 				setVisible(false);
 
 			}

@@ -11,7 +11,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.MessageManager;
@@ -35,7 +34,7 @@ public class SaveSessionAction extends AbstractAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JFileChooser chooser = new JFileChooser(
-				Configuration.instance().getFile("lastDirectory"));
+				model.getConfiguration().getFile("lastDirectory"));
 		chooser.setMultiSelectionEnabled(false);
 		chooser.setFileFilter(new FileFilter() {
 
@@ -63,7 +62,7 @@ public class SaveSessionAction extends AbstractAction {
 
 				Session.save(f, model);
 
-				Configuration.instance().set("lastDirectory",
+				model.getConfiguration().set("lastDirectory",
 						f.getParentFile());
 
 			} catch (Exception ex) {

@@ -44,12 +44,11 @@ public class InitDataLoader {
 	public void init(String cmdUrl, String cmdFile, String[] remArgs,
 			String position, String session)
 			throws InterruptedException, ExecutionException {
+		Configuration conf = model.getConfiguration();
 
-		SourceCache.cacheDir = new File(Configuration.instance().getDirectory(),
-				"cache");
-		IndexManager.cacheDir = new File(
-				Configuration.instance().getDirectory(), "index");
-		DataSourceFactory.disableURLCaching = Configuration.instance()
+		SourceCache.cacheDir = new File(conf.getDirectory(), "cache");
+		IndexManager.cacheDir = new File(conf.getDirectory(), "index");
+		DataSourceFactory.disableURLCaching = conf
 				.getBoolean("general:disableURLCaching");
 		final Reporter log = model.getLog();
 
@@ -58,8 +57,9 @@ public class InitDataLoader {
 		 * session does.
 		 */
 		try {
-			if (session != null)
+			if (session != null) {
 				Session.loadSession(model, session);
+			}
 		} catch (IOException e1) {
 			model.getLog().log(Level.WARNING, MessageManager.getString(
 					"crashhandler.failed_to_propertly_load_requested_session"),

@@ -24,7 +24,6 @@ import net.sf.genomeview.gui.dialog.TryAgainHandler;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.Locator;
-import net.sf.nameservice.NameService;
 
 /**
  * 
@@ -87,6 +86,7 @@ public class Session {
 	private static Thread loadSession(final Model model, final InputStream is) {
 		model.messageModel().setStatusBarMessage(
 				MessageManager.getString("session.preparing_load_session"));
+		final Configuration config = model.getConfiguration();
 
 		Thread t = new Thread(new Runnable() {
 
@@ -110,8 +110,9 @@ public class Session {
 						for (String line : it) {
 							try {
 								if (line.trim().startsWith("#")
-										|| line.trim().isEmpty())
+										|| line.trim().isEmpty()) {
 									continue;
+								}
 								char firstchar = line.toUpperCase().charAt(0);
 
 								String[] arr = line.split("[: \t]", 2);
@@ -136,10 +137,11 @@ public class Session {
 									try {
 										switch (si) {
 										case PREFIX:
-											if (arr.length == 1)
+											if (arr.length == 1) {
 												prefix = "";
-											else
+											} else {
 												prefix = arr[1].trim();
+											}
 											break;
 										case EXTRA:
 											model.getExtraSessionFiles()
@@ -162,6 +164,7 @@ public class Session {
 																+ line
 																+ " from the session file.\n\tTo recover GenomeView skipped this file.",
 														new Runnable() {
+															@Override
 															public void run() {
 																try {
 																	DataSourceHelper
@@ -183,25 +186,23 @@ public class Session {
 											break;
 										case C:
 										case CONFIG:
-											Configuration.instance()
-													.loadExtra(new Locator(
-															prefix + arr[1]
-																	.trim(),
-															model.getLog())
-															.stream());
+											config.loadExtra(new Locator(
+													prefix + arr[1].trim(),
+													model.getLog()).stream());
 											// Configuration.loadExtra(URIFactory.url(arr[1]).openStream());
 											break;
 										case OPTION:
 											String[] ap = arr[1].trim()
 													.split("=", 2);
-											Configuration.instance().set(
-													ap[0].trim(), ap[1].trim());
+											config.set(ap[0].trim(),
+													ap[1].trim());
 											break;
 										case ALIAS:
 											String[] al = arr[1].trim()
 													.split("=", 2);
-											NameService.instance().addSynonym(
-													al[1].trim(), al[0].trim());
+											model.getGlobal().getNameService()
+													.addSynonym(al[1].trim(),
+															al[0].trim());
 											break;
 										case LOCATION:
 											model.setPosition(arr[1].trim());
@@ -252,9 +253,9 @@ public class Session {
 			Locator l = ds.getLocator();
 			out.println("DATA:" + l);
 		}
-		for (String key : Configuration.instance().keySet()) {
+		for (String key : model.getConfiguration().keySet()) {
 			out.println(
-					"OPTION:" + key + "=" + Configuration.instance().get(key));
+					"OPTION:" + key + "=" + model.getConfiguration().get(key));
 
 		}
 

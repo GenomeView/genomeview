@@ -28,7 +28,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 
 /**
@@ -43,15 +42,10 @@ public class StringConfig extends Container {
 
 	private JTextField valueField = new JTextField("");
 
-	@Deprecated
-	public StringConfig(final String key, final String title) {
-		this(key, title, null);
-	}
-
 	public StringConfig(final String key, final String title,
 			final Model model) {
 
-		valueField.setText(Configuration.instance().get(key));
+		valueField.setText(model.getConfiguration().get(key));
 		label.setText(title);
 		setLayout(new BorderLayout());
 		add(label, BorderLayout.WEST);
@@ -61,9 +55,10 @@ public class StringConfig extends Container {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				super.keyReleased(e);
-				Configuration.instance().set(key, valueField.getText());
-				if (model != null)
+				model.getConfiguration().set(key, valueField.getText());
+				if (model != null) {
 					model.refresh();
+				}
 			}
 
 		});

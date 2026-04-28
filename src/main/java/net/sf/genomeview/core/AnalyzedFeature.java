@@ -28,12 +28,14 @@ public class AnalyzedFeature {
 	private String translation;
 	private Sequence dna;
 	private String startCodon;
+	private final Configuration config;
 
 	public AnalyzedFeature(Sequence sequence, Feature rf,
-			AminoAcidMapping aminoAcidMapping) {
+			AminoAcidMapping aminoAcidMapping, Configuration config) {
 		this.seq = sequence;
 		this.f = rf;
 		this.aa = aminoAcidMapping;
+		this.config = config;
 		dna = SequenceTools.extractSequence(seq, f);
 		startCodon = dna.subsequence(1, 4).stringRepresentation();
 		translation = SequenceTools.translate(dna, aa);
@@ -89,11 +91,12 @@ public class AnalyzedFeature {
 	}
 
 	public boolean hasMissingStartCodon() {
-		if (aa.isStart(startCodon))
-			if (!Configuration.instance()
-					.getBoolean("general:onlyMethionineAsStart")
-					|| aa.get(startCodon) == 'M')
+		if (aa.isStart(startCodon)) {
+			if (!config.getBoolean("general:onlyMethionineAsStart")
+					|| aa.get(startCodon) == 'M') {
 				return false;
+			}
+		}
 		return true;
 
 	}
@@ -123,11 +126,13 @@ public class AnalyzedFeature {
 	private Location getntpos(int aapos) {
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		for (Location l : f.location()) {
-			for (int i = l.start; i <= l.end; i++)
+			for (int i = l.start; i <= l.end; i++) {
 				list.add(i);
+			}
 		}
-		if (f.strand() == Strand.REVERSE)
+		if (f.strand() == Strand.REVERSE) {
 			Collections.reverse(list);
+		}
 		return new Location(list.get(aapos * 3), list.get(aapos * 3 + 2));
 
 	}

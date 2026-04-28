@@ -9,7 +9,6 @@ import java.util.Observer;
 
 import javax.swing.JOptionPane;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 
@@ -22,23 +21,26 @@ public class DataExplorerManager implements Observer {
 	DataExplorer bg;
 	private Model model;
 
-	private boolean autoMode = Configuration.instance()
-			.getBoolean("general:enableGenomeExplorer");
+	private boolean autoMode;
 
 	public DataExplorerManager(Model model) {
-		bg = new DataExplorer(model);
 		this.model = model;
+		this.autoMode = model.getConfiguration()
+				.getBoolean("general:enableGenomeExplorer");
+		bg = new DataExplorer(model);
+
 		model.getGUIManager().registerGenomeExplorer(this);
 		model.addObserver(this);
 		model.getWorkerManager().addObserver(this);
 	}
 
 	public void setVisible(final boolean vis) {
-		if (vis)
-			autoMode = Configuration.instance()
+		if (vis) {
+			autoMode = model.getConfiguration()
 					.getBoolean("general:enableGenomeExplorer");
-		else
+		} else {
 			autoMode = false;
+		}
 		visi(vis);
 
 	}
@@ -82,13 +84,15 @@ public class DataExplorerManager implements Observer {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if (!autoMode)
+		if (!autoMode) {
 			return;
+		}
 
 		if (model.getWorkerManager().runningJobs() > 0
 				|| model.entries().size() > 0) {
-			if (bg.isVisible())
+			if (bg.isVisible()) {
 				visi(false);
+			}
 		} else {
 			if (!bg.isVisible()) {
 				visi(true);

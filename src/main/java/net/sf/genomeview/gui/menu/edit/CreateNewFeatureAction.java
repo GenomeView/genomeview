@@ -11,25 +11,24 @@ import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.NewFeatureDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
+@SuppressWarnings("serial")
+public class CreateNewFeatureAction extends AbstractModelAction {
 
+	public CreateNewFeatureAction(Model model) {
+		super(MessageManager.getString("editmenu.create_new_feature"), model);
 
-public class CreateNewFeatureAction extends AbstractModelAction{
+	}
 
-    private static final long serialVersionUID = 4521376746707912717L;
+	@Override
+	public void actionPerformedSafe(ActionEvent e) {
+		NewFeatureDialog nfd = new NewFeatureDialog(model);
+		nfd.setVisible(true);
+	}
 
-    public CreateNewFeatureAction(Model model) {
-        super(MessageManager.getString("editmenu.create_new_feature"), model);
-      
-    }
+	@Override
+	public void updateSafe(Observable o, Object arg) {
+		setEnabled(model.getSelectedRegion() != null);
 
-    public void actionPerformed(ActionEvent e) {
-        NewFeatureDialog nfd = new NewFeatureDialog(model);
-        nfd.setVisible(true);
-    }
-
-    public void update(Observable o, Object arg) {
-        setEnabled(model.getSelectedRegion() != null);
-
-    }
+	}
 
 }

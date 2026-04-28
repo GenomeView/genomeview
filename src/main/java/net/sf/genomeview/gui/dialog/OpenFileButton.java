@@ -13,7 +13,6 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
@@ -42,15 +41,16 @@ public class OpenFileButton extends JButton {
 			public void actionPerformed(ActionEvent e) {
 
 				JFileChooser chooser = new JFileChooser(
-						Configuration.instance().getFile("lastDirectory"));
+						gvModel.getConfiguration().getFile("lastDirectory"));
 				chooser.resetChoosableFileFilters();
 				for (final String ext : exts) {
 					chooser.addChoosableFileFilter(new FileFilter() {
 
 						@Override
 						public boolean accept(File f) {
-							if (f.isDirectory())
+							if (f.isDirectory()) {
 								return true;
+							}
 
 							if (f.getName().toLowerCase().endsWith(ext)
 									|| f.getName().toLowerCase()
@@ -74,8 +74,9 @@ public class OpenFileButton extends JButton {
 
 					@Override
 					public boolean accept(File f) {
-						if (f.isDirectory())
+						if (f.isDirectory()) {
 							return true;
+						}
 						for (String ext : exts) {
 
 							if (f.getName().toLowerCase().endsWith(ext)
@@ -108,7 +109,7 @@ public class OpenFileButton extends JButton {
 									files[i].toString(), gvModel.getLog()));
 
 						}
-						Configuration.instance().set("lastDirectory",
+						gvModel.getConfiguration().set("lastDirectory",
 								files[0].getParentFile());
 						// load(out);
 					} catch (IOException | URISyntaxException

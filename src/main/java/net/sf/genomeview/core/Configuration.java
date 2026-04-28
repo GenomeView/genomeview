@@ -21,8 +21,8 @@ import be.abeel.io.GZIPPrintWriter;
 import be.abeel.io.LineIterator;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.DataKey;
+import net.sf.jannot.Global;
 import net.sf.jannot.Type;
-import net.sf.nameservice.NameService;
 
 /**
  * Low level access to the configuration.
@@ -31,6 +31,7 @@ import net.sf.nameservice.NameService;
  * 
  */
 public class Configuration {
+	private final Global global;
 
 	private static File confDir;
 
@@ -50,16 +51,16 @@ public class Configuration {
 
 	private static File configFile;
 
-	private static Configuration instance;
-
 	/**
+	 * @param global the {@link Global} constants from jannot
 	 * @throws IllegalStateException if the Configuration can not be created or
 	 *                               read. This is a nasty RuntimeException that
 	 *                               we don't catch anywhere, assuming
 	 *                               GenomeView will die instantly at startup if
 	 *                               this happens.
 	 */
-	private Configuration() {
+	public Configuration(Global global) {
+		this.global = global;
 		String s = System.getProperty("user.home");
 		confDir = new File(s + "/.genomeview");
 		if (!confDir.exists()) {
@@ -91,17 +92,6 @@ public class Configuration {
 			throw new IllegalStateException("Failed to load configuration", e);
 		}
 
-	}
-
-	/**
-	 * 
-	 * @return the instance of this Configuration.
-	 */
-	public static Configuration instance() {
-		if (instance == null) {
-			instance = new Configuration();
-		}
-		return instance;
 	}
 
 	/**
@@ -161,14 +151,13 @@ public class Configuration {
 				.getResourceAsStream("/conf/genomeview.properties")) {
 			gvProperties.load(is);
 		} catch (Exception e1) {
-			throw new IOException(
-					"genomeview.properties file could not be loaded! ", e1);
-
+			global.getLog().log(Level.WARNING,
+					"genomeview.properties file could not be loaded!", e1);
 		}
 
 		/* loading default configuration from the jar */
 
-//		logger.info("Loading default configuration...");
+		global.getLog().log(Level.INFO, "Loading default configuration...");
 		LineIterator it;
 
 		try (InputStream is = Configuration.class
@@ -257,7 +246,7 @@ public class Configuration {
 			for (String s : deflt.split(",")) {
 				try (InputStream is = Configuration.class
 						.getResourceAsStream(s)) {
-					NameService.instance().addSynonyms(is);
+					global.getNameService().addSynonyms(is);
 				} catch (Exception e) {
 					throw new IOException(
 							"Failed to load default synonyms for: " + s, e);
@@ -275,7 +264,7 @@ public class Configuration {
 
 				try (InputStream is = Configuration.class
 						.getResourceAsStream(s)) {
-					NameService.instance().addSynonyms(is);
+					global.getNameService().addSynonyms(is);
 				} catch (Exception e) {
 					throw new IOException(
 							"Failed to load default synonyms for: " + s, e);
@@ -312,15 +301,17 @@ public class Configuration {
 
 	public Color getColor(String string) {
 		String tmp = get(string);
-		if (tmp == null)
+		if (tmp == null) {
 			tmp = "GRAY";
+		}
 		return Colors.decodeColor(get(string));
 	}
 
 	public int getInt(String string) {
 		String s = get(string);
-		if (s == null)
+		if (s == null) {
 			return 0;
+		}
 		return Integer.parseInt(s);
 	}
 
@@ -346,10 +337,11 @@ public class Configuration {
 	}
 
 	public void set(String key, String value) {
-		if (extraMap.containsKey(key))
+		if (extraMap.containsKey(key)) {
 			extraMap.put(key, value);
-		else
+		} else {
 			localMap.put(key, value);
+		}
 
 	}
 
@@ -443,8 +435,9 @@ public class Configuration {
 	}
 
 	public void reset(Model model) {
-		if (!configFile.delete())
+		if (!configFile.delete()) {
 			model.getLog().log(Level.WARNING, "Could not reset configuration!");
+		}
 
 		localMap.clear();
 		extraMap.clear();
@@ -460,18 +453,20 @@ public class Configuration {
 
 	public File getFile(String key) {
 		String val = get(key);
-		if (val != null)
+		if (val != null) {
 			return new File(val);
-		else
+		} else {
 			return null;
+		}
 	}
 
 	public double getDouble(String string, double defaultValue) {
 		String s = get(string);
-		if (s == null)
+		if (s == null) {
 			return defaultValue;
-		else
+		} else {
 			return Double.parseDouble(get(string));
+		}
 	}
 
 	public double getDouble(String string) {
@@ -486,8 +481,9 @@ public class Configuration {
 	 * @return the weight of dk.
 	 */
 	public int getWeight(DataKey dk) {
-		if (get("track:weight:" + dk) == null)
+		if (get("track:weight:" + dk) == null) {
 			return 1000;
+		}
 		return getInt("track:weight:" + dk);
 
 	}

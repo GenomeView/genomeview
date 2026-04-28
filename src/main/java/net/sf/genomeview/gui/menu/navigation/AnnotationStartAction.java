@@ -4,6 +4,7 @@
 package net.sf.genomeview.gui.menu.navigation;
 
 import java.awt.event.ActionEvent;
+import java.util.Observable;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
@@ -15,20 +16,24 @@ import net.sf.jannot.Location;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class AnnotationStartAction extends AbstractModelAction {
 
-	private static final long serialVersionUID = -8869862710635018773L;
-
 	public AnnotationStartAction(Model model) {
-        super(null, null, model);
-        
-    }
+		super(null, null, model);
 
-    @Override
-    public void actionPerformed(ActionEvent arg0) {
-        Location r = model.vlm.getAnnotationLocationVisible();
-        model.vlm.setAnnotationLocationVisible(new Location(1,r.length()));
+	}
 
-    }
+	@Override
+	public void actionPerformedSafe(ActionEvent arg0) {
+		Location r = model.vlm.getAnnotationLocationVisible();
+		model.vlm.setAnnotationLocationVisible(new Location(1, r.length()));
+
+	}
+
+	@Override
+	public void updateSafe(Observable o, Object obj) {
+		// ignore
+	}
 
 }

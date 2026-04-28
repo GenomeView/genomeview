@@ -3,8 +3,8 @@ package net.sf.genomeview.data;
 import java.util.Observable;
 
 import net.sf.jannot.Entry;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * Model (MVC) where user is currently looking at.
@@ -20,13 +20,13 @@ public class VisualLocationModel extends Observable {
 	 */
 	private Location visibleLocation = new Location(0, 0);
 	private double screenWidth;
-	private final Reporter log;
+	private Global global;
 
 	/**
 	 * @param log needed to create {@link DummyEntry}
 	 */
-	public VisualLocationModel(Reporter log) {
-		this.log = log;
+	public VisualLocationModel(Global global) {
+		this.global = global;
 	}
 
 	/**
@@ -37,7 +37,7 @@ public class VisualLocationModel extends Observable {
 	 */
 	public Entry getVisibleEntry() {
 		if (visibleEntry == null) {
-			return new DummyEntry(log);
+			return new DummyEntry(global);
 		}
 		return visibleEntry;
 	}

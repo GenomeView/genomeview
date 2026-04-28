@@ -13,7 +13,6 @@ import javax.swing.JList;
 import javax.swing.JToolBar;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.components.AAMappingChooser;
 import net.sf.genomeview.gui.menu.edit.RedoAction;
@@ -58,7 +57,7 @@ public class Toolbar extends JToolBar {
 		});
 		add(cb);
 
-		if (Configuration.instance().getBoolean("geneticCodeSelection")) {
+		if (model.getConfiguration().getBoolean("geneticCodeSelection")) {
 			add(new JLabel(MessageManager.getString("toolbar.code")));
 			add(new AAMappingChooser(model));
 		}
@@ -72,6 +71,7 @@ public class Toolbar extends JToolBar {
  */
 @SuppressWarnings("serial")
 class EntryRenderer extends BasicComboBoxRenderer {
+	@Override
 	public Component getListCellRendererComponent(JList list, Object value,
 			int index, boolean isSelected, boolean cellHasFocus) {
 		// set proper background, foreground etc

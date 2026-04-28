@@ -34,6 +34,4 @@ public interface DataProvider<T> {
 	 */
 	public void get(int start, int end, DataCallback<T> cb) throws IOException;
 
-//	public Iterable<Status> getStatus(int start, int end);
-
 }

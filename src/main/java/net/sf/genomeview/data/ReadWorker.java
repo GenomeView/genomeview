@@ -3,6 +3,9 @@
  */
 package net.sf.genomeview.data;
 
+import java.util.logging.Level;
+
+import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.source.DataSource;
 
 /**
@@ -19,12 +22,8 @@ public class ReadWorker extends DataSourceWorker {
 
 	@Override
 	protected Void doInBackground() {
-		try {
-			model.addData(source);
-		} catch (Throwable e) {
-			model.daemonException(e);
-			
-		}
+		StaticUtils.run(() -> model.addData(source), model.getLog(),
+				Level.WARNING, "read failed of data");
 		return null;
 	}
 

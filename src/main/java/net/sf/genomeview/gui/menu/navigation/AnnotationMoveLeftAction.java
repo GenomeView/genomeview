@@ -20,33 +20,33 @@ import net.sf.jannot.Location;
  */
 public class AnnotationMoveLeftAction extends AbstractModelAction {
 
-    @Override
-    public void update(Observable o, Object obj) {
-        setEnabled(model.vlm.getAnnotationLocationVisible().start() > 1);
-    }
+	@Override
+	public void updateSafe(Observable o, Object obj) {
+		setEnabled(model.vlm.getAnnotationLocationVisible().start() > 1);
+	}
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -151723517814284940L;
+	public AnnotationMoveLeftAction(Model model) {
+		super(null,
+				new ImageIcon(
+						model.getClass().getResource("/images/arrow_left.png")),
+				model);
 
-    public AnnotationMoveLeftAction(Model model) {
-        super(null, new ImageIcon(model.getClass().getResource("/images/arrow_left.png")), model);
-        
-    }
+	}
 
-    @Override
-    public void actionPerformed(ActionEvent arg0) {
-        Location r = model.vlm.getAnnotationLocationVisible();
-        int halve = r.length() / 4;
-        if(enabled)
-        	model.vlm.setAnnotationLocationVisible(new Location(r.start() - halve, r.end() - halve));
+	@Override
+	public void actionPerformedSafe(ActionEvent arg0) {
+		Location r = model.vlm.getAnnotationLocationVisible();
+		int halve = r.length() / 4;
+		if (enabled) {
+			model.vlm.setAnnotationLocationVisible(
+					new Location(r.start() - halve, r.end() - halve));
+		}
 
-    }
-    
-    public static void perform(Model model){
-    	AnnotationMoveLeftAction action = new AnnotationMoveLeftAction(model);
-    	action.actionPerformed(null);
-    }
+	}
+
+	public static void perform(Model model) {
+		AnnotationMoveLeftAction action = new AnnotationMoveLeftAction(model);
+		action.actionPerformed(null);
+	}
 
 }

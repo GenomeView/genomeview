@@ -13,26 +13,25 @@ import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
-
+@SuppressWarnings("serial")
 public class EditStructureAction extends AbstractModelAction {
 
-    private static final long serialVersionUID = -2032099327942679205L;
+	public EditStructureAction(Model model) {
+		super(MessageManager.getString("editmenu.edit_structure"), model);
+		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control E"));
+	}
 
-    public EditStructureAction(Model model) {
-        super(MessageManager.getString("editmenu.edit_structure"), model);
-        super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control E"));
-    }
+	@Override
+	public void actionPerformedSafe(ActionEvent arg0) {
+		StaticUtils.getEditStructure(model).setVisible(true);
 
-    @Override
-    public void actionPerformed(ActionEvent arg0) {
-        StaticUtils.getEditStructure(model).setVisible(true);
+	}
 
-    }
+	@Override
+	public void updateSafe(Observable o, Object arg) {
+		setEnabled(model.selectionModel().getFeatureSelection() != null
+				&& model.selectionModel().getFeatureSelection().size() == 1);
 
-    @Override
-    public void update(Observable o, Object arg) {
-        setEnabled(model.selectionModel().getFeatureSelection() != null && model.selectionModel().getFeatureSelection().size() == 1);
-
-    }
+	}
 
 }

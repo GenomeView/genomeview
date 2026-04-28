@@ -22,8 +22,6 @@ import net.sf.jannot.Feature;
  */
 public class RemoveAction extends AbstractModelAction implements Observer {
 
-	private static final long serialVersionUID = -3409728329439144492L;
-
 	public RemoveAction(Model model) {
 		super(MessageManager.getString("editmenu.remove_feature"), model);
 		model.addObserver(this);
@@ -31,17 +29,20 @@ public class RemoveAction extends AbstractModelAction implements Observer {
 				&& model.selectionModel().getFeatureSelection().size() > 0);
 	}
 
-	public void actionPerformed(ActionEvent arg0) {
+	@Override
+	public void actionPerformedSafe(ActionEvent arg0) {
 
 		Set<Feature> toRemove = new HashSet<Feature>();
 		toRemove.addAll(model.selectionModel().getFeatureSelection());
-		for (Feature rf : toRemove)
+		for (Feature rf : toRemove) {
 			model.vlm.getVisibleEntry().getMemoryAnnotation(rf.type())
 					.remove(rf);
+		}
 		model.refresh(NotificationTypes.JANNOTCHANGE);
 	}
 
-	public void update(Observable o, Object arg) {
+	@Override
+	public void updateSafe(Observable o, Object arg) {
 		setEnabled(model.selectionModel().getFeatureSelection() != null
 				&& model.selectionModel().getFeatureSelection().size() > 0);
 

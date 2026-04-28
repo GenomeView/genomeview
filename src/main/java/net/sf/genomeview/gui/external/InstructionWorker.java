@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.logging.Level;
 
 import be.abeel.net.URIFactory;
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.LRUSet;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
@@ -57,13 +56,15 @@ class InstructionWorker implements Runnable {
 	 * @param s     a socket on which an instruction came in
 	 */
 	InstructionWorker(Model model, String id, Socket s) {
-		if (model == null)
+		if (model == null) {
 			throw new NullPointerException("model must be non-null");
+		}
 		this.model = model;
 		this.id = id;
 		this.s = s;
 	}
 
+	@Override
 	public void run() {
 
 		model.getLog().log(Level.INFO, "Running worker");
@@ -90,8 +91,9 @@ class InstructionWorker implements Runnable {
 	 * @throws IOException
 	 */
 	void handleClient() throws IOException {
-		if (s == null)
+		if (s == null) {
 			return; // This happens when exiting
+		}
 		s.setSoTimeout(5000);
 		s.setTcpNoDelay(true);
 		BufferedReader it = new BufferedReader(
@@ -133,8 +135,9 @@ class InstructionWorker implements Runnable {
 				|| line.startsWith("GET /genomeview-ALL/")) {
 			String[] id = line.split("\\$\\$");
 			if (id.length == 1 || !lastID.contains(id[1])) {
-				if (id.length > 1)
+				if (id.length > 1) {
 					lastID.add(id[1]);
+				}
 
 				line = id[0];
 				String[] arr = line.split(" ")[1].split("/", 4);
@@ -190,12 +193,14 @@ class InstructionWorker implements Runnable {
 		ArrayList<Track> hits = new ArrayList<Track>();
 		for (Track t : model.getTrackList()) {
 			if (t.getDataKey().toString().toLowerCase().contains(input)
-					|| t.config().displayName().toLowerCase().contains(input))
+					|| t.config().displayName().toLowerCase().contains(input)) {
 				hits.add(t);
+			}
 
 		}
-		if (hits.size() > 0)
+		if (hits.size() > 0) {
 			model.getGUIManager().getEvidenceLabel().scroll2track(hits.get(0));
+		}
 	}
 
 	/**
@@ -252,7 +257,7 @@ class InstructionWorker implements Runnable {
 
 	private void doConfig(String string) {
 		String[] arr = string.trim().split("=", 2);
-		Configuration.instance().set(arr[0], arr[1]);
+		model.getConfiguration().set(arr[0], arr[1]);
 	}
 
 	private void doPosition(String string) {
@@ -275,6 +280,7 @@ class InstructionWorker implements Runnable {
 class Port {
 	private int port;
 
+	@Override
 	public String toString() {
 		return "" + port;
 	}
@@ -303,15 +309,19 @@ class Port {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Port other = (Port) obj;
-		if (port != other.port)
+		if (port != other.port) {
 			return false;
+		}
 		return true;
 	}
 

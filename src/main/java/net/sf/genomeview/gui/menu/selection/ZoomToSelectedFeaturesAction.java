@@ -14,32 +14,37 @@ import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 
-public class ZoomToSelectedFeaturesAction extends AbstractModelAction implements Observer {
+@SuppressWarnings("serial")
+public class ZoomToSelectedFeaturesAction extends AbstractModelAction
+		implements Observer {
 
-    private static final long serialVersionUID = 2073453052082133190L;
+	public ZoomToSelectedFeaturesAction(Model model) {
+		super(MessageManager.getString("selectionmenu.zoom_to_feature"), model);
+	}
 
-    public ZoomToSelectedFeaturesAction(Model model) {
-        super(MessageManager.getString("selectionmenu.zoom_to_feature"), model);
-    }
+	@Override
+	public void actionPerformedSafe(ActionEvent e) {
+		Set<Feature> selected = model.selectionModel().getFeatureSelection();
+		int min = Integer.MAX_VALUE;
+		int max = 0;
+		for (Feature f : selected) {
+			if (min > f.start()) {
+				min = f.start();
+			}
+			if (max < f.end()) {
+				max = f.start();
+			}
 
-    public void actionPerformed(ActionEvent e) {
-        Set<Feature> selected = model.selectionModel().getFeatureSelection();
-        int min = Integer.MAX_VALUE;
-        int max = 0;
-        for (Feature f : selected) {
-            if (min > f.start())
-                min = f.start();
-            if (max < f.end())
-                max = f.start();
+		}
+		double margin = (max - min) * 0.05;
+		model.vlm.setAnnotationLocationVisible(
+				new Location((int) (min - margin), (int) (max + margin)));
 
-        }
-        double margin = (max - min) * 0.05;
-        model.vlm.setAnnotationLocationVisible(new Location((int) (min - margin), (int) (max + margin)));
+	}
 
-    }
+	@Override
+	public void updateSafe(Observable o, Object arg) {
+		setEnabled(model.selectionModel().getFeatureSelection().size() > 0);
 
-    public void update(Observable o, Object arg) {
-        setEnabled(model.selectionModel().getFeatureSelection().size() > 0);
-
-    }
+	}
 }

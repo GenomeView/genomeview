@@ -21,7 +21,6 @@ import com.lowagie.text.pdf.PdfTemplate;
 import com.lowagie.text.pdf.PdfWriter;
 
 import be.abeel.io.ExtensionManager;
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel;
 
@@ -52,7 +51,7 @@ public class ExportPdfDialog extends JDialog {
 	 */
 	public void display() {
 		final JFileChooser chooser = new JFileChooser(
-				Configuration.instance().getFile("lastDirectory"));
+				model.getConfiguration().getFile("lastDirectory"));
 		chooser.setMultiSelectionEnabled(false);
 
 		int result = chooser
@@ -134,7 +133,7 @@ public class ExportPdfDialog extends JDialog {
 						model.getLog().log(Level.SEVERE, "Image export failed",
 								ex);
 					}
-					Configuration.instance().set("lastDirectory",
+					model.getConfiguration().set("lastDirectory",
 							ef.getParentFile());
 				} catch (Exception ex) {
 					model.getLog().log(Level.SEVERE, "Image export failed", ex);

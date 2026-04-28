@@ -29,7 +29,6 @@ import java.util.logging.Level;
 
 import javax.swing.JViewport;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.Status;
@@ -65,8 +64,6 @@ public abstract class Track {
 	 * Model for track configuration
 	 */
 	final protected TrackConfig config;
-
-	// private boolean visible;
 
 	/**
 	 * 
@@ -227,7 +224,7 @@ public abstract class Track {
 	 */
 	private void paintHighlight(Graphics2D g, int yOffset, int used,
 			double width) {
-		if (Configuration.instance()
+		if (model.getConfiguration()
 				.getBoolean("track:highlight:" + config.dataKey)) {
 			g.setColor(new Color(255, 0, 0, 25));
 			g.fillRect(0, yOffset, (int) width, used);

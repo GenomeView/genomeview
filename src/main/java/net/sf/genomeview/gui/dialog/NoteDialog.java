@@ -11,75 +11,73 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
 
+import be.abeel.util.Pair;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.QualifierCombo;
 import net.sf.jannot.Feature;
-import net.sf.jannot.Type;
-import be.abeel.util.Pair;
 
 public class NoteDialog extends JDialog {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -1331026064119986714L;
+	private final JTextField value;
 
-    private final JTextField value;
+	private final QualifierCombo term;
 
-    private final QualifierCombo term;
+	private NoteDialog(final Model model) {
+		super(model.getGUIManager().getMainWindow(),
+				MessageManager.getString("notedialog.title"));
+		setModal(true);
 
-    private NoteDialog(final Model model) {
-    	super(model.getGUIManager().getMainWindow(), MessageManager.getString("notedialog.title"));
-        setModal(true);
+		term = new QualifierCombo(model.getConfiguration());
 
-        term = new QualifierCombo();
+		setLayout(new BorderLayout());
+		add(term, BorderLayout.NORTH);
 
-        setLayout(new BorderLayout());
-        add(term, BorderLayout.NORTH);
+		value = new JTextField();
+		add(value, BorderLayout.CENTER);
+		JButton ok = new JButton(MessageManager.getString("button.ok"));
+		this.getRootPane().setDefaultButton(ok);
+		ok.addActionListener(new ActionListener() {
 
-        value = new JTextField();
-        add(value, BorderLayout.CENTER);
-        JButton ok = new JButton(MessageManager.getString("button.ok"));
-        this.getRootPane().setDefaultButton(ok);
-        ok.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-              
-                Feature rf = model.selectionModel().getFeatureSelection().iterator().next();
-                if (currentNote != null) {
-                	currentNote=new Pair(term.getQualifierKey(),value.getText());
-                    
-                } else {
-                   
-                    rf.addQualifier(term.getQualifierKey(), value.getText());
-                }
-                setVisible(false);
+				Feature rf = model.selectionModel().getFeatureSelection()
+						.iterator().next();
+				if (currentNote != null) {
+					currentNote = new Pair(term.getQualifierKey(),
+							value.getText());
 
-            }
+				} else {
 
-        });
-        add(ok, BorderLayout.SOUTH);
-        pack();
-        StaticUtils.center(model.getGUIManager().getMainWindow(),this);
-    }
+					rf.addQualifier(term.getQualifierKey(), value.getText());
+				}
+				setVisible(false);
 
-    private static NoteDialog dialog = null;
+			}
 
-    private static Pair<String,String> currentNote;
+		});
+		add(ok, BorderLayout.SOUTH);
+		pack();
+		StaticUtils.center(model.getGUIManager().getMainWindow(), this);
+	}
 
-    public static void showDialog(Model model, Pair<String,String> note) {
-        if (dialog == null)
-            dialog = new NoteDialog(model);
-        currentNote = note;
-        if (note != null) {
-            dialog.value.setText(note.y());
-            dialog.term.setSelectedItem(Type.valueOf(note.x()));
-        }
-        dialog.setVisible(true);
+	private static NoteDialog dialog = null;
 
-    }
+	private static Pair<String, String> currentNote;
+
+	public static void showDialog(Model model, Pair<String, String> note) {
+		if (dialog == null) {
+			dialog = new NoteDialog(model);
+		}
+		currentNote = note;
+		if (note != null) {
+			dialog.value.setText(note.y());
+			dialog.term.setSelectedItem(Type.valueOf(note.x()));
+		}
+		dialog.setVisible(true);
+
+	}
 
 }

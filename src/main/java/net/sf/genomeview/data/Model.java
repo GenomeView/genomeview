@@ -26,7 +26,6 @@ import be.abeel.io.LineIterator;
 import be.abeel.util.DefaultHashMap;
 import htsjdk.samtools.util.StringUtil;
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.DistributingReporter;
 import net.sf.genomeview.gui.GUIManager;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
@@ -39,13 +38,16 @@ import net.sf.genomeview.gui.viztracks.TickmarkTrack;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.AminoAcidMapping;
+import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Entry;
 import net.sf.jannot.EntrySet;
+import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.event.ChangeEvent;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
+import tudelft.utilities.logging.Reporter;
 
 /**
  * The Model. This seems to contain all the data sets loaded, and other models
@@ -57,8 +59,9 @@ import net.sf.jannot.source.DataSource;
  */
 public class Model extends Observable implements Observer {
 
-	// the main logger for the system.
-	private final DistributingReporter log;
+	private final Global global;
+	private final Configuration configuration;
+	private final Reporter log; // convenience copy of global.log
 
 	/**
 	 * The EntrySet which contains all loaded 'chromosomes'.
@@ -94,11 +97,6 @@ public class Model extends Observable implements Observer {
 	private final FilteredListModel<String> extraFiles = new FilteredListModel<String>(
 			new DefaultListModel<String>());
 
-	/**
-	 * Exceptions
-	 */
-	private Stack<Throwable> exceptionStack = new Stack<Throwable>();
-
 	/* Cache of the sources that are currently loaded */
 	private ConcurrentSkipListSet<DataSource> loadedSources = new ConcurrentSkipListSet<DataSource>();
 
@@ -124,9 +122,7 @@ public class Model extends Observable implements Observer {
 	/**
 	 * amino-acid mapping - names of std sequences. See {@link AminoAcidMapping}
 	 */
-	private HashMap<Entry, AminoAcidMapping> aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(
-			AminoAcidMapping.valueOf(
-					Configuration.instance().get("translationTable:default")));
+	private HashMap<Entry, AminoAcidMapping> aamapping;
 
 	private final GUIManager guimanager;
 
@@ -141,20 +137,27 @@ public class Model extends Observable implements Observer {
 	 * 
 	 */
 	/**
-	 * @param id  the name of this
-	 * @param log a {@link DistributingReporter} to be used for general logging.
-	 *            Not null
+	 * @param id     the name of this
+	 * @param global the {@link Global} data
 	 */
 
-	public Model(String id, DistributingReporter log) {
-		if (log == null) {
+	public Model(String id, Global global, Configuration config) {
+		if (global == null) {
 			throw new NullPointerException("log must not be null");
 		}
-		this.log = log;
-		vlm = new VisualLocationModel(log);
-		entries = new EntrySet(log);
+		this.global = global;
+		this.configuration = config;
 
-		this.connectionMonitor = new ConnectionMonitor(log);
+		this.log = global.getLog();
+
+		// initialize fields
+		aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(AminoAcidMapping
+				.valueOf(configuration.get("translationTable:default")));
+
+		vlm = new VisualLocationModel(global);
+		entries = new EntrySet(global);
+
+		this.connectionMonitor = new ConnectionMonitor(log, config);
 		guimanager = new GUIManager();
 
 		new JavaScriptHandler(this, id);
@@ -176,13 +179,12 @@ public class Model extends Observable implements Observer {
 		this.trackList = new TrackList(this);
 		// entries.addObserver(this);
 
-		Configuration.instance().getTypeSet("visibleTypes");
+		configuration.getTypeSet("visibleTypes");
 		updateTracks();
 
 		try {
 
-			File recent = new File(Configuration.instance().getDirectory(),
-					"recent.gv");
+			File recent = new File(configuration.getDirectory(), "recent.gv");
 			if (recent.exists() && recent.length() > 0) {
 				LineIterator it = new LineIterator(recent);
 				while (it.hasNext()) {
@@ -196,7 +198,7 @@ public class Model extends Observable implements Observer {
 	}
 
 	public DistributingReporter getLog() {
-		return log;
+		return global.getLog();
 	}
 
 	/**
@@ -279,14 +281,13 @@ public class Model extends Observable implements Observer {
 		this.exitRequested = true;
 
 		try {
-			if (Configuration.instance()
-					.getBoolean("session:enableRememberLast")) {
+			if (configuration.getBoolean("session:enableRememberLast")) {
 
 				/*
 				 * Write recent files to disk
 				 */
-				PrintWriter pw = new PrintWriter(new File(
-						Configuration.instance().getDirectory(), "recent.gv"));
+				PrintWriter pw = new PrintWriter(
+						new File(configuration.getDirectory(), "recent.gv"));
 
 				for (int i = 0; i < recentFiles.getSize(); i++) {
 
@@ -296,10 +297,8 @@ public class Model extends Observable implements Observer {
 
 				/* Only store session if there is something to store */
 				if (this.loadedSources().size() > 0) {
-					Session.save(
-							new File(Configuration.instance().getDirectory(),
-									"previous.gvs"),
-							this);
+					Session.save(new File(configuration.getDirectory(),
+							"previous.gvs"), this);
 				}
 			}
 		} catch (IOException e) {
@@ -587,27 +586,6 @@ public class Model extends Observable implements Observer {
 
 	}
 
-// not used and buggy. Disabled to be sure
-//	public synchronized Throwable processException() {
-//		if (!exceptionStack.isEmpty())
-//			return exceptionStack.pop();
-//		return null;
-//	}
-
-	/**
-	 * Method to register daemon exceptions to the model. WARNING seems buggy as
-	 * nobody handles exceptionStack events.
-	 * 
-	 * @param e
-	 */
-	public synchronized void daemonException(Throwable e) {
-		exceptionStack.push(e);
-		log.log(Level.SEVERE, "Exception in daemon thread", e);
-		setChanged();
-		notifyObservers(NotificationTypes.EXCEPTION);
-
-	}
-
 	public AnnotationModel annotationModel() {
 		return annotationModel;
 	}
@@ -722,6 +700,14 @@ public class Model extends Observable implements Observer {
 
 	public ConnectionMonitor getConnectionMonitor() {
 		return connectionMonitor;
+	}
+
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
+	public Global getGlobal() {
+		return global;
 	}
 
 }

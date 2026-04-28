@@ -15,7 +15,9 @@ import java.util.Arrays;
 import java.util.logging.Level;
 
 import be.abeel.concurrency.DaemonThread;
-import net.sf.genomeview.core.DistributingReporter;
+import net.sf.genomeview.core.Configuration;
+import net.sf.jannot.DistributingReporter;
+import net.sf.jannot.Global;
 
 /**
  * Tries to open a service on localhost on port
@@ -42,8 +44,8 @@ public class ApplicationInstanceManager {
 	 * 
 	 * @return true if first instance, false if not.
 	 */
-	public static boolean registerInstance(final String[] args,
-			DistributingReporter log) {
+	public static boolean registerInstance(final String[] args, Global global) {
+		DistributingReporter log = global.getLog();
 		// returnValueOnError should be true if lenient (allows app to run on
 		// network error) or false if strict.
 		boolean returnValueOnError = true;
@@ -52,6 +54,7 @@ public class ApplicationInstanceManager {
 		// if unable to open, connect to existing and send new instance message,
 		// return false
 		try {
+			// FIXME this is a mess. When is it even used?
 			final ServerSocket socket = new ServerSocket(
 					SINGLE_INSTANCE_NETWORK_SOCKET, 10,
 					InetAddress.getLocalHost());
@@ -83,10 +86,14 @@ public class ApplicationInstanceManager {
 											log.log(Level.INFO,
 													"Re-initializing with params: "
 															+ s);
+											// CHECK hacked together
+											CommandLineOptions clo = new CommandLineOptions(
+													args,
+													new Configuration(global));
 											wm.init(s
 													.substring(1,
 															s.length() - 1)
-													.split(", "), null);
+													.split(", "), null, clo);
 										}
 										in.close();
 										client.close();

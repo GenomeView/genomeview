@@ -130,11 +130,13 @@ public class MultipleAlignmentTrack2 extends Track {
 		return false;
 	}
 
+	@Override
 	public boolean mouseExited(int x, int y, MouseEvent e) {
 		lastMouse = null;
 		return false;
 	}
 
+	@Override
 	public boolean mouseClicked(int x, int y, MouseEvent e) {
 		/* Specific mouse code for this label */
 		if (!e.isConsumed() && (Mouse.button2(e) || Mouse.button3(e))) {
@@ -161,15 +163,13 @@ public class MultipleAlignmentTrack2 extends Track {
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,
 			JViewport view, TrackCommunicationModel tcm) {
+		final Configuration conf = model.getConfiguration();
 		this.g = g;
 		this.yOffset = yOffset;
 		this.screenWidth = screenWidth;
-		comparativeAnnotation = Configuration.instance()
-				.getBoolean("maf:enableAnnotation");
-		comparativeAnnotationType = Type
-				.get(Configuration.instance().get("maf:annotationType"));
-		maximumVisibleRange = Configuration.instance()
-				.getInt("maf:maximumVisibleRange");
+		comparativeAnnotation = conf.getBoolean("maf:enableAnnotation");
+		comparativeAnnotationType = Type.get(conf.get("maf:annotationType"));
+		maximumVisibleRange = conf.getInt("maf:maximumVisibleRange");
 
 		currentYOffset = yOffset;
 		ma = (AbstractMAFMultipleAlignment) entry.get(dataKey);
@@ -189,8 +189,9 @@ public class MultipleAlignmentTrack2 extends Track {
 			try {
 				int x = 0;
 				for (String e : ma.species()) {
-					if (!ordering.contains(e))
+					if (!ordering.contains(e)) {
 						ordering.putForward(e, x++);
+					}
 				}
 			} catch (ConcurrentModificationException e) {
 				// Something changed while we were compiling the ordering, we
@@ -261,16 +262,18 @@ public class MultipleAlignmentTrack2 extends Track {
 					visible, screenWidth);
 			int blockScreenEnd = Convert.translateGenomeToScreen(end, visible,
 					screenWidth);
-			if (showAll.get())
+			if (showAll.get()) {
 				abCount = ordering.size();
+			}
 
 			Rectangle rec = new Rectangle(start, yOffset, end - start - 1,
 					abCount * LINE_HEIGHT);
 			while (hitmap.collision(rec)) {
 				rec.y += LINE_HEIGHT;
 			}
-			if (rec.y + rec.height > yMax)
+			if (rec.y + rec.height > yMax) {
 				yMax = rec.y + rec.height;
+			}
 			hitmap.addLocation(rec, null);
 			paintedBlocks.put(new Rectangle(blockScreenStart, rec.y - yOffset,
 					blockScreenEnd - blockScreenStart, rec.height), ab);
@@ -410,13 +413,16 @@ public class MultipleAlignmentTrack2 extends Track {
 
 			}
 
-			if (featureStart < as.start())
+			if (featureStart < as.start()) {
 				featureStart = as.start();
-			if (featureStart > as.end())
+			}
+			if (featureStart > as.end()) {
 				featureStart = as.end();
+			}
 
-			if (featureEnd > as.end())
+			if (featureEnd > as.end()) {
 				featureEnd = as.end();
+			}
 
 			if (featureEnd < as.start()) {
 				featureEnd = as.start();
@@ -441,8 +447,9 @@ public class MultipleAlignmentTrack2 extends Track {
 
 			}
 
-			if (featureScreenEnd > blockScreenEnd)
+			if (featureScreenEnd > blockScreenEnd) {
 				featureScreenEnd = blockScreenEnd;
+			}
 
 			if (featureScreenEnd > featureScreenStart && featureScreenEnd >= 0
 					&& featureScreenStart <= screenWidth) {
@@ -456,8 +463,10 @@ public class MultipleAlignmentTrack2 extends Track {
 							LINE_HEIGHT - 6);
 					if (visible.length() < 10000) {
 						g.setColor(Color.CYAN.darker().darker());
-						g.drawString(FeatureUtils.displayName(f),
-								(int) featureScreenStart,
+						g.drawString(
+								FeatureUtils.displayName(f,
+										model.getConfiguration()),
+								featureScreenStart,
 								rec.y + (line) * LINE_HEIGHT - 4);
 					}
 				} else {
@@ -474,44 +483,48 @@ public class MultipleAlignmentTrack2 extends Track {
 	private int paintAS(SequenceTranslator st, int start, int end,
 			int blockScreenStart, int blockScreenEnd, Rectangle rec,
 			BitSet lines, char[] ref, int line, AbstractAlignmentSequence as) {
+		Configuration configu = model.getConfiguration();
 		if (visible.length() < 1000) {
 
 			if (st != null) {
 
 				for (int i = visible.start; i <= visible.end; i++) {
 					if (i >= start && i < end) {
-						double width = screenWidth / (double) visible.length();
+						double width = screenWidth / visible.length();
 						int translated = st.translate(i - start) + 1;
 
 						char nt;
 
-						if (as.strand() == Strand.FORWARD)
+						if (as.strand() == Strand.FORWARD) {
 							nt = as.seq().get(translated, translated + 1)
 									.iterator().next();
-						else
+						} else {
 							nt = SequenceTools.complement(as.seq()
 									.get(as.seq().size() - translated + 1,
 											as.seq().size() - translated + 2)
 									.iterator().next());
+						}
 
 						// System.out.println("NT:
 						// "+translated+"\t"+nt);
 						if (ref[i - visible.start] != nt) {
-							if (nt == '-')
+							if (nt == '-') {
 								g.setColor(Color.RED);
-							else
+							} else {
 								g.setColor(Color.DARK_GRAY);
+							}
 							g.fillRect((int) ((i - visible.start) * width),
 									rec.y + (line - 1) * LINE_HEIGHT,
 									(int) Math.ceil(width), LINE_HEIGHT);
 							if (visible.length() < 100) {
 								Rectangle2D stringSize = g.getFontMetrics()
 										.getStringBounds("" + nt, g);
-								if (nt == '-')
+								if (nt == '-') {
 									g.setColor(Color.BLACK);
-								else
-									g.setColor(Configuration.instance()
-											.getNucleotideColor(nt).brighter());
+								} else {
+									g.setColor(configu.getNucleotideColor(nt)
+											.brighter());
+								}
 								g.drawString("" + nt,
 										(int) (((i - visible.start) * width
 												- stringSize.getWidth() / 2)
@@ -535,12 +548,12 @@ public class MultipleAlignmentTrack2 extends Track {
 				lines.set(line - 1);
 			}
 			if (as.strand() == Strand.FORWARD) {
-				Color or = Configuration.instance().getColor("ma:forwardColor");
+				Color or = configu.getColor("ma:forwardColor");
 				g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(),
 						100));
 
 			} else {
-				Color or = Configuration.instance().getColor("ma:reverseColor");
+				Color or = configu.getColor("ma:reverseColor");
 				g.setColor(new Color(or.getRed(), or.getGreen(), or.getBlue(),
 						100));
 			}
@@ -560,7 +573,7 @@ public class MultipleAlignmentTrack2 extends Track {
 	private void paintMouseOverInfo(MouseHit mh) {
 		/* Mouse is over a block and there is some information to display */
 		if (mh != null) {
-			boolean fullNames = Configuration.instance()
+			boolean fullNames = model.getConfiguration()
 					.getBoolean("maf:extendedNames");
 			HashMap<String, AbstractAlignmentSequence> shown = new HashMap<String, AbstractAlignmentSequence>();
 			if (showAll.get()) {
@@ -583,8 +596,9 @@ public class MultipleAlignmentTrack2 extends Track {
 				// String s = e.getID();
 				arr[ordering.getForward(e)] = e;
 				AbstractAlignmentSequence as = shown.get(e);
-				if (as != null)
+				if (as != null) {
 					arr[ordering.getForward(e)] = shown.get(e).toString();
+				}
 
 				arr[ordering.getForward(e)] = fullNames
 						? arr[ordering.getForward(e)]
@@ -593,15 +607,16 @@ public class MultipleAlignmentTrack2 extends Track {
 				Rectangle2D stringSize = g.getFontMetrics()
 						.getStringBounds(arr[ordering.getForward(e)], g);
 				size[ordering.getForward(e)] = stringSize;
-				if (stringSize.getWidth() > maxWidth)
+				if (stringSize.getWidth() > maxWidth) {
 					maxWidth = (int) stringSize.getWidth();
+				}
 			}
 
 			g.setColor(new Color(192, 192, 192, 175));
-			g.fillRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth,
+			g.fillRect(Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth,
 					ordering.size() * LINE_HEIGHT);
 			g.setColor(Color.DARK_GRAY);
-			g.drawRect((int) Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth,
+			g.drawRect(Math.max(mh.x1 - maxWidth, 5), mh.rec.y, maxWidth,
 					ordering.size() * LINE_HEIGHT);
 			g.setColor(Color.black);
 			int index = 0;
@@ -632,11 +647,13 @@ public class MultipleAlignmentTrack2 extends Track {
 						.submit(new Task(new Location(ab.start(), ab.end())) {
 							private boolean cancelled = false;
 
+							@Override
 							public void cancel() {
 								translatorQueue.remove(ab);
 								cancelled = true;
 							}
 
+							@Override
 							public boolean isCancelled() {
 								return cancelled;
 							}
@@ -644,8 +661,9 @@ public class MultipleAlignmentTrack2 extends Track {
 							@Override
 							public void run() {
 								translatorQueue.remove(ab);
-								if (cancelled)
+								if (cancelled) {
 									return;
+								}
 
 								// System.out.println("Calculating new
 								// translator " +

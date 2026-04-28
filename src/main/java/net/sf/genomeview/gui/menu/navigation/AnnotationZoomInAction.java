@@ -8,14 +8,12 @@ import java.util.Observable;
 
 import javax.swing.ImageIcon;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Location;
 
+@SuppressWarnings("serial")
 public class AnnotationZoomInAction extends AbstractModelAction {
-
-	private static final long serialVersionUID = -1125623416282373487L;
 
 	public AnnotationZoomInAction(Model model) {
 		super(null,
@@ -25,24 +23,25 @@ public class AnnotationZoomInAction extends AbstractModelAction {
 
 	}
 
-	public void actionPerformed(ActionEvent arg0) {
+	@Override
+	public void actionPerformedSafe(ActionEvent arg0) {
 		Location r = model.vlm.getAnnotationLocationVisible();
 		double start = r.start();
 		double end = r.end();
 		double center = end - (end - start) / 2;
 		int newStart = (int) (center - (end - start) * 0.25);
 		int newEnd = (int) (center + (end - start) * 0.25);
-		if (enabled)
+		if (enabled) {
 			model.vlm.setAnnotationLocationVisible(
 					new Location(newStart, newEnd));
+		}
 
 	}
 
 	@Override
-	public void update(Observable arg0, Object arg1) {
-		setEnabled(model.vlm.getAnnotationLocationVisible()
-				.length() > Configuration.instance()
-						.getInt("minimumNucleotides"));
+	public void updateSafe(Observable arg0, Object arg1) {
+		setEnabled(model.vlm.getAnnotationLocationVisible().length() > model
+				.getConfiguration().getInt("minimumNucleotides"));
 
 	}
 

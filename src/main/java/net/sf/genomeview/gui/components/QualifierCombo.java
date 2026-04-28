@@ -11,9 +11,8 @@ public class QualifierCombo extends JComboBox {
 
 	private static final long serialVersionUID = 3311298470708351886L;
 
-	public QualifierCombo() {
-		for (String ct : Configuration.instance()
-				.getStringSet("emblQualifiers")) {
+	public QualifierCombo(Configuration config) {
+		for (String ct : config.getStringSet("emblQualifiers")) {
 			this.addItem(ct);
 		}
 	}

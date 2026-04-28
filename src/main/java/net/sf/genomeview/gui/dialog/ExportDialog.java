@@ -31,7 +31,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ProgressMonitorInputStream;
 import javax.swing.filechooser.FileFilter;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
@@ -46,11 +45,7 @@ import net.sf.jannot.source.Locator;
  */
 public class ExportDialog extends JDialog {
 
-	private static final long serialVersionUID = -5209291628487502687L;
-
 	private class DataSourceCheckbox extends JCheckBox {
-
-		private static final long serialVersionUID = -3767564402477672638L;
 
 		private Locator data;
 
@@ -73,17 +68,19 @@ public class ExportDialog extends JDialog {
 		}
 
 		private Thread save(Locator loc, File location) {
-			if (loc == null)
+			if (loc == null) {
 				return null;
+			}
 			try {
 				m.getLog().log(Level.INFO, "Loc: " + loc + ", " + location);
 				m.getLog().log(Level.INFO, loc.getName());
 				File out = new File(location, loc.getName());
 				InputStream r = null;
-				if (loc.isURL())
+				if (loc.isURL()) {
 					r = loc.url().openStream();
-				else
+				} else {
 					r = new FileInputStream(loc.file());
+				}
 
 				InputStream in = new ProgressMonitorInputStream(
 						m.getGUIManager().getMainWindow(),
@@ -154,8 +151,9 @@ public class ExportDialog extends JDialog {
 		cp.setLayout(new GridLayout(0, 1));
 		for (DataSource ds : model.loadedSources()) {
 			Locator data = ds.getLocator();
-			if (data.isWebservice())
+			if (data.isWebservice()) {
 				continue;
+			}
 			Locator idx = null;
 
 			if (ds.isIndexed()) {
@@ -203,9 +201,11 @@ public class ExportDialog extends JDialog {
 							for (DataSourceCheckbox dsb : dss) {
 								if (dsb.isSelected()) {
 									Thread[] a = dsb.export(location);
-									for (int i = 0; i < a.length; i++)
-										if (a[i] != null)
+									for (int i = 0; i < a.length; i++) {
+										if (a[i] != null) {
 											monitor.add(a[i]);
+										}
+									}
 
 								}
 							}
@@ -250,34 +250,12 @@ public class ExportDialog extends JDialog {
 						_self.dispose();
 					}
 
-//					private void showServerMessage(String reply) {
-//						final JDialog diag = new JDialog(model.getGUIManager().getParent());
-//						JTextArea txt = new JTextArea(10, 20);
-//						txt.setEditable(false);
-//						txt.setText(reply);
-//						diag.setTitle("Server reply");
-//						diag.getContentPane().setLayout(new BorderLayout());
-//						diag.getContentPane().add(txt, BorderLayout.CENTER);
-//						diag.getContentPane().add(new JButton(new AbstractAction("OK") {
-//
-//							@Override
-//							public void actionPerformed(ActionEvent e) {
-//								diag.dispose();
-//							}
-//
-//						}), BorderLayout.SOUTH);
-//						diag.pack();
-//						StaticUtils.center(diag);
-//						diag.setVisible(true);
-//
-//					}
-
 				});
 			}
 
 			private File file() {
 				JFileChooser chooser = new JFileChooser(
-						Configuration.instance().getFile("lastDirectory"));
+						model.getConfiguration().getFile("lastDirectory"));
 				chooser.addChoosableFileFilter(new FileFilter() {
 
 					@Override

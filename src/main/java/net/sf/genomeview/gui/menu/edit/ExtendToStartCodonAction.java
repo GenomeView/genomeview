@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.util.Observable;
 
 import net.sf.genomeview.core.AnalyzedFeature;
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
@@ -32,29 +31,25 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2143874687832094430L;
-
 	@Override
-	public void update(Observable o, Object obj) {
+	public void updateSafe(Observable o, Object obj) {
 		if (model.selectionModel().getFeatureSelection().size() == 1
 				&& model.selectionModel().getFeatureSelection().first()
 						.type() == Type.get("CDS")) {
 			AnalyzedFeature af = new AnalyzedFeature(
 					model.vlm.getVisibleEntry().sequence(),
 					model.selectionModel().getFeatureSelection().first(),
-					model.getAAMapping());
+					model.getAAMapping(), model.getConfiguration());
 
 			setEnabled(af.hasMissingStartCodon());
-		} else
+		} else {
 			setEnabled(false);
+		}
 
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	public void actionPerformedSafe(ActionEvent arg0) {
 		assert (model.selectionModel().getFeatureSelection() != null);
 		assert (model.selectionModel().getFeatureSelection().size() == 1);
 		Feature rf = model.selectionModel().getFeatureSelection().iterator()
@@ -65,7 +60,7 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 		// int rest = nt.length() % 3;
 		AnalyzedFeature af = new AnalyzedFeature(
 				model.vlm.getVisibleEntry().sequence(), rf,
-				model.getAAMapping());
+				model.getAAMapping(), model.getConfiguration());
 		assert (af.hasMissingStartCodon());
 		if (rf.strand() == Strand.FORWARD) {
 			int start = rf.start();
@@ -92,10 +87,11 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 				.getVisibleEntry().sequence().subsequence(start, start + 3))
 				.stringRepresentation();
 		if (model.getAAMapping().isStart(codon)) {
-			if (!Configuration.instance()
+			if (!model.getConfiguration()
 					.getBoolean("general:onlyMethionineAsStart")
-					|| model.getAAMapping().get(codon) == 'M')
+					|| model.getAAMapping().get(codon) == 'M') {
 				return true;
+			}
 		}
 		return false;
 
@@ -105,10 +101,11 @@ public class ExtendToStartCodonAction extends AbstractModelAction {
 		String codon = model.vlm.getVisibleEntry().sequence()
 				.subsequence(start, start + 3).stringRepresentation();
 		if (model.getAAMapping().isStart(codon)) {
-			if (!Configuration.instance()
+			if (!model.getConfiguration()
 					.getBoolean("general:onlyMethionineAsStart")
-					|| model.getAAMapping().get(codon) == 'M')
+					|| model.getAAMapping().get(codon) == 'M') {
 				return true;
+			}
 		}
 		return false;
 

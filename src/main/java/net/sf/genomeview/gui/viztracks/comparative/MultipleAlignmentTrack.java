@@ -22,7 +22,6 @@ import java.util.TreeMap;
 
 import javax.swing.JViewport;
 
-import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.MessageManager;
@@ -61,7 +60,7 @@ public class MultipleAlignmentTrack extends Track {
 			List<WeightedAlignment> set = new ArrayList<WeightedAlignment>();
 
 			for (Alignment a : aa.get()) {
-				double d = Configuration.instance()
+				double d = model.getConfiguration()
 						.getDouble("MAWEIGHT_" + a.name(), 0);
 				set.add(new WeightedAlignment(d, a));
 			}
@@ -134,7 +133,7 @@ public class MultipleAlignmentTrack extends Track {
 			if (r.length() < 1000) {
 
 				for (Alignment alignment : mat.ordered()) {
-					double width = screenWidth / (double) r.length();
+					double width = screenWidth / r.length();
 					int grouping = (int) Math.ceil(1.0 / width);
 					for (int i = r.start(); i <= r.end(); i += grouping) {
 						char nt = ' ';
@@ -143,8 +142,9 @@ public class MultipleAlignmentTrack extends Track {
 						for (int j = 0; j < grouping; j++) {
 							nt = alignment.getNucleotide(i + j);
 							conservation += mat.getConservation(i + j);
-							if (nt == '-')
+							if (nt == '-') {
 								dash = true;
+							}
 
 						}
 						conservation /= grouping;
@@ -160,9 +160,10 @@ public class MultipleAlignmentTrack extends Track {
 							// g.setColor(new Color(0x00,0x00,0xff));/*blue*/
 							// g.setColor(new Color(0x00,0xff,0x00));/*green */
 							g.setColor(Color.LIGHT_GRAY);
-						} else
+						} else {
 							// g.setColor(new Color(0xcc,0xff,0x00));
 							g.setColor(Color.WHITE);
+						}
 						if (dash) {
 							g.setColor(Color.RED);
 						}
@@ -183,8 +184,9 @@ public class MultipleAlignmentTrack extends Track {
 									.getStringBounds("" + nt, g);
 							if (conservation > 0.75) {
 								g.setColor(Color.WHITE);
-							} else
+							} else {
 								g.setColor(Color.BLACK);
+							}
 							g.drawString("" + nt,
 									(int) (((i - r.start()) * width
 											- stringSize.getWidth() / 2)
@@ -210,8 +212,9 @@ public class MultipleAlignmentTrack extends Track {
 
 				for (Alignment alignment : mat.ordered()) {
 					/* Plot whatever is in the cache */
-					if (!pips.containsKey(alignment))
+					if (!pips.containsKey(alignment)) {
 						pips.put(alignment, percentIdentify(alignment));
+					}
 					float[] b = pips.get(alignment);
 
 					int stepSize = (int) Math.max(1,
@@ -228,10 +231,12 @@ public class MultipleAlignmentTrack extends Track {
 						for (int j = 0; j < stepSize; j++) {
 							if (i + j <= b.length) {
 								float val = b[i + j - 1];
-								if (val > max)
+								if (val > max) {
 									max = val;
-								if (val < min)
+								}
+								if (val < min) {
 									min = val;
+								}
 							}
 
 						}
@@ -248,7 +253,7 @@ public class MultipleAlignmentTrack extends Track {
 			int logoLineHeight = 40;
 
 			if (model.vlm.getAnnotationLocationVisible().length() < 100) {
-				double width = screenWidth / (double) r.length();
+				double width = screenWidth / r.length();
 				int grouping = (int) Math.ceil(1.0 / width);
 				for (int i = r.start(); i <= r.end(); i += grouping) {
 					// TODO do something with zoom-out
@@ -280,7 +285,7 @@ public class MultipleAlignmentTrack extends Track {
 							width, yOffset);
 				}
 			} else {
-				double width = screenWidth / (double) r.length() / 10.0;
+				double width = screenWidth / r.length() / 10.0;
 				int grouping = (int) Math.ceil(1.0 / width);
 
 				GeneralPath conservationGP = new GeneralPath();
@@ -324,8 +329,9 @@ public class MultipleAlignmentTrack extends Track {
 		int reflen = alignment.refLength();
 		for (int i = 1; i <= reflen; i++) {
 			if (alignment.getReferenceNucleotide(i) == alignment
-					.getNucleotide(i))
+					.getNucleotide(i)) {
 				rollingBuffer.set(i - 1);
+			}
 		}
 		float[] out = new float[reflen];
 		for (int i = 0; i < reflen; i++) {
@@ -333,12 +339,15 @@ public class MultipleAlignmentTrack extends Track {
 			for (int j = -50; j <= 50; j++) {
 				/* wrap index */
 				int idx = (i - j);
-				if (idx < 0)
+				if (idx < 0) {
 					idx += reflen;
-				if (idx >= reflen)
+				}
+				if (idx >= reflen) {
 					idx -= reflen;
-				if (rollingBuffer.get(idx))
+				}
+				if (rollingBuffer.get(idx)) {
 					count++;
+				}
 
 			}
 
@@ -360,7 +369,7 @@ public class MultipleAlignmentTrack extends Track {
 		int left = lineHeight;
 		for (int key : map.keySet()) {
 			for (char c : map.get(key).toCharArray()) {
-				Color ntColor = Configuration.instance().getNucleotideColor(c);
+				Color ntColor = model.getConfiguration().getNucleotideColor(c);
 				// System.out.println(c + "\t" + key);
 				double fraction = key / (double) numAlign;
 
@@ -377,7 +386,7 @@ public class MultipleAlignmentTrack extends Track {
 				int x = (int) (((position
 						- model.vlm.getAnnotationLocationVisible().start())
 						* width) + (width - stringSize.getWidth()) / 2);
-				int y = (int) (yOffset + left);
+				int y = yOffset + left;
 				g.translate(x, y);
 				left -= fraction * lineHeight;
 				java.awt.Shape shape = glyphvector.getGlyphOutline(0);

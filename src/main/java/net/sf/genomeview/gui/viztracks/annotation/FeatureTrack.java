@@ -111,8 +111,8 @@ public class FeatureTrack extends Track {
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double width,
 			JViewport view, TrackCommunicationModel tcm) {
-		boolean forceLabels = Configuration.instance()
-				.getBoolean("track:forceFeatureLabels");
+		final Configuration conf = model.getConfiguration();
+		boolean forceLabels = conf.getBoolean("track:forceFeatureLabels");
 		boolean collision = false;
 		hitmap.clear();
 		Location visible = model.vlm.getVisibleLocation();
@@ -121,8 +121,9 @@ public class FeatureTrack extends Track {
 		FeatureAnnotation annot = (FeatureAnnotation) entry.get(ftc.type());
 
 		if (ftm.qualifierKeys().contains("color")
-				|| ftm.qualifierKeys().contains("colour"))
+				|| ftm.qualifierKeys().contains("colour")) {
 			ftc.setColorQualifierEnabled(true);
+		}
 		/* If there are proper scores, enable color gradient */
 		if (ftm.getMaxScore() - ftm.getMinScore() > 0.00001) {
 			ftc.setScoreColorGradientEnabled(true);
@@ -133,8 +134,8 @@ public class FeatureTrack extends Track {
 		/* Get feature estimate */
 		boolean manyFeature = false;
 		int estimate = annot.getEstimateCount(visible);
-		if (estimate > 25 * Configuration.instance()
-				.getInt("annotationview:maximumNoVisibleFeatures")) {
+		if (estimate > 25
+				* conf.getInt("annotationview:maximumNoVisibleFeatures")) {
 
 			g.setColor(Color.BLACK);
 			g.drawString(
@@ -143,7 +144,7 @@ public class FeatureTrack extends Track {
 									"featuretrack.too_many_to_display_warn"),
 					10, yOffset + 10);
 			return 20 + 5;
-		} else if (estimate > Configuration.instance()
+		} else if (estimate > conf
 				.getInt("annotationview:maximumNoVisibleFeatures")) {
 			manyFeature = true;
 		}
@@ -157,8 +158,7 @@ public class FeatureTrack extends Track {
 		g.translate(0, yOffset + 2);
 		CollisionMap fullBlockMap = new CollisionMap(model);
 
-		int lineThickness = Configuration.instance()
-				.getInt("evidenceLineHeight");
+		int lineThickness = conf.getInt("evidenceLineHeight");
 
 		int lines = 0;
 
@@ -167,11 +167,12 @@ public class FeatureTrack extends Track {
 			ftm.update(rf);
 
 			/* Skip feature that do not satisfy threshold filter */
-			if (rf.getScore() <= ftc.getThreshold())
+			if (rf.getScore() <= ftc.getThreshold()) {
 				continue;
+			}
 			int thisLine = 0;
 
-			Color c = Configuration.instance().getColor("TYPE_" + rf.type());
+			Color c = conf.getColor("TYPE_" + rf.type());
 			// if (ftc.isColorQualifier() && rf.getColor() != null) {
 			String color = rf.getColor();
 			if (color != null) {
@@ -180,8 +181,9 @@ public class FeatureTrack extends Track {
 			// }
 			if (ftc.isScoreColorGradient()) {
 				double range = ftm.getMaxScore() - ftm.getMinScore();
-				if (range > 0.00001)
+				if (range > 0.00001) {
 					c = ftc.getColor(rf.getScore() / range);
+				}
 			}
 
 			g.setColor(c);
@@ -199,8 +201,7 @@ public class FeatureTrack extends Track {
 				 * How close can items be together before they are considered
 				 * overlapping?
 				 */
-				int closenessOverlap = Configuration.instance()
-						.getInt("closenessOverlap");
+				int closenessOverlap = conf.getInt("closenessOverlap");
 				Rectangle r = new Rectangle(x1 - closenessOverlap,
 						thisLine * lineThickness,
 						maxX - x1 + 2 * closenessOverlap, lineThickness);
@@ -208,13 +209,15 @@ public class FeatureTrack extends Track {
 				if (!config.isCollapsed() && !manyFeature) {
 					// only when the blocks should be tiled, do we need to
 					// determine an empty place.
-					if (!collision)
+					if (!collision) {
 						collision = fullBlockMap.collision(r);
+					}
 					while (fullBlockMap.collision(r)) {
 						thisLine++;
 
-						if (thisLine > lines)
+						if (thisLine > lines) {
 							lines = thisLine;
+						}
 						r = new Rectangle(x1 - closenessOverlap,
 								thisLine * lineThickness,
 								maxX - x1 + 2 * closenessOverlap,
@@ -277,8 +280,9 @@ public class FeatureTrack extends Track {
 
 				// Set<Feature> selected = model.getFeatureSelection();
 				Set<Location> intersection = new HashSet<Location>();
-				for (Location l : loc)
+				for (Location l : loc) {
 					intersection.add(l);
+				}
 				intersection.retainAll(
 						model.selectionModel().getLocationSelection());
 
@@ -301,8 +305,10 @@ public class FeatureTrack extends Track {
 						Font resetFont = g.getFont();
 						g.setColor(c.darker().darker().darker());
 						g.setFont(new Font("SansSerif", Font.PLAIN, 10));
-						g.drawString(FeatureUtils.displayName(rf), a + 5,
-								thisLine * lineThickness + 9);
+						g.drawString(
+								FeatureUtils.displayName(rf,
+										model.getConfiguration()),
+								a + 5, thisLine * lineThickness + 9);
 						g.setFont(resetFont);
 					}
 
@@ -391,21 +397,25 @@ public class FeatureTrack extends Track {
 			FeatureAnnotation annot = (FeatureAnnotation) entry.get(ftc.type());
 
 			model.annotationModel().addObserver(this);
-			if (annot instanceof MemoryFeatureAnnotation)
+			if (annot instanceof MemoryFeatureAnnotation) {
 				try {
-					for (Feature f : annot.get())
+					for (Feature f : annot.get()) {
 						update(f);
+					}
 				} catch (IOException e) {
 					model.getLog().log(Level.WARNING, "Can't update features",
 							e);
 				}
+			}
 		}
 
 		void update(Feature f) {
-			if (f.getScore() > maxScore)
+			if (f.getScore() > maxScore) {
 				maxScore = f.getScore();
-			if (f.getScore() < minScore)
+			}
+			if (f.getScore() < minScore) {
 				minScore = f.getScore();
+			}
 			qualifierKeys.addAll(f.getQualifiersKeys());
 		}
 
@@ -420,8 +430,9 @@ public class FeatureTrack extends Track {
 		@Override
 		public void update(Observable o, Object arg) {
 			assert (arg instanceof Type);
-			if (ftc.type() == (Type) arg)
+			if (ftc.type() == (Type) arg) {
 				init();
+			}
 
 		}
 
@@ -431,9 +442,7 @@ public class FeatureTrack extends Track {
 
 	}
 
-	private static class FeatureInfoWindow extends JWindow {
-
-		private static final long serialVersionUID = -7416732151483650659L;
+	private class FeatureInfoWindow extends JWindow {
 
 		private JLabel floater = new JLabel();
 
@@ -456,9 +465,11 @@ public class FeatureTrack extends Track {
 				StringBuffer text = new StringBuffer();
 				text.append("<html>");
 				for (Feature f : features) {
-					String name = FeatureUtils.displayName(f);
-					if (name.length() > 50)
+					String name = FeatureUtils.displayName(f,
+							model.getConfiguration());
+					if (name.length() > 50) {
 						name = name.substring(0, 50);
+					}
 					text.append("Name : " + name + "<br />");
 					text.append("Start : " + f.start() + "<br />");
 					text.append("End : " + f.end() + "<br />");
@@ -556,6 +567,7 @@ public class FeatureTrack extends Track {
 					slider.setPaintLabels(true);
 
 					ChangeListener changeListener = new ChangeListener() {
+						@Override
 						public void stateChanged(ChangeEvent changeEvent) {
 							DoubleJSlider theSlider = (DoubleJSlider) changeEvent
 									.getSource();
@@ -692,7 +704,7 @@ public class FeatureTrack extends Track {
 		}
 
 		public boolean isScoreColorGradient() {
-			return Configuration.instance()
+			return model.getConfiguration()
 					.getBoolean("feature:scoreColorGradient_" + type());
 
 		}
@@ -700,7 +712,7 @@ public class FeatureTrack extends Track {
 		public void setScoreColorGradient(boolean scoreColorGradient) {
 			// this.scoreColorGradient = scoreColorGradient;
 			if (isScoreColorGradient() != scoreColorGradient) {
-				Configuration.instance().set(
+				model.getConfiguration().set(
 						"feature:scoreColorGradient_" + type(),
 						scoreColorGradient);
 				model.refresh(this);

@@ -1,6 +1,7 @@
 package net.sf.genomeview.gui.menu.file;
 
 import java.awt.event.ActionEvent;
+import java.util.Observable;
 
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MessageManager;
@@ -15,8 +16,14 @@ public class ExportPDFAction extends AbstractModelAction {
 
 	}
 
-	public void actionPerformed(ActionEvent arg0) {
+	@Override
+	public void actionPerformedSafe(ActionEvent arg0) {
 		new ExportPdfDialog(model).display();
+	}
+
+	@Override
+	public void updateSafe(Observable o, Object obj) {
+		// ignore
 	}
 
 }

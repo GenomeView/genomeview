@@ -20,8 +20,8 @@ class DoubleConfig extends Container {
 
 	private JTextField valueField = new JTextField("");
 
-	DoubleConfig(final String key, final String title) {
-		valueField.setText(Configuration.instance().get(key));
+	DoubleConfig(final String key, final String title, Configuration config) {
+		valueField.setText(config.get(key));
 		label.setText(title);
 		setLayout(new BorderLayout());
 		add(label, BorderLayout.WEST);
@@ -31,7 +31,7 @@ class DoubleConfig extends Container {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				super.keyReleased(e);
-				Configuration.instance().set(key, valueField.getText());
+				config.set(key, valueField.getText());
 
 			}
 
