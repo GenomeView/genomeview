@@ -6,6 +6,8 @@ package net.sf.genomeview.data;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -76,7 +78,7 @@ public class TrackList implements Iterable<Track> {
 	 * @param index 0-based track number
 	 * @return the track[index] or null if index=-1 (??).
 	 */
-	public Track get(int index) {
+	public synchronized Track get(int index) {
 		if (index == -1) {
 			return null;
 		}
@@ -98,7 +100,7 @@ public class TrackList implements Iterable<Track> {
 
 	}
 
-	public StructureTrack structure() {
+	public synchronized StructureTrack structure() {
 		return (StructureTrack) mapping.get(StructureTrack.key);
 	}
 
@@ -108,7 +110,7 @@ public class TrackList implements Iterable<Track> {
 	 * @param dk    the {@link DataKey}
 	 * @param track a visualization {@link Track}
 	 */
-	private void add(DataKey dk, Track track) {
+	private synchronized void add(DataKey dk, Track track) {
 		mapping.put(dk, track);
 		if (!order.contains(dk)) {
 			int x = findIndex(dk);
@@ -124,7 +126,7 @@ public class TrackList implements Iterable<Track> {
 	 *         entries we already have in {@link #order}. The weights are set in
 	 *         the preferences track:weight for all {@link DataKey}s
 	 */
-	private int findIndex(DataKey dk) {
+	private synchronized int findIndex(DataKey dk) {
 		int w = model.getConfiguration().getWeight(dk);
 
 		int count = 0;
@@ -141,7 +143,7 @@ public class TrackList implements Iterable<Track> {
 	 * reset tracks to the default
 	 */
 	@Deprecated
-	public void clear() {
+	public synchronized void clear() {
 		mapping.clear();
 		order.clear();
 		init();
@@ -153,7 +155,7 @@ public class TrackList implements Iterable<Track> {
 	 * 
 	 * @param row the row number.
 	 */
-	public void down(int row) {
+	public synchronized void down(int row) {
 		if (row < order.size() - 1) {
 			final Configuration conf = model.getConfiguration();
 			DataKey tmp = order.get(row);
@@ -194,7 +196,7 @@ public class TrackList implements Iterable<Track> {
 	 * 
 	 * @param key the key to remove.
 	 */
-	public void remove(DataKey key) {
+	public synchronized void remove(DataKey key) {
 		order.remove(key);
 		mapping.remove(key);
 	}
@@ -212,27 +214,12 @@ public class TrackList implements Iterable<Track> {
 	}
 
 	@Override
-	public Iterator<Track> iterator() {
-		return new Iterator<Track>() {
-			int index = 0;
-
-			@Override
-			public boolean hasNext() {
-				return index < order.size();
-			}
-
-			@Override
-			public Track next() {
-				return mapping.get(order.get(index++));
-			}
-
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-
-			}
-
-		};
+	public synchronized Iterator<Track> iterator() {
+		List<Track> sorted = new LinkedList<Track>();
+		for (int index = 0; index < order.size(); index++) {
+			sorted.add(mapping.get(order.get(index)));
+		}
+		return sorted.iterator();
 	}
 
 	/**
@@ -243,7 +230,7 @@ public class TrackList implements Iterable<Track> {
 	 *          selected chromosome)
 	 * @return true iff the final size equals the start size.
 	 */
-	public boolean update(Entry e) {
+	public synchronized boolean update(Entry e) {
 		model.getLog().log(Level.INFO, "Updating tracks for " + e);
 		int startSize = this.size();
 		/* Graph tracks */

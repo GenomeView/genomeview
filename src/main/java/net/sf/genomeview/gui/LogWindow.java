@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelListener;
@@ -36,12 +37,12 @@ public class LogWindow extends JFrame implements Reporter {
 
 	/**
 	 * 
-	 * @param log the {@link DistributingReporter} to subscribe with
+	 * @param parentlogger the {@link DistributingReporter} to subscribe with
 	 */
-	public LogWindow(DistributingReporter log) {
+	public LogWindow(DistributingReporter parentlogger) {
 		setLayout(new BorderLayout());
-		log.add(this);
-		log.log(Level.INFO, "log window opened");
+		parentlogger.add(this);
+		parentlogger.log(Level.INFO, "log window opened");
 		pack();
 
 		// set panel content
@@ -135,11 +136,21 @@ class LogTableModel implements TableModel {
 		this.maxsize = maxsize;
 	}
 
-	public String getMessage(int row) {
+	/**
+	 * 
+	 * @param row the row to get message from
+	 * @return message currently at row.
+	 */
+	public synchronized String getMessage(int row) {
 		return logs.get(row).getMessage();
 	}
 
-	public Throwable getStacktrace(int row) {
+	/**
+	 * 
+	 * @param row the row to get message from
+	 * @return stacjtrace currently at row.
+	 */
+	public synchronized Throwable getStacktrace(int row) {
 		return logs.get(row).getThrown();
 	}
 
@@ -149,22 +160,37 @@ class LogTableModel implements TableModel {
 	 * @param record a new logrecord to add as first item
 	 */
 	public synchronized void add(LogRecord record) {
+		// this particular order ensures list size never decreases
+		// and helps thread 'safety'
+		logs.add(0, record);
 		while (logs.size() > maxsize) {
 			logs.remove(logs.size() - 1); // remove last
 		}
-		logs.add(0, record);
 		notifyListeners();
 	}
 
 	private void notifyListeners() {
-		for (TableModelListener l : listeners) {
-			l.tableChanged(null); // null just refreshes the panel. Maybe
-									// smarter way?
+		// tableChanged is NOT THREAD SAFE.. Workaround
+		SwingUtilities.invokeLater(() -> notifyListenersOnSwingThread());
+	}
+
+	/**
+	 * ONLY CALL THIS FROM INSIDE SWING THREAD.
+	 */
+	private synchronized void notifyListenersOnSwingThread() {
+		try {
+			for (TableModelListener l : listeners) {
+				// null just refreshes the entire panel.
+				l.tableChanged(null);
+			}
+		} catch (Exception e) {
+			// can't log problems inside a logger! What now?
+			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public int getRowCount() {
+	public synchronized int getRowCount() {
 		return logs.size();
 	}
 
@@ -196,7 +222,7 @@ class LogTableModel implements TableModel {
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
+	public synchronized Object getValueAt(int rowIndex, int columnIndex) {
 		LogRecord record = logs.get(rowIndex);
 		switch (columnIndex) {
 		case 0:
@@ -213,12 +239,12 @@ class LogTableModel implements TableModel {
 	}
 
 	@Override
-	public void addTableModelListener(TableModelListener l) {
+	public synchronized void addTableModelListener(TableModelListener l) {
 		listeners.add(l);
 	}
 
 	@Override
-	public void removeTableModelListener(TableModelListener l) {
+	public synchronized void removeTableModelListener(TableModelListener l) {
 		listeners.remove(l);
 	}
 
