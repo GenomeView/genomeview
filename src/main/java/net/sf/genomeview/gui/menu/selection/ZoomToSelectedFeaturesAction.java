@@ -8,7 +8,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
@@ -19,7 +18,8 @@ public class ZoomToSelectedFeaturesAction extends AbstractModelAction
 		implements Observer {
 
 	public ZoomToSelectedFeaturesAction(Model model) {
-		super(MessageManager.getString("selectionmenu.zoom_to_feature"), model);
+		super(model.getMessageMgr().getString("selectionmenu.zoom_to_feature"),
+				model);
 	}
 
 	@Override

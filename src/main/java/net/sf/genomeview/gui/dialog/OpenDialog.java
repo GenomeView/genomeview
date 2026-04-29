@@ -23,7 +23,6 @@ import javax.swing.filechooser.FileFilter;
 
 import be.abeel.gui.GridBagPanel;
 import net.sf.genomeview.core.Icons;
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.NotificationTypes;
@@ -67,12 +66,13 @@ public class OpenDialog extends JDialog {
 		GridBagPanel gp = new GridBagPanel();
 		_self.setContentPane(gp);
 		JButton file = new JButton(
-				MessageManager.getString("opendialog.local_files"),
+				model.getMessageMgr().getString("opendialog.local_files"),
 				Icons.get("Hard Disk_48x48.png"));
 		configButton(file);
 		gp.add(file, gp.gc);
 		gp.gc.gridx++;
-		JButton url = new JButton(MessageManager.getString("opendialog.url"),
+		JButton url = new JButton(
+				model.getMessageMgr().getString("opendialog.url"),
 				Icons.get("Globe_48x48.png"));
 		configButton(url);
 		gp.add(url, gp.gc);

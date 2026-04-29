@@ -61,13 +61,15 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 
 	@Override
 	public String getColumnName(int columnIndex) {
+		final MessageManager mm = model.getMessageMgr();
+
 		switch (columnIndex) {
 		case 0:
-			return MessageManager.getString("searchsequenceresult.strand");
+			return mm.getString("searchsequenceresult.strand");
 		case 1:
-			return MessageManager.getString("searchsequenceresult.start");
+			return mm.getString("searchsequenceresult.start");
 		case 2:
-			return MessageManager.getString("searchsequenceresult.end");
+			return mm.getString("searchsequenceresult.end");
 		}
 		return null;
 	}
@@ -104,6 +106,8 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 	 */
 	void search(final Model model, String pattern, final int mismatch,
 			final SequenceType type) {
+		final MessageManager mm = model.getMessageMgr();
+
 		locations.clear();
 		model.clearHighlights();
 		final byte[] bytePattern = pattern.toUpperCase().getBytes();
@@ -123,9 +127,9 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 				} catch (IllegalArgumentException ie) {
 					JOptionPane.showMessageDialog(
 							model.getGUIManager().getMainWindow(),
-							MessageManager.getString(
+							mm.getString(
 									"searchsequenceresult.too_many_mismatches_warn"),
-							MessageManager.getString(
+							mm.getString(
 									"searchsequenceresult.too_many_mismatches"),
 							JOptionPane.WARNING_MESSAGE);
 				}
@@ -182,12 +186,13 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 				/* Search forward strand */
 				int[] lastPos = { 0, 0 };
 				do {
-					if (mismatch == 0)
+					if (mismatch == 0) {
 						lastPos[0] = bm.searchBytes(byteSequence, lastPos[0],
 								byteSequence.length, bytePattern);
-					else
+					} else {
 						lastPos = som.searchBytes(byteSequence, lastPos[0],
 								byteSequence.length, bytePattern, mismatch);
+					}
 
 					if (lastPos[0] >= 0) {
 
@@ -254,12 +259,13 @@ class SequenceSearchResultModel extends AbstractSearchResultModel {
 				/* Search reverse strand */
 				int lastPos[] = { 0, 0 };
 				do {
-					if (mismatch == 0)
+					if (mismatch == 0) {
 						lastPos[0] = bm.searchBytes(byteSequence, lastPos[0],
 								byteSequence.length, bytePattern);
-					else
+					} else {
 						lastPos = som.searchBytes(byteSequence, lastPos[0],
 								byteSequence.length, bytePattern, mismatch);
+					}
 
 					if (lastPos[0] >= 0) {
 						Location l = null;

@@ -40,17 +40,24 @@ public class SearchDialog extends EscapeDialog {
 	final private JTabbedPane pane;
 
 	private SearchDialog(Model model) {
-		super(model.getGUIManager().getMainWindow(), MessageManager.getString("searchdialog.search"));
+		super(model.getGUIManager().getMainWindow(),
+				model.getMessageMgr().getString("searchdialog.search"));
+		final MessageManager mm = model.getMessageMgr();
 		setModalityType(ModalityType.MODELESS);
 		pane = new JTabbedPane();
 		setLayout(new BorderLayout());
 		add(pane, BorderLayout.CENTER);
-		pane.add(MessageManager.getString("searchdialog.keyword_search"), new KeywordSearchPane(model));
-		pane.add(MessageManager.getString("searchdialog.entry_search"),new EntrySearchPane(model));
-		pane.add(MessageManager.getString("searchdialog.sequence_search"), new SequenceSearchPane(model));
-		pane.add(MessageManager.getString("searchdialog.motif_search"), new MotifSearchPane(model));
-		
-		pane.add(MessageManager.getString("searchdialog.overlap_search"), new OverlapSearchPane(model));
+		pane.add(mm.getString("searchdialog.keyword_search"),
+				new KeywordSearchPane(model));
+		pane.add(mm.getString("searchdialog.entry_search"),
+				new EntrySearchPane(model));
+		pane.add(mm.getString("searchdialog.sequence_search"),
+				new SequenceSearchPane(model));
+		pane.add(mm.getString("searchdialog.motif_search"),
+				new MotifSearchPane(model));
+
+		pane.add(mm.getString("searchdialog.overlap_search"),
+				new OverlapSearchPane(model));
 
 		pack();
 		StaticUtils.right(this, model.getGUIManager().getMainWindow());
@@ -58,8 +65,9 @@ public class SearchDialog extends EscapeDialog {
 	}
 
 	public static void showDialog(Model model) {
-		if (dialog == null)
+		if (dialog == null) {
 			dialog = new SearchDialog(model);
+		}
 		EventQueue.invokeLater(new Runnable() {
 
 			@Override
@@ -72,7 +80,9 @@ public class SearchDialog extends EscapeDialog {
 
 			@Override
 			public void run() {
-				((SearchPanel) dialog.pane.getComponentAt(dialog.pane.getSelectedIndex())).getFocusComponent().requestFocusInWindow();
+				((SearchPanel) dialog.pane
+						.getComponentAt(dialog.pane.getSelectedIndex()))
+						.getFocusComponent().requestFocusInWindow();
 
 			}
 		});
@@ -81,6 +91,7 @@ public class SearchDialog extends EscapeDialog {
 
 	enum SequenceType {
 		Nucleotide, AminoAcid;
+
 		@Override
 		public String toString() {
 			switch (this) {

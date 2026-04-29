@@ -140,7 +140,7 @@ public class FeatureTrack extends Track {
 			g.setColor(Color.BLACK);
 			g.drawString(
 					ftc.type() + ": "
-							+ MessageManager.getString(
+							+ model.getMessageMgr().getString(
 									"featuretrack.too_many_to_display_warn"),
 					10, yOffset + 10);
 			return 20 + 5;
@@ -530,16 +530,27 @@ public class FeatureTrack extends Track {
 	}
 
 	static class FeatureTrackConfig extends TrackConfig {
+		// private boolean scoreColorGradient, colorQualifier;
+
+		private double minScore = Double.NEGATIVE_INFINITY;
+
+		private double maxScore = Double.POSITIVE_INFINITY;
+
+		private boolean scoreColorGradientEnabled;
+
+		private double threshold = Double.NEGATIVE_INFINITY;
+
+		private boolean colorQualifierEnabled;
 
 		@Override
 		protected GridBagPanel getGUIContainer() {
+			final MessageManager mm = model.getMessageMgr();
 			GridBagPanel out = super.getGUIContainer();
 
 			out.gc.gridy++;
 			final JComponent colorGradient = new BooleanConfig(
 					"feature:scoreColorGradient_" + type(),
-					MessageManager.getString("featuretrack.use_color_gradient"),
-					model);
+					mm.getString("featuretrack.use_color_gradient"), model);
 			out.add(colorGradient, out.gc);
 
 			/* Filter items based on score */
@@ -547,7 +558,7 @@ public class FeatureTrack extends Track {
 			out.gc.gridy++;
 
 			final JButton filter = new JButton(new AbstractAction(
-					MessageManager.getString("featuretrack.filter_by_score")) {
+					mm.getString("featuretrack.filter_by_score")) {
 				// filter.setAction(new
 				// AbstractAction("Filter items by score") {
 				@Override
@@ -582,14 +593,13 @@ public class FeatureTrack extends Track {
 					};
 					slider.addChangeListener(changeListener);
 					optionPane.setMessage(new Object[] {
-							MessageManager
-									.getString("featuretrack.select_score_th"),
+							mm.getString("featuretrack.select_score_th"),
 							slider, label });
 					optionPane.setMessageType(JOptionPane.QUESTION_MESSAGE);
 					optionPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
 					JDialog dialog = optionPane.createDialog(
 							model.getGUIManager().getMainWindow(),
-							MessageManager.getString("featuretrack.score_th"));
+							mm.getString("featuretrack.score_th"));
 					// dialog.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 					dialog.setVisible(true);
 					setThreshold((Double) optionPane.getInputValue());
@@ -618,19 +628,13 @@ public class FeatureTrack extends Track {
 			});
 
 			ColorConfig cc = new ColorConfig(model, "TYPE_" + type(),
-					MessageManager.getString("featuretrack.display_color"));
+					mm.getString("featuretrack.display_color"));
 			out.gc.gridy++;
 			out.add(cc, out.gc);
 
 			return out;
 
 		}
-
-		// private boolean scoreColorGradient, colorQualifier;
-
-		private double minScore = Double.NEGATIVE_INFINITY;
-
-		private double maxScore = Double.POSITIVE_INFINITY;
 
 		/**
 		 * @return the minScore
@@ -678,12 +682,6 @@ public class FeatureTrack extends Track {
 		// model.refresh(this);
 		// }
 		// }
-
-		private boolean scoreColorGradientEnabled;
-
-		private double threshold = Double.NEGATIVE_INFINITY;
-
-		private boolean colorQualifierEnabled;
 
 		public double getThreshold() {
 			return threshold;

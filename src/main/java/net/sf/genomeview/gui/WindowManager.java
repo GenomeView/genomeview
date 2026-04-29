@@ -27,14 +27,13 @@ import javax.swing.JPanel;
 import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.Globals;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.jannot.Cleaner;
 import net.sf.jannot.DistributingReporter;
-import net.sf.jannot.Global;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * MainWindow is the container for a single GenomeView instance.
@@ -55,21 +54,24 @@ public class WindowManager extends WindowAdapter implements Observer {
 	private final LogWindow logwindow;
 
 	private final Model model;
-	private final Global global;
+	private final Globals global;
 
 	/**
 	 * 
-	 * @param args   the init args, usually from the commandline
-	 * @param splash splash screen to show info on, can be null
-	 * @param log    must be non null {@link Reporter}
+	 * @param args    the init args, usually from the commandline
+	 * @param splash  splash screen to show info on, can be null
+	 * @param globals must be non null {@link Globals}
 	 * @throws InterruptedException
 	 * @throws ExecutionException
 	 */
-	public WindowManager(String args[], Splash splash, Global global,
+	public WindowManager(String args[], Splash splash, Globals globals,
 			Configuration configuration)
 			throws InterruptedException, ExecutionException {
-		this.global = global;
-		DistributingReporter log = global.getLog();
+		if (globals == null) {
+			throw new NullPointerException("globals is null");
+		}
+		this.global = globals;
+		DistributingReporter log = globals.getLog();
 		running++;
 		logwindow = new LogWindow(log);
 
@@ -78,14 +80,14 @@ public class WindowManager extends WindowAdapter implements Observer {
 			options = new CommandLineOptions(args, configuration);
 		} catch (IllegalOptionValueException | UnknownOptionException e) {
 			throw new ExecutionException(
-					MessageManager.getString(
+					globals.getMessageManager().getString(
 							"commandlineoptions.parsing_command_line_error"),
 					e);
 		} catch (IOException | URISyntaxException e) {
 			throw new ExecutionException("Loading extra options failed", e);
 		}
 
-		model = new Model(options.id(), global, configuration);
+		model = new Model(options.id(), globals);
 
 		model.addObserver(this);
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
@@ -130,7 +132,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 		int result = JOptionPane.showConfirmDialog(
 				model.getGUIManager().getMainWindow(),
-				MessageManager.getString("windowmanager.exit"));
+				global.getMessageManager().getString("windowmanager.exit"));
 		if (result == JOptionPane.YES_OPTION) {
 			this.model.exit();
 		}
@@ -233,10 +235,11 @@ public class WindowManager extends WindowAdapter implements Observer {
 		// FIXME special handling if this is not the first time the application
 		// is initialized
 
-		info(MessageManager.getString("windowmanager.parsing_params"), splash);
+		final MessageManager mm = global.getMessageManager();
 
-		info(MessageManager.getString("windowmanager.creating_windows"),
-				splash);
+		info(mm.getString("windowmanager.parsing_params"), splash);
+
+		info(mm.getString("windowmanager.creating_windows"), splash);
 
 		GraphicsEnvironment ge = GraphicsEnvironment
 				.getLocalGraphicsEnvironment();
@@ -245,8 +248,8 @@ public class WindowManager extends WindowAdapter implements Observer {
 
 		if (window == null) {
 			freshwindow = true;
-			model.getLog().log(Level.INFO, MessageManager
-					.getString("windowmanager.creating_new_window"));
+			model.getLog().log(Level.INFO,
+					mm.getString("windowmanager.creating_new_window"));
 			window = new GenomeViewWindow(model,
 					"GenomeView :: " + model.getConfiguration().version(),
 					gs[0].getDefaultConfiguration());
@@ -293,11 +296,10 @@ public class WindowManager extends WindowAdapter implements Observer {
 				}
 			}
 			window.setVisible(true);
-			info(MessageManager.getString("windowmanager.installing_plugins"),
-					splash);
+			info(mm.getString("windowmanager.installing_plugins"), splash);
 
 		}
-		info(MessageManager.getString("windowmanager.loading_data"), splash);
+		info(mm.getString("windowmanager.loading_data"), splash);
 		/* Data specified on command line */
 		InitDataLoader idl = new InitDataLoader(model);
 		if (options.goodParse()) {

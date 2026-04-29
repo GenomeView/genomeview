@@ -8,7 +8,6 @@ import java.util.Observable;
 
 import javax.swing.KeyStroke;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.genomeview.gui.search.SearchDialog;
@@ -22,7 +21,7 @@ import net.sf.genomeview.gui.search.SearchDialog;
 public class SearchAction extends AbstractModelAction {
 
 	public SearchAction(Model model) {
-		super(MessageManager.getString("navigationmenu.search"), model);
+		super(model.getMessageMgr().getString("navigationmenu.search"), model);
 		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control F"));
 
 	}

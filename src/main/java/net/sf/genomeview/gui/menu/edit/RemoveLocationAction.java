@@ -10,7 +10,6 @@ import java.util.Observer;
 import java.util.Set;
 import java.util.SortedSet;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Data;
@@ -28,7 +27,8 @@ public class RemoveLocationAction extends AbstractModelAction
 		implements Observer {
 
 	public RemoveLocationAction(Model model) {
-		super(MessageManager.getString("editmenu.remove_location"), model);
+		super(model.getMessageMgr().getString("editmenu.remove_location"),
+				model);
 	}
 
 	@Override

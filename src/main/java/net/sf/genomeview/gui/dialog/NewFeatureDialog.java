@@ -30,13 +30,13 @@ import net.sf.jannot.MemoryFeatureAnnotation;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class NewFeatureDialog extends JDialog {
-
-	private static final long serialVersionUID = -770863087750087961L;
 
 	public NewFeatureDialog(final Model model) {
 		super(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("newfeature.title"));
+				model.getMessageMgr().getString("newfeature.title"));
+		final MessageManager mm = model.getMessageMgr();
 		final NewFeatureDialog _self = this;
 		setModal(true);
 		setAlwaysOnTop(true);
@@ -58,9 +58,10 @@ public class NewFeatureDialog extends JDialog {
 		c.add(typeCombo, gc);
 		gc.gridwidth = 1;
 		gc.gridy++;
-		JButton ok = new JButton(MessageManager.getString("button.ok"));
+		JButton ok = new JButton(mm.getString("button.ok"));
 		ok.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				SortedSet<Location> loc = new TreeSet<Location>();
 				loc.add(model.getSelectedRegion());
@@ -77,9 +78,10 @@ public class NewFeatureDialog extends JDialog {
 			}
 
 		});
-		JButton cancel = new JButton(MessageManager.getString("button.cancel"));
+		JButton cancel = new JButton(mm.getString("button.cancel"));
 		cancel.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
 

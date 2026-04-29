@@ -16,7 +16,6 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 import be.abeel.concurrency.DaemonThreadFactory;
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 
 /**
@@ -51,13 +50,14 @@ public class JavaScriptHandler {
 
 			@Override
 			public void update(Observable o, Object arg) {
-				if (model.isExitRequested())
+				if (model.isExitRequested()) {
 					try {
 						ss.close();
 					} catch (IOException e) {
 						model.getLog().log(Level.WARNING,
 								"javascripthandler close failed", e);
 					}
+				}
 
 			}
 		});
@@ -66,8 +66,9 @@ public class JavaScriptHandler {
 			@Override
 			public void run() {
 				int localPort = ss.getLocalPort();
-				if (localPort != 2223)
+				if (localPort != 2223) {
 					notifyMainHandler(localPort);
+				}
 
 				model.getLog().log(Level.INFO,
 						"listening on port: " + ss.getLocalPort());
@@ -84,7 +85,7 @@ public class JavaScriptHandler {
 
 					} catch (IOException e) {
 						model.getLog().log(Level.SEVERE,
-								MessageManager.getString(
+								model.getMessageMgr().getString(
 										"jshandler.failed_to_accept_socket"),
 								e);
 					}

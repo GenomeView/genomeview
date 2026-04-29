@@ -26,6 +26,7 @@ import be.abeel.io.LineIterator;
 import be.abeel.util.DefaultHashMap;
 import htsjdk.samtools.util.StringUtil;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.Globals;
 import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.gui.GUIManager;
 import net.sf.genomeview.gui.StaticUtils;
@@ -59,9 +60,9 @@ import tudelft.utilities.logging.Reporter;
  */
 public class Model extends Observable implements Observer {
 
-	private final Global global;
-	private final Configuration configuration;
-	private final Reporter log; // convenience copy of global.log
+	private final Globals globals;
+	private final Configuration configuration; // convenience copy
+	private final Reporter log; // convenience copy
 
 	/**
 	 * The EntrySet which contains all loaded 'chromosomes'.
@@ -138,26 +139,25 @@ public class Model extends Observable implements Observer {
 	 */
 	/**
 	 * @param id     the name of this
-	 * @param global the {@link Global} data
+	 * @param global the {@link Globals} data
 	 */
 
-	public Model(String id, Global global, Configuration config) {
-		if (global == null) {
-			throw new NullPointerException("log must not be null");
+	public Model(String id, Globals globals) {
+		if (globals == null) {
+			throw new NullPointerException("globals must not be null");
 		}
-		this.global = global;
-		this.configuration = config;
-
-		this.log = global.getLog();
+		this.globals = globals;
+		this.log = globals.getLog();
+		this.configuration = globals.getConfiguration();
 
 		// initialize fields
 		aamapping = new DefaultHashMap<Entry, AminoAcidMapping>(AminoAcidMapping
 				.valueOf(configuration.get("translationTable:default")));
 
-		vlm = new VisualLocationModel(global);
-		entries = new EntrySet(global);
+		vlm = new VisualLocationModel(globals);
+		entries = new EntrySet(globals.getGlobal());
 
-		this.connectionMonitor = new ConnectionMonitor(log, config);
+		this.connectionMonitor = new ConnectionMonitor(globals);
 		guimanager = new GUIManager();
 
 		new JavaScriptHandler(this, id);
@@ -198,7 +198,7 @@ public class Model extends Observable implements Observer {
 	}
 
 	public DistributingReporter getLog() {
-		return global.getLog();
+		return globals.getLog();
 	}
 
 	/**
@@ -624,7 +624,7 @@ public class Model extends Observable implements Observer {
 						 */
 						if (arr.length > 3 || arr.length < 2) {
 							getLog().log(Level.WARNING,
-									MessageManager.getString(
+									globals.getMessageManager().getString(
 											"externalhelper.couldnt_parse_location")
 											+ " " + position);
 							return;
@@ -663,7 +663,7 @@ public class Model extends Observable implements Observer {
 					}
 				} catch (NumberFormatException ne) {
 					getLog().log(Level.WARNING,
-							MessageManager.getString(
+							globals.getMessageManager().getString(
 									"externalhelper.couldnt_parse_location")
 									+ " " + position,
 							ne);
@@ -706,8 +706,30 @@ public class Model extends Observable implements Observer {
 		return configuration;
 	}
 
+	/**
+	 * convenience method.
+	 * 
+	 * @return the jannot sub-Globals
+	 */
 	public Global getGlobal() {
-		return global;
+		return globals.getGlobal();
+	}
+
+	/**
+	 * 
+	 * @return the {@link Globals}
+	 */
+	public Globals getGlobals() {
+		return globals;
+	}
+
+	/**
+	 * convenience method
+	 * 
+	 * @return the {@link MessageManager}
+	 */
+	public MessageManager getMessageMgr() {
+		return globals.getMessageManager();
 	}
 
 }

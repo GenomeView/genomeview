@@ -6,7 +6,6 @@ package net.sf.genomeview.gui.menu.edit;
 import java.awt.event.ActionEvent;
 import java.util.Observable;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
@@ -15,8 +14,8 @@ import net.sf.jannot.Feature;
 public class CloneFeatureAction extends AbstractModelAction {
 
 	public CloneFeatureAction(Model model) {
-		super(MessageManager.getString("editmenu.clone_selected_feature"),
-				model);
+		super(model.getMessageMgr()
+				.getString("editmenu.clone_selected_feature"), model);
 
 	}
 

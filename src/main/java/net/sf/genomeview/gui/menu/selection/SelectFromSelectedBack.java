@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Observable;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
@@ -17,8 +16,8 @@ import net.sf.jannot.Location;
 public class SelectFromSelectedBack extends AbstractModelAction {
 
 	public SelectFromSelectedBack(Model model) {
-		super(MessageManager.getString("selectionmenu.move_back_location"),
-				model);
+		super(model.getMessageMgr()
+				.getString("selectionmenu.move_back_location"), model);
 
 	}
 

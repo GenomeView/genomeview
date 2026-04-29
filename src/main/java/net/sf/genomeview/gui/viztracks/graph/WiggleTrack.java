@@ -42,6 +42,16 @@ public class WiggleTrack extends Track {
 
 	private Tooltip tooltip = new Tooltip();
 
+	private Location currentVisible;
+	private int currentYOffset;
+	private static final double LOG2 = Math.log(2);
+	private int plotType = 0;
+	private double screenWidth;
+
+	public WiggleTrack(DataKey key, Model model, boolean b) {
+		super(key, model, b, true);
+	}
+
 	private class Tooltip extends JWindow {
 
 		private static final long serialVersionUID = -7416732151483650659L;
@@ -77,10 +87,12 @@ public class WiggleTrack extends Track {
 	}
 
 	private class WigglePopup extends JPopupMenu {
+		final MessageManager mm = model.getMessageMgr();
+
 		public WigglePopup() {
-			if (!logScaled)
-				add(new AbstractAction(MessageManager
-						.getString("wiggletrack.use_log_scaling")) {
+			if (!logScaled) {
+				add(new AbstractAction(
+						mm.getString("wiggletrack.use_log_scaling")) {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -90,9 +102,9 @@ public class WiggleTrack extends Track {
 					}
 
 				});
-			else {
-				add(new AbstractAction(MessageManager
-						.getString("wiggletrack.use_normal_scaling")) {
+			} else {
+				add(new AbstractAction(
+						mm.getString("wiggletrack.use_normal_scaling")) {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -104,7 +116,7 @@ public class WiggleTrack extends Track {
 				});
 			}
 			add(new AbstractAction(
-					MessageManager.getString("wiggletrack.toggle_plot_mode")) {
+					mm.getString("wiggletrack.toggle_plot_mode")) {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -159,37 +171,9 @@ public class WiggleTrack extends Track {
 
 	}
 
-	// private String name;
-	private Location currentVisible;
-	private int currentYOffset;
-
-	public WiggleTrack(DataKey key, Model model, boolean b) {
-		super(key, model, b, true);
-		// this.name = name;
-	}
-
-	// public WiggleTrack(DataKey key, Data data) {
-	// // TODO Auto-generated constructor stub
-	// }
-	//
-	// public WiggleTrack(Model model, DataKey key, Data data) {
-	// // TODO Auto-generated constructor stub
-	// }
-
-//	@Override
-//	public String displayName() {
-//		return dataKey.toString();
-//	}
-
-	// private HashMap<Entry, Graph> graphs = new HashMap<Entry, Graph>();
-	private static final double LOG2 = Math.log(2);
-
 	private double log2(double d) {
 		return Math.log(d) / LOG2;
 	}
-
-	private int plotType = 0;
-	private double screenWidth;
 
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,
@@ -199,25 +183,28 @@ public class WiggleTrack extends Track {
 		this.screenWidth = screenWidth;
 
 		int graphLineHeigh = 50;
-		if (config.isCollapsed())
+		if (config.isCollapsed()) {
 			graphLineHeigh = 10;
+		}
 
 		g.setColor(Color.BLACK);
 
 		Graph graph = (Graph) entry.get(dataKey);// e.graphs.getGraph(name);
 		/* When there is no data, return immediately */
-		if (graph == null)
+		if (graph == null) {
 			return 0;
+		}
 
 		/* Check whether this graph is visible, if not, don't bother */
 		Rectangle rec = view.getViewRect();
 		if (yOffset < rec.y + rec.height && yOffset + graphLineHeigh > rec.y) {
 
-			double width = screenWidth / (double) currentVisible.length();
+			double width = screenWidth / currentVisible.length();
 
 			double min = graph.min();
-			if (min > 0)
+			if (min > 0) {
 				min = 0;
+			}
 			double max = graph.max();
 
 			int scale = 1;
@@ -245,8 +232,9 @@ public class WiggleTrack extends Track {
 						currentVisible, screenWidth);
 				double val = f[i];
 
-				if (val > graph.max())
+				if (val > graph.max()) {
 					val = graph.max();
+				}
 
 				if (logScaled) {
 					double logrange = log2(max + 1) - log2(min + 1);

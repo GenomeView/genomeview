@@ -13,7 +13,7 @@ import javax.swing.JLabel;
 
 import be.abeel.concurrency.DaemonThread;
 import be.abeel.io.LineIterator;
-import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.Globals;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.core.MessageManager;
 import tudelft.utilities.logging.Reporter;
@@ -37,8 +37,7 @@ public class ConnectionMonitor extends Observable {
 	public JLabel networkLabel = new JLabel();
 	public JLabel webLabel = new JLabel();
 	public JLabel reposLabel = new JLabel();
-	private Reporter log;
-	private Configuration config;
+	private final Globals globals;
 
 	/**
 	 * One instance of this is created in the Model at startup. No need to
@@ -46,9 +45,10 @@ public class ConnectionMonitor extends Observable {
 	 * 
 	 * @param log the {@link Reporter} to log issues to
 	 */
-	public ConnectionMonitor(Reporter log, Configuration config) {
-		this.log = log;
-		this.config = config;
+	public ConnectionMonitor(Globals globals) {
+		this.globals = globals;
+		final MessageManager mm = globals.getMessageManager();
+
 		// FIXME this monitor should not manipulate GUI labels?
 		networkLabel.setPreferredSize(
 				new Dimension(online.getIconWidth(), online.getIconHeight()));
@@ -62,20 +62,20 @@ public class ConnectionMonitor extends Observable {
 			public void update(Observable o, Object arg) {
 				if (webstartOnline) {
 					webLabel.setIcon(online);
-					webLabel.setToolTipText(MessageManager
+					webLabel.setToolTipText(mm
 							.getString("connectionmonitor.genomeview_online"));
 				} else {
 					webLabel.setIcon(offline);
-					webLabel.setToolTipText(MessageManager.getString(
+					webLabel.setToolTipText(mm.getString(
 							"connectionmonitor.cannot_connect_genomeview"));
 				}
 				if (reposOnline) {
 					reposLabel.setIcon(online);
-					reposLabel.setToolTipText(MessageManager.getString(
+					reposLabel.setToolTipText(mm.getString(
 							"connectionmonitor.data_repository_online"));
 				} else {
 					reposLabel.setIcon(offline);
-					reposLabel.setToolTipText(MessageManager.getString(
+					reposLabel.setToolTipText(mm.getString(
 							"connectionmonitor.cannot_connect_data_repository"));
 				}
 
@@ -95,7 +95,8 @@ public class ConnectionMonitor extends Observable {
 					networkLabel.setToolTipText(
 							"<html>" + text.toString() + "</html>");
 				} catch (Exception e) {
-					log.log(Level.WARNING, "update of network label failed", e);
+					globals.getLog().log(Level.WARNING,
+							"update of network label failed", e);
 				}
 
 				if (networkInterface) {
@@ -120,7 +121,8 @@ public class ConnectionMonitor extends Observable {
 					webstartOnline = false;
 
 					try {
-						if (config.getBoolean("general:monitorConnection")) {
+						if (globals.getConfiguration()
+								.getBoolean("general:monitorConnection")) {
 							LineIterator it = new LineIterator(
 									"http://genomeview.org/online.php");
 							// log.info("Reply from web: " + it.next());
@@ -151,7 +153,8 @@ public class ConnectionMonitor extends Observable {
 				while (true) {
 					reposOnline = false;
 					try {
-						if (config.getBoolean("general:monitorConnection")) {
+						if (globals.getConfiguration()
+								.getBoolean("general:monitorConnection")) {
 							LineIterator it = new LineIterator(
 									"http://www.broadinstitute.org/software/genomeview/online.php");
 							// log.info("Reply from repository: " + it.next());
@@ -195,7 +198,7 @@ public class ConnectionMonitor extends Observable {
 						}
 
 					} catch (Exception e) {
-						log.log(Level.WARNING,
+						globals.getLog().log(Level.WARNING,
 								"network monitoring deamon failed", e);
 						networkInterface = false;
 					}

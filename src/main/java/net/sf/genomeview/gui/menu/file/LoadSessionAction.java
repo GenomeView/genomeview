@@ -23,13 +23,13 @@ import net.sf.genomeview.data.Session;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class LoadSessionAction extends AbstractAction {
 
-	private static final long serialVersionUID = -3508287264527633444L;
 	private Model model;
 
 	public LoadSessionAction(Model model) {
-		super(MessageManager.getString("filemenu.load_session"));
+		super(model.getMessageMgr().getString("filemenu.load_session"));
 		this.model = model;
 	}
 
@@ -38,7 +38,7 @@ public class LoadSessionAction extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
+		final MessageManager mm = model.getMessageMgr();
 		JFileChooser chooser = new JFileChooser(
 				model.getConfiguration().getFile("lastDirectory"));
 		chooser.setMultiSelectionEnabled(false);
@@ -63,8 +63,8 @@ public class LoadSessionAction extends AbstractAction {
 			if (model.loadedSources().size() != 0) {
 				result = JOptionPane.showConfirmDialog(
 						model.getGUIManager().getMainWindow(),
-						MessageManager.getString("filemenu.load_session_warn"),
-						MessageManager.getString("filemenu.clear_session"),
+						mm.getString("filemenu.load_session_warn"),
+						mm.getString("filemenu.clear_session"),
 						JOptionPane.YES_NO_OPTION);
 				if (result != JOptionPane.YES_OPTION) {
 					return;
@@ -75,7 +75,7 @@ public class LoadSessionAction extends AbstractAction {
 				Session.loadSession(model, chooser.getSelectedFile());
 			} catch (FileNotFoundException e1) {
 				model.getLog().log(Level.WARNING,
-						MessageManager.getString(
+						mm.getString(
 								"loadsessionaction.couldnt_load_session_file"),
 						e1);
 			}

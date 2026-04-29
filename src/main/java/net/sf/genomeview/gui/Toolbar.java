@@ -34,7 +34,7 @@ public class Toolbar extends JToolBar {
 	private static final long serialVersionUID = -3468536836400268783L;
 
 	public Toolbar(Model model) {
-
+		final MessageManager mm = model.getMessageMgr();
 		setFloatable(false);
 
 		add(new UndoAction(model));
@@ -45,7 +45,7 @@ public class Toolbar extends JToolBar {
 		add(new AnnotationMoveLeftAction(model));
 		add(new AnnotationMoveRightAction(model));
 		addSeparator();
-		add(new JLabel(MessageManager.getString("toolbar.chromosome")));
+		add(new JLabel(mm.getString("toolbar.chromosome")));
 		final JComboBox<?> cb = new JComboBox(new EntryListModel(model));
 		cb.setRenderer(new EntryRenderer());
 		model.addObserver(new Observer() {
@@ -59,7 +59,7 @@ public class Toolbar extends JToolBar {
 		add(cb);
 
 		if (model.getConfiguration().getBoolean("geneticCodeSelection")) {
-			add(new JLabel(MessageManager.getString("toolbar.code")));
+			add(new JLabel(mm.getString("toolbar.code")));
 			add(new AAMappingChooser(model));
 		}
 

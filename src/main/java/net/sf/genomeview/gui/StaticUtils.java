@@ -15,7 +15,7 @@ import java.util.Random;
 import java.util.logging.Level;
 
 import be.abeel.net.URIFactory;
-import net.sf.genomeview.core.MessageManager;
+import net.sf.genomeview.core.Globals;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.EditFeatureWindow;
 import net.sf.genomeview.gui.dialog.SplitFeatureDialog;
@@ -116,12 +116,12 @@ public final class StaticUtils {
 	 *            characters
 	 * @param log the {@link Reporter} to log issues
 	 */
-	public static void browse(String uristring, Reporter log) {
+	public static void browse(String uristring, Globals globals) {
 		try {
 			Desktop.getDesktop().browse(URIFactory.uri(uristring));
 		} catch (Throwable e) {
-			log.log(Level.WARNING,
-					MessageManager.formatMessage(
+			globals.getLog().log(Level.WARNING,
+					globals.getMessageManager().formatMessage(
 							"staticutils.couldnt_open_url_warn",
 							new Object[] { uristring }),
 					e);

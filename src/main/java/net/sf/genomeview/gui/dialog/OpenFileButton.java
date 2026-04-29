@@ -14,7 +14,6 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.Icons;
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.exception.ReadFailedException;
@@ -30,7 +29,7 @@ public class OpenFileButton extends JButton {
 	private final Model m;
 
 	public OpenFileButton(final Model gvModel) {
-		super(MessageManager.getString("opendialog.local_files"),
+		super(gvModel.getMessageMgr().getString("opendialog.local_files"),
 				Icons.get("Hard Disk_48x48.png"));
 		this.m = gvModel;
 		setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -114,8 +113,9 @@ public class OpenFileButton extends JButton {
 						// load(out);
 					} catch (IOException | URISyntaxException
 							| ReadFailedException e1) {
-						m.getLog().log(Level.WARNING, MessageManager.getString(
-								"editfeature.notes_failed_warn"), e1);
+						m.getLog().log(Level.WARNING, m.getMessageMgr()
+								.getString("editfeature.notes_failed_warn"),
+								e1);
 					}
 				}
 
@@ -123,11 +123,5 @@ public class OpenFileButton extends JButton {
 		});
 
 	}
-
-	// private void configButton(JButton button) {
-	// button.setVerticalTextPosition(SwingConstants.BOTTOM);
-	// button.setHorizontalTextPosition(SwingConstants.CENTER);
-	//
-	// }
 
 }

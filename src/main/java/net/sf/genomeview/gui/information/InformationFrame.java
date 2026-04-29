@@ -29,14 +29,14 @@ import net.sf.jannot.Type;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class InformationFrame extends GridBagPanel {
 
-	private static final long serialVersionUID = -8504854026653847566L;
 	private Model model;
 
 	public InformationFrame(final Model model) {
 		this.model = model;
-
+		final MessageManager mm = model.getMessageMgr();
 		// let's make this frame available to plugins
 		model.getGUIManager().registerInformationFrame(this);
 
@@ -52,11 +52,11 @@ public class InformationFrame extends GridBagPanel {
 		gc.weighty = 0;
 		gc.weightx = 0;
 		add(new HelpButton(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("infoframe.track_list_help")), gc);
+				mm.getString("infoframe.track_list_help")), gc);
 		gc.gridx++;
 		gc.gridwidth = 4;
 		gc.weightx = 1;
-		add(new JLabel(MessageManager.getString("infoframe.track_list")), gc);
+		add(new JLabel(mm.getString("infoframe.track_list")), gc);
 
 		gc.gridwidth = 5;
 		gc.gridx = 0;
@@ -71,9 +71,9 @@ public class InformationFrame extends GridBagPanel {
 		gc.gridwidth = 1;
 		gc.weightx = 0;
 		add(new HelpButton(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("infoframe.features_help")), gc);
+				mm.getString("infoframe.features_help")), gc);
 		gc.gridx++;
-		add(new JLabel(MessageManager.getString("infoframe.features")), gc);
+		add(new JLabel(mm.getString("infoframe.features")), gc);
 		TypeCombo type = new TypeCombo(model, false);
 		type.setSelectedItem(Type.get("CDS"));
 		type.addActionListener(annotationTrackList);
@@ -92,10 +92,10 @@ public class InformationFrame extends GridBagPanel {
 		gc.weighty = 0;
 		gc.gridwidth = 1;
 		add(new HelpButton(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("infoframe.details_item_help")), gc);
+				mm.getString("infoframe.details_item_help")), gc);
 		gc.gridx++;
 		gc.gridwidth = 4;
-		add(new JLabel(MessageManager.getString("infoframe.details_item")), gc);
+		add(new JLabel(mm.getString("infoframe.details_item")), gc);
 		gc.gridy++;
 		gc.weightx = 0;
 		gc.gridx = 0;

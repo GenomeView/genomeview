@@ -44,48 +44,37 @@ public class ConfigurationDialog extends JDialog {
 	}
 
 	class PileupConfigPanel extends GridBagPanel {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 2077613517228432752L;
 		private Model model;
 
 		public PileupConfigPanel(Model model) {
 			this.model = model;
+			final MessageManager mm = model.getMessageMgr();
 
 			this.add(ConfigBox.booleanInstance(model,
-					"pileup:crossTrackScaling", MessageManager.getString(
-							"configdialog.cross_connect_track_scalling")),
+					"pileup:crossTrackScaling",
+					mm.getString("configdialog.cross_connect_track_scalling")),
 					gc);
 			gc.gridy++;
 
 			this.add(
-					new JLabel(MessageManager
-							.getString("configdialog.default_track_config")),
-					gc);
-			gc.gridy++;
-			this.add(ConfigBox.booleanInstance(model, "pileup:dynamicRange",
-					MessageManager
-							.getString("configdialog.tracks_dynamic_range")),
+					new JLabel(
+							mm.getString("configdialog.default_track_config")),
 					gc);
 			gc.gridy++;
 			this.add(
-					ConfigBox
-							.booleanInstance(model, "pileup:logScale",
-									MessageManager.getString(
-											"configdialog.tracks_log_scale")),
+					ConfigBox.booleanInstance(model, "pileup:dynamicRange",
+							mm.getString("configdialog.tracks_dynamic_range")),
 					gc);
+			gc.gridy++;
+			this.add(ConfigBox.booleanInstance(model, "pileup:logScale",
+					mm.getString("configdialog.tracks_log_scale")), gc);
 			gc.gridy++;
 			this.add(ConfigBox.doubleInstance("pileup:maxPile",
-					MessageManager.getString(
-							"configdialog.max_height_pileup_track"),
+					mm.getString("configdialog.max_height_pileup_track"),
 					model), gc);
 			gc.gridy++;
-			this.add(
-					ConfigBox.integerInstance("pileup:switchBarLine",
-							MessageManager.getString(
-									"configdialog.switch_bar_to_line"),
-							model),
+			this.add(ConfigBox.integerInstance("pileup:switchBarLine",
+					mm.getString("configdialog.switch_bar_to_line"), model),
 					gc);
 
 		}
@@ -93,9 +82,8 @@ public class ConfigurationDialog extends JDialog {
 
 	static class AANucleotideColorsConfigPanel extends GridBagPanel {
 
-		private static final long serialVersionUID = -2574897453334264771L;
-
 		public AANucleotideColorsConfigPanel(Model model) {
+			final MessageManager mm = model.getMessageMgr();
 			setLayout(new BorderLayout());
 			Container aa = new Container();
 			aa.setLayout(new GridLayout(0, 8));
@@ -108,11 +96,13 @@ public class ConfigurationDialog extends JDialog {
 			for (char c : model.getConfiguration().getNucleotides()) {
 				nt.add(ConfigBox.colorInstance(model, "N_" + c, "" + c));
 			}
-			this.add(new TitledComponent(
-					MessageManager.getString("configdialog.aminoacids"), aa),
+			this.add(
+					new TitledComponent(mm.getString("configdialog.aminoacids"),
+							aa),
 					BorderLayout.NORTH);
-			this.add(new TitledComponent(
-					MessageManager.getString("configdialog.nucleotids"), nt),
+			this.add(
+					new TitledComponent(mm.getString("configdialog.nucleotids"),
+							nt),
 					BorderLayout.CENTER);
 		}
 
@@ -128,94 +118,73 @@ public class ConfigurationDialog extends JDialog {
 	static class ShortReadConfigPanel extends GridBagPanel {
 
 		public ShortReadConfigPanel(Model model) {
-
-			this.add(
-					ConfigBox.integerInstance("shortread:graphLineHeight",
-							MessageManager.getString(
-									"configdialog.coverage_graph_height"),
-							model),
+			final MessageManager mm = model.getMessageMgr();
+			this.add(ConfigBox.integerInstance("shortread:graphLineHeight",
+					mm.getString("configdialog.coverage_graph_height"), model),
 					gc);
 			gc.gridy++;
 
-			this.add(
-					ConfigBox.integerInstance("shortread:snpTrackHeight",
-							MessageManager.getString(
-									"configdialog.snp_track_height"),
-							model),
-					gc);
+			this.add(ConfigBox.integerInstance("shortread:snpTrackHeight",
+					mm.getString("configdialog.snp_track_height"), model), gc);
 			gc.gridy++;
 
-			this.add(
-					ConfigBox.integerInstance(
-							"shortread:snpTrackMinimumCoverage",
-							MessageManager.getString(
-									"configdialog.snp_min_coverage"),
-							model),
-					gc);
+			this.add(ConfigBox.integerInstance(
+					"shortread:snpTrackMinimumCoverage",
+					mm.getString("configdialog.snp_min_coverage"), model), gc);
 			gc.gridy++;
 
 			this.add(ConfigBox.integerInstance("shortread:maxReads",
-					MessageManager.getString(
-							"configdialog.max_number_displayed_reads"),
+					mm.getString("configdialog.max_number_displayed_reads"),
 					model), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("shortread:maxRegion",
-					MessageManager.getString(
-							"configdialog.max_range_nucleotides_reads"),
+					mm.getString("configdialog.max_range_nucleotides_reads"),
 					model), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("shortread:maxStack",
-					MessageManager.getString(
-							"configdialog.max_depth_stacked_reads"),
+					mm.getString("configdialog.max_depth_stacked_reads"),
 					model), gc);
 			gc.gridy++;
 			this.add(ConfigBox.booleanInstance(model, "shortread:enablepairing",
-					MessageManager.getString(
-							"configdialog.draw_connected_paired_reads")),
+					mm.getString("configdialog.draw_connected_paired_reads")),
 					gc);
 			gc.gridy++;
-			this.add(
-					ConfigBox.integerInstance("shortread:maximumCache",
-							MessageManager.getString(
-									"configdialog.max_reads_cache"),
-							model),
-					gc);
+			this.add(ConfigBox.integerInstance("shortread:maximumCache",
+					mm.getString("configdialog.max_reads_cache"), model), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("shortread:maximumPairing",
-					MessageManager.getString(
-							"configdialog.max_distance_paired_reads"),
+					mm.getString("configdialog.max_distance_paired_reads"),
 					model), gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("shortread:maximumPairing",
-					MessageManager.getString(
-							"configdialog.max_distance_paired_reads"),
+					mm.getString("configdialog.max_distance_paired_reads"),
 					model), gc);
 			gc.gridy++;
 			this.add(ConfigBox.colorInstance(model, "shortread:forwardColor",
-					MessageManager.getString(
+					mm.getString(
 							"configdialog.color_reads_mapping_forward_strands")),
 					gc);
 			gc.gridy++;
 			this.add(ConfigBox.colorInstance(model, "shortread:reverseColor",
-					MessageManager.getString(
+					mm.getString(
 							"configdialog.color_reads_mapping_reverse_strands")),
 					gc);
 			gc.gridy++;
 			this.add(ConfigBox.colorInstance(model,
 					"shortread:forwardAntiColor",
-					MessageManager.getString(
+					mm.getString(
 							"configdialog.color_reads_mapping_forward_strands_anti")),
 					gc);
 			gc.gridy++;
 			this.add(ConfigBox.colorInstance(model,
 					"shortread:reverseAntiColor",
-					MessageManager.getString(
+					mm.getString(
 							"configdialog.color_reads_mapping_reverse_strands_anti")),
 					gc);
 			gc.gridy++;
 			this.add(
 					ConfigBox.colorInstance(model, "shortread:pairingColor",
-							MessageManager.getString(
+							mm.getString(
 									"configdialog.color_between_paired_reads")),
 					gc);
 			gc.gridy++;
@@ -233,80 +202,64 @@ public class ConfigurationDialog extends JDialog {
 	}
 
 	class StructureConfigPanel extends GridBagPanel {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 7503579007314777946L;
 
 		public StructureConfigPanel(Model model) {
+			final MessageManager mm = model.getMessageMgr();
+
 			this.add(ConfigBox.booleanInstance(model,
-					"general:onlyMethionineAsStart", MessageManager.getString(
-							"configdialog.show_only_methionine_as_start")),
+					"general:onlyMethionineAsStart",
+					mm.getString("configdialog.show_only_methionine_as_start")),
 					gc);
 			gc.gridy++;
 			this.add(ConfigBox.booleanInstance(model, "track:showStructure",
-					MessageManager.getString(
+					mm.getString(
 							"configdialog.show_structure_track_on_startup")),
 					gc);
 			gc.gridy++;
-			this.add(
-					ConfigBox.integerInstance("geneStructureLineHeight",
-							MessageManager.getString(
-									"configdialog.track_height_pixels"),
-							model),
+			this.add(ConfigBox.integerInstance("geneStructureLineHeight",
+					mm.getString("configdialog.track_height_pixels"), model),
 					gc);
 			gc.gridy++;
 			this.add(
-					ConfigBox
-							.booleanInstance(model, "colorStartCodons",
-									MessageManager.getString(
-											"configdialog.color_start_codons")),
+					ConfigBox.booleanInstance(model, "colorStartCodons",
+							mm.getString("configdialog.color_start_codons")),
 					gc);
 			gc.gridy++;
 			this.add(
-					ConfigBox
-							.booleanInstance(model, "colorStopCodons",
-									MessageManager.getString(
-											"configdialog.color_stop_codons")),
+					ConfigBox.booleanInstance(model, "colorStopCodons",
+							mm.getString("configdialog.color_stop_codons")),
 					gc);
 			gc.gridy++;
 			this.add(
-					ConfigBox
-							.booleanInstance(model, "showNucleotideColor",
-									MessageManager.getString(
-											"configdialog.color_nucleotides")),
+					ConfigBox.booleanInstance(model, "showNucleotideColor",
+							mm.getString("configdialog.color_nucleotides")),
 					gc);
 			gc.gridy++;
 			this.add(
-					ConfigBox
-							.booleanInstance(model, "showSpliceSiteColor",
-									MessageManager.getString(
-											"configdialog.color_splice_sites")),
+					ConfigBox.booleanInstance(model, "showSpliceSiteColor",
+							mm.getString("configdialog.color_splice_sites")),
 					gc);
 			gc.gridy++;
 
-			this.add(ConfigBox.integerInstance(
-					"structureview:maximumNoVisibleFeatures",
-					MessageManager.getString("configdialog.max_features"),
-					model), gc);
+			this.add(
+					ConfigBox.integerInstance(
+							"structureview:maximumNoVisibleFeatures",
+							mm.getString("configdialog.max_features"), model),
+					gc);
 
 		}
 	}
 
 	static class FeatureTrackConfigPanel extends GridBagPanel {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 7503579007314777946L;
 
 		public FeatureTrackConfigPanel(Model model) {
+			final MessageManager mm = model.getMessageMgr();
 			gc.gridwidth = 2;
 			gc.weightx = 1;
 			gc.weighty = 0;
-			this.add(ConfigBox.booleanInstance(model,
-					"track:forceFeatureLabels",
-					MessageManager
-							.getString("configdialog.force_label_features")),
+			this.add(
+					ConfigBox.booleanInstance(model, "track:forceFeatureLabels",
+							mm.getString("configdialog.force_label_features")),
 					gc);
 			gc.gridy++;
 			gc.weighty = 1;
@@ -320,45 +273,36 @@ public class ConfigurationDialog extends JDialog {
 			}
 
 			this.add(new TitledComponent(
-					MessageManager.getString("configdialog.features_types"),
-					typeContainer), gc);
+					mm.getString("configdialog.features_types"), typeContainer),
+					gc);
 
 		}
 	}
 
 	class ComparativePanel extends GridBagPanel {
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 511805592898297604L;
-
 		public ComparativePanel(final Model model) {
+			final MessageManager mm = model.getMessageMgr();
+
 			gc.gridwidth = 2;
 			gc.weightx = 1;
 			this.add(ConfigBox.booleanInstance(model, "maf:enableAnnotation",
-					MessageManager.getString(
+					mm.getString(
 							"configdialog.enable_comparative_annotations")),
 					gc);
 			gc.gridy++;
 			this.add(
 					ConfigBox.stringInstance(model, "maf:annotationType",
-							MessageManager.getString(
+							mm.getString(
 									"configdialog.annotation_comparative")),
 					gc);
 			gc.gridy++;
-			this.add(
-					ConfigBox.integerInstance("maf:maximumVisibleRange",
-							MessageManager.getString(
-									"configdialog.maximum_visible_range"),
-							model),
+			this.add(ConfigBox.integerInstance("maf:maximumVisibleRange",
+					mm.getString("configdialog.maximum_visible_range"), model),
 					gc);
 			gc.gridy++;
-			this.add(
-					ConfigBox.booleanInstance(model, "maf:extendedNames",
-							MessageManager
-									.getString("configdialog.extended_names")),
-					gc);
+			this.add(ConfigBox.booleanInstance(model, "maf:extendedNames",
+					mm.getString("configdialog.extended_names")), gc);
 		}
 	}
 
@@ -366,42 +310,37 @@ public class ConfigurationDialog extends JDialog {
 
 // FIXME clean this up
 		public MiscellaneousPanel(final Model model) {
+			final MessageManager mm = model.getMessageMgr();
 			final Configuration config = model.getConfiguration();
 			gc.gridwidth = 2;
 			gc.weightx = 1;
 			this.add(
-					ConfigBox.integerInstance("general:zoomout", MessageManager
-							.getString("configdialog.max_zoom_out"), model),
+					ConfigBox.integerInstance("general:zoomout",
+							mm.getString("configdialog.max_zoom_out"), model),
 					gc);
 			gc.gridy++;
 			this.add(
-					ConfigBox
-							.booleanInstance(model, "general:monitorConnection",
-									MessageManager.getString(
-											"configdialog.monitor_connection")),
+					ConfigBox.booleanInstance(model,
+							"general:monitorConnection",
+							mm.getString("configdialog.monitor_connection")),
 					gc);
 			gc.gridy++;
 			this.add(
-					ConfigBox
-							.booleanInstance(model, "dualscreen",
-									MessageManager.getString(
-											"configdialog.enable_dual_screen")),
+					ConfigBox.booleanInstance(model, "dualscreen",
+							mm.getString("configdialog.enable_dual_screen")),
 					gc);
 			gc.gridy++;
 			this.add(
-					ConfigBox
-							.booleanInstance(model, "general:singleInstance",
-									MessageManager.getString(
-											"configdialog.allow_one_instance")),
+					ConfigBox.booleanInstance(model, "general:singleInstance",
+							mm.getString("configdialog.allow_one_instance")),
 					gc);
 			gc.gridy++;
 			this.add(ConfigBox.booleanInstance(model, "geneticCodeSelection",
-					MessageManager.getString(
-							"configdialog.enable_genetic_code_selection")),
+					mm.getString("configdialog.enable_genetic_code_selection")),
 					gc);
 			gc.gridy++;
 			this.add(ConfigBox.integerInstance("general:exportMagnifyFactor",
-					MessageManager.getString(
+					mm.getString(
 							"configdialog.resultion_increase_export_images"),
 					model), gc);
 			gc.gridy++;
@@ -410,22 +349,20 @@ public class ConfigurationDialog extends JDialog {
 					config.getStringSet("resource:lang:available")
 							.toArray(new String[0]),
 					"lang:current",
-					MessageManager.getString("configdialog.select_language")),
-					gc);
+					mm.getString("configdialog.select_language")), gc);
 
 			gc.gridy++;
 			gc.gridwidth = 1;
 
-			this.add(ConfigBox.booleanInstance(model,
-					"general:disableURLCaching",
-					MessageManager
-							.getString("configdialog.disable_url_caching")),
+			this.add(
+					ConfigBox.booleanInstance(model,
+							"general:disableURLCaching",
+							mm.getString("configdialog.disable_url_caching")),
 					gc);
 			gc.weightx = 0;
 			gc.gridx++;
 			this.add(new HelpButton(model.getGUIManager().getMainWindow(),
-					MessageManager.getString(
-							"configdialog.disable_url_caching_to_save")),
+					mm.getString("configdialog.disable_url_caching_to_save")),
 					gc);
 			gc.gridwidth = 2;
 			gc.weightx = 1;
@@ -433,8 +370,8 @@ public class ConfigurationDialog extends JDialog {
 			gc.gridy++;
 			// this.add(ConfigBox.booleanInstance("logToFile",
 			// "Log console output to a file (Requires restart)"), gc);
-			JButton resetButton = new JButton(MessageManager
-					.getString("configdialog.reset_configuration"));
+			JButton resetButton = new JButton(
+					mm.getString("configdialog.reset_configuration"));
 			resetButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -447,7 +384,7 @@ public class ConfigurationDialog extends JDialog {
 
 			this.add(resetButton, gc);
 			JButton resetCache = new JButton(
-					MessageManager.getString("configdialog.empty_cache"));
+					mm.getString("configdialog.empty_cache"));
 			resetCache.addActionListener(new ActionListener() {
 
 				@Override
@@ -461,10 +398,8 @@ public class ConfigurationDialog extends JDialog {
 					}
 					JOptionPane.showMessageDialog(
 							model.getGUIManager().getMainWindow(),
-							MessageManager
-									.getString("configdialog.clear_cache_info"),
-							MessageManager
-									.getString("configdialog.cache_cleared"),
+							mm.getString("configdialog.clear_cache_info"),
+							mm.getString("configdialog.cache_cleared"),
 							JOptionPane.INFORMATION_MESSAGE);
 
 				}
@@ -477,8 +412,10 @@ public class ConfigurationDialog extends JDialog {
 	}
 
 	public ConfigurationDialog(final Model model) {
-		super(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("configddialog.configuration_panel"));
+		super(model.getGUIManager().getMainWindow(), model.getMessageMgr()
+				.getString("configddialog.configuration_panel"));
+		final MessageManager mm = model.getMessageMgr();
+
 		setModal(true);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
@@ -505,28 +442,25 @@ public class ConfigurationDialog extends JDialog {
 		JPanel colors = new AANucleotideColorsConfigPanel(model);
 		JPanel miscPanel = new MiscellaneousPanel(model);
 
-		jtp.add(MessageManager.getString("configdialog.structure_view_tab"),
-				structure);
+		jtp.add(mm.getString("configdialog.structure_view_tab"), structure);
 		// jtp.add("Evidence view", evidence);
-		jtp.add(MessageManager.getString("configdialog.nucleotide_color_tab"),
-				colors);
-		jtp.add(MessageManager.getString("configdialog.feature_track_tab"),
+		jtp.add(mm.getString("configdialog.nucleotide_color_tab"), colors);
+		jtp.add(mm.getString("configdialog.feature_track_tab"),
 				new FeatureTrackConfigPanel(model));
 
-		jtp.add(MessageManager.getString("configdialog.short_reads_tab"),
+		jtp.add(mm.getString("configdialog.short_reads_tab"),
 				new ShortReadConfigPanel(model));
-		jtp.add(MessageManager.getString("configdialog.pileup_tracks_tab"),
+		jtp.add(mm.getString("configdialog.pileup_tracks_tab"),
 				new PileupConfigPanel(model));
 
-		jtp.add(MessageManager.getString("configdialog.compartive_track_tab"),
+		jtp.add(mm.getString("configdialog.compartive_track_tab"),
 				new ComparativePanel(model));
 
-		jtp.add(MessageManager.getString("configdialog.miscellaneous_tab"),
-				miscPanel);
+		jtp.add(mm.getString("configdialog.miscellaneous_tab"), miscPanel);
 
 		add(jtp, BorderLayout.CENTER);
 
-		JButton ok = new JButton(MessageManager.getString("button.ok"));
+		JButton ok = new JButton(mm.getString("button.ok"));
 		ok.addActionListener(new ActionListener() {
 
 			@Override

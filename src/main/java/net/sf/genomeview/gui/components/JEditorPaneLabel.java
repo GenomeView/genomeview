@@ -10,27 +10,27 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import net.sf.genomeview.core.Globals;
 import net.sf.genomeview.gui.StaticUtils;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * 
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class JEditorPaneLabel extends JEditorPane {
 
-	private static final long serialVersionUID = 7954185710654053247L;
-
-	public JEditorPaneLabel(Reporter log) {
+	public JEditorPaneLabel(Globals globals) {
 		super("text/html", null);
 		setEditable(false);
-		super.addHyperlinkListener(new Hyperactive(log));
+		super.addHyperlinkListener(new Hyperactive(globals));
 		// ## Fix for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6993691
 		setEditorKit(new HTMLEditorKit() {
 
 			private static final long serialVersionUID = -8823280246213759957L;
 
+			@Override
 			protected Parser getParser() {
 				try {
 					@SuppressWarnings("rawtypes")
@@ -55,15 +55,16 @@ public class JEditorPaneLabel extends JEditorPane {
 
 class Hyperactive implements HyperlinkListener {
 
-	private Reporter log;
+	private final Globals globals;
 
-	public Hyperactive(Reporter log) {
-		this.log = log;
+	public Hyperactive(Globals globals) {
+		this.globals = globals;
 	}
 
+	@Override
 	public void hyperlinkUpdate(HyperlinkEvent e) {
 		if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-			StaticUtils.browse(e.getURL().toString(), log);
+			StaticUtils.browse(e.getURL().toString(), globals);
 		}
 	}
 }

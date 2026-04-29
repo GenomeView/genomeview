@@ -11,7 +11,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
 import net.sf.genomeview.core.Icons;
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.exception.ReadFailedException;
@@ -22,7 +21,7 @@ public class OpenURLButton extends JButton {
 	private static final long serialVersionUID = -1666800247496691936L;
 
 	public OpenURLButton(final Model gvModel) {
-		super(MessageManager.getString("opendialog.url"),
+		super(gvModel.getMessageMgr().getString("opendialog.url"),
 				Icons.get("Globe_48x48.png"));
 		setVerticalTextPosition(SwingConstants.BOTTOM);
 		setHorizontalTextPosition(SwingConstants.CENTER);

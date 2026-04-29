@@ -113,6 +113,8 @@ public class RecentDataPanel extends GridBagPanel {
 	 * @param log   the reporter to use when loading new models
 	 */
 	public RecentDataPanel(final Model model) {
+		final MessageManager mm = model.getMessageMgr();
+
 		// this.model = model;
 		// this.repos = new NCBIRepository();
 
@@ -140,7 +142,7 @@ public class RecentDataPanel extends GridBagPanel {
 
 		gc.gridy++;
 		gc.weighty = 1;
-		JEditorPaneLabel msgLabel = new JEditorPaneLabel(model.getLog());
+		JEditorPaneLabel msgLabel = new JEditorPaneLabel(model.getGlobals());
 		msgLabel.setText("");
 
 		msgLabel.setPreferredSize(
@@ -149,8 +151,7 @@ public class RecentDataPanel extends GridBagPanel {
 
 		gc.weighty = 0;
 		gc.gridy++;
-		JButton box = new JButton(
-				MessageManager.getString("button.dismiss_dialog"));
+		JButton box = new JButton(mm.getString("button.dismiss_dialog"));
 		box.setBackground(Color.WHITE);
 		box.addActionListener(new ActionListener() {
 
@@ -192,7 +193,7 @@ public class RecentDataPanel extends GridBagPanel {
 									new Locator(selection, model.getLog()));
 						} catch (Exception e1) {
 							model.getLog().log(Level.WARNING,
-									MessageManager.getString(
+									mm.getString(
 											"genome.couldnt_load_this_session"),
 									e1);
 						}
@@ -221,7 +222,7 @@ public class RecentDataPanel extends GridBagPanel {
 									new Locator(selection, model.getLog()));
 						} catch (Exception e1) {
 							model.getLog().log(Level.WARNING,
-									MessageManager.getString(
+									mm.getString(
 											"genome.couldnt_load_this_session"),
 									e1);
 						}

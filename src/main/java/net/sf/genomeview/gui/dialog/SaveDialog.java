@@ -78,20 +78,19 @@ public class SaveDialog extends JDialog {
 
 	public SaveDialog(final Model model) {
 		super(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("savedialog.title"), true);
+				model.getMessageMgr().getString("savedialog.title"), true);
+		final MessageManager mm = model.getMessageMgr();
 		Configuration config = model.getConfiguration();
 		setLayout(new MigLayout("wrap 2"));
 
 		/*
 		 * Save location
 		 */
-		addSeparator(
-				MessageManager.getString("savedialog.location_to_save_to"));
+		addSeparator(mm.getString("savedialog.location_to_save_to"));
 		final JTextField locationField = new JTextField();
 		add(locationField, "growx");
 
-		JButton browseButton = new JButton(
-				MessageManager.getString("savedialog.browse"));
+		JButton browseButton = new JButton(mm.getString("savedialog.browse"));
 		browseButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -121,8 +120,7 @@ public class SaveDialog extends JDialog {
 		/*
 		 * Parser selection
 		 */
-		addSeparator(
-				MessageManager.getString("savedialog.file_format_options"));
+		addSeparator(mm.getString("savedialog.file_format_options"));
 		String defaultParserName = config.get("save:defaultParser");
 		// Parser defaultParser = Configuration.getParser("save:defaultParser");
 		String[] arr = new String[] { "GFF3", "EMBL" };
@@ -162,8 +160,7 @@ public class SaveDialog extends JDialog {
 		});
 
 		/* Entries list */
-		addSeparator(
-				MessageManager.getString("savedialog.select_entries_to_save"));
+		addSeparator(mm.getString("savedialog.select_entries_to_save"));
 		boolean entrySelectionEnabledFlag = config
 				.getBoolean("save:enableEntrySelection");
 		final MultiSelectionArray<Entry> entriesList = new MultiSelectionArray<Entry>(
@@ -171,7 +168,7 @@ public class SaveDialog extends JDialog {
 		add(new JScrollPane(entriesList), "growx,growy,span 1 2");
 
 		JButton selectAllEntries = new JButton(
-				MessageManager.getString("savedialog.select_all_entries"));
+				mm.getString("savedialog.select_all_entries"));
 		add(selectAllEntries);
 
 		selectAllEntries.addActionListener(new ActionListener() {
@@ -183,7 +180,7 @@ public class SaveDialog extends JDialog {
 		});
 
 		JButton selectNoneEntries = new JButton(
-				MessageManager.getString("savedialog.deselect_all_entries"));
+				mm.getString("savedialog.deselect_all_entries"));
 		add(selectNoneEntries);
 		selectNoneEntries.addActionListener(new ActionListener() {
 			@Override
@@ -199,7 +196,7 @@ public class SaveDialog extends JDialog {
 		/*
 		 * Type selection
 		 */
-		addSeparator(MessageManager.getString("savedialog.annotation_types"));
+		addSeparator(mm.getString("savedialog.annotation_types"));
 		boolean typeSelectionEnabledFlag = config
 				.getBoolean("save:enableTypeSelection");
 		final MultiSelectionArray<net.sf.jannot.Type> typesList = new MultiSelectionArray<net.sf.jannot.Type>(
@@ -208,11 +205,11 @@ public class SaveDialog extends JDialog {
 		add(new JScrollPane(typesList), "growx,growy,span 1 2");
 
 		JButton selectAllTypes = new JButton(
-				MessageManager.getString("savedialog.select_all_types"));
+				mm.getString("savedialog.select_all_types"));
 		add(selectAllTypes);
 
 		JButton selectNoneTypes = new JButton(
-				MessageManager.getString("savedialog.deselect_all_types"));
+				mm.getString("savedialog.deselect_all_types"));
 		add(selectNoneTypes);
 
 		typesList.setEnabled(typeSelectionEnabledFlag);
@@ -238,8 +235,8 @@ public class SaveDialog extends JDialog {
 		 * Actions
 		 */
 		addSeparator("");
-		JButton save = new JButton(MessageManager.getString("button.save"));
-		JButton close = new JButton(MessageManager.getString("button.cancel"));
+		JButton save = new JButton(mm.getString("button.save"));
+		JButton close = new JButton(mm.getString("button.cancel"));
 
 		add(save, "center");
 		add(close, "center");
@@ -249,7 +246,7 @@ public class SaveDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				model.messageModel().setStatusBarMessage(
-						MessageManager.getString("savedialog.saving_data"));
+						mm.getString("savedialog.saving_data"));
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -307,9 +304,8 @@ public class SaveDialog extends JDialog {
 											url);
 
 									if (reply.equals("")) {
-										showServerMessage(
-												MessageManager.getString(
-														"savedialog.empty_reply_server"));
+										showServerMessage(mm.getString(
+												"savedialog.empty_reply_server"));
 //										throw new SaveFailedException();
 									} else if (reply.toLowerCase()
 											.contains("error")) {
@@ -330,9 +326,9 @@ public class SaveDialog extends JDialog {
 									JOptionPane.showMessageDialog(
 											model.getGUIManager()
 													.getMainWindow(),
-											MessageManager.getString(
+											mm.getString(
 													"savedialog.provided_path_emtpy"),
-											MessageManager.getString(
+											mm.getString(
 													"savedialog.save_failed"),
 											JOptionPane.ERROR_MESSAGE);
 								} else {
@@ -354,23 +350,21 @@ public class SaveDialog extends JDialog {
 											JOptionPane.showMessageDialog(
 													model.getGUIManager()
 															.getMainWindow(),
-													MessageManager.getString(
+													mm.getString(
 															"savedialog.save_succeeded"));
 											tryToSave = false;
 										} catch (FileExistsException fee) {
 											model.getLog().log(Level.WARNING,
-													MessageManager.getString(
+													mm.getString(
 															"savedialog.file_exists"));
 											int answer = JOptionPane
 													.showOptionDialog(model
 															.getGUIManager()
 															.getMainWindow(),
-															MessageManager
-																	.getString(
-																			"savedialog.file_exists"),
-															MessageManager
-																	.getString(
-																			"savedialog.file_exists_title"),
+															mm.getString(
+																	"savedialog.file_exists"),
+															mm.getString(
+																	"savedialog.file_exists_title"),
 															JOptionPane.YES_NO_OPTION,
 															JOptionPane.QUESTION_MESSAGE,
 															null, null, null);
@@ -381,14 +375,14 @@ public class SaveDialog extends JDialog {
 											}
 										} catch (IOException e) {
 											model.getLog().log(Level.SEVERE,
-													MessageManager.getString(
+													mm.getString(
 															"savedialog.save_failed"),
 													e);
 											// FIXME remove popup
 											JOptionPane.showMessageDialog(
 													model.getGUIManager()
 															.getMainWindow(),
-													MessageManager.getString(
+													mm.getString(
 															"savedialog.save_failed"));
 											tryToSave = false;
 										}
@@ -407,7 +401,7 @@ public class SaveDialog extends JDialog {
 						final JDialog diag = new JDialog(
 								model.getGUIManager().getMainWindow());
 						JEditorPaneLabel txt = new JEditorPaneLabel(
-								model.getLog());
+								model.getGlobals());
 						txt.setEditable(false);
 						txt.setText(reply);
 						txt.setPreferredSize(new Dimension(300, 200));
@@ -415,9 +409,8 @@ public class SaveDialog extends JDialog {
 						diag.getContentPane().setLayout(new BorderLayout());
 						diag.getContentPane().add(new JScrollPane(txt),
 								BorderLayout.CENTER);
-						diag.getContentPane()
-								.add(new JButton(new AbstractAction(
-										MessageManager.getString("button.ok")) {
+						diag.getContentPane().add(new JButton(
+								new AbstractAction(mm.getString("button.ok")) {
 
 									@Override
 									public void actionPerformed(ActionEvent e) {

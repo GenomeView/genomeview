@@ -3,9 +3,8 @@
  */
 package net.sf.genomeview.data;
 
-import net.sf.genomeview.core.MessageManager;
+import net.sf.genomeview.core.Globals;
 import net.sf.jannot.Entry;
-import net.sf.jannot.Global;
 
 /**
  * An Entry indicating nothing is loaded
@@ -15,8 +14,9 @@ import net.sf.jannot.Global;
  */
 final public class DummyEntry extends Entry {
 
-	public DummyEntry(Global global) {
-		super(MessageManager.getString("dummyentry.nothing_loaded"), global);
+	public DummyEntry(Globals global) {
+		super(global.getMessageManager().getString("dummyentry.nothing_loaded"),
+				global.getGlobal());
 	}
 
 }

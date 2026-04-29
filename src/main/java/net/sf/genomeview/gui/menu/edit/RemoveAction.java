@@ -9,7 +9,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.NotificationTypes;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
@@ -23,7 +22,8 @@ import net.sf.jannot.Feature;
 public class RemoveAction extends AbstractModelAction implements Observer {
 
 	public RemoveAction(Model model) {
-		super(MessageManager.getString("editmenu.remove_feature"), model);
+		super(model.getMessageMgr().getString("editmenu.remove_feature"),
+				model);
 		model.addObserver(this);
 		setEnabled(model.selectionModel().getFeatureSelection() != null
 				&& model.selectionModel().getFeatureSelection().size() > 0);

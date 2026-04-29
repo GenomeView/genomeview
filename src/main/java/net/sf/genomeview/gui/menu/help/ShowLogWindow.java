@@ -8,7 +8,6 @@ import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.LogWindow;
 
@@ -22,7 +21,7 @@ public class ShowLogWindow extends AbstractAction {
 	private Model model;
 
 	public ShowLogWindow(Model model) {
-		super(MessageManager.getString("helpmenu.logwindow"));
+		super(model.getMessageMgr().getString("helpmenu.logwindow"));
 		this.model = model;
 	}
 

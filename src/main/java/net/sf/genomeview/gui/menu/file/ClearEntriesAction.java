@@ -12,6 +12,7 @@ import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Task;
+
 /**
  * 
  * @author Thomas Abeel
@@ -23,20 +24,22 @@ public class ClearEntriesAction extends AbstractAction {
 	private Model model;
 
 	public ClearEntriesAction(Model model) {
-		super(MessageManager.getString("filemenu.unload_all_data"));
+		super(model.getMessageMgr().getString("filemenu.unload_all_data"));
 		this.model = model;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		int result = JOptionPane.showConfirmDialog(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("filemenu.clear_all_loaded_warn"),
-				MessageManager.getString("filemenu.clear_entries"), JOptionPane.YES_NO_OPTION);
-		if (result == JOptionPane.YES_OPTION){
+		final MessageManager mm = model.getMessageMgr();
+		int result = JOptionPane.showConfirmDialog(
+				model.getGUIManager().getMainWindow(),
+				mm.getString("filemenu.clear_all_loaded_warn"),
+				mm.getString("filemenu.clear_entries"),
+				JOptionPane.YES_NO_OPTION);
+		if (result == JOptionPane.YES_OPTION) {
 			model.clearEntries();
 			GenomeViewScheduler.submit(Task.GC);
 		}
-		
 
 	}
 

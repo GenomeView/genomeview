@@ -9,7 +9,6 @@ import java.util.Observer;
 
 import javax.swing.JOptionPane;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 
 /**
@@ -59,9 +58,10 @@ public class DataExplorerManager implements Observer {
 					autoMode = false;
 					JOptionPane.showMessageDialog(
 							model.getGUIManager().getMainWindow(),
-							MessageManager
+							model.getMessageMgr()
 									.getString("explorermanager.offline_warn"),
-							MessageManager.getString("explorermanager.offline"),
+							model.getMessageMgr()
+									.getString("explorermanager.offline"),
 							JOptionPane.WARNING_MESSAGE);
 				} else {
 					bg.setVisible(vis);
@@ -69,17 +69,6 @@ public class DataExplorerManager implements Observer {
 			}
 		});
 
-//		if (vis && firstUse) {
-//			firstUse = false;
-//			EventQueue.invokeLater(new Runnable() {
-//
-//				@Override
-//				public void run() {
-//					bg.scollToTop();
-//				}
-//			});
-//
-//		}
 	}
 
 	@Override

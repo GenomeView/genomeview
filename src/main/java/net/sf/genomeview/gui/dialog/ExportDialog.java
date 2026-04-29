@@ -129,6 +129,7 @@ public class ExportDialog extends JDialog {
 
 	private ExportDialog(final Model model, final boolean useDefault) {
 		super(model.getGUIManager().getMainWindow(), "Export dialog", true);
+		final MessageManager mm = model.getMessageMgr();
 		final ExportDialog _self = this;
 		setLayout(new GridBagLayout());
 
@@ -143,7 +144,8 @@ public class ExportDialog extends JDialog {
 		gc.fill = GridBagConstraints.BOTH;
 
 		final ArrayList<DataSourceCheckbox> dss = new ArrayList<DataSourceCheckbox>();
-		add(new JLabel(MessageManager.getString("exportdialog.select_sources")),
+		add(new JLabel(
+				model.getMessageMgr().getString("exportdialog.select_sources")),
 				gc);
 
 		gc.gridy++;
@@ -169,8 +171,8 @@ public class ExportDialog extends JDialog {
 		}
 		add(new JScrollPane(cp), gc);
 		gc.gridy++;
-		JButton save = new JButton(MessageManager.getString("button.save"));
-		JButton close = new JButton(MessageManager.getString("button.close"));
+		JButton save = new JButton(mm.getString("button.save"));
+		JButton close = new JButton(mm.getString("button.close"));
 
 		gc.gridwidth = 1;
 		gc.gridy++;
@@ -183,7 +185,7 @@ public class ExportDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				final Hider h = new Hider(model,
-						MessageManager.getString("exportdialog.saving_data"));
+						mm.getString("exportdialog.saving_data"));
 
 				EventQueue.invokeLater(new Runnable() {
 					@Override
@@ -225,7 +227,7 @@ public class ExportDialog extends JDialog {
 									JOptionPane.showMessageDialog(
 											model.getGUIManager()
 													.getMainWindow(),
-											MessageManager.getString(
+											mm.getString(
 													"exportdialog.export_complete"));
 
 								}
@@ -235,16 +237,16 @@ public class ExportDialog extends JDialog {
 							moni.start();
 							JOptionPane.showMessageDialog(
 									model.getGUIManager().getMainWindow(),
-									MessageManager.getString(
+									mm.getString(
 											"exportdialog.export_started"));
 
 						} catch (Exception ex) {
-							model.getLog().log(Level.SEVERE, MessageManager
-									.getString("exportdialog.save_failed"), ex);
+							model.getLog().log(Level.SEVERE,
+									mm.getString("exportdialog.save_failed"),
+									ex);
 							JOptionPane.showMessageDialog(
 									model.getGUIManager().getMainWindow(),
-									MessageManager.getString(
-											"exportdialog.save_failed"));
+									mm.getString("exportdialog.save_failed"));
 						}
 						h.dispose();
 						_self.dispose();

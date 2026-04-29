@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.OpenDialog;
 
@@ -24,12 +23,13 @@ public class LoadFeaturesAction extends AbstractAction {
 	private Model model;
 
 	public LoadFeaturesAction(Model model) {
-		super(MessageManager.getString("filemenu.load_data"));
+		super(model.getMessageMgr().getString("filemenu.load_data"));
 		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control O"));
 		this.model = model;
 
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		new OpenDialog(model.getGUIManager().getMainWindow(), model);
 

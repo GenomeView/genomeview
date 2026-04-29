@@ -9,7 +9,6 @@ import java.util.Observable;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
@@ -23,7 +22,7 @@ import net.sf.genomeview.gui.menu.AbstractModelAction;
 public class UndoAction extends AbstractModelAction {
 
 	public UndoAction(Model model2) {
-		super(MessageManager.getString("editmenu.undo"),
+		super(model2.getMessageMgr().getString("editmenu.undo"),
 				new ImageIcon(
 						model2.getClass().getResource("/images/undo.png")),
 				model2);

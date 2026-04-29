@@ -45,7 +45,7 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 
 	public FeatureDetailPanel(Model model) {
 		this.model = model;
-		name = new JEditorPaneLabel(model.getLog());
+		name = new JEditorPaneLabel(model.getGlobals());
 
 		StyleSheet css = name.getStyleSheet();
 		css.addRule("body {color:#000; margin-left: 4px; margin-right: 4px; }");
@@ -115,7 +115,8 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								q.query(name.getSelectedText(), model.getLog());
+								q.query(name.getSelectedText(),
+										model.getGlobals());
 
 							}
 						});

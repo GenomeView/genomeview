@@ -22,7 +22,6 @@ import java.util.TreeMap;
 
 import javax.swing.JViewport;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
 import net.sf.genomeview.gui.viztracks.Track;
@@ -125,7 +124,7 @@ public class MultipleAlignmentTrack extends Track {
 			if (r.length() > 10000000) {
 				g.setColor(Color.BLACK);
 				g.drawString(
-						MessageManager.getString(
+						model.getMessageMgr().getString(
 								"multiplealignmenttrack.too_much_data_warn"),
 						5, yOffset + lineHeigh - 2);
 				return lineHeigh;

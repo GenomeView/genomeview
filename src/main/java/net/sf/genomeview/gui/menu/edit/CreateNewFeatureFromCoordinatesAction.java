@@ -8,7 +8,6 @@ import java.util.Observable;
 
 import javax.swing.KeyStroke;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.NewFeatureFromCoordinatesDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
@@ -17,8 +16,8 @@ import net.sf.genomeview.gui.menu.AbstractModelAction;
 public class CreateNewFeatureFromCoordinatesAction extends AbstractModelAction {
 
 	public CreateNewFeatureFromCoordinatesAction(Model model) {
-		super(MessageManager.getString("editmenu.create_feature_coordinates"),
-				model);
+		super(model.getMessageMgr()
+				.getString("editmenu.create_feature_coordinates"), model);
 		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control N"));
 	}
 

@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
@@ -62,7 +61,7 @@ public class InitDataLoader {
 				Session.loadSession(model, session);
 			}
 		} catch (IOException e1) {
-			model.getLog().log(Level.WARNING, MessageManager.getString(
+			model.getLog().log(Level.WARNING, model.getMessageMgr().getString(
 					"crashhandler.failed_to_propertly_load_requested_session"),
 					e1);
 		}

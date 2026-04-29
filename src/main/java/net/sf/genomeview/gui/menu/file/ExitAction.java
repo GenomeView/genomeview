@@ -8,7 +8,6 @@ import java.util.Observable;
 
 import javax.swing.KeyStroke;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
@@ -16,7 +15,7 @@ import net.sf.genomeview.gui.menu.AbstractModelAction;
 public class ExitAction extends AbstractModelAction {
 
 	public ExitAction(Model model) {
-		super(MessageManager.getString("filemenu.exit"), model);
+		super(model.getMessageMgr().getString("filemenu.exit"), model);
 		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control Q"));
 	}
 

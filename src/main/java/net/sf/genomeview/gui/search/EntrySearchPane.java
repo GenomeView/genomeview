@@ -17,7 +17,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import be.abeel.gui.TitledComponent;
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Entry;
 
@@ -26,9 +25,8 @@ import net.sf.jannot.Entry;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 class EntrySearchPane extends SearchPanel {
-
-	private static final long serialVersionUID = -3757228100935904699L;
 
 	EntrySearchPane(final Model model) {
 		gc.weightx = 1;
@@ -37,7 +35,7 @@ class EntrySearchPane extends SearchPanel {
 		final JTextField text = new JTextField(40);
 		setFocusField(text);
 		JButton searchButton = new JButton(
-				MessageManager.getString("button.search"));
+				model.getMessageMgr().getString("button.search"));
 
 		final EntrySearchResultModel srm = new EntrySearchResultModel(model);
 		final JTable resultTable = new JTable(srm);
@@ -46,8 +44,9 @@ class EntrySearchPane extends SearchPanel {
 			public void mouseClicked(MouseEvent e) {
 				int row = resultTable.getSelectedRow();
 				Entry entry = srm.getEntry(row);
-				if (model.vlm.getVisibleEntry() != entry)
+				if (model.vlm.getVisibleEntry() != entry) {
 					model.setSelectedEntry(entry);
+				}
 
 			}
 		});
@@ -86,8 +85,8 @@ class EntrySearchPane extends SearchPanel {
 		});
 
 		gc.gridwidth = 2;
-		add(new TitledComponent(MessageManager.getString("entrypane.entry"),
-				text), gc);
+		add(new TitledComponent(
+				model.getMessageMgr().getString("entrypane.entry"), text), gc);
 		gc.gridy++;
 
 		add(searchButton, gc);

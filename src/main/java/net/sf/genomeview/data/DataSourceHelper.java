@@ -65,6 +65,7 @@ public class DataSourceHelper {
 	public static void load(final Model model, Locator data, boolean wait)
 			throws URISyntaxException, IOException, ReadFailedException {
 
+		final MessageManager mm = model.getGlobals().getMessageManager();
 		/*
 		 * Check whether data locator is session, if so, load as session and
 		 * skip the rest
@@ -79,8 +80,7 @@ public class DataSourceHelper {
 		data.stripIndex();
 
 		if (!data.exists()) {
-			String msg = MessageManager.formatMessage(
-					"datasourcehelper.data_missing_warn",
+			String msg = mm.formatMessage("datasourcehelper.data_missing_warn",
 					new Object[] { data.getName() });
 			model.getLog().log(Level.WARNING, msg);
 			return;
@@ -93,8 +93,7 @@ public class DataSourceHelper {
 		/* Check for stale index */
 		if (index != null && index.lastModified() < data.lastModified()) {
 			if (IndexManager.canBuildIndex(data)) {
-				String msg = MessageManager.formatMessage(
-						"index_outdated_warn_message",
+				String msg = mm.formatMessage("index_outdated_warn_message",
 						new Object[] { data.getName() });
 
 				model.getLog().log(Level.WARNING, msg);
@@ -133,10 +132,8 @@ public class DataSourceHelper {
 		if (data.isWig()) {
 			int res = JOptionPane.showConfirmDialog(
 					model.getGUIManager().getMainWindow(),
-					MessageManager.getString(
-							"datasourcehelper.wig_not_recommended_warn"),
-					MessageManager
-							.getString("datasourcehelper.wig_not_recommended"),
+					mm.getString("datasourcehelper.wig_not_recommended_warn"),
+					mm.getString("datasourcehelper.wig_not_recommended"),
 					JOptionPane.YES_NO_OPTION);
 			if (res == JOptionPane.YES_OPTION) {
 				convertWig2TDF(model, data, model.getLog());
@@ -169,12 +166,11 @@ public class DataSourceHelper {
 
 					boolean ok = JOptionPaneX.showOkCancelDialog(
 							model.getGUIManager().getMainWindow(),
-							MessageManager.formatMessage(
+							mm.formatMessage(
 									"datasourcehelper.load_big_file_no_index",
 									new Object[] { data.getName() }),
-							MessageManager.getString(
-									"datasourcehelper.index_missing"),
-							JOptionPane.WARNING_MESSAGE);
+							mm.getString("datasourcehelper.index_missing"),
+							JOptionPane.WARNING_MESSAGE, model.getGlobals());
 					if (!ok) {
 						return;
 					}
@@ -200,7 +196,7 @@ public class DataSourceHelper {
 			}
 			asd.setIos(new ProgressMonitorInputStream(
 					model.getGUIManager().getMainWindow(),
-					MessageManager.getString("datasourcehelper.reading_file"),
+					mm.getString("datasourcehelper.reading_file"),
 					new BufferedInputStream(asd.getIos(), 512 * 1024)));
 
 		}
@@ -239,11 +235,10 @@ public class DataSourceHelper {
 	 */
 	private static void problem(Model model, String messageref, String titleref,
 			int options, String... params) {
+		final MessageManager mm = model.getMessageMgr();
 		JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
-				MessageManager.formatMessage("datasourcehelper." + messageref,
-						params),
-				MessageManager.getString("datasourcehelper." + titleref),
-				options);
+				mm.formatMessage("datasourcehelper." + messageref, params),
+				mm.getString("datasourcehelper." + titleref), options);
 	}
 
 	/**
@@ -253,11 +248,11 @@ public class DataSourceHelper {
 	 */
 	private static int yesno(Model model, String messageref, String titleref,
 			String... params) {
+		final MessageManager mm = model.getMessageMgr();
 		return JOptionPane.showConfirmDialog(
 				model.getGUIManager().getMainWindow(),
-				MessageManager.formatMessage("datasourcehelper." + messageref,
-						params),
-				MessageManager.getString("datasourcehelper." + titleref),
+				mm.formatMessage("datasourcehelper." + messageref, params),
+				mm.getString("datasourcehelper." + titleref),
 				JOptionPane.YES_NO_OPTION);
 	}
 
@@ -326,6 +321,8 @@ public class DataSourceHelper {
 
 			@Override
 			public void run() {
+				final MessageManager mm = model.getGlobals()
+						.getMessageManager();
 				try {
 					JFileChooser chooser = new JFileChooser(
 							model.getConfiguration().getFile("lastDirectory"));
@@ -352,7 +349,7 @@ public class DataSourceHelper {
 
 						@Override
 						public String getDescription() {
-							return MessageManager.getString(
+							return mm.getString(
 									"datasourcehelper.multiple_alignment_files");
 						}
 
@@ -372,7 +369,7 @@ public class DataSourceHelper {
 
 							ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(
 									model.getGUIManager().getMainWindow(),
-									MessageManager.getString(
+									mm.getString(
 											"datasourcehelper.compressing_maf_file"),
 									data.stream());
 							pmis.getProgressMonitor()
@@ -382,7 +379,7 @@ public class DataSourceHelper {
 							SeekableStream is = new SeekableFileStream(file);
 							SeekableProgressStream spmis = new SeekableProgressStream(
 									model.getGUIManager().getMainWindow(),
-									MessageManager.getString(
+									mm.getString(
 											"datasourcehelper.indexing_maf_file"),
 									is);
 							spmis.getProgressMonitor()
@@ -446,12 +443,12 @@ public class DataSourceHelper {
 	 * @return a parser as selected.
 	 */
 	private static Parser offerParserChoice(Model model, Locator l) {
+		final MessageManager mm = model.getMessageMgr();
 		Parser[] list = ParserFactory.parsers(l, model.getGlobal());
 		Parser p = (Parser) JOptionPane.showInputDialog(
 				model.getGUIManager().getMainWindow(),
-				MessageManager
-						.getString("datasourcehelper.couldnt_detect_file"),
-				MessageManager.getString("datasourcehelper.parser_detection"),
+				mm.getString("datasourcehelper.couldnt_detect_file"),
+				mm.getString("datasourcehelper.parser_detection"),
 				JOptionPane.QUESTION_MESSAGE, null, list, list[0]);
 		return p;
 	}

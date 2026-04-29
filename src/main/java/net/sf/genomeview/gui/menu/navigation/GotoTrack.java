@@ -10,7 +10,6 @@ import java.util.Observable;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.genomeview.gui.viztracks.Track;
@@ -24,14 +23,15 @@ import net.sf.genomeview.gui.viztracks.Track;
 public class GotoTrack extends AbstractModelAction {
 
 	public GotoTrack(Model model) {
-		super(MessageManager.getString("navigationmenu.goto_track"), model);
+		super(model.getMessageMgr().getString("navigationmenu.goto_track"),
+				model);
 		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control T"));
 	}
 
 	@Override
 	public void actionPerformedSafe(ActionEvent arg0) {
-		String input = JOptionPane.showInputDialog(
-				MessageManager.getString("navigationmenu.provide_trackname"));
+		String input = JOptionPane.showInputDialog(model.getMessageMgr()
+				.getString("navigationmenu.provide_trackname"));
 		if (input != null && input.trim().length() > 0) {
 
 			input = input.toLowerCase();

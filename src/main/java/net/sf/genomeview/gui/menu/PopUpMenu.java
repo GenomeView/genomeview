@@ -12,7 +12,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPopupMenu;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.edit.CloneFeatureAction;
 import net.sf.genomeview.gui.menu.edit.CreateNewFeatureAction;
@@ -45,8 +44,9 @@ public class PopUpMenu extends JPopupMenu {
 		addC(new EditStructureAction(model));
 		addC(new ClearFeatureSelectionAction(model));
 		addC(new ShowSequenceWindowAction(model));
-		if (count > 0)
+		if (count > 0) {
 			addSeparator();
+		}
 		count = 0;
 		addC(new ClearRegionSelectionAction(model));
 
@@ -55,8 +55,9 @@ public class PopUpMenu extends JPopupMenu {
 		addC(new MergeFeatureAction(model));
 		addC(new SplitFeatureAction(model));
 
-		if (count > 0)
+		if (count > 0) {
 			addSeparator();
+		}
 		count = 0;
 
 		SortedSet<Feature> sf = model.selectionModel().getFeatureSelection();
@@ -70,22 +71,26 @@ public class PopUpMenu extends JPopupMenu {
 						url = q;
 						name = "Web query";
 					}
-					actions.add(new OpenURLAction(name, url, model.getLog()));
+					actions.add(
+							new OpenURLAction(name, url, model.getGlobals()));
 				}
 			}
 		}
-		if (actions.size() > 0)
+		if (actions.size() > 0) {
 			addSeparator();
-		for (Action a : actions)
+		}
+		for (Action a : actions) {
 			add(a);
+		}
 		count += actions.size();
 
-		if (count > 0)
+		if (count > 0) {
 			addSeparator();
+		}
 		count = 0;
 
 		add(new AbstractAction(
-				MessageManager.getString("mainmenu.configure_track")) {
+				model.getMessageMgr().getString("mainmenu.configure_track")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {

@@ -8,26 +8,31 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.text.html.StyleSheet;
 
-import net.sf.genomeview.core.MessageManager;
+import net.sf.genomeview.core.Globals;
 import net.sf.genomeview.gui.StaticUtils;
-import tudelft.utilities.logging.ReportToLogger;
-import tudelft.utilities.logging.Reporter;
 
 public class JOptionPaneX {
-	public final static Reporter log = new ReportToLogger(
-			JOptionPaneX.class.getSimpleName());
 
-	public static void main(String[] args) {
-		JOptionPaneX.showOkCancelDialog(null, "test", "title",
-				JOptionPane.WARNING_MESSAGE);
-	}
+//	public static void main(String[] args) {
+//		JOptionPaneX.showOkCancelDialog(null, "test", "title",
+//				JOptionPane.WARNING_MESSAGE);
+//	}
 
+	/**
+	 * FIXME a separate class for just this?
+	 * 
+	 * @param frame
+	 * @param msg
+	 * @param title
+	 * @param type
+	 * @param globals
+	 * @return
+	 */
 	public static boolean showOkCancelDialog(Frame frame, String msg,
-			String title, int type) {
-		DD x = new DD(frame, msg, title, type);
+			String title, int type, Globals globals) {
+		DD x = new DD(frame, msg, title, type, globals);
 		return x.getRet();
 
 	}
@@ -37,12 +42,12 @@ public class JOptionPaneX {
 class DD {
 	private boolean retOK = false;
 
-	public DD(Frame frame, String msg, String title, int type) {
+	public DD(Frame frame, String msg, String title, int type,
+			Globals globals) {
 		final JDialog dialog = new JDialog(frame, title, true);
-
 		Container contentPane = dialog.getContentPane();
 
-		JEditorPaneLabel text = new JEditorPaneLabel(JOptionPaneX.log);
+		JEditorPaneLabel text = new JEditorPaneLabel(globals);
 		StyleSheet css = text.getStyleSheet();
 		// css.addRule("body {color:#000; margin-left: 4px; margin-right: 4px;
 		// }");
@@ -53,7 +58,8 @@ class DD {
 		text.setText("<html>" + msg + "</html>");
 
 		contentPane.add(text, BorderLayout.CENTER);
-		JButton ok = new JButton(MessageManager.getString("button.ok"));
+		JButton ok = new JButton(
+				globals.getMessageManager().getString("button.ok"));
 
 		ok.addActionListener(new ActionListener() {
 
@@ -65,7 +71,8 @@ class DD {
 			}
 		});
 
-		JButton cancel = new JButton(MessageManager.getString("button.cancel"));
+		JButton cancel = new JButton(
+				globals.getMessageManager().getString("button.cancel"));
 		cancel.addActionListener(new ActionListener() {
 
 			@Override

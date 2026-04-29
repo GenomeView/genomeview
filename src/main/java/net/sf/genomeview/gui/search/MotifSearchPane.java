@@ -17,33 +17,33 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import be.abeel.gui.TitledComponent;
 import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.search.SearchDialog.SequenceType;
 import net.sf.jannot.Location;
-import be.abeel.gui.TitledComponent;
 
 /**
  * 
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 class MotifSearchPane extends SearchPanel {
-
-	private static final long serialVersionUID = -3270709193426284702L;
 
 	MotifSearchPane(final Model model) {
 		gc.fill = GridBagConstraints.BOTH;
-	
-		
+
+		final MessageManager mm = model.getMessageMgr();
 		final JTextField seq = new JTextField(40);
 		this.setFocusField(seq);
-		
-		JButton search = new JButton(MessageManager.getString("button.search"));
+
+		JButton search = new JButton(mm.getString("button.search"));
 
 		final MotifSearchResultModel mrm = new MotifSearchResultModel(model);
 		final JTable results = new JTable(mrm);
 		results.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				int row = results.getSelectedRow();
 				if (row >= 0) {
@@ -60,7 +60,7 @@ class MotifSearchPane extends SearchPanel {
 			public void actionPerformed(ActionEvent e) {
 				mrm.clear();
 				model.clearHighlights();
-				mrm.search(model, seq.getText().trim(), 
+				mrm.search(model, seq.getText().trim(),
 						(SequenceType) type.getSelectedItem());
 
 			}
@@ -89,14 +89,13 @@ class MotifSearchPane extends SearchPanel {
 			}
 
 		});
-		
 
-		
 		/* Query sequence box */
 		gc.weightx = 1;
 		gc.gridwidth = 4;
 		gc.weighty = 0.1;
-		add(new TitledComponent(MessageManager.getString("motifsearch.query_sequence"), seq), gc);
+		add(new TitledComponent(mm.getString("motifsearch.query_sequence"),
+				seq), gc);
 		gc.weighty = 0;
 		gc.gridwidth = 1;
 		gc.gridy++;
@@ -104,7 +103,6 @@ class MotifSearchPane extends SearchPanel {
 		gc.weightx = 0;
 		gc.gridx++;
 		add(search, gc);
-	
 
 		/* Result table */
 		gc.gridx = 0;
@@ -112,7 +110,8 @@ class MotifSearchPane extends SearchPanel {
 		gc.gridy++;
 		gc.weighty = 1;
 		gc.weightx = 1;
-		add(new TitledComponent(MessageManager.getString("motifsearch.result_locations"), new JScrollPane(results)), gc);
+		add(new TitledComponent(mm.getString("motifsearch.result_locations"),
+				new JScrollPane(results)), gc);
 
 	}
 

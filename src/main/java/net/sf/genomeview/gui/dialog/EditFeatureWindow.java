@@ -53,13 +53,12 @@ public class EditFeatureWindow extends JDialog {
 	private StrandCombo strandSelection;
 	private TypeCombo typeSelection;
 
+	@SuppressWarnings("serial")
 	private class EditFeatureWindowContent extends GridBagPanel {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 3211302042434915395L;
 
 		public EditFeatureWindowContent() {
+			final MessageManager mm = model.getMessageMgr();
+
 			gc.gridwidth = 3;
 			gc.fill = GridBagConstraints.BOTH;
 			gc.weightx = 1;
@@ -70,23 +69,20 @@ public class EditFeatureWindow extends JDialog {
 			location.setLineWrap(true);
 			strandSelection = new StrandCombo();
 			typeSelection = new TypeCombo(model);
-			this.add(new TitledComponent(
-					MessageManager.getString("editfeature.type"),
+			this.add(new TitledComponent(mm.getString("editfeature.type"),
 					typeSelection), gc);
 			gc.gridy++;
-			this.add(new TitledComponent(
-					MessageManager.getString("editfeature.strand"),
+			this.add(new TitledComponent(mm.getString("editfeature.strand"),
 					strandSelection), gc);
 
 			/* Notes legend */
 			gc.gridy++;
 			gc.gridwidth = 1;
-			this.add(new JLabel(MessageManager.getString("editfeature.notes")),
-					gc);
+			this.add(new JLabel(mm.getString("editfeature.notes")), gc);
 			gc.gridx++;
 			this.add(
 					new HelpButton(_self,
-							MessageManager.getString(
+							mm.getString(
 									"editfeature.help_one_qualifier_line")),
 					gc);
 
@@ -102,13 +98,11 @@ public class EditFeatureWindow extends JDialog {
 			gc.weighty = 0;
 			gc.gridy++;
 			gc.gridwidth = 1;
-			this.add(
-					new JLabel(
-							MessageManager.getString("editfeature.location")),
-					gc);
+			this.add(new JLabel(mm.getString("editfeature.location")), gc);
 			gc.gridx++;
-			this.add(new HelpButton(_self,
-					MessageManager.getString("editfeature.location_separator")),
+			this.add(
+					new HelpButton(_self,
+							mm.getString("editfeature.location_separator")),
 					gc);
 
 			/* Location text area */
@@ -121,10 +115,10 @@ public class EditFeatureWindow extends JDialog {
 
 			gc.gridy++;
 			gc.weighty = 0;
-			JButton ok = new JButton(
-					MessageManager.getString("button.save_close"));
+			JButton ok = new JButton(mm.getString("button.save_close"));
 			ok.addActionListener(new ActionListener() {
 
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					boolean warning = false;
 					try {
@@ -139,26 +133,26 @@ public class EditFeatureWindow extends JDialog {
 							String[] as = s.split("\\.\\.");
 							int start = Integer.parseInt(as[0].trim());
 							int end = Integer.parseInt(as[1].trim());
-							if (start < 1)
+							if (start < 1) {
 								start = 1;
+							}
 							if (end > model.vlm.getVisibleEntry()
-									.getMaximumLength())
+									.getMaximumLength()) {
 								end = model.vlm.getVisibleEntry()
 										.getMaximumLength();
+							}
 							loc.add(new Location(start, end));
 						}
 						feature.setLocation(loc);
 					} catch (Exception e) {
-						model.getLog().log(Level.WARNING, MessageManager
-								.getString("editfeature.location_failed_warn"),
-								e);
+						model.getLog().log(Level.WARNING, mm.getString(
+								"editfeature.location_failed_warn"), e);
 						// FIXME do we really need a popup now?
 						// the log warning should draw attention
 						JOptionPane.showMessageDialog(_self,
-								MessageManager.getString(
+								mm.getString(
 										"editfeature.location_failed_warn"),
-								MessageManager.getString(
-										"editfeature.location_failed"),
+								mm.getString("editfeature.location_failed"),
 								JOptionPane.WARNING_MESSAGE);
 						warning = true;
 					}
@@ -195,14 +189,13 @@ public class EditFeatureWindow extends JDialog {
 //						}
 //						feature.setMute(false);
 					} catch (Exception e) {
-						model.getLog().log(Level.WARNING, MessageManager
-								.getString("editfeature.notes_failed_warn"), e);
+						model.getLog().log(Level.WARNING,
+								mm.getString("editfeature.notes_failed_warn"),
+								e);
 						// FIXME remove popup
 						JOptionPane.showMessageDialog(_self,
-								MessageManager.getString(
-										"editfeature.notes_failed_warn"),
-								MessageManager
-										.getString("editfeature.notes_failed"),
+								mm.getString("editfeature.notes_failed_warn"),
+								mm.getString("editfeature.notes_failed"),
 								JOptionPane.WARNING_MESSAGE);
 						warning = true;
 					}
@@ -225,8 +218,9 @@ public class EditFeatureWindow extends JDialog {
 						model.annotationModel().typeUpdated(feature.type());
 					}
 
-					if (!warning)
+					if (!warning) {
 						_self.setVisible(false);
+					}
 
 				}
 
@@ -234,6 +228,7 @@ public class EditFeatureWindow extends JDialog {
 			JButton cancel = new JButton("Close");
 			cancel.addActionListener(new ActionListener() {
 
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					_self.setVisible(false);
 
@@ -252,7 +247,7 @@ public class EditFeatureWindow extends JDialog {
 
 	public EditFeatureWindow(Model model) {
 		super(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("editfeature.edit_structure"));
+				model.getMessageMgr().getString("editfeature.edit_structure"));
 		_self = this;
 		setModal(true);
 		this.model = model;
@@ -264,6 +259,7 @@ public class EditFeatureWindow extends JDialog {
 
 	}
 
+	@Override
 	public void setVisible(boolean b) {
 		if (b) {
 			this.feature = model.selectionModel().getFeatureSelection().first();

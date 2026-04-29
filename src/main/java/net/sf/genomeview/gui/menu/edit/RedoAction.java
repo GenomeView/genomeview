@@ -8,7 +8,6 @@ import java.util.Observable;
 
 import javax.swing.ImageIcon;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
@@ -22,7 +21,7 @@ import net.sf.genomeview.gui.menu.AbstractModelAction;
 public class RedoAction extends AbstractModelAction {
 
 	public RedoAction(Model model) {
-		super(MessageManager.getString("editmenu.redo"),
+		super(model.getMessageMgr().getString("editmenu.redo"),
 				new ImageIcon(model.getClass().getResource("/images/redo.png")),
 				model);
 	}

@@ -14,24 +14,24 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 
 import be.abeel.gui.GridBagPanel;
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrackModel;
-import net.sf.jannot.Type;
 
 /**
  * 
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class StructureTrackConfig extends JDialog {
 
-	private static final long serialVersionUID = -5209291628487502687L;
-
-	private StructureTrackConfig(final Model model, final StructureTrackModel stm) {
-		super(model.getGUIManager().getMainWindow(), MessageManager.getString("structuretrackconfig.title"), true);
-		final Window _self=this;
+	private StructureTrackConfig(final Model model,
+			final StructureTrackModel stm) {
+		super(model.getGUIManager().getMainWindow(),
+				model.getMessageMgr().getString("structuretrackconfig.title"),
+				true);
+		final Window _self = this;
 		setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagPanel().gc;
 		for (final net.sf.jannot.Type t : net.sf.jannot.Type.values()) {
@@ -48,16 +48,17 @@ public class StructureTrackConfig extends JDialog {
 			add(jc, gc);
 			gc.gridy++;
 		}
-		add(new JButton(new AbstractAction(MessageManager.getString("button.ok")) {
-			
+		add(new JButton(new AbstractAction(
+				model.getMessageMgr().getString("button.ok")) {
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
-				
+
 			}
-		}),gc);
+		}), gc);
 		pack();
-		StaticUtils.center(model.getGUIManager().getMainWindow(),this);
+		StaticUtils.center(model.getGUIManager().getMainWindow(), this);
 		setVisible(true);
 
 	}

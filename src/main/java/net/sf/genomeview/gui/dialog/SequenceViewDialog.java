@@ -78,8 +78,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 	private String subSequenceNuc;
 	private String subSequenceProt;
 
-	private final JButton toggleButton = new JButton(
-			MessageManager.getString("sequenceviewdialog.protein_view"));
+	private final JButton toggleButton;
 
 	private Sequence getseq() {
 		Sequence seq = null;
@@ -103,13 +102,14 @@ public class SequenceViewDialog extends JDialog implements Observer {
 	}
 
 	public SequenceViewDialog(final Model model) {
-		// this.setModal(true);
+		this.model = model;
+		final MessageManager mm = model.getMessageMgr();
+		toggleButton = new JButton(
+				mm.getString("sequenceviewdialog.protein_view"));
 
 		this.setLayout(new BorderLayout());
-		this.setTitle(
-				MessageManager.getString("sequenceviewdialog.sequence_view"));
+		this.setTitle(mm.getString("sequenceviewdialog.sequence_view"));
 		this.setAlwaysOnTop(true);
-		this.model = model;
 		model.addObserver(this);
 
 		Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
@@ -127,13 +127,12 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
 		// buttons
 
-		JButton closeButton = new JButton(
-				MessageManager.getString("button.close"));
+		JButton closeButton = new JButton(mm.getString("button.close"));
 		JButton exportButton = new JButton(
-				MessageManager.getString("sequenceviewdialog.export_fasta"));
+				mm.getString("sequenceviewdialog.export_fasta"));
 
 		JButton clipboardButton = new JButton(
-				MessageManager.getString("sequenceviewdialog.copy_clipboard"));
+				mm.getString("sequenceviewdialog.copy_clipboard"));
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -146,7 +145,7 @@ public class SequenceViewDialog extends JDialog implements Observer {
 		buttonPanel.add(exportButton);
 		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonPanel.add(new JButton(new AbstractAction(
-				MessageManager.getString("sequenceviewdialog.ncbi_blastp")) {
+				mm.getString("sequenceviewdialog.ncbi_blastp")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -154,31 +153,31 @@ public class SequenceViewDialog extends JDialog implements Observer {
 				String protein = SequenceTools.translate(seq,
 						model.getAAMapping());
 				StaticUtils.browse(Blast.blastp("GVquery", protein),
-						model.getLog());
+						model.getGlobals());
 			}
 
 		}));
 		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonPanel.add(new JButton(new AbstractAction(
-				MessageManager.getString("sequenceviewdialog.ncbi_blastn")) {
+				mm.getString("sequenceviewdialog.ncbi_blastn")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String seq = getseq().stringRepresentation();
 				StaticUtils.browse(Blast.blastn("GVquery", seq),
-						model.getLog());
+						model.getGlobals());
 
 			}
 		}));
 		buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonPanel.add(new JButton(new AbstractAction(
-				MessageManager.getString("sequenceviewdialog.ncbi_blastx")) {
+				mm.getString("sequenceviewdialog.ncbi_blastx")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String seq = getseq().stringRepresentation();
 				StaticUtils.browse(Blast.blastx("GVquery", seq),
-						model.getLog());
+						model.getGlobals());
 
 			}
 		}));
@@ -424,18 +423,20 @@ public class SequenceViewDialog extends JDialog implements Observer {
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
+		final MessageManager mm = model.getMessageMgr();
+
 		nucList = null;
 		protList = null;
 		subSequenceNuc = null;
 		subSequenceProt = null;
 		if (viewMode == NUC_MODE) {
 			fillWithNucleotides();
-			toggleButton.setText(MessageManager
-					.getString("sequenceviewdialog.protein_view"));
+			toggleButton
+					.setText(mm.getString("sequenceviewdialog.protein_view"));
 		} else {
 			fillWithProteins();
-			toggleButton.setText(MessageManager
-					.getString("sequenceviewdialog.nucleotide_view"));
+			toggleButton.setText(
+					mm.getString("sequenceviewdialog.nucleotide_view"));
 		}
 		highlight(sequenceText);
 

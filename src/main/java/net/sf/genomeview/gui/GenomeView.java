@@ -15,8 +15,7 @@ import javax.swing.SwingUtilities;
 
 import be.abeel.concurrency.DaemonThread;
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.core.MessageManager;
-import net.sf.jannot.Global;
+import net.sf.genomeview.core.Globals;
 import net.sf.jannot.exception.ReadFailedException;
 import tudelft.utilities.logging.Reporter;
 
@@ -43,14 +42,15 @@ public class GenomeView {
 
 	public static void main(final String[] args)
 			throws IOException, ReadFailedException {
-		Global global = new Global();
-		Reporter log = global.getLog();
-		Configuration configuration = new Configuration(global);
+		Globals globals = new Globals();
+		Reporter log = globals.getLog();
+		Configuration configuration = globals.getConfiguration();
 
 		log.log(Level.INFO, "Starting GenomeView " + configuration.version());
-		log.log(Level.INFO, "Using language: " + MessageManager.getLocale());
+		log.log(Level.INFO,
+				"Using language: " + globals.getMessageManager().getLocale());
 		try {
-			SwingUtilities.invokeAndWait(() -> splash = new Splash());
+			SwingUtilities.invokeAndWait(() -> splash = new Splash(globals));
 		} catch (InterruptedException | InvocationTargetException e1) {
 			log.log(Level.WARNING, "Splash screen failed", e1);
 		}
@@ -100,7 +100,7 @@ public class GenomeView {
 							.getBoolean("general:singleInstance");
 					if (singleInstance) {
 						if (!ApplicationInstanceManager.registerInstance(args,
-								global)) {
+								globals)) {
 							// instance already running.
 							log.log(Level.WARNING,
 									"Another instance of this application is already running.  Exiting.");
@@ -111,9 +111,10 @@ public class GenomeView {
 
 					}
 
-					Authenticator.setDefault(new MyAuthenticator());
+					Authenticator.setDefault(new MyAuthenticator(globals));
 
-					mw = new WindowManager(args, splash, global, configuration);
+					mw = new WindowManager(args, splash, globals,
+							configuration);
 					ApplicationInstanceManager.setCallback(mw);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "main initialization failed", e);

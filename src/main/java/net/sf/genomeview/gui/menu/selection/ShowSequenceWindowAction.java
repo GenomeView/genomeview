@@ -8,7 +8,6 @@ import java.util.Observable;
 
 import javax.swing.KeyStroke;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.SequenceViewDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
@@ -23,7 +22,7 @@ import net.sf.genomeview.gui.menu.AbstractModelAction;
 public class ShowSequenceWindowAction extends AbstractModelAction {
 
 	public ShowSequenceWindowAction(Model model) {
-		super(MessageManager.getString("selectionmenu.show_dna_protein"),
+		super(model.getMessageMgr().getString("selectionmenu.show_dna_protein"),
 				model);
 		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control Q"));
 	}

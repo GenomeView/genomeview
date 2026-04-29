@@ -163,6 +163,7 @@ public class MultipleAlignmentTrack2 extends Track {
 	@Override
 	public int paintTrack(Graphics2D g, int yOffset, double screenWidth,
 			JViewport view, TrackCommunicationModel tcm) {
+		final MessageManager mm = model.getMessageMgr();
 		final Configuration conf = model.getConfiguration();
 		this.g = g;
 		this.yOffset = yOffset;
@@ -174,7 +175,7 @@ public class MultipleAlignmentTrack2 extends Track {
 		currentYOffset = yOffset;
 		ma = (AbstractMAFMultipleAlignment) entry.get(dataKey);
 		if (ma == null) {
-			g.drawString(MessageManager.getString(
+			g.drawString(mm.getString(
 					"multiplealignmenttrack.no_multiple_alignment_loaded_warn"),
 					10, yOffset + 10);
 			return 20 + 5;
@@ -214,7 +215,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 		if (!abs.iterator().hasNext()) {
 			g.drawString(
-					MessageManager.getString(
+					mm.getString(
 							"multiplealignmenttrack.no_alignment_blocks_warn"),
 					10, yOffset + 10);
 			return 20 + 5;
@@ -769,9 +770,10 @@ class MultipleAlignmentPopUp extends JPopupMenu {
 		this.model = model;
 		this.ordering = ordering;
 		this.showAll = showAll;
+		final MessageManager mm = model.getMessageMgr();
 
-		add(new AbstractAction(MessageManager
-				.getString("multiplealignmenttrack.toggle_all_entries")) {
+		add(new AbstractAction(
+				mm.getString("multiplealignmenttrack.toggle_all_entries")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -780,8 +782,8 @@ class MultipleAlignmentPopUp extends JPopupMenu {
 			}
 
 		});
-		add(new AbstractAction(MessageManager
-				.getString("multiplealignmenttrack.rearrange_ordering")) {
+		add(new AbstractAction(
+				mm.getString("multiplealignmenttrack.rearrange_ordering")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {

@@ -37,9 +37,9 @@ public class SelectedSequenceDialog extends JDialog {
 	private static final long serialVersionUID = 2529848844411398233L;
 
 	private SelectedSequenceDialog(final Model model) {
-		super(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("selectedsequencedialog.which_seq"),
-				true);
+		super(model.getGUIManager().getMainWindow(), model.getMessageMgr()
+				.getString("selectedsequencedialog.which_seq"), true);
+		final MessageManager mm = model.getMessageMgr();
 		setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.insets = new Insets(3, 3, 3, 3);
@@ -47,13 +47,14 @@ public class SelectedSequenceDialog extends JDialog {
 		gc.gridy = 0;
 		gc.gridwidth = 2;
 		gc.gridheight = 1;
-		add(new JLabel(MessageManager
-				.getString("selectedsequencedialog.location_or_complete")), gc);
+		add(new JLabel(
+				mm.getString("selectedsequencedialog.location_or_complete")),
+				gc);
 		ButtonGroup loc = new ButtonGroup();
-		final JRadioButton location = new JRadioButton(MessageManager
-				.getString("selectedsequencedialog.selected_locations"));
-		final JRadioButton feature = new JRadioButton(MessageManager
-				.getString("selectedsequencedialog.completed_features"));
+		final JRadioButton location = new JRadioButton(
+				mm.getString("selectedsequencedialog.selected_locations"));
+		final JRadioButton feature = new JRadioButton(
+				mm.getString("selectedsequencedialog.completed_features"));
 		feature.setSelected(true);
 		loc.add(location);
 		loc.add(feature);
@@ -62,15 +63,16 @@ public class SelectedSequenceDialog extends JDialog {
 		gc.gridy++;
 		add(feature, gc);
 		gc.gridy++;
-		add(new JLabel(MessageManager
-				.getString("selectedsequencedialog.nucleotides_or_amino")), gc);
+		add(new JLabel(
+				mm.getString("selectedsequencedialog.nucleotides_or_amino")),
+				gc);
 
 		ButtonGroup trans = new ButtonGroup();
 		final JRadioButton nucleotides = new JRadioButton(
-				MessageManager.getString("selectedsequencedialog.nucleotides"));
+				mm.getString("selectedsequencedialog.nucleotides"));
 		nucleotides.setSelected(true);
 		final JRadioButton aa = new JRadioButton(
-				MessageManager.getString("selectedsequencedialog.amino"));
+				mm.getString("selectedsequencedialog.amino"));
 		trans.add(nucleotides);
 		trans.add(aa);
 		gc.gridy++;
@@ -78,7 +80,7 @@ public class SelectedSequenceDialog extends JDialog {
 		gc.gridy++;
 		add(aa, gc);
 
-		JButton ok = new JButton(MessageManager.getString("button.ok"));
+		JButton ok = new JButton(mm.getString("button.ok"));
 		ok.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -119,8 +121,9 @@ public class SelectedSequenceDialog extends JDialog {
 					selectedSequence = SequenceTools.translate(
 							new MemorySequence(tmp, model.getLog()),
 							model.getAAMapping());
-				} else
+				} else {
 					selectedSequence = tmp.toString();
+				}
 				setVisible(false);
 			}
 
@@ -128,7 +131,7 @@ public class SelectedSequenceDialog extends JDialog {
 		gc.gridy++;
 		gc.gridwidth = 1;
 		add(ok, gc);
-		JButton close = new JButton(MessageManager.getString("button.close"));
+		JButton close = new JButton(mm.getString("button.close"));
 		close.addActionListener(new ActionListener() {
 
 			@Override
@@ -153,8 +156,9 @@ public class SelectedSequenceDialog extends JDialog {
 
 	public static void display(Model model) {
 		selectedSequence = null;
-		if (diag == null)
+		if (diag == null) {
 			diag = new SelectedSequenceDialog(model);
+		}
 		diag.setVisible(true);
 	}
 

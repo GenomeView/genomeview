@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.util.Observable;
 import java.util.Observer;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
@@ -16,7 +15,8 @@ public class ClearRegionSelectionAction extends AbstractModelAction
 		implements Observer {
 
 	public ClearRegionSelectionAction(Model model) {
-		super(MessageManager.getString("selectionmenu.clear_region"), model);
+		super(model.getMessageMgr().getString("selectionmenu.clear_region"),
+				model);
 		model.addObserver(this);
 		setEnabled(model.getSelectedRegion() != null);
 	}

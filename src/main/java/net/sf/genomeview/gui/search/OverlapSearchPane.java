@@ -33,6 +33,7 @@ class OverlapSearchPane extends SearchPanel {
 	private static final long serialVersionUID = 2986333484335063190L;
 
 	public OverlapSearchPane(final Model model) {
+		final MessageManager mm = model.getMessageMgr();
 		gc.weightx = 1;
 		gc.weighty = 0;
 		gc.fill = GridBagConstraints.BOTH;
@@ -49,9 +50,9 @@ class OverlapSearchPane extends SearchPanel {
 				int row = results.getSelectedRow();
 				Feature f = srm.getFeature(row);
 				model.selectionModel().setLocationSelection(f);
-				if (f.length() < model.vlm.getVisibleLocation().length())
+				if (f.length() < model.vlm.getVisibleLocation().length()) {
 					model.vlm.center((f.end() + f.start()) / 2);
-				else {
+				} else {
 					double border = 0.05 * (f.end() - f.start());
 					model.vlm.setAnnotationLocationVisible(
 							new Location((int) (f.start() - border),
@@ -61,8 +62,7 @@ class OverlapSearchPane extends SearchPanel {
 
 			}
 		});
-		JButton searchButton = new JButton(
-				MessageManager.getString("button.search"));
+		JButton searchButton = new JButton(mm.getString("button.search"));
 		searchButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -79,13 +79,11 @@ class OverlapSearchPane extends SearchPanel {
 		});
 
 		gc.gridwidth = 2;
-		add(new TitledComponent(
-				MessageManager.getString("overlappane.overlap_1") + " ",
+		add(new TitledComponent(mm.getString("overlappane.overlap_1") + " ",
 				sourceType), gc);
 		gc.gridy++;
-		add(new TitledComponent(
-				MessageManager.getString("overlappane.overlap_2"), targetType),
-				gc);
+		add(new TitledComponent(mm.getString("overlappane.overlap_2"),
+				targetType), gc);
 		gc.gridy++;
 
 		add(searchButton, gc);

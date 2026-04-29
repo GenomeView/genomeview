@@ -49,11 +49,12 @@ public class MainMenu extends JMenuBar {
 	private static final long serialVersionUID = 6478474621947392346L;
 
 	public MainMenu(Model model) {
-		JMenu file = new JMenu(MessageManager.getString("mainmenu.file"));
+		final MessageManager mm = model.getMessageMgr();
+		JMenu file = new JMenu(mm.getString("mainmenu.file"));
 
 		JMenuItem i = new JMenuItem(new LoadFeaturesAction(model));
 		OverlayListener ol = new OverlayListener(
-				MessageManager.getString("mainmenu.load_info"));
+				mm.getString("mainmenu.load_info"));
 		i.addMouseListener(ol);
 		i.addActionListener(ol);
 		file.add(i);
@@ -76,7 +77,7 @@ public class MainMenu extends JMenuBar {
 		file.add(new ExitAction(model));
 		add(file);
 
-		JMenu edit = new JMenu(MessageManager.getString("mainmenu.edit"));
+		JMenu edit = new JMenu(mm.getString("mainmenu.edit"));
 
 		edit.add(new CopySequenceAction(model));
 		edit.add(new CloneFeatureAction(model));
@@ -93,15 +94,13 @@ public class MainMenu extends JMenuBar {
 
 		add(edit);
 
-		JMenu navigation = new JMenu(
-				MessageManager.getString("mainmenu.navigation"));
+		JMenu navigation = new JMenu(mm.getString("mainmenu.navigation"));
 		navigation.add(new GotoPosition(model));
 		navigation.add(new GotoTrack(model));
 		navigation.add(new SearchAction(model));
 		add(navigation);
 
-		JMenu select = new JMenu(
-				MessageManager.getString("mainmenu.selection"));
+		JMenu select = new JMenu(mm.getString("mainmenu.selection"));
 		select.add(new ShowSequenceWindowAction(model));
 //		select.add(new NCBIdnaBlastAction(model));
 //		select.add(new NCBIproteinBlastAction(model));
@@ -115,14 +114,12 @@ public class MainMenu extends JMenuBar {
 		select.add(new ZoomToSelectedLocationAction(model));
 		add(select);
 
-		JMenu help = new JMenu(MessageManager.getString("mainmenu.help"));
-		help.add(new OpenURLAction(
-				MessageManager.getString("mainmenu.user_documentation"),
-				"http://genomeview.org/manual", model.getLog()));
-		help.add(new OpenURLAction(
-				MessageManager.getString("mainmenu.post_bug_request"),
+		JMenu help = new JMenu(mm.getString("mainmenu.help"));
+		help.add(new OpenURLAction(mm.getString("mainmenu.user_documentation"),
+				"http://genomeview.org/manual", model.getGlobals()));
+		help.add(new OpenURLAction(mm.getString("mainmenu.post_bug_request"),
 				"https://github.com/GenomeView/genomeview/issues",
-				model.getLog()));
+				model.getGlobals()));
 
 		help.addSeparator();
 		help.add(new ShowLogWindow(model));

@@ -27,12 +27,13 @@ public class SaveSessionAction extends AbstractAction {
 	private Model model;
 
 	public SaveSessionAction(Model model) {
-		super(MessageManager.getString("filemenu.save_session"));
+		super(model.getMessageMgr().getString("filemenu.save_session"));
 		this.model = model;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		final MessageManager mm = model.getMessageMgr();
 		JFileChooser chooser = new JFileChooser(
 				model.getConfiguration().getFile("lastDirectory"));
 		chooser.setMultiSelectionEnabled(false);
@@ -45,7 +46,7 @@ public class SaveSessionAction extends AbstractAction {
 
 			@Override
 			public String getDescription() {
-				return MessageManager.getString("filemenu.session_desc");
+				return mm.getString("filemenu.session_desc");
 			}
 
 		});
@@ -66,8 +67,8 @@ public class SaveSessionAction extends AbstractAction {
 						f.getParentFile());
 
 			} catch (Exception ex) {
-				model.getLog().log(Level.SEVERE, MessageManager
-						.getString("filemenu.could_not_save_session"), ex);
+				model.getLog().log(Level.SEVERE,
+						mm.getString("filemenu.could_not_save_session"), ex);
 			}
 		}
 

@@ -84,8 +84,9 @@ public class Session {
 	 * @return thread loading the session
 	 */
 	private static Thread loadSession(final Model model, final InputStream is) {
+		final MessageManager mm = model.getMessageMgr();
 		model.messageModel().setStatusBarMessage(
-				MessageManager.getString("session.preparing_load_session"));
+				mm.getString("session.preparing_load_session"));
 		final Configuration config = model.getConfiguration();
 
 		Thread t = new Thread(new Runnable() {
@@ -101,7 +102,7 @@ public class Session {
 							&& lcKey.contains("session"))) {
 						JOptionPane.showMessageDialog(
 								model.getGUIManager().getMainWindow(),
-								MessageManager.getString(
+								mm.getString(
 										"session.not_genome_view_session"));
 					} else {
 
@@ -117,8 +118,8 @@ public class Session {
 
 								String[] arr = line.split("[: \t]", 2);
 
-								model.messageModel().setStatusBarMessage(
-										MessageManager.formatMessage(
+								model.messageModel()
+										.setStatusBarMessage(mm.formatMessage(
 												"session.loading_session_current_file_line",
 												new Object[] { line }));
 								SessionInstruction si = null;
@@ -229,8 +230,9 @@ public class Session {
 						}
 					}
 				} catch (Exception ex) {
-					model.getLog().log(Level.WARNING, MessageManager.getString(
-							"crashhandler.couldnt_load_session"), ex);
+					model.getLog().log(Level.WARNING,
+							mm.getString("crashhandler.couldnt_load_session"),
+							ex);
 				}
 				it.close();
 				model.messageModel().setStatusBarMessage(null);

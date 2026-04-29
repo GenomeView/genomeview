@@ -2,8 +2,8 @@ package net.sf.genomeview.data;
 
 import java.util.Observable;
 
+import net.sf.genomeview.core.Globals;
 import net.sf.jannot.Entry;
-import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 
 /**
@@ -20,12 +20,12 @@ public class VisualLocationModel extends Observable {
 	 */
 	private Location visibleLocation = new Location(0, 0);
 	private double screenWidth;
-	private Global global;
+	private Globals global;
 
 	/**
 	 * @param log needed to create {@link DummyEntry}
 	 */
-	public VisualLocationModel(Global global) {
+	public VisualLocationModel(Globals global) {
 		this.global = global;
 	}
 

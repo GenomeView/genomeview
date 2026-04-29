@@ -6,7 +6,6 @@ package net.sf.genomeview.gui.menu.selection;
 import java.awt.event.ActionEvent;
 import java.util.Observable;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
@@ -14,7 +13,7 @@ import net.sf.genomeview.gui.menu.AbstractModelAction;
 public class ZoomToSelectionAction extends AbstractModelAction {
 
 	public ZoomToSelectionAction(Model model) {
-		super(MessageManager
+		super(model.getMessageMgr()
 				.getString("selectionmenu.zoom_to_selected_features"), model);
 	}
 

@@ -9,7 +9,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Level;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
@@ -30,8 +29,9 @@ public class ReferenceMissingMonitor implements Observer {
 	private static ReferenceMissingMonitor rmm = null;
 
 	public static void init(Model model) {
-		if (rmm == null)
+		if (rmm == null) {
 			rmm = new ReferenceMissingMonitor(model);
+		}
 
 	}
 
@@ -144,8 +144,9 @@ public class ReferenceMissingMonitor implements Observer {
 			if (e.sequence().size() == 0) {
 				// System.out.println(e.sequence().getClass());
 				int dataCount = 0;
-				for (DataKey dk : e)
+				for (DataKey dk : e) {
 					dataCount++;
+				}
 				if (dataCount > 0) {
 					missingReference++;
 					missing.add(e.getID());
@@ -154,7 +155,7 @@ public class ReferenceMissingMonitor implements Observer {
 		}
 
 		if (missingReference > 0 && lastMissing != missingReference) {
-			String msg = MessageManager.getString(
+			String msg = model.getMessageMgr().getString(
 					"referencemissing.not_every_entry_has_reference") + missing;
 			model.getLog().log(Level.WARNING, msg);
 //			floater.setText(msg.toString());

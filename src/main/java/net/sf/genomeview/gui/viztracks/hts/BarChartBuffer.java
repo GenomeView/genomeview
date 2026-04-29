@@ -632,6 +632,7 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 
 	@Override
 	public String getTooltip(int mouseX) {
+		final MessageManager mm = model.getMessageMgr();
 		double factor = MAX_WIDTH / visible.length();
 		nf.setMinimumFractionDigits(0);
 		nf.setMaximumFractionDigits(3);
@@ -640,8 +641,7 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 		StringBuffer text = new StringBuffer();
 
 		text.append("<html>");
-		text.append("<strong>"
-				+ MessageManager.getString("barchartbuffer.window_length")
+		text.append("<strong>" + mm.getString("barchartbuffer.window_length")
 				+ " </strong>" + pileWidth + "<br/>");
 		int ntPosition = Convert.translateScreenToGenome(mouseX, visible,
 				ptm.getScreenWidth()) - visible.start;// track.translateFromMouse(e.getX());
@@ -657,12 +657,11 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 				} catch (IndexOutOfBoundsException e) {
 					// leave count at 0 then
 				}
-				text.append("<strong>"
-						+ MessageManager.getString("barchartbuffer.matches")
+				text.append("<strong>" + mm.getString("barchartbuffer.matches")
 						+ "</strong> " + format(count, total) + "<br/>");
-				text.append("<strong>"
-						+ MessageManager.getString("barchartbuffer.mismatches")
-						+ "</strong><br/>");
+				text.append(
+						"<strong>" + mm.getString("barchartbuffer.mismatches")
+								+ "</strong><br/>");
 				text.append(
 						"A: " + format(nc.getCount('A', ntPosition), total));
 				text.append("<br/>");
@@ -702,14 +701,13 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 				double reverse = r1cov + r2cov;
 				double forward = f1cov + f2cov;
 				text.append(nrReg.format(sense + antisense) + "<br/>");
-				text.append(MessageManager
-						.getString("barchartbuffer.forward_transcript") + " "
-						+ nrReg.format(sense) + " (" + nrReg.format(r1cov)
+				text.append(mm.getString("barchartbuffer.forward_transcript")
+						+ " " + nrReg.format(sense) + " (" + nrReg.format(r1cov)
 						+ " - " + nrReg.format(f2cov) + ")" + "<br/>");
-				text.append(MessageManager
-						.getString("barchartbuffer.reverse_transcript") + " "
-						+ nrReg.format(antisense) + " (" + nrReg.format(f1cov)
-						+ " - " + nrReg.format(r2cov) + ")" + "<br/>");
+				text.append(mm.getString("barchartbuffer.reverse_transcript")
+						+ " " + nrReg.format(antisense) + " ("
+						+ nrReg.format(f1cov) + " - " + nrReg.format(r2cov)
+						+ ")" + "<br/>");
 				// text.append("Forward mapping: " + nrReg.format(forward) +
 				// "<br/>");
 				// text.append("Reverse mapping: " + nrReg.format(reverse) +
@@ -735,8 +733,7 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 			}
 		} else {
 			text.append("<strong>"
-					+ MessageManager
-							.getString("barchartbuffer.no_coverage_in_region")
+					+ mm.getString("barchartbuffer.no_coverage_in_region")
 					+ "</strong> ");
 		}
 		text.append("</html>");

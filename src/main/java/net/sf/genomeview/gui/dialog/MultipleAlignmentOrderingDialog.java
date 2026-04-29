@@ -21,9 +21,7 @@ import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.genomeview.core.BiMap;
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-
 
 /**
  * 
@@ -31,11 +29,12 @@ import net.sf.genomeview.data.Model;
  * 
  */
 public class MultipleAlignmentOrderingDialog extends JDialog {
-	public MultipleAlignmentOrderingDialog(Model model,BiMap<String, Integer> ordering) {
+	public MultipleAlignmentOrderingDialog(Model model,
+			BiMap<String, Integer> ordering) {
 		setModal(true);
-		final JDialog _self=this;
+		final JDialog _self = this;
 		final OrderingTableModel listModel = new OrderingTableModel(ordering);
-		final JTable table=new JTable(listModel);
+		final JTable table = new JTable(listModel);
 		table.setUI(new DragDropRowTableUI(model, ordering));
 		table.setCellSelectionEnabled(false);
 		table.setRowSelectionAllowed(false);
@@ -43,18 +42,19 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		setLayout(new BorderLayout());
-		add(table,BorderLayout.CENTER);
-		JButton close=new JButton(MessageManager.getString("button.close"));
-		close.addActionListener(new ActionListener(){
+		add(table, BorderLayout.CENTER);
+		JButton close = new JButton(
+				model.getMessageMgr().getString("button.close"));
+		close.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
-				
+
 			}
-			
+
 		});
-		add(close,BorderLayout.SOUTH);
+		add(close, BorderLayout.SOUTH);
 
 	}
 
@@ -66,38 +66,48 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 		private BiMap<String, Integer> ordering;
 		private Model model;
 
-		public DragDropRowTableUI(Model model,BiMap<String, Integer>ordering){
-			this.ordering=ordering;
-			this.model=model;
+		public DragDropRowTableUI(Model model,
+				BiMap<String, Integer> ordering) {
+			this.ordering = ordering;
+			this.model = model;
 		}
-		
+
+		@Override
 		protected MouseInputListener createMouseInputListener() {
 			return new DragDropRowMouseInputHandler();
 		}
 
+		@Override
 		public void paint(Graphics g, JComponent c) {
 			super.paint(g, c);
 
 			if (draggingRow) {
 				g.setColor(table.getParent().getBackground());
-				Rectangle cellRect = table.getCellRect(table.getSelectedRow(), 0, false);
-				g.copyArea(cellRect.x, cellRect.y, table.getWidth(), table.getRowHeight(), cellRect.x, dyOffset);
+				Rectangle cellRect = table.getCellRect(table.getSelectedRow(),
+						0, false);
+				g.copyArea(cellRect.x, cellRect.y, table.getWidth(),
+						table.getRowHeight(), cellRect.x, dyOffset);
 
 				if (dyOffset < 0) {
-					g.fillRect(cellRect.x, cellRect.y + (table.getRowHeight() + dyOffset), table.getWidth(), (dyOffset * -1));
+					g.fillRect(cellRect.x,
+							cellRect.y + (table.getRowHeight() + dyOffset),
+							table.getWidth(), (dyOffset * -1));
 				} else {
-					g.fillRect(cellRect.x, cellRect.y, table.getWidth(), dyOffset);
+					g.fillRect(cellRect.x, cellRect.y, table.getWidth(),
+							dyOffset);
 				}
 			}
 		}
 
 		class DragDropRowMouseInputHandler extends MouseInputHandler {
 
+			@Override
 			public void mousePressed(MouseEvent e) {
 				super.mousePressed(e);
 				startDragPoint = (int) e.getPoint().getY();
 			}
 
+			@Override
 			public void mouseDragged(MouseEvent e) {
 				int fromRow = table.getSelectedRow();
 
@@ -105,7 +115,8 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 					draggingRow = true;
 
 					int rowHeight = table.getRowHeight();
-					int middleOfSelectedRow = (rowHeight * fromRow) + (rowHeight / 2);
+					int middleOfSelectedRow = (rowHeight * fromRow)
+							+ (rowHeight / 2);
 
 					int toRow = -1;
 					int yMousePoint = (int) e.getPoint().getY();
@@ -115,15 +126,16 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 						// Move row up
 						toRow = fromRow - 1;
 //						up = true;
-					} /* Down */else if (yMousePoint > (middleOfSelectedRow + rowHeight)) {
+					} /* Down */else if (yMousePoint > (middleOfSelectedRow
+							+ rowHeight)) {
 						// Move row down
 						toRow = fromRow + 1;
 //						down = true;
 					}
 
 					if (toRow >= 0 && toRow < table.getRowCount()) {
-						String a=ordering.getReverse(fromRow);
-						String b=ordering.getReverse(toRow);
+						String a = ordering.getReverse(fromRow);
+						String b = ordering.getReverse(toRow);
 						ordering.putReverse(fromRow, b);
 						ordering.putReverse(toRow, a);
 						table.setRowSelectionInterval(toRow, toRow);
@@ -136,6 +148,7 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 				}
 			}
 
+			@Override
 			public void mouseReleased(MouseEvent e) {
 				super.mouseReleased(e);
 
@@ -153,10 +166,8 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 			return "Name";
 		}
 
-		
-
 		public OrderingTableModel(BiMap<String, Integer> ordering2) {
-			this.ordering=ordering2;
+			this.ordering = ordering2;
 		}
 
 		public void update(Observable o, Object arg) {
@@ -178,7 +189,6 @@ public class MultipleAlignmentOrderingDialog extends JDialog {
 		@Override
 		public Object getValueAt(int row, int col) {
 			return ordering.getReverse(row);
-			
 
 		}
 	}

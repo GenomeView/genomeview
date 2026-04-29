@@ -8,7 +8,6 @@ import java.util.Observable;
 
 import javax.swing.KeyStroke;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
@@ -17,7 +16,7 @@ import net.sf.genomeview.gui.menu.AbstractModelAction;
 public class SplitFeatureAction extends AbstractModelAction {
 
 	public SplitFeatureAction(Model model) {
-		super(MessageManager.getString("editmenu.split_feature"), model);
+		super(model.getMessageMgr().getString("editmenu.split_feature"), model);
 		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control U"));
 	}
 

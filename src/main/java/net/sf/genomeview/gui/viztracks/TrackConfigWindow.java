@@ -28,7 +28,6 @@ import java.util.logging.Level;
 
 import javax.swing.JDialog;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 
@@ -47,7 +46,7 @@ public class TrackConfigWindow implements Observer {
 
 		window.setModal(false);
 		window.setTitle(
-				MessageManager.getString("trackconfig.configure_track"));
+				model.getMessageMgr().getString("trackconfig.configure_track"));
 		this.config = config;
 		model.getLog().log(Level.INFO, config.toString());
 		window.add(config.getGUIContainer());

@@ -37,16 +37,13 @@ import net.sf.jannot.MemoryFeatureAnnotation;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class NewFeatureFromCoordinatesDialog extends JDialog {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5266511180264863028L;
 
 	public NewFeatureFromCoordinatesDialog(final Model model) {
 		super(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("newfeature.title"));
+				model.getMessageMgr().getString("newfeature.title"));
+		final MessageManager mm = model.getMessageMgr();
 		final NewFeatureFromCoordinatesDialog _self = this;
 		setModal(true);
 		Container c = new Container();
@@ -76,8 +73,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 		gc.gridwidth = 2;
 		c.add(coordinates, gc);
 		gc.gridx += 2;
-		c.add(new HelpButton(this,
-				MessageManager.getString("newfeaturecoord.hlp_text")));
+		c.add(new HelpButton(this, mm.getString("newfeaturecoord.hlp_text")));
 
 		gc.gridx = 0;
 		gc.gridy++;
@@ -86,9 +82,10 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 		c.add(typeCombo, gc);
 		gc.gridwidth = 1;
 		gc.gridy++;
-		JButton ok = new JButton(MessageManager.getString("button.ok"));
+		JButton ok = new JButton(mm.getString("button.ok"));
 		ok.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
 					SortedSet<Location> loc = parse(coordinates.getText());
@@ -108,9 +105,8 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 					_self.dispose();
 				} catch (Exception ex) {
 					JOptionPane.showMessageDialog(_self,
-							MessageManager.getString(
-									"newfeaturecoord.couldnt_create_warn"),
-							MessageManager.getString("newfeaturecoord.error"),
+							mm.getString("newfeaturecoord.couldnt_create_warn"),
+							mm.getString("newfeaturecoord.error"),
 							JOptionPane.WARNING_MESSAGE);
 				}
 
@@ -121,14 +117,15 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 				Iterator<Location> it = loc.iterator();
 				while (it.hasNext()) {
 					Location l = it.next();
-					if (l.end < range.start)
+					if (l.end < range.start) {
 						it.remove();
-					else if (l.start < range.start)
+					} else if (l.start < range.start) {
 						l.setStart(range.start);
-					else if (l.start > range.end)
+					} else if (l.start > range.end) {
 						it.remove();
-					else if (l.end > range.end)
+					} else if (l.end > range.end) {
 						l.setEnd(range.end);
+					}
 				}
 
 			}
@@ -154,9 +151,11 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 
 		});
 
-		JButton cancel = new JButton(MessageManager.getString("button.cancel"));
+		JButton cancel = new JButton(
+				model.getMessageMgr().getString("button.cancel"));
 		cancel.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
 

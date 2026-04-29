@@ -8,27 +8,26 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.Globals;
 import net.sf.genomeview.gui.viztracks.TickmarkTrack;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.Entry;
-import net.sf.jannot.Global;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.SyntenicData;
 import net.sf.jannot.exception.ReadFailedException;
 
 public class TrackListTest {
 
-	private final Global global;
+	private final Globals globals;
 
 	public TrackListTest() throws IOException, ReadFailedException {
-		global = new Global();
+		globals = new Globals();
 	}
 
 	@Test
 	public void testThreadSafeIterator() {
-		Model model = new Model("id", global, new Configuration(global));
+		Model model = new Model("id", globals);
 
 		TrackList tracklist = new TrackList(model);
 		// add an extra entry
@@ -47,9 +46,9 @@ public class TrackListTest {
 	 * @return a test entry
 	 */
 	private Entry getEntry() {
-		Entry e = new Entry("entry", global);
+		Entry e = new Entry("entry", globals.getGlobal());
 		SyntenicData syntenic = new SyntenicData(new ArrayList<>(),
-				global.getLog());
+				globals.getLog());
 		e.add(new StringKey("data1"), syntenic);
 		return e;
 	}

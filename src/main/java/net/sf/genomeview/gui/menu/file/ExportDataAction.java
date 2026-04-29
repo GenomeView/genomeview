@@ -6,7 +6,6 @@ package net.sf.genomeview.gui.menu.file;
 import java.awt.event.ActionEvent;
 import java.util.Observable;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.ExportDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
@@ -20,7 +19,7 @@ import net.sf.genomeview.gui.menu.AbstractModelAction;
 public class ExportDataAction extends AbstractModelAction {
 
 	public ExportDataAction(Model model) {
-		super(MessageManager.getString("filemenu.export_data"), model);
+		super(model.getMessageMgr().getString("filemenu.export_data"), model);
 
 	}
 

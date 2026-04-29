@@ -7,8 +7,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import net.sf.genomeview.core.Globals;
 import net.sf.genomeview.gui.StaticUtils;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * Opens a URL in a browser window.
@@ -20,17 +20,17 @@ import tudelft.utilities.logging.Reporter;
 public class OpenURLAction extends AbstractAction {
 
 	private final String url;
-	private final Reporter log;
+	private final Globals globals;
 
-	public OpenURLAction(String title, String url, Reporter log) {
+	public OpenURLAction(String title, String url, Globals globals) {
 		super(title);
 		this.url = url;
-		this.log = log;
+		this.globals = globals;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		StaticUtils.browse(url, log);
+		StaticUtils.browse(url, globals);
 
 	}
 

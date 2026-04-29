@@ -34,12 +34,13 @@ public class SaveImage extends AbstractAction {
 	private Model model;
 
 	public SaveImage(Model model) {
-		super(MessageManager.getString("filemenu.save_image"));
+		super(model.getMessageMgr().getString("filemenu.save_image"));
 		this.model = model;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		final MessageManager mm = model.getMessageMgr();
 		final Configuration config = model.getConfiguration();
 		final JFileChooser chooser = new JFileChooser(
 				config.getFile("lastDirectory"));
@@ -53,7 +54,7 @@ public class SaveImage extends AbstractAction {
 			if (ef.exists()) {
 				int confirm = JOptionPane.showConfirmDialog(
 						model.getGUIManager().getMainWindow(),
-						MessageManager.getString("filemenu.save_image_warn"));
+						mm.getString("filemenu.save_image_warn"));
 				if (confirm != JOptionPane.YES_OPTION) {
 					return;
 				}
@@ -61,7 +62,7 @@ public class SaveImage extends AbstractAction {
 			}
 
 			final Hider h = new Hider(model,
-					MessageManager.getString("filemenu.exporting_image"));
+					mm.getString("filemenu.exporting_image"));
 			SwingUtilities.invokeLater(new Runnable() {
 
 				@Override

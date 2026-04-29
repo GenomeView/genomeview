@@ -31,22 +31,19 @@ import net.sf.jannot.EntrySet;
 final class EntryListModel implements Observer, ComboBoxModel<Entry> {
 
 	private Model model;
+	private int lastSize = 0;
+	private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
+	private List<Entry> tmpList = new ArrayList<Entry>();
 
 	public EntryListModel(Model model) {
 		model.addObserver(this);
 		this.model = model;
 	}
 
-	private static final long serialVersionUID = -3028394066023453566L;
-
-	private int lastSize = 0;
-
-	private List<Entry> tmpList = new ArrayList<Entry>();
-
 	@Override
 	public Entry getElementAt(int i) {
 		if (tmpList.size() == 0 || i >= tmpList.size()) {
-			return new DummyEntry(model.getGlobal());
+			return new DummyEntry(model.getGlobals());
 		} else {
 			return tmpList.get(i);
 		}
@@ -100,8 +97,6 @@ final class EntryListModel implements Observer, ComboBoxModel<Entry> {
 		}
 
 	}
-
-	private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
 
 	@Override
 	public void addListDataListener(ListDataListener l) {

@@ -43,8 +43,9 @@ public class MergeFeatureDialog extends JDialog {
 
 	public MergeFeatureDialog(final Model model) {
 		super(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("mergefeatures.title"));
+				model.getMessageMgr().getString("mergefeatures.title"));
 		final MergeFeatureDialog _self = this;
+		final MessageManager mm = model.getMessageMgr();
 		setModal(true);
 		setAlwaysOnTop(true);
 
@@ -60,10 +61,10 @@ public class MergeFeatureDialog extends JDialog {
 
 		ButtonGroup mergeType = new ButtonGroup();
 		final JRadioButton intron = new JRadioButton(
-				MessageManager.getString("mergefeatures.merge_space_intron"));
+				mm.getString("mergefeatures.merge_space_intron"));
 		intron.setSelected(true);
 		final JRadioButton exon = new JRadioButton(
-				MessageManager.getString("mergefeatures.merge_space_exon"));
+				mm.getString("mergefeatures.merge_space_exon"));
 		mergeType.add(intron);
 		mergeType.add(exon);
 		gc.gridwidth = 2;
@@ -71,8 +72,8 @@ public class MergeFeatureDialog extends JDialog {
 		cp.setLayout(new BorderLayout());
 		cp.add(intron, BorderLayout.NORTH);
 		cp.add(exon, BorderLayout.SOUTH);
-		c.add(new TitledComponent(
-				MessageManager.getString("mergefeatures.merge_type"), cp), gc);
+		c.add(new TitledComponent(mm.getString("mergefeatures.merge_type"), cp),
+				gc);
 		gc.gridy++;
 		setBackground(exon.getBackground());
 		// final TypeCombo select = new TypeCombo(model);
@@ -91,12 +92,14 @@ public class MergeFeatureDialog extends JDialog {
 			} else if (f.getQualifiersKeys().contains("ID")) {
 				label = f.qualifier("ID") + " (" + label + ")";
 			}
-			if (label.length() > 50)
+			if (label.length() > 50) {
 				label = label.substring(0, 50) + "...";
+			}
 			JRadioButton button = new JRadioButton(label);
 			button.setActionCommand(f.toString() + f.hashCode());
-			if (index == 0)
+			if (index == 0) {
 				button.setSelected(true);
+			}
 			bg.add(button);
 
 			mapping.put(button.getActionCommand(), f);
@@ -104,21 +107,21 @@ public class MergeFeatureDialog extends JDialog {
 			// fs[index++] = f;
 		}
 		// System.out.println(mapping);
-		c.add(new TitledComponent(
-				MessageManager.getString("mergefeatures.master_feature"), cp),
-				gc);
+		c.add(new TitledComponent(mm.getString("mergefeatures.master_feature"),
+				cp), gc);
 		gc.gridy++;
 
 		// c.add(select, gc);
-		final JCheckBox remove = new JCheckBox(MessageManager
-				.getString("mergefeatures.remove_original_after_merger"));
+		final JCheckBox remove = new JCheckBox(
+				mm.getString("mergefeatures.remove_original_after_merger"));
 		gc.gridy++;
 		c.add(remove, gc);
 		gc.gridwidth = 1;
 		gc.gridy++;
-		JButton ok = new JButton(MessageManager.getString("button.ok"));
+		JButton ok = new JButton(mm.getString("button.ok"));
 		ok.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 
 				List<Location> list = new ArrayList<Location>();
@@ -174,9 +177,10 @@ public class MergeFeatureDialog extends JDialog {
 					Set<Feature> toRemove = new HashSet<Feature>();
 					toRemove.addAll(
 							model.selectionModel().getFeatureSelection());
-					for (Feature rf : toRemove)
+					for (Feature rf : toRemove) {
 						model.vlm.getVisibleEntry()
 								.getMemoryAnnotation(rf.type()).remove(rf);
+					}
 				}
 				model.selectionModel().clearLocationSelection();
 
@@ -185,9 +189,10 @@ public class MergeFeatureDialog extends JDialog {
 			}
 
 		});
-		JButton cancel = new JButton(MessageManager.getString("button.cancel"));
+		JButton cancel = new JButton(mm.getString("button.cancel"));
 		cancel.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
 

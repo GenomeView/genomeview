@@ -54,34 +54,35 @@ public class TrackConfig extends Observable {
 	 *                model.
 	 */
 	protected TrackConfig(Model model, DataKey dataKey) {
+		final MessageManager mm = model.getMessageMgr();
 		this.dataKey = dataKey;
 		this.model = model;
-		guicontainer.add(
-				new JLabel(MessageManager.getString("trackconfig.track_key")
-						+ " \n" + dataKey),
+		guicontainer.add(new JLabel(
+				mm.getString("trackconfig.track_key") + " \n" + dataKey),
 				guicontainer.gc);
 		guicontainer.gc.gridy++;
 
-		guicontainer.add(new StringConfig("track:alias:" + dataKey,
-				MessageManager.getString("trackconfig.track_alias"), model),
+		guicontainer.add(
+				new StringConfig("track:alias:" + dataKey,
+						mm.getString("trackconfig.track_alias"), model),
 				guicontainer.gc);
 		guicontainer.gc.gridy++;
 		model.getConfiguration().getVisible(dataKey);
-		guicontainer.add(new BooleanConfig("track:visible:" + dataKey,
-				MessageManager.getString("trackconfig.track_visible"), model),
+		guicontainer.add(
+				new BooleanConfig("track:visible:" + dataKey,
+						mm.getString("trackconfig.track_visible"), model),
 				guicontainer.gc);
 		guicontainer.gc.gridy++;
-		guicontainer.add(new BooleanConfig("track:highlight:" + dataKey,
-				MessageManager.getString("trackconfig.track_highlight"), model),
+		guicontainer.add(
+				new BooleanConfig("track:highlight:" + dataKey,
+						mm.getString("trackconfig.track_highlight"), model),
 				guicontainer.gc);
 
 		if (isCollapsible()) {
 			guicontainer.gc.gridy++;
 			guicontainer.add(
 					new BooleanConfig("track:collapsed:" + dataKey,
-							MessageManager.getString(
-									"trackconfig.track_collapsed"),
-							model),
+							mm.getString("trackconfig.track_collapsed"), model),
 					guicontainer.gc);
 		}
 

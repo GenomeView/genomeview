@@ -6,7 +6,6 @@ package net.sf.genomeview.gui.menu.file;
 import java.awt.event.ActionEvent;
 import java.util.Observable;
 
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.config.ConfigurationDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
@@ -15,7 +14,7 @@ import net.sf.genomeview.gui.menu.AbstractModelAction;
 public class ShowConfigurationAction extends AbstractModelAction {
 
 	public ShowConfigurationAction(Model model) {
-		super(MessageManager.getString("filemenu.configuration"), model);
+		super(model.getMessageMgr().getString("filemenu.configuration"), model);
 	}
 
 	@Override

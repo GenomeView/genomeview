@@ -12,7 +12,6 @@ import java.util.Observable;
 import javax.swing.KeyStroke;
 
 import net.sf.genomeview.BufferSeq;
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.SelectedSequenceDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
@@ -29,7 +28,7 @@ import net.sf.jannot.refseq.Sequence;
 public class CopySequenceAction extends AbstractModelAction {
 
 	public CopySequenceAction(Model model) {
-		super(MessageManager.getString("editmenu.copy_sequence"), model);
+		super(model.getMessageMgr().getString("editmenu.copy_sequence"), model);
 		super.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("control C"));
 	}
 

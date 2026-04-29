@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.util.Observable;
 
 import net.sf.genomeview.core.AnalyzedFeature;
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
@@ -21,11 +20,12 @@ import net.sf.jannot.utils.SequenceTools;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class ExtendToStartCodonAction extends AbstractModelAction {
 
 	public ExtendToStartCodonAction(Model model) {
-		super(MessageManager.getString("editmenu.extend_to_next_start_codon"),
-				model);
+		super(model.getMessageMgr()
+				.getString("editmenu.extend_to_next_start_codon"), model);
 		model.addObserver(this);
 		update(null, null);
 

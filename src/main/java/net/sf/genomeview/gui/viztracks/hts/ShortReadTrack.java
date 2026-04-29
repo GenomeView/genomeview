@@ -159,7 +159,7 @@ public class ShortReadTrack extends Track {
 
 	}
 
-	private static class InsertionTooltip extends JWindow {
+	private class InsertionTooltip extends JWindow {
 
 		private static final long serialVersionUID = -7416732151483650659L;
 
@@ -184,8 +184,8 @@ public class ShortReadTrack extends Track {
 			text.append("<html>");
 
 			if (sri != null) {
-				text.append(MessageManager.getString("shortreadtrack.insertion")
-						+ " ");
+				text.append(model.getMessageMgr()
+						.getString("shortreadtrack.insertion") + " ");
 				byte[] bases = sri.esr.getReadBases();
 				for (int i = sri.start; i < sri.start + sri.len; i++) {
 					text.append((char) bases[i]);
@@ -207,7 +207,7 @@ public class ShortReadTrack extends Track {
 
 	}
 
-	private static class ReadInfo extends JWindow {
+	private class ReadInfo extends JWindow {
 
 		private static final long serialVersionUID = -7416732151483650659L;
 
@@ -225,6 +225,7 @@ public class ShortReadTrack extends Track {
 		}
 
 		public void set(MouseEvent e, SAMRecord sr) {
+			final MessageManager mm = model.getMessageMgr();
 			if (sr == null) {
 				return;
 			}
@@ -232,29 +233,27 @@ public class ShortReadTrack extends Track {
 			text.append("<html>");
 
 			if (sr != null) {
-				text.append(MessageManager.getString("shortreadtrack.name")
-						+ " " + sr.getReadName() + "<br/>");
-				text.append(MessageManager.getString("shortreadtrack.len") + " "
+				text.append(mm.getString("shortreadtrack.name") + " "
+						+ sr.getReadName() + "<br/>");
+				text.append(mm.getString("shortreadtrack.len") + " "
 						+ sr.getReadLength() + "<br/>");
-				text.append(MessageManager.getString("shortreadtrack.cigar")
-						+ " " + sr.getCigarString() + "<br/>");
-				text.append(MessageManager.getString("shortreadtrack.sequence")
-						+ " " + rerun(sr.getReadString()) + "<br/>");
-				text.append(MessageManager.getString("shortreadtrack.paired")
-						+ " " + sr.getReadPairedFlag() + "<br/>");
+				text.append(mm.getString("shortreadtrack.cigar") + " "
+						+ sr.getCigarString() + "<br/>");
+				text.append(mm.getString("shortreadtrack.sequence") + " "
+						+ rerun(sr.getReadString()) + "<br/>");
+				text.append(mm.getString("shortreadtrack.paired") + " "
+						+ sr.getReadPairedFlag() + "<br/>");
 				if (sr.getReadPairedFlag()) {
 					if (!sr.getMateUnmappedFlag()) {
-						text.append(
-								MessageManager.getString("shortreadtrack.mate")
-										+ " " + sr.getMateReferenceName() + ":"
-										+ sr.getMateAlignmentStart() + "<br/>");
+						text.append(mm.getString("shortreadtrack.mate") + " "
+								+ sr.getMateReferenceName() + ":"
+								+ sr.getMateAlignmentStart() + "<br/>");
 					} else {
-						text.append(MessageManager.getString(
-								"shortreadtrack.mate_missing") + "<br/>");
+						text.append(mm.getString("shortreadtrack.mate_missing")
+								+ "<br/>");
 					}
-					text.append(
-							MessageManager.getString("shortreadtrack.second")
-									+ " " + sr.getFirstOfPairFlag());
+					text.append(mm.getString("shortreadtrack.second") + " "
+							+ sr.getFirstOfPairFlag());
 				}
 				// text.append("<br/>");
 			}

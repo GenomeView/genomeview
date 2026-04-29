@@ -28,7 +28,8 @@ public class SplitFeatureDialog extends JDialog {
 
 	public SplitFeatureDialog(final Model model) {
 		super(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("splitfeaturedialog.title"));
+				model.getMessageMgr().getString("splitfeaturedialog.title"));
+		final MessageManager mm = model.getMessageMgr();
 		final SplitFeatureDialog _self = this;
 		setModal(true);
 		setAlwaysOnTop(true);
@@ -47,7 +48,7 @@ public class SplitFeatureDialog extends JDialog {
 
 		select.setSelectedItem(selected.type());
 
-		final JCheckBox remove = new JCheckBox(MessageManager
+		final JCheckBox remove = new JCheckBox(model.getMessageMgr()
 				.getString("splitfeaturedialog.delete_original_after_split"));
 
 		gc.gridwidth = 2;
@@ -57,9 +58,10 @@ public class SplitFeatureDialog extends JDialog {
 		gc.gridy++;
 		gc.gridwidth = 1;
 
-		JButton ok = new JButton(MessageManager.getString("button.ok"));
+		JButton ok = new JButton(mm.getString("button.ok"));
 		ok.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 
 				assert (model.selectionModel().getLocationSelection()
@@ -75,10 +77,11 @@ public class SplitFeatureDialog extends JDialog {
 				Location query = model.selectionModel().getLocationSelection()
 						.last();
 				for (Location l : f.location()) {
-					if (l.compareTo(query) == -1)
+					if (l.compareTo(query) == -1) {
 						upstream.add(l.copy());
-					else
+					} else {
 						downstream.add(l.copy());
+					}
 				}
 
 				/* Create left feature */
@@ -88,12 +91,6 @@ public class SplitFeatureDialog extends JDialog {
 						.add(left);// //.annotation.add(left);
 
 				/* Create right feature */
-				//
-				// for (Location l :
-				// f.location().tailSet(model.selectionModel().getLocationSelection().last()))
-				// {
-				// downstream.add(l.copy());
-				// }
 				Feature right = f.copy();
 				right.setLocation(downstream);
 				model.vlm.getVisibleEntry().getMemoryAnnotation(right.type())
@@ -112,9 +109,10 @@ public class SplitFeatureDialog extends JDialog {
 			}
 
 		});
-		JButton cancel = new JButton(MessageManager.getString("button.cancel"));
+		JButton cancel = new JButton(mm.getString("button.cancel"));
 		cancel.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				_self.dispose();
 

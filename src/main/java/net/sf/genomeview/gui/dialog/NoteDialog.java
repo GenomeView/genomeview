@@ -12,7 +12,6 @@ import javax.swing.JDialog;
 import javax.swing.JTextField;
 
 import be.abeel.util.Pair;
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.QualifierCombo;
@@ -26,7 +25,7 @@ public class NoteDialog extends JDialog {
 
 	private NoteDialog(final Model model) {
 		super(model.getGUIManager().getMainWindow(),
-				MessageManager.getString("notedialog.title"));
+				model.getMessageMgr().getString("notedialog.title"));
 		setModal(true);
 
 		term = new QualifierCombo(model.getConfiguration());
@@ -36,7 +35,7 @@ public class NoteDialog extends JDialog {
 
 		value = new JTextField();
 		add(value, BorderLayout.CENTER);
-		JButton ok = new JButton(MessageManager.getString("button.ok"));
+		JButton ok = new JButton(model.getMessageMgr().getString("button.ok"));
 		this.getRootPane().setDefaultButton(ok);
 		ok.addActionListener(new ActionListener() {
 

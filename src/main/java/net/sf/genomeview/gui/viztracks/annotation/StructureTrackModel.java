@@ -28,7 +28,6 @@ import javax.swing.JButton;
 
 import be.abeel.gui.GridBagPanel;
 import be.abeel.util.DefaultHashMap;
-import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.StructureTrackConfig;
 import net.sf.genomeview.gui.viztracks.TrackConfig;
@@ -72,7 +71,7 @@ public class StructureTrackModel extends TrackConfig {
 		final StructureTrackModel _self = this;
 		out.gc.gridy++;
 		out.add(new JButton(new AbstractAction(
-				MessageManager.getString("structuretrack.configure")) {
+				model.getMessageMgr().getString("structuretrack.configure")) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {

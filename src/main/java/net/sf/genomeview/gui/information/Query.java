@@ -9,9 +9,9 @@ import java.util.logging.Level;
 
 import javax.swing.Icon;
 
+import net.sf.genomeview.core.Globals;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.gui.StaticUtils;
-import tudelft.utilities.logging.Reporter;
 
 /**
  * Class representing a website query.
@@ -59,15 +59,15 @@ public class Query {
 		return label;
 	}
 
-	public void query(String q, Reporter log) {
+	public void query(String q, Globals globals) {
 		String query;
 		try {
 			query = queryURL.replaceAll("%query%",
 					URLEncoder.encode(q.trim(), "UTF-8"));
-			StaticUtils.browse(query, log);
+			StaticUtils.browse(query, globals);
 		} catch (UnsupportedEncodingException e) {
 			// this is probably a bug, hence severe
-			log.log(Level.SEVERE, "Failed to open query", e);
+			globals.getLog().log(Level.SEVERE, "Failed to open query", e);
 		}
 	}
 
