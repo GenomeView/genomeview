@@ -33,23 +33,23 @@ import net.sf.jannot.Type;
 public class Configuration {
 	private final Global global;
 
-	private static File confDir;
+	private final File confDir;
 
 	/* Map with resource configuration */
-	private static HashMap<String, String> resourceMap = new HashMap<String, String>();
+	private final HashMap<String, String> resourceMap = new HashMap<String, String>();
 
 	/* Map with default genomeview configuration */
-	private static HashMap<String, String> defaultMap = new HashMap<String, String>();
+	private final HashMap<String, String> defaultMap = new HashMap<String, String>();
 
 	/* Map with user configuration */
-	private static HashMap<String, String> localMap = new HashMap<String, String>();
+	private final HashMap<String, String> localMap = new HashMap<String, String>();
 
 	/* Map with extra configuration */
-	private static HashMap<String, String> extraMap = new HashMap<String, String>();
+	private final HashMap<String, String> extraMap = new HashMap<String, String>();
 
-	private static Properties gvProperties = new Properties();
+	private final Properties gvProperties = new Properties();
 
-	private static File configFile;
+	private File configFile;
 
 	/**
 	 * @param global the {@link Global} constants from jannot
@@ -61,25 +61,8 @@ public class Configuration {
 	 */
 	public Configuration(Global global) {
 		this.global = global;
-		String s = System.getProperty("user.home");
-		confDir = new File(s + "/.genomeview");
-		if (!confDir.exists()) {
-			if (!confDir.mkdir()) {
-//				logger.warn("Could not create configuration in user directory: "
-//						+ confDir + ", let's try run folder.");
-				confDir = new File(".genomeview");
-				if (!confDir.exists()) {
-					if (!confDir.mkdir()) {
-//						logger.error(
-//								"Could not create configuration in runtime directory directory: "
-//										+ confDir);
-						confDir = null;
-					}
-				}
-			}
-
-		}
-		// logger.info("User config: " + confDir);
+		this.confDir = findOurDirectory();
+		global.getLog().log(Level.INFO, "User config: " + confDir);
 
 		try {
 			load();
@@ -92,6 +75,32 @@ public class Configuration {
 			throw new IllegalStateException("Failed to load configuration", e);
 		}
 
+	}
+
+	/**
+	 * 
+	 * @return our directory, or null if we can't find or make it.
+	 */
+	private File findOurDirectory() {
+		String s = System.getProperty("user.home");
+		File dir = new File(s + "/.genomeview");
+		if (!dir.exists()) {
+			if (!dir.mkdir()) {
+				global.getLog().log(Level.WARNING,
+						"Could not create configuration in user directory: "
+								+ dir + ", let's try run folder.");
+				dir = new File(".genomeview");
+				if (!dir.exists()) {
+					if (!dir.mkdir()) {
+						global.getLog().log(Level.WARNING,
+								"Could not create configuration in runtime directory directory: "
+										+ dir);
+						dir = null;
+					}
+				}
+			}
+		}
+		return dir;
 	}
 
 	/**
