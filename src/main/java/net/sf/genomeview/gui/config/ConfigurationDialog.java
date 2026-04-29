@@ -25,9 +25,9 @@ import javax.swing.JTabbedPane;
 import be.abeel.gui.GridBagPanel;
 import be.abeel.gui.TitledComponent;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.NotificationTypes;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.dialog.HelpButton;
 

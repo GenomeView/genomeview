@@ -28,8 +28,8 @@ import java.util.logging.Level;
 
 import javax.swing.JDialog;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 
 /**

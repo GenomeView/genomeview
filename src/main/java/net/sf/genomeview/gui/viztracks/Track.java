@@ -30,10 +30,10 @@ import java.util.logging.Level;
 import javax.swing.JViewport;
 
 import net.sf.genomeview.core.Icons;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrack;
 import net.sf.jannot.Data;
 import net.sf.jannot.DataKey;

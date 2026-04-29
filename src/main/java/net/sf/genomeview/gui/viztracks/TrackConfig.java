@@ -25,8 +25,8 @@ import java.util.Observable;
 import javax.swing.JLabel;
 
 import be.abeel.gui.GridBagPanel;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.config.BooleanConfig;
 import net.sf.genomeview.gui.config.StringConfig;
 import net.sf.jannot.DataKey;

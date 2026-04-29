@@ -13,8 +13,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 

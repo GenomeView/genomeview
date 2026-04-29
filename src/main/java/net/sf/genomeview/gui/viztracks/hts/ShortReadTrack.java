@@ -22,9 +22,9 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
 import htsjdk.samtools.SAMRecord;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.ShortReadProvider;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;

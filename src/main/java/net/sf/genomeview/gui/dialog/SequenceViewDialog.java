@@ -41,9 +41,9 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
 import be.abeel.io.ExtensionManager;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Blast;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;

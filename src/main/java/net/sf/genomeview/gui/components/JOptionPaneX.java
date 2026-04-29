@@ -11,7 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.text.html.StyleSheet;
 
-import net.sf.genomeview.gui.MessageManager;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import tudelft.utilities.logging.ReportToLogger;
 import tudelft.utilities.logging.Reporter;

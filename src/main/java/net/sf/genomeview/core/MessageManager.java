@@ -1,4 +1,4 @@
-package net.sf.genomeview.gui;
+package net.sf.genomeview.core;
 
 import java.text.MessageFormat;
 import java.util.Locale;

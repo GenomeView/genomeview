@@ -22,9 +22,9 @@ import java.util.TreeMap;
 
 import javax.swing.JViewport;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;

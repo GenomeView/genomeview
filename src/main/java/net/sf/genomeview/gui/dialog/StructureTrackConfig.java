@@ -14,9 +14,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 
 import be.abeel.gui.GridBagPanel;
-
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.viztracks.annotation.StructureTrackModel;
 import net.sf.jannot.Type;

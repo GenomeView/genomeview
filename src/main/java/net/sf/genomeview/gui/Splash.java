@@ -18,6 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JWindow;
 import javax.swing.border.Border;
 
+import net.sf.genomeview.core.MessageManager;
+
 /**
  * 
  * @author Thomas Abeel

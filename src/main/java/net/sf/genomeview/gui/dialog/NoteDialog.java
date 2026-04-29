@@ -12,8 +12,8 @@ import javax.swing.JDialog;
 import javax.swing.JTextField;
 
 import be.abeel.util.Pair;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.QualifierCombo;
 import net.sf.jannot.Feature;

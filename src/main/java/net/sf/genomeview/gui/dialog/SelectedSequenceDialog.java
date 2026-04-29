@@ -17,8 +17,8 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
 import net.sf.genomeview.BufferSeq;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;

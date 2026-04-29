@@ -11,9 +11,9 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
 import net.sf.genomeview.core.Icons;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
 

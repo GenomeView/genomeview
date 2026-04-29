@@ -12,8 +12,8 @@ import com.eaio.stringsearch.BoyerMooreHorspoolRaita;
 import com.eaio.stringsearch.ShiftOrMismatches;
 
 import net.sf.genomeview.BufferSeq;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.search.SearchDialog.SequenceType;
 import net.sf.jannot.AminoAcidMapping;
 import net.sf.jannot.Location;

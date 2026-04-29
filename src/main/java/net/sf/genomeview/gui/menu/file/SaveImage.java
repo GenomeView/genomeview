@@ -18,8 +18,8 @@ import javax.swing.SwingUtilities;
 
 import be.abeel.io.ExtensionManager;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.Hider;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel;
 

@@ -17,8 +17,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import be.abeel.gui.TitledComponent;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.Entry;
 
 /**

@@ -9,8 +9,8 @@ import java.util.Observer;
 
 import javax.swing.JOptionPane;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 
 /**
  * 

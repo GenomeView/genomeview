@@ -39,9 +39,9 @@ import javax.swing.JRadioButton;
 import org.broad.igv.track.WindowFunction;
 
 import be.abeel.gui.GridBagPanel;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.PileProvider;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.config.BooleanConfig;
 import net.sf.genomeview.gui.config.ConfigListener;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;

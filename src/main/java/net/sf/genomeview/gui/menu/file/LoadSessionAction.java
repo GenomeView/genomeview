@@ -13,9 +13,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
-import net.sf.genomeview.gui.MessageManager;
 
 /**
  * Action to handle loading sessions.

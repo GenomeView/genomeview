@@ -37,6 +37,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import be.abeel.gui.TitledComponent;
+import net.sf.genomeview.core.MessageManager;
 
 /**
  * 

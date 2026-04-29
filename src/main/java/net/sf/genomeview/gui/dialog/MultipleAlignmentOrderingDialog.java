@@ -21,8 +21,8 @@ import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.genomeview.core.BiMap;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 
 
 /**

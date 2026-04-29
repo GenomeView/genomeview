@@ -15,6 +15,7 @@ import java.util.Random;
 import java.util.logging.Level;
 
 import be.abeel.net.URIFactory;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.dialog.EditFeatureWindow;
 import net.sf.genomeview.gui.dialog.SplitFeatureDialog;

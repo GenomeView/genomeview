@@ -15,6 +15,7 @@ import javax.swing.SwingUtilities;
 
 import be.abeel.concurrency.DaemonThread;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.jannot.Global;
 import net.sf.jannot.exception.ReadFailedException;
 import tudelft.utilities.logging.Reporter;

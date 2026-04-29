@@ -8,8 +8,8 @@ import java.util.Observable;
 
 import javax.swing.KeyStroke;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.SaveDialog;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 

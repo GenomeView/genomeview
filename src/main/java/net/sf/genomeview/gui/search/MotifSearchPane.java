@@ -17,8 +17,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.search.SearchDialog.SequenceType;
 import net.sf.jannot.Location;
 import be.abeel.gui.TitledComponent;

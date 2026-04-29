@@ -21,8 +21,8 @@ import java.awt.EventQueue;
 
 import javax.swing.JTabbedPane;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.EscapeDialog;
 

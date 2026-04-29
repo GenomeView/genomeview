@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;

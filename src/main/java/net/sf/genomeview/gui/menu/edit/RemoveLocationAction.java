@@ -10,8 +10,8 @@ import java.util.Observer;
 import java.util.Set;
 import java.util.SortedSet;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Data;
 import net.sf.jannot.Feature;

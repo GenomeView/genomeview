@@ -9,8 +9,8 @@ import java.util.Observable;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 
 @SuppressWarnings("serial")

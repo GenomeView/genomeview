@@ -21,9 +21,9 @@ import javax.swing.JWindow;
 import javax.swing.border.Border;
 
 import net.sf.genomeview.core.Colors;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.Mouse;
 import net.sf.genomeview.gui.viztracks.Track;
 import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;

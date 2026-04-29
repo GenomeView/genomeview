@@ -11,9 +11,9 @@ import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
-import net.sf.genomeview.gui.MessageManager;
 
 /**
  * Action that takes care of saving all loaded data into a session file.

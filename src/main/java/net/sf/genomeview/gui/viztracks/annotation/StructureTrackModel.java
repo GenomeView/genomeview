@@ -28,8 +28,8 @@ import javax.swing.JButton;
 
 import be.abeel.gui.GridBagPanel;
 import be.abeel.util.DefaultHashMap;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.dialog.StructureTrackConfig;
 import net.sf.genomeview.gui.viztracks.TrackConfig;
 import net.sf.jannot.StringKey;

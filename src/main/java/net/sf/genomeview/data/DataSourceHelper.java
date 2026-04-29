@@ -18,7 +18,7 @@ import be.abeel.gui.MemoryWidget;
 import be.abeel.io.ExtensionManager;
 import htsjdk.samtools.seekablestream.SeekableFileStream;
 import htsjdk.samtools.seekablestream.SeekableStream;
-import net.sf.genomeview.gui.MessageManager;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.gui.components.JOptionPaneX;
 import net.sf.jannot.ConvertWig2TDF;
 import net.sf.jannot.exception.ReadFailedException;

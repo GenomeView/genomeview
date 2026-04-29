@@ -8,9 +8,9 @@ import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.LogWindow;
-import net.sf.genomeview.gui.MessageManager;
 
 /**
  * Action to show the log window

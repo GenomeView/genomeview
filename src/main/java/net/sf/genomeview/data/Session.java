@@ -19,7 +19,7 @@ import javax.swing.JOptionPane;
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
 import net.sf.genomeview.core.Configuration;
-import net.sf.genomeview.gui.MessageManager;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.gui.dialog.TryAgainHandler;
 import net.sf.jannot.Location;
 import net.sf.jannot.source.DataSource;

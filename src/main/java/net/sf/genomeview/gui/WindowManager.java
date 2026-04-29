@@ -28,6 +28,7 @@ import jargs.gnu.CmdLineParser.IllegalOptionValueException;
 import jargs.gnu.CmdLineParser.UnknownOptionException;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.MainMenu;
 import net.sf.jannot.Cleaner;

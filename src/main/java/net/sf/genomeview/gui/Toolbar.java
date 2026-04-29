@@ -13,6 +13,7 @@ import javax.swing.JList;
 import javax.swing.JToolBar;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.components.AAMappingChooser;
 import net.sf.genomeview.gui.menu.edit.RedoAction;

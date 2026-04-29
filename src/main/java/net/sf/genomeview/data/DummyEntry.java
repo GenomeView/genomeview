@@ -3,7 +3,7 @@
  */
 package net.sf.genomeview.data;
 
-import net.sf.genomeview.gui.MessageManager;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Global;
 

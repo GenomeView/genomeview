@@ -16,8 +16,8 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 import be.abeel.concurrency.DaemonThreadFactory;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 
 /**
  * Javascript Handler for GenomeView

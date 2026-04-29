@@ -9,6 +9,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Level;
 
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;

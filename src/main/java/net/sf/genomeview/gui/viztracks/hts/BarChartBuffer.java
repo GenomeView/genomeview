@@ -14,13 +14,13 @@ import java.util.logging.Level;
 
 import net.sf.genomeview.core.Colors;
 import net.sf.genomeview.core.Configuration;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.core.NoFailIterable;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.provider.DataCallback;
 import net.sf.genomeview.data.provider.PileProvider;
 import net.sf.genomeview.data.provider.Status;
 import net.sf.genomeview.gui.Convert;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.jannot.Location;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.refseq.Sequence;

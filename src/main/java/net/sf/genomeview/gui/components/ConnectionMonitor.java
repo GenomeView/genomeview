@@ -15,7 +15,7 @@ import be.abeel.concurrency.DaemonThread;
 import be.abeel.io.LineIterator;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Icons;
-import net.sf.genomeview.gui.MessageManager;
+import net.sf.genomeview.core.MessageManager;
 import tudelft.utilities.logging.Reporter;
 
 /**

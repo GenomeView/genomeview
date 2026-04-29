@@ -13,8 +13,8 @@ import javax.swing.JScrollPane;
 
 import be.abeel.gui.GridBagPanel;
 import be.abeel.gui.MemoryWidget;
+import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
-import net.sf.genomeview.gui.MessageManager;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.genomeview.gui.dialog.HelpButton;
 import net.sf.jannot.Type;
