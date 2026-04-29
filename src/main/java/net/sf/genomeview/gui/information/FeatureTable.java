@@ -37,19 +37,20 @@ import net.sf.jannot.Feature;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class FeatureTable extends JTable implements Observer, ActionListener {
 
 	final FeatureTableModel listModel;
 
-	private Model model;
+	private final Model model;
 
 	public FeatureTable(final Model model) {
 		super(new FeatureTableModel(model));
+		this.model = model;
 		FeatureTableSelectionModel ftsm = new FeatureTableSelectionModel();
 		setSelectionModel(ftsm);
 		setDefaultRenderer(String.class, new FeatureTableCellRenderer());
 		model.addObserver(this);
-		this.model = model;
 		listModel = (FeatureTableModel) this.getModel();
 
 		// setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -107,6 +108,7 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 
 	}
 
+	@SuppressWarnings("serial")
 	class FeatureTableSelectionModel extends DefaultListSelectionModel
 			implements Observer {
 

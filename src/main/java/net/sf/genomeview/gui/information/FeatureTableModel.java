@@ -20,28 +20,27 @@ import net.sf.jannot.Type;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class FeatureTableModel extends AbstractTableModel implements Observer {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 320228141380099074L;
-
 	private String[] columns = { "Name" };
+	private Model model;
 
 	@Override
 	public String getColumnName(int column) {
 		return columns[column];
 	}
 
-	private Model model;
-
 	public FeatureTableModel(Model model) {
+		if (model == null) {
+			throw new NullPointerException("model is null");
+		}
 		this.model = model;
 		model.addObserver(this);
 
 	}
 
+	@Override
 	public void update(Observable o, Object arg) {
 		if (arg == NotificationTypes.GENERAL
 				|| arg == NotificationTypes.TRANSLATIONTABLECHANGE
@@ -61,8 +60,9 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	public int getRowCount() {
 		MemoryFeatureAnnotation fa = model.vlm.getVisibleEntry()
 				.getMemoryAnnotation(type);
-		if (fa == null)
+		if (fa == null) {
 			return 0;
+		}
 		return fa.cachedCount();// .noFeatures(type);
 	}
 

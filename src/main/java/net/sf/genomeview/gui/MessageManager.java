@@ -5,8 +5,6 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import net.sf.genomeview.core.Configuration;
-
 /**
  * 
  * @author David Roldan Martinez
@@ -17,10 +15,12 @@ import net.sf.genomeview.core.Configuration;
 public class MessageManager {
 
 	private static ResourceBundle rb;
+	private static Locale loc = Locale.getDefault();
 
-	private static Locale loc = Configuration.instance().get("lang:current")
-			.equals("automatic") ? Locale.getDefault()
-					: new Locale(Configuration.instance().get("lang:current"));
+	// FIXME use original code using the Configuration
+//	private static Locale loc = Configuration.instance().get("lang:current")
+//			.equals("automatic") ? Locale.getDefault()
+//					: new Locale(Configuration.instance().get("lang:current"));
 
 	static {
 		/* Localize Java dialogs */
