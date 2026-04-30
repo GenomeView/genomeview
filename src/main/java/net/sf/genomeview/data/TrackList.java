@@ -231,13 +231,13 @@ public class TrackList implements Iterable<Track> {
 	 * @return true iff the final size equals the start size.
 	 */
 	public synchronized boolean update(Entry e) {
-		model.getLog().log(Level.INFO, "Updating tracks for " + e);
+		model.getLog().log(Level.INFO, "track update, show " + e.getID());
 		int startSize = this.size();
 		/* Graph tracks */
 		for (DataKey key : e) {
 			Data<?> data = e.get(key);
-			model.getLog().log(Level.INFO,
-					"Data " + key + " of type " + data.getClass());
+			model.getLog().log(Level.FINE, "track includes Data " + key
+					+ " of type " + data.getClass());
 
 			if (data instanceof MemoryFeatureAnnotation) {
 				if (!this.containsTrack(key)

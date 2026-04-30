@@ -93,17 +93,28 @@ public class LogWindow extends JFrame implements Reporter {
 	public void log(Level level, String msg, Throwable thrown) {
 		LogRecord record = new LogRecord(level, msg);
 		record.setThrown(thrown);
-		logs.add(record);
-		if (level.intValue() >= Level.WARNING.intValue()
-				|| msg.equals(MAKE_LOG_VISIBLE_REQUEST)) {
-			showOnTop();
-		}
+		// models must be updated only in swing thread.
+		SwingUtilities.invokeLater(() -> {
+			logs.add(record);
+			if (level.intValue() >= Level.WARNING.intValue()
+					|| msg.equals(MAKE_LOG_VISIBLE_REQUEST)) {
+				showNowOnTop();
+			}
+		});
 	}
 
 	/**
-	 * show the window, force it to front.
+	 * show the window, force it to front. threadsafe - actual works on swing
+	 * thread.
 	 */
 	public void showOnTop() {
+		SwingUtilities.invokeLater(() -> showNowOnTop());
+	}
+
+	/**
+	 * Show the window. Not thread safe, only call this from swing thread!
+	 */
+	private void showNowOnTop() {
 		setAlwaysOnTop(true);
 		setVisible(true);
 		setAlwaysOnTop(false);
@@ -117,6 +128,7 @@ public class LogWindow extends JFrame implements Reporter {
 
 	@Override
 	public Dimension getPreferredSize() {
+		// avoid showing 1x1 pixel panel...
 		return new Dimension(400, 400);
 	}
 }
@@ -141,7 +153,7 @@ class LogTableModel implements TableModel {
 	 * @param row the row to get message from
 	 * @return message currently at row.
 	 */
-	public synchronized String getMessage(int row) {
+	public String getMessage(int row) {
 		return logs.get(row).getMessage();
 	}
 
@@ -150,7 +162,7 @@ class LogTableModel implements TableModel {
 	 * @param row the row to get message from
 	 * @return stacjtrace currently at row.
 	 */
-	public synchronized Throwable getStacktrace(int row) {
+	public Throwable getStacktrace(int row) {
 		return logs.get(row).getThrown();
 	}
 
@@ -159,7 +171,7 @@ class LogTableModel implements TableModel {
 	 * 
 	 * @param record a new logrecord to add as first item
 	 */
-	public synchronized void add(LogRecord record) {
+	public void add(LogRecord record) {
 		// this particular order ensures list size never decreases
 		// and helps thread 'safety'
 		logs.add(0, record);
@@ -177,7 +189,7 @@ class LogTableModel implements TableModel {
 	/**
 	 * ONLY CALL THIS FROM INSIDE SWING THREAD.
 	 */
-	private synchronized void notifyListenersOnSwingThread() {
+	private void notifyListenersOnSwingThread() {
 		try {
 			for (TableModelListener l : listeners) {
 				// null just refreshes the entire panel.
@@ -190,7 +202,7 @@ class LogTableModel implements TableModel {
 	}
 
 	@Override
-	public synchronized int getRowCount() {
+	public int getRowCount() {
 		return logs.size();
 	}
 
@@ -222,7 +234,7 @@ class LogTableModel implements TableModel {
 	}
 
 	@Override
-	public synchronized Object getValueAt(int rowIndex, int columnIndex) {
+	public Object getValueAt(int rowIndex, int columnIndex) {
 		LogRecord record = logs.get(rowIndex);
 		switch (columnIndex) {
 		case 0:

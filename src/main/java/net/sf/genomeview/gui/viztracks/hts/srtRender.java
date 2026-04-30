@@ -36,6 +36,7 @@ import net.sf.jannot.shortread.BAMreads;
 import net.sf.jannot.shortread.ShortReadTools;
 
 /**
+ * Renders a ShortReadProvider to a buffered image of fixed size.
  * 
  * @author Thomas Abeel
  * 
@@ -59,6 +60,16 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 	/* Keep track of the last x-coordinate that has been used for painting */
 	private int lastX = 100;
 
+	/**
+	 * create a renderer for the {@link #provider}.
+	 * 
+	 * @param model    the {@link Model}. The current screen size is used for
+	 *                 buffer size. Please create a new srtRender if screen size
+	 *                 changes.
+	 * @param provider the {@link ShortReadProvider}
+	 * @param srtc     the {@link ShortReadTrackConfig}
+	 * @param key
+	 */
 	public srtRender(Model model, ShortReadProvider provider,
 			ShortReadTrackConfig srtc, DataKey key) {
 		model.vlm.addObserver(this);
@@ -68,6 +79,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 		this.srtc = srtc;
 		buffer = new BufferedImage((int) model.vlm.screenWidth(), 20,
 				BufferedImage.TYPE_INT_ARGB);
+		update(null, null);
 
 	}
 

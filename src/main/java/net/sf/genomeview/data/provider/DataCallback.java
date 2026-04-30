@@ -8,10 +8,15 @@ import net.sf.jannot.Location;
  * 
  * @author Thomas Abeel
  *
- * @param <T>
+ * @param <T> the data that will be provided in the future
  */
 public interface DataCallback<T> {
 
-	
-	public void dataReady(Location l,List<T>it);
+	/**
+	 * This should be called when data is available for given location
+	 * 
+	 * @param l  the {@link Location}
+	 * @param it a list of data of type T
+	 */
+	public void dataReady(Location l, List<T> it);
 }

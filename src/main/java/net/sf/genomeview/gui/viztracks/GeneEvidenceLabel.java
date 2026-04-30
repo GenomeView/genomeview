@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.TreeMap;
-import java.util.logging.Level;
 
 import javax.swing.JLabel;
 import javax.swing.JViewport;
@@ -135,7 +134,7 @@ public class GeneEvidenceLabel extends JLabel
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		model.getLog().log(Level.INFO, "model changed, repainting tracks");
+		// model.getLog().log(Level.FINE, "model changed, repainting tracks");
 		repaint();
 
 	}
