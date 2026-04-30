@@ -39,7 +39,7 @@ import tudelft.utilities.logging.Reporter;
 public class DataSourceHelper {
 
 	// singleton utility class.
-	// FIXME maybe this should be a real class with a real Reporter
+	// FIXME maybe this should be a real class
 
 	// shortcuts to often used constants, to make code readable
 	private final static int warn = JOptionPane.WARNING_MESSAGE;

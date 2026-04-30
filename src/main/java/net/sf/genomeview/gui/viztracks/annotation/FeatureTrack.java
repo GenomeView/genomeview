@@ -75,8 +75,6 @@ import net.sf.jannot.Type;
 /**
  * Visualization track for feature tracks.
  * 
- * 
- * 
  * @author Thomas Abeel
  * 
  */
@@ -442,6 +440,7 @@ public class FeatureTrack extends Track {
 
 	}
 
+	@SuppressWarnings("serial")
 	private class FeatureInfoWindow extends JWindow {
 
 		private JLabel floater = new JLabel();

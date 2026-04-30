@@ -168,7 +168,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 					"Instances still running: " + running);
 			if (running < 1) {
 				model.getLog().log(Level.INFO, "No instances left, exiting VM");
-				Cleaner.exit();
+				Cleaner.exit(model.getLog());
 
 				// System.exit(0);
 				model.getLog().log(Level.INFO,
