@@ -536,7 +536,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 				}
 
 			}
-			byte[] readNts = ShortReadTools.construct(rf);
+			byte[] readNts = ShortReadTools.construct(rf, model.getLog());
 			for (int j = rf.getAlignmentStart(); j <= rf
 					.getAlignmentEnd(); j++) {
 				if (j > annotationVisible.end || j < annotationVisible.start) {
