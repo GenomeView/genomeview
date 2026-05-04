@@ -37,10 +37,9 @@ import net.sf.jannot.Location;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class GeneEvidenceLabel extends JLabel
 		implements Observer, MouseListener, MouseMotionListener {
-
-	private static final long serialVersionUID = -8338383664013028337L;
 
 	protected Model model;
 
