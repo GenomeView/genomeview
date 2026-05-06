@@ -82,7 +82,8 @@ public class InitDataLoader {
 			log.log(Level.INFO, "URL commandline option is set: " + cmdUrl);
 
 			try {
-				DataSourceHelper.load(model, new Locator(cmdUrl, log), true);
+				new DataSourceHelper(model).load(new Locator(cmdUrl, log),
+						true);
 			} catch (URISyntaxException | IOException | ReadFailedException e) {
 				log.log(Level.WARNING, "problem loading url " + cmdUrl, e);
 			}
@@ -91,7 +92,8 @@ public class InitDataLoader {
 			log.log(Level.INFO, "File commandline option is set: " + cmdFile);
 
 			try {
-				DataSourceHelper.load(model, new Locator(cmdFile, log), true);
+				new DataSourceHelper(model).load(new Locator(cmdFile, log),
+						true);
 			} catch (URISyntaxException | IOException | ReadFailedException e) {
 				log.log(Level.WARNING, "problem loading file " + cmdFile, e);
 			}
@@ -102,7 +104,7 @@ public class InitDataLoader {
 		for (String s : remArgs) {
 			log.log(Level.INFO, "loading additional from commandline: " + s);
 			try {
-				DataSourceHelper.load(model, new Locator(s, log));
+				new DataSourceHelper(model).load(new Locator(s, log));
 			} catch (Exception e) {
 				log.log(Level.WARNING, "problem loading  " + s, e);
 			}

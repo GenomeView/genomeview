@@ -267,7 +267,7 @@ class InstructionWorker implements Runnable {
 
 	private void doLoad(String s) {
 		try {
-			DataSourceHelper.load(model, new Locator(s, model.getLog()));
+			new DataSourceHelper(model).load(new Locator(s, model.getLog()));
 		} catch (URISyntaxException | IOException | ReadFailedException e) {
 			// FIXME unreachable? load should not crash
 			model.getLog().log(Level.SEVERE, "Failed to load " + s, e);

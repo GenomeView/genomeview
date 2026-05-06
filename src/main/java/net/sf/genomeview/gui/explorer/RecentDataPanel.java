@@ -189,7 +189,7 @@ public class RecentDataPanel extends GridBagPanel {
 					for (String selection : selectionList) {
 						try {
 
-							DataSourceHelper.load(model,
+							new DataSourceHelper(model).load(
 									new Locator(selection, model.getLog()));
 						} catch (Exception e1) {
 							model.getLog().log(Level.WARNING,
@@ -218,7 +218,7 @@ public class RecentDataPanel extends GridBagPanel {
 					for (String selection : selectionList) {
 						try {
 
-							DataSourceHelper.load(model,
+							new DataSourceHelper(model).load(
 									new Locator(selection, model.getLog()));
 						} catch (Exception e1) {
 							model.getLog().log(Level.WARNING,

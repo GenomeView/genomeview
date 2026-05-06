@@ -149,7 +149,7 @@ public class OpenDialog extends JDialog {
 //					DataSource[] out = new DataSource[files.length];
 					try {
 						for (int i = 0; i < files.length; i++) {
-							DataSourceHelper.load(model, new Locator(
+							new DataSourceHelper(model).load(new Locator(
 									files[i].toString(), model.getLog()));
 
 						}
@@ -175,7 +175,7 @@ public class OpenDialog extends JDialog {
 						"Give the URL of the data");
 				if (input != null && input.trim().length() > 0) {
 					try {
-						DataSourceHelper.load(model,
+						new DataSourceHelper(model).load(
 								new Locator(input.trim(), model.getLog()));
 					} catch (IOException | URISyntaxException
 							| ReadFailedException e2) {

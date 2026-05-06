@@ -35,7 +35,7 @@ public class OpenURLButton extends JButton {
 						"Give the URL of the data");
 				if (input != null && input.trim().length() > 0) {
 					try {
-						DataSourceHelper.load(gvModel,
+						new DataSourceHelper(gvModel).load(
 								new Locator(input.trim(), gvModel.getLog()));
 
 					} catch (IOException | URISyntaxException

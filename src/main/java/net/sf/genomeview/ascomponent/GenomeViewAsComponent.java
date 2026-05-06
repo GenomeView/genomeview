@@ -41,9 +41,10 @@ public class GenomeViewAsComponent {
 		frame.setVisible(true);
 
 		Reporter log = globals.getLog();
-		DataSourceHelper.load(model, new Locator(FASTA_EX, log));
-		DataSourceHelper.load(model, new Locator(GFF_EX, log));
-		DataSourceHelper.load(model, new Locator(BAM_EX, log));
+		final DataSourceHelper helper = new DataSourceHelper(model);
+		helper.load(new Locator(FASTA_EX, log));
+		helper.load(new Locator(GFF_EX, log));
+		helper.load(new Locator(BAM_EX, log));
 
 	}
 }

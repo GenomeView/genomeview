@@ -38,31 +38,35 @@ import tudelft.utilities.logging.Reporter;
  */
 public class DataSourceHelper {
 
-	// singleton utility class.
-	// FIXME maybe this should be a real class
-
-	// shortcuts to often used constants, to make code readable
-	private final static int warn = JOptionPane.WARNING_MESSAGE;
-	private final static int error = JOptionPane.ERROR_MESSAGE;
+	private final Model model;
 
 	/**
 	 * 
 	 * @param model the {@link Model}
-	 * @param data  the data to load
-	 * @param log   a {@link Reporter} to log problems to.
+	 */
+	public DataSourceHelper(Model model) {
+		this.model = model;
+
+	}
+
+	/**
+	 * @param data the {@link Locator} for the data to load
 	 * @throws URISyntaxException
 	 * @throws IOException
 	 * @throws ReadFailedException FIXME this can't throw, ?
 	 */
-	public static void load(Model model, Locator data)
+	public void load(Locator data)
 			throws URISyntaxException, IOException, ReadFailedException {
-		load(model, data, false);
+		load(data, false);
 	}
 
 	/**
-	 * FIXME this shouldn't throw?
+	 * @param data the {@link Locator} for the data to load
+	 * @param wait if true, load waits for reader to complete.
+	 * 
+	 *             FIXME this shouldn't throw?
 	 */
-	public static void load(final Model model, Locator data, boolean wait)
+	public void load(Locator data, boolean wait)
 			throws URISyntaxException, IOException, ReadFailedException {
 
 		final MessageManager mm = model.getGlobals().getMessageManager();
@@ -99,13 +103,13 @@ public class DataSourceHelper {
 				model.getLog().log(Level.WARNING, msg);
 				// problem(model, "index_outdated_warn_message",
 				// "index_outdated_warn_title", warn);
-				index(model, data);
+				index(data);
 
 				return;
 
 			} else {
-				problem(model, "index_outdated_error_message",
-						"index_outdated_error_title", warn, data.getName());
+				problem("index_outdated_error_message",
+						"index_outdated_error_title", data.getName());
 			}
 
 			return;
@@ -114,15 +118,15 @@ public class DataSourceHelper {
 
 		if (data.requiresIndex() && index == null) {
 			if (IndexManager.canBuildIndex(data)) {
-				int res = yesno(model, "index_missing_warn", "index_required");
+				int res = yesno("index_missing_warn", "index_required");
 				if (res == JOptionPane.YES_OPTION) {
-					index(model, data);
+					index(data);
 				}
 
 				return;
 
 			} else {
-				problem(model, "couldnt_locate_index", "index_missing", error,
+				problem("couldnt_locate_index", "index_missing",
 						data.getName());
 			}
 
@@ -136,7 +140,7 @@ public class DataSourceHelper {
 					mm.getString("datasourcehelper.wig_not_recommended"),
 					JOptionPane.YES_NO_OPTION);
 			if (res == JOptionPane.YES_OPTION) {
-				convertWig2TDF(model, data, model.getLog());
+				convertWig2TDF(data, model.getLog());
 				return;
 			}
 		}
@@ -144,20 +148,20 @@ public class DataSourceHelper {
 		if (index == null && data.supportsIndex()
 				&& data.length() > 5 * 1024 * 1024) {
 			if (IndexManager.canBuildIndex(data)) {
-				int res = yesno(model, "create_index", "index_missing",
+				int res = yesno("create_index", "index_missing",
 						data.getName());
 				if (res == JOptionPane.YES_OPTION) {
-					index(model, data);
+					index(data);
 					return;
 				}
 
 			}
 
 			if (data.isMaf() && !data.isBlockCompressed()) {
-				int res = yesno(model, "preprocessing_warn",
-						"preprocessing_available", data.getName());
+				int res = yesno("preprocessing_warn", "preprocessing_available",
+						data.getName());
 				if (res == JOptionPane.YES_OPTION) {
-					mafprocess(model, data);
+					mafprocess(data);
 					return;
 				}
 			} else {
@@ -179,15 +183,14 @@ public class DataSourceHelper {
 
 		} else if (index == null && data.length() > 50000000
 				&& !(data.isTDF() || data.isBigWig())) {
-			problem(model, "large_file_warn", "large_file",
-					JOptionPane.ERROR_MESSAGE);
+			problem("large_file_warn", "large_file");
 		}
 		DataSource ds = DataSourceFactory.create(data, index,
 				model.getGlobal());
 		if (ds instanceof AbstractStreamDataSource) {
 			AbstractStreamDataSource asd = ((AbstractStreamDataSource) ds);
 			if (asd.getParser() == null) {
-				Parser tmp = offerParserChoice(model, data);
+				Parser tmp = offerParserChoice(data);
 				if (tmp != null) {
 					asd.setParser(tmp);
 				} else {
@@ -204,8 +207,7 @@ public class DataSourceHelper {
 				&& !data.isBigWig()
 				&& data.length() > (0.75 * MemoryWidget.getAvailable())) {
 			System.out.println("Available mem: " + MemoryWidget.getAvailable());
-			problem(model, "memory_warn", "not_enough_memory", error,
-					data.getName());
+			problem("memory_warn", "not_enough_memory", data.getName());
 			return;
 		}
 
@@ -233,8 +235,7 @@ public class DataSourceHelper {
 	 * @param optinos    The {@link #warn}, {@link #error} etc
 	 * @param params     the additional args to format the message.
 	 */
-	private static void problem(Model model, String messageref, String titleref,
-			int options, String... params) {
+	private void problem(String messageref, String titleref, String... params) {
 		final MessageManager mm = model.getMessageMgr();
 		model.getLog().log(Level.WARNING,
 				mm.formatMessage("datasourcehelper." + messageref, params));
@@ -248,8 +249,7 @@ public class DataSourceHelper {
 	 * 
 	 * @return YES_OPTION or NO_OPTION
 	 */
-	private static int yesno(Model model, String messageref, String titleref,
-			String... params) {
+	private int yesno(String messageref, String titleref, String... params) {
 		final MessageManager mm = model.getMessageMgr();
 		return JOptionPane.showConfirmDialog(
 				model.getGUIManager().getMainWindow(),
@@ -258,8 +258,7 @@ public class DataSourceHelper {
 				JOptionPane.YES_NO_OPTION);
 	}
 
-	private static void convertWig2TDF(final Model model, final Locator data,
-			final Reporter log) {
+	private void convertWig2TDF(final Locator data, final Reporter log) {
 		JFileChooser chooser = new JFileChooser(
 				model.getConfiguration().getFile("lastDirectory"));
 		chooser.resetChoosableFileFilters();
@@ -304,7 +303,7 @@ public class DataSourceHelper {
 						Locator mafdata = new Locator(extFile.toString(), log);
 						log.log(Level.INFO,
 								"Load newly create tdf file as: " + mafdata);
-						load(model, mafdata);
+						load(mafdata);
 					} catch (Exception e) {
 						model.getLog().log(Level.WARNING, "failed to load tdf",
 								e);
@@ -317,7 +316,7 @@ public class DataSourceHelper {
 
 	}
 
-	private static void mafprocess(final Model model, final Locator data) {
+	private void mafprocess(final Locator data) {
 		GenomeViewScheduler.submit(new Task() {
 
 			@Override
@@ -391,7 +390,7 @@ public class DataSourceHelper {
 									model.getLog());
 							model.getLog().log(Level.INFO,
 									"Load newly create mafix as: " + mafdata);
-							load(model, mafdata);
+							load(mafdata);
 
 							// load(out);
 						} catch (IOException | URISyntaxException e1) {
@@ -414,7 +413,7 @@ public class DataSourceHelper {
 	 * @param prep
 	 * @param log   the logger to use for the indexing
 	 */
-	private static void index(final Model model, final Locator prep) {
+	private void index(final Locator prep) {
 
 		// final Locator prep = data;
 		GenomeViewScheduler.submit(new Task() {
@@ -423,7 +422,7 @@ public class DataSourceHelper {
 			public void run() {
 				try {
 					if (IndexManager.createIndex(prep, model.getLog())) {
-						load(model, prep);
+						load(prep);
 					}
 				} catch (Throwable e) {
 					// catch ALL errors, otherwise they end up in threadpool
@@ -444,7 +443,7 @@ public class DataSourceHelper {
 	 * @param l
 	 * @return a parser as selected.
 	 */
-	private static Parser offerParserChoice(Model model, Locator l) {
+	private Parser offerParserChoice(Locator l) {
 		final MessageManager mm = model.getMessageMgr();
 		Parser[] list = ParserFactory.parsers(l, model.getGlobal());
 		Parser p = (Parser) JOptionPane.showInputDialog(

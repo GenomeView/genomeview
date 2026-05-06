@@ -154,8 +154,8 @@ public class Session {
 													prefix + arr[1].trim(),
 													model.getLog());
 											try {
-												DataSourceHelper.load(model,
-														loc);
+												new DataSourceHelper(model)
+														.load(loc);
 											} catch (RuntimeException re) {
 												TryAgainHandler.ask(model,
 														"Something went wrong while loading line: "
@@ -165,9 +165,9 @@ public class Session {
 															@Override
 															public void run() {
 																try {
-																	DataSourceHelper
-																			.load(model,
-																					loc);
+																	new DataSourceHelper(
+																			model)
+																			.load(loc);
 																} catch (Exception e) {
 																	throw new RuntimeException(
 																			e);

@@ -104,7 +104,7 @@ public class OpenFileButton extends JButton {
 					// DataSource[] out = new DataSource[files.length];
 					try {
 						for (int i = 0; i < files.length; i++) {
-							DataSourceHelper.load(gvModel, new Locator(
+							new DataSourceHelper(gvModel).load(new Locator(
 									files[i].toString(), gvModel.getLog()));
 
 						}
