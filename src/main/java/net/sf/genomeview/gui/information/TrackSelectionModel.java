@@ -8,7 +8,7 @@ import javax.swing.event.ListSelectionListener;
 public class TrackSelectionModel implements ListSelectionModel {
 
 	private int selectedRow = -1;
-	private ArrayList<ListSelectionListener> listeners = new ArrayList<ListSelectionListener>();
+	private final ArrayList<ListSelectionListener> listeners = new ArrayList<ListSelectionListener>();
 
 	@Override
 	public void setValueIsAdjusting(boolean valueIsAdjusting) {
@@ -24,8 +24,9 @@ public class TrackSelectionModel implements ListSelectionModel {
 
 	@Override
 	public void setSelectionInterval(int index0, int index1) {
-		if (index0 != index1)
+		if (index0 != index1) {
 			throw new UnsupportedOperationException("Can't select ranges!");
+		}
 		selectedRow = index0;
 
 	}

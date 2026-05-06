@@ -28,8 +28,6 @@ public class JEditorPaneLabel extends JEditorPane {
 		// ## Fix for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6993691
 		setEditorKit(new HTMLEditorKit() {
 
-			private static final long serialVersionUID = -8823280246213759957L;
-
 			@Override
 			protected Parser getParser() {
 				try {

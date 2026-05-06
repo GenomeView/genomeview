@@ -23,8 +23,6 @@ import net.sf.genomeview.gui.viztracks.AnnotationFrame;
  */
 public class MainContent {
 
-	private static final long serialVersionUID = -2304899922750491897L;
-
 	public static JPanel[] createContent(Model model, int screens) {
 		if (screens == 1) {
 			return createOne(model);
@@ -79,19 +77,6 @@ public class MainContent {
 		leftRight.setOneTouchExpandable(true);
 
 		out[0].add(leftRight, BorderLayout.CENTER);
-		return out;
-	}
-
-	public static JPanel createMiniContent(Model model) {
-		JPanel out = new JPanel();
-		out.setLayout(new BorderLayout());
-		out.add(new Toolbar(model), BorderLayout.PAGE_START);
-
-		AnnotationFrame af = new AnnotationFrame(0, model);
-		out.add(af, BorderLayout.CENTER);
-		StatusBar sb = new StatusBar(model);
-		out.add(sb, BorderLayout.SOUTH);
-
 		return out;
 	}
 
