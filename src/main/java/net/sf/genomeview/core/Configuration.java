@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
@@ -30,9 +31,18 @@ import net.sf.jannot.Type;
  * 
  */
 public class Configuration {
+	// resources used to initialze the config
+	private static final String PERSONAL_CONF_GZ = "personal.conf.gz";
+
+	private static final String RESOURCES_CONF = "/conf/resources.conf";
+
+	private static final String DEFAULT_CONF = "/conf/default.conf";
+
 	private final Global global;
 
 	private final File confDir;
+
+	private final File configFile;
 
 	/* Map with resource configuration */
 	private final HashMap<String, String> resourceMap = new HashMap<String, String>();
@@ -46,8 +56,6 @@ public class Configuration {
 	/* Map with extra configuration */
 	private final HashMap<String, String> extraMap = new HashMap<String, String>();
 
-	private File configFile;
-
 	/**
 	 * @param global the {@link Global} constants from jannot
 	 * @throws IllegalStateException if the Configuration can not be created or
@@ -59,6 +67,8 @@ public class Configuration {
 	public Configuration(Global global) {
 		this.global = global;
 		this.confDir = findOurDirectory();
+		this.configFile = new File(confDir, PERSONAL_CONF_GZ);
+
 		global.getLog().log(Level.INFO, "User config: " + confDir);
 
 		try {
@@ -134,6 +144,10 @@ public class Configuration {
 
 	}
 
+	/**
+	 * 
+	 * @return {@link Set} containing all keys available.
+	 */
 	public Set<String> keySet() {
 		Set<String> tmp = new HashSet<String>();
 		tmp.addAll(extraMap.keySet());
@@ -143,11 +157,8 @@ public class Configuration {
 	}
 
 	/**
-	 * load various versious of configuration.
-	 * <ol>
-	 * <li>In classpath in /genomeview.properties
-	 * <li>In classpath in /conf/default.conf
-	 * <li>In classpath in /conf/resources.conf
+	 * load various versious of configuration: {@link #DEFAULT_CONF},
+	 * {@link #RESOURCES_CONF}, {@link #PERSONAL_CONF_GZ}.
 	 * 
 	 * @throws IOException if problem occurs
 	 */
@@ -157,32 +168,14 @@ public class Configuration {
 		global.getLog().log(Level.INFO, "Loading default configuration...");
 		LineIterator it;
 
-		try (InputStream is = Configuration.class
-				.getResourceAsStream("/conf/default.conf")) {
-			it = new LineIterator(is, true, true);
-			for (String line : it) {
-				String key = line.substring(0, line.indexOf('='));
-				String value = line.substring(line.indexOf('=') + 1);
-				defaultMap.put(key.trim(), value.trim());
-
-			}
-			it.close();
+		try {
+			defaultMap.putAll(readMap(DEFAULT_CONF));
 		} catch (Exception e) {
 			throw new IOException("Could not find default configuration file.",
 					e);
 		}
-
-		try (InputStream is = Configuration.class
-				.getResourceAsStream("/conf/resources.conf")) {
-			it = new LineIterator(is, true, true);
-			for (String line : it) {
-				String key = line.substring(0, line.indexOf('='));
-				String value = line.substring(line.indexOf('=') + 1);
-				resourceMap.put(key.trim(), value.trim());
-			}
-			it.close();
-
-			updateSynonyms();
+		try {
+			resourceMap.putAll(readMap(RESOURCES_CONF));
 		} catch (Exception e) {
 			throw new IOException(
 					"Could not find resources configuration file.", e);
@@ -191,7 +184,6 @@ public class Configuration {
 		/* look for local configuration and load it if present */
 		// logger.info("Configuration directory: " + confDir);
 
-		configFile = new File(confDir, "personal.conf.gz");
 		if (!configFile.exists()) {
 			if (!configFile.createNewFile()) {
 				throw new IOException(
@@ -203,29 +195,50 @@ public class Configuration {
 					"Failed to load Config file, the file is empty!");
 		} else {
 			try {
-				it = new LineIterator(
-						new GZIPInputStream(new FileInputStream(configFile)));
-				it.setSkipBlanks(true);
-				it.setSkipComments(true);
-				for (String line : it) {
-					if (line.indexOf('=') > 0) {
-						String key = line.substring(0, line.indexOf('='));
-						String value = line.substring(line.indexOf('=') + 1);
-						localMap.put(key.trim(), value.trim());
-					} else {
-						throw new IOException(
-								"Invalid line in configuration file! '" + line
-										+ "'");
-					}
-
-				}
-				it.close();
-			} catch (Exception e) {
+				localMap.putAll(readMapStream(
+						new GZIPInputStream(new FileInputStream(configFile))));
+			} catch (IOException e) {
 				throw new IOException("Failed loading the config file.", e);
 			}
 		}
 		updateSynonyms();
 
+	}
+
+	/**
+	 * 
+	 * @param resource the resource name eg "/conf/default.conf"
+	 * @return map with key-values from the resource.
+	 * @throws IOException
+	 */
+	private Map<String, String> readMap(String resource) throws IOException {
+		return readMapStream(Configuration.class.getResourceAsStream(resource));
+	}
+
+	/**
+	 * 
+	 * @param is an inputstream
+	 * @return map with key-values from the resource.
+	 * @throws IOException
+	 */
+	private Map<String, String> readMapStream(InputStream is)
+			throws IOException {
+		Map<String, String> map = new HashMap<>();
+		LineIterator it = new LineIterator(is, true, true);
+		for (String line : it) {
+			if (line.indexOf('=') > 0) {
+
+				String key = line.substring(0, line.indexOf('='));
+				String value = line.substring(line.indexOf('=') + 1);
+				map.put(key.trim(), value.trim());
+			} else {
+				throw new IOException(
+						"Invalid line in configuration file! '" + line + "'");
+			}
+		}
+		it.close();
+		is.close();
+		return map;
 	}
 
 	/**

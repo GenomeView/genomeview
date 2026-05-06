@@ -40,6 +40,13 @@ public class GenomeView {
 
 	}
 
+	/**
+	 * starts up genomeview
+	 * 
+	 * @param args
+	 * @throws IOException or ReadFailedException if the initialization fails.
+	 *                     This is an fatal exit, not a log-and-continue.
+	 */
 	public static void main(final String[] args)
 			throws IOException, ReadFailedException {
 		Globals globals = new Globals();
