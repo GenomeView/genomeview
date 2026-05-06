@@ -157,7 +157,7 @@ public class DataSourceHelper {
 				int res = yesno(model, "preprocessing_warn",
 						"preprocessing_available", data.getName());
 				if (res == JOptionPane.YES_OPTION) {
-					mafprocess(model, data, model.getLog());
+					mafprocess(model, data);
 					return;
 				}
 			} else {
@@ -315,8 +315,7 @@ public class DataSourceHelper {
 
 	}
 
-	private static void mafprocess(final Model model, final Locator data,
-			Reporter log) {
+	private static void mafprocess(final Model model, final Locator data) {
 		GenomeViewScheduler.submit(new Task() {
 
 			@Override
@@ -386,8 +385,9 @@ public class DataSourceHelper {
 									.setMaximum((int) file.length());
 							MafixFactory.generateIndex(spmis,
 									new File(file + ".mfi"));
-							Locator mafdata = new Locator(file.toString(), log);
-							log.log(Level.INFO,
+							Locator mafdata = new Locator(file.toString(),
+									model.getLog());
+							model.getLog().log(Level.INFO,
 									"Load newly create mafix as: " + mafdata);
 							load(model, mafdata);
 

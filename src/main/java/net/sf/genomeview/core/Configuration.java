@@ -407,28 +407,6 @@ public class Configuration {
 
 	}
 
-//	public File getPluginDirectory() {
-//		File modules = new File(confDir, "plugin");
-//		if (!modules.exists()) {
-//			if (!modules.mkdir())
-//				logger.warn(
-//						"Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
-//		}
-//
-//		return modules;
-//	}
-
-//	public File getSessionPluginDirectory() {
-//		File modules = new File(confDir, "session_plugin");
-//		if (!modules.exists()) {
-//			if (!modules.mkdir())
-//				logger.warn(
-//						"Cannot create plugin directory, make sure GenomeView has write access to you home directory!");
-//		}
-//
-//		return modules;
-//	}
-
 	public void set(String key, int value) {
 		set(key, "" + value);
 
@@ -514,20 +492,6 @@ public class Configuration {
 		return getBoolean("track:visible:" + dk);
 
 	}
-
-//	public static String getParser(String string) {
-//		String pKey = Configuration.get(string);
-//		if (pKey.equals("EMBL")) {
-//			return new EMBLParser(log);
-//			// return ParserFactory.EMBL;
-//		}
-//		if (pKey.equals("GFF")) {
-//			return new GFF3Parser(log);
-//			// return ParserFactory.GFF3;
-//		}
-//
-//		return null;
-//	}
 
 	public void unset(String string) {
 		extraMap.remove(string);

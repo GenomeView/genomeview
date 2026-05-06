@@ -296,7 +296,7 @@ public class WindowManager extends WindowAdapter implements Observer {
 				}
 			}
 			window.setVisible(true);
-			info(mm.getString("windowmanager.installing_plugins"), splash);
+			// info(mm.getString("windowmanager.installing_plugins"), splash);
 
 		}
 		info(mm.getString("windowmanager.loading_data"), splash);
@@ -344,48 +344,4 @@ public class WindowManager extends WindowAdapter implements Observer {
 		return new Rectangle(Math.min(width, (int) rec.getWidth()),
 				Math.min(height, (int) rec.getHeight()));
 	}
-}
-
-/**
- * Information about the environment that the application is running in.
- * 
- * @author Thomas Abeel
- * 
- */
-class Environment {
-	private static boolean applet = false;
-
-	public static boolean isApplet() {
-		return applet;
-	}
-
-	public static boolean isWebstart() {
-		/* While this may not work 100%, it is better than nothing :-/ */
-		return System.getProperty("javawebstart.version", null) != null;
-
-	}
-
-	public static boolean isWindows() {
-		String os = System.getProperty("os.name").toLowerCase();
-		return (os.indexOf("win") >= 0);
-
-	}
-
-	public static boolean isNix() {
-		String os = System.getProperty("os.name").toLowerCase();
-		return (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0);
-
-	}
-
-	public static boolean isMac() {
-		String os = System.getProperty("os.name").toLowerCase();
-		return (os.indexOf("mac") >= 0);
-
-	}
-
-	public static void setApplet() {
-		applet = true;
-
-	}
-
 }

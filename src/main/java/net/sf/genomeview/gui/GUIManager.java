@@ -6,7 +6,6 @@ package net.sf.genomeview.gui;
 import java.awt.Frame;
 
 import net.sf.genomeview.gui.explorer.DataExplorerManager;
-import net.sf.genomeview.gui.information.InformationFrame;
 import net.sf.genomeview.gui.viztracks.GeneEvidenceLabel;
 
 /**
@@ -25,7 +24,6 @@ public class GUIManager {
 	private GeneEvidenceLabel gel = null;
 	private StatusBar statusBar;
 	private DataExplorerManager genomeExplorerManager;
-	private InformationFrame infoFrame;
 
 	public void registerMainWindow(Frame parentFrame) {
 		this.parent = parentFrame;
@@ -65,14 +63,6 @@ public class GUIManager {
 
 	public DataExplorerManager getGenomeExplorer() {
 		return genomeExplorerManager;
-	}
-
-	public void registerInformationFrame(InformationFrame infoFrame) {
-		this.infoFrame = infoFrame;
-	}
-
-	public InformationFrame getInformationFrame() {
-		return infoFrame;
 	}
 
 }

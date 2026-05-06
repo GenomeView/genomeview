@@ -37,8 +37,6 @@ public class InformationFrame extends GridBagPanel {
 	public InformationFrame(final Model model) {
 		this.model = model;
 		final MessageManager mm = model.getMessageMgr();
-		// let's make this frame available to plugins
-		model.getGUIManager().registerInformationFrame(this);
 
 		gc.fill = GridBagConstraints.BOTH;
 		gc.weightx = 1;

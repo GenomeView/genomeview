@@ -41,7 +41,7 @@ import net.sf.jannot.Location;
 public class GeneEvidenceLabel extends JLabel
 		implements Observer, MouseListener, MouseMotionListener {
 
-	protected Model model;
+	protected final Model model;
 
 	/**
 	 * The MouseWheelListener passed on from the JScrollPane. Only to be invoked
