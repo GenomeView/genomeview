@@ -42,6 +42,12 @@ import net.sf.jannot.Feature;
  */
 @SuppressWarnings("serial")
 public class FeatureDetailPanel extends GridBagPanel implements Observer {
+	// html table keywords
+	private static final String ETH = "</th>";
+	private static final String ETR = "</tr>";
+	private static final String TR = "<tr>";
+	private static final String ETD = "</td>";
+	private static final String TD = "<td>";
 	private static final String TH = "<th style=\"text-align: left;\">";
 
 	private final JEditorPaneLabel panel;
@@ -50,7 +56,7 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 
 	public FeatureDetailPanel(Model model) {
 		this.model = model;
-		panel = new JEditorPaneLabel(model.getGlobals());
+		this.panel = new JEditorPaneLabel(model.getGlobals());
 
 		StyleSheet css = panel.getStyleSheet();
 		css.addRule("body {color:#000; margin-left: 4px; margin-right: 4px; }");
@@ -115,9 +121,6 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 			private JMenuItem wrapMenu(final Query q) {
 				return new JMenuItem(
 						new AbstractAction(q.getLabel(), q.getIcon()) {
-
-							private static final long serialVersionUID = -3208849232821620577L;
-
 							@Override
 							public void actionPerformed(ActionEvent e) {
 								q.query(panel.getSelectedText(),
@@ -150,45 +153,44 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 			return;
 		}
 
-		Map<String, String> keyvalues = new LinkedHashMap<>();
-
-		if (set != null && set.size() > 0) {
-			for (Feature rf : set) {
-				// text += "Data origin: " + rf.getSource() + "\n";
-				if (rf.location() != null) {
-					keyvalues.put("Location", StaticUtils
-							.escapeHTML(Arrays.toString(rf.location())));
-				}
-				keyvalues.put("Strand", "" + rf.strand());
-				keyvalues.put("Score", "" + rf.getScore());
-				List<String> list = new ArrayList<String>(
-						rf.getQualifiersKeys());
-				Collections.sort(list,
-						NaturalOrderComparator.NUMERICAL_ORDER_IGNORE_CASE);
-				int nurls = 1;
-				for (String key : list) {
-					if (key.equals("url")) {
-						String[] urls = rf.qualifier(key).split(",");
-						for (String url : urls) {
-							keyvalues.put("url" + nurls++,
-									"<a href='" + url + "'>" + url + "</a>");
-						}
-					} else {
-						keyvalues.put(key, rf.qualifier(key));
-					}
-				}
-			}
-
-			// text += "---------------------------------------\n";
-			// int hash = text.hashCode();
-			// if (hash != lastHash) {
-			// name.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
-			// lastHash = hash;
-			// }
-
-		}
+		Map<String, String> keyvalues = getMap(set);
 		panel.setText("<html><body>" + html(keyvalues) + "</body></html>");
 		lastSelection = set;
+	}
+
+	/**
+	 * @param set of {@link Feature}s. null means empty map.
+	 * @return map with key-value pairs for the set , sorted by key
+	 */
+	private Map<String, String> getMap(Set<Feature> set) {
+		final Map<String, String> keyvalues = new LinkedHashMap<>();
+		if (set == null) {
+			set = Collections.emptySet();
+		}
+		for (final Feature rf : set) {
+			if (rf.location() != null) {
+				keyvalues.put("Location",
+						StaticUtils.escapeHTML(Arrays.toString(rf.location())));
+			}
+			keyvalues.put("Strand", "" + rf.strand());
+			keyvalues.put("Score", "" + rf.getScore());
+			List<String> list = new ArrayList<String>(rf.getQualifiersKeys());
+			Collections.sort(list,
+					NaturalOrderComparator.NUMERICAL_ORDER_IGNORE_CASE);
+			int nurls = 1;
+			for (final String key : list) {
+				if (key.equals("url")) {
+					String[] urls = rf.qualifier(key).split(",");
+					for (final String url : urls) {
+						keyvalues.put("url" + nurls++,
+								"<a href='" + url + "'>" + url + "</a>");
+					}
+				} else {
+					keyvalues.put(key, rf.qualifier(key));
+				}
+			}
+		}
+		return keyvalues;
 	}
 
 	/**
@@ -198,13 +200,14 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 	 *         map. Use {@link LinkedHashMap} to fix the order of items.
 	 */
 	private String html(Map<String, String> keyvalues) {
-		StringBuilder txt = new StringBuilder();
+		final StringBuilder txt = new StringBuilder();
 		txt.append("<table>");
-		txt.append("<tr>" + TH + "key</th>" + TH + "value</th>" + "</tr>");
+		txt.append(TR + TH + "key" + ETH + TH + "value" + ETH + ETR);
 		for (Entry<String, String> entry : keyvalues.entrySet()) {
-			txt.append("<tr>");
-			txt.append("<td>" + entry.getKey() + "</td>");
-			txt.append("<td>" + entry.getValue() + "</td>");
+			txt.append(TR);
+			txt.append(TD + entry.getKey() + ETD);
+			txt.append(TD + entry.getValue() + ETD);
+			txt.append(ETR);
 		}
 		txt.append("</table>");
 		return txt.toString();
