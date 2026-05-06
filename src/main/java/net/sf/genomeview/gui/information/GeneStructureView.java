@@ -34,19 +34,21 @@ import net.sf.jannot.Strand;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class GeneStructureView extends JLabel implements Observer {
 
-	private Model model;
+	private final Model model;
 
+	// the feature currently shown in the panel, null=none
 	private Feature rf = null;
-
+	// the entry currently shown. null=none
 	private Entry entry;
 
-	private CollisionMap collisionMap;
+	private final CollisionMap collisionMap;
 
 	public GeneStructureView(Model model) {
 		this.model = model;
-		collisionMap = new CollisionMap(model);
+		this.collisionMap = new CollisionMap(model);
 
 		model.addObserver(this);
 		this.setPreferredSize(new Dimension(200, 50));
@@ -66,12 +68,12 @@ public class GeneStructureView extends JLabel implements Observer {
 						_self.model.vlm.setAnnotationLocationVisible(
 								new Location(l.start() - gap, l.end() + gap));
 					} else {
-						int hGap = (int) (_self.getWidth() * 0.05);
-						double posPixelRatio = _self.getWidth() * 0.90
-								/ rf.length();
-						int pos = (int) ((e.getX() - hGap) / posPixelRatio);
-						System.out.println("CDSView click:" + pos);
 						if (rf != null) {
+							int hGap = (int) (_self.getWidth() * 0.05);
+							double posPixelRatio = _self.getWidth() * 0.90
+									/ rf.length();
+							int pos = (int) ((e.getX() - hGap) / posPixelRatio);
+							// System.out.println("CDSView click:" + pos);
 							_self.model.vlm.center(rf.start() + pos);
 						}
 					}
@@ -143,7 +145,7 @@ public class GeneStructureView extends JLabel implements Observer {
 	}
 
 	/**
-	 * Will render a CDS based on a feature.
+	 * Will render a CDS (coding DNA sequence) based on a feature.
 	 * 
 	 * <code>
 	 * +-----------------------+

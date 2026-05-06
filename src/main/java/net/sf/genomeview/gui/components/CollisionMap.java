@@ -17,10 +17,13 @@ import net.sf.genomeview.gui.dialog.UniqueFeatureHitDialog;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 
+/**
+ * FIXME WHAT IS THIS?
+ */
 public class CollisionMap {
-	private Map<Rectangle, ArrayList<Location>> locationMap = new HashMap<Rectangle, ArrayList<Location>>();
+	private final Map<Rectangle, ArrayList<Location>> locationMap = new HashMap<Rectangle, ArrayList<Location>>();
 
-	private Model model;
+	private final Model model;
 
 	public CollisionMap(Model model) {
 		this.model = model;
@@ -34,30 +37,36 @@ public class CollisionMap {
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		return locationMap.toString();
 	}
+
 	public Location uniqueLocation(int x, int y) {
 
 		Set<Location> locHits = locationHits(x, y);
-		if (locHits.size() == 0)
+		if (locHits.size() == 0) {
 			return null;
+		}
 		Feature f = uniqueFeature(x, y);
 		for (Location l : locHits) {
-			if (l.getParent().equals(f))
+			if (l.getParent().equals(f)) {
 				return l;
+			}
 		}
 		throw new RuntimeException(
-				"The feature was found, but the corresponding location was missing. This should never happen.");
+				"The feature was found, but the corresponding location was missing. "
+						+ "This should never happen.");
 
 	}
 
 	public Feature uniqueFeature(int x, int y) {
 		Set<Feature> hits = featureHits(x, y);
-		if (hits.size() == 0)
+		if (hits.size() == 0) {
 			return null;
-		if (hits.size() == 1)
+		}
+		if (hits.size() == 1) {
 			return hits.iterator().next();
+		}
 		return new UniqueFeatureHitDialog(hits, model).value();
 	}
 
@@ -103,45 +112,51 @@ public class CollisionMap {
 				hits.addAll(locationMap.get(rec));
 			}
 		}
-		if (hits.size() == 0)
+		if (hits.size() == 0) {
 			return null;
+		}
 
 		Set<Feature> fh = new HashSet<Feature>();
 		for (Location l : hits) {
 			fh.add(l.getParent());
 		}
 		Feature f;
-		if (fh.size() == 1)
+		if (fh.size() == 1) {
 			f = fh.iterator().next();
-		else {
+		} else {
 
-			SortedSet<Feature> intersection = model.selectionModel().getFeatureSelection();
+			SortedSet<Feature> intersection = model.selectionModel()
+					.getFeatureSelection();
 			intersection.retainAll(fh);
 
-			if (intersection.size() == 1)
+			if (intersection.size() == 1) {
 				f = intersection.first();
-			else
+			} else {
 				f = new UniqueFeatureHitDialog(fh, model).value();
+			}
 
 		}
 		for (Location l : hits) {
-			if (l.getParent().equals(f))
+			if (l.getParent().equals(f)) {
 				return l;
+			}
 		}
 		return null;
 	}
 
 	public void addLocation(Rectangle r, Location l) {
-		if (!locationMap.containsKey(r))
+		if (!locationMap.containsKey(r)) {
 			locationMap.put(r, new ArrayList<Location>());
+		}
 		locationMap.get(r).add(l);
 
 	}
 
 	public boolean collision(Rectangle rectangle) {
 		for (Rectangle r : locationMap.keySet()) {
-			if (rectangle.intersects(r))
+			if (rectangle.intersects(r)) {
 				return true;
+			}
 		}
 		return false;
 

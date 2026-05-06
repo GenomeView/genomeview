@@ -31,9 +31,8 @@ import net.sf.genomeview.gui.components.EscapeDialog;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class SearchDialog extends EscapeDialog {
-
-	private static final long serialVersionUID = 6844861145552724990L;
 
 	private static SearchDialog dialog = null;
 
