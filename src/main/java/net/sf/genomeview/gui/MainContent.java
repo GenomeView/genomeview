@@ -34,7 +34,6 @@ public class MainContent {
 		StatusBar sb = new StatusBar(model);
 		for (int i = 0; i < out.length - 1; i++) {
 			out[i] = new JPanel();
-			// registerKeyboard(out[i], model);
 			out[i].setLayout(new BorderLayout());
 			out[i].add(new Toolbar(model), BorderLayout.PAGE_START);
 
@@ -52,14 +51,9 @@ public class MainContent {
 	}
 
 	private static JPanel[] createOne(Model model) {
-		// Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		// logger.info("Detected screen width: "+screen.getWidth());
-		// logger.info("Detected screen height: "+screen.getHeight());
-		// screen.setSize(screen.getWidth() * 0.7, screen.getHeight() * 0.5);
 		JPanel[] out = new JPanel[1];
 
 		out[0] = new JPanel();
-		// registerKeyboard(out[0], model);
 		out[0].setLayout(new BorderLayout());
 		out[0].add(new Toolbar(model), BorderLayout.PAGE_START);
 
@@ -69,7 +63,6 @@ public class MainContent {
 		leftContainer.setLayout(new BorderLayout());
 
 		AnnotationFrame af = new AnnotationFrame(0, model);
-		// af.setPreferredSize(screen);
 
 		leftContainer.add(af, BorderLayout.CENTER);
 
@@ -85,26 +78,16 @@ public class MainContent {
 
 		leftRight.setOneTouchExpandable(true);
 
-		// out[0].add(new InformationFrame(model));
 		out[0].add(leftRight, BorderLayout.CENTER);
 		return out;
 	}
 
 	public static JPanel createMiniContent(Model model) {
 		JPanel out = new JPanel();
-		// registerKeyboard(out[0], model);
 		out.setLayout(new BorderLayout());
 		out.add(new Toolbar(model), BorderLayout.PAGE_START);
 
-		// JSplitPane leftRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		// Container leftContainer = new Container();
-
-		// leftContainer.setLayout(new BorderLayout());
-
 		AnnotationFrame af = new AnnotationFrame(0, model);
-		// af.setPreferredSize(screen);
-
-		// leftContainer.add(af, BorderLayout.CENTER);
 		out.add(af, BorderLayout.CENTER);
 		StatusBar sb = new StatusBar(model);
 		out.add(sb, BorderLayout.SOUTH);
