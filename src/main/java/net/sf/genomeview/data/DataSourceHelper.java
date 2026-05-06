@@ -236,9 +236,11 @@ public class DataSourceHelper {
 	private static void problem(Model model, String messageref, String titleref,
 			int options, String... params) {
 		final MessageManager mm = model.getMessageMgr();
-		JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
-				mm.formatMessage("datasourcehelper." + messageref, params),
-				mm.getString("datasourcehelper." + titleref), options);
+		model.getLog().log(Level.WARNING,
+				mm.formatMessage("datasourcehelper." + messageref, params));
+//		JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
+//				mm.formatMessage("datasourcehelper." + messageref, params),
+//				mm.getString("datasourcehelper." + titleref), options);
 	}
 
 	/**

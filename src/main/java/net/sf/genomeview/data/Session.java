@@ -33,9 +33,6 @@ import net.sf.jannot.source.Locator;
  */
 public class Session {
 
-//	private static Logger log = LoggerFactory
-//			.getLogger(Session.class.getCanonicalName());
-
 	/**
 	 * 
 	 * @param model
