@@ -11,7 +11,10 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -39,22 +42,24 @@ import net.sf.jannot.Feature;
  */
 @SuppressWarnings("serial")
 public class FeatureDetailPanel extends GridBagPanel implements Observer {
-	private final JEditorPaneLabel name;
+	private static final String TH = "<th style=\"text-align: left;\">";
+
+	private final JEditorPaneLabel panel;
 
 	private final Model model;
 
 	public FeatureDetailPanel(Model model) {
 		this.model = model;
-		name = new JEditorPaneLabel(model.getGlobals());
+		panel = new JEditorPaneLabel(model.getGlobals());
 
-		StyleSheet css = name.getStyleSheet();
+		StyleSheet css = panel.getStyleSheet();
 		css.addRule("body {color:#000; margin-left: 4px; margin-right: 4px; }");
 		css.addRule("p {margin:0px;padding:0px;}");
 		css.addRule("h3 {font-size:115%;color: " + Colors.encode(Color.green)
 				+ ";margin:0px;padding:0px;}");
 
-		name.setEditable(false);
-		name.addMouseListener(new MouseAdapter() {
+		panel.setEditable(false);
+		panel.addMouseListener(new MouseAdapter() {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -115,7 +120,7 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								q.query(name.getSelectedText(),
+								q.query(panel.getSelectedText(),
 										model.getGlobals());
 
 							}
@@ -128,7 +133,7 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 		gc.fill = GridBagConstraints.BOTH;
 		gc.weightx = 1;
 		gc.weighty = 0;
-		add(name, gc);
+		add(panel, gc);
 		gc.gridy++;
 		gc.weighty = 1;
 		add(new JLabel(), gc);
@@ -144,50 +149,64 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 		if (set != null && set.equals(lastSelection)) {
 			return;
 		}
-		StringBuffer text = new StringBuffer();
+
+		Map<String, String> keyvalues = new LinkedHashMap<>();
 
 		if (set != null && set.size() > 0) {
 			for (Feature rf : set) {
 				// text += "Data origin: " + rf.getSource() + "\n";
 				if (rf.location() != null) {
-					text.append(
-							"Location: "
-									+ StaticUtils.escapeHTML(
-											Arrays.toString(rf.location()))
-									+ "<br/>");
+					keyvalues.put("Location", StaticUtils
+							.escapeHTML(Arrays.toString(rf.location())));
 				}
-				text.append("Strand: " + rf.strand() + "<br/>");
-				text.append("Score: " + rf.getScore() + "<br/>");
-				List<String> list = new ArrayList<String>();
-				list.addAll(rf.getQualifiersKeys());
+				keyvalues.put("Strand", "" + rf.strand());
+				keyvalues.put("Score", "" + rf.getScore());
+				List<String> list = new ArrayList<String>(
+						rf.getQualifiersKeys());
 				Collections.sort(list,
 						NaturalOrderComparator.NUMERICAL_ORDER_IGNORE_CASE);
+				int nurls = 1;
 				for (String key : list) {
 					if (key.equals("url")) {
 						String[] urls = rf.qualifier(key).split(",");
 						for (String url : urls) {
-							text.append("<a href='" + url + "'>" + url
-									+ "</a><br/>");
+							keyvalues.put("url" + nurls++,
+									"<a href='" + url + "'>" + url + "</a>");
 						}
 					} else {
-						text.append(key + "=" + rf.qualifier(key) + "<br/>");
+						keyvalues.put(key, rf.qualifier(key));
 					}
-
 				}
-
 			}
 
 			// text += "---------------------------------------\n";
 			// int hash = text.hashCode();
 			// if (hash != lastHash) {
-			name.setText("<html><body>" + text + "</body></html>");
 			// name.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
 			// lastHash = hash;
 			// }
 
-		} else {
-			name.setText("");
 		}
+		panel.setText("<html><body>" + html(keyvalues) + "</body></html>");
 		lastSelection = set;
+	}
+
+	/**
+	 * 
+	 * @param keyvalues a Map<String,String>
+	 * @return html text with table with this map, in the default order of the
+	 *         map. Use {@link LinkedHashMap} to fix the order of items.
+	 */
+	private String html(Map<String, String> keyvalues) {
+		StringBuilder txt = new StringBuilder();
+		txt.append("<table>");
+		txt.append("<tr>" + TH + "key</th>" + TH + "value</th>" + "</tr>");
+		for (Entry<String, String> entry : keyvalues.entrySet()) {
+			txt.append("<tr>");
+			txt.append("<td>" + entry.getKey() + "</td>");
+			txt.append("<td>" + entry.getValue() + "</td>");
+		}
+		txt.append("</table>");
+		return txt.toString();
 	}
 }
