@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
@@ -46,8 +45,6 @@ public class Configuration {
 
 	/* Map with extra configuration */
 	private final HashMap<String, String> extraMap = new HashMap<String, String>();
-
-	private final Properties gvProperties = new Properties();
 
 	private File configFile;
 
@@ -155,15 +152,6 @@ public class Configuration {
 	 * @throws IOException if problem occurs
 	 */
 	private void load() throws IOException {
-		// InputStream is = null;
-		try (InputStream is = Configuration.class
-				.getResourceAsStream("/conf/genomeview.properties")) {
-			gvProperties.load(is);
-		} catch (Exception e1) {
-			global.getLog().log(Level.WARNING,
-					"genomeview.properties file could not be loaded!", e1);
-		}
-
 		/* loading default configuration from the jar */
 
 		global.getLog().log(Level.INFO, "Loading default configuration...");
@@ -381,8 +369,14 @@ public class Configuration {
 		return out;
 	}
 
+	/**
+	 * 
+	 * @return current genomeview version. This comes from the meta info in the
+	 *         jar.
+	 */
 	public String version() {
-		return gvProperties.getProperty("version", "developer version");
+		String v = getClass().getPackage().getImplementationVersion();
+		return v == null ? "developer version" : v;
 	}
 
 	public void loadExtra(InputStream ios) throws IOException {
