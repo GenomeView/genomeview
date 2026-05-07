@@ -23,6 +23,8 @@ import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
 
 /**
+ * Panel "keyword search", which is under a tab in the {@link SearchDialog}.
+ * This panel enables the user to initiate a search action.
  * 
  * @author Thomas Abeel
  * 
@@ -62,11 +64,6 @@ class KeywordSearchPane extends SearchPanel {
 		});
 		text.addKeyListener(new KeyAdapter() {
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see java.awt.event.KeyAdapter#keyTyped(java.awt.event.KeyEvent)
-			 */
 			@Override
 			public void keyReleased(KeyEvent e) {
 

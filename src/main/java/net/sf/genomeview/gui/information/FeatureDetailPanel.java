@@ -43,12 +43,12 @@ import net.sf.jannot.Feature;
 @SuppressWarnings("serial")
 public class FeatureDetailPanel extends GridBagPanel implements Observer {
 	// html table keywords
-	private static final String ETH = "</th>";
-	private static final String ETR = "</tr>";
 	private static final String TR = "<tr>";
-	private static final String ETD = "</td>";
+	private static final String ETR = "</tr>";
 	private static final String TD = "<td>";
+	private static final String ETD = "</td>";
 	private static final String TH = "<th style=\"text-align: left;\">";
+	private static final String ETH = "</th>";
 
 	private final JEditorPaneLabel panel;
 
@@ -153,8 +153,7 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 			return;
 		}
 
-		Map<String, String> keyvalues = getMap(set);
-		panel.setText("<html><body>" + html(keyvalues) + "</body></html>");
+		panel.setText("<html><body>" + html(getMap(set)) + "</body></html>");
 		lastSelection = set;
 	}
 
@@ -174,11 +173,12 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 			}
 			keyvalues.put("Strand", "" + rf.strand());
 			keyvalues.put("Score", "" + rf.getScore());
-			List<String> list = new ArrayList<String>(rf.getQualifiersKeys());
-			Collections.sort(list,
+			List<String> qualifiers = new ArrayList<String>(
+					rf.getQualifiersKeys());
+			Collections.sort(qualifiers,
 					NaturalOrderComparator.NUMERICAL_ORDER_IGNORE_CASE);
 			int nurls = 1;
-			for (final String key : list) {
+			for (final String key : qualifiers) {
 				if (key.equals("url")) {
 					String[] urls = rf.qualifier(key).split(",");
 					for (final String url : urls) {
@@ -195,9 +195,11 @@ public class FeatureDetailPanel extends GridBagPanel implements Observer {
 
 	/**
 	 * 
-	 * @param keyvalues a Map<String,String>
-	 * @return html text with table with this map, in the default order of the
-	 *         map. Use {@link LinkedHashMap} to fix the order of items.
+	 * @param keyvalues a 2-column table in the form of a Map<String,String>.
+	 *                  Row order is determined by the order in which this
+	 *                  returns the items. You can use {@link LinkedHashMap} to
+	 *                  fix the order of items.
+	 * @return html text with table with this map.
 	 */
 	private String html(Map<String, String> keyvalues) {
 		final StringBuilder txt = new StringBuilder();

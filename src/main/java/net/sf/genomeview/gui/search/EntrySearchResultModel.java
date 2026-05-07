@@ -13,9 +13,8 @@ import net.sf.jannot.Entry;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 class EntrySearchResultModel extends AbstractSearchResultModel {
-
-	private static final long serialVersionUID = 2628403363607798505L;
 
 	private ArrayList<Entry> entries = new ArrayList<Entry>();
 
@@ -47,8 +46,8 @@ class EntrySearchResultModel extends AbstractSearchResultModel {
 		switch (col) {
 		case 0:
 			return entries.get(row);
-			// case 1:
-			// return features.get(row);
+		// case 1:
+		// return features.get(row);
 		}
 		return null;
 
@@ -63,8 +62,9 @@ class EntrySearchResultModel extends AbstractSearchResultModel {
 		String lowerCaseText = text.toLowerCase();
 		clear();
 		for (Entry e : model.entries()) {
-			if (e.getID().toLowerCase().contains(lowerCaseText))
+			if (e.getID().toLowerCase().contains(lowerCaseText)) {
 				entries.add(e);
+			}
 
 		}
 
@@ -72,6 +72,7 @@ class EntrySearchResultModel extends AbstractSearchResultModel {
 
 	}
 
+	@Override
 	void clear() {
 		entries.clear();
 		fireTableDataChanged();
