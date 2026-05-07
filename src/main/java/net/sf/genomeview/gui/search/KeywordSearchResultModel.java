@@ -202,6 +202,7 @@ class SearchPhrase {
 	 * @return lower value if term matches better with a value in values.
 	 */
 	private int score(String term, List<String> values) {
+		// FIXME return Levenshtein best match value
 		return values.contains(term) ? 0 : 1;
 	}
 
