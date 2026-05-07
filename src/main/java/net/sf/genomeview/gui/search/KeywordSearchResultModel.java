@@ -74,9 +74,11 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 	}
 
 	/**
-	 * Called when a search action is initated. From the GUI, this happens when
-	 * the user presses enter or clicks search. Then this model updates to show
-	 * search results. The search is done case insensitive.
+	 * Update this model with new search results. Called when a search action is
+	 * initated. From the GUI, this happens when the user presses enter or
+	 * clicks search. The search is done case insensitive. All search terms must
+	 * match with one of the feature values. Special characters like {}[](),.
+	 * are ignored
 	 * 
 	 * @param text the text the user typed in the search text area.
 	 */
@@ -178,6 +180,14 @@ class SearchPhrase {
 		return terms.toString();
 	}
 
+	/**
+	 * 
+	 * @param value a String - possible candidate matching this. The value is
+	 *              assumed to contain a number of words. Those words are
+	 *              separated {@link #clean(String)} and compared with the
+	 *              {@link #terms}
+	 * @return true if value scores high enough to be assumed a match
+	 */
 	public boolean matches(String value) {
 		return score(Arrays.asList(clean(value).split(" "))) <= 1;
 	}
