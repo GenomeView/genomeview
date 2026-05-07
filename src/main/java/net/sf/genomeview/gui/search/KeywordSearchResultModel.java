@@ -5,7 +5,9 @@ package net.sf.genomeview.gui.search;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -81,6 +83,7 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 	void search(final String text) {
 
 		final SearchPhrase phrase = new SearchPhrase(text);
+		model.getLog().log(Level.INFO, "searching " + phrase);
 		clear();
 		for (final Entry e : model.entries()) {
 			for (final DataKey d : e) {
@@ -151,13 +154,55 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
  * a phrase (word or bunch of words etc) that is being searched for
  */
 class SearchPhrase {
-	private String searchTerm;
+	private final List<String> terms = new ArrayList<>();
 
-	public SearchPhrase(String searchTerm) {
-		this.searchTerm = searchTerm.toLowerCase();
+	public SearchPhrase(final String searchTerm) {
+		terms.addAll(Arrays.asList(clean(searchTerm).split(" ")));
+	}
+
+	/**
+	 * 
+	 * @param value a value to be cleaned
+	 * @return cleaned value, with brackets, comma, dots etc replaced with
+	 *         whitespace " "
+	 * 
+	 */
+	private String clean(String value) {
+		return value.toLowerCase().trim()
+				.replaceAll("[\\s\\{\\}\\(\\)\\[\\].,]", " ")
+				.replaceAll("  ", " ");
+	}
+
+	@Override
+	public String toString() {
+		return terms.toString();
 	}
 
 	public boolean matches(String value) {
-		return value.toLowerCase().contains(searchTerm);
+		return score(Arrays.asList(clean(value).split(" "))) <= 1;
 	}
+
+	/**
+	 * @param values a List of words to be matched with the search phrase
+	 * @return score how well value matches to the searchphrase. LOWER is BETTER
+	 */
+	public int score(final List<String> values) {
+		// each search term must score well with one of the values
+		int score = 0;
+		for (String term : terms) {
+			score += score(term, values);
+		}
+		return score;
+	}
+
+	/**
+	 * 
+	 * @param term   the search term in {@link #terms}
+	 * @param values the values to score
+	 * @return lower value if term matches better with a value in values.
+	 */
+	private int score(String term, List<String> values) {
+		return values.contains(term) ? 0 : 1;
+	}
+
 }
