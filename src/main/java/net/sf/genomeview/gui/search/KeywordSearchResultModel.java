@@ -80,7 +80,7 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 	 */
 	void search(final String text) {
 
-		final String lowerCaseText = text.toLowerCase();
+		final SearchPhrase phrase = new SearchPhrase(text);
 		clear();
 		for (final Entry e : model.entries()) {
 			for (final DataKey d : e) {
@@ -88,7 +88,7 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 					try {
 						for (final Feature f : ((FeatureAnnotation) e.get(d))
 								.get()) {
-							searchFeature(lowerCaseText, e, f);
+							searchFeature(phrase, e, f);
 						}
 					} catch (IOException e1) {
 						model.getLog().log(Level.WARNING,
@@ -111,10 +111,11 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 	 * @param e             the {@link Entry}
 	 * @param f             the {@link Feature}
 	 */
-	private void searchFeature(final String lowerCaseText, final Entry e,
+	private void searchFeature(final SearchPhrase phrase, final Entry e,
 			final Feature f) {
 		if (featuresSet.contains(f)) {
 			return;
+			// FIXME Feature does not implement equals, hashCode ??
 		}
 
 		for (final String key : f.getQualifiersKeys()) {
@@ -123,7 +124,7 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 				continue;
 			}
 
-			if (matches(lowerCaseText, value.toLowerCase())) {
+			if (phrase.matches(value)) {
 				features.add(f);
 				entries.add(e);
 				featuresSet.add(f);
@@ -131,17 +132,6 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 			}
 
 		}
-	}
-
-	/**
-	 * @param searchTerm String with search term.
-	 * @param value
-	 * @return true iff the searchTerm matches the value
-	 */
-	private boolean matches(String lowerCaseText, String value) {
-//		if (key.toLowerCase().contains(lowerCaseText)
-//		|| value.toLowerCase().contains(lowerCaseText)) {
-		return value.contains(lowerCaseText);
 	}
 
 	Feature getFeature(int row) {
@@ -154,5 +144,20 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 		entries.clear();
 		featuresSet.clear();
 		fireTableDataChanged();
+	}
+}
+
+/**
+ * a phrase (word or bunch of words etc) that is being searched for
+ */
+class SearchPhrase {
+	private String searchTerm;
+
+	public SearchPhrase(String searchTerm) {
+		this.searchTerm = searchTerm.toLowerCase();
+	}
+
+	public boolean matches(String value) {
+		return value.toLowerCase().contains(searchTerm);
 	}
 }
