@@ -22,6 +22,13 @@ public class Globals {
 		messageManager = new MessageManager(configuration.get("lang.current"));
 	}
 
+	public Globals(Global global, Configuration configuration,
+			MessageManager mm) {
+		this.global = global;
+		this.configuration = configuration;
+		this.messageManager = mm;
+	}
+
 	/**
 	 * Convenience method
 	 * 
