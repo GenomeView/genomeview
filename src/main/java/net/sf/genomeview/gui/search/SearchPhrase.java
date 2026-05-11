@@ -59,7 +59,9 @@ public class SearchPhrase {
 	 *              assumed to contain a number of words. Those words are
 	 *              separated {@link #clean(String)} and compared with the
 	 *              {@link #terms}.
-	 * @return true if value scores high enough to be assumed a match
+	 * @return true if value scores high enough to be assumed a match. This
+	 *         means all words match and the total levenshtein edit distance is
+	 *         at most 1.
 	 */
 	public boolean matches(String value) {
 		return score(Arrays.asList(clean(value).split(" "))) <= 1;
