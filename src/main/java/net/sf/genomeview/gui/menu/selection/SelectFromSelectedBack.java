@@ -6,8 +6,10 @@ package net.sf.genomeview.gui.menu.selection;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Observable;
+import java.util.logging.Level;
 
 import net.sf.genomeview.data.Model;
+import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Location;
@@ -23,7 +25,7 @@ public class SelectFromSelectedBack extends AbstractModelAction {
 
 	@Override
 	public void updateSafe(Observable o, Object obj) {
-		try {
+		StaticUtils.run(() -> {
 			boolean oneFeatureSelection = model.selectionModel()
 					.getFeatureSelection() != null
 					&& model.selectionModel().getFeatureSelection().size() == 1;
@@ -37,11 +39,8 @@ public class SelectFromSelectedBack extends AbstractModelAction {
 			} else {
 				setEnabled(false);
 			}
-		} catch (Exception e) {
-			System.err.println("SelectFromSelectedBack update exception...");
-
-		}
-
+		}, model.getLog(), Level.WARNING,
+				"SelectFromSelectedBack update failed");
 	}
 
 	private Location getPrev() {

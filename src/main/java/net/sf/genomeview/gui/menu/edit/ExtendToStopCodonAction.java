@@ -74,7 +74,7 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
 
 		} else if (rf.strand() == Strand.REVERSE) {
 			int start = rf.start() + rest;
-			System.out.println(start);
+			// System.out.println(start);
 			String codon = SequenceTools
 					.reverseComplement(model.vlm.getVisibleEntry().sequence()
 							.subsequence(start, start + 3))

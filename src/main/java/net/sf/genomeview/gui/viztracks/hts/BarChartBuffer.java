@@ -757,7 +757,7 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 
 		for (Pile p : new NoFailIterable<Pile>(itt)) {
 			if (p == null) {
-				System.out.println("Null pile");
+				model.getLog().log(Level.WARNING, "Null pile in piles");
 				continue;
 			}
 			if (detailedRects == null) {

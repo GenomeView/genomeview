@@ -275,7 +275,7 @@ public class SaveDialog extends JDialog {
 							FileOutputStream fos = new FileOutputStream(tmp);
 
 							for (Entry e : entriesList.selectedItems()) {
-								System.out.println(selectedTypes);
+								// System.out.println(selectedTypes);
 								parser.write(fos, e, selectedTypes
 										.toArray(new net.sf.jannot.Type[0]));
 							}

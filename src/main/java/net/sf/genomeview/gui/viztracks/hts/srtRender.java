@@ -325,8 +325,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 				// }
 			}
 		} catch (ConcurrentModificationException e) {
-			System.err.println("CME!!");
-			// Ignore
+			model.getLog().log(Level.WARNING, "dataReady handler problem", e);
 		}
 		if (stackExceeded) {
 			g.setColor(Color.RED);
@@ -472,7 +471,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			// FIXME does this ever happen?
 			// XXX The one time it did happen it pointed to a bug, so it may be
 			// that it doesn't happen when all goes well.
-			System.err.println("This happens!");
+			model.getLog().log(Level.WARNING, "Bug in paintRead");
 		}
 
 		int qual = rf.getMappingQuality();

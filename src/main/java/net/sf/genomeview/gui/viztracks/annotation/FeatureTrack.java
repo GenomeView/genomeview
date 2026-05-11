@@ -602,7 +602,8 @@ public class FeatureTrack extends Track {
 					// dialog.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 					dialog.setVisible(true);
 					setThreshold((Double) optionPane.getInputValue());
-					System.out.println("Input: " + optionPane.getInputValue());
+					// System.out.println("Input: " +
+					// optionPane.getInputValue());
 
 				}
 
