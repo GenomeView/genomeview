@@ -14,8 +14,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 
-import javax.swing.JOptionPane;
-
 import be.abeel.io.LineIterator;
 import be.abeel.net.URIFactory;
 import net.sf.genomeview.core.Configuration;
@@ -97,10 +95,8 @@ public class Session {
 					String lcKey = key.toLowerCase();
 					if (!(lcKey.contains("genomeview")
 							&& lcKey.contains("session"))) {
-						JOptionPane.showMessageDialog(
-								model.getGUIManager().getMainWindow(),
-								mm.getString(
-										"session.not_genome_view_session"));
+						model.getLog().log(Level.SEVERE, mm
+								.getString("session.not_genome_view_session"));
 					} else {
 
 						model.clearEntries();
@@ -126,7 +122,7 @@ public class Session {
 								} catch (Exception e) {
 									model.getLog().log(Level.WARNING,
 											"Could not parse: " + arr[0]
-													+ "\n Unknown instruction.\nCould not load session line: "
+													+ ". Unknown instruction. Could not load session line: "
 													+ line,
 											e);
 								}

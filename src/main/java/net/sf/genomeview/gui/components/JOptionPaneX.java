@@ -15,11 +15,6 @@ import net.sf.genomeview.gui.StaticUtils;
 
 public class JOptionPaneX {
 
-//	public static void main(String[] args) {
-//		JOptionPaneX.showOkCancelDialog(null, "test", "title",
-//				JOptionPane.WARNING_MESSAGE);
-//	}
-
 	/**
 	 * FIXME a separate class for just this?
 	 * 

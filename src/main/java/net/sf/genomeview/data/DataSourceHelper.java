@@ -134,11 +134,8 @@ public class DataSourceHelper {
 		}
 
 		if (data.isWig()) {
-			int res = JOptionPane.showConfirmDialog(
-					model.getGUIManager().getMainWindow(),
-					mm.getString("datasourcehelper.wig_not_recommended_warn"),
-					mm.getString("datasourcehelper.wig_not_recommended"),
-					JOptionPane.YES_NO_OPTION);
+			// FIXME
+			int res = yesno("wig_not_recommended_warn", "wig_not_recommended");
 			if (res == JOptionPane.YES_OPTION) {
 				convertWig2TDF(data, model.getLog());
 				return;
@@ -239,14 +236,16 @@ public class DataSourceHelper {
 		final MessageManager mm = model.getMessageMgr();
 		model.getLog().log(Level.WARNING,
 				mm.formatMessage("datasourcehelper." + messageref, params));
-//		JOptionPane.showMessageDialog(model.getGUIManager().getMainWindow(),
-//				mm.formatMessage("datasourcehelper." + messageref, params),
-//				mm.getString("datasourcehelper." + titleref), options);
 	}
 
 	/**
 	 * as problem, but now showing yes/no option .
 	 * 
+	 * @param messageref the message ID to use in the message manager. Prefixed
+	 *                   with "datasourcehelper.".
+	 * @param titleref   the title ID, again used with messagemanager and
+	 *                   prefixed with "datasourcehelper."
+	 * @param params     the params to use with formatting the messageref
 	 * @return YES_OPTION or NO_OPTION
 	 */
 	private int yesno(String messageref, String titleref, String... params) {
