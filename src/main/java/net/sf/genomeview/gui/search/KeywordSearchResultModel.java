@@ -31,11 +31,11 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 	private final ArrayList<Feature> features = new ArrayList<Feature>();
 	private final ArrayList<Entry> entries = new ArrayList<Entry>();
 
+	private final String[] columns = new String[] { "Entry", "Feature" };
+
 	KeywordSearchResultModel(Model model) {
 		super(model);
 	}
-
-	private String[] columns = new String[] { "Entry", "Feature" };
 
 	@Override
 	public String getColumnName(int col) {
@@ -121,6 +121,7 @@ class KeywordSearchResultModel extends AbstractSearchResultModel {
 			// FIXME Feature does not implement equals, hashCode ??
 		}
 
+		// add all features that match the search phrase
 		for (final String key : f.getQualifiersKeys()) {
 			final String value = f.qualifier(key);
 			if (key == null || value == null) {

@@ -32,7 +32,7 @@ public class SearchPhrase {
 	 *         whitespace " "
 	 * 
 	 */
-	private String clean(String value) {
+	private static String clean(String value) {
 		return value.toLowerCase().trim()
 				.replaceAll("[\\s\\{\\}\\(\\)\\[\\].,]", " ")
 				.replaceAll("  ", " ");
@@ -44,7 +44,7 @@ public class SearchPhrase {
 	 *             {@link #clean(String)}
 	 * @return list of words in the term
 	 */
-	public List<String> split(String term) {
+	public static List<String> split(String term) {
 		return Arrays.asList(clean(term).split(" "));
 	}
 
@@ -56,15 +56,14 @@ public class SearchPhrase {
 	/**
 	 * 
 	 * @param value a String - possible candidate matching this. The value is
-	 *              assumed to contain a number of words. Those words are
-	 *              separated {@link #clean(String)} and compared with the
-	 *              {@link #terms}.
+	 *              assumed to contain a number of words separated by whitespace
+	 *              - see {@link #split(String)}.
 	 * @return true if value scores high enough to be assumed a match. This
 	 *         means all words match and the total levenshtein edit distance is
 	 *         at most 1.
 	 */
 	public boolean matches(String value) {
-		return score(Arrays.asList(clean(value).split(" "))) <= 1;
+		return score(split(value)) <= 1;
 	}
 
 	/**
