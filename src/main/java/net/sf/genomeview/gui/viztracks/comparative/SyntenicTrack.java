@@ -19,9 +19,9 @@ import net.sf.genomeview.gui.viztracks.TrackCommunicationModel;
 import net.sf.jannot.DataKey;
 import net.sf.jannot.Entry;
 import net.sf.jannot.Location;
-import net.sf.jannot.SyntenicBlock;
-import net.sf.jannot.SyntenicData;
 import net.sf.jannot.parser.SyntenicParser;
+import net.sf.jannot.syntenic.SyntenicBlock;
+import net.sf.jannot.syntenic.SyntenicData;
 
 /**
  * Track to display syntenic information.
