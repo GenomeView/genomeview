@@ -208,9 +208,9 @@ public class StructureTrack extends Track {
 			int track = model.getPressTrack();
 			g.setColor(new Color(0f, 0, 1, 0.5f));
 			int start = Convert.translateGenomeToScreen(
-					model.getSelectedRegion().start, r, screenWidth);
+					model.getSelectedRegion().start(), r, screenWidth);
 			int end = Convert.translateGenomeToScreen(
-					model.getSelectedRegion().end + 1, r, screenWidth);
+					model.getSelectedRegion().end() + 1, r, screenWidth);
 			end--;
 			switch (track) {
 			case 0:
@@ -579,7 +579,7 @@ public class StructureTrack extends Track {
 				if (annot != null) {
 					Iterable<Feature> trackData;
 					try {
-						trackData = annot.get(l.start, l.end);
+						trackData = annot.get(l.start(), l.end());
 					} catch (IOException e) {
 						model.getLog().log(Level.WARNING, "Can't paint CDS", e);
 						continue;
@@ -1081,7 +1081,7 @@ public class StructureTrack extends Track {
 				.getConfiguration().getInt("geneStructureAminoAcidWindow")) {
 			if (bs == null) {
 				bs = new BufferSeq(entry.sequence(), new Location(
-						visibleRegion.start - 3, visibleRegion.end + 3));
+						visibleRegion.start() - 3, visibleRegion.end() + 3));
 			}
 			// forward strand
 			paintAminoAcidReadingFrame(g, true, yOffset);
@@ -1100,7 +1100,7 @@ public class StructureTrack extends Track {
 				.getConfiguration().getInt("geneStructureNucleotideWindow")) {
 			if (bs == null) {
 				bs = new BufferSeq(entry.sequence(), new Location(
-						visibleRegion.start - 3, visibleRegion.end + 3));
+						visibleRegion.start() - 3, visibleRegion.end() + 3));
 			}
 			// forward strand sequence
 			paintSequence(g, true, yOffset);

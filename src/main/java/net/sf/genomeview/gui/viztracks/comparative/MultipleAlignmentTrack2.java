@@ -210,8 +210,8 @@ public class MultipleAlignmentTrack2 extends Track {
 				/ (double) entry.getMaximumLength();
 
 		int estCount = (int) (frac * ma.noAlignmentBlocks());
-		Iterable<AbstractAlignmentBlock> abs = ma.get(visible.start,
-				visible.end);
+		Iterable<AbstractAlignmentBlock> abs = ma.get(visible.start(),
+				visible.end());
 
 		if (!abs.iterator().hasNext()) {
 			g.drawString(
@@ -298,7 +298,7 @@ public class MultipleAlignmentTrack2 extends Track {
 			char[] ref = null;
 			if (visible.length() < 1000) {
 				Iterable<Character> bufferedSeq = entry.sequence()
-						.get(visible.start, visible.end + 1);
+						.get(visible.start(), visible.end() + 1);
 
 				ref = new char[visible.length()];
 
@@ -489,7 +489,7 @@ public class MultipleAlignmentTrack2 extends Track {
 
 			if (st != null) {
 
-				for (int i = visible.start; i <= visible.end; i++) {
+				for (int i = visible.start(); i <= visible.end(); i++) {
 					if (i >= start && i < end) {
 						double width = screenWidth / visible.length();
 						int translated = st.translate(i - start) + 1;
@@ -508,13 +508,13 @@ public class MultipleAlignmentTrack2 extends Track {
 
 						// System.out.println("NT:
 						// "+translated+"\t"+nt);
-						if (ref[i - visible.start] != nt) {
+						if (ref[i - visible.start()] != nt) {
 							if (nt == '-') {
 								g.setColor(Color.RED);
 							} else {
 								g.setColor(Color.DARK_GRAY);
 							}
-							g.fillRect((int) ((i - visible.start) * width),
+							g.fillRect((int) ((i - visible.start()) * width),
 									rec.y + (line - 1) * LINE_HEIGHT,
 									(int) Math.ceil(width), LINE_HEIGHT);
 							if (visible.length() < 100) {
@@ -527,7 +527,7 @@ public class MultipleAlignmentTrack2 extends Track {
 											.brighter());
 								}
 								g.drawString("" + nt,
-										(int) (((i - visible.start) * width
+										(int) (((i - visible.start()) * width
 												- stringSize.getWidth() / 2)
 												+ (width / 2)),
 										rec.y + line * LINE_HEIGHT - 2);

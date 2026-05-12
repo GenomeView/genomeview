@@ -42,12 +42,14 @@ public class GenomeViewScheduler {
 			Task t = (Task) r;
 			gvs.remove(t);
 			Location l = t.getLocation();
-			if (l != null && l.overlaps(visible.start, visible.end)) {
+			if (l != null && l.overlaps(visible)) {
 				t.boost();
-			} else
+			} else {
 				t.cancel();
-			if (!t.isCancelled())
+			}
+			if (!t.isCancelled()) {
 				gvs.add(t);
+			}
 
 		}
 	}

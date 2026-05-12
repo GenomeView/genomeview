@@ -144,8 +144,8 @@ public class MergeFeatureDialog extends JDialog {
 							Feature n = parents.get(i + 1);// .getParent();
 							// System.out.println("Parents: "+c+"\t"+n);
 							if (c != n) {
-								locations.add(new Location(list.get(i).start,
-										list.get(i + 1).end));
+								locations.add(new Location(list.get(i).start(),
+										list.get(i + 1).end()));
 								i++;
 							} else {
 								locations.add(list.get(i));

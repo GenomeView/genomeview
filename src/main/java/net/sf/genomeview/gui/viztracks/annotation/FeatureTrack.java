@@ -148,7 +148,7 @@ public class FeatureTrack extends Track {
 		}
 		Iterable<Feature> list;
 		try {
-			list = annot.get(visible.start, visible.end);
+			list = annot.get(visible.start(), visible.end());
 		} catch (IOException e) {
 			model.getLog().log(Level.WARNING, "Can't get annotations", e);
 			return 25;

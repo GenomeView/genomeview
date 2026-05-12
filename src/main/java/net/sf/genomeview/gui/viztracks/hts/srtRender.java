@@ -225,7 +225,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 				}
 
 				/* Find empty line */
-				int pos = one.getAlignmentStart() - currentVisible.start;
+				int pos = one.getAlignmentStart() - currentVisible.start();
 
 				int line = tilingCounter.getFreeLine(pos);
 
@@ -250,7 +250,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 							if (one.getMateAlignmentStart() < one
 									.getAlignmentStart()) {
 								pos = one.getMateAlignmentStart()
-										- currentVisible.start;
+										- currentVisible.start();
 								line = tilingCounter.getFreeLine(pos);
 								if (line >= maxStack) {
 									stackExceeded = true;
@@ -315,8 +315,9 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 					// properly set the scrollbars.
 					if (true || paintOne || paintTwo) {
 						tilingCounter.rangeSet(
-								clearStart - pairLength - currentVisible.start,
-								clearEnd + 4 - currentVisible.start, line);
+								clearStart - pairLength
+										- currentVisible.start(),
+								clearEnd + 4 - currentVisible.start(), line);
 					}
 
 				} else {
@@ -378,7 +379,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			Location visible = model.vlm.getVisibleLocation();
 			int x = 0;
 			if (bufferedLocation != null) {
-				x = Convert.translateGenomeToScreen(bufferedLocation.start,
+				x = Convert.translateGenomeToScreen(bufferedLocation.start(),
 						visible, screenWidth);
 			}
 			g.drawImage(backupBuffer, x, 0, null);
@@ -390,7 +391,8 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			buffer = bi;
 			/* Access to BAMread is through buffer for performance! */
 			try {
-				provider.get(currentVisible.start, currentVisible.end, this);
+				provider.get(currentVisible.start(), currentVisible.end(),
+						this);
 			} catch (IOException e) {
 				model.getLog().log(Level.WARNING, "srt render can't get data",
 						e);
@@ -499,10 +501,10 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			Location l1 = new Location(subOtherX1, subOtherX2);
 			Location l2 = new Location(subX1, subX2);
 
-			if (l1.overlaps(subX1, subX2)) {
+			if (l1.overlaps(l2)) {
 				Location l = LocationTools.getOverlap(l1, l2);
 				g.setColor(Color.BLACK);
-				g.fillRect(l.start, yRec, l.length(), readLineHeight - 1);
+				g.fillRect(l.start(), yRec, l.length(), readLineHeight - 1);
 
 			}
 
@@ -526,7 +528,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			if (newMeta.seqBuffer == null) {
 
 				Iterable<Character> bufferedSeq = entry.sequence().get(
-						annotationVisible.start, annotationVisible.end + 1);
+						annotationVisible.start(), annotationVisible.end() + 1);
 
 				newMeta.seqBuffer = new char[annotationVisible.length() + 1];
 				int idx = 0;
@@ -538,7 +540,8 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 			byte[] readNts = ShortReadTools.construct(rf, model.getLog());
 			for (int j = rf.getAlignmentStart(); j <= rf
 					.getAlignmentEnd(); j++) {
-				if (j > annotationVisible.end || j < annotationVisible.start) {
+				if (j > annotationVisible.end()
+						|| j < annotationVisible.start()) {
 					continue;
 				}
 				// FIXME Speed-up by putting code here...
@@ -547,7 +550,7 @@ public class srtRender implements Observer, DataCallback<SAMRecord> {
 				char readNt = (char) readNts[j - rf.getAlignmentStart()];
 				// char refNt = entry.sequence.getNucleotide(j);
 
-				char refNt = newMeta.seqBuffer[j - annotationVisible.start];
+				char refNt = newMeta.seqBuffer[j - annotationVisible.start()];
 				double tx1 = Convert.translateGenomeToScreen(j,
 						annotationVisible, screenWidth);
 				double tx2 = Convert.translateGenomeToScreen(j + 1,

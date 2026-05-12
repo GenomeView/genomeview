@@ -52,13 +52,13 @@ public class AnalyzedFeature {
 	 */
 	public boolean missingAcceptor(Location l) {
 		if (!l.equals(f.location()[0]) && f.strand() == Strand.FORWARD) {
-			String s = seq.subsequence(l.start - 2, l.start)
+			String s = seq.subsequence(l.start() - 2, l.start())
 					.stringRepresentation();
 			return !(s.equalsIgnoreCase("ag"));
 		}
 		if (!l.equals(f.location()[f.location().length - 1])
 				&& f.strand() == Strand.REVERSE) {
-			String s = seq.subsequence(l.end + 1, l.end + 3)
+			String s = seq.subsequence(l.end() + 1, l.end() + 3)
 					.stringRepresentation();
 			return !(s.equalsIgnoreCase("ct"));
 		}
@@ -78,12 +78,12 @@ public class AnalyzedFeature {
 
 		if (!l.equals(f.location()[f.location().length - 1])
 				&& f.strand() == Strand.FORWARD) {
-			String s = seq.subsequence(l.end + 1, l.end + 3)
+			String s = seq.subsequence(l.end() + 1, l.end() + 3)
 					.stringRepresentation();
 			return !(s.equalsIgnoreCase("gt") || s.equalsIgnoreCase("gc"));
 		}
 		if (!l.equals(f.location()[0]) && f.strand() == Strand.REVERSE) {
-			String s = seq.subsequence(l.start - 2, l.start)
+			String s = seq.subsequence(l.start() - 2, l.start())
 					.stringRepresentation();
 			return !(s.equalsIgnoreCase("ac") || s.equalsIgnoreCase("gc"));
 		}
@@ -126,7 +126,7 @@ public class AnalyzedFeature {
 	private Location getntpos(int aapos) {
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		for (Location l : f.location()) {
-			for (int i = l.start; i <= l.end; i++) {
+			for (int i = l.start(); i <= l.end(); i++) {
 				list.add(i);
 			}
 		}

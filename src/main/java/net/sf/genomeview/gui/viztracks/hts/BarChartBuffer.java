@@ -62,7 +62,7 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 		// status = provider.getStatus(visible.start, visible.end);
 
 		/* Iterable<Pile> itt = */
-		provider.get(visible.start, visible.end + 1, this);
+		provider.get(visible.start(), visible.end() + 1, this);
 
 		// System.out.println("Halt!");
 	}
@@ -92,7 +92,7 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 				}
 				/* Might have jumped past the end */
 				if (i < reads.length) {
-					nc.count((char) reads[i], p.start() - visible.start);
+					nc.count((char) reads[i], p.start() - visible.start());
 				}
 			} catch (NumberFormatException ne) {
 				model.getLog().log(Level.WARNING,
@@ -160,8 +160,8 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 
 		int snpTrackHeight = 0;
 		if (visible.length() < MAX_WIDTH) {
-			Sequence sb = ptm.sequence().subsequence(visible.start,
-					visible.end + 1);
+			Sequence sb = ptm.sequence().subsequence(visible.start(),
+					visible.end() + 1);
 			char[] seqBuffer = new char[visible.length()];
 			int idx = 0;
 			for (char cc : sb.get()) {
@@ -184,12 +184,12 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 				g.setColor(Color.BLACK);
 				g.drawString("SNPs", 5, yOffset + snpTrackHeight - 4);
 
-				for (int i = visible.start; i <= visible.end; i++) {
+				for (int i = visible.start(); i <= visible.end(); i++) {
 					// System.out.println("it: "+i);
 					int x1 = Convert.translateGenomeToScreen(i, visible,
 							screenWidth);
-					double total = nc.getTotalCount(i - visible.start);
-					char refNt = seqBuffer[i - visible.start];
+					double total = nc.getTotalCount(i - visible.start());
+					char refNt = seqBuffer[i - visible.start()];
 					double done = 0;// Fraction gone to previous nucs
 
 					if (total > snpTrackMinimumCoverage) {
@@ -199,7 +199,7 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 								try {
 									fraction = snpTrackHeight
 											* nc.getCount(nucs[j],
-													i - visible.start)
+													i - visible.start())
 											/ total;
 								} catch (IndexOutOfBoundsException e) {
 									model.getLog().log(Level.WARNING,
@@ -319,11 +319,11 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 			int r2size = (int) (r2frac * graphLineHeigh);
 
 			double factor = MAX_WIDTH / visible.length();
-			int sLoc = (int) ((i / factor) + visible.start);
-			int eLoc = (int) (((i + 1) / factor) + 1 + visible.start);
+			int sLoc = (int) ((i / factor) + visible.start());
+			int eLoc = (int) (((i + 1) / factor) + 1 + visible.start());
 			if (exact) {
-				sLoc = (i) + visible.start;
-				eLoc = ((i)) + 1 + visible.start;
+				sLoc = (i) + visible.start();
+				eLoc = ((i)) + 1 + visible.start();
 			}
 			int screenX1 = Convert.translateGenomeToScreen(sLoc, visible,
 					screenWidth);
@@ -434,11 +434,11 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 
 			double factor = MAX_WIDTH / visible.length();
 
-			int sLoc = (int) ((i / factor) + visible.start);
-			int eLoc = (int) (((i + 1) / factor) + 1 + visible.start);
+			int sLoc = (int) ((i / factor) + visible.start());
+			int eLoc = (int) (((i + 1) / factor) + 1 + visible.start());
 			if (exact) {
-				sLoc = (i) + visible.start;
-				eLoc = ((i)) + 1 + visible.start;
+				sLoc = (i) + visible.start();
+				eLoc = ((i)) + 1 + visible.start();
 			}
 			int screenX1 = Convert.translateGenomeToScreen(sLoc, visible,
 					screenWidth);
@@ -548,11 +548,11 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 			double rfrac = rcov / range;
 			int rsize = (int) (rfrac * graphLineHeigh);
 			double factor = MAX_WIDTH / visible.length();
-			int sLoc = (int) ((i / factor) + visible.start);
-			int eLoc = (int) (((i + 1) / factor) + 1 + visible.start);
+			int sLoc = (int) ((i / factor) + visible.start());
+			int eLoc = (int) (((i + 1) / factor) + 1 + visible.start());
 			if (exact) {
-				sLoc = (i) + visible.start;
-				eLoc = ((i)) + 1 + visible.start;
+				sLoc = (i) + visible.start();
+				eLoc = ((i)) + 1 + visible.start();
 			}
 			// System.out.println("LOC: "+sLoc+"\t"+eLoc);
 			int screenX1 = Convert.translateGenomeToScreen(sLoc, visible,
@@ -644,7 +644,7 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 		text.append("<strong>" + mm.getString("barchartbuffer.window_length")
 				+ " </strong>" + pileWidth + "<br/>");
 		int ntPosition = Convert.translateScreenToGenome(mouseX, visible,
-				ptm.getScreenWidth()) - visible.start;// track.translateFromMouse(e.getX());
+				ptm.getScreenWidth()) - visible.start();// track.translateFromMouse(e.getX());
 
 		if (nc != null) {
 
@@ -679,10 +679,10 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 		}
 		int effectivePosition = (int) (factor
 				* (Convert.translateScreenToGenome(mouseX, visible,
-						ptm.getScreenWidth()) - visible.start));// track.translateFromMouse(e.getX());
+						ptm.getScreenWidth()) - visible.start()));// track.translateFromMouse(e.getX());
 		if (exact) {
 			effectivePosition = Convert.translateScreenToGenome(mouseX, visible,
-					ptm.getScreenWidth()) - visible.start;
+					ptm.getScreenWidth()) - visible.start();
 		}
 		if (detailedRects != null) {
 			text.append("<strong>" + (pileWidth > 1 ? "Average " : "")
@@ -764,8 +764,8 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 				initArray(p, visible.length());
 			}
 
-			if (p.start() + p.getLength() < visible.start
-					|| p.start() > visible.end) {
+			if (p.start() + p.getLength() < visible.start()
+					|| p.start() > visible.end()) {
 
 				continue;
 			}
@@ -779,11 +779,11 @@ class BarChartBuffer implements VizBuffer, DataCallback<Pile> {
 			int startPos = p.start();
 			int endPos = p.end();
 
-			int startIdx = (int) ((startPos - visible.start) * factor);
-			int endIdx = (int) ((endPos - visible.start) * factor);
+			int startIdx = (int) ((startPos - visible.start()) * factor);
+			int endIdx = (int) ((endPos - visible.start()) * factor);
 			if (exact) {
-				startIdx = startPos - visible.start;
-				endIdx = endPos - visible.start;
+				startIdx = startPos - visible.start();
+				endIdx = endPos - visible.start();
 			}
 
 			// if(p.getTotal()>0)

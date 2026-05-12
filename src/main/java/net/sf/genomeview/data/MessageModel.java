@@ -50,8 +50,8 @@ public class MessageModel extends Observable {
 	public String getStatusBarMessage() {
 		StringBuffer msg = new StringBuffer();
 		Location viz = model.vlm.getAnnotationLocationVisible();
-		msg.append("  " + model.vlm.getVisibleEntry() + ":" + viz.start + ":"
-				+ viz.end + " ");
+		msg.append("  " + model.vlm.getVisibleEntry() + ":" + viz.start() + ":"
+				+ viz.end() + " ");
 
 		int currentCoord = model.mouseModel().getCurrentCoord();
 		if (currentCoord == -1) {
@@ -68,8 +68,9 @@ public class MessageModel extends Observable {
 							+ " aa ");
 		}
 
-		if (message != null)
+		if (message != null) {
 			msg.append("-- " + message);
+		}
 
 		return msg.toString();
 	}

@@ -91,15 +91,15 @@ public class VisualLocationModel extends Observable {
 	public void setAnnotationLocationVisible(Location r, boolean mayExpand) {
 		int modStart = -1;
 		int modEnd = -1;
-		if (r.start > 1) {
-			modStart = r.start;
+		if (r.start() > 1) {
+			modStart = r.start();
 		} else {
 			modStart = 1;
 			modEnd = r.length();
 		}
 		int chromLength = getVisibleEntry().getMaximumLength();
-		if (r.end < chromLength || chromLength == 0) {
-			modEnd = r.end;
+		if (r.end() < chromLength || chromLength == 0) {
+			modEnd = r.end();
 		} else {
 			modEnd = chromLength;
 			modStart = modEnd - r.length();
@@ -113,14 +113,14 @@ public class VisualLocationModel extends Observable {
 			setAnnotationLocationVisible(
 					new Location(modStart - 25, modEnd + 25));
 		}
-		if (newZoom.length() != visibleLocation.end - visibleLocation.start + 1
-				&& newZoom.length() < 50) {
+		if (newZoom.length() != visibleLocation.end() - visibleLocation.start()
+				+ 1 && newZoom.length() < 50) {
 			return;
 		}
 		// if (newZoom.length() != annotationEnd - annotationStart + 1
 		// && newZoom.length() > Configuration.getInt("general:zoomout"))
 		// return;
-		if (newZoom.start < 1 || newZoom.end < 1) {
+		if (newZoom.start() < 1 || newZoom.end() < 1) {
 			return;
 		}
 
@@ -140,7 +140,7 @@ public class VisualLocationModel extends Observable {
 	 * @param genomePosition the position to center on
 	 */
 	public void center(int genomePosition) {
-		int length = (visibleLocation.end - visibleLocation.start) / 2;
+		int length = (visibleLocation.end() - visibleLocation.start()) / 2;
 		setAnnotationLocationVisible(
 				new Location(genomePosition - length, genomePosition + length));
 

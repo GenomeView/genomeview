@@ -50,8 +50,8 @@ public class VariationTrack extends Track {
 
 		Iterable<Variation> data;
 		try {
-			data = (Iterable<Variation>) entry.get(dataKey).get(visible.start,
-					visible.end);
+			data = (Iterable<Variation>) entry.get(dataKey).get(visible.start(),
+					visible.end());
 		} catch (IOException e) {
 			model.getLog().log(Level.WARNING, "can't paint Variation track", e);
 			return 0;
@@ -63,17 +63,19 @@ public class VariationTrack extends Track {
 					model.vlm.getAnnotationLocationVisible(), width);
 			int w = Convert.translateGenomeToScreen(coordinate + 1,
 					model.vlm.getAnnotationLocationVisible(), width) - x1;
-			if (w < 1)
+			if (w < 1) {
 				w = 1;
+			}
 			for (Allele a : v.alleles()) {
 				// float freq = a.alternativeFrequency();
-				if (a.reference().length() > a.alternative().length())
+				if (a.reference().length() > a.alternative().length()) {
 					g.setColor(Color.RED);
-				else if (a.reference().length() < a.alternative().length())
+				} else if (a.reference().length() < a.alternative().length()) {
 					g.setColor(Color.BLACK);
-				else
+				} else {
 					g.setColor(Color.CYAN);
-				g.fillRect(x1, yOffset, w, (int) (40/* freq */));
+				}
+				g.fillRect(x1, yOffset, w, (40/* freq */));
 			}
 		}
 

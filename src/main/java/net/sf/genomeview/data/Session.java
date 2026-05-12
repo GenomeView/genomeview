@@ -256,7 +256,7 @@ public class Session {
 
 		String e = model.vlm.getVisibleEntry().getID();
 		Location l = model.vlm.getAnnotationLocationVisible();
-		out.println("LOCATION:" + e + ":" + l.start + ":" + l.end);
+		out.println("LOCATION:" + e + ":" + l.start() + ":" + l.end());
 
 		out.close();
 

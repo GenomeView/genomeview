@@ -11,7 +11,6 @@ import net.sf.genomeview.data.GenomeViewScheduler;
 import net.sf.genomeview.data.Model;
 import net.sf.jannot.Data;
 import net.sf.jannot.Entry;
-import net.sf.jannot.pileup.DoublePile;
 import net.sf.jannot.pileup.Pile;
 import net.sf.jannot.pileup.PileTools;
 
@@ -20,7 +19,7 @@ import net.sf.jannot.pileup.PileTools;
  * @author Thomas Abeel
  * 
  */
-class PileupSummary extends Observable{
+class PileupSummary extends Observable {
 
 	static final int CHUNK = 32000;
 	static final int SUMMARYSIZE = 100;
@@ -40,39 +39,42 @@ class PileupSummary extends Observable{
 //	private double maxSummary = 0;
 	private Model model;
 
-
 	public int length() {
-		if (forwardSummary == null)
+		if (forwardSummary == null) {
 			return 0;
+		}
 		return forwardSummary.length;
 	}
 
-	public PileupSummary(Model model,Entry e) {
+	public PileupSummary(Model model, Entry e) {
 		this.model = model;
-		//this.entry=e;
+		// this.entry=e;
 		reset(e);
 		// System.out.println(entry);
-	
+
 	}
-	
-	private void reset(Entry e){
+
+	private void reset(Entry e) {
 		forwardSummary = new int[e.getMaximumLength() / SUMMARYSIZE + 1];
 		reverseSummary = new int[e.getMaximumLength() / SUMMARYSIZE + 1];
 		ready = new BitSet();
 		queued = new BitSet();
 		running = new BitSet();
-		
+
 	}
 
 	void conditionalQueue(Data<Pile> pw, int idx) {
 		if (!queued.get(idx)) {
 			if (idx < forwardSummary.length) {
 				/* Only queue additional chunks in visible region */
-				if ((idx) * PileupSummary.CHUNK < model.vlm.getAnnotationLocationVisible().end
-						&& (idx + 1) * PileupSummary.CHUNK > model.vlm.getAnnotationLocationVisible().start) {
+				if ((idx) * PileupSummary.CHUNK < model.vlm
+						.getAnnotationLocationVisible().end()
+						&& (idx + 1) * PileupSummary.CHUNK > model.vlm
+								.getAnnotationLocationVisible().start()) {
 
 					queued.set(idx);
-					GenomeViewScheduler.submit(new PileupTask(pw, idx, this, model));
+					GenomeViewScheduler
+							.submit(new PileupTask(pw, idx, this, model));
 				}
 			}
 
@@ -80,7 +82,6 @@ class PileupSummary extends Observable{
 
 	}
 
-	
 	private boolean isReady(int i) {
 		return ready.get(i);
 	}
@@ -96,10 +97,11 @@ class PileupSummary extends Observable{
 	private double getFValue(int idx) {
 		return forwardSummary[idx];
 	}
+
 	private double getRValue(int idx) {
 		return reverseSummary[idx];
 	}
-	
+
 	void setRunning(int idx) {
 		running.set(idx);
 
@@ -113,39 +115,37 @@ class PileupSummary extends Observable{
 //		return maxSummary;
 //	}
 
-	void add(int idx, float fcov,float rcov) {
+	void add(int idx, float fcov, float rcov) {
 		forwardSummary[idx] += fcov;
 		reverseSummary[idx] += rcov;
-		if (fcov > maxPile)
+		if (fcov > maxPile) {
 			maxPile = fcov;
-		if (rcov> maxPile)
+		}
+		if (rcov > maxPile) {
 			maxPile = rcov;
 //		if (summary[idx] > maxPile)
 //			maxPile = summary[idx];
+		}
 
 	}
 
-
-	
-	
 	public void complyCancel(int idx) {
-		
-		ready.set(idx,false);
-		queued.set(idx,false);
-		running.set(idx,false);
-		lastStart=-1;
-		lastEnd=-1;
+
+		ready.set(idx, false);
+		queued.set(idx, false);
+		running.set(idx, false);
+		lastStart = -1;
+		lastEnd = -1;
 		setChanged();
 		notifyObservers();
-		
+
 	}
 
-	
 	void setReady(int idx) {
 		ready.set(idx);
-		System.out.println("Completed "+idx);
-		lastStart=-1;
-		lastEnd=-1;
+		System.out.println("Completed " + idx);
+		lastStart = -1;
+		lastEnd = -1;
 		setChanged();
 		notifyObservers();
 
@@ -156,46 +156,53 @@ class PileupSummary extends Observable{
 //
 //	}
 
-	private ArrayList<Pile>buffer=new ArrayList<Pile>();
-	private int lastEnd=0;
-	private int lastStart=0;
+	private ArrayList<Pile> buffer = new ArrayList<Pile>();
+	private int lastEnd = 0;
+	private int lastStart = 0;
+
 	public Iterable<Pile> get(Data<Pile> source, int start, int end) {
-		
-		
+
 		/* Queue data retrieval */
 		int startChunk = start / PileupSummary.CHUNK;
 		int endChunk = end / PileupSummary.CHUNK;
 		int stepChunk = (endChunk - startChunk) / 20 + 1;
-		for (int i = start / PileupSummary.CHUNK; i < end / PileupSummary.CHUNK + 1; i += stepChunk) {
+		for (int i = start / PileupSummary.CHUNK; i < end / PileupSummary.CHUNK
+				+ 1; i += stepChunk) {
 			final int idx = i;
 			conditionalQueue(source, idx);
 
 		}
-		int vs = start / PileupSummary.SUMMARYSIZE * PileupSummary.SUMMARYSIZE;// + PileupSummary.SUMMARYSIZE / 2;
-		//double topValue = maxPile;
+		int vs = start / PileupSummary.SUMMARYSIZE * PileupSummary.SUMMARYSIZE;// +
+																				// PileupSummary.SUMMARYSIZE
+																				// /
+																				// 2;
+		// double topValue = maxPile;
 		// double range = topValue - bottomValue;
 
-		//conservationGP.moveTo(-5, yOffset + graphLineHeigh);
+		// conservationGP.moveTo(-5, yOffset + graphLineHeigh);
 
-		if (start >= lastStart && end <= lastEnd)
+		if (start >= lastStart && end <= lastEnd) {
 			return buffer;
-		
-		lastStart=start;
-		lastEnd=end;
+		}
+
+		lastStart = start;
+		lastEnd = end;
 
 		buffer.clear();
-		for (int i = vs; i < end + PileupSummary.SUMMARYSIZE; i += PileupSummary.SUMMARYSIZE) {
-			if (!isReady(i / PileupSummary.CHUNK))
+		for (int i = vs; i < end
+				+ PileupSummary.SUMMARYSIZE; i += PileupSummary.SUMMARYSIZE) {
+			if (!isReady(i / PileupSummary.CHUNK)) {
 				continue;
-			else{
+			} else {
 				int idx = i / PileupSummary.SUMMARYSIZE;
 				if (idx >= length()) {
 					// System.err.println(idx);
 					idx = length() - 1;
 				}
-				float fval = (float)getFValue(idx)/SUMMARYSIZE;// /
-				float rval = (float)getRValue(idx)/SUMMARYSIZE;// /
-				Pile tmp=PileTools.create(i, fval,rval);//new DoublePile(i,fval,rval,null);
+				float fval = (float) getFValue(idx) / SUMMARYSIZE;// /
+				float rval = (float) getRValue(idx) / SUMMARYSIZE;// /
+				Pile tmp = PileTools.create(i, fval, rval);// new
+															// DoublePile(i,fval,rval,null);
 				tmp.setLength(PileupSummary.SUMMARYSIZE);
 				buffer.add(tmp);
 			}
@@ -204,21 +211,24 @@ class PileupSummary extends Observable{
 	}
 
 	public Iterable<Status> getStatus(int start, int end) {
-		ArrayList<Status>out=new ArrayList<Status>();
-		
-		int vs = start / PileupSummary.CHUNK * PileupSummary.CHUNK;// + PileupSummary.SUMMARYSIZE / 2;
-		
-		for (int i = vs; i < end + PileupSummary.CHUNK; i += PileupSummary.CHUNK) {
-			out.add(getStatus(i/PileupSummary.CHUNK));
+		ArrayList<Status> out = new ArrayList<Status>();
+
+		int vs = start / PileupSummary.CHUNK * PileupSummary.CHUNK;// +
+																	// PileupSummary.SUMMARYSIZE
+																	// / 2;
+
+		for (int i = vs; i < end
+				+ PileupSummary.CHUNK; i += PileupSummary.CHUNK) {
+			out.add(getStatus(i / PileupSummary.CHUNK));
 		}
 		return out;
-		
+
 	}
 
 	private Status getStatus(int i) {
-		return new Status(isRunning(i),isQueued(i),isReady(i),i*CHUNK,(i+1)*CHUNK);
-			
+		return new Status(isRunning(i), isQueued(i), isReady(i), i * CHUNK,
+				(i + 1) * CHUNK);
+
 	}
 
-	
 }

@@ -105,8 +105,8 @@ public class SyntenicTrack extends Track {
 			} else {
 				for (SyntenicBlock d : data.get(reference, target)) {
 					final Location refloc = d.refLocation();
-					float startf = (float) refrange.fraction(refloc.start);
-					float endf = (float) refrange.fraction(refloc.end);
+					float startf = (float) refrange.fraction(refloc.start());
+					float endf = (float) refrange.fraction(refloc.end());
 					if (!d.getRefStrand().equals(d.getTargetStrand())) {
 						// direction is reversed or unknown. Swap the srart, end
 						// colors
@@ -147,12 +147,14 @@ public class SyntenicTrack extends Track {
 	private void paintGradient(int yoffset, float sc, float ec, Location range,
 			float width, Graphics2D g) {
 		final Location visible = model.vlm.getVisibleLocation();
-		float start = (float) visible.fraction(range.start);
-		if (start > 1.0)
+		float start = (float) visible.fraction(range.start());
+		if (start > 1.0) {
 			return; // entirely outside visible
-		float end = (float) visible.fraction(range.end);
-		if (end < 0.0)
+		}
+		float end = (float) visible.fraction(range.end());
+		if (end < 0.0) {
 			return; // entirely outside visible
+		}
 		int barStart, barEnd;
 		float startColor, endColor;
 		if (start >= 0.0) { // in visible range
@@ -161,18 +163,18 @@ public class SyntenicTrack extends Track {
 		} else {
 			barStart = 0;
 			startColor = (float) (sc
-					+ (ec - sc) * range.fraction(visible.start));
+					+ (ec - sc) * range.fraction(visible.start()));
 		}
 		if (end <= 1.0) {
 			barEnd = (int) (width * end);
 			endColor = ec;
 		} else {
 			barEnd = (int) width;
-			endColor = (float) (sc + (ec - sc) * range.fraction(visible.end));
+			endColor = (float) (sc + (ec - sc) * range.fraction(visible.end()));
 		}
 
 		float delta = (barEnd - barStart) / PAINT_STEPS;
-		float dcol = (float) (endColor - startColor) / PAINT_STEPS;
+		float dcol = (endColor - startColor) / PAINT_STEPS;
 
 		if (dcol < 0.01 | delta < 4) {
 			paintPiece(yoffset, g, barStart, barEnd, startColor, endColor);

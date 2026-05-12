@@ -117,14 +117,14 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 				Iterator<Location> it = loc.iterator();
 				while (it.hasNext()) {
 					Location l = it.next();
-					if (l.end < range.start) {
+					if (l.end() < range.start()) {
 						it.remove();
-					} else if (l.start < range.start) {
-						l.setStart(range.start);
-					} else if (l.start > range.end) {
+					} else if (l.start() < range.start()) {
+						l.setStart(range.start());
+					} else if (l.start() > range.end()) {
 						it.remove();
-					} else if (l.end > range.end) {
-						l.setEnd(range.end);
+					} else if (l.end() > range.end()) {
+						l.setEnd(range.end());
 					}
 				}
 

@@ -214,8 +214,8 @@ public class WiggleTrack extends Track {
 				scaleIndex++;
 			}
 
-			int start = currentVisible.start / scale * scale;
-			int end = ((currentVisible.end / scale) + 1) * scale;
+			int start = currentVisible.start() / scale * scale;
+			int end = ((currentVisible.end() / scale) + 1) * scale;
 
 			float[] f;
 			try {

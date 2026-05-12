@@ -219,7 +219,7 @@ public class MultipleAlignmentTrack extends Track {
 					int stepSize = (int) Math.max(1,
 							Math.floor((r.length() / screenWidth) / 2));
 
-					for (int i = r.start; i <= r.end; i += stepSize) {
+					for (int i = r.start(); i <= r.end(); i += stepSize) {
 						int x = Convert.translateGenomeToScreen(i, r,
 								screenWidth);
 						int width = Math.max(1,

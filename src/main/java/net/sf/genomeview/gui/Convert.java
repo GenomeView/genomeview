@@ -18,7 +18,7 @@ public class Convert {
 	public static int translateGenomeToScreen(int pos, Location r,
 			double screenWidth) {
 		int genomeWidth = r.length();
-		int relativePos = pos - r.start;
+		int relativePos = pos - r.start();
 		return (int) (screenWidth / genomeWidth * relativePos);
 
 	}
@@ -36,7 +36,7 @@ public class Convert {
 			double screenWidth) {
 		// Location r = model.getAnnotationLocationVisible();
 		int genomeWidth = r.length();
-		return (int) (pos / screenWidth * genomeWidth) + r.start;
+		return (int) (pos / screenWidth * genomeWidth) + r.start();
 
 	}
 }
