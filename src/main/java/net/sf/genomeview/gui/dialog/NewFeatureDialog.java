@@ -65,7 +65,7 @@ public class NewFeatureDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				SortedSet<Location> loc = new TreeSet<Location>();
 				loc.add(model.getSelectedRegion());
-				Feature f = new Feature(loc, typeCombo.getTerm(),
+				Feature f = new Feature(loc, typeCombo.getSelectedType(),
 						strandSelection.getStrand());
 				MemoryFeatureAnnotation fa = model.vlm.getVisibleEntry()
 						.getMemoryAnnotation(f.type());

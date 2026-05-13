@@ -14,38 +14,40 @@ import net.sf.genomeview.data.Model;
 import net.sf.jannot.Type;
 
 /**
- * Combobox with all possible type terms.
+ * Combobox with which use can select a {@link Type} from all known
+ * {@link Type}s.
  * 
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class TypeCombo extends JComboBox {
 
-	private static final long serialVersionUID = 3311298470708351886L;
-
 	public TypeCombo(Model model) {
-		this(model,true);
-		
+		this(model, true);
 
 	}
+
 	public TypeCombo(Model model, boolean editable) {
 		super(new TypeModel(model));
 		this.setEditable(editable);
-		setMinimumSize(new Dimension(25,this.getPreferredSize().height));
-		//setPreferredSize(new Dimension(25,this.getPreferredSize().height));
+		setMinimumSize(new Dimension(25, this.getPreferredSize().height));
 	}
-	public Type getTerm() {
+
+	public Type getSelectedType() {
 		return (Type) this.getSelectedItem();
 	}
 
 }
 
+/**
+ * A model for a combobox containing all known {@link Type}s
+ */
+@SuppressWarnings("serial")
 class TypeModel extends DefaultComboBoxModel implements Observer {
 
-	private static final long serialVersionUID = -5021594934465844712L;
+	private final Model model;
 
-	private Model model;
-	
 	public TypeModel(Model model) {
 		model.addObserver(this);
 		this.model = model;
@@ -66,6 +68,5 @@ class TypeModel extends DefaultComboBoxModel implements Observer {
 	public void update(Observable o, Object arg) {
 		fireContentsChanged(o, 0, Type.values().length);
 	}
-	
 
 }

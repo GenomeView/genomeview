@@ -37,23 +37,31 @@ import net.sf.jannot.MemoryFeatureAnnotation;
  * @author Thomas Abeel
  * 
  */
+@SuppressWarnings("serial")
 public class EditFeatureWindow extends JDialog {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -790390435947336529L;
-
 	private final Model model;
+	private final EditFeatureWindow _self;
 
 	private Feature feature;
 
-	private EditFeatureWindow _self;
 	private JTextArea notes, location;
 	private StrandCombo strandSelection;
 	private TypeCombo typeSelection;
 
-	@SuppressWarnings("serial")
+	public EditFeatureWindow(final Model model) {
+		super(model.getGUIManager().getMainWindow(),
+				model.getMessageMgr().getString("editfeature.edit_structure"));
+		this.model = model;
+
+		_self = this;
+		setModal(true);
+		this.setContentPane(new EditFeatureWindowContent());
+
+		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+
+		pack();
+	}
+
 	private class EditFeatureWindowContent extends GridBagPanel {
 
 		public EditFeatureWindowContent() {
@@ -160,11 +168,9 @@ public class EditFeatureWindow extends JDialog {
 
 					/* Update qualifiers */
 					try {
-//						feature.setMute(true);
 						feature.clearQualifiers();
 
 						/* Construct new qualifiers */
-//						List<Qualifier> list = new ArrayList<Qualifier>();
 						for (String line : new LineIterator(
 								new StringReader(notes.getText()))) {
 							if (line.trim().length() > 0) {
@@ -173,21 +179,6 @@ public class EditFeatureWindow extends JDialog {
 										arr[1].trim());
 							}
 						}
-//						/* Remove all qualifiers */
-//						List<Qualifier> remove = new ArrayList<Qualifier>();
-//						for (String key : feature.getQualifiersKeys()) {
-//							List<Qualifier> qs = feature.qualifier(key);
-//							for (Qualifier q : qs) {
-//								remove.add(q);
-//							}
-//						}
-//						for (Qualifier q : remove) {
-//							feature.removeQualifier(q);
-//						}
-//						for (Qualifier q : list) {
-//							feature.addQualifier(q);
-//						}
-//						feature.setMute(false);
 					} catch (Exception e) {
 						model.getLog().log(Level.WARNING,
 								mm.getString("editfeature.notes_failed_warn"),
@@ -201,19 +192,19 @@ public class EditFeatureWindow extends JDialog {
 					}
 
 					/* Update type if needed and notify annotation model */
-					if (feature.type() != typeSelection.getTerm()) {
+					if (feature.type() != typeSelection.getSelectedType()) {
 						MemoryFeatureAnnotation mf = model.vlm.getVisibleEntry()
 								.getMemoryAnnotation(feature.type());
 						mf.remove(feature);
-						feature.setType(typeSelection.getTerm());
-						mf = model.vlm.getVisibleEntry()
-								.getMemoryAnnotation(typeSelection.getTerm());
+						feature.setType(typeSelection.getSelectedType());
+						mf = model.vlm.getVisibleEntry().getMemoryAnnotation(
+								typeSelection.getSelectedType());
 						mf.add(feature);
 						model.updateTracks();
 
 						model.annotationModel().typeUpdated(feature.type());
 						model.annotationModel()
-								.typeUpdated(typeSelection.getTerm());
+								.typeUpdated(typeSelection.getSelectedType());
 					} else {
 						model.annotationModel().typeUpdated(feature.type());
 					}
@@ -243,20 +234,6 @@ public class EditFeatureWindow extends JDialog {
 
 			add(cancel, gc);
 		}
-	}
-
-	public EditFeatureWindow(Model model) {
-		super(model.getGUIManager().getMainWindow(),
-				model.getMessageMgr().getString("editfeature.edit_structure"));
-		_self = this;
-		setModal(true);
-		this.model = model;
-		this.setContentPane(new EditFeatureWindowContent());
-
-		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-
-		pack();
-
 	}
 
 	@Override

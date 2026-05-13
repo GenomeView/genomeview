@@ -256,6 +256,6 @@ public class FeatureTable extends JTable implements Observer, ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		listModel.setType(((TypeCombo) e.getSource()).getTerm());
+		listModel.setType(((TypeCombo) e.getSource()).getSelectedType());
 	}
 }

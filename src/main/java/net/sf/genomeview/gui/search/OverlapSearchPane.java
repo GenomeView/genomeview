@@ -69,7 +69,7 @@ class OverlapSearchPane extends SearchPanel {
 			public void actionPerformed(ActionEvent e) {
 				srm.clear();
 				try {
-					srm.search(sourceType.getTerm(), targetType.getTerm());
+					srm.search(sourceType.getSelectedType(), targetType.getSelectedType());
 				} catch (IOException e1) {
 					model.getLog().log(Level.WARNING, "Search failed", e1);
 				}
