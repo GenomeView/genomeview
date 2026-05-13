@@ -91,16 +91,11 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 					SortedSet<Location> loc = parse(coordinates.getText());
 					filterLocation(loc, new Location(1,
 							model.vlm.getVisibleEntry().getMaximumLength()));
-					Feature f = new Feature(loc);
-					f.setType(typeCombo.getTerm());
-					f.setStrand(strandSelection.getStrand());
-					// model.getSelectedEntry().annotation.add(f);
-					// MemoryFeatureAnnotation fa = (MemoryFeatureAnnotation)
-					// model.getSelectedEntry().get(f.type());
+					Feature f = new Feature(loc, typeCombo.getTerm(),
+							strandSelection.getStrand());
 					MemoryFeatureAnnotation fa = model.vlm.getVisibleEntry()
 							.getMemoryAnnotation(f.type());
 					fa.add(f);
-					// model.setSelectedRegion(null);
 					model.updateTracks();
 					_self.dispose();
 				} catch (Exception ex) {
