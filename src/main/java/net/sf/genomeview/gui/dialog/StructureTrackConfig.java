@@ -34,7 +34,8 @@ public class StructureTrackConfig extends JDialog {
 		final Window _self = this;
 		setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagPanel().gc;
-		for (final net.sf.jannot.Type t : net.sf.jannot.Type.values()) {
+		for (final net.sf.jannot.Type t : model.getGlobal().typeFactory()
+				.values()) {
 			final JCheckBox jc = new JCheckBox();
 			jc.setSelected(stm.isTypeVisible(t));
 			jc.setAction(new AbstractAction(t.toString()) {

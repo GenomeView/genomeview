@@ -571,7 +571,7 @@ public class StructureTrack extends Track {
 
 	private void paintCDS(Graphics2D g, int yOffset) {
 		int y = lineHeight - 2;
-		for (Type type : Type.values()) {
+		for (Type type : model.getGlobal().typeFactory().values()) {
 			if (stm.isTypeVisible(type)) {
 				Location l = model.vlm.getAnnotationLocationVisible();
 				FeatureAnnotation annot = (FeatureAnnotation) model.vlm

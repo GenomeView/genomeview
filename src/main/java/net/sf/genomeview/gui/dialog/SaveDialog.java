@@ -200,7 +200,7 @@ public class SaveDialog extends JDialog {
 		boolean typeSelectionEnabledFlag = config
 				.getBoolean("save:enableTypeSelection");
 		final MultiSelectionArray<net.sf.jannot.Type> typesList = new MultiSelectionArray<net.sf.jannot.Type>(
-				Arrays.asList(net.sf.jannot.Type.values()),
+				Arrays.asList(model.getGlobal().typeFactory().values()),
 				typeSelectionEnabledFlag);
 		add(new JScrollPane(typesList), "growx,growy,span 1 2");
 
@@ -253,7 +253,8 @@ public class SaveDialog extends JDialog {
 						try {
 
 							Collection<net.sf.jannot.Type> selectedTypes = Arrays
-									.asList(net.sf.jannot.Type.values());
+									.asList(model.getGlobal().typeFactory()
+											.values());
 							if (typesList.selectedItems().size() > 0) {
 								selectedTypes = typesList.selectedItems();
 							}

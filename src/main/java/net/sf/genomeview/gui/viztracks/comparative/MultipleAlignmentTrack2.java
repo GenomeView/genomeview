@@ -169,7 +169,8 @@ public class MultipleAlignmentTrack2 extends Track {
 		this.yOffset = yOffset;
 		this.screenWidth = screenWidth;
 		comparativeAnnotation = conf.getBoolean("maf:enableAnnotation");
-		comparativeAnnotationType = Type.get(conf.get("maf:annotationType"));
+		comparativeAnnotationType = model.getGlobal().typeFactory()
+				.get(conf.get("maf:annotationType"));
 		maximumVisibleRange = conf.getInt("maf:maximumVisibleRange");
 
 		currentYOffset = yOffset;

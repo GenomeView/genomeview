@@ -17,7 +17,6 @@ import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.components.TypeCombo;
 import net.sf.genomeview.gui.dialog.HelpButton;
-import net.sf.jannot.Type;
 
 /**
  * Panel with an overview of all available tracks and where they should be
@@ -73,7 +72,7 @@ public class InformationFrame extends GridBagPanel {
 		gc.gridx++;
 		add(new JLabel(mm.getString("infoframe.features")), gc);
 		TypeCombo type = new TypeCombo(model, false);
-		type.setSelectedItem(Type.get("CDS"));
+		type.setSelectedItem(model.getGlobal().typeFactory().get("CDS"));
 		type.addActionListener(annotationTrackList);
 		gc.gridx++;
 		gc.gridwidth = 3;

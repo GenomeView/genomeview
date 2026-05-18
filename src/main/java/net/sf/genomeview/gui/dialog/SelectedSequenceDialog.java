@@ -119,7 +119,7 @@ public class SelectedSequenceDialog extends JDialog {
 
 				if (aa.isSelected()) {
 					selectedSequence = SequenceTools.translate(
-							new MemorySequence(tmp, model.getLog()),
+							new MemorySequence(tmp, model.getGlobal()),
 							model.getAAMapping());
 				} else {
 					selectedSequence = tmp.toString();

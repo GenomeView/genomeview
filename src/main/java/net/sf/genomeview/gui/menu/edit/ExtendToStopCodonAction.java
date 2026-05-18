@@ -11,7 +11,6 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.menu.AbstractModelAction;
 import net.sf.jannot.Feature;
 import net.sf.jannot.Strand;
-import net.sf.jannot.Type;
 import net.sf.jannot.refseq.Sequence;
 import net.sf.jannot.utils.SequenceTools;
 
@@ -34,7 +33,7 @@ public class ExtendToStopCodonAction extends AbstractModelAction {
 	public void updateSafe(Observable o, Object obj) {
 		if (model.selectionModel().getFeatureSelection().size() == 1
 				&& model.selectionModel().getFeatureSelection().first()
-						.type() == Type.get("CDS")) {
+						.type() == model.getGlobal().typeFactory().get("CDS")) {
 			AnalyzedFeature af = new AnalyzedFeature(
 					model.vlm.getVisibleEntry().sequence(),
 					model.selectionModel().getFeatureSelection().first(),

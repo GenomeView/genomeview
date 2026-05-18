@@ -21,7 +21,7 @@ import net.sf.jannot.Type;
  * 
  */
 @SuppressWarnings("serial")
-public class TypeCombo extends JComboBox {
+public class TypeCombo extends JComboBox<Type> {
 
 	public TypeCombo(Model model) {
 		this(model, true);
@@ -44,7 +44,7 @@ public class TypeCombo extends JComboBox {
  * A model for a combobox containing all known {@link Type}s
  */
 @SuppressWarnings("serial")
-class TypeModel extends DefaultComboBoxModel implements Observer {
+class TypeModel extends DefaultComboBoxModel<Type> implements Observer {
 
 	private final Model model;
 
@@ -54,19 +54,20 @@ class TypeModel extends DefaultComboBoxModel implements Observer {
 	}
 
 	@Override
-	public Object getElementAt(int index) {
+	public Type getElementAt(int index) {
 
-		return Type.values()[index];
+		return model.getGlobal().typeFactory().values()[index];
 	}
 
 	@Override
 	public int getSize() {
-		return Type.values().length;
+		return model.getGlobal().typeFactory().values().length;
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
-		fireContentsChanged(o, 0, Type.values().length);
+		fireContentsChanged(o, 0,
+				model.getGlobal().typeFactory().values().length);
 	}
 
 }

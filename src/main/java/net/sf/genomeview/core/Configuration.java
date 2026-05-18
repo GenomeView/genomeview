@@ -377,7 +377,7 @@ public class Configuration {
 		String tmp = get(string);
 		Set<Type> out = new HashSet<Type>();
 		for (String s : tmp.split(",")) {
-			out.add(Type.get(s.trim()));
+			out.add(global.typeFactory().get(s.trim()));
 		}
 		return out;
 	}

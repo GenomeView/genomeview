@@ -3,6 +3,7 @@
  */
 package net.sf.genomeview.gui.information;
 
+import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -23,21 +24,20 @@ import net.sf.jannot.Type;
 @SuppressWarnings("serial")
 public class FeatureTableModel extends AbstractTableModel implements Observer {
 
-	private String[] columns = { "Name" };
-	private Model model;
+	private final String[] columns = { "Name" };
+	private final Model model;
+	private Type type; // mutable!
+
+	public FeatureTableModel(Model model) {
+		this.model = Objects.requireNonNull(model);
+		type = model.getGlobal().typeFactory().get("CDS");
+		model.addObserver(this);
+
+	}
 
 	@Override
 	public String getColumnName(int column) {
 		return columns[column];
-	}
-
-	public FeatureTableModel(Model model) {
-		if (model == null) {
-			throw new NullPointerException("model is null");
-		}
-		this.model = model;
-		model.addObserver(this);
-
 	}
 
 	@Override
@@ -69,19 +69,6 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 	@Override
 	public Class<?> getColumnClass(int col) {
 		return String.class;
-//		switch (col) {
-//		case 0:
-//			return String.class;
-//		case 1:
-//		case 2:
-//		case 3:
-//		case 4:
-//			return Icon.class;
-//		default:
-//			return String.class;
-//
-//		}
-
 	}
 
 	public Feature getFeature(int row) {
@@ -100,8 +87,6 @@ public class FeatureTableModel extends AbstractTableModel implements Observer {
 				.getCachedIndexOf(first);
 
 	}
-
-	private Type type = Type.get("CDS");
 
 	public Type getType() {
 		return type;

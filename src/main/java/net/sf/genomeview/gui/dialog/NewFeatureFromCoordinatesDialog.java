@@ -66,7 +66,7 @@ public class NewFeatureFromCoordinatesDialog extends JDialog {
 		});
 
 		final TypeCombo typeCombo = new TypeCombo(model);
-		typeCombo.setSelectedItem(net.sf.jannot.Type.get("CDS"));
+		typeCombo.setSelectedItem(model.getGlobal().typeFactory().get("CDS"));
 		final StrandCombo strandSelection = new StrandCombo();
 
 		/* Coordinates field + help */

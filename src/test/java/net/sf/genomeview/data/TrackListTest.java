@@ -26,14 +26,6 @@ public class TrackListTest {
 		TrackList tracklist = new TrackList(model);
 		// add an extra entry
 		tracklist.update(getEntry());
-
-		// to test thread safety we get an iterator,
-		// and then injedt a new Entry
-//		Iterator<Track> it = tracklist.iterator();
-//		assertTrue(it.next() instanceof TickmarkTrack);
-//		assertTrue(it.next() instanceof StructureTrack);
-//		tracklist.clear(); // remove tne entry that we added previously
-//		it.next();
 	}
 
 	/**
@@ -42,7 +34,7 @@ public class TrackListTest {
 	private Entry getEntry() {
 		Entry e = new Entry("entry", globals.getGlobal());
 		SyntenicData syntenic = new SyntenicData(new ArrayList<>(),
-				globals.getLog());
+				globals.getGlobal());
 		e.add(new StringKey("data1"), syntenic);
 		return e;
 	}
