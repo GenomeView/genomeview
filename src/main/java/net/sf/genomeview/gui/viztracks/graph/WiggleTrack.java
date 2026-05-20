@@ -32,101 +32,30 @@ import net.sf.jannot.Location;
 import net.sf.jannot.wiggle.Graph;
 
 /**
+ * A SINGLE WIGGLE TRACK CAN CONTAIN MULTIPLE GRAPHS
  * 
  * @author Thomas Abeel
  * 
  */
-// A SINGLE WIGGLE TRACK CAN CONTAIN MULTIPLE GRAPHS
 public class WiggleTrack extends Track {
+	private static final double LOG2 = Math.log(2);
 	private boolean logScaled = false;
 
 	private Tooltip tooltip = new Tooltip();
 
 	private Location currentVisible;
 	private int currentYOffset;
-	private static final double LOG2 = Math.log(2);
 	private int plotType = 0;
 	private double screenWidth;
 
+	/**
+	 * 
+	 * @param key   the {@link DataKey} with the data ID
+	 * @param model the {@link Model}
+	 * @param b     true iff track is visible
+	 */
 	public WiggleTrack(DataKey key, Model model, boolean b) {
 		super(key, model, b, true);
-	}
-
-	private class Tooltip extends JWindow {
-
-		private static final long serialVersionUID = -7416732151483650659L;
-
-		private JLabel floater = new JLabel();
-
-		private Tooltip() {
-			floater.setBackground(Color.GRAY);
-			floater.setForeground(Color.BLACK);
-			Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-			Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
-			floater.setBorder(BorderFactory.createCompoundBorder(colorBorder,
-					emptyBorder));
-			add(floater);
-			pack();
-		}
-
-		public void set(float value, MouseEvent e) {
-			StringBuffer text = new StringBuffer();
-			text.append(value);
-			if (!text.toString().equals(floater.getText())) {
-				floater.setText(text.toString());
-				this.pack();
-			}
-			setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
-
-			if (!isVisible()) {
-				setVisible(true);
-			}
-
-		}
-
-	}
-
-	private class WigglePopup extends JPopupMenu {
-		final MessageManager mm = model.getMessageMgr();
-
-		public WigglePopup() {
-			if (!logScaled) {
-				add(new AbstractAction(
-						mm.getString("wiggletrack.use_log_scaling")) {
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						logScaled = true;
-						model.refresh();
-
-					}
-
-				});
-			} else {
-				add(new AbstractAction(
-						mm.getString("wiggletrack.use_normal_scaling")) {
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						logScaled = false;
-						model.refresh();
-
-					}
-
-				});
-			}
-			add(new AbstractAction(
-					mm.getString("wiggletrack.toggle_plot_mode")) {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					plotType++;
-					plotType %= 2;
-					model.refresh();
-				}
-
-			});
-		}
 	}
 
 	@Override
@@ -219,6 +148,7 @@ public class WiggleTrack extends Track {
 
 			float[] f;
 			try {
+				// System.out.println("scale=" + scaleIndex);
 				f = graph.get(start - 1, end, scaleIndex);
 			} catch (IOException e) {
 				model.getLog().log(Level.WARNING, "Can't get wiggle data", e);
@@ -283,4 +213,84 @@ public class WiggleTrack extends Track {
 		return graphLineHeigh;
 
 	}
+
+	/**
+	 * FIXME pull this out
+	 */
+	@SuppressWarnings("serial")
+	private class WigglePopup extends JPopupMenu {
+		final MessageManager mm = model.getMessageMgr();
+
+		public WigglePopup() {
+			if (!logScaled) {
+				add(new AbstractAction(
+						mm.getString("wiggletrack.use_log_scaling")) {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						logScaled = true;
+						model.refresh();
+
+					}
+
+				});
+			} else {
+				add(new AbstractAction(
+						mm.getString("wiggletrack.use_normal_scaling")) {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						logScaled = false;
+						model.refresh();
+
+					}
+
+				});
+			}
+			add(new AbstractAction(
+					mm.getString("wiggletrack.toggle_plot_mode")) {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					plotType++;
+					plotType %= 2;
+					model.refresh();
+				}
+
+			});
+		}
+	}
+}
+
+@SuppressWarnings("serial")
+class Tooltip extends JWindow {
+
+	private JLabel floater = new JLabel();
+
+	protected Tooltip() {
+		floater.setBackground(Color.GRAY);
+		floater.setForeground(Color.BLACK);
+		Border emptyBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+		Border colorBorder = BorderFactory.createLineBorder(Color.BLACK);
+		floater.setBorder(
+				BorderFactory.createCompoundBorder(colorBorder, emptyBorder));
+		add(floater);
+		pack();
+	}
+
+	public void set(float value, MouseEvent e) {
+		StringBuffer text = new StringBuffer();
+		text.append(value);
+		if (!text.toString().equals(floater.getText())) {
+			floater.setText(text.toString());
+			this.pack();
+		}
+		setLocation(e.getXOnScreen() + 5, e.getYOnScreen() + 5);
+
+		if (!isVisible()) {
+			setVisible(true);
+		}
+
+	}
+
 }
