@@ -15,8 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
@@ -200,7 +199,7 @@ public class SaveDialog extends JDialog {
 		boolean typeSelectionEnabledFlag = config
 				.getBoolean("save:enableTypeSelection");
 		final MultiSelectionArray<net.sf.jannot.Type> typesList = new MultiSelectionArray<net.sf.jannot.Type>(
-				Arrays.asList(model.getGlobal().typeFactory().values()),
+				model.getGlobal().typeFactory().values(),
 				typeSelectionEnabledFlag);
 		add(new JScrollPane(typesList), "growx,growy,span 1 2");
 
@@ -252,9 +251,8 @@ public class SaveDialog extends JDialog {
 					public void run() {
 						try {
 
-							Collection<net.sf.jannot.Type> selectedTypes = Arrays
-									.asList(model.getGlobal().typeFactory()
-											.values());
+							List<net.sf.jannot.Type> selectedTypes = model
+									.getGlobal().typeFactory().values();
 							if (typesList.selectedItems().size() > 0) {
 								selectedTypes = typesList.selectedItems();
 							}
@@ -277,8 +275,7 @@ public class SaveDialog extends JDialog {
 
 							for (Entry e : entriesList.selectedItems()) {
 								// System.out.println(selectedTypes);
-								parser.write(fos, e, selectedTypes
-										.toArray(new net.sf.jannot.Type[0]));
+								parser.write(fos, e, selectedTypes);
 							}
 							fos.close();
 							setVisible(false);
@@ -476,7 +473,7 @@ class MultiSelectionArray<T> extends Container {
 		}
 	}
 
-	protected Collection<T> selectedItems() {
+	protected List<T> selectedItems() {
 		ArrayList<T> out = new ArrayList<T>();
 		for (TCheckBox item : dss) {
 			if (item.isSelected()) {

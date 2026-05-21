@@ -56,18 +56,18 @@ class TypeModel extends DefaultComboBoxModel<Type> implements Observer {
 	@Override
 	public Type getElementAt(int index) {
 
-		return model.getGlobal().typeFactory().values()[index];
+		return model.getGlobal().typeFactory().values().get(index);
 	}
 
 	@Override
 	public int getSize() {
-		return model.getGlobal().typeFactory().values().length;
+		return model.getGlobal().typeFactory().values().size();
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
 		fireContentsChanged(o, 0,
-				model.getGlobal().typeFactory().values().length);
+				model.getGlobal().typeFactory().values().size());
 	}
 
 }
