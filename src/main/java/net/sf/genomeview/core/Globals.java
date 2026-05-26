@@ -1,5 +1,6 @@
 package net.sf.genomeview.core;
 
+import java.io.File;
 import java.io.IOException;
 
 import net.sf.jannot.DistributingReporter;
@@ -20,6 +21,14 @@ public class Globals {
 		global = new Global();
 		configuration = new Configuration(global);
 		messageManager = new MessageManager(configuration.get("lang.current"));
+
+		/**
+		 * Nasty but "original": change cache dir as set in the configuration
+		 */
+		global.getSourceFactory().getCache()
+				.setDirectory(new File(configuration.getDirectory(), "cache"));
+		global.getSourceFactory().setDisableCaching(
+				configuration.getBoolean("general:disableURLCaching"));
 	}
 
 	public Globals(Global global, Configuration configuration,

@@ -27,7 +27,6 @@ import net.sf.jannot.parser.Parser;
 import net.sf.jannot.parser.ParserFactory;
 import net.sf.jannot.source.AbstractStreamDataSource;
 import net.sf.jannot.source.DataSource;
-import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
 import tudelft.utilities.logging.Reporter;
@@ -50,6 +49,8 @@ public class DataSourceHelper {
 	}
 
 	/**
+	 * FIXME What does this do?
+	 * 
 	 * @param data the {@link Locator} for the data to load
 	 * @throws URISyntaxException
 	 * @throws IOException
@@ -61,10 +62,12 @@ public class DataSourceHelper {
 	}
 
 	/**
+	 * FIXME What does this do, it does not return anything? Side effect? FIXME
+	 * this shouldn't throw? FIXME this method is way too long
+	 * 
 	 * @param data the {@link Locator} for the data to load
 	 * @param wait if true, load waits for reader to complete.
 	 * 
-	 *             FIXME this shouldn't throw?
 	 */
 	public void load(Locator data, boolean wait)
 			throws URISyntaxException, IOException, ReadFailedException {
@@ -182,7 +185,7 @@ public class DataSourceHelper {
 				&& !(data.isTDF() || data.isBigWig())) {
 			problem("large_file_warn", "large_file");
 		}
-		DataSource ds = DataSourceFactory.create(data, index,
+		DataSource ds = model.getGlobal().getSourceFactory().create(data, index,
 				model.getGlobal());
 		if (ds instanceof AbstractStreamDataSource) {
 			AbstractStreamDataSource asd = ((AbstractStreamDataSource) ds);

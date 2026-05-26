@@ -28,6 +28,8 @@ import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.StringKey;
 import net.sf.jannot.exception.ReadFailedException;
+import net.sf.jannot.source.DataSourceFactory;
+import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
 
 public class KeywordSearchResultModelTest {
@@ -51,8 +53,9 @@ public class KeywordSearchResultModelTest {
 		// initializing model is quite involved, need to
 		// either mock or make real objects.
 		// init reads all kind of config files ......
-		Global global = new Global(log, mock(JavaLogInterceptor.class),
-				new NameService(log));
+		Global global = new Global(log, new JavaLogInterceptor(log),
+				new NameService(log),
+				new DataSourceFactory(mock(SourceCache.class), true));
 		Globals globals = new Globals(global, new Configuration(global),
 				new MessageManager(null));
 		model = new Model("id", globals);

@@ -13,10 +13,8 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.explorer.DataExplorerManager;
 import net.sf.jannot.exception.ReadFailedException;
-import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
-import net.sf.jannot.source.cache.SourceCache;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -46,10 +44,11 @@ public class InitDataLoader {
 			throws InterruptedException, ExecutionException {
 		Configuration conf = model.getConfiguration();
 
-		SourceCache.cacheDir = new File(conf.getDirectory(), "cache");
+//		SourceCache cache = new SourceCache(
+//				new File(conf.getDirectory(), "cache"));
 		IndexManager.cacheDir = new File(conf.getDirectory(), "index");
-		DataSourceFactory.disableURLCaching = conf
-				.getBoolean("general:disableURLCaching");
+//		this.DataSourceFactory.disableURLCaching = conf
+//				.getBoolean("general:disableURLCaching");
 		final Reporter log = model.getLog();
 
 		/*
