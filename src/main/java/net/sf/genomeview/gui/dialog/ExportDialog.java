@@ -28,7 +28,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.ProgressMonitorInputStream;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.genomeview.core.MessageManager;
@@ -82,11 +81,12 @@ public class ExportDialog extends JDialog {
 					r = new FileInputStream(loc.file());
 				}
 
-				InputStream in = new ProgressMonitorInputStream(
-						m.getGUIManager().getMainWindow(),
-						"Downloading file " + loc.getName(), r);
+				// wrap Progress Monitor around r
+//				InputStream in = new ProgressMonitorInputStream(
+//						m.getGUIManager().getMainWindow(),
+//						"Downloading file " + loc.getName(), r);
 				FileOutputStream fos = new FileOutputStream(out);
-				return copy(in, fos);
+				return copy(r, fos);
 
 			} catch (URISyntaxException | IOException e) {
 				m.getLog().log(Level.WARNING, "save failed to " + loc, e);

@@ -3,7 +3,6 @@
  */
 package net.sf.genomeview.data;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -11,7 +10,6 @@ import java.util.logging.Level;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.ProgressMonitorInputStream;
 import javax.swing.filechooser.FileFilter;
 
 import be.abeel.gui.MemoryWidget;
@@ -190,17 +188,30 @@ public class DataSourceHelper {
 		if (ds instanceof AbstractStreamDataSource) {
 			AbstractStreamDataSource asd = ((AbstractStreamDataSource) ds);
 			if (asd.getParser() == null) {
-				Parser tmp = offerParserChoice(data);
-				if (tmp != null) {
-					asd.setParser(tmp);
-				} else {
-					return;
-				}
+				return;
 			}
-			asd.setIos(new ProgressMonitorInputStream(
-					model.getGUIManager().getMainWindow(),
-					mm.getString("datasourcehelper.reading_file"),
-					new BufferedInputStream(asd.getIos(), 512 * 1024)));
+
+			// disabled prompt for user to choose.
+			// Prompting the user here causes just frustration.
+			// The user usually can't make anything of this situation
+			// as he can't look into the file and even then it
+			// would required an expert to determining what to do.
+			// {
+//				Parser tmp = offerParserChoice(data);
+//				if (tmp != null) {
+//					asd.setParser(tmp);
+//				} else {
+//					return;
+//				}
+//			}
+
+// removed: inject the progress monitor.
+// ProcessMonitor is archaic, and insertion just in this case
+// seems arbitrary
+//			asd.setIos(new ProgressMonitorInputStream(
+//					model.getGUIManager().getMainWindow(),
+//					mm.getString("datasourcehelper.reading_file"),
+//					new BufferedInputStream(asd.getIos(), 512 * 1024)));
 
 		}
 		if (MemoryWidget.getAvailable() > 0 && index == null && !data.isTDF()
@@ -369,14 +380,16 @@ public class DataSourceHelper {
 							File file = ExtensionManager.extension(files,
 									"maf.bgz");
 
-							ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(
-									model.getGUIManager().getMainWindow(),
-									mm.getString(
-											"datasourcehelper.compressing_maf_file"),
-									data.stream());
-							pmis.getProgressMonitor()
-									.setMaximum((int) data.length());
-							MafixFactory.generateBlockZippedFile(pmis, file);
+							// wrap progress monitor around the data stream
+//							ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(
+//									model.getGUIManager().getMainWindow(),
+//									mm.getString(
+//											"datasourcehelper.compressing_maf_file"),
+//									data.stream());
+//							pmis.getProgressMonitor()
+//									.setMaximum((int) data.length());
+							MafixFactory.generateBlockZippedFile(data.stream(),
+									file);
 
 							SeekableStream is = new SeekableFileStream(file);
 							SeekableProgressStream spmis = new SeekableProgressStream(
