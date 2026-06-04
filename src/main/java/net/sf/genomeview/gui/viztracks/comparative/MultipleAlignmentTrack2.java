@@ -577,7 +577,7 @@ public class MultipleAlignmentTrack2 extends Track {
 		if (mh != null) {
 			boolean fullNames = model.getConfiguration()
 					.getBoolean("maf:extendedNames");
-			HashMap<String, AbstractAlignmentSequence> shown = new HashMap<String, AbstractAlignmentSequence>();
+			final Map<String, AbstractAlignmentSequence> shown = new HashMap<String, AbstractAlignmentSequence>();
 			if (showAll.get()) {
 				for (String e : ma.species()) {
 					shown.put(e, null);

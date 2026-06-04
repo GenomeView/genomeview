@@ -23,7 +23,7 @@ import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.mafix.MafixFactory;
 import net.sf.jannot.parser.Parser;
 import net.sf.jannot.parser.ParserFactory;
-import net.sf.jannot.source.AbstractStreamDataSource;
+import net.sf.jannot.source.ParserDataSource;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
@@ -185,8 +185,8 @@ public class DataSourceHelper {
 		}
 		DataSource ds = model.getGlobal().getSourceFactory().create(data, index,
 				model.getGlobal());
-		if (ds instanceof AbstractStreamDataSource) {
-			AbstractStreamDataSource asd = ((AbstractStreamDataSource) ds);
+		if (ds instanceof ParserDataSource) {
+			ParserDataSource asd = ((ParserDataSource) ds);
 			if (asd.getParser() == null) {
 				return;
 			}
