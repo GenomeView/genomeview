@@ -43,7 +43,6 @@ import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.StaticUtils;
 import net.sf.genomeview.gui.components.JEditorPaneLabel;
 import net.sf.jannot.Entry;
-import net.sf.jannot.exception.SaveFailedException;
 import net.sf.jannot.parser.EMBLParser;
 import net.sf.jannot.parser.GFF3Parser;
 import net.sf.jannot.parser.Parser;
@@ -282,42 +281,35 @@ public class SaveDialog extends JDialog {
 							String location = locationField.getText().trim();
 							if (location.startsWith("http://")
 									|| location.startsWith("https://")) {
-								try {
-									URL url = URIFactory.url(location);
-									model.getLog().log(Level.INFO,
-											url.getProtocol() + "://"
-													+ url.getHost() + ":"
-													+ url.getPort()
-													+ url.getPath());
-									url = URIFactory.url(url.getProtocol()
-											+ "://" + url.getHost() + ":"
-											+ url.getPort() + url.getPath());
+								URL url = URIFactory.url(location);
+								model.getLog().log(Level.INFO, url.getProtocol()
+										+ "://" + url.getHost() + ":"
+										+ url.getPort() + url.getPath());
+								url = URIFactory.url(url.getProtocol() + "://"
+										+ url.getHost() + ":" + url.getPort()
+										+ url.getPath());
 
-									model.getLog().log(Level.INFO,
-											"File size and location: "
-													+ tmp.length() + "\t"
-													+ tmp.getCanonicalPath());
+								model.getLog().log(Level.INFO,
+										"File size and location: "
+												+ tmp.length() + "\t"
+												+ tmp.getCanonicalPath());
 
-									String reply = ClientHttpUpload.upload(tmp,
-											url);
+								String reply = ClientHttpUpload.upload(tmp,
+										url);
 
-									if (reply.equals("")) {
-										showServerMessage(mm.getString(
-												"savedialog.empty_reply_server"));
+								if (reply.equals("")) {
+									showServerMessage(mm.getString(
+											"savedialog.empty_reply_server"));
 //										throw new SaveFailedException();
-									} else if (reply.toLowerCase()
-											.contains("error")) {
-										showServerMessage(reply);
+								} else if (reply.toLowerCase()
+										.contains("error")) {
+									showServerMessage(reply);
 //										throw new SaveFailedException(MessageManager.getString("savedialog.save_failed"));
 
-									} else {
-										showServerMessage(reply);
-									}
-
-								} catch (IOException ex) {
-									throw new SaveFailedException("IOException",
-											ex);
+								} else {
+									showServerMessage(reply);
 								}
+
 							} else {
 								if ((location == null)
 										|| (location.trim().length() == 0)) {
@@ -392,7 +384,6 @@ public class SaveDialog extends JDialog {
 						} finally {
 							model.messageModel().setStatusBarMessage(null);
 						}
-						// h.dispose();
 					}
 
 					private void showServerMessage(String reply) {
