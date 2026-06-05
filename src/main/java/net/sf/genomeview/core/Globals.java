@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import net.sf.jannot.DistributingReporter;
 import net.sf.jannot.Global;
-import net.sf.jannot.exception.ReadFailedException;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -17,7 +16,7 @@ public class Globals {
 	private final Configuration configuration;
 	private final MessageManager messageManager;
 
-	public Globals() throws IOException, ReadFailedException {
+	public Globals() throws IOException {
 		global = new Global();
 		configuration = new Configuration(global);
 		messageManager = new MessageManager(configuration.get("lang.current"));

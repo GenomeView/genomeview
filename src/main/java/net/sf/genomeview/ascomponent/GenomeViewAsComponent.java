@@ -11,7 +11,6 @@ import net.sf.genomeview.core.Globals;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.gui.MainContent;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
 import tudelft.utilities.logging.Reporter;
 
@@ -27,8 +26,8 @@ public class GenomeViewAsComponent {
 	private static final String GFF_EX = "http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.gff.gz ";
 	private static final String FASTA_EX = "http://www.broadinstitute.org/software/genomeview/demo_c_elegans/IV.fasta.gz";
 
-	public static void main(String[] args) throws MalformedURLException,
-			IOException, ReadFailedException, URISyntaxException {
+	public static void main(String[] args)
+			throws MalformedURLException, IOException, URISyntaxException {
 		// quick workaround, logger needs to be redirected to a console
 		Globals globals = new Globals();
 

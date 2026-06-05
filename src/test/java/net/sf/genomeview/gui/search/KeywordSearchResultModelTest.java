@@ -27,7 +27,6 @@ import net.sf.jannot.FeatureAnnotation;
 import net.sf.jannot.Global;
 import net.sf.jannot.JavaLogInterceptor;
 import net.sf.jannot.StringKey;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSourceFactory;
 import net.sf.jannot.source.cache.SourceCache;
 import net.sf.nameservice.NameService;
@@ -48,8 +47,7 @@ public class KeywordSearchResultModelTest {
 			feature2 = mock(Feature.class), feature3 = mock(Feature.class);
 	private DistributingReporter log = mock(DistributingReporter.class);
 
-	public KeywordSearchResultModelTest()
-			throws IOException, ReadFailedException {
+	public KeywordSearchResultModelTest() throws IOException {
 		// initializing model is quite involved, need to
 		// either mock or make real objects.
 		// init reads all kind of config files ......

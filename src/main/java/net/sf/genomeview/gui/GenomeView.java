@@ -16,7 +16,6 @@ import javax.swing.SwingUtilities;
 import be.abeel.concurrency.DaemonThread;
 import net.sf.genomeview.core.Configuration;
 import net.sf.genomeview.core.Globals;
-import net.sf.jannot.exception.ReadFailedException;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -47,8 +46,7 @@ public class GenomeView {
 	 * @throws IOException or ReadFailedException if the initialization fails.
 	 *                     This is an fatal exit, not a log-and-continue.
 	 */
-	public static void main(final String[] args)
-			throws IOException, ReadFailedException {
+	public static void main(final String[] args) throws IOException {
 		Globals globals = new Globals();
 		Reporter log = globals.getLog();
 		Configuration configuration = globals.getConfiguration();

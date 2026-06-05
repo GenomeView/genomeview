@@ -46,7 +46,6 @@ import net.sf.jannot.Global;
 import net.sf.jannot.Location;
 import net.sf.jannot.Strand;
 import net.sf.jannot.event.ChangeEvent;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.DataSource;
 import tudelft.utilities.logging.Reporter;
 
@@ -370,32 +369,27 @@ public class Model extends Observable implements Observer {
 	 * 
 	 *                             FIXME move to read worker
 	 */
-	void addData(DataSource f) throws ReadFailedException {
+	void addData(DataSource f) {
 		if (entries.size() == 0) {
 			vlm.setAnnotationLocationVisible(new Location(1, 51));
 		}
 		log.log(Level.INFO, "Reading source:" + f);
 		recentFiles.removeElement(f.getLocator().toString());
 		recentFiles.add(0, f.getLocator().toString());
-		try {
-			f.read(entries);
-			if (entries.size() > 0
-					&& vlm.getVisibleEntry() instanceof DummyEntry) {
-				vlm.setVisibleEntry(entries.firstEntry());
-				Entry selected = vlm.getVisibleEntry();
-				int len = selected.getMaximumLength();
-				if (len > 5000) {
-					int randomStart = StaticUtils.rg.nextInt((len / 2) - 1000)
-							+ len / 4;
-					log.log(Level.INFO, "Setting random location at data load: "
-							+ selected + "\t" + randomStart);
-					vlm.setAnnotationLocationVisible(
-							new Location(randomStart, randomStart + 1000));
-				}
-
+		f.read(entries);
+		if (entries.size() > 0 && vlm.getVisibleEntry() instanceof DummyEntry) {
+			vlm.setVisibleEntry(entries.firstEntry());
+			Entry selected = vlm.getVisibleEntry();
+			int len = selected.getMaximumLength();
+			if (len > 5000) {
+				int randomStart = StaticUtils.rg.nextInt((len / 2) - 1000)
+						+ len / 4;
+				log.log(Level.INFO, "Setting random location at data load: "
+						+ selected + "\t" + randomStart);
+				vlm.setAnnotationLocationVisible(
+						new Location(randomStart, randomStart + 1000));
 			}
-		} catch (Exception e) {
-			throw new ReadFailedException(e);
+
 		}
 		log.log(Level.INFO, "Entries: " + entries.size());
 		log.log(Level.INFO, "Model adding data done!");

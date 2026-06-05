@@ -27,7 +27,6 @@ import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.NotificationTypes;
 import net.sf.genomeview.gui.StaticUtils;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
 
 /**
@@ -156,8 +155,7 @@ public class OpenDialog extends JDialog {
 						model.getConfiguration().set("lastDirectory",
 								files[0].getParentFile());
 //						load(out);
-					} catch (IOException | URISyntaxException
-							| ReadFailedException e1) {
+					} catch (IOException | URISyntaxException e1) {
 						model.getLog().log(Level.WARNING, "open failed", e1);
 					}
 				}
@@ -177,8 +175,7 @@ public class OpenDialog extends JDialog {
 					try {
 						new DataSourceHelper(model).load(
 								new Locator(input.trim(), model.getLog()));
-					} catch (IOException | URISyntaxException
-							| ReadFailedException e2) {
+					} catch (IOException | URISyntaxException e2) {
 						model.getLog().log(Level.SEVERE,
 								"load failed of " + input, e2);
 					}

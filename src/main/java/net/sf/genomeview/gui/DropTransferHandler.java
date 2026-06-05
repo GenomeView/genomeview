@@ -21,7 +21,6 @@ import javax.swing.TransferHandler;
 
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
 import tudelft.utilities.logging.Reporter;
 
@@ -122,7 +121,7 @@ class DropTransferHandler extends TransferHandler {
 					log.log(Level.WARNING, "Data rejected: " + flavor);
 					// Don't return; try next flavor.
 				}
-			} catch (IOException | URISyntaxException | ReadFailedException
+			} catch (IOException | URISyntaxException
 					| UnsupportedFlavorException ex) {
 				log.log(Level.INFO, "Problem handling drop" + ex);
 			}

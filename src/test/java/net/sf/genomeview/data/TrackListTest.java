@@ -8,14 +8,13 @@ import org.junit.Test;
 import net.sf.genomeview.core.Globals;
 import net.sf.jannot.Entry;
 import net.sf.jannot.StringKey;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.syntenic.SyntenicData;
 
 public class TrackListTest {
 
 	private final Globals globals;
 
-	public TrackListTest() throws IOException, ReadFailedException {
+	public TrackListTest() throws IOException {
 		globals = new Globals();
 	}
 

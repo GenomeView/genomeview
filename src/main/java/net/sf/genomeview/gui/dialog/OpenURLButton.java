@@ -13,7 +13,6 @@ import javax.swing.SwingConstants;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
 
 public class OpenURLButton extends JButton {
@@ -38,8 +37,7 @@ public class OpenURLButton extends JButton {
 						new DataSourceHelper(gvModel).load(
 								new Locator(input.trim(), gvModel.getLog()));
 
-					} catch (IOException | URISyntaxException
-							| ReadFailedException e2) {
+					} catch (IOException | URISyntaxException e2) {
 						// pretty nasty if this would fail to open.
 						gvModel.getLog().log(Level.WARNING,
 								"Failed to open " + input, e2);

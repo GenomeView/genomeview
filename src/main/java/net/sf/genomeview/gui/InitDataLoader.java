@@ -12,7 +12,6 @@ import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.explorer.DataExplorerManager;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
 import tudelft.utilities.logging.Reporter;
@@ -83,7 +82,7 @@ public class InitDataLoader {
 			try {
 				new DataSourceHelper(model).load(new Locator(cmdUrl, log),
 						true);
-			} catch (URISyntaxException | IOException | ReadFailedException e) {
+			} catch (URISyntaxException | IOException e) {
 				log.log(Level.WARNING, "problem loading url " + cmdUrl, e);
 			}
 
@@ -93,7 +92,7 @@ public class InitDataLoader {
 			try {
 				new DataSourceHelper(model).load(new Locator(cmdFile, log),
 						true);
-			} catch (URISyntaxException | IOException | ReadFailedException e) {
+			} catch (URISyntaxException | IOException e) {
 				log.log(Level.WARNING, "problem loading file " + cmdFile, e);
 			}
 

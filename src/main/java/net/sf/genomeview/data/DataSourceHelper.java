@@ -19,14 +19,13 @@ import htsjdk.samtools.seekablestream.SeekableStream;
 import net.sf.genomeview.core.MessageManager;
 import net.sf.genomeview.gui.components.JOptionPaneX;
 import net.sf.jannot.ConvertWig2TDF;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.mafix.MafixFactory;
 import net.sf.jannot.parser.Parser;
 import net.sf.jannot.parser.ParserFactory;
-import net.sf.jannot.source.ParserDataSource;
 import net.sf.jannot.source.DataSource;
 import net.sf.jannot.source.IndexManager;
 import net.sf.jannot.source.Locator;
+import net.sf.jannot.source.ParserDataSource;
 import tudelft.utilities.logging.Reporter;
 
 /**
@@ -54,8 +53,7 @@ public class DataSourceHelper {
 	 * @throws IOException
 	 * @throws ReadFailedException FIXME this can't throw, ?
 	 */
-	public void load(Locator data)
-			throws URISyntaxException, IOException, ReadFailedException {
+	public void load(Locator data) throws URISyntaxException, IOException {
 		load(data, false);
 	}
 
@@ -68,7 +66,7 @@ public class DataSourceHelper {
 	 * 
 	 */
 	public void load(Locator data, boolean wait)
-			throws URISyntaxException, IOException, ReadFailedException {
+			throws URISyntaxException, IOException {
 
 		final MessageManager mm = model.getGlobals().getMessageManager();
 		/*

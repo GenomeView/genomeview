@@ -16,7 +16,6 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.genomeview.core.Icons;
 import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
 
 public class OpenFileButton extends JButton {
@@ -111,8 +110,7 @@ public class OpenFileButton extends JButton {
 						gvModel.getConfiguration().set("lastDirectory",
 								files[0].getParentFile());
 						// load(out);
-					} catch (IOException | URISyntaxException
-							| ReadFailedException e1) {
+					} catch (IOException | URISyntaxException e1) {
 						m.getLog().log(Level.WARNING, m.getMessageMgr()
 								.getString("editfeature.notes_failed_warn"),
 								e1);

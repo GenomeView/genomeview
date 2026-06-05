@@ -20,7 +20,6 @@ import net.sf.genomeview.data.DataSourceHelper;
 import net.sf.genomeview.data.Model;
 import net.sf.genomeview.data.Session;
 import net.sf.genomeview.gui.viztracks.Track;
-import net.sf.jannot.exception.ReadFailedException;
 import net.sf.jannot.source.Locator;
 
 /**
@@ -268,7 +267,7 @@ class InstructionWorker implements Runnable {
 	private void doLoad(String s) {
 		try {
 			new DataSourceHelper(model).load(new Locator(s, model.getLog()));
-		} catch (URISyntaxException | IOException | ReadFailedException e) {
+		} catch (URISyntaxException | IOException e) {
 			// FIXME unreachable? load should not crash
 			model.getLog().log(Level.SEVERE, "Failed to load " + s, e);
 		}
